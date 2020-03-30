@@ -1,0 +1,31 @@
+.no-boards-container {
+    background-color: white;
+    padding-top: 125px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 14px;
+    text-align: center;
+
+    .no-boards-text {
+      margin-top: 10px;
+      margin-bottom: 15px;
+      max-width: 100%;
+      font-size: 28px;
+    }
+
+    .no-boards-sub-text {
+        margin-bottom: 15px;
+    }
+
+    .create-new-board-button {
+      margin: 10px;
+    }
+
+    img {
+        height: 160px;
+        margin-bottom: 15px;
+    }
+  }

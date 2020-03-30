@@ -1,0 +1,190 @@
+$feedback_column_card_height: 60px;
+
+.board-metadata-form {
+  text-align: center;
+  padding-top: 20px;
+
+  .board-metadata-form-anonymous-feedback-section {
+    padding-top: 20px;
+  }
+
+  .board-metadata-form-section-header {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-size: 16px;
+    font-weight: 200;
+    width: 100%;
+
+    &.bottom-padding-zero {
+      padding-bottom: 0;
+    }
+  }
+
+  .board-metadata-form-section-subheader {
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 200;
+    width: 100%;
+  }
+
+  .feedback-column-card {
+    height: $feedback_column_card_height;
+    margin-top: 10px;
+    align-items: center;
+
+    .feedback-column-card-icon-button,
+    .feedback-column-card-accent-color-button {
+      background: none;
+      min-width: 30px;
+      padding-left: 0px;
+      padding-right: 0px;
+      margin-left: 5px;
+      margin-right: 5px;
+      border: none;
+
+      &:hover {
+        background: #f4f4f4;
+      }
+    }
+
+    .editable-document-card-title {
+      margin-top: 0px;
+      min-height: auto;
+      color: inherit;
+
+      .input-validation-message {
+        float: none;
+        display: block;
+        font-size: 12px;
+      }
+
+      .editable-text {
+        display: inherit;
+        margin-left: 20px;
+        margin-right: 20px;
+        font-size: 16px;
+        line-height: 16px;
+      }
+
+      .editable-text-input-container {
+        padding-top: 0px;
+        width: auto;
+      }
+    }
+
+    .feedback-column-card-move-up-button,
+    .feedback-column-card-move-down-button,
+    .feedback-column-card-delete-button {
+      background-color: rgba(0, 0, 0, 0);
+      border: none;
+
+      &:hover {
+        background: #f4f4f4;
+      }
+
+      &.is-disabled {
+        i {
+          color: rgba(0, 0, 0, 0.25);
+        }
+      }
+    }
+
+    &.marked-for-deletion {
+      background: rgba(0, 0, 0, 0.2);
+
+      .feedback-column-card-icon {
+        color: rgba(0, 0, 0, 0.3);
+      }
+
+      .editable-text {
+        color: rgba(0, 0, 0, 0.3);
+      }
+
+      i {
+        &.ms-Button-icon {
+          color: rgba(0, 0, 0, 0.3);
+        }
+      }
+
+      .feedback-column-card-undelete-button {
+        height: $feedback_column_card_height - 2px;
+        background: white;
+        border: none;
+
+        &:hover {
+          background: #f4f4f4;
+        }
+
+        &.is-disabled {
+          i {
+            &.ms-Button-icon {
+              color: rgba(0, 0, 0, 0.25);
+            }
+          }
+        }
+
+        i {
+          &.ms-Button-icon {
+            color: rgba(0, 0, 0, 1);
+          }
+        }
+      }
+    }
+  }
+
+  .create-feedback-column-card-button-wrapper {
+    .create-feedback-column-card-button {
+      border: none;
+    }
+  }
+
+  .board-metadata-logo {
+    margin-bottom: 20px;
+  }
+
+  .input-validation-message {
+    color: $bug_red;
+  }
+
+  .title-input-container {
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 2px;
+    
+    .ms-TextField-wrapper {
+      display: flex;
+      align-items: center;
+      
+      .ms-Label {
+        width: 50px;
+      }
+
+      .ms-TextField-fieldGroup {
+        width: 300px;
+      }
+    }
+
+    .ms-TextField-errorMessage {
+      margin-left: -82px;
+    }
+  }
+}
+
+.retrospectives-choose-column-accent-color-dialog {
+  .choose-feedback-column-accent-color-button {
+    font-size: 30px;
+    height: 50px;
+    margin: 5px 5px 5px 5px;
+  }
+}
+
+.retrospectives-choose-column-icon-dialog {
+  .choose-feedback-column-icon-button {
+    font-size: 30px;
+    height: 50px;
+    margin: 5px 5px 5px 5px;
+  }
+}

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="500"
+   height="44.998093"
+   viewBox="0 0 132.29166 11.905746"
+   version="1.1"
+   id="svg5166"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="round-trapezoid-mobile.svg">
+  <defs
+     id="defs5160" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="109.26143"
+     inkscape:cy="135.97311"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1137"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     units="px">
+    <inkscape:grid
+       type="xygrid"
+       id="grid5805"
+       originx="7.9374988"
+       originy="10.583147" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5163">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-200.51637,-158.85002)">
+    <path
+       style="fill:#f4f4f4;fill-opacity:0.94685992;stroke:none;stroke-width:0.20670347;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="m 218.43087,158.85002 c -0.21453,0 -0.42493,0.003 -0.63131,0.007 -5.24168,0.14667 -7.88903,2.12698 -9.65833,4.43072 -2.23697,2.87116 -3.11569,6.24458 -5.8291,7.20276 -0.52275,0.17972 -1.11377,0.27473 -1.79576,0.26452 h 132.29167 c -0.68199,0.01 -1.27302,-0.0849 -1.79576,-0.26452 -2.71341,-0.95818 -3.59213,-4.3316 -5.8291,-7.20276 -1.76931,-2.30374 -4.41666,-4.28405 -9.65833,-4.43072 -0.001,-4e-5 -0.003,3e-5 -0.003,0 -0.20521,-0.006 -0.41472,-0.007 -0.6279,-0.007 z"
+       id="rect5711"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

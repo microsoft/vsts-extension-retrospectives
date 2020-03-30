@@ -1,0 +1,97 @@
+@import "_variables.scss";
+
+.retrospectives-carousel-dialog-modal {
+  .ms-Overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  .retrospectives-carousel-dialog {
+    .ms-Dialog-subText {
+      font-size: 14px;
+    }
+
+    .feedback-carousel-pivot {
+      .ms-Pivot {
+        margin-bottom: 20px;
+  
+        .ms-Button:first-of-type {
+          margin-left: -8px;
+        }
+      }
+    }
+  
+    div[class^='content-'], div[class*=' content'] {
+      overflow-y: hidden;
+  
+      .slick-dots {
+        position: static;
+        bottom: auto;
+        padding-top: 20px;
+      }
+    
+      .slick-next {
+        right: 0px;
+        z-index: 1;
+        background: white;
+        height: 100%;
+        opacity: 1;
+        width: 25px;
+    
+        &::before {
+          color: #999999;
+          background: white;
+          font-size: 25px;
+        }
+      }
+    
+      .slick-prev {
+        left: 0px;
+        z-index: 1;
+        background: white;
+        height: 100%;
+        opacity: 1;
+        width: 25px;
+    
+        &::before {
+          color: #999999;
+          background: white;
+          font-size: 25px;
+        }
+      }
+    }
+  }
+}
+
+.slick-slider {
+  .feedback-carousel-item {
+    margin: 5px 150px;
+  }
+}
+
+.feedback-carousel-item {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: calc((100% - #{$main_item_card_max_width}) / 2);
+
+  .related-task-sub-card {
+    width: $main_item_card_max_width - 1px;
+  }
+
+  .add-action-item-wrapper {
+    width: $main_item_card_max_width - 2px;
+  }
+
+  .feedback-item {
+    .mainItemCard {
+      width: $main_item_card_max_width;
+    }
+  }
+
+  .feedback-item-group {
+    &:not(.feedback-item-group-expanded) {
+      .item-cards-stack {
+        width: $main_item_card_max_width - 5px;
+      }
+    }
+  }
+}

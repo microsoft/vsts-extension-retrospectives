@@ -1,0 +1,47 @@
+// header
+$header_horizontal_spacing: 15px;
+$extension_header_height: 55px;
+$second_level_header_height: 40px;
+
+// feedback column
+$column_items_distribution_breakpoint: 2000px;
+
+// feedback item
+$main_item_card_max_width: 300px;
+$feedback_item_action_button_height: 30px;
+$feedback_item_action_button_width: 30px;
+$feedback_item_header_height: $feedback_item_action_button_height + 5;
+
+// mobile-specific
+$mobile_breakpoint: 1024px;
+$mobile_smallest: 764px;
+$mobile_font_size: 26px;
+$mobile_extension_header_height: 65px;
+$mobile_extension_header_height_with_margin: $mobile_extension_header_height + 10px;
+$mobile_second_level_header_height: 55px;
+$mobile_feedback_item_action_button_height: 60px;
+$mobile_feedback_item_action_button_width: 60px;
+$mobile_feedback_item_header_height: $mobile_feedback_item_action_button_height + 15;
+$mobile_font_size_main: 50px;
+
+// colors
+$azure_devops_navigator_light_grey: #f4f4f4;
+$azure_devops_navigator_dark_grey: #dcdcdc;
+$border_grey: #dadada;
+$dark_grey: #333333;
+$main_blue: #0071CD;
+$light_background: #eeeeee;
+$pastel_red: #ff6961;
+$bug_red: rgb(204, 41, 61);
+$task_yellow: rgb(242, 203, 29);
+$resolved_green: rgb(51, 153, 51);
+$hover_grey: rgba(0, 0, 0, .04);
+
+// high contrast color substitutes. bow = black on white theme. wob = white on black theme
+$hc_bow_hover_grey: rgb(55, 0, 110);
+$hc_wob_hover_grey: rgb(26, 235, 255);
+$hc_wob_main_blue: rgb(26, 235, 255);
+$hc_bow_main_blue: rgb(0, 0, 0);
+
+// fonts
+$default_vsts_font: "Segoe UI VSS (Regular)","-apple-system",BlinkMacSystemFont,"Segoe UI",sans-serif;

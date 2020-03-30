@@ -1,0 +1,223 @@
+@import "_variables.scss";
+$mobile_stage_block_width: 90px;
+$mobile_stage_block_height: 40px;
+$mobile_stage_block_left_margin_width: 10px;
+$mobile_team_selector_list_item_height: 90px;
+
+.feedback-board-container {
+  height: calc(100vh - #{$mobile_extension_header_height_with_margin} - 55px); // 55px is the approximate height of the second-level header on mobile.
+  overflow-x: hidden;
+}
+
+.initialization-spinner {
+    font-size: 40px;
+
+  .ms-Spinner-circle {
+    height: 80px;
+    width: 80px;
+  }
+}
+
+.retrospective-notification-toast-container {
+  width: calc(100% - 1em - 16px);
+  top: 1em;
+
+  .retrospective-notification-toast {
+    .retrospective-notification-toast-body {
+      font-size: 30px;
+    }
+  }
+}
+
+.team-filter-container {
+  padding-top: 20px;
+}
+
+.retrospectives-dialog-modal {
+  .ms-Dialog-main {
+    width: 90%;
+    min-width: auto;
+    max-width: none;
+    position: absolute;
+    top: 2%;
+    max-height: 85%;
+
+    .ms-TextField-fieldGroup {
+      height: 90px;
+      align-items: center;
+      font-size: 20px;
+
+      .ms-TextField-field {
+        font-size: 40px;
+      }
+    }
+
+    i {
+      font-size: 40px;
+    }
+
+    .ms-Dialog-inner {
+
+      button {
+        font-size: 30px;
+        margin-left: 20px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        height: 60px;
+        min-width: 30%;
+      }
+    }
+
+    &.selector {
+      .ms-Dialog-title {
+        height: 50px;
+      }
+    }
+
+    &.retrospectives-delete-feedback-item-dialog, 
+    &.retrospectives-board-metadata-dialog, 
+    &.retrospectives-board-deleted-info-dialog, 
+    &.retrospectives-unlink-feedback-item-confirmation-dialog,
+    &.retrospectives-delete-board-confirmation-dialog,
+    &.retrospectives-visit-history-cleared-info-dialog {
+      .ms-Dialog-title {
+        font-size: 40px;
+      }
+    
+      .ms-Dialog-subText {
+        font-size: 30px;
+      }
+    }
+
+    &.retrospectives-board-metadata-dialog {
+      .board-metadata-form {      
+        .title-input-container {
+          .ms-Label {
+            font-size: 40px;
+            margin-right: 10px;
+            width: auto;
+          }
+          .ms-TextField-fieldGroup {
+            width: auto;
+          }
+        }
+      }
+    }
+  }
+
+  .mobile-board-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    button {
+      width: 60%;
+      
+      .ms-Button-textContainer {
+        margin-left: 12px;
+      }
+    }
+  }
+
+  .input-validation-message {
+    font-size: $mobile_font_size_main - 20px;
+    color: $bug_red;
+  }
+}
+
+.pivot-container {
+  .ms-Pivot-link {
+    display: none !important;
+  }
+
+  .pivot-content-wrapper {
+    top: $mobile_extension_header_height_with_margin;
+  }
+}
+
+#extension-header {
+  width: 100vw;
+  flex-wrap: wrap;
+  transform-origin: 0 0;
+  height: $mobile_extension_header_height;
+  padding-top: 10px;
+
+  .extension-title-text {
+    font-size: 40px;
+  }
+
+  .contact-us-button {
+    margin-left: auto;
+
+    i {
+      font-size: 25px;
+    }
+  }
+}
+
+.feedback-board-container-header {
+  width: 100vw;
+  max-width: $mobile_breakpoint;
+  margin-left: $header_horizontal_spacing;
+  margin-top: -55px;
+
+  .menu-button {
+    display: none;
+  }
+
+  .board-selector-group {
+    min-width: 330px;
+    transform-origin: 0 0;
+
+    .board-actions-menu {
+      margin-bottom: 0px;
+      margin-top: 9px;
+    }
+  }
+
+  .feedback-workflow-wrapper {
+    margin-left: 40px;
+
+    .retrospective-workflowState {
+      height: $mobile_stage_block_height;
+      font-size: $mobile_font_size;
+      width: $mobile_stage_block_width;
+      margin-left: $mobile_stage_block_left_margin_width;
+
+      &:nth-child(2), &:nth-child(4) {
+        pointer-events: none;
+        opacity: 0.4;
+        color: grey;
+      }
+
+      &.active {
+        &::before {
+          width: 72px;
+          margin-left: 9.5px;
+          border-bottom-width: 4px;
+        }
+      }
+
+      .stage-text {
+        font-size: 22px;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .feedback-workflow-wrapper-background {
+    margin-left: -450px;
+    top: 6.5px;
+  }
+}
+
+.info-message-bar {
+  .ms-MessageBar-content {
+    .ms-MessageBar-text {
+      .ms-MessageBar-innerText {
+        font-size: 18px;
+        line-height: 20px;
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+﻿@import "_variables.scss";
+
+.editable-document-card-title {
+    margin-top: -20px;
+    color: $dark_grey;
+    overflow: hidden;
+    word-wrap: break-word;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100px;
+
+    .editable-text {
+        display: inline-block;
+        max-width: 100%;
+        vertical-align: middle;
+        white-space: pre-wrap;
+        word-break: break-word;
+        cursor: text;
+        font-size: 16px;
+    }
+
+    .editable-text-input-container {
+        display: inline-block;
+        min-width: 75%;
+        width: 100%;
+        resize: none;
+        vertical-align: middle;
+        font-family: $default_vsts_font;
+        padding-top: 20px;
+
+        .editable-text-input {
+            &.error-border {
+                @include input-error-border;
+                margin: -1px;
+            }
+        }
+
+        .ms-TextField-wrapper {
+            .ms-TextField-fieldGroup {
+                .editable-text-input {
+                    font-size: 16px;
+                    line-height: 21px;
+                }
+            }
+        }
+    }
+
+    .edit-symbol {
+        color: grey;
+        display: inline-block;
+        vertical-align: middle;
+        padding-left: 10px;
+    }
+
+    .input-validation-message {
+        float: left;
+        color: $bug_red;
+        font-size: 15px;
+    }
+
+    .save-symbol {
+        color: grey;
+        display: inline-block;
+        vertical-align: middle;
+        padding-left: 10px;
+    }
+}

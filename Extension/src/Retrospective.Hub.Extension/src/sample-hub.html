@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+    <script src="../node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"></script>
+    <script src="../node_modules/applicationinsights-js/dist/ai.0.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        VSS.init({
+            explicitNotifyLoaded: true,
+            setupModuleLoader: true
+        });
+        VSS.ready(function () {
+            VSS.require(["../dist/reflect-bundle"], function (app) {
+                VSS.notifyLoadSucceeded();
+            });
+        });
+    </script>
+    <div id="root"></div>
+</body>
+</html>

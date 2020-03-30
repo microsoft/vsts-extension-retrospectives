@@ -1,0 +1,96 @@
+.selector-list-header {
+  background-color: white;
+  display: flex;
+  height: $team_selector_list_item_height;
+  width: $team_selector_list_item_width;
+  padding-left: 10px;
+
+  .selector-list-header-text {
+    vertical-align: middle;
+    text-align: center;
+    line-height: $team_selector_list_item_height;
+    color: $main_blue;
+    font-weight: 600;
+    font-size: 14px;
+  }
+}
+
+.selector-list-container {
+  max-height: 250px;
+  overflow: auto;
+
+  .selector-list-item {
+    background-color: white;
+    height: $team_selector_list_item_height;
+    width: $team_selector_list_item_width;
+    display: flex;
+    cursor: pointer;
+    padding-left: 8px;
+    
+    &:hover {
+      background-color: $azure_devops_navigator_light_grey;
+    }
+
+    .selector-list-item-text {
+      vertical-align: middle;
+      line-height: $team_selector_list_item_height;
+      margin-right: 15px;
+      font-size: 14px;
+      font-weight: normal;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  
+    i {
+      vertical-align: middle;
+      text-align: center;
+      line-height: $team_selector_list_item_height;
+      margin-right: 8px;
+      font-size: 16px;
+    }
+  }
+}
+
+.selector-button {
+  background-color: inherit;
+  display: flex;
+  height: 30px;
+  padding-left: 8px;
+  padding-right: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $hover_grey;
+  }
+
+  i.selector-button-icon{
+    font-size: 18px;
+    line-height: 30px;
+    margin-right: 4px;
+  }
+
+  .selector-button-text-wrapper {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 8px;
+  }
+
+  .selector-button-text {
+    font-size: 18px;
+    line-height: 30px;
+    display: inline;
+    white-space: nowrap;
+  }
+
+  i.selector-button-chevron{
+    font-size: 12px;
+    color: rgba(0, 0, 0, .55);
+    line-height: 30px;
+  }
+}
+
+.list-item-shimmer {
+  padding: 5px 20px;
+}

@@ -1,0 +1,260 @@
+$stage_block_width: 90px;
+$team_selector_list_item_height: 32px;
+$team_selector_list_item_width: 450px;
+
+.feedback-board-container {
+  background-color: $light_background;
+  display: flex;
+  height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
+  overflow-y: auto;
+}
+
+.initialization-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -50px;
+}
+
+.retrospectives-board-metadata-dialog {
+  width: 500px;
+  max-width: 500px;
+}
+
+.feedback-board-container-header-spacer {
+  margin-top: $extension_header_height + 40;
+  background: $azure_devops_navigator_dark_grey;
+  height: 1px;
+  z-index: 2;
+  width: 100%;
+  position: fixed;
+}
+
+.extension-header-spacer {
+  padding-bottom: $extension_header_height;
+}
+
+.team-filter-container {
+  .ms-TextField {
+    margin: 8px 6px;
+  }
+}
+
+.retrospective-notification-toast-container {
+  top: 50px;
+
+  .retrospective-notification-toast {
+    .retrospective-notification-toast-body {
+      font-family: "Segoe UI VSS (Regular)","-apple-system",BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color: black;
+      word-break: break-word;
+    }
+
+    .retrospective-notification-toast-progress-bar {
+      background: $main_blue;
+    }
+  }
+}
+
+.toggle-carousel-button-tooltip-wrapper {
+  position: relative;
+
+  .toggle-carousel-button {
+    margin-top: 8px;
+    margin-left: 8px;
+    margin-right: 8px;
+    color: black;
+  
+    &:hover {
+      color: $main_blue;
+
+      .ms-Button-icon {
+        color: $main_blue;
+      }
+    }
+  
+    .ms-Button-icon {
+      color: black;
+      margin-top: 2px;
+    }
+
+    .ms-Button-textContainer {
+      .ms-Button-label {
+        width: 100%;
+      }
+    }
+  }
+}
+
+#extension-header {
+  display: flex;
+  position: fixed;
+  z-index: 2;
+  width: 100%;
+  height: $extension_header_height;
+  align-items: center;
+  justify-content: flex-start;
+  background: white;
+  padding-left: $header_horizontal_spacing;
+  padding-right: $header_horizontal_spacing;
+
+  .extension-title-text{
+    font-size: 26px;
+    line-height: 40px;
+    letter-spacing: -.04em;
+    font-weight: 500;
+  }
+
+  .contact-us-button {
+    margin-top: 5px;
+    margin-left: auto;
+    margin-right: 20px;
+
+    .ms-Button {
+      min-width: 40px;
+    }
+
+    &:hover {
+      background-color: $hover_grey;
+    }
+    
+    i {
+      color: black;
+    }
+  }
+  
+  .team-selector {
+    font-weight: 400;
+    display: flex;
+    align-items: baseline;
+    margin: 0 25px;
+    padding-top: 7px;
+  }
+}
+
+.pivot-container {
+  position: fixed;
+  top: $extension_header_height;
+  background-color: white;
+  z-index: 2;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+
+  .ms-Pivot {
+    margin-left: calc(#{$header_horizontal_spacing} - 8px);
+  }
+
+  .pivot-content-wrapper {
+    position: absolute;
+    width: 100%;
+  }
+}
+
+.vertical-tab-separator {
+  width: 2px;
+  display: flex;
+  height: 24px;
+  margin-right: 16px;
+  background: $border_grey;
+  margin-top: 12px
+}
+
+.feedback-board-container-header {
+  display: flex;
+  position: absolute;
+  z-index: 2;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: 200px;
+  padding-right: $header_horizontal_spacing;
+  margin-top: -48px;
+
+  .menu-button {
+    margin-left: 5px;
+    margin-right: 20px;
+    background-color: $azure_devops_navigator_light_grey;
+  }
+
+  .board-selector-group {
+    display: flex;
+    padding-top: 12px;
+    align-items: center;
+
+    .board-selector {
+      font-size: 16px;
+      display: flex;
+      align-items: baseline;
+
+      .selector-button {
+        margin-left: -8px;
+      }
+    }
+  }
+
+  .board-actions-menu {
+    margin-left: 5px;
+  }
+
+  .feedback-workflow-wrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    margin-left: 35px;
+
+    .retrospective-workflowState {
+      width: 72px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      text-align: center;
+      align-items: center;
+
+      .stage-text {
+        font-size: 12px;
+        width: 100%;
+      }
+
+      &.active {
+        color: $main_blue;
+        font-weight: bold;
+
+        &::before {
+          background-color: transparent;
+          bottom: 0px;
+          content: '';
+          position: absolute;
+          width: 44px;
+          margin-left: 14px;
+          box-sizing: border-box;
+          border-bottom: 2px solid $main_blue;
+        }
+      }
+    }
+  }
+
+  .feedback-workflow-wrapper-background {
+    position: relative;
+    margin-left: -325px;
+    top: 6px;
+    z-index: -1;
+  }
+}
+
+.info-message-bar {
+  flex-direction: row;
+  align-items: center;
+
+  .ms-MessageBar-actions {
+    margin-bottom: 5px;
+    margin-right: 5px;
+    min-width: 130px;
+    min-height: 50px;
+
+    .info-message-bar-action {
+      margin-top: 5px;
+      margin-right: 5px;
+    }
+  }
+}

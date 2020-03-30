@@ -1,0 +1,179 @@
+@import "_variables.scss";
+
+.feedbackItem {
+    margin: 0px 12px 12px 0px;
+    break-inside: avoid-column;
+    display: inline-block;
+    vertical-align: top;
+    flex-basis: $main_item_card_max_width;
+
+  &.newFeedbackItem {
+    .ms-DocumentCard {
+      animation: fadeInFromGreen 1000ms ease-in 1;
+    }
+  }
+
+  &.removeFeedbackItem {
+    .ms-DocumentCard {
+      animation: fadeOutToRed 1000ms ease-in 1 forwards;
+    }
+  }
+
+  .document-card-wrapper {
+    position: relative;
+  }
+    
+  .mainItemCard {
+    max-width: $main_item_card_max_width;
+    
+    .card-integral-part {
+      border-left-width: 3px;
+      border-left-style: solid;
+
+      .card-header {
+        height: $feedback_item_header_height;
+        display: inline-flex;
+        width: 100%;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 10px;
+  
+        .feedback-action-button {
+          height: $feedback_item_action_button_height;
+          min-width: $feedback_item_action_button_width;
+          max-width: 100px;
+          z-index: 1;
+          padding: 0px 2px;
+          align-items: center;
+          margin: 0px 2px;
+          background-color: inherit;
+          border: none;
+          display: flex;
+          justify-content: center;
+          
+          i {
+            line-height: $feedback_item_action_button_height - 5px;
+            color: grey;
+            font-size: 14px;
+          }
+  
+          &:focus {
+            border: 1px solid;
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: default;
+          }      
+        }
+       
+        .feedback-add-vote {
+  
+          &:hover:not(:disabled) {
+            i {
+              color: $main_blue;
+            }
+          }
+          
+          &.voteAnimation {
+            animation: push .3s linear 1;
+            
+            i {
+              color: $main_blue !important;
+            }
+          }
+  
+          .feedback-upvote-count {
+            font: 400 12.3333px Arial;
+            line-height: $feedback_item_action_button_height - 5px;
+            margin-left: 5px;
+          }
+        }
+  
+        .item-actions-menu {
+          padding-right: 3px;
+          
+          .contextual-menu-button {
+            min-width: 25px;
+            width: 25px;
+          }
+        }
+      }
+      
+      .card-content {
+        display: flex;
+        margin-right: 16px;
+        margin-left: 16px;
+      }
+  
+      .ms-DocumentCardActivity {
+        .msDocumentCardActivity-details {
+          padding-left: 5px;
+        }
+      }
+
+      .anonymous-created-date {
+        padding: 8px 16px;
+        display: block;
+        font-size: 12px;
+        font-weight: 400;
+        color: #666666;
+        line-height: 18px;
+        overflow: hidden;
+        word-wrap: break-word;
+        height: 45px;
+      }
+    }
+  }
+}
+
+.retrospectives-move-feedback-item-dialog {
+  .move-feedback-item-column-button {
+    i {
+      margin-right: 10px;
+    }
+  }
+}
+
+.retrospectives-group-feedback-item-dialog {
+  .output-container {
+    overflow-y: auto;
+    height: 300px;
+
+    .no-matching-feedback-message {
+      font-size: 15px;
+      font-style: italic;
+    }
+
+    .feedback-item-search-result-item {
+      cursor: pointer;
+
+      &:focus, &:hover {
+        .feedbackItem {
+          .mainItemCard {
+            border-width: 1px;
+            border-color: $main_blue;
+          }
+        }
+      }
+
+      .feedbackItem {
+        margin: 0;
+        width: 100%;
+  
+        .mainItemCard {
+          min-width: 100%;
+  
+          .card-header {
+            display: none;
+          }
+
+          .non-editable-text-container {
+            width: 100%;
+            word-wrap: break-word;
+          }
+        }
+      }
+    }
+  }
+}

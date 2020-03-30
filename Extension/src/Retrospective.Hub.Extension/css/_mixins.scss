@@ -1,0 +1,13 @@
+@mixin input-error-border {
+    border: 1px solid red;
+}
+
+@mixin vsts-workitem-colors {
+    .task-yellow {
+        color: $task_yellow;
+    }
+    
+    .bug-red {
+        color: $bug_red;
+    }
+}

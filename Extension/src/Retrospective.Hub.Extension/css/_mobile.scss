@@ -1,0 +1,65 @@
+.mobile-mode {
+    @import "./mobile/mobileAddActionItem.scss";
+    @import "./mobile/mobileFeedbackBoard.scss";
+    @import "./mobile/mobileFeedbackBoardContainer.scss";
+    @import "./mobile/mobileFeedbackColumn.scss";
+    @import "./mobile/mobileFeedbackItem.scss";
+    @import "./mobile/mobileFeedbackItemGroup.scss";
+    @import "./mobile/mobileEditableDocumentCardTitle.scss";
+    @import "./mobile/mobileBoardSummary.scss";
+    @import "./mobile/mobileExtensionSettingsMenu.scss";
+    @import "./mobile/mobileContextualMenu.scss";
+    @import "./mobile/mobileSelectorCombo.scss";
+    @import "./mobile/mobileFeedbackBoardMetadataForm.scss";
+  
+    .hide-desktop {
+      display: initial !important;
+    }
+
+    .hide-mobile {
+      display: none !important;
+    }
+  
+    .hide-collapse {
+      display: none;
+    }
+  
+    .collapse {
+      width: 100%;
+    }
+  
+    #root {
+      max-width: $mobile_breakpoint;
+    }
+  
+    body {
+      background-color: $light_background;
+    }
+  
+    #vss_1 {
+      font-size: $mobile_font_size;
+      min-height: 50px;
+      flex-basis: 100%;
+    }
+  
+    select,
+    textarea,
+    input {
+      font-size: 25px;
+    }
+  
+    // Styles for dropdown items, which for unknown reasons are not a child of
+    // the ms-Dropdown element
+    .ms-Callout-container {
+      .ms-Dropdown-callout {
+        left: 14px !important; // Necessary evil to override fabric ui styling
+        width: 694px;
+  
+        .ms-Dropdown-optionText {
+          font-size: 24px;
+          height: 40px;
+          padding-top: 10px;
+        }
+      }
+    }
+}

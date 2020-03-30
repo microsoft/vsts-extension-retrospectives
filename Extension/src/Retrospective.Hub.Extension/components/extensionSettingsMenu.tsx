@@ -1,0 +1,152 @@
+import * as React from 'react';
+import { PrimaryButton, DefaultButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
+import { Dialog, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
+import { userDataService } from '../dal/userDataService';
+import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
+import { ViewMode } from '../config/constants';
+
+interface IExtensionSettingsMenuState {
+  isClearVisitHistoryDialogHidden: boolean;
+  isMobileExtensionSettingsDialogHidden: boolean;
+}
+
+interface IExtensionSettingsMenuProps {
+  onScreenViewModeChanged: () => void;
+  isDesktop: boolean;
+}
+
+export default class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      isClearVisitHistoryDialogHidden: true,
+      isMobileExtensionSettingsDialogHidden: true
+    };
+  }
+
+  private clearVisitHistory = async () => {
+    await userDataService.clearVisits()
+    this.hideClearVisitHistoryDialog();
+  }
+
+  private showClearVisitHistoryDialog = () => {
+    this.setState({ isClearVisitHistoryDialogHidden: false });
+  }
+
+  private hideClearVisitHistoryDialog = () => {
+    this.setState({ isClearVisitHistoryDialogHidden: true });
+  }
+
+  private showMobileExtensionSettingsMenuDialog = () => {
+    this.setState({ isMobileExtensionSettingsDialogHidden: false });
+  }
+
+  private hideMobileExtensionSettingsMenuDialog = () => {
+    this.setState({ isMobileExtensionSettingsDialogHidden: true });
+  }
+
+  // If an action needs to be hidden on desktop or mobile view, use the item's className property
+  // with .hide-mobile or .hide-desktop
+  private readonly extensionSettingsMenuItem: IContextualMenuItem[] = [
+    {
+      key: 'clearVisitHistory',
+      iconProps: { iconName: 'RemoveEvent' },
+      onClick: this.showClearVisitHistoryDialog,
+      text: 'Clear visit history',
+      title: 'Clear visit history',
+    },
+    {
+      key: 'switchToDesktop',
+      iconProps: { iconName: 'TVMonitor' },
+      onClick: this.props.onScreenViewModeChanged,
+      text: 'Switch to Desktop View',
+      title: 'Switch to Desktop View',
+      className: 'hide-desktop',
+    },
+    {
+      key: 'switchToMobile',
+      iconProps: { iconName: 'CellPhone' },
+      onClick: this.props.onScreenViewModeChanged,
+      text: 'Switch to Mobile View',
+      title: 'Switch to Mobile View',
+      className: 'hide-mobile'
+    },
+  ];
+
+  public render() {
+    return (
+      <div className="extension-settings-menu">
+        <DefaultButton
+          className="contextual-menu-button hide-mobile"
+          aria-label="User Settings Menu"
+          iconProps={{ iconName: 'CollapseMenu' }}
+          title="User Settings Menu"
+          menuProps={{
+            items: this.extensionSettingsMenuItem,
+            className: this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile,
+          }}
+        />
+        <DefaultButton
+          className="contextual-menu-button hide-desktop"
+          aria-label="User Settings Menu"
+          iconProps={{ iconName: 'CollapseMenu' }}
+          title="User Settings Menu"
+          onClick={this.showMobileExtensionSettingsMenuDialog}
+        />
+        <Dialog
+          hidden={this.state.isMobileExtensionSettingsDialogHidden}
+          onDismiss={this.hideMobileExtensionSettingsMenuDialog}
+          modalProps={{
+            isBlocking: false,
+            containerClassName: 'ms-dialogMainOverride',
+            className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
+          }}
+        >
+          <div className="mobile-contextual-menu-list">
+            {
+              this.extensionSettingsMenuItem.map((extensionSettingsMenuItem) =>
+                <ActionButton
+                  key={extensionSettingsMenuItem.key}
+                  iconProps={extensionSettingsMenuItem.iconProps}
+                  className={extensionSettingsMenuItem.className}
+                  aria-label={extensionSettingsMenuItem.text}
+                  onClick={() => {
+                    this.hideMobileExtensionSettingsMenuDialog();
+                    extensionSettingsMenuItem.onClick();
+                  }}
+                  text={extensionSettingsMenuItem.text}
+                  title={extensionSettingsMenuItem.title}
+                />
+              )
+            }
+          </div>
+          <DialogFooter>
+            <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
+          </DialogFooter>
+        </Dialog>
+        <Dialog
+          hidden={this.state.isClearVisitHistoryDialogHidden}
+          onDismiss={this.hideClearVisitHistoryDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Clear Visit History',
+            subText: 'This extension maintains records of the teams and boards you visited. ' + 
+            'Clearing visit history means that the next time you use the extension, ' +
+            'you will not be automatically directed to the your last visited board.',
+          }}
+          minWidth={450}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-visit-history-cleared-info-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogFooter>
+            <PrimaryButton onClick={this.clearVisitHistory} text="Clear my visit history" />
+            <DefaultButton onClick={this.hideClearVisitHistoryDialog} text="Cancel" />
+          </DialogFooter>
+        </Dialog>
+      </div>
+    );
+  }
+}

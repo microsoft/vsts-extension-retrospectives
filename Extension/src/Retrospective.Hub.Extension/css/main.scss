@@ -1,0 +1,74 @@
+﻿@import "_variables.scss";
+@import "_animations.scss";
+@import "_mixins.scss";
+@import "editableDocumentCardTitle.scss";
+@import "feedbackBoardContainer.scss";
+@import "noFeedbackBoardsView.scss";
+@import "feedbackBoardMetadataForm.scss"; 
+@import "feedbackBoardPreviewEmail.scss";
+@import "feedbackBoard.scss";
+@import "feedbackColumn.scss";
+@import "feedbackItem.scss";
+@import "feedbackItemGroup.scss";
+@import "feedbackCarousel.scss";
+@import "addActionItem.scss";
+@import "boardSummary.scss";
+@import "extensionSettingsMenu.scss";
+@import "contextualMenu.scss";
+@import "selectorCombo.scss";
+@import "_mobile.scss";
+@import "_highContrast.scss";
+
+@import "../node_modules/slick-carousel/slick/slick.css";
+@import "../node_modules/slick-carousel/slick/slick-theme.css";
+@import "../node_modules/react-toastify/dist/ReactToastify.css";
+
+body {
+  overflow-y: auto;
+  background-color: white;
+  color: black;
+  font-family: "Segoe UI VSS (Regular)","-apple-system",BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.retrospective-columnset {
+  background-color: $light_background;
+  padding: 10px;
+  display: flex;
+  overflow-y: auto;
+  flex-direction: row;
+}
+
+.combo {
+    margin: 10px;
+    height: 30px;
+    width: 600px;
+    flex: 1;
+}
+
+.ms-ContextualMenuButtonsExample {
+  display: flex;
+  background-color: $azure_devops_navigator_light_grey;
+}
+
+// VSS automatically adds border and boldfaces button text. This doesn't look good with Office Fabric, so we will remove the styling.
+button:hover:not(.ms-Button), button:focus:not(.ms-Button){
+  border: none;
+  
+  // !important required to override the "bold !important" style in VSS bundle.
+  font-weight: normal !important; 
+}
+
+#vss_1 {
+  max-width: 400px;
+  min-height: 30px;
+}
+
+.anonymous_checkbox .title-input .create-button {
+    margin-right: 5px;
+}
+
+.desktop-mode {
+  .hide-desktop {
+    display: none !important;
+  }
+}

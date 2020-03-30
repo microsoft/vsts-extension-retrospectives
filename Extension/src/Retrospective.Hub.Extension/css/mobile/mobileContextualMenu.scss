@@ -1,0 +1,21 @@
+.contextual-menu-button {
+  i {
+    font-size: 25px;
+  }
+}
+
+.retrospectives-dialog-modal {
+  .mobile-contextual-menu-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    button {
+      width: 60%;
+      
+      .ms-Button-textContainer {
+        margin-left: 12px;
+      }
+    }
+  }
+}

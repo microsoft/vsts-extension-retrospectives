@@ -1,0 +1,35 @@
+@keyframes fadeInFromGreen {
+  from {
+    opacity: 0;
+    background-color: green;
+  }
+  50% {
+    background-color: lightgreen;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutToRed {
+  from {
+    opacity: 1;
+  }
+  50% {
+    background-color: lightcoral;
+  }
+  to {
+    opacity: 0;
+    background-color: red;
+    visibility: hidden;
+  }
+}
+
+@keyframes push {
+  33% {
+    transform: scale(0.8);
+  }
+  66% {
+    transform: scale(1.2);
+  }
+}

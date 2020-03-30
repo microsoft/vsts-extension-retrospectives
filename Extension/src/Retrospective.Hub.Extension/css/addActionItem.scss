@@ -1,0 +1,173 @@
+﻿@import "_variables.scss";
+
+.related-task-sub-card {
+  height: 35px;
+  margin: 0;
+  max-width: $main_item_card_max_width - 1px;
+  border-bottom: 0;
+
+  @include vsts-workitem-colors;
+
+  .ms-DocumentCard-details {
+    padding-right: 16px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .ms-DocumentCardPreview-iconContainer2 {
+    width: 30px;
+  }
+
+  .ms-DocumentCardTitle {
+    line-height: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 14px;
+  }
+
+  &.resolved-border-right {
+    border-right: 3px solid rgb(51, 153, 51);
+  
+    &:hover {
+      border-right-color: rgb(51, 153, 51);
+    }
+  }
+}
+
+.work-item-icon {
+  width: 16px;
+}
+
+.related-task-sub-card {
+  .ms-Image-image {
+    width: 16px;
+  }
+}
+
+.action-item-selector {
+  @include vsts-workitem-colors;
+}
+
+.add-action-item-wrapper {
+  display: flex;
+  max-width: $main_item_card_max_width - 2px;
+  background-color: $azure_devops_navigator_light_grey;
+
+  .feedback-spacer {
+    flex: 1;
+  }
+
+  .add-action-item-button {
+    height: 32px;
+  }
+}
+
+.action-items {
+  .ms-DocumentCard {
+    .ms-DocumentCardActions {
+      padding: 0 4px 0 0;
+
+      .ms-DocumentCardActions-action {
+        height: 30px;
+        width: 25px;
+
+        .ms-Button {
+          .ms-Button-flexContainer {
+            i {
+              color: grey;
+              font-size: 12px;
+            }
+          }
+
+          &:hover:not(:disabled) {
+            i {
+              color: #666666; // Office UI dark grey
+               font-size: 13px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.add-action-item-callout {
+  .ms-Callout-main {
+    max-height: 90vh;
+
+    .work-item-list-divider {
+      border-width: 1px;
+      border-style: solid;
+      border-color: rgb(234, 234, 234);
+    }
+
+    .add-action-item-list-container {
+      .add-action-item-list-item {
+        display: flex;
+        cursor: pointer;
+        padding-left: 8px;
+        align-items: center;
+        background-color: inherit;
+        width: 100%;
+        border: 0px hidden;
+        overflow: hidden; 
+
+        &:hover {
+          background-color: $azure_devops_navigator_light_grey;
+        }
+
+        &:focus {
+          background-color: $azure_devops_navigator_light_grey;
+        }
+
+        .work-item-icon {
+          margin-right: 8px;
+          width: 16px;
+        }
+
+        .add-action-item-list-item-text {
+          line-height: $team_selector_list_item_height;
+          margin-right: 15px;
+          font-size: 14px;
+          font-weight: normal;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+}
+
+.retrospectives-link-existing-work-item-dialog {
+  width: 500px;
+  height: 250px;
+  max-width: 500px;
+
+  .error-container {
+    height: 20px;
+  }
+  
+  .output-container {
+    height: 40px;
+  }
+
+  .related-task-sub-card {
+    width: 100%;
+    border: 1px solid #eaeaea;
+  }
+
+  .work-item-not-found {
+    width: 100%;
+  }
+  
+  .input-validation-message {
+    color: $bug_red;
+  }
+
+  .work-item-id-input {
+    width: 100%;
+  }
+}
