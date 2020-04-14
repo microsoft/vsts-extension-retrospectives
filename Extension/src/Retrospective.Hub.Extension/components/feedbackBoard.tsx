@@ -123,7 +123,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
 
   private receiveUpdatedItemHandler = async (columnId: string, feedbackItemId: string) => {
     const updatedItem = await itemDataService.getFeedbackItem(this.props.board.id, feedbackItemId);
-    this.refreshFeedbackItems([updatedItem], this.props.hideFeedbackItems);
+    this.refreshFeedbackItems([updatedItem], false);
   }
 
   private initColumns = () => {
