@@ -73,42 +73,41 @@ export interface FeedbackBoardContainerState {
   isAutoResizeEnabled: boolean;
 }
 
-export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
+export default class FeedbackBoardContainer
+  extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
   constructor(props: FeedbackBoardContainerProps) {
     super(props);
     this.state = {
+      allWorkItemTypes: [],
       boards: [],
       currentBoard: undefined,
       currentTeam: undefined,
       filteredProjectTeams: [],
       filteredUserTeams: [],
-      isAppInitialized: false,
-      isBackendServiceConnected: false,
-      isReconnectingToBackendService: false,
-      isSummaryDashboardVisible: false,
-      isTeamDataLoaded: false,
       isAllTeamsLoaded: false,
-      projectTeams: [],
-      userTeams: [],
-      nonHiddenWorkItemTypes: [],
-      allWorkItemTypes: [],
-
-      isPreviewEmailDialogHidden: true,
+      isAppInitialized: false,
+      isAutoResizeEnabled: true,
+      isBackendServiceConnected: false,
       isBoardCreationDialogHidden: true,
       isBoardUpdateDialogHidden: true,
+      isCarouselDialogHidden: true,
       isDeleteBoardConfirmationDialogHidden: true,
+      isDesktop: true,
+      isDropIssueInEdgeMessageBarVisible: true,
+      isLiveSyncInTfsIssueMessageBarVisible: true,
       isMobileBoardActionsDialogHidden: true,
       isMobileTeamSelectorDialogHidden: true,
+      isPreviewEmailDialogHidden: true,
+      isReconnectingToBackendService: false,
+      isSummaryDashboardVisible: false,
       isTeamBoardDeletedInfoDialogHidden: true,
+      isTeamDataLoaded: false,
       isTeamSelectorCalloutVisible: false,
+      nonHiddenWorkItemTypes: [],
+      projectTeams: [],
       teamBoardDeletedDialogMessage: '',
       teamBoardDeletedDialogTitle: '',
-      isCarouselDialogHidden: true,
-      isLiveSyncInTfsIssueMessageBarVisible: true,
-      isDropIssueInEdgeMessageBarVisible: true,
-      
-      isDesktop: true,
-      isAutoResizeEnabled: true,
+      userTeams: [],
     };
   }
 
@@ -664,6 +663,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       [TelemetryEventProperties.OldWorkflowPhase]: this.state.currentBoard.activePhase,
       [TelemetryEventProperties.NewWorkflowPhase]: newPhase
     });
+
     this.setState(prevState => {
       const updatedCurrentBoard = prevState.currentBoard;
       updatedCurrentBoard.activePhase = newPhase;
@@ -674,8 +674,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     });
   }
 
-  private createBoard = async (title: string, columns: IFeedbackColumn[], isBoardAnonymous: boolean) => {
-    const createdBoard = await boardDataService.createBoardForTeam(this.state.currentTeam.id, title, columns, isBoardAnonymous);
+  private createBoard = async (title: string, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean) => {
+    const createdBoard = await boardDataService.createBoardForTeam(this.state.currentTeam.id, title, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -780,7 +780,10 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     dialogTitle: string,
     placeholderText: string,
     initialValue: string,
-    onSubmit: (title: string, columns: IFeedbackColumn[], isBoardAnonymous: boolean) => void,
+    onSubmit: (
+        title: string, columns: IFeedbackColumn[],
+        isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean,
+      ) => void,
     onCancel: () => void) => {
     return (
       <Dialog
@@ -1137,6 +1140,10 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                       isCarouselDialogHidden={this.state.isCarouselDialogHidden}
                       hideCarouselDialog={this.hideCarouselDialog}
                       isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
+                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? 
+                        this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
+                        false
+                      }
                     />
                   </div>
                   <Dialog

@@ -28,23 +28,25 @@ export interface FeedbackBoardProps {
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   isAnonymous: boolean;
+  hideFeedbackItems: boolean;
 
   isCarouselDialogHidden: boolean;
   hideCarouselDialog: () => void;
 }
 
 export interface IColumn {
-  columnProperties: IFeedbackColumn,
-  columnItems: IColumnItem[],
-  shouldFocusOnCreateFeedback?: boolean,
+  columnProperties: IFeedbackColumn;
+  columnItems: IColumnItem[];
+  shouldFocusOnCreateFeedback?: boolean;
 }
 
 export interface IColumnItem {
-  feedbackItem: IFeedbackItemDocument,
-  actionItems: WorkItem[],
-  newlyCreated?: boolean,
-  showAddedAnimation?: boolean,
-  shouldHaveFocus?: boolean,
+  feedbackItem: IFeedbackItemDocument;
+  actionItems: WorkItem[];
+  newlyCreated?: boolean;
+  showAddedAnimation?: boolean;
+  shouldHaveFocus?: boolean;
+  hideFeedbackItems?: boolean;
 }
 
 export interface FeedbackBoardState {
@@ -60,12 +62,12 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
   constructor(props: FeedbackBoardProps) {
     super(props);
     this.state = {
-      isDataLoaded: false,
-      columns: {},
       columnIds: [],
-      hasItems: false,
+      columns: {},
+      defaultActionItemAreaPath: '',
       defaultActionItemIteration: '',
-      defaultActionItemAreaPath: ''
+      hasItems: false,
+      isDataLoaded: false,
     };
   }
 
@@ -115,12 +117,13 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       /*shouldBroadcast*/ false,
       /*newlyCreated*/ false,
       /*showAddedAnimation*/ true,
-      /*shouldHaveFocus*/ false);
+      /*shouldHaveFocus*/ false,
+      this.props.hideFeedbackItems);
   }
 
   private receiveUpdatedItemHandler = async (columnId: string, feedbackItemId: string) => {
     const updatedItem = await itemDataService.getFeedbackItem(this.props.board.id, feedbackItemId);
-    this.refreshFeedbackItems([updatedItem], false);
+    this.refreshFeedbackItems([updatedItem], this.props.hideFeedbackItems);
   }
 
   private initColumns = () => {
@@ -167,34 +170,34 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
     const feedbackItems = await itemDataService.getFeedbackItemsForBoard(this.props.board.id);
 
     if (!feedbackItems) {
-      this.setState({ isDataLoaded: true })
+      this.setState({ isDataLoaded: true });
       return;
     }
 
-    const columnItemPromises: Promise<IColumnItem>[] = feedbackItems.map(async feedbackItem => {
+    const columnItemPromises: Promise<IColumnItem>[] = feedbackItems.map(async (feedbackItem) => {
       const actionItems = feedbackItem.associatedActionItemIds && feedbackItem.associatedActionItemIds.length ?
         await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
 
       return {
+        actionItems,
         feedbackItem,
-        actionItems
       };
     });
 
     const columnItems = await Promise.all(columnItemPromises);
 
-    this.setState(prevState => {
-      columnItems.forEach(columnItem => {
+    this.setState((prevState) => {
+      columnItems.forEach((columnItem) => {
         // Some columns might have been deleted. Only add items to columns that still exist.
         if ( this.state.columnIds.indexOf(columnItem.feedbackItem.columnId) >= 0 ) {
           prevState.columns[columnItem.feedbackItem.columnId].columnItems.push(columnItem);
         }
-      })
+      });
 
       return {
         columns: prevState.columns,
-        isDataLoaded: true,
         hasItems: true,
+        isDataLoaded: true,
       };
     });
   }
@@ -213,8 +216,8 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
 
     this.setState(
       {
-        defaultActionItemIteration: defaultIteration,
         defaultActionItemAreaPath: defaultAreaPath,
+        defaultActionItemIteration: defaultIteration,
       });
   }
 
@@ -236,8 +239,10 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
     return resetFocusForStateColumns;
   }
 
-  private addFeedbackItems = (columnId: string, feedbackItems: IFeedbackItemDocument[],
-    shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean) => {
+  private addFeedbackItems = (
+    columnId: string, feedbackItems: IFeedbackItemDocument[],
+    shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean,
+    shouldHaveFocus: boolean, hideFeedbackItems: boolean) => {
     this.setState((previousState) => {
       const firstAddedItemId = feedbackItems.length && feedbackItems[0].id;
       const resetFocusForStateColumns = this.getColumnsWithReleasedFocus(previousState);
@@ -246,21 +251,23 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
         (feedbackItem): IColumnItem => {
           if (feedbackItem.id === firstAddedItemId) {
             return {
-              feedbackItem,
               actionItems: [],
+              feedbackItem,
+              hideFeedbackItems,
               newlyCreated,
-              showAddedAnimation,
               shouldHaveFocus,
+              showAddedAnimation,
             };
-          };
+          }
 
           return {
-            feedbackItem,
             actionItems: [],
+            feedbackItem,
+            hideFeedbackItems,
             newlyCreated,
-            showAddedAnimation
+            showAddedAnimation,
           };
-        }
+        },
       ).concat(resetFocusForStateColumns[columnId].columnItems);
 
       const newColumns = {...resetFocusForStateColumns}
@@ -269,14 +276,14 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       return {
         columns: newColumns,
         isDataLoaded: true,
-      }
+      };
     });
 
     if (shouldBroadcast) {
       feedbackItems.forEach((columnItem) => {
         reflectBackendService.broadcastNewItem(
           columnId,
-          columnItem.id
+          columnItem.id,
         );
       });
     }
@@ -412,7 +419,8 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
           nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
           allWorkItemTypes: this.props.allWorkItemTypes,
           isBoardAnonymous: this.props.isAnonymous,
-          shouldFocusOnCreateFeedback: this.state.columns[columnId].shouldFocusOnCreateFeedback? true : false
+          shouldFocusOnCreateFeedback: this.state.columns[columnId].shouldFocusOnCreateFeedback? true : false,
+          hideFeedbackItems: this.props.hideFeedbackItems,
         };
       });
 

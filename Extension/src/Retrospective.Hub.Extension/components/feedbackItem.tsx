@@ -6,7 +6,6 @@ import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dia
 import {
   DocumentCard,
   DocumentCardActivity,
-  DocumentCardTitle
 } from 'office-ui-fabric-react/lib/DocumentCard';
 import * as React from 'react';
 
@@ -23,7 +22,7 @@ import { appInsightsClient, TelemetryEvents } from '../utilities/appInsightsClie
 import { IColumn, IColumnItem } from './feedbackBoard';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
-import { MessageBar } from 'office-ui-fabric-react/lib/MessageBar';
+import { getUserIdentity } from '../utilities/userIdentityHelper';
 
 export interface IFeedbackItemProps {
   id: string;
@@ -53,11 +52,20 @@ export interface IFeedbackItemProps {
   allWorkItemTypes: WorkItemType[];
   isInteractable: boolean;
   shouldHaveFocus: boolean;
+  hideFeedbackItems: boolean;
+  userIdRef: string;
 
-  addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean) => void;
-  removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
+  addFeedbackItems: (
+    columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
+    newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
+
+  removeFeedbackItemFromColumn: (
+    columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
+
   refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void;
-  moveFeedbackItem: (refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void,
+
+  moveFeedbackItem: (
+    refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void,
     boardId: string,
     feedbackItemId: string,
     columnId: string) => void;
@@ -87,6 +95,7 @@ export interface IFeedbackItemState {
   itemElementHeight: number;
   searchedFeedbackItems: IColumnItem[];
   searchTerm: string;
+  hideFeedbackItems: boolean;
 }
 
 interface FeedbackItemEllipsisMenuItem {
@@ -97,29 +106,30 @@ interface FeedbackItemEllipsisMenuItem {
 }
 
 export default class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemState> {
+  private itemElement: HTMLElement;
+  private itemElementRef: any;
+
   constructor(props: IFeedbackItemProps) {
     super(props);
     this.state = {
+      hideFeedbackItems: false,
       isBeingDragged: false,
       isDeleteItemConfirmationDialogHidden: true,
       isGroupFeedbackItemDialogHidden: true,
-      isMarkedForDeletion: false,
       isLocalDelete: false,
+      isMarkedForDeletion: false,
       isMobileFeedbackItemActionsDialogHidden: true,
       isMoveFeedbackItemDialogHidden: true,
       isRemoveFeedbackItemFromGroupConfirmationDialogHidden: true,
-      showVotedAnimation: false,
       itemElementHeight: 0,
-      searchedFeedbackItems: [],
       searchTerm: '',
+      searchedFeedbackItems: [],
+      showVotedAnimation: false,
     };
 
     this.itemElement = null;
     this.itemElementRef = (element: HTMLElement) => this.itemElement = element;
   }
-
-  private itemElement: HTMLElement;
-  private itemElementRef: any;
 
   public async componentDidMount() {
     if (this.props.groupedItemProps && this.props.groupedItemProps.isMainItem) {
@@ -395,20 +405,25 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     }
   }
 
-  private removeFeedbackItem = (feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean = false) => {
-    this.props.removeFeedbackItemFromColumn(this.props.columnId, feedbackItemIdToDelete, shouldSetFocusOnFirstAvailableItem);
+  private removeFeedbackItem = (
+    feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean = false) => {
+    this.props.removeFeedbackItemFromColumn(
+      this.props.columnId, feedbackItemIdToDelete, shouldSetFocusOnFirstAvailableItem);
   }
 
-  private onFeedbackItemDocumentCardTitleSave = async (feedbackItemId: string, newTitle: string, newlyCreated: boolean) => {
+  private onFeedbackItemDocumentCardTitleSave = async (
+    feedbackItemId: string, newTitle: string, newlyCreated: boolean) => {
     if (!newTitle.trim()) {
       if (newlyCreated) {
         this.removeFeedbackItem(feedbackItemId);
       }
+
       return;
     }
 
     if (newlyCreated) {
-      const newFeedbackItem = await itemDataService.createItemForBoard(this.props.boardId, newTitle, this.props.columnId, !this.props.createdBy );
+      const newFeedbackItem = await itemDataService.createItemForBoard(
+        this.props.boardId, newTitle, this.props.columnId, !this.props.createdBy);
       appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemCreated);
 
       // Replace empty card UI with populated feedback item
@@ -420,7 +435,8 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         /*shouldBroadcast*/ true,
         /*newlyCreated*/ false, 
         /*showAddedAnimation*/ false,
-        /*shouldHaveFocus*/ true);
+        /*shouldHaveFocus*/ true,
+        /*hideFeedbackItems*/ false);
 
       return;
     }
@@ -541,7 +557,8 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     const isMainItem = isNotGroupedItem || this.props.groupedItemProps.isMainItem;
     const groupItemsCount = this.props && this.props.groupedItemProps && this.props.groupedItemProps.groupedCount + 1;
     const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : 'Feedback group main item. Group has ' + groupItemsCount + ' items.'); 
-    
+    const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.createdBy ? this.props.userIdRef !== getUserIdentity().id : false);
+
     return (
       <div
         ref={this.itemElementRef}
@@ -554,6 +571,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
           feedbackItemGroupGroupedItem: !isNotGroupedItem && !isMainItem,
           newFeedbackItem: this.props.showAddedAnimation,
           removeFeedbackItem: this.state.isMarkedForDeletion,
+          hideFeedbackItem: hideFeedbackItems,
         })}        
         draggable={isDraggable}
         onDragStart={this.dragFeedbackItemStart}

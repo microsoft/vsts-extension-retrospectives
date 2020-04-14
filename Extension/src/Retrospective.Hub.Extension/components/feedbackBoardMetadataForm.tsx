@@ -19,7 +19,10 @@ interface IFeedbackBoardMetadataFormProps {
   teamId: string;
   placeholderText: string;
   initialValue: string;
-  onFormSubmit: (title: string, columns: IFeedbackColumn[], isBoardAnonymous: boolean) => void;
+  onFormSubmit: (
+      title: string, columns: IFeedbackColumn[],
+      isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean,
+    ) => void;
   onFormCancel: () => void;
 }
 
@@ -29,6 +32,7 @@ interface IFeedbackBoardMetadataFormState {
   placeholderText: string;
   columnCards: IFeedbackColumnCard[];
   isBoardAnonymous: boolean;
+  shouldShowFeedbackAfterCollect: boolean;
 
   isDeleteColumnConfirmationDialogHidden: boolean;
   isChooseColumnIconDialogHidden: boolean;
@@ -43,33 +47,34 @@ interface IFeedbackColumnCard {
   markedForDeletion: boolean;
 }
 
-export default class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
+export default class FeedbackBoardMetadataForm 
+  extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
   constructor(props: any) {
     super(props);
 
     const defaultColumnCards: IFeedbackColumnCard[] = [{
       column: {
-        id: uuid(),
+        accentColor: '#008000',
         iconClass: 'far fa-smile',
+        id: uuid(),
         title: 'What went well',
-        accentColor: "#008000",
       },
       markedForDeletion: false,
     }, {
       column: {
-        id: uuid(),
+        accentColor: '#cc293d',
         iconClass: 'far fa-frown',
+        id: uuid(),
         title: "What didn't go well",
-        accentColor: "#cc293d",
       },
       markedForDeletion: false,
     }];
 
     this.state = {
-      title: this.props.initialValue,
-      isBoardNameTaken: false,
-      placeholderText: this.props.placeholderText,
-      columnCards: this.props.isNewBoardCreation ? defaultColumnCards : this.props.currentBoard.columns.map((column) => {
+      columnCardBeingEdited: undefined,
+      columnCards: this.props.isNewBoardCreation ?
+      defaultColumnCards :
+      this.props.currentBoard.columns.map((column) => {
         return {
           // Need a deep copy of the column object here to avoid making changes to the original column.
           // This ensures no changes are made when the user hits Cancel.
@@ -77,14 +82,22 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
           markedForDeletion: false,
         };
       }),
-
-      isDeleteColumnConfirmationDialogHidden: true,
-      isChooseColumnIconDialogHidden: true,
+      isBoardAnonymous: this.props.isNewBoardCreation ?
+        false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
+      isBoardNameTaken: false,
       isChooseColumnAccentColorDialogHidden: true,
-      columnCardBeingEdited: undefined,
-      selectedIconKey: undefined,
+      isChooseColumnIconDialogHidden: true,
+      isDeleteColumnConfirmationDialogHidden: true,
+      placeholderText: this.props.placeholderText,
       selectedAccentColorKey: undefined,
-      isBoardAnonymous: this.props.isNewBoardCreation ? false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
+      selectedIconKey: undefined,
+      shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ?
+      false :
+      (
+        this.props.currentBoard.shouldShowFeedbackAfterCollect ?
+        this.props.currentBoard.shouldShowFeedbackAfterCollect : false
+      ),
+      title: this.props.initialValue,
     };
   }
 
@@ -119,12 +132,19 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
     this.props.onFormSubmit(
       this.state.title.trim(),
       this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
-      this.state.isBoardAnonymous);
+      this.state.isBoardAnonymous,
+      this.state.shouldShowFeedbackAfterCollect);
   }
   
   private handleIsAnonymousCheckboxChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
     this.setState({
       isBoardAnonymous: checked,
+    });
+  }
+
+  private handleShouldShowFeedbackAfterCollectChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+    this.setState({
+      shouldShowFeedbackAfterCollect: checked,
     });
   }
 
@@ -243,8 +263,25 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
                     display: 'flex',
                   },
                 }} />
-                Note: This selection cannot be modified after board creation.
-            </div>
+          </div>
+
+          <div className="board-metadata-form-section-subheader">
+              <Checkbox
+                label="Only show feedback after Collect phase"
+                ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
+                boxSide="end"
+                defaultChecked={this.state.shouldShowFeedbackAfterCollect}
+                disabled={!this.props.isNewBoardCreation}
+                onChange={this.handleShouldShowFeedbackAfterCollectChange}
+                styles={{
+                  root: {
+                    justifyContent: 'center',
+                    width: '100%',
+                    display: 'flex',
+                  },
+                }} />
+                Note: These selections cannot be modified after board creation.
+          </div>
         </div>
         <div className="board-metadata-form-edit-column-section hide-desktop">
           <div className="board-metadata-form-section-header">Columns</div>
