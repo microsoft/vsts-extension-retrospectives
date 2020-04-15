@@ -19,8 +19,8 @@
     }
   }
 
-  &.hideFeedbackItem {
-    display: none;
+  &.hideFeedbackItem .card-content {
+    filter: blur(3px);
   }
 
   .document-card-wrapper {
