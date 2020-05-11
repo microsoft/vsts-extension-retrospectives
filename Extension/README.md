@@ -76,7 +76,7 @@ The extension is still in preview mode and is available only to internal Microso
 
 ## Contribute
 
-TBD
+See [Contribute](https://github.com/microsoft/vsts-extension-retrospectives/blob/master/Extension/CONTRIBUTING.md)
 
 ## License
 
