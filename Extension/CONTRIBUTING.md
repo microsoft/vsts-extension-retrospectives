@@ -52,4 +52,4 @@ Retrospectives is an Azure DevOps extension. Visit [this link](https://docs.micr
 The Retrospectives tool uses the [Azure DevOps data service](https://docs.microsoft.com/en-us/azure/devops/extend/develop/data-storage?view=vsts) for handling all its storage.
 
 ### Backend
-The Retrospectives tool uses the [Azure SignalR service](https://azure.microsoft.com/en-us/services/signalr-service/) to add real time support. The backend codebase is maintained separately and can be found [here](https://microsoft.visualstudio.com/DefaultCollection/Universal%20Store/_git/DES.CDID.Reflect.Backend).
+The Retrospectives tool uses the [Azure SignalR service](https://azure.microsoft.com/en-us/services/signalr-service/) to add real time support. The backend codebase can be found [here](https://github.com/microsoft/vsts-extension-retrospectives/tree/master/Backend).
