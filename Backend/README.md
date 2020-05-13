@@ -40,7 +40,7 @@ Test cases will be added that can be used for testing your changes. Add test cas
 
 ## Contributing
 
-TBD
+See [Contributing](https://github.com/microsoft/vsts-extension-retrospectives/blob/master/Backend/CONTRIBUTING.md)
 
 ## Versioning and changelog
 
