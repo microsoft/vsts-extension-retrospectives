@@ -13,11 +13,11 @@ ms.reviewedBy:
 
 This is a live backend service that is used by the Retrospectives Azure DevOps extensions. The [Retrospectives](https://marketplace.visualstudio.com/items?itemName=ms-devlabs.team-retrospectives#qna) Azure DevOps extension uses this service to support real time synchronisation for Retrospective board events.
 
-Refer to the [Retrospectives documentation](https://microsoft.visualstudio.com/DefaultCollection/Universal%20Store/_git/DES.CDID.Retrospective?path=%2FREADME.md&version=GBmaster) for help and instructions about the Aure DevOps extension.
+Refer to the [Retrospectives documentation](https://github.com/microsoft/vsts-extension-retrospectives/blob/master/Extension/README.md) for help and instructions about the Azure DevOps extension.
 
 ### Prerequisites
 
-1. Microsoft Visual Studio 2017 or higher. Download at [Microsoft IT Products Web](https://productsweb/). Any other IDE of choice can also be used.
+1. Microsoft Visual Studio 2017 or higher. Any other IDE of choice can also be used.
 2. .NET Core 2.2 SDK. [Download](https://dotnet.microsoft.com/download/dotnet-core/2.2).
 
 ### Installing
@@ -30,7 +30,7 @@ Test cases will be added that can be used for testing your changes. Add test cas
 
 ## Deployment
 
-- Reach out to the (Retrospectives team)[retrospectives@microsoft.com] for deployments.
+- Reach out to the [Retrospectives team](mailto:retrospectives@microsoft.com) for deployments.
 
 ## Built With
 
@@ -48,7 +48,7 @@ See [Contributing](https://github.com/microsoft/vsts-extension-retrospectives/bl
 
 Team aliases:
 
-- [Retrospectives team](retrospectives@microsoft.com)
+- [Retrospectives team](mailto:retrospectives@microsoft.com)
 
 ## License
 
