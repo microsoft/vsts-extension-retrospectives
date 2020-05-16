@@ -19,16 +19,11 @@ Retrospectives is an Azure DevOps extension to perform **smart and efficient ret
 
 ## Install
 
-The extension is still in preview mode and is available only to internal Microsoft users. For Microsoft accounts, installing the extension is a 3 step process -
-
-1. Reach out to our team and let us know which DevOps organization you belong to. (Eg. MICROSOFT, MICROSOFTIT, MSENG, etc.). The extension will be shared with your org.
-2. Contact an admin for your org and have them install the extension. This installation process is similar to installing any other DevOps extensions. Refer to [this link](https://docs.microsoft.com/en-us/azure/devops/marketplace/install-extension?view=vsts) for instructions.
-
-3. Since the extension is still in preview mode, it needs to be enabled for the Azure DevOps project. Reach out to your project admin and have them enable the extension from the 'Preview Features' tab.
+The extension can be installed from [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-devlabs.team-retrospectives).
 
 ## Use
 
-1. Navigate to the Azure 'Boards' tab in your account. Select the 'Retrospectives (Preview)' tab under boards.
+1. Navigate to the Azure 'Boards' tab in your account. Select the 'Retrospectives' tab under boards.
 
    ![Group](src/Retrospective.Hub.Extension/images/usage/boardandretrospectivestab.png)
 
