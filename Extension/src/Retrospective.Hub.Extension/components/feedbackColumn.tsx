@@ -34,9 +34,13 @@ export interface FeedbackColumnProps {
   allWorkItemTypes: WorkItemType[];
   isBoardAnonymous: boolean;
   shouldFocusOnCreateFeedback: boolean;
+  hideFeedbackItems: boolean;
 
-  addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean) => void;
-  removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
+  addFeedbackItems: (
+    columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
+    newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
+  removeFeedbackItemFromColumn: (
+    columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
   refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void;
 }
 
@@ -51,8 +55,8 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   constructor(props: FeedbackColumnProps) {
     super(props);
     this.state = {
+      isCarouselHidden: true,
       isCollapsed: false,
-      isCarouselHidden: true
     };
   }
 
@@ -65,30 +69,32 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   }
 
   public createEmptyFeedbackItem = () => {
-    const item = this.props.columnItems.find(x => x.feedbackItem.id === 'emptyFeedbackItem');
+    const item = this.props.columnItems.find((x) => x.feedbackItem.id === 'emptyFeedbackItem');
     if (item) {
-      // Don't create another empty feedback item if one already exists. 
+      // Don't create another empty feedback item if one already exists.
       return;
     }
 
     const userIdentity = getUserIdentity();
     const feedbackItem: IFeedbackItemDocument = {
-      id: 'emptyFeedbackItem',
       boardId: this.props.boardId,
-      title: '',
       columnId: this.props.columnId,
       createdBy: this.props.isBoardAnonymous ? null : userIdentity,
       createdDate: new Date(Date.now()),
-      upvotes: 0
-    }
-    
+      id: 'emptyFeedbackItem',
+      title: '',
+      upvotes: 0,
+      userIdRef: userIdentity.id,
+    };
+
     this.props.addFeedbackItems(
       this.props.columnId,
       [feedbackItem],
       /*shouldBroadcast*/ false,
       /*newlyCreated*/ true,
       /*showAddedAnimation*/ false,
-      /*shouldHaveFocus*/ false);
+      /*shouldHaveFocus*/ false,
+      /*hideFeedbackItems*/ false);
   }
 
   public dragFeedbackItemOverColumn = (e: React.DragEvent<HTMLDivElement>) => {
@@ -164,6 +170,8 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       allWorkItemTypes: columnProps.allWorkItemTypes,
       isInteractable: isInteractable,
       shouldHaveFocus: columnItem.shouldHaveFocus ? true : false,
+      hideFeedbackItems: columnProps.hideFeedbackItems,
+      userIdRef: columnItem.feedbackItem.userIdRef,
     }
   }
 

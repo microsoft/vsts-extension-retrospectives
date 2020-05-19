@@ -4,31 +4,34 @@ import { v4 as uuid } from 'uuid';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-import moment = require('moment');
 
 class BoardDataService {
     public readonly legacyPositiveColumnId: string = 'whatwentwell';
     public readonly legacyNegativeColumnId: string = 'whatdidntgowell';
 
-    public createBoardForTeam = async (teamId: string, title: string, columns: IFeedbackColumn[], isAnonymous?: boolean, startDate?: Date, endDate?: Date) => {
+    public createBoardForTeam = async (
+        teamId: string, title: string, columns: IFeedbackColumn[], 
+        isAnonymous?: boolean, shouldShowFeedbackAfterCollect?: boolean, startDate?: Date, endDate?: Date) => {
         const boardId: string = uuid();
         const userIdentity = getUserIdentity();
 
         const board: IFeedbackBoardDocument = {
-            id: boardId,
-            title: title,
-            createdBy: userIdentity,
-            teamId: teamId,
-            createdDate: new Date(Date.now()),
-            modifiedDate: new Date(Date.now()),
-            columns: columns,
-            startDate: startDate,
-            endDate: endDate,
             activePhase: WorkflowPhase.Collect,
+            columns,
+            createdBy: userIdentity,
+            createdDate: new Date(Date.now()),
+            endDate,
+            id: boardId,
             isAnonymous: isAnonymous ? isAnonymous : false,
+            modifiedDate: new Date(Date.now()),
+            shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ? shouldShowFeedbackAfterCollect : false,
+            startDate,
+            teamId,
+            title,
         }
 
-        const createdBoard: IFeedbackBoardDocument = await ExtensionDataService.createDocument<IFeedbackBoardDocument>(teamId, board);
+        const createdBoard: IFeedbackBoardDocument =
+            await ExtensionDataService.createDocument<IFeedbackBoardDocument>(teamId, board);
         return createdBoard;
     }
 
@@ -48,8 +51,7 @@ class BoardDataService {
 
         try {
             teamBoards = await ExtensionDataService.readDocuments<IFeedbackBoardDocument>(teamId, false, true);
-        } 
-        catch (e) {
+        } catch (e) {
             if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
                 appInsightsClient.trackTrace(TelemetryExceptions.BoardsNotFoundForTeam, e, AI.SeverityLevel.Warning);
             }
@@ -59,7 +61,8 @@ class BoardDataService {
     }
 
     public getBoardForTeamById = async (teamId: string, boardId: string) => {
-        const boardById: IFeedbackBoardDocument = await ExtensionDataService.readDocument<IFeedbackBoardDocument>(teamId, boardId);
+        const boardById: IFeedbackBoardDocument =
+            await ExtensionDataService.readDocument<IFeedbackBoardDocument>(teamId, boardId);
         return boardById;
     }
 

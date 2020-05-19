@@ -23,6 +23,7 @@ export interface IFeedbackBoardDocument {
   modifiedBy?: IdentityRef;
   activePhase: WorkflowPhase;
   isAnonymous?: boolean;
+  shouldShowFeedbackAfterCollect?: boolean;
 }
 
 export interface IFeedbackColumn {
@@ -38,8 +39,8 @@ export interface IFeedbackItemDocument {
   boardId: string;
   title: string;
   description?: string;
-  childFeedbackItemIds?: string[]
-  parentFeedbackItemId?: string
+  childFeedbackItemIds?: string[];
+  parentFeedbackItemId?: string;
   associatedActionItemIds?: number[];
   columnId: string;
   upvotes: number;
@@ -47,4 +48,5 @@ export interface IFeedbackItemDocument {
   createdDate: Date;
   modifedDate?: Date;
   modifiedBy?: IdentityRef;
+  userIdRef: string;
 }

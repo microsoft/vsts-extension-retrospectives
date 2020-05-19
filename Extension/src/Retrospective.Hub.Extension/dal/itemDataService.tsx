@@ -1,7 +1,5 @@
 import * as ExtensionDataService from './dataService';
-import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
-import { boardDataService } from './boardDataService';
-import { ExceptionCode } from '../interfaces/retrospectiveState';
+import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { WorkItem } from 'TFS/WorkItemTracking/Contracts';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
@@ -12,21 +10,25 @@ class ItemDataService {
   /**
    * Create an item with given title and column id in the board.
    */
-  public createItemForBoard = async (boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
+  public createItemForBoard = async (
+    boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
     const itemId: string = uuid();
     const userIdentity = getUserIdentity();
 
     const feedbackItem: IFeedbackItemDocument = {
-      id: itemId,
-      boardId: boardId,
-      title: title,
-      columnId: columnId,
+      boardId,
+      columnId,
       createdBy: isAnonymous ? null : userIdentity,
       createdDate: new Date(Date.now()),
+      id: itemId,
+      title,
       upvotes: 0,
-    }
+      userIdRef: userIdentity.id,
+    };
 
-    const createdItem: IFeedbackItemDocument = await ExtensionDataService.createDocument<IFeedbackItemDocument>(boardId, feedbackItem);
+    const createdItem: IFeedbackItemDocument =
+      await ExtensionDataService.createDocument<IFeedbackItemDocument>(boardId, feedbackItem);
+
     return createdItem;
   }
 
@@ -34,7 +36,8 @@ class ItemDataService {
    * Get the feedback item.
    */
   public getFeedbackItem = async (boardId: string, feedbackItemId: string): Promise<IFeedbackItemDocument> => {
-    const feedbackItem: IFeedbackItemDocument = await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
+    const feedbackItem: IFeedbackItemDocument =
+      await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
     return feedbackItem;
   }
 
@@ -43,11 +46,10 @@ class ItemDataService {
    */
   public getFeedbackItemsForBoard = async (boardId: string): Promise<IFeedbackItemDocument[]> => {
     let feedbackItems: IFeedbackItemDocument[] = [];
-    
+
     try {
       feedbackItems = await ExtensionDataService.readDocuments<IFeedbackItemDocument>(boardId, false, true);
-    } 
-    catch (e) {
+    } catch (e) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
         appInsightsClient.trackTrace(TelemetryExceptions.ItemsNotFoundForBoard, e, AI.SeverityLevel.Warning);
       }

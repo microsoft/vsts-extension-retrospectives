@@ -19,6 +19,10 @@
     }
   }
 
+  &.hideFeedbackItem .card-content {
+    filter: blur(3px);
+  }
+
   .document-card-wrapper {
     position: relative;
   }
