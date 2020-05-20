@@ -7,10 +7,7 @@ const enum UserDataKey {
 
 class UserDataService {
   public addVisit = async (teamId: string, boardId?: string): Promise<IUserVisit[]> => {
-    const visit: IUserVisit = {
-      teamId: teamId,
-      boardId: boardId
-    };
+    const visit: IUserVisit = { boardId, teamId };
 
     const existingVisits: IUserVisit[] = await ExtensionDataService.getValue<IUserVisit[]>(UserDataKey.Visits, true);
     let newVisits: IUserVisit[] = [];
@@ -28,8 +25,8 @@ class UserDataService {
     newVisits.splice(0, newVisits.length - 10);
 
     const updatedVisits: IUserVisit[] = await ExtensionDataService.setValue<IUserVisit[]>(
-      UserDataKey.Visits, 
-      newVisits, 
+      UserDataKey.Visits,
+      newVisits,
       true);
     return updatedVisits;
   }

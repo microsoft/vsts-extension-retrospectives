@@ -6,4 +6,4 @@ export const buildAvatarUrl = (id: string): string => {
     }
 
     return null;
-}
+};

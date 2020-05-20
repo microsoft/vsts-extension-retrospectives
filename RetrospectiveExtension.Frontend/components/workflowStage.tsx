@@ -2,32 +2,21 @@
 import * as React from 'react';
 import { WorkflowPhase } from '../interfaces/workItem';
 
-export interface WorkflowStageProps {
+export interface IWorkflowStageProps {
   display: string;
   value: WorkflowPhase;
   isActive: boolean;
   clickEventCallback: any;
 }
 
-export interface WorkflowStageState {
-}
-
-export default class WorkflowStage extends React.Component<WorkflowStageProps, WorkflowStageState> {
-  constructor(props: WorkflowStageProps) {
+export default class WorkflowStage extends React.Component<IWorkflowStageProps, {}> {
+  constructor(props: IWorkflowStageProps) {
     super(props);
-    this.state = {
-    };
+    this.state = { };
   }
 
   public clickWorkflowState = (clickedElement: React.MouseEvent<HTMLElement>, newState: WorkflowPhase) => {
     this.props.clickEventCallback(clickedElement, newState);
-    }
-
-  private handleKeyPressWorkFlowState = (event: React.KeyboardEvent<HTMLDivElement>, newState: WorkflowPhase) => {
-    if (event.keyCode == 13) {
-      this.props.clickEventCallback(event, newState);
-    }
-    return;
   }
 
   public render() {
@@ -50,5 +39,12 @@ export default class WorkflowStage extends React.Component<WorkflowStageProps, W
         </p>
       </div>
     );
+  }
+
+  private handleKeyPressWorkFlowState = (event: React.KeyboardEvent<HTMLDivElement>, newState: WorkflowPhase) => {
+    if (event.keyCode === 13) {
+      this.props.clickEventCallback(event, newState);
+    }
+    return;
   }
 }
