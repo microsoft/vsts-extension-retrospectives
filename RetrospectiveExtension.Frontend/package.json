@@ -7,10 +7,10 @@
     "build": "webpack -d",
     "build:p": "set NODE_ENV=production&&webpack -p",
     "dev": "webpack -d --watch",
-    "pack": "tfx extension create --rev-version --manifests vss-extension-dev.json",
-    "pack:dev": "tfx extension create --manifests vss-extension-dev.json",
-    "pack:p": "tfx extension create --manifests vss-extension.json",
-    "pack:devlabs": "tfx extension create --manifests vss-extension-devlabs.json"
+    "pack": "tfx extension create --rev-version --manifests vss-extension-dev.json --output-path ./dist/",
+    "pack:dev": "tfx extension create --manifests vss-extension-dev.json --output-path ./dist/",
+    "pack:p": "tfx extension create --manifests vss-extension.json --output-path ./dist/",
+    "pack:devlabs": "tfx extension create --manifests vss-extension-devlabs.json --output-path ./dist/"
   },
   "repository": {
     "type": "git",
