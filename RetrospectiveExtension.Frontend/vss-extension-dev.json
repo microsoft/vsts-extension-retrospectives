@@ -17,10 +17,10 @@
   },
   "content": {
     "details": {
-      "path": "PACKAGE-DESCRIPTION.md"
+      "path": "./assets/PACKAGE-DESCRIPTION.md"
     },
     "license": {
-        "path": "LICENSE.md"
+        "path": "./assets/LICENSE.md"
     }
   },
   "targets": [
