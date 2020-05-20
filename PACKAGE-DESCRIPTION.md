@@ -1,51 +1,51 @@
 # Overview
 
-Don’t just ship your products — LEARN from them. Looking back is an essential part of moving forward. 
+Don’t just ship your products — LEARN from them. Looking back is an essential part of moving forward.
 
-Team Retrospectives, a Microsoft Garage project, is an extension for Azure DevOps that provides a first-class experience for retrospectives and general feedback board scenarios. 
-Collect feedback on your project milestones, organize and prioritize, and create and track actionable tasks to help your team improve over time. 
-Optimized for both desktop and mobile. 
+Team Retrospectives, a Microsoft Garage project, is an extension for Azure DevOps that provides a first-class experience for retrospectives and general feedback board scenarios.
+Collect feedback on your project milestones, organize and prioritize, and create and track actionable tasks to help your team improve over time.
+Optimized for both desktop and mobile.
 Celebrate the good, improve the bad, and increase productivity with Team Retrospectives.
 
-![Desktop board](images/screenshots/board_desktop.jpg)
-![Mobile board](images/screenshots/board_mobile.jpg)
+![Desktop board](./RetrospectiveExtension.Frontend/images/screenshots/board_desktop.jpg)
+![Mobile board](./RetrospectiveExtension.Frontend/images/screenshots/board_mobile.jpg)
 
-# Retrospectives
+## Retrospectives
 
 Create a retrospective, and connect from any device.
 
-![Introduction screen showing a button to click to create a board](images/screenshots/intro_screen.jpg)
+![Introduction screen showing a button to click to create a board](./RetrospectiveExtension.Frontend/images/screenshots/intro_screen.jpg)
 
 ### Collect
 
 Start submitting positive or negative feedback.
 
-![Creating a new feedback item by hitting the "Add new feedback" button and typing in the title](images/screenshots/collect.gif)
+![Creating a new feedback item by hitting the "Add new feedback" button and typing in the title](./RetrospectiveExtension.Frontend/images/screenshots/collect.gif)
 
 ### Group
 
 Organize similar items into categories to facilitate discussion.
 
-![One feedback item being dragged onto another feedback item to group](images/screenshots/group.gif)
+![One feedback item being dragged onto another feedback item to group](./RetrospectiveExtension.Frontend/images/screenshots/group.gif)
 
 ### Vote
 
 Prioritize feedback by having the team vote on the items that are most important to them.
 
-![Feedback item being voted](images/screenshots/vote.gif)
+![Feedback item being voted](./RetrospectiveExtension.Frontend/images/screenshots/vote.gif)
 
 ### Act
 
-Create follow-up work items in your team’s Azure DevOps project. 
+Create follow-up work items in your team’s Azure DevOps project.
 
-![A feedback item with an work item attached](images/screenshots/act.jpg)
+![A feedback item with an work item attached](./RetrospectiveExtension.Frontend/images/screenshots/act.jpg)
 
 Use Focus Mode to help the team walk through one feedback item at a time.
 
-![Retrospective board in Focus Mode showing one feedback item at a time](images/screenshots/act_carousel_animated.gif)
+![Retrospective board in Focus Mode showing one feedback item at a time](./RetrospectiveExtension.Frontend/images/screenshots/act_carousel_animated.gif)
 
-# History
+## History
 
 Track previous work items and view roll-up status to ensure your team is progressing.
 
-![History mode showing a table of all retrospectives for a given team and their corresponding resolved and unresolved work items](images/screenshots/history.jpg)
+![History mode showing a table of all retrospectives for a given team and their corresponding resolved and unresolved work items](./RetrospectiveExtension.Frontend/images/screenshots/history.jpg)
