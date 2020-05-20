@@ -10,8 +10,7 @@
     "pack": "tfx extension create --rev-version --manifests vss-extension-dev.json",
     "pack:dev": "tfx extension create --manifests vss-extension-dev.json",
     "pack:p": "tfx extension create --manifests vss-extension.json",
-    "pack:devlabs": "tfx extension create --manifests vss-extension-devlabs.json",
-    "tslint": "tslint './**/*.tsx'"
+    "pack:devlabs": "tfx extension create --manifests vss-extension-devlabs.json"
   },
   "repository": {
     "type": "git",
