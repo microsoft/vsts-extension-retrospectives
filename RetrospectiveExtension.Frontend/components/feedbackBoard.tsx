@@ -11,7 +11,7 @@ import FeedbackColumn from './feedbackColumn';
 import {
   IFeedbackBoardDocument,
   IFeedbackColumn,
-  IFeedbackItemDocument
+  IFeedbackItemDocument,
 } from '../interfaces/feedback';
 import { ExceptionCode } from '../interfaces/retrospectiveState';
 import { WorkflowPhase } from '../interfaces/workItem';
@@ -106,7 +106,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
   public async componentWillUnmount() {
     // Remove event listeners.
     reflectBackendService.removeOnReceiveNewItem(this.receiveNewItemHandler);
-    reflectBackendService.removeOnReceiveUpdatedItem(this.receiveUpdatedItemHandler)
+    reflectBackendService.removeOnReceiveUpdatedItem(this.receiveUpdatedItemHandler);
   }
 
   private receiveNewItemHandler = async (columnId: string, feedbackItemId: string) => {
@@ -132,26 +132,26 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
     let stateColumns: { [id: string]: IColumn } = {};
     const columnIds: string[] = new Array<string>();
 
-    columnProperties.map(col => {
+    columnProperties.map((col) => {
       // If icon class is not present in the document, assign the smile and frown
       // based on column id.
       col.iconClass = col.iconClass
         ? col.iconClass
         : col.id === boardDataService.legacyPositiveColumnId
-          ? "far fa-smile"
+          ? 'far fa-smile'
           : col.id === boardDataService.legacyNegativeColumnId
-            ? "far fa-frown"
+            ? 'far fa-frown'
             // Default icon to a chalkboard if there's any issue.
-            : "fas fa-chalkboard";
-      
+            : 'fas fa-chalkboard';
+
       col.accentColor = col.accentColor
         ? col.accentColor
-        : col.id === boardDataService.legacyPositiveColumnId 
-          ? "green"
-          : col.id === boardDataService.legacyNegativeColumnId 
-            ? "#cc293d" 
+        : col.id === boardDataService.legacyPositiveColumnId
+          ? 'green'
+          : col.id === boardDataService.legacyNegativeColumnId
+            ? '#cc293d'
             // Default accent color to DevOps blue if there's any issue.
-            : "#0078d4";
+            : '#0078d4';
 
       let column: IColumn = {
         columnProperties: col,
@@ -270,7 +270,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
         },
       ).concat(resetFocusForStateColumns[columnId].columnItems);
 
-      const newColumns = {...resetFocusForStateColumns}
+      const newColumns = {...resetFocusForStateColumns};
       newColumns[columnId].columnItems = updatedColumnItems;
 
       return {
@@ -335,7 +335,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
         // TODO: Optimize performance by only updating work items in action-item-related update scenario.
         const actionItems = feedbackItem.associatedActionItemIds && feedbackItem.associatedActionItemIds.length ?
           await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
-          
+
         return {
           feedbackItem,
           actionItems,
@@ -372,7 +372,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
 
         const newColumns = newColumnsAsList.reduce(
           (columns, columnsAsList) => {
-            columns[columnsAsList.key] = columnsAsList.value
+            columns[columnsAsList.key] = columnsAsList.value;
             return columns;
           },
           emptyColumns);
@@ -380,15 +380,15 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
         return {
           columns: newColumns
         };
-      })
+      });
     }
 
     if (shouldBroadcast) {
       updatedFeedbackItems.forEach(updatedFeedbackItem => {
-        reflectBackendService.broadcastUpdatedItem("dummyColumn", updatedFeedbackItem.id);
+        reflectBackendService.broadcastUpdatedItem('dummyColumn', updatedFeedbackItem.id);
       });
     }
-  };
+  }
 
   public render() {
     if (!this.props.displayBoard) {
@@ -419,7 +419,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
           nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
           allWorkItemTypes: this.props.allWorkItemTypes,
           isBoardAnonymous: this.props.isAnonymous,
-          shouldFocusOnCreateFeedback: this.state.columns[columnId].shouldFocusOnCreateFeedback? true : false,
+          shouldFocusOnCreateFeedback: this.state.columns[columnId].shouldFocusOnCreateFeedback ? true : false,
           hideFeedbackItems: this.props.hideFeedbackItems,
         };
       });
