@@ -71,7 +71,7 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
 
 ## Contribute
 
-See [Contribute](https://github.com/microsoft/vsts-extension-retrospectives/blob/master/Extension/CONTRIBUTING.md)
+See [Contribute](./CONTRIBUTING.md)
 
 ## License
 
