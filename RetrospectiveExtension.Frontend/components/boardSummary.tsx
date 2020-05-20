@@ -27,8 +27,8 @@ export interface IBoardSummaryProps {
 }
 
 interface IBoardSummaryState {
-  actionItemTableItems: IActionItemsTableProps[],
-  actionItemTableColumns: IColumn[],
+  actionItemTableItems: IActionItemsTableProps[];
+  actionItemTableColumns: IColumn[];
 }
 
 interface IIconProps {
@@ -47,39 +47,39 @@ interface IActionItemsTableProps {
   assignedTo: string;
   priority: string;
   id: number;
-  onActionItemClick: (id: number) => void
+  onActionItemClick: (id: number) => void;
 }
 
 export default class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryState> {
-  constructor (props: IBoardSummaryProps) {
+  constructor(props: IBoardSummaryProps) {
     super (props);
-    
+
     const actionItemsTableColumns: IColumn[] = [
       {
-        key: 'icon',
-        name: 'Work Item Icon',
         ariaLabel: 'Work item type icon',
-        isIconOnly: true,
         fieldName: 'icon',
-        minWidth: 16,
+        isIconOnly: true,
+        isResizable: false,
+        key: 'icon',
         maxWidth: 16,
+        minWidth: 16,
+        name: 'Work Item Icon',
         onRender: (props) => {
           return <Image src={props.icon.url} className="work-item-type-icon" alt={`${props.type} icon`} />;
-        },
-        isResizable: false,
+        }
       },
       {
-        key: 'title',
-        name: 'Title',
-        fieldName: 'title',
-        minWidth: 100,
-        maxWidth: 700,
-        isResizable: true,
-        onRender: (props: IActionItemsTableProps) => {
-          return <div onClick={async () => { await props.onActionItemClick(props.id)}} className="work-item-title overflow-ellipsis">{props.title}</div>;
-        },
         ariaLabel: 'Work item title.',
+        fieldName: 'title',
+        isResizable: true,
+        key: 'title',
+        maxWidth: 700,
+        minWidth: 100,
+        name: 'Title',
         onColumnClick: this.onColumnClick,
+        onRender: (props: IActionItemsTableProps) => {
+          return <div onClick={async () => { await props.onActionItemClick(props.id); }} className="work-item-title overflow-ellipsis">{props.title}</div>;
+        }
       },
       {
         key: 'state',
@@ -140,15 +140,13 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
     this.state = {
       actionItemTableItems: new Array<IActionItemsTableProps>(),
       actionItemTableColumns: actionItemsTableColumns
-    }
+    };
   }
 
   public componentDidMount() {
     const actionItemTableItems = this.buildActionItemsList();
 
-    this.setState({
-      actionItemTableItems: actionItemTableItems,
-    });
+    this.setState({ actionItemTableItems });
   }
 
   private getIconForWorkItemType = (type: string): IIconProps => {
@@ -159,7 +157,7 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
       class: workItemType.icon.id,
       url: workItemType.icon.url,
     };
-  };
+  }
 
   private buildActionItemsList = () => {
     const actionItemsList = new Array<IActionItemsTableProps>();
@@ -210,7 +208,7 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
       actionItemTableColumns: newTableColumns,
       actionItemTableItems: newActionItems
     });
-  };
+  }
 
   private onItemInvoked = async (item: any) => {
     const workItemNavSvc = await WorkItemFormNavigationService.getService();
@@ -239,7 +237,7 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
         return 0;
       });
     }
-  };
+  }
 
   public render() {
     return (
@@ -299,7 +297,7 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
           }
         </div>
       </div>
-      
+
     );
   }
 }
