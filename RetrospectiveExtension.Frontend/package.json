@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://microsoft.visualstudio.com/DefaultCollection/Universal%20Store/_git/DES.CDID.Retrospective"
+    "url": "https://github.com/microsoft/vsts-extension-retrospectives"
   },
   "author": "Microsoft",
   "license": "ISC",
