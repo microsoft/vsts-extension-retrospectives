@@ -7,6 +7,8 @@
     "build": "webpack -d",
     "build:p": "set NODE_ENV=production&&webpack -p",
     "dev": "webpack -d --watch",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint-fix": "eslint . --ext .ts,.tsx --fix",
     "pack": "tfx extension create --rev-version --manifests vss-extension-dev.json --output-path ./dist/",
     "pack:dev": "tfx extension create --manifests vss-extension-dev.json --output-path ./dist/",
     "pack:p": "tfx extension create --manifests vss-extension.json --output-path ./dist/",
