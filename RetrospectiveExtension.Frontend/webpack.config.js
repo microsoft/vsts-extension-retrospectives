@@ -10,10 +10,10 @@ module.exports = {
   output: {
     path: BUILD_DIR,
     filename: './reflect-bundle.js',
-    libraryTarget: "amd"
+    libraryTarget: 'amd'
   },
   externals: [
-      /^VSS\/.*/, /^TFS\/.*/
+    /^VSS\/.*/, /^TFS\/.*/
   ],
   resolve: {
     extensions: ['.Webpack.js', '.web.js', '.ts', '.js', '.jsx', '.tsx']
@@ -22,8 +22,8 @@ module.exports = {
     rules: [
       {
         test: /\.ts|.tsx$/,
-        enforce:"pre",
-        loader:'tslint-loader'
+        enforce: 'pre',
+        loader:'eslint-loader'
       },
       {
         test: /\.ts|.tsx$/,
@@ -36,7 +36,7 @@ module.exports = {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: "babel-loader"
+          loader: 'babel-loader'
         }
       },
       { test: /(\.css$)/, loaders: ['style-loader', 'css-loader'] },
@@ -46,7 +46,7 @@ module.exports = {
       },
       { 
         test: /.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/,
-        use: "url-loader?limit=100000"
+        use: 'url-loader?limit=100000'
       }
     ]
   },
