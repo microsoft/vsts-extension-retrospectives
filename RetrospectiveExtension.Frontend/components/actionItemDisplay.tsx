@@ -223,7 +223,7 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
             {this.state.isWorkItemTypeListCalloutVisible &&
               <FocusTrapCallout
                 className="add-action-item-callout"
-                ariaLabel='List of available work item types'
+                ariaLabel="List of available work item types"
                 target={this.addActionItemButtonWrapper}
                 directionalHint={DirectionalHint.rightCenter}
                 gapSpace={0}
