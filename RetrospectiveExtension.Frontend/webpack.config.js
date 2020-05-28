@@ -1,4 +1,4 @@
-﻿const webpack = require('webpack');
+const webpack = require('webpack');
 const path = require('path');
 
 const BUILD_DIR = path.resolve(__dirname, 'dist');
@@ -30,13 +30,6 @@ module.exports = {
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'ts-loader'
-        }
-      },
-      {
-        test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: {
-          loader: 'babel-loader'
         }
       },
       { test: /(\.css$)/, loaders: ['style-loader', 'css-loader'] },
