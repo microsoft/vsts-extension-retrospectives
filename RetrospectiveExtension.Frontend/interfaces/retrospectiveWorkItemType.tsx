@@ -1,6 +1,6 @@
 import * as ProcessDefinitionsContracts from 'TFS/WorkItemTracking/ProcessDefinitionsContracts';
 
-export let feedbackType: ProcessDefinitionsContracts.FieldModel = {
+export const feedbackType: ProcessDefinitionsContracts.FieldModel = {
     description: 'The type of feedback.',
     id: null,
     name: 'Feedback Type',
@@ -9,7 +9,7 @@ export let feedbackType: ProcessDefinitionsContracts.FieldModel = {
     url: null,
 };
 
-export let upvotes: ProcessDefinitionsContracts.FieldModel = {
+export const upvotes: ProcessDefinitionsContracts.FieldModel = {
     description: 'Upvote count',
     id: null,
     name: 'Upvotes',
