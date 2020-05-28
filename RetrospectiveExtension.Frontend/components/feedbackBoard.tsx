@@ -129,7 +129,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
   private initColumns = () => {
     const columnProperties = this.props.board.columns;
 
-    let stateColumns: { [id: string]: IColumn } = {};
+    const stateColumns: { [id: string]: IColumn } = {};
     const columnIds: string[] = new Array<string>();
 
     columnProperties.map((col) => {
@@ -153,7 +153,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
             // Default accent color to DevOps blue if there's any issue.
             : '#0078d4';
 
-      let column: IColumn = {
+      const column: IColumn = {
         columnProperties: col,
         columnItems: [],
         shouldFocusOnCreateFeedback: false,
@@ -224,7 +224,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
   private getColumnsWithReleasedFocus = (currentFeedbackBoardState: FeedbackBoardState) => {
     const resetFocusForStateColumns = {...currentFeedbackBoardState.columns};
 
-    for (let columnIdKey in currentFeedbackBoardState.columns) {
+    for (const columnIdKey in currentFeedbackBoardState.columns) {
       if (resetFocusForStateColumns[columnIdKey].shouldFocusOnCreateFeedback) {
         resetFocusForStateColumns[columnIdKey].shouldFocusOnCreateFeedback = false;
       }
@@ -331,7 +331,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
 
   private refreshFeedbackItems = async (updatedFeedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean): Promise<void> => {
     if (updatedFeedbackItems.length) {
-      const updatedColumnItems: IColumnItem[] = await Promise.all(updatedFeedbackItems.map(async (feedbackItem, index) => {
+      const updatedColumnItems: IColumnItem[] = await Promise.all(updatedFeedbackItems.map(async (feedbackItem) => {
         // TODO: Optimize performance by only updating work items in action-item-related update scenario.
         const actionItems = feedbackItem.associatedActionItemIds && feedbackItem.associatedActionItemIds.length ?
           await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
@@ -429,8 +429,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
         <div className="feedback-columns-container">
           {this.state.isDataLoaded &&
             feedbackColumnPropsList.map((columnProps) => {
-              return (<FeedbackColumn {...columnProps}
-              />);
+              return (<FeedbackColumn {...columnProps} />);
             })
           }
         </div>
