@@ -47,7 +47,7 @@ export class TelemetryClient {
         // console.log("TelemetryClient settings disableAjaxTracking: " + (settings.disableAjaxTracking === "true"));
         // console.log("TelemetryClient settings enableDebug: " + (settings.enableDebug === "true"));
 
-        var config: any = {
+        const config = {
             instrumentationKey: settings.key,
             disableTelemetry : (settings.disableTelemetry === "true"),
             disableAjaxTracking : (settings.disableAjaxTracking === "true"),
@@ -57,7 +57,7 @@ export class TelemetryClient {
         this.ExtensionContext = settings.extensioncontext;
 
         try {
-            var webContext = VSS.getWebContext();
+            const webContext = VSS.getWebContext();
 
             AppInsights.downloadAndSetup(config);
             AppInsights.setAuthenticatedUserContext(webContext.user.id, webContext.collection.id);
@@ -92,7 +92,7 @@ export class TelemetryClient {
         try {
                 console.error(exceptionMessage);
 
-                var error: Error = {
+                const error: Error = {
                     name: this.ExtensionContext + "." + handledAt,
                     message: exceptionMessage
                 };
