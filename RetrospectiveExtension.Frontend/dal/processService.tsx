@@ -1,5 +1,5 @@
 import ProcessRestClient = require("TFS/WorkItemTracking/ProcessRestClient");
-import { ProcessModel, GetProcessExpandLevel, FieldModel } from "TFS/WorkItemTracking/ProcessContracts";
+import { GetProcessExpandLevel } from "TFS/WorkItemTracking/ProcessContracts";
 import ProcessDefinitionsRestClient = require("TFS/WorkItemTracking/ProcessDefinitionsRestClient");
 import * as ProcessDefinitionsContracts  from 'TFS/WorkItemTracking/ProcessDefinitionsContracts';
 import { retrospectiveWorkItemTypeModel } from '../interfaces/retrospectiveWorkItemType';
