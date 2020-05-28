@@ -1,5 +1,5 @@
 import { ExtensionDataService } from 'VSS/SDK/Services/ExtensionData';
-import { appInsightsClient, TelemetryEvents, TelemetryExceptions } from '../utilities/appInsightsClient';
+import { appInsightsClient } from '../utilities/appInsightsClient';
 
 let extensionDataService: ExtensionDataService;
 
