@@ -24,7 +24,7 @@ export default class FeedbackCarousel extends React.Component<IFeedbackCarouselP
           FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);
 
         return (
-          <div className="feedback-carousel-item">
+          <div key={feedbackItemProps.id} className="feedback-carousel-item">
             <FeedbackItem
               key={feedbackItemProps.id}
               {...feedbackItemProps}
