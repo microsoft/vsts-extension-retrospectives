@@ -9,7 +9,10 @@ export interface IWorkflowStageProps {
   clickEventCallback: any;
 }
 
-export default class WorkflowStage extends React.Component<IWorkflowStageProps, {}> {
+export interface IWorkflowStageState {
+}
+
+export default class WorkflowStage extends React.Component<IWorkflowStageProps, IWorkflowStageState> {
   constructor(props: IWorkflowStageProps) {
     super(props);
     this.state = { };
