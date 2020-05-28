@@ -1,4 +1,4 @@
-const webpack = require('webpack');
+﻿const webpack = require('webpack');
 const path = require('path');
 
 const BUILD_DIR = path.resolve(__dirname, 'dist');
@@ -26,7 +26,7 @@ module.exports = {
         loader:'eslint-loader'
       },
       {
-        test: /\.ts|.tsx$/,
+        test: /\.ts|.js|.tsx$/,
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'ts-loader'
