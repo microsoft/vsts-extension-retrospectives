@@ -49,24 +49,24 @@ export default class FeedbackBoardPreviewEmail extends React.Component<IFeedback
     if (!this.state.emailContent) {
       return (
         <div>
-          <Spinner className='preview-email-spinner'
+          <Spinner className="preview-email-spinner"
             size={SpinnerSize.large}
-            label='Loading...'
-            ariaLive='assertive' />
+            label="Loading..."
+            ariaLive="assertive" />
         </div>
       );
     }
     
     return (
       <div>
-        <ActionButton className='copy-email-button'
-          text='Copy to clipboard'
+        <ActionButton className="copy-email-button"
+          text="Copy to clipboard"
           onClick={this.onCopyButtonClick}
-          iconProps={{ iconName: 'Copy' }} />
-        <TextField multiline rows={20} className='preview-email-field'
+          iconProps={{ iconName: "Copy" }} />
+        <TextField multiline rows={20} className="preview-email-field"
             componentRef={(element: ITextField) => {this.emailTextField = element;}}
             readOnly={true}
-            ariaLabel='Email summary for retrospective'
+            ariaLabel="Email summary for retrospective"
             onClick={(e) => {e.stopPropagation(); this.handleClick();}}
             value={this.state.emailContent} />
       </div>
