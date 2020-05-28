@@ -428,4 +428,4 @@ class ItemDataService {
   }
 }
 
-export let itemDataService = new ItemDataService();
+export const itemDataService = new ItemDataService();

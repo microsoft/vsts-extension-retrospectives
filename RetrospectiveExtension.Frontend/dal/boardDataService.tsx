@@ -104,4 +104,4 @@ class BoardDataService {
     }
 }
 
-export let boardDataService = new BoardDataService();
+export const boardDataService = new BoardDataService();

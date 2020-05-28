@@ -75,4 +75,4 @@ class AzureDevOpsCoreService {
   // }
 }
 
-export let azureDevOpsCoreService = new AzureDevOpsCoreService();
+export const azureDevOpsCoreService = new AzureDevOpsCoreService();

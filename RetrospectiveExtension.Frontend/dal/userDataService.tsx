@@ -55,4 +55,4 @@ class UserDataService {
   }
 }
 
-export let userDataService = new UserDataService();
+export const userDataService = new UserDataService();

@@ -235,7 +235,7 @@ class WorkItemService {
    * @param ids The ids of the work items to fetch.
    */
   public async getWorkItemsByIds(ids: number[]) {
-    let workItems = await this._httpClient.getWorkItems(ids, undefined, undefined, WorkItemExpand.All, WorkItemErrorPolicy.Omit, VSS.getWebContext().project.id);
+    const workItems = await this._httpClient.getWorkItems(ids, undefined, undefined, WorkItemExpand.All, WorkItemErrorPolicy.Omit, VSS.getWebContext().project.id);
     return workItems.filter(wi => wi != null);
   }
 
@@ -363,4 +363,4 @@ class WorkItemService {
   }
 }
 
-export let workItemService = new WorkItemService();
+export const workItemService = new WorkItemService();
