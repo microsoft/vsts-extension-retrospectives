@@ -1,6 +1,6 @@
 import Work_Contracts = require('TFS/Work/Contracts');
 import WorkClient = require('TFS/Work/RestClient');
-import { appInsightsClient, TelemetryEvents, TelemetryExceptions } from '../utilities/appInsightsClient';
+import { appInsightsClient } from '../utilities/appInsightsClient';
 
 class WorkService {
   private _httpWorkClient: WorkClient.WorkHttpClient2_3;
