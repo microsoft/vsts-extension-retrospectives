@@ -1,4 +1,4 @@
-import { DefaultButton, IButtonProps, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { DefaultButton, IButtonProps, PrimaryButton, BaseButton, Button } from 'office-ui-fabric-react/lib/Button';
 import {
   DocumentCard,
   DocumentCardActions,
@@ -124,7 +124,7 @@ export default class ActionItem extends React.Component<ActionItemProps, ActionI
     }
   }
 
-  private handleKeyPressSelectorButton = (event: any) => {
+  private handleKeyPressSelectorButton = (event: React.KeyboardEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button>) => {
     if (event.key === 'Enter') {
       this.showUnlinkWorkItem(event);
       return;
@@ -137,8 +137,8 @@ export default class ActionItem extends React.Component<ActionItemProps, ActionI
     event.stopPropagation();
   }
 
-  private showWorkItemForm = (e: any) => {
-    e && e.stopPropagation();
+  private showWorkItemForm = (event: any) => {
+    event && event.stopPropagation();
     this.onActionItemClick(this.props.actionItem.id);
   }
 

@@ -254,7 +254,7 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
                   <List
                     className="add-action-item-list-items"
                     items={this.props.nonHiddenWorkItemTypes}
-                    onRenderCell={(item: WorkItemType, index: number) => {
+                    onRenderCell={(item: WorkItemType) => {
                       return (
                         <DefaultButton
                           className="add-action-item-list-item"
