@@ -56,23 +56,6 @@ class AzureDevOpsCoreService {
     await getTeamBatch(0);
     return allTeams;
   }
-
-  // proak: Leaving this in here for now, in case we want to add more teams for testing.
-  // To use, add the 'vso.project_manage' scope to manifest, uncomment and call the method below.
-  //
-  // public async createTestTeams(projectId: string, count: number):
-  //   Promise<void> {
-  //   let i = 0;
-  //   while (i<count) {
-  //     i++;
-  //     const rand = "team" + new Date().getTime().toString();
-  //     const team = {
-  //       name: rand,
-  //       description: rand,
-  //     }
-  //     await this._httpCoreClient.createTeam(team, projectId);
-  //   }
-  // }
 }
 
 export const azureDevOpsCoreService = new AzureDevOpsCoreService();
