@@ -89,7 +89,7 @@ export class ProcessService {
 
     public getList = (listName: string) => {
         return this.workItemTrackingProcessDefinitionsHttpClient.getListsMetadata().then(lists => {
-            let pickListMetadata = lists.find( list => list.name === listName);
+            const pickListMetadata = lists.find( list => list.name === listName);
             if (pickListMetadata) {
                 return this.workItemTrackingProcessDefinitionsHttpClient.getList(pickListMetadata.id);
             }
@@ -101,7 +101,7 @@ export class ProcessService {
     public getField = (name: string) => {
         return workItemService.getAllFields()
         .then(fields => {
-            let field = fields.find(field => field.name === name);
+            const field = fields.find(field => field.name === name);
             if (field) {
                 return Promise.resolve(field);
             }
@@ -111,4 +111,4 @@ export class ProcessService {
     }
 }
 
-export let processService = new ProcessService();
+export const processService = new ProcessService();
