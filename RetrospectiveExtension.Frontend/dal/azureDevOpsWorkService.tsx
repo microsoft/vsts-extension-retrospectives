@@ -68,4 +68,4 @@ class WorkService {
   }
 }
 
-export let workService = new WorkService();
+export const workService = new WorkService();
