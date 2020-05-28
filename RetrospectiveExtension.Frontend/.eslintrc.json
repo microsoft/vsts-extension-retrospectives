@@ -1,34 +1,40 @@
 {
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "ignorePatterns": ["node_modules/**/*.*", "dist/**/*.*"],
-    "settings": {
-        "react": {
-            "version": "detect"
-        }
-    },
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended"
-    ],
-    "plugins": [
-        "@typescript-eslint",
-        "react"
-    ],
-    "rules": {
-        "indent": [
-            "error",
-            2
-        ],
-        "quotes": [
-            "error",
-            "single",{
-                "avoidEscape": true,
-                "allowTemplateLiterals": true
-            }
-        ],
-        "jsx-quotes": ["error", "prefer-double"]
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "ignorePatterns": [
+    "node_modules/**/*.*",
+    "dist/**/*.*"
+  ],
+  "settings": {
+    "react": {
+      "version": "detect"
     }
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "react"
+  ],
+  "rules": {
+    "indent": "off",
+    "quotes": "off",
+    "react/jsx-key": "off",
+    "react/no-direct-mutation-state": "off",
+    "@typescript-eslint/ban-types": "off",
+    "jsx-quotes": [
+      "error",
+      "prefer-double"
+    ],
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off"
+  }
 }
