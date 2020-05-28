@@ -1,4 +1,4 @@
-import { Wiql, WorkItemExpand, WorkItemRelation, WorkItemErrorPolicy, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking/Contracts';
+import { Wiql, WorkItemExpand, WorkItemRelation, WorkItemErrorPolicy } from 'TFS/WorkItemTracking/Contracts';
 import WorkitemRestClient = require('TFS/WorkItemTracking/RestClient');
 import { JsonPatchDocument, Operation } from 'VSS/WebApi/Contracts';
 import { IRetrospectiveItemCreate, IRetrospectiveItemsQuery, RelationshipType } from '../interfaces/workItem';
