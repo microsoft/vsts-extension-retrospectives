@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { PrimaryButton, DefaultButton, Button, IconButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
+import { PrimaryButton, DefaultButton, IconButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
-import { Checkbox, ICheckboxProps } from 'office-ui-fabric-react/lib/Checkbox';
+import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 const NoWorkSvg = require('../images/zerodata-no-work-scheduled.svg');
 
 import { boardDataService } from '../dal/boardDataService';
