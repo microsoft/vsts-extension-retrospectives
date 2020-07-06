@@ -11,7 +11,7 @@ import { List } from 'office-ui-fabric-react/lib/List';
 import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
 import classNames = require('classnames');
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
-import { v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
