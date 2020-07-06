@@ -1,4 +1,4 @@
-﻿import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+﻿import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -29,7 +29,7 @@ import FeedbackBoardPreviewEmail from './feedbackBoardPreviewEmail';
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import { WorkItemType, WorkItemTypeReference } from 'TFS/WorkItemTracking/Contracts';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
-import { isInternalOrg, isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
+import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import moment = require('moment');
 const TrapezoidSvg = require('../images/round-trapezoid.svg');
 const TrapezoidMobileSvg = require('../images/round-trapezoid-mobile.svg');
@@ -110,8 +110,6 @@ export default class FeedbackBoardContainer
       userTeams: [],
     };
   }
-
-  private isInternal = isInternalOrg();
 
   public async componentDidMount() {
     window.addEventListener('resize', this.handleResolutionChange);
@@ -950,17 +948,6 @@ export default class FeedbackBoardContainer
             selectorListItemOnClick={this.changeSelectedTeam}
             title={"Team"}
           />
-          <div className="contact-us-button">
-            <IconButton
-              iconProps={{ iconName: 'ChatInviteFriend' }}
-              title="Contact Us"
-              aria-label="Contact Us"
-              href={this.isInternal
-                ? "mailto:retrospectives@microsoft.com?subject=Retrospectives Feedback"
-                : "https://marketplace.visualstudio.com/items?itemName=ms-devlabs.team-retrospectives#qna"}
-              target="_blank"
-            />
-          </div>
           <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.toggleAndFixResolution} />
         </div>
         <div className="pivot-container">
