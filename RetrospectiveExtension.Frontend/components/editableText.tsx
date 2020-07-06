@@ -148,7 +148,7 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
             maxLength={this.props.maxLength}
             resizable={false}
             onKeyDown={this.handleKeyPress}
-            onClick={(e: MouseEvent) => {
+            onClick={(e: React.MouseEvent<HTMLTextAreaElement | HTMLInputElement, MouseEvent>) => {
               e.stopPropagation();
             }}
           />
