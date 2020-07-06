@@ -67,7 +67,7 @@ export default class FeedbackBoardPreviewEmail extends React.Component<IFeedback
             componentRef={(element: ITextField) => {this.emailTextField = element;}}
             readOnly={true}
             ariaLabel="Email summary for retrospective"
-            onClick={(e: MouseEvent) => {e.stopPropagation(); this.handleClick();}}
+            onClick={(e: React.MouseEvent<HTMLTextAreaElement | HTMLInputElement, MouseEvent>) => {e.stopPropagation(); this.handleClick();}}
             value={this.state.emailContent} />
       </div>
     );
