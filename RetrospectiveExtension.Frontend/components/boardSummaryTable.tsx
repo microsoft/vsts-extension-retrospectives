@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import ReactTable, { Column } from 'react-table';
 import { boardDataService } from '../dal/boardDataService';
@@ -9,10 +9,8 @@ import BoardSummary from './boardSummary';
 import * as moment from 'moment';
 import { appInsightsClient } from '../utilities/appInsightsClient';
 import classNames from 'classnames';
-const PerfectScrollbar = require('react-perfect-scrollbar');
 
 import 'react-table/react-table.css'
-import 'react-perfect-scrollbar/dist/css/styles.css';
 
 const boardSummaryColumns: Column[] = [
   {
@@ -305,13 +303,13 @@ export class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, 
 
   private getCustomTbodyComponent = (props: any) => (
     <div {...props} className={classNames("rt-tbody", props.className || [])}>
-      <PerfectScrollbar>{props.children}</PerfectScrollbar>
+      {props.children}
     </div>
   );
 
   public render() {
     return (
-      <div className="board-summary-table-container">
+        <div className="board-summary-table-container">
         {/*
           // @ts-ignore TS2786 */}
         <ReactTable
