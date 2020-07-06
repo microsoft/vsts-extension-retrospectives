@@ -46,6 +46,10 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
+  private onContactUsClicked = () => {
+    window.open('https://github.com/microsoft/vsts-extension-retrospectives/issues', '_blank');
+  }
+
   // If an action needs to be hidden on desktop or mobile view, use the item's className property
   // with .hide-mobile or .hide-desktop
   private readonly extensionSettingsMenuItem: IContextualMenuItem[] = [
@@ -71,6 +75,13 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
       text: 'Switch to Mobile View',
       title: 'Switch to Mobile View',
       className: 'hide-mobile'
+    },
+    {
+      key: 'contactUs',
+      iconProps: { iconName: 'ChatInviteFriend' },
+      onClick: this.onContactUsClicked,
+      text: 'Contact Us',
+      title: 'Contact Us'
     },
   ];
 
