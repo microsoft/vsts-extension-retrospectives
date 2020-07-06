@@ -142,7 +142,7 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
     }
   }
 
-  private handleInputChange = async (newValue: string) => {
+  private handleInputChange = async (event?: React.ChangeEvent<HTMLInputElement>, newValue?: string) => {
     if (!newValue || !newValue.trim()) {
       this.setState({
         isLinkedWorkItemLoaded: false,
