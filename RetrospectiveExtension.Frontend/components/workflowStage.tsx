@@ -6,7 +6,7 @@ export interface IWorkflowStageProps {
   display: string;
   value: WorkflowPhase;
   isActive: boolean;
-  clickEventCallback: any;
+  clickEventCallback: (clickedElement: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => void;
 }
 
 export interface IWorkflowStageState {
