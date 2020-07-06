@@ -190,7 +190,7 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
     let newActionItems = actionItems.slice();
 
     const newTableColumns: IColumn[] = this.state.actionItemTableColumns.slice();
-    const currColumn: IColumn = newTableColumns.filter((currCol: IColumn, idx: number) => {
+    const currColumn: IColumn = newTableColumns.filter((currCol: IColumn) => {
       return column.key === currCol.key;
     })[0];
     newTableColumns.forEach((newCol: IColumn) => {
