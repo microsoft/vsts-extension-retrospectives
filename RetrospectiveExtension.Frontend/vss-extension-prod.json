@@ -1,11 +1,11 @@
 {
   "manifestVersion": 1,
-  "id": "retrospective-vsts-extension",
-  "publisher": "ReflectTeam",
+  "id": "team-retrospectives",
+  "publisher": "ms-devlabs",
   "version": "1.0.41",
-  "name": "Retrospectives (Internal Prod)",
+  "name": "Retrospectives",
   "description": "An Azure DevOps extension for efficient retrospectives.",
-  "public": false,
+  "public": true,
   "icons": {
     "small": "images/logos/logo_small.png",
     "branding": "images/logos/logo_branding.png",
@@ -17,10 +17,10 @@
   },
   "content": {
     "details": {
-      "path": "PACKAGE-DESCRIPTION.md"
+      "path": "./assets/PACKAGE-DESCRIPTION.md"
     },
     "license": {
-        "path": "LICENSE.md"
+        "path": "./assets/LICENSE.md"
     }
   },
   "targets": [
@@ -37,7 +37,7 @@
     "retrospective"
   ],
   "categories": [
-    "Plan and track"
+    "Azure Boards"
   ],
   "scopes": [
     "vso.work",
@@ -45,13 +45,13 @@
   ],
   "contributions": [
     {
-      "id": "reflect-hub",
+      "id": "home",
       "type": "ms.vss-web.hub",
       "targets": [
         "ms.vss-work-web.work-hub-group"
       ],
       "properties": {
-        "name": "Retrospectives (Internal Prod)",
+        "name": "Retrospectives",
         "uri": "src/sample-hub.html",
         "icon": {
             "light": "asset://images/logos/logo_navbar_light_theme.png",
