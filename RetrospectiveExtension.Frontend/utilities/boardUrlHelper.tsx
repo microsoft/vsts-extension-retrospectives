@@ -8,8 +8,7 @@ export const getBoardUrl = (teamId: string, boardId: string): string => {
     const queryParams = new URLSearchParams();
     queryParams.append('teamId', teamId);
     queryParams.append('boardId', boardId);
-    const boardDeepLinkUrl = url.protocol + '//' + url.hostname + url.pathname + '?'
-      + queryParams.toString();
+    const boardDeepLinkUrl = `${url.protocol}//${url.hostname}${url.port}${url.pathname}?${queryParams.toString()}`;
 
     return boardDeepLinkUrl;
 }
