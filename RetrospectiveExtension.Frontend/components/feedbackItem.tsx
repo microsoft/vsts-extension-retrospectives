@@ -477,7 +477,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     // TODO: Inform user when not all updates are successful due to race conditions.
   }
 
-  private handleFeedbackItemSearchInputChange = async (searchTerm: string) => {
+  private handleFeedbackItemSearchInputChange = async (event?: React.ChangeEvent<HTMLInputElement>, searchTerm?: string) => {
     if (!searchTerm || !searchTerm.trim()) {
       this.setState({
         searchTerm: searchTerm,
