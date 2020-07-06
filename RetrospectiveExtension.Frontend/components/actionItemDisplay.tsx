@@ -62,7 +62,6 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
     }
   }
 
-  private addActionItemButton: HTMLElement | null;
   private addActionItemButtonWrapper: HTMLElement | null;
 
   private createAndLinkActionItem = async (workItemTypeName: string) => {
@@ -137,9 +136,6 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
     event && event.stopPropagation();
     this.hideSelectorCallout();
     this.addActionItem(item.name)
-    if (this.addActionItemButton) {
-      this.addActionItemButton.focus();
-    }
   }
 
   private handleInputChange = async (event?: React.ChangeEvent<HTMLInputElement>, newValue?: string) => {
