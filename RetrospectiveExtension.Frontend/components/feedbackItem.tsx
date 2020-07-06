@@ -107,7 +107,7 @@ interface FeedbackItemEllipsisMenuItem {
 
 export default class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemState> {
   private itemElement: HTMLElement;
-  private itemElementRef: any;
+  private itemElementRef: (element: HTMLElement) => void;
 
   constructor(props: IFeedbackItemProps) {
     super(props);
