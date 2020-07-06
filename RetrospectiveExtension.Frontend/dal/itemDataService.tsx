@@ -3,7 +3,7 @@ import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { WorkItem } from 'TFS/WorkItemTracking/Contracts';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
-import { v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 
 class ItemDataService {
