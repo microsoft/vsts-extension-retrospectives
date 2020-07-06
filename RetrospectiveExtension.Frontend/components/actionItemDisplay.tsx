@@ -133,7 +133,7 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
     }
   }
 
-  private handleClickWorkItemType = (event: React.MouseEvent<Button | HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton>, item: WorkItemType) => {
+  private handleClickWorkItemType = (event: React.MouseEvent<Button | HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | HTMLSpanElement>, item: WorkItemType) => {
     event && event.stopPropagation();
     this.hideSelectorCallout();
     this.addActionItem(item.name)
