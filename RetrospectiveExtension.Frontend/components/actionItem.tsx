@@ -131,13 +131,13 @@ export default class ActionItem extends React.Component<ActionItemProps, ActionI
     }
   }
 
-  private showUnlinkWorkItem = (event: any) => {
+  private showUnlinkWorkItem = (event: React.KeyboardEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button> | React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button | HTMLSpanElement, MouseEvent>) => {
     event.preventDefault();
     this.showUnlinkWorkItemConfirmationDialog();
     event.stopPropagation();
   }
 
-  private showWorkItemForm = (event: any) => {
+  private showWorkItemForm = (event: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event && event.stopPropagation();
     this.onActionItemClick(this.props.actionItem.id);
   }
