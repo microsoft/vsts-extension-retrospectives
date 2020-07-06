@@ -208,6 +208,7 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
             <div
               ref={(div) => this.addActionItemButtonWrapper = div}>
               <ActionButton
+                // @ts-ignore TS2769
                 componentRef={(actionButton: HTMLElement) => this.addActionItemButton = actionButton}
                 className="add-action-item-button"
                 ariaLabel="Add work item"

@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import ReactTable, { Column } from 'react-table';
 import { boardDataService } from '../dal/boardDataService';
@@ -312,6 +312,8 @@ export class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, 
   public render() {
     return (
       <div className="board-summary-table-container">
+        {/*
+          // @ts-ignore TS2786 */}
         <ReactTable
           data={this.state.boardsTableItems}
           TbodyComponent={this.getCustomTbodyComponent}
@@ -329,6 +331,7 @@ export class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, 
           getTrProps={this.getTrProps}
           getTdProps={this.getTdProps}
           getTableProps={this.getTableProps}
+          // @ts-ignore TS7006
           SubComponent={row => {
             const currentBoard = this.state.boardsTableItems.find(board => board.id === row.original.id);
             const actionItems = this.state.actionItemsByBoard[currentBoard.id];

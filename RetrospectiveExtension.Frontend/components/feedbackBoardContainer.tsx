@@ -208,6 +208,7 @@ export default class FeedbackBoardContainer
       return;
     }
 
+    // @ts-ignore TS2345
     this.setState(prevState => {
       const boardsForTeam = [...prevState.boards, boardToAdd]
         .sort((b1, b2) => {
@@ -281,6 +282,7 @@ export default class FeedbackBoardContainer
       return;
     }
 
+    // @ts-ignore TS2345
     this.setState(prevState => {
       const currentBoards = prevState.boards;
       // Note: Javascript filter maintains order.
@@ -560,6 +562,7 @@ export default class FeedbackBoardContainer
         });
       }
 
+      // @ts-ignore TS2345
       this.setState(prevState => {
         // Ensure that we are actually changing teams to prevent needless rerenders.
         if (!prevState.currentTeam || prevState.currentTeam.id !== matchedTeam.id) {
@@ -627,6 +630,7 @@ export default class FeedbackBoardContainer
     const matchedBoard = this.state.boards.find((board) => board.id === selectedBoard.id);
 
     if (matchedBoard) {
+      // @ts-ignore TS2345
       this.setState(prevState => {
         // Ensure that we are actually changing boards to prevent needless rerenders.
         if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {

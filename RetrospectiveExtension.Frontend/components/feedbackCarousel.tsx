@@ -78,6 +78,7 @@ export default class FeedbackCarousel extends React.Component<IFeedbackCarouselP
                 this.renderSingleFeedbackCarouselItem(columnProps)
               }
               {mainCardCount >= 2 &&
+                // @ts-ignore TS2786
                 <Slider {...settings}>
                   {React.Children.map(this.renderFeedbackCarouselItems(columnProps), (child: React.ReactElement<FeedbackItem>) => {
                     return (
