@@ -143,7 +143,7 @@ class WorkItemService {
       // Operation.Update doesn't seem to support this scenario.
       .then((referenceRelationshipItems) => {
         if (referenceRelationshipItems.length) {
-          const referenceRelationshipItemUpdates = referenceRelationshipItems.map((referenceRelationshipItem) => {
+          referenceRelationshipItems.map((referenceRelationshipItem) => {
             const relationIndexToRemove = referenceRelationshipItem.relations.findIndex(
               (relation: WorkItemRelation) => relation.rel === RelationshipType.ReferencedByForward
                 && relation.url === `https://reflect-retrospective-hackathon.visualstudio.com/_apis/wit/workItems/${sourceReferencingId}`);
