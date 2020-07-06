@@ -4,7 +4,7 @@ import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
 
 import { workService } from '../dal/azureDevOpsWorkService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
-import { boardDataService } from '../dal/boardDataService';
+import BoardDataService from '../dal/boardDataService';
 import { itemDataService } from '../dal/itemDataService';
 import { reflectBackendService } from '../dal/reflectBackendService';
 import FeedbackColumn from './feedbackColumn';
@@ -137,18 +137,18 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       // based on column id.
       col.iconClass = col.iconClass
         ? col.iconClass
-        : col.id === boardDataService.legacyPositiveColumnId
+        : col.id === BoardDataService.legacyPositiveColumnId
           ? 'far fa-smile'
-          : col.id === boardDataService.legacyNegativeColumnId
+          : col.id === BoardDataService.legacyNegativeColumnId
             ? 'far fa-frown'
             // Default icon to a chalkboard if there's any issue.
             : 'fas fa-chalkboard';
 
       col.accentColor = col.accentColor
         ? col.accentColor
-        : col.id === boardDataService.legacyPositiveColumnId
+        : col.id === BoardDataService.legacyPositiveColumnId
           ? 'green'
-          : col.id === boardDataService.legacyNegativeColumnId
+          : col.id === BoardDataService.legacyNegativeColumnId
             ? '#cc293d'
             // Default accent color to DevOps blue if there's any issue.
             : '#0078d4';

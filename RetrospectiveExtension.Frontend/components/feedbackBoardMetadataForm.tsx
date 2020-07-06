@@ -5,7 +5,7 @@ import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dia
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 const NoWorkSvg = require('../images/zerodata-no-work-scheduled.svg');
 
-import { boardDataService } from '../dal/boardDataService';
+import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
@@ -19,10 +19,7 @@ interface IFeedbackBoardMetadataFormProps {
   teamId: string;
   placeholderText: string;
   initialValue: string;
-  onFormSubmit: (
-      title: string, columns: IFeedbackColumn[],
-      isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean,
-    ) => void;
+  onFormSubmit: (title: string, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean) => void;
   onFormCancel: () => void;
 }
 
@@ -33,7 +30,6 @@ interface IFeedbackBoardMetadataFormState {
   columnCards: IFeedbackColumnCard[];
   isBoardAnonymous: boolean;
   shouldShowFeedbackAfterCollect: boolean;
-
   isDeleteColumnConfirmationDialogHidden: boolean;
   isChooseColumnIconDialogHidden: boolean;
   isChooseColumnAccentColorDialogHidden: boolean;
@@ -119,7 +115,7 @@ export default class FeedbackBoardMetadataForm
       return;
     }
 
-    const isBoardNameTaken = await boardDataService.checkIfBoardNameIsTaken(this.props.teamId, this.state.title);
+    const isBoardNameTaken = await BoardDataService.checkIfBoardNameIsTaken(this.props.teamId, this.state.title);
 
     if (isBoardNameTaken && this.props.initialValue !== this.state.title) {
       this.setState({
@@ -135,7 +131,7 @@ export default class FeedbackBoardMetadataForm
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect);
   }
-  
+
   private handleIsAnonymousCheckboxChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
     this.setState({
       isBoardAnonymous: checked,
@@ -249,44 +245,43 @@ export default class FeedbackBoardMetadataForm
         {this.state.isBoardNameTaken && <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>}
         <div className="board-metadata-form-anonymous-feedback-section hide-mobile">
           <div className="board-metadata-form-section-subheader">
-              <Checkbox
-                label="Make all feedback anonymous"
-                ariaLabel="Make all feedback anonymous. This selection cannot be modified after board creation."
-                boxSide="end"
-                defaultChecked={this.state.isBoardAnonymous}
-                disabled={!this.props.isNewBoardCreation}
-                onChange={this.handleIsAnonymousCheckboxChange}
-                styles={{
-                  root: {
-                    justifyContent: 'center',
-                    width: '100%',
-                    display: 'flex',
-                  },
-                }} />
+            <Checkbox
+              label="Make all feedback anonymous"
+              ariaLabel="Make all feedback anonymous. This selection cannot be modified after board creation."
+              boxSide="end"
+              defaultChecked={this.state.isBoardAnonymous}
+              disabled={!this.props.isNewBoardCreation}
+              onChange={this.handleIsAnonymousCheckboxChange}
+              styles={{
+                root: {
+                  justifyContent: 'center',
+                  width: '100%',
+                  display: 'flex',
+                },
+              }} />
           </div>
 
           <div className="board-metadata-form-section-subheader">
-              <Checkbox
-                label="Only show feedback after Collect phase"
-                ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
-                boxSide="end"
-                defaultChecked={this.state.shouldShowFeedbackAfterCollect}
-                disabled={!this.props.isNewBoardCreation}
-                onChange={this.handleShouldShowFeedbackAfterCollectChange}
-                styles={{
-                  root: {
-                    justifyContent: 'center',
-                    width: '100%',
-                    display: 'flex',
-                  },
-                }} />
-                Note: These selections cannot be modified after board creation.
+            <Checkbox
+              label="Only show feedback after Collect phase"
+              ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
+              boxSide="end"
+              defaultChecked={this.state.shouldShowFeedbackAfterCollect}
+              disabled={!this.props.isNewBoardCreation}
+              onChange={this.handleShouldShowFeedbackAfterCollectChange}
+              styles={{
+                root: {
+                  justifyContent: 'center',
+                  width: '100%',
+                  display: 'flex',
+                },
+              }} />
+              Note: These selections cannot be modified after board creation.
           </div>
         </div>
         <div className="board-metadata-form-edit-column-section hide-desktop">
           <div className="board-metadata-form-section-header">Columns</div>
-          <div className="board-metadata-form-section-subheader">Editing columns is supported on the desktop version only. 
-          Please use a device with a larger screen and expand the window width if you would like to add, edit, or remove columns.</div>
+          <div className="board-metadata-form-section-subheader">Editing columns is supported on the desktop version only. Please use a device with a larger screen and expand the window width if you would like to add, edit, or remove columns.</div>
         </div>
         <div className="board-metadata-form-edit-column-section hide-mobile">
           <div className="board-metadata-form-section-header">Columns</div>

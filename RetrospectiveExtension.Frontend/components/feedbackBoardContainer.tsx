@@ -10,7 +10,7 @@ import * as vssClipboard from 'VSS/Utils/Clipboard';
 import { ViewMode, MobileWidthBreakpoint } from '../config/constants';
 import { WorkflowPhase } from '../interfaces/workItem';
 import WorkflowStage from './workflowStage';
-import { boardDataService } from '../dal/boardDataService';
+import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback';
 import FeedbackBoard from '../components/feedbackBoard';
 import FeedbackBoardMetadataForm from './feedbackBoardMetadataForm';
@@ -200,7 +200,7 @@ export default class FeedbackBoardContainer
       return;
     }
 
-    const boardToAdd = await boardDataService.getBoardForTeamById(this.state.currentTeam.id, boardId);
+    const boardToAdd = await BoardDataService.getBoardForTeamById(this.state.currentTeam.id, boardId);
 
     if (!boardToAdd) {
       return;
@@ -265,7 +265,7 @@ export default class FeedbackBoardContainer
       return;
     }
 
-    const updatedBoard = await boardDataService.getBoardForTeamById(this.state.currentTeam.id, updatedBoardId);
+    const updatedBoard = await BoardDataService.getBoardForTeamById(this.state.currentTeam.id, updatedBoardId);
 
     if (!updatedBoard) {
       // Board has been deleted after the update. Just ignore the update. The delete should be handled on its own.
@@ -429,7 +429,7 @@ export default class FeedbackBoardContainer
       };
     }
 
-    const boardsForMatchedTeam = await boardDataService.getBoardsForTeam(matchedTeam.id);
+    const boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
     if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
       boardsForMatchedTeam.sort((b1, b2) => {
         return (new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime());
@@ -502,7 +502,7 @@ export default class FeedbackBoardContainer
       const mostRecentTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, mostRecentUserVisit.teamId);
 
       if (mostRecentTeam) {
-        const boardsForTeam = await boardDataService.getBoardsForTeam(mostRecentTeam.id);
+        const boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
         if (boardsForTeam && boardsForTeam.length) {
           boardsForTeam.sort((b1, b2) => {
             return (new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime());
@@ -526,7 +526,7 @@ export default class FeedbackBoardContainer
       }
     }
 
-    const boardsForMatchedTeam = await boardDataService.getBoardsForTeam(defaultTeam.id);
+    const boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(defaultTeam.id);
     if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
       boardsForMatchedTeam.sort((b1, b2) => {
         return (new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime());
@@ -553,7 +553,7 @@ export default class FeedbackBoardContainer
       this.state.userTeams.find((team) => team.id === teamId);
 
     if (matchedTeam) {
-      const boardsForTeam = await boardDataService.getBoardsForTeam(matchedTeam.id);
+      const boardsForTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
       if (boardsForTeam && boardsForTeam.length) {
         boardsForTeam.sort((b1, b2) => {
           return (new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime());
@@ -593,7 +593,7 @@ export default class FeedbackBoardContainer
   private reloadBoardsForCurrentTeam = async () => {
     this.setState({ isTeamDataLoaded: false });
 
-    const boardsForTeam = await boardDataService.getBoardsForTeam(this.state.currentTeam.id);
+    const boardsForTeam = await BoardDataService.getBoardsForTeam(this.state.currentTeam.id);
 
     if (!boardsForTeam.length) {
       this.setState({
@@ -677,7 +677,7 @@ export default class FeedbackBoardContainer
   }
 
   private createBoard = async (title: string, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean) => {
-    const createdBoard = await boardDataService.createBoardForTeam(this.state.currentTeam.id, title, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect);
+    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -702,7 +702,7 @@ export default class FeedbackBoardContainer
 
   private updateBoardMetadata = async (title: string, columns: IFeedbackColumn[]) => {
     const updatedBoard =
-      await boardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, title, columns);
+      await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, title, columns);
     
     this.updateBoardAndBroadcast(updatedBoard);
   }
@@ -763,7 +763,7 @@ export default class FeedbackBoardContainer
   }
 
   private deleteCurrentBoard = async () => {
-    await boardDataService.deleteFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
+    await BoardDataService.deleteFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     await this.reloadBoardsForCurrentTeam();
     this.hideDeleteBoardConfirmationDialog();

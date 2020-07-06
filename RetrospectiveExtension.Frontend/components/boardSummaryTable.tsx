@@ -1,7 +1,7 @@
 ﻿import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import ReactTable, { Column } from 'react-table';
-import { boardDataService } from '../dal/boardDataService';
+import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking/Contracts';
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
@@ -103,7 +103,7 @@ export class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, 
 
   // TODO: Add live update support.
   private setBoardsTable = async () => {
-    const boardsForTeam = await boardDataService.getBoardsForTeam(this.props.teamId);
+    const boardsForTeam = await BoardDataService.getBoardsForTeam(this.props.teamId);
     if (!boardsForTeam || boardsForTeam.length === 0) {
       this.setState({ isDataLoaded: true, boardsTableItems: [] });
       return;
