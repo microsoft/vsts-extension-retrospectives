@@ -34,3 +34,6 @@ RUN apt-get update \
     #
     # Install node
     && apt install -y nodejs \
+    #
+    # Install npm
+    && apt install -y npm \
