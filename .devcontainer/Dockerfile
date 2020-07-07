@@ -8,3 +8,6 @@ RUN apt-get update \
     #
     # Verify wget, jq, unzip, git and process tools installed
     && apt-get -y install git iproute2 procps wget unzip jq \
+    #
+    # Upgrade existing packages
+    && apt-get -y upgrade \
