@@ -31,3 +31,6 @@ RUN apt-get update \
     && apt-get install -y apt-transport-https \
     && apt-get update \
     && apt-get install -y dotnet-sdk-3.1 \
+    #
+    # Install node
+    && apt install -y nodejs \
