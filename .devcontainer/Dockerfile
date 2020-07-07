@@ -37,3 +37,6 @@ RUN apt-get update \
     #
     # Install npm
     && apt install -y npm \
+    #
+    # Install npm-check-updates tool globally
+    && npm install -g npm-check-updates \
