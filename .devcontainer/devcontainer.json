@@ -6,5 +6,6 @@
   ],
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash",
+    "workbench.iconTheme": "vscode-icons"
   },
 }
