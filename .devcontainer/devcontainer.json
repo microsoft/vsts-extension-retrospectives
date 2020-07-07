@@ -1,3 +1,4 @@
 {
   "name": "Retrospective Extension Development Environment",
+  "dockerFile": "Dockerfile",
 }
