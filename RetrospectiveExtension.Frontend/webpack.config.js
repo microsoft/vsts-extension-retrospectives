@@ -23,7 +23,7 @@ module.exports = {
       {
         test: /\.ts|.tsx$/,
         enforce: 'pre',
-        loader:'eslint-loader'
+        loader: 'eslint-loader'
       },
       {
         test: /\.ts|.js|.tsx$/,
@@ -37,7 +37,7 @@ module.exports = {
         test: /\.scss$/,
         loaders: ['style-loader', 'css-loader', 'sass-loader']
       },
-      { 
+      {
         test: /.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/,
         use: 'url-loader?limit=100000'
       }
@@ -49,5 +49,6 @@ module.exports = {
         BUILD_BUILDNUMBER: JSON.stringify(process.env.BUILD_BUILDNUMBER),
         NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
       }
-    })]
+    })
+  ]
 }
