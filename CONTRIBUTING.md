@@ -30,7 +30,7 @@ Clone the repository to your local machine from the Azure DevOps endpoint.
 
 ### Build and Test
 
-**Note:** You will need NodeJS to be able to build the project and download depedencies. Go [here](https://nodejs.org/en/download/) to download NodeJS.
+**Note:** You will need NodeJS to be able to build the project and download dependencies. Go [here](https://nodejs.org/en/download/) to download NodeJS.
 
 **Note:** The project uses webpack for module bundling. Refer to the webpack documentation [here](https://webpack.js.org/).
 
