@@ -52,7 +52,7 @@
       ],
       "properties": {
         "name": "Retrospectives",
-        "uri": "src/sample-hub.html",
+        "uri": "src/index.html",
         "icon": {
             "light": "asset://images/logos/logo_navbar_light_theme.png",
             "dark": "asset://images/logos/logo_navbar_dark_theme.png"
