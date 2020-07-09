@@ -29,9 +29,7 @@ const createOrGetFeedbacktypeField = (feedbackPickList: ProcessDefinitionsContra
   const feedbackTypeField: ProcessDefinitionsContracts.FieldModel = RetrospectiveItemContract.feedbackType;
   feedbackTypeField.pickList = feedbackPickList;
 
-  return processService.getField(feedbackTypeField.name)
-  .then(workItemField =>{
-    console.log(workItemField);
+  return processService.getField(feedbackTypeField.name).then(workItemField => {
     const feedbackTypeWitFieldModel: ProcessDefinitionsContracts.WorkItemTypeFieldModel = {
       allowGroups: false,
       defaultValue: "",
@@ -43,7 +41,7 @@ const createOrGetFeedbacktypeField = (feedbackPickList: ProcessDefinitionsContra
       url: null,
       required: false,
     };
-    return feedbackTypeWitFieldModel;   
+    return feedbackTypeWitFieldModel;
   }, () => {
     return processService.createField(feedbackTypeField, processId).then(fieldModel => {
       const feedbackTypeWitFieldModel: ProcessDefinitionsContracts.WorkItemTypeFieldModel = {
@@ -64,22 +62,18 @@ const createOrGetFeedbacktypeField = (feedbackPickList: ProcessDefinitionsContra
 
 const addFeedbackTypeField = (processId: string, workItemTypeId: string) => {
   return createIfNotExistsFeedbackPicklist().then(picklist => {
-    return createOrGetFeedbacktypeField(picklist, processId)
-      .then(fieldModel => {
-        return processService.addFieldToWorkItemType(fieldModel, processId, workItemTypeId)
-          .then( witFieldModel => {
-              return witFieldModel;
-            });
+    return createOrGetFeedbacktypeField(picklist, processId).then(fieldModel => {
+      return processService.addFieldToWorkItemType(fieldModel, processId, workItemTypeId).then( witFieldModel => {
+        return witFieldModel;
       });
+    });
   });
 }
 
 const createOrGetUpvoteField = (processId: string) => {
   const upvoteField: ProcessDefinitionsContracts.FieldModel = RetrospectiveItemContract.upvotes;
 
-  return processService.getField(upvoteField.name)
-  .then(workItemField =>{
-    console.log(workItemField);
+  return processService.getField(upvoteField.name).then(workItemField =>{
     const upvoteWitFieldModel: ProcessDefinitionsContracts.WorkItemTypeFieldModel = {
       allowGroups: false,
       defaultValue: "",
@@ -91,9 +85,8 @@ const createOrGetUpvoteField = (processId: string) => {
       url: null,
       required: false,
     };
-    return upvoteWitFieldModel;   
-  }, rej => {
-    console.log(rej);
+    return upvoteWitFieldModel;
+  }, () => {
     return processService.createField(upvoteField, processId).then(fieldModel => {
       const upvoteWitFieldModel: ProcessDefinitionsContracts.WorkItemTypeFieldModel = {
         allowGroups: false,
@@ -111,22 +104,20 @@ const createOrGetUpvoteField = (processId: string) => {
   });
 }
 
-const addUpvoteField =  (processId: string, workItemTypeId: string) => {
-  return createOrGetUpvoteField(processId)
-    .then(fieldModel =>{
-      return processService.addFieldToWorkItemType(fieldModel, processId, workItemTypeId)
-        .then(witFieldModel => {
-          return witFieldModel;
-        });
+const addUpvoteField = (processId: string, workItemTypeId: string) => {
+  return createOrGetUpvoteField(processId).then(fieldModel =>{
+    return processService.addFieldToWorkItemType(fieldModel, processId, workItemTypeId).then(witFieldModel => {
+      return witFieldModel;
     });
+  });
 }
 
 const createRetrospectiveWorkItemType = (processId: string) => {
   return processService.createRetrospectiveWorkItemTypeForProcess(processId);
 }
 
-const createFormControl = (id: string, label: string) => {
-  const formControl: ProcessDefinitionsContracts.Control = {
+const createFormControl = (id: string, label: string): ProcessDefinitionsContracts.Control => {
+  return {
     contribution: null,
     controlType: null,
     height: null,
@@ -141,8 +132,6 @@ const createFormControl = (id: string, label: string) => {
     visible: true,
     watermark: null,
   };
-  
-  return formControl;
 }
 
 export const initializeRetrospectiveWorkItemType = () => {
@@ -151,7 +140,7 @@ export const initializeRetrospectiveWorkItemType = () => {
     displayBoard: false
   }
 
-  // Get process Id.
+  // Get process Id
   const processId = getCurrentProcess.then(curProcess => {
     if (curProcess) {
       return curProcess.typeId;
@@ -163,21 +152,19 @@ export const initializeRetrospectiveWorkItemType = () => {
     return curProcess && (curProcess.properties.class != ProcessClass.System);
   });
 
-  const initialState = isInherited
-    .then(inherited => {
-      if(inherited) {
-        // Inherited process.
+  const initialState = isInherited.then(inherited => {
+      if (inherited) {
+        // Inherited process
         initialRetrospectiveState.isInheritedProcess = true;
-        return processId
-          .then(currentProcessId => {
+        return processId.then(currentProcessId => {
             if(!currentProcessId) {
               initialRetrospectiveState.displayBoard = false;
               initialRetrospectiveState.exceptionCode = ExceptionCode.Unexpected;
               return initialRetrospectiveState;
             }
-            // Get all work item types for the process.
-            return getAllWits(currentProcessId)
-              .then(wits => {
+
+            // Get all work item types for the process
+            return getAllWits(currentProcessId).then(wits => {
                 const retrospectiveItem = getRetrospectiveItem(wits);
                 // Check if process already has a Retrospective work item type.
                 if (retrospectiveItem) {
@@ -188,29 +175,24 @@ export const initializeRetrospectiveWorkItemType = () => {
                 else {
                   // Create Retrospective work item type and its fields.
                   // Create work item type for the current process.
-                  return createRetrospectiveWorkItemType(currentProcessId)
-                    .then(wit => {
+                  return createRetrospectiveWorkItemType(currentProcessId).then(wit => {
                       // TODO: Make this more generic, to add a collection of any fields.
                       // Create FeedbackType field and add to work item type.
-                      return addFeedbackTypeField(currentProcessId, wit.id)
-                        .then(feedbackFieldModel => {
+                      return addFeedbackTypeField(currentProcessId, wit.id).then(feedbackFieldModel => {
                           // Create Upvote field and add to work item type.
-                          return addUpvoteField(currentProcessId, wit.id)
-                            .then(upvoteFieldModel => {
+                          return addUpvoteField(currentProcessId, wit.id).then(upvoteFieldModel => {
                                 // Add fields to work item type UI form.
-                                return processService.getFormLayoutPage(currentProcessId, wit.id)
-                                  .then(page => {
+                                return processService.getFormLayoutPage(currentProcessId, wit.id).then(page => {
                                     if (!page) {
                                       initialRetrospectiveState.displayBoard = false;
                                       initialRetrospectiveState.exceptionCode = ExceptionCode.Unexpected;
-                                      return initialRetrospectiveState;         
+                                      return initialRetrospectiveState;
                                     }
 
                                     const upvoteControl: ProcessDefinitionsContracts.Control = createFormControl(upvoteFieldModel.referenceName, upvoteFieldModel.name);
                                     const feedbackControl: ProcessDefinitionsContracts.Control = createFormControl(feedbackFieldModel.referenceName, feedbackFieldModel.name);
                                     const controls: ProcessDefinitionsContracts.Control[] = [upvoteControl, feedbackControl];
-                                    return processService.addGroupToPage(controls, currentProcessId, wit.id, page.id, page.sections[0].id)
-                                      .then(() => {
+                                    return processService.addGroupToPage(controls, currentProcessId, wit.id, page.id, page.sections[0].id).then(() => {
                                         initialRetrospectiveState.displayBoard = true;
                                         initialRetrospectiveState.retrospectiveWorkItemType = wit;
                                         return initialRetrospectiveState;
@@ -227,9 +209,9 @@ export const initializeRetrospectiveWorkItemType = () => {
         initialRetrospectiveState.isInheritedProcess = false;
         initialRetrospectiveState.displayBoard = false;
         initialRetrospectiveState.exceptionCode = ExceptionCode.NotInheritedProcess;
-        return initialRetrospectiveState;      
+        return initialRetrospectiveState;
       }
     });
-  
+
   return initialState;
 }
