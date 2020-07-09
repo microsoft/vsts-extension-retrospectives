@@ -449,19 +449,6 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
           <FeedbackItemCarousel
             feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} />
         </Dialog>
-        {/* <Dialog
-          hidden={this.props.isCarouselDialogHidden}
-          onDismiss={this.props.hideCarouselDialog}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: 'Focus Mode',
-            subText: 'Focus Mode is not available on smaller screens. '
-              + 'Please use a device with a larger screen and expand the window width.'
-          }}
-          modalProps={{
-            className: 'hide-desktop'
-          }}>
-        </Dialog> */}
       </div>);
   }
 }
