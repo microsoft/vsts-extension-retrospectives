@@ -53,7 +53,7 @@
 }
 
 .selector-button {
-  background-color: inherit;
+  background-color: var(--panel-shadow-color);
   display: flex;
   height: 30px;
   padding-left: 8px;
