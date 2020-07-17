@@ -1,4 +1,4 @@
-@import "_variables.scss";
+﻿@import "_variables.scss";
 
 #feedback-board-summary-table-header {
   display: flex;
@@ -6,7 +6,7 @@
   height: 65px;
   align-items: center;
   padding: 0 32px;
-  
+
   .menu-button {
     margin-left: 5px;
     margin-right: 20px;
@@ -29,7 +29,7 @@
 
     .rt-table {
       flex: 0 1 auto;
-      
+
       .rt-thead { 
         .rt-resizable-header-content {
           height: 30px;
@@ -86,7 +86,7 @@
     padding: 24px;
     width: 20%;
     min-width: 270px;
-    
+
     .resolved-green {
       color: $resolved_green;
     }
