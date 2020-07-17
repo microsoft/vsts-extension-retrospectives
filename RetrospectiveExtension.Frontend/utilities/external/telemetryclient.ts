@@ -40,12 +40,7 @@ export class TelemetryClient {
     }
 
     private Init(settings: TelemetryClientSettings) {
-
-        // console.log("TelemetryClient settings key: " + settings.key.substring(0,8)+ "************");
-        // console.log("TelemetryClient settings extension context: " + settings.extensioncontext);
-         console.log("TelemetryClient settings disableTelemetry: " + (settings.disableTelemetry === "true"));
-        // console.log("TelemetryClient settings disableAjaxTracking: " + (settings.disableAjaxTracking === "true"));
-        // console.log("TelemetryClient settings enableDebug: " + (settings.enableDebug === "true"));
+        console.log("TelemetryClient settings disableTelemetry: " + (settings.disableTelemetry === "true"));
 
         const config = {
             instrumentationKey: settings.key,
