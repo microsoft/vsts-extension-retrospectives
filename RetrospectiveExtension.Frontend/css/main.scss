@@ -1,4 +1,4 @@
-﻿@import "./_variables.scss";
+@import "./_variables.scss";
 @import "./_animations.scss";
 @import "./_mixins.scss";
 @import "./editableDocumentCardTitle.scss";
@@ -23,24 +23,7 @@
 
 body {
   overflow-y: auto;
-  background-color: white;
-  color: black;
-  font-family: "Segoe UI VSS (Regular)","-apple-system",BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-
-.retrospective-columnset {
-  background-color: $light_background;
-  padding: 10px;
-  display: flex;
-  overflow-y: auto;
-  flex-direction: row;
-}
-
-.combo {
-    margin: 10px;
-    height: 30px;
-    width: 600px;
-    flex: 1;
+  font-family: $default_vsts_font;
 }
 
 .ms-ContextualMenuButtonsExample {
