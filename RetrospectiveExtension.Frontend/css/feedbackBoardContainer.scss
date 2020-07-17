@@ -45,7 +45,7 @@ $team_selector_list_item_width: 450px;
 
   .retrospective-notification-toast {
     .retrospective-notification-toast-body {
-      font-family: "Segoe UI VSS (Regular)","-apple-system",BlinkMacSystemFont,"Segoe UI",sans-serif;
+      font-family: $default_vsts_font;
       color: black;
       word-break: break-word;
     }
