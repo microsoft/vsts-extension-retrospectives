@@ -21,6 +21,8 @@
 
 @import "../node_modules/react-toastify/dist/ReactToastify.css";
 
+:focus { outline: none; }
+
 body {
   overflow-y: auto;
   font-family: $default_vsts_font;
