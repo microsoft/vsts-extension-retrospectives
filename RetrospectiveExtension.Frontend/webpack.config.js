@@ -1,4 +1,4 @@
-const webpack = require('webpack');
+﻿const webpack = require('webpack');
 const path = require('path');
 
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
@@ -46,6 +46,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new MomentLocalesPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
         BUILD_BUILDNUMBER: JSON.stringify(process.env.BUILD_BUILDNUMBER),
