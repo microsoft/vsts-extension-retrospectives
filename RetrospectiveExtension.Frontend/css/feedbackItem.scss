@@ -30,7 +30,9 @@
     
   .mainItemCard {
     max-width: $main_item_card_max_width;
-    
+    background-color: var(--panel-shadow-color);
+    border: 0;
+
     .card-integral-part {
       border-left-width: 3px;
       border-left-style: solid;
