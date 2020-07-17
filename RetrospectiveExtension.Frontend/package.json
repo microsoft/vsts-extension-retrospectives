@@ -5,7 +5,7 @@
   "main": "index.tsx",
   "scripts": {
     "build:d": "webpack --development",
-    "build:p": "set NODE_ENV=production && webpack --mode=production",
+    "build:p": "set NODE_ENV=production && rm -rf ./dist && webpack --mode=production",
     "lint": "eslint . --ext .ts,.tsx",
     "pack:d": "tfx extension create --manifests vss-extension-dev.json --output-path ./dist/",
     "pack:p": "tfx extension create --manifests vss-extension-prod.json --output-path ./dist/"
