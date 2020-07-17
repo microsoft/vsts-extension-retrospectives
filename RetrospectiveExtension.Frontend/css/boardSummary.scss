@@ -1,4 +1,4 @@
-﻿@import "_variables.scss";
+@import "_variables.scss";
 
 #feedback-board-summary-table-header {
   display: flex;
@@ -39,10 +39,7 @@
 
       .-pagination {
         .-btn {
-          background: #f4f4f4;
-          color: rgb(51, 51, 51);
           border-radius: 0;
-          font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
           -webkit-font-smoothing: antialiased;
           font-size: 14px;
 
