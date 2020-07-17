@@ -277,10 +277,6 @@ export default class FeedbackBoardMetadataForm
               Note: These selections cannot be modified after board creation.
           </div>
         </div>
-        <div className="board-metadata-form-edit-column-section hide-desktop">
-          <div className="board-metadata-form-section-header">Columns</div>
-          <div className="board-metadata-form-section-subheader">Editing columns is supported on the desktop version only. Please use a device with a larger screen and expand the window width if you would like to add, edit, or remove columns.</div>
-        </div>
         <div className="board-metadata-form-edit-column-section hide-mobile">
           <div className="board-metadata-form-section-header">Columns</div>
           <div className="board-metadata-form-section-subheader">You can create a maximum of {this.maxColumnCount} columns in a retrospective.</div>
