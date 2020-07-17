@@ -3,7 +3,6 @@ $team_selector_list_item_height: 32px;
 $team_selector_list_item_width: 450px;
 
 .feedback-board-container {
-  background-color: $light_background;
   display: flex;
   height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
   overflow-y: auto;
