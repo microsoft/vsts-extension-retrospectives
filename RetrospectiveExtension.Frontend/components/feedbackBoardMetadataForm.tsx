@@ -3,7 +3,6 @@ import { PrimaryButton, DefaultButton, IconButton, ActionButton } from 'office-u
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
-const NoWorkSvg = require('../images/zerodata-no-work-scheduled.svg');
 
 import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback';
@@ -233,7 +232,6 @@ export default class FeedbackBoardMetadataForm
   public render() {
     return (
       <div className="board-metadata-form">
-        <img src={NoWorkSvg} alt="No Retrospectives found, create your first one to get started." width="160" className="board-metadata-logo" />
         <div className="board-metadata-form-section-header">Retrospective Title</div>
         <TextField autoFocus
           ariaLabel="Please enter new retrospective name"
