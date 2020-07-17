@@ -27,7 +27,7 @@
   .document-card-wrapper {
     position: relative;
   }
-    
+
   .mainItemCard {
     max-width: $main_item_card_max_width;
     background-color: var(--panel-shadow-color);
@@ -44,7 +44,7 @@
         justify-content: flex-end;
         align-items: center;
         margin-bottom: 10px;
-  
+
         .feedback-action-button {
           height: $feedback_item_action_button_height;
           min-width: $feedback_item_action_button_width;
@@ -63,7 +63,7 @@
             color: grey;
             font-size: 14px;
           }
-  
+
           &:focus {
             border: 1px solid;
           }
@@ -71,17 +71,17 @@
           &:disabled {
             opacity: 0.5;
             cursor: default;
-          }      
+          }
         }
-       
+
         .feedback-add-vote {
-  
+
           &:hover:not(:disabled) {
             i {
               color: $main_blue;
             }
           }
-          
+
           &.voteAnimation {
             animation: push .3s linear 1;
             
@@ -167,10 +167,10 @@
       .feedbackItem {
         margin: 0;
         width: 100%;
-  
+
         .mainItemCard {
           min-width: 100%;
-  
+
           .card-header {
             display: none;
           }
