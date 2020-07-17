@@ -31,8 +31,6 @@ import { WorkItemType, WorkItemTypeReference } from 'TFS/WorkItemTracking/Contra
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import moment = require('moment');
-const TrapezoidSvg = require('../images/round-trapezoid.svg');
-const TrapezoidMobileSvg = require('../images/round-trapezoid-mobile.svg');
 
 export interface FeedbackBoardContainerProps {
   projectId: string;
@@ -966,7 +964,7 @@ export default class FeedbackBoardContainer
                           nameGetter={(feedbackBoard) => feedbackBoard.title}
                           selectorList={boardSelectorList}
                           selectorListItemOnClick={this.changeSelectedBoard}
-                          title={"Retrospective Board"}                          />
+                          title={"Retrospective Board"} />
                       </div>
                       <div className="board-actions-menu">
                         <DefaultButton
@@ -1040,16 +1038,6 @@ export default class FeedbackBoardContainer
                         isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act}
                         clickEventCallback={this.clickWorkflowStateCallback} />
                     </div>
-                    <img
-                      className="feedback-workflow-wrapper-background hide-mobile"
-                      src={TrapezoidSvg}
-                      alt="State selector outline"
-                      role="presentation" />
-                    <img
-                      className="feedback-workflow-wrapper-background hide-desktop"
-                      src={TrapezoidMobileSvg}
-                      alt="State selector outline"
-                      role="presentation" />
                     {
                       this.getCurrentBoardPhase() === WorkflowPhase.Act &&
                       <TooltipHost
