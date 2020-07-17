@@ -1,4 +1,4 @@
-@import "_variables.scss";
+﻿@import "_variables.scss";
 
 .feedback-column {
   border-right: 2px solid white;
@@ -18,16 +18,16 @@
   padding: 10px;
   padding-top: 15px;
   padding-left: $header_horizontal_spacing;
-  
+
   .feedback-column-title {
     display: flex;
     align-items: center;
-  
+
     .feedback-column-icon {
       font-size: 20px;
       padding-right: 5px;
     }
-  
+
     .feedback-column-name {
       font-size: 15px;
       margin-left: 5px;
