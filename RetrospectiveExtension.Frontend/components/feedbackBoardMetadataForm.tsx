@@ -96,7 +96,7 @@ export default class FeedbackBoardMetadataForm
     };
   }
 
-  private maxColumnCount = 4;
+  private maxColumnCount = 5;
 
   public handleInputChange = (event: any, newValue: string) => {
     this.setState({
