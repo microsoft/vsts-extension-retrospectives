@@ -1,5 +1,7 @@
-﻿const webpack = require('webpack');
+const webpack = require('webpack');
 const path = require('path');
+
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
 const BUILD_DIR = path.resolve(__dirname, 'dist');
 const APP_DIR = path.resolve(__dirname, '');
