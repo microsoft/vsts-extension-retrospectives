@@ -48,12 +48,10 @@ export default class FeedbackBoardPreviewEmail extends React.Component<IFeedback
   public render(): JSX.Element {
     if (!this.state.emailContent) {
       return (
-        <div>
-          <Spinner className="preview-email-spinner"
-            size={SpinnerSize.large}
-            label="Loading..."
-            ariaLive="assertive" />
-        </div>
+        <Spinner className="preview-email-spinner"
+          size={SpinnerSize.large}
+          label="Loading..."
+          ariaLive="assertive" />
       );
     }
     
