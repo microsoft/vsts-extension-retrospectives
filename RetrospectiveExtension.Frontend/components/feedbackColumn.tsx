@@ -60,7 +60,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     };
   }
 
-  public componentDidUpdate(prevProps: FeedbackColumnProps) {
+  public componentDidUpdate() {
     this.props.shouldFocusOnCreateFeedback && this.createFeedbackButton && this.createFeedbackButton.focus();
   }
 
