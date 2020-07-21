@@ -572,7 +572,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
           newFeedbackItem: this.props.showAddedAnimation,
           removeFeedbackItem: this.state.isMarkedForDeletion,
           hideFeedbackItem: hideFeedbackItems,
-        })}        
+        })}
         draggable={isDraggable}
         onDragStart={this.dragFeedbackItemStart}
         onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null}
