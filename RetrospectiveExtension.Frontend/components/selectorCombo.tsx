@@ -214,13 +214,13 @@ export default class SelectorCombo<T>
       />
       {
         !finishedLoading &&
-        <div>
+        <>
           <Shimmer className="list-item-shimmer" />
           <Shimmer className="list-item-shimmer" />
           <Shimmer className="list-item-shimmer" />
           <Shimmer className="list-item-shimmer" />
           <Shimmer className="list-item-shimmer" />
-        </div>
+        </>
       }
     </div>);
   }
