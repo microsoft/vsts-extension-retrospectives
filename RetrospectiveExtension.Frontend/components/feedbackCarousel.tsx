@@ -63,38 +63,36 @@ export default class FeedbackCarousel extends React.Component<IFeedbackCarouselP
     };
 
     return (
-      <div>
-        <Pivot
-          className="feedback-carousel-pivot">
-          {this.props.feedbackColumnPropsList.map((columnProps) => {
-            const mainCardCount = columnProps.columnItems.filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId).length;
+      <Pivot
+        className="feedback-carousel-pivot">
+        {this.props.feedbackColumnPropsList.map((columnProps) => {
+          const mainCardCount = columnProps.columnItems.filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId).length;
 
-            return <PivotItem
-              key={columnProps.columnId}
-              headerText={columnProps.columnName}
-              className="feedback-carousel-pivot-item"
-            >
-              {mainCardCount === 1 &&
-                this.renderSingleFeedbackCarouselItem(columnProps)
-              }
-              {mainCardCount >= 2 &&
-                // @ts-ignore TS2786
-                <Slider {...settings}>
-                  {React.Children.map(this.renderFeedbackCarouselItems(columnProps), (child: React.ReactElement<FeedbackItem>) => {
-                    return (
-                      <div
-                        className="feedback-carousel-item-wrapper"
-                        key={child.key}>
-                        {child}
-                      </div>
-                    );
-                  })}
-                </Slider>
-              }
-            </PivotItem>
-          })}
-        </Pivot>
-      </div>
+          return <PivotItem
+            key={columnProps.columnId}
+            headerText={columnProps.columnName}
+            className="feedback-carousel-pivot-item"
+          >
+            {mainCardCount === 1 &&
+              this.renderSingleFeedbackCarouselItem(columnProps)
+            }
+            {mainCardCount >= 2 &&
+              // @ts-ignore TS2786
+              <Slider {...settings}>
+                {React.Children.map(this.renderFeedbackCarouselItems(columnProps), (child: React.ReactElement<FeedbackItem>) => {
+                  return (
+                    <div
+                      className="feedback-carousel-item-wrapper"
+                      key={child.key}>
+                      {child}
+                    </div>
+                  );
+                })}
+              </Slider>
+            }
+          </PivotItem>
+        })}
+      </Pivot>
     );
   }
 }
