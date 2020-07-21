@@ -210,7 +210,7 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
     });
   }
 
-  private onItemInvoked = async (item: any) => {
+  private onItemInvoked = async (item: { id: number }) => {
     const workItemNavSvc = await WorkItemFormNavigationService.getService();
     await workItemNavSvc.openWorkItem(item.id);
   }
