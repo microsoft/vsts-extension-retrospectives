@@ -150,7 +150,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     }
   }
 
-  public componentDidUpdate(prevProps: IFeedbackItemProps) {
+  public componentDidUpdate() {
     if (this.props.groupedItemProps && this.props.groupedItemProps.isMainItem) {
       this.updateFeedbackItemGroupShadowCardHeight();
     }
