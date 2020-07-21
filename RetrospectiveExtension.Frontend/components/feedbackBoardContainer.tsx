@@ -1,4 +1,4 @@
-import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+﻿import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -897,12 +897,10 @@ export default class FeedbackBoardContainer
   public render() {
     if (!this.state.isAppInitialized || !this.state.isTeamDataLoaded) {
       return (
-        <div>
-          <Spinner className="initialization-spinner"
-            size={SpinnerSize.large}
-            label="Loading..."
-            ariaLive="assertive" />
-        </div>
+        <Spinner className="initialization-spinner"
+          size={SpinnerSize.large}
+          label="Loading..."
+          ariaLive="assertive" />
       );
     }
 
