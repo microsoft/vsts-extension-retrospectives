@@ -58,7 +58,7 @@ export default class SelectorCombo<T>
   public render(): JSX.Element {
     const selectorButtonText: string = this.props.nameGetter(this.props.currentValue);
 
-    return (<div>
+    return (<>
       <div className={classNames('hide-desktop', this.props.className)}>
         <div
           className="selector-button"
@@ -122,7 +122,7 @@ export default class SelectorCombo<T>
           {this.renderSelectorCombo(this.getFilteredValues(), true)}
         </FocusTrapCallout>
       </div>
-    </div>);
+    </>);
   }
 
   private handleKeyPressSelectorButton = (event: React.KeyboardEvent<HTMLDivElement>) => {
