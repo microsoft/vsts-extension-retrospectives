@@ -149,6 +149,15 @@ $team_selector_list_item_width: 450px;
   }
 }
 
+.pivot-container button[role=tab] {
+  color: rgba(var(--palette-neutral-80,51, 51, 51),1);
+}
+
+.pivot-container button[role=tab]:hover {
+  color: rgba(var(--palette-neutral-80,51, 51, 51),1);
+  background-color: transparent;
+}
+
 .vertical-tab-separator {
   width: 2px;
   display: flex;
