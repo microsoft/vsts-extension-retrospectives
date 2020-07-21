@@ -56,7 +56,7 @@ export default class FeedbackBoardPreviewEmail extends React.Component<IFeedback
     }
     
     return (
-      <div>
+      <>
         <ActionButton className="copy-email-button"
           text="Copy to clipboard"
           onClick={this.onCopyButtonClick}
@@ -67,7 +67,7 @@ export default class FeedbackBoardPreviewEmail extends React.Component<IFeedback
             ariaLabel="Email summary for retrospective"
             onClick={(e: React.MouseEvent<HTMLTextAreaElement | HTMLInputElement, MouseEvent>) => {e.stopPropagation(); this.handleClick();}}
             value={this.state.emailContent} />
-      </div>
+      </>
     );
   }
 }
