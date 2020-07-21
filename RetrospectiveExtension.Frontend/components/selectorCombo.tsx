@@ -275,24 +275,22 @@ export default class SelectorCombo<T>
     }
 
     return (
-      <div>
-        <div className="selector-filter-container">
-          <TextField autoFocus
-            ariaLabel={searchResultsAriaLabel + ' Please enter text here to search.'}
-            placeholder="Search"
-            onChange={this.updateFilterText}
-            tabIndex={0}
-          />
-          <div className="selector-list-container" data-is-scrollable={true}>
-            {selectorList.selectorListItems.map(
-              (selectorListItem) => this.renderSelectorList(
-                selectorListItem.finishedLoading,
-                selectorListItem.header,
-                selectorListItem.items,
-                shouldVirtualizeItems
-              )
-            )}
-          </div>
+      <div className="selector-filter-container">
+        <TextField autoFocus
+          ariaLabel={searchResultsAriaLabel + ' Please enter text here to search.'}
+          placeholder="Search"
+          onChange={this.updateFilterText}
+          tabIndex={0}
+        />
+        <div className="selector-list-container" data-is-scrollable={true}>
+          {selectorList.selectorListItems.map(
+            (selectorListItem) => this.renderSelectorList(
+              selectorListItem.finishedLoading,
+              selectorListItem.header,
+              selectorListItem.items,
+              shouldVirtualizeItems
+            )
+          )}
         </div>
       </div>
     );
