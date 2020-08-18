@@ -39,6 +39,13 @@
   "categories": [
     "Azure Boards"
   ],
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/microsoft/vsts-extension-retrospectives"
+  },
+  "CustomerQnASupport": {
+    "enableqna":"true"
+  },
   "scopes": [
     "vso.work",
     "vso.work_write"
