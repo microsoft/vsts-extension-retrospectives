@@ -34,11 +34,11 @@ Clone the repository to your local machine from the Azure DevOps endpoint.
 
 **Note:** The project uses webpack for module bundling. Refer to the webpack documentation [here](https://webpack.js.org/).
 
-- Open the 'Retrospective.sln' file with Visual Studio or open the Retrospectives folder with Visual Studio Code. You can also use any IDE or editor that you normally use to work with React/Typescript. Using Powershell, navigate to the /Retrospective/Retrospective.Hub.Extension' folder.
+- Clone this repo and open it with Visual Studio or with Visual Studio Code. You can also use any IDE or editor that you normally use to work with C# and React/Typescript. Using Powershell, navigate to the '/RetrospectiveExtension.Frontend' folder.
 
-- Run  ```npm install```. This will download all the dependent packages listed in 'package.json'.
+- Run  `npm install`. This will download all the dependent packages listed in 'package.json'.
 
-- Run ```npm run build``` to build the project. Refer to the 'scripts' section in 'package.json' for other commands.
+- Run `npm run build:p` to build the project. Refer to the 'scripts' section in 'package.json' for other commands.
 
 - To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page). Currently this is the only way to test the extension.
 
@@ -54,7 +54,7 @@ Clone the repository to your local machine from the Azure DevOps endpoint.
 }
 ```
 
-- Run ```npm run pack``` to package the modules into a Azure DevOps extension package. This generated package has a '.vsix' extension. This package is generated using information from the manifest file and your built code. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts) to know more about extension manifests.
+- Run `npm run pack:p` to package the modules into a Azure DevOps extension package. This generated package has a '.vsix' extension. This package is generated using information from the manifest file and your built code. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts) to know more about extension manifests.
 
 - [Publish your to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish). Once published, share the extension with the newly created test org. See [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share) for documentation on sharing.
 
@@ -76,7 +76,7 @@ The Retrospectives tool uses the [Azure SignalR service](https://azure.microsoft
 
 ## Style Guidelines for Backend Project
 
-Follow the coding guidelines here - http://aka.ms/csharpguidelines.
+Follow the coding guidelines here - [C# Coding Conventions (C# Programming Guide)](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/inside-a-program/coding-conventions).
 
 ## Pull Request Process
 
