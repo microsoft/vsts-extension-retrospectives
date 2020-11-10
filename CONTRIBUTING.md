@@ -34,9 +34,9 @@ Clone the repository to your local machine from the Azure DevOps endpoint.
 
 **Note:** The project uses webpack for module bundling. Refer to the webpack documentation [here](https://webpack.js.org/).
 
-- Clone this repo and open it with Visual Studio or with Visual Studio Code. You can also use any IDE or editor that you normally use to work with C# and React/Typescript. Using Powershell, navigate to the '/RetrospectiveExtension.Frontend' folder.
+- Clone this repo and open it with Visual Studio or with Visual Studio Code. You can also use any IDE or editor that you normally use to work with C# and React/Typescript.
 
-- Run  `npm install`. This will download all the dependent packages listed in 'package.json'.
+- Using Powershell, navigate to the '/RetrospectiveExtension.Frontend' folder, run `npm install`. This will download all the dependent packages listed in 'package.json'.
 
 - Run `npm run build:p` to build the project. Refer to the 'scripts' section in 'package.json' for other commands.
 
@@ -64,7 +64,7 @@ Clone the repository to your local machine from the Azure DevOps endpoint.
 
 - For updates, simple rebuild and package your extension and publish an update from the Azure DevOps marketplace. That will automatically update the extension in your project.
 
-- For the real time live syncing to work, our service needs to know your publisher id and your extension's unique key. To enable real time updates for your test extension, please [reach out to us](mailto:retrospectives@microsoft.com?subject=[InnerSource]%20Add%20package%20secret%20for%20backend%20support) with your publisher id and the unique key of your extension. [Instructions on how to download the unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key).
+- For the real time live syncing to work, our service needs to know your publisher id and your extension's unique key. To enable real time updates for your test extension, please [reach out to us](https://github.com/microsoft/vsts-extension-retrospectives/issues) with your publisher id and the unique key of your extension. [Instructions on how to download the unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key).
 
 ### Storage
 
@@ -72,7 +72,7 @@ The Retrospectives tool uses the [Azure DevOps data service](https://docs.micros
 
 ### Backend
 
-The Retrospectives tool uses the [Azure SignalR service](https://azure.microsoft.com/en-us/services/signalr-service/) to add real time support. The backend codebase can be found [here](https://github.com/microsoft/vsts-extension-retrospectives/tree/master/Backend).
+The Retrospectives tool uses the [Azure SignalR service](https://azure.microsoft.com/en-us/services/signalr-service/) to add real time support. The backend codebase can be found [here](https://github.com/microsoft/vsts-extension-retrospectives/tree/master/RetrospectiveExtension.Backend).
 
 ## Style Guidelines for Backend Project
 
@@ -81,7 +81,7 @@ Follow the coding guidelines here - [C# Coding Conventions (C# Programming Guide
 ## Pull Request Process
 
 1. Clone the repository to your local machine.
-2. Create a new local branch from the 'master' branch. Follow the '<alias>/<nameofyourbranch>' naming convention for your branch.
+2. Create a new local branch from the 'master' branch. Follow the `<alias>/<nameofyourbranch>` naming convention for your branch.
 3. Publish the newly created branch to the Reflect Backend repo. Use this branch as your working branch.
 4. Once you are ready to check-in, create a pull request against the 'master' branch. Link the Bug/Task that you are fixing/adding to the pull request. Reviewers will be added automatically.
 5. Ensure builds are successful and tests, including any added or updated tests, pass prior to submitting the pull request.
@@ -94,6 +94,7 @@ Follow the coding guidelines here - [C# Coding Conventions (C# Programming Guide
 2. The 'ReflectBackend.ReflectHub' class contains the implementation of all the functions that the backend service supports. New methods should be added here to support more real time scenarios.
 3. Examples:
    - The code snippet below provides a method that the client can use to join a backend Group. Groups in SignalR provide a method for broadcasting messages to specified subsets of connected clients. Any client using this method gets added to the group that it specifies by the reflectBoardId.
+
      ```csharp
          /// <summary>
          /// Adds the client to the group for this reflect board.
@@ -105,7 +106,9 @@ Follow the coding guidelines here - [C# Coding Conventions (C# Programming Guide
              return Groups.AddToGroupAsync( Context.ConnectionId, reflectBoardId );
          }
      ```
+
    - The code snippet below broadcasts that a new Feedback specified by the 'feedbackItemId' is available on the board specified by 'reflectBoardId'. The 'columnId' specifies which column of the board the item was added to. Clients can use this method to signal to other clients that a new Feedback was added to one of its boards.
+
      ```csharp
      /// <summary>
      /// Broadcast receiveNewItem to all other clients viewing the same reflect board.
