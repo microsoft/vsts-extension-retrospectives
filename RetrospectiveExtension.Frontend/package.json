@@ -38,7 +38,7 @@
     "vss-web-extension-sdk": "5.141.0"
   },
   "devDependencies": {
-    "@fortawesome/fontawesome-free": "5.15.1",
+    "@fortawesome/fontawesome-free": "5.15.2",
     "@types/applicationinsights-js": "1.0.9",
     "@types/classnames": "2.2.11",
     "@types/crypto-js": "4.0.1",
