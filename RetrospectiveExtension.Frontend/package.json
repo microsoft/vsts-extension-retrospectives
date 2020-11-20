@@ -59,7 +59,7 @@
     "file-loader": "6.2.0",
     "moment-locales-webpack-plugin": "1.2.0",
     "node-sass": "5.0.0",
-    "sass-loader": "10.1.0",
+    "sass-loader": "10.1.1",
     "style-loader": "2.0.0",
     "tfx-cli": "0.8.3",
     "ts-loader": "8.0.14",
