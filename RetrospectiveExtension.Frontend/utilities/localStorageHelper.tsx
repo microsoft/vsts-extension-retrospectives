@@ -1,5 +1,3 @@
-import { DragAndDropKeys } from '../config/constants';
-
 const getItemAndRemoveIfRequired = (key: string, andRemove: boolean): string => {
   const value = localStorage.getItem(key);
   if (andRemove) {
@@ -12,14 +10,14 @@ const getItemAndRemoveIfRequired = (key: string, andRemove: boolean): string => 
  * Gets and removes the drag and drop id value from the browser's local storage
  */
 const getIdValue = (andRemove: boolean = false): string => {
-  return getItemAndRemoveIfRequired(DragAndDropKeys.Id, andRemove);
+  return getItemAndRemoveIfRequired('reflect/dnd/id', andRemove);
 }
 
 /**
  * Sets the drag and drop id value in the browser's local storage
  */
 const setIdValue = (value: string) => {
-  localStorage.setItem(DragAndDropKeys.Id, value);
+  localStorage.setItem('reflect/dnd/id', value);
 }
 
 export default {

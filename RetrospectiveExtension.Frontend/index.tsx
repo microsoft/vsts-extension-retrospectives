@@ -16,7 +16,7 @@ appInsightsClient.trackEvent(TelemetryEvents.ExtensionLaunched);
 
 const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
   projectId: VSS.getWebContext().project.id
-} 
+};
 
 ReactDOM.render(
   <FeedbackBoardContainer {...feedbackBoardContainerProps}/>,

@@ -185,6 +185,10 @@ export default class FeedbackBoardMetadataForm
       iconClass: 'far fa-frown',
     },
     {
+      friendlyName: 'angry',
+      iconClass: 'far fa-angry',
+    },
+    {
       friendlyName: 'chalkboard',
       iconClass: 'fas fa-chalkboard',
     },
@@ -193,13 +197,33 @@ export default class FeedbackBoardMetadataForm
       iconClass: 'far fa-comments',
     },
     {
+      friendlyName: 'book',
+      iconClass: 'fas fa-book',
+    },
+    {
+      friendlyName: 'compass',
+      iconClass: 'far fa-compass',
+    },
+    {
+      friendlyName: 'eye',
+      iconClass: 'far fa-eye',
+    },
+    {
       friendlyName: 'question',
       iconClass: 'fas fa-question',
     },
     {
       friendlyName: 'exclamation',
       iconClass: 'fas fa-exclamation',
-    }
+    },
+    {
+      friendlyName: 'celebrate',
+      iconClass: 'fas fa-birthday-cake',
+    },
+    {
+      friendlyName: 'balance',
+      iconClass: 'fas fa-balance-scale-right',
+    },
   ];
 
   private allAccentColors: { friendlyName: string, colorCode: string }[] = [
@@ -210,6 +234,18 @@ export default class FeedbackBoardMetadataForm
     {
       friendlyName: 'red',
       colorCode: '#cc293d'
+    },
+    {
+      friendlyName: 'navy',
+      colorCode: '#174170'
+    },
+    {
+      friendlyName: 'orange',
+      colorCode: '#F78A53'
+    },
+    {
+      friendlyName: 'pink',
+      colorCode: '#ff00cc'
     },
     {
       friendlyName: 'yellow',

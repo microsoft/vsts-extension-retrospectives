@@ -6,8 +6,6 @@ using CollaborationStateService.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,16 +23,9 @@ namespace CollaborationStateService
         .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", optional: true)
         .AddEnvironmentVariables();
 
-      // Build an intermediary config to get the azure key vault name from the environment variables
-      var config = builder.Build();
-
-      var keyVaultEndpoint = config.GetValue<string>("AzureKeyVaultSettings:Endpoint");
-      var azureServiceTokenProvider = new AzureServiceTokenProvider();
-      var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-
-      builder.AddAzureKeyVault(keyVaultEndpoint, keyVaultClient, new ReflectKeyVaultSecretManager());
-
       Configuration = builder.Build();
+
+      Console.WriteLine("Configuration built...");
     }
 
     public IConfiguration Configuration { get; }
@@ -50,6 +41,8 @@ namespace CollaborationStateService
       combinedKeys.AddRange(developerCertificateData.AsEnumerable().Where(keyValue => !string.IsNullOrWhiteSpace(keyValue.Value)).Select(x => x.Value));
 
       services.AddApplicationInsightsTelemetry();
+
+      services.AddCors();
 
       services.AddAuthentication(options => {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -7,7 +7,7 @@ import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import * as React from 'react';
 import * as vssClipboard from 'VSS/Utils/Clipboard';
 
-import { ViewMode, MobileWidthBreakpoint } from '../config/constants';
+import { ViewMode } from '../config/constants';
 import { WorkflowPhase } from '../interfaces/workItem';
 import WorkflowStage from './workflowStage';
 import BoardDataService from '../dal/boardDataService';
@@ -180,7 +180,7 @@ export default class FeedbackBoardContainer
   }
 
   private handleResolutionChange = () => {
-    const isDesktop = window.innerWidth >= MobileWidthBreakpoint;
+    const isDesktop = window.innerWidth >= 1024;
 
     if (this.state.isAutoResizeEnabled && this.state.isDesktop != isDesktop) {
       this.setState({

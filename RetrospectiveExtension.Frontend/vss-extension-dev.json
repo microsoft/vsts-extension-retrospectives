@@ -1,8 +1,8 @@
 {
   "manifestVersion": 1,
   "id": "retrospective-vsts-extension-dev",
-  "publisher": "ReflectTeam",
-  "version": "1.0.41",
+  "publisher": "EnginPolat",
+  "version": "1.0.61",
   "name": "Retrospectives (Dev)",
   "description": "An Azure DevOps extension for efficient retrospectives.",
   "public": false,
