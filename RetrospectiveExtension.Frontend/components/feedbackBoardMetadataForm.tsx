@@ -11,6 +11,7 @@ import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/Docum
 import classNames = require('classnames');
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
 import { v4 as uuid } from 'uuid';
+import { ChangeEvent } from 'react';
 
 interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -174,6 +175,196 @@ export default class FeedbackBoardMetadataForm
   private getRandomArrayElement = <T extends {}>(array: T[]) => {
     return array[Math.floor(Math.random() * array.length)];
   }
+
+  private handleColumnsTemplateChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    switch (event.target.value) {
+      case '4ls':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Liked',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'fas fa-book',
+                id: uuid(),
+                title: 'Learned',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'far fa-compass',
+                id: uuid(),
+                title: 'Lacked',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#8063bf',
+                iconClass: 'far fa-eye',
+                id: uuid(),
+                title: 'Longed for',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case '1to1':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Good',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'fas fa-exclamation',
+                id: uuid(),
+                title: 'So-so',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-balance-scale-right',
+                id: uuid(),
+                title: 'Improve',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#8063bf',
+                iconClass: 'fas fa-birthday-cake',
+                id: uuid(),
+                title: 'Done',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'mad-sad-glad':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-angry',
+                id: uuid(),
+                title: 'Mad',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'Sad',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Glad',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'good-bad-ideas':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Good',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-angry',
+                id: uuid(),
+                title: 'Bad',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-exclamation',
+                id: uuid(),
+                title: 'Ideas',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'start-stop-continue':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Start',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'Stop',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'far fa-eye',
+                id: uuid(),
+                title: 'Continue',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      default:
+        break;
+    }
+  };
 
   private allIconClassNames: { friendlyName: string, iconClass: string }[] = [
     {
