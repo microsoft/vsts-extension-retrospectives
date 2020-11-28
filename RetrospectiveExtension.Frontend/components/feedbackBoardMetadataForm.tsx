@@ -471,6 +471,17 @@ export default class FeedbackBoardMetadataForm
         <div className="board-metadata-form-edit-column-section hide-mobile">
           <div className="board-metadata-form-section-header">Columns</div>
           <div className="board-metadata-form-section-subheader">You can create a maximum of {this.maxColumnCount} columns in a retrospective.</div>
+          <div className="board-metadata-form-section-header">
+            Apply template :
+            <select onChange={this.handleColumnsTemplateChange} className="title-input-container" style={{ display: 'inline-flex', backgroundColor: '#fff', fontWeight: 'normal', marginLeft: '10px' }}>
+              <option value="">Select a template</option>
+              <option value="4ls">4Ls</option>
+              <option value="1to1">1-to-1</option>
+              <option value="mad-sad-glad">Mad-Sad-Glad</option>
+              <option value="good-bad-ideas">Good-Bad-Ideas</option>
+              <option value="start-stop-continue">Start-Stop-Continue</option>
+            </select>
+          </div>
           <List
             items={this.state.columnCards}
             onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
