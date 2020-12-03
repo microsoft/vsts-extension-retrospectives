@@ -27,6 +27,10 @@
   .ReactTable {
     height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
 
+    .rt-extender::after {
+      border-top: 7px solid rgba(var(--palette-neutral-100,0, 0, 0),1);
+    }
+
     .rt-table {
       flex: 0 1 auto;
 

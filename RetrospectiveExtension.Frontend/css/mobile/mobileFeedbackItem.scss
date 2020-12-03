@@ -24,27 +24,26 @@
             height: 65px;
             line-height: 1.3;
             font-size: $mobile_font_size_main;
-          }    
+          }
         }
-  
+
         .feedback-add-vote {
-  
-          &:hover:not(:disabled) {
+            &:hover:not(:disabled) {
             i {
               color: grey;
             }
           }
-  
+
           .feedback-upvote-count {
             margin-left: 10px;
             font-size: $mobile_font_size_main;
             line-height: 1.3;
           }
         }
-  
+
         .item-actions-menu {
           padding: 15px 15px 0 0;
-  
+
           .contextual-menu-button {
             height: 60px;
             width: 45px;
@@ -59,7 +58,7 @@
           }
         }
       }
-  
+
       .ms-DocumentCardActivity, .anonymous-created-date {
         display: none;
       }
