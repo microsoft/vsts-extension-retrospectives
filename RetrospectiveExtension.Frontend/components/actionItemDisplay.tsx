@@ -70,6 +70,7 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
       'System.AssignedTo': VSS.getWebContext().user.name,
       'Tags': 'feedback;reflect-hub',
       'Title': '',
+      'Description': `${this.props.feedbackItemTitle}`,
       'priority': 1,
       'System.History': `Created by Retrospectives |` +
         ` Team [ ${this.props.team.name} ] Retrospective [ ${this.props.boardTitle} ] Item [ ${this.props.feedbackItemTitle} ]` +
