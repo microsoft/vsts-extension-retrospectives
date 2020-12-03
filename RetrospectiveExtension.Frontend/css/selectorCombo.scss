@@ -53,7 +53,7 @@
 }
 
 .selector-button {
-  background-color: var(--panel-shadow-color);
+  background-color: $hover_grey;
   display: flex;
   height: 30px;
   padding-left: 8px;
@@ -61,7 +61,7 @@
   cursor: pointer;
 
   &:hover {
-    background-color: $hover_grey;
+    background-color: var(--panel-shadow-color);
   }
 
   i.selector-button-icon{

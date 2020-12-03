@@ -11,6 +11,7 @@ import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/Docum
 import classNames = require('classnames');
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
 import { v4 as uuid } from 'uuid';
+import { ChangeEvent } from 'react';
 
 interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -175,6 +176,196 @@ export default class FeedbackBoardMetadataForm
     return array[Math.floor(Math.random() * array.length)];
   }
 
+  private handleColumnsTemplateChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    switch (event.target.value) {
+      case '4ls':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Liked',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'fas fa-book',
+                id: uuid(),
+                title: 'Learned',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'far fa-compass',
+                id: uuid(),
+                title: 'Lacked',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#8063bf',
+                iconClass: 'far fa-eye',
+                id: uuid(),
+                title: 'Longed for',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case '1to1':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Good',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'fas fa-exclamation',
+                id: uuid(),
+                title: 'So-so',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-balance-scale-right',
+                id: uuid(),
+                title: 'Improve',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#8063bf',
+                iconClass: 'fas fa-birthday-cake',
+                id: uuid(),
+                title: 'Done',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'mad-sad-glad':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-angry',
+                id: uuid(),
+                title: 'Mad',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'Sad',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Glad',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'good-bad-ideas':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Good',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-angry',
+                id: uuid(),
+                title: 'Bad',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-exclamation',
+                id: uuid(),
+                title: 'Ideas',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'start-stop-continue':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Start',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'Stop',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'far fa-eye',
+                id: uuid(),
+                title: 'Continue',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
   private allIconClassNames: { friendlyName: string, iconClass: string }[] = [
     {
       friendlyName: 'smile',
@@ -185,6 +376,10 @@ export default class FeedbackBoardMetadataForm
       iconClass: 'far fa-frown',
     },
     {
+      friendlyName: 'angry',
+      iconClass: 'far fa-angry',
+    },
+    {
       friendlyName: 'chalkboard',
       iconClass: 'fas fa-chalkboard',
     },
@@ -193,12 +388,32 @@ export default class FeedbackBoardMetadataForm
       iconClass: 'far fa-comments',
     },
     {
+      friendlyName: 'book',
+      iconClass: 'fas fa-book',
+    },
+    {
+      friendlyName: 'compass',
+      iconClass: 'far fa-compass',
+    },
+    {
+      friendlyName: 'eye',
+      iconClass: 'far fa-eye',
+    },
+    {
       friendlyName: 'question',
       iconClass: 'fas fa-question',
     },
     {
       friendlyName: 'exclamation',
       iconClass: 'fas fa-exclamation',
+    },
+    {
+      friendlyName: 'celebrate',
+      iconClass: 'fas fa-birthday-cake',
+    },
+    {
+      friendlyName: 'balance',
+      iconClass: 'fas fa-balance-scale-right',
     }
   ];
 
@@ -210,6 +425,18 @@ export default class FeedbackBoardMetadataForm
     {
       friendlyName: 'red',
       colorCode: '#cc293d'
+    },
+    {
+      friendlyName: 'navy',
+      colorCode: '#174170'
+    },
+    {
+      friendlyName: 'orange',
+      colorCode: '#F78A53'
+    },
+    {
+      friendlyName: 'pink',
+      colorCode: '#ff00cc'
     },
     {
       friendlyName: 'yellow',
@@ -280,6 +507,17 @@ export default class FeedbackBoardMetadataForm
         <div className="board-metadata-form-edit-column-section hide-mobile">
           <div className="board-metadata-form-section-header">Columns</div>
           <div className="board-metadata-form-section-subheader">You can create a maximum of {this.maxColumnCount} columns in a retrospective.</div>
+          <div className="board-metadata-form-section-header">
+            Apply template :
+            <select onChange={this.handleColumnsTemplateChange} className="title-input-container" style={{ display: 'inline-flex', backgroundColor: '#fff', fontWeight: 'normal', marginLeft: '10px' }}>
+              <option value="">Select a template</option>
+              <option value="4ls">4Ls</option>
+              <option value="1to1">1-to-1</option>
+              <option value="mad-sad-glad">Mad-Sad-Glad</option>
+              <option value="good-bad-ideas">Good-Bad-Ideas</option>
+              <option value="start-stop-continue">Start-Stop-Continue</option>
+            </select>
+          </div>
           <List
             items={this.state.columnCards}
             onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
