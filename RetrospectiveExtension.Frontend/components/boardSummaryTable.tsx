@@ -188,17 +188,14 @@ export class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, 
         updatedActionItemsForBoard.isDataLoaded = true;
 
         const pendingWorkItems = updatedItems.map((updatedItem) => {
-          const stateName = updatedItem.fields['System.State'];
-          const type = updatedItem.fields['System.WorkItemType'];
-
-          const states = workItemTypeToStatesMap[type].filter((workItemState) => workItemState.name === stateName);
+          const states = workItemTypeToStatesMap[updatedItem.fields['System.WorkItemType']].filter((workItemState) => workItemState.name === updatedItem.fields['System.State']);
           if (states.length) {
             return states[0];
           }
 
           return null;
         }).filter((workItemState) => {
-          return !workItemState || workItemState.category !== 'Completed';
+          return !workItemState || (workItemState.category !== 'Completed' && workItemState.category !== 'Removed');
         });
 
         const pendingWorkItemsCount = pendingWorkItems.length;
