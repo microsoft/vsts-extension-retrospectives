@@ -14,7 +14,7 @@ export const getBoardUrl = (teamId: string, boardId: string): string => {
   queryParams.append('teamId', teamId);
   queryParams.append('boardId', boardId);
 
-  const boardDeepLinkUrl = `${ctx.host.uri}${ctx.project.name}/_apps/hub/ms-devlabs.retrospective-vsts-extension.reflect-hub?${queryParams.toString()}`;
+  const boardDeepLinkUrl = `${ctx.host.uri}${ctx.project.name}/_apps/hub/ms-devlabs.team-retrospectives.home?${queryParams.toString()}`;
 
   return boardDeepLinkUrl;
 }
