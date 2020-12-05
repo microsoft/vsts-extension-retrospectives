@@ -1,4 +1,4 @@
-﻿@import "_variables.scss";
+@import "_variables.scss";
 
 .editable-document-card-title {
     margin-top: -20px;
@@ -8,6 +8,7 @@
     flex-direction: column;
     justify-content: center;
     min-height: 100px;
+  color: var(--text-secondary-color);
 
     .editable-text {
         display: inline-block;
