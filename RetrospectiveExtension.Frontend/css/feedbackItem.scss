@@ -30,12 +30,19 @@
 
   .mainItemCard {
     max-width: $main_item_card_max_width;
-    background-color: var(--panel-shadow-color);
-    border: 0;
+    background-color: var(--background-color);
+    border-top: 1px solid rgb(96, 94, 92);
+    border-right: 1px solid rgb(96, 94, 92);
+    border-bottom: 1px solid rgb(96, 94, 92);
+    border-left: 0;
 
     .card-integral-part {
       border-left-width: 3px;
       border-left-style: solid;
+
+      .ms-DocumentCardActivity .ms-DocumentCardActivity-details span {
+        color: var(--text-secondary-color);
+      }
 
       .card-header {
         height: $feedback_item_header_height;
@@ -60,12 +67,12 @@
           
           i {
             line-height: $feedback_item_action_button_height - 5px;
-            color: grey;
+            color: var(--text-secondary-color);
             font-size: 14px;
           }
 
           &:focus {
-            border: 1px solid;
+            border: none;
           }
 
           &:disabled {
@@ -75,7 +82,6 @@
         }
 
         .feedback-add-vote {
-
           &:hover:not(:disabled) {
             i {
               color: $main_blue;
@@ -89,17 +95,17 @@
               color: $main_blue !important;
             }
           }
-  
+
           .feedback-upvote-count {
-            font: 400 12.3333px Arial;
+            color: var(--text-secondary-color);
             line-height: $feedback_item_action_button_height - 5px;
             margin-left: 5px;
           }
         }
-  
+
         .item-actions-menu {
           padding-right: 3px;
-          
+
           .contextual-menu-button {
             min-width: 25px;
             width: 25px;

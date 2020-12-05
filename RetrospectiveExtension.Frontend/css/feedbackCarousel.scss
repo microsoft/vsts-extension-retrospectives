@@ -1,12 +1,33 @@
 @import "_variables.scss";
 
+.feedback-carousel-pivot > div {
+  display: flex;
+}
+
+.feedback-carousel-pivot-item {
+  width: 100%
+}
+
+.feedback-carousel-pivot > .ms-Pivot .ms-Button {
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
+}
+
 .retrospectives-carousel-dialog-modal {
   .ms-Overlay {
     background-color: rgba(0, 0, 0, 0.4);
   }
 
   .retrospectives-carousel-dialog {
+
+    background-color: rgba(var(--palette-neutral-2, 248, 248, 248), 1);
+
+    .ms-Dialog-title {
+      color: var(--text-primary-color);
+    }
+
     .ms-Dialog-subText {
+      color: var(--text-primary-color);
       font-size: 14px;
     }
 
@@ -19,42 +40,38 @@
         }
       }
     }
-  
+
     div[class^='content-'], div[class*=' content'] {
       overflow-y: hidden;
-  
+
       .slick-dots {
         position: static;
         bottom: auto;
         padding-top: 20px;
       }
-    
+
       .slick-next {
         right: 0px;
         z-index: 1;
-        background: white;
         height: 100%;
         opacity: 1;
         width: 25px;
-    
+
         &::before {
           color: #999999;
-          background: white;
           font-size: 25px;
         }
       }
-    
+
       .slick-prev {
         left: 0px;
         z-index: 1;
-        background: white;
         height: 100%;
         opacity: 1;
         width: 25px;
     
         &::before {
           color: #999999;
-          background: white;
           font-size: 25px;
         }
       }
