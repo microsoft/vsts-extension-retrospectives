@@ -60,12 +60,12 @@
           
           i {
             line-height: $feedback_item_action_button_height - 5px;
-            color: grey;
+            color: var(--text-secondary-color);
             font-size: 14px;
           }
 
           &:focus {
-            border: 1px solid;
+            border: none;
           }
 
           &:disabled {
