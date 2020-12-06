@@ -11,7 +11,7 @@ class ShareBoardHelper {
     const feedbackItems: IFeedbackItemDocument[] = await itemDataService.getFeedbackItemsForBoard(board.id);
 
     let content: string = `Retrospectives Summary for "${board.title}" (${getBoardUrl(board.teamId, board.id)})\n`;
-    content += "Feedback Items\nType,Description,Votes,CreatedDate,CreatedBy\n"
+    content += "\n\nFeedback Items\nType,Description,Votes,CreatedDate,CreatedBy\n"
 
     const contentList: {type: string, description: string, votes: number, createdDate: Date, createdBy: string}[] = [];
 
