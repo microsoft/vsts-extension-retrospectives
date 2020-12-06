@@ -59,20 +59,27 @@ $team_selector_list_item_width: 450px;
 .toggle-carousel-button-tooltip-wrapper {
   position: relative;
 
+  .toggle-carousel-button .ms-Button-icon {
+    color: var(--text-primary-color) !important;
+  }
+
   .toggle-carousel-button {
     margin-top: 8px;
     margin-left: 8px;
     margin-right: 8px;
-    color: black;
-  
+
+    font-size: 13px;
+
+    color: var(--text-primary-color);
+
     &:hover {
       color: $main_blue;
 
       .ms-Button-icon {
-        color: $main_blue;
+        color: $main_blue !important;
       }
     }
-  
+
     .ms-Button-icon {
       color: black;
       margin-top: 2px;

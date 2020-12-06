@@ -5,5 +5,7 @@
 
   .feedback-columns-container {
     display: table-row;
+
+    background-color: rgba(var(--palette-neutral-2, 248, 248, 248), 1);
   }
 }

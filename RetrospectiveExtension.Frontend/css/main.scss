@@ -36,7 +36,7 @@ body {
 // VSS automatically adds border and boldfaces button text. This doesn't look good with Office Fabric, so we will remove the styling.
 button:hover:not(.ms-Button), button:focus:not(.ms-Button){
   border: none;
-  
+
   // !important required to override the "bold !important" style in VSS bundle.
   font-weight: normal !important; 
 }
@@ -47,7 +47,7 @@ button:hover:not(.ms-Button), button:focus:not(.ms-Button){
 }
 
 .anonymous_checkbox .title-input .create-button {
-    margin-right: 5px;
+  margin-right: 5px;
 }
 
 .desktop-mode {
