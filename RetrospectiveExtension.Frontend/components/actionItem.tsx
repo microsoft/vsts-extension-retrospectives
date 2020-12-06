@@ -146,7 +146,7 @@ export default class ActionItem extends React.Component<ActionItemProps, ActionI
     const workItemType: any = this.props.allWorkItemTypes.find(wit => wit.name === this.props.actionItem.fields['System.WorkItemType']);
     const iconProps: IDocumentCardPreviewProps = this.getWorkItemTypeIconProps(workItemType);
 
-    // Explicitly cast, since the returned contract contains states, but the interface defined does not. 
+    // Explicitly cast, since the returned contract contains states, but the interface defined does not
     const workItemStates: WorkItemStateColor[] = workItemType.states ? workItemType.states : null;
     const workItemState: WorkItemStateColor = workItemStates ? workItemStates.find(wisc => wisc.name === this.props.actionItem.fields['System.State']) : null;
     const resolvedBorderRight: string = workItemState && (workItemState.category === 'Completed' || workItemState.category === 'Resolved') ? 'resolved-border-right' : '';
