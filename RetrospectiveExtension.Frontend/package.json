@@ -21,6 +21,7 @@
     "classnames": "2.2.6",
     "copy-to-clipboard": "3.3.1",
     "crypto-js": "4.0.0",
+    "file-saver": "2.0.5",
     "jsonwebtoken": "8.5.1",
     "moment": "2.29.1",
     "office-ui-fabric-react": "7.153.4",
@@ -37,9 +38,7 @@
   "devDependencies": {
     "@fortawesome/fontawesome-free": "5.15.1",
     "@types/applicationinsights-js": "1.0.9",
-    "@types/classnames": "2.2.11",
-    "@types/crypto-js": "4.0.1",
-    "@types/jest": "26.0.16",
+    "@types/file-saver": "2.0.1",
     "@types/jsonwebtoken": "8.5.0",
     "@types/node": "14.14.10",
     "@types/react": "17.0.0",

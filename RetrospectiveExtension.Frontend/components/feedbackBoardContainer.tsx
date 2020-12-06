@@ -31,6 +31,7 @@ import { WorkItemType, WorkItemTypeReference } from 'TFS/WorkItemTracking/Contra
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import moment = require('moment');
+import { shareBoardHelper } from '../utilities/shareBoardHelper';
 
 export interface FeedbackBoardContainerProps {
   projectId: string;
@@ -847,6 +848,14 @@ export default class FeedbackBoardContainer
       },
       text: 'Copy retrospective link',
       title: 'Copy retrospective link',
+    },
+    {
+      key: 'exportCSV',
+      className: 'hide-mobile',
+      iconProps: { iconName: 'DownloadDocument' },
+      onClick: () => { shareBoardHelper.generateCSVContent(this.state.currentBoard) },
+      text: 'Export CSV content',
+      title: 'Export CSV content',
     },
     {
       key: 'emailPreview',
