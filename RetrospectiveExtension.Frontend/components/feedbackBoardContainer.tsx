@@ -774,10 +774,6 @@ export default class FeedbackBoardContainer
     vssClipboard.copyToClipboard(boardDeepLinkUrl);
   }
 
-  private exportCSVContent = () => {
-    shareBoardHelper.generateCSVContent(this.state.currentBoard);
-  }
-
   private renderBoardUpdateMetadataFormDialog = (
     isNewBoardCreation: boolean,
     hidden: boolean,
@@ -856,8 +852,8 @@ export default class FeedbackBoardContainer
     {
       key: 'exportCSV',
       className: 'hide-mobile',
-      iconProps: { iconName: 'Mail' },
-      onClick: this.exportCSVContent,
+      iconProps: { iconName: 'DownloadDocument' },
+      onClick: () => { shareBoardHelper.generateCSVContent(this.state.currentBoard) },
       text: 'Export CSV content',
       title: 'Export CSV content',
     },
