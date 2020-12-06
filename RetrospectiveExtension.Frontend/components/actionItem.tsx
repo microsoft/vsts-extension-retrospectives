@@ -41,7 +41,7 @@ export default class ActionItem extends React.Component<ActionItemProps, ActionI
 
     this.state = {
       isUnlinkWorkItemConfirmationDialogHidden: true,
-      linkedWorkItem: null,
+      linkedWorkItem: null as WorkItem,
       workItemSearchTextboxHasErrors: false,
     };
 
