@@ -38,7 +38,7 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
 
   private editableTextRef: HTMLElement;
 
-  private handleTextChange = (event: any, newValue: string) => {
+  private handleTextChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string) => {
     if (!newValue.trim()) {
       this.setState({
         newText: "",
