@@ -40,9 +40,7 @@ export interface ISelectorComboState<T> {
   isSelectorDialogHidden: boolean;
 }
 
-export default class SelectorCombo<T>
-  extends React.Component<ISelectorComboProps<T>, ISelectorComboState<T>>  {
-
+export default class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelectorComboState<T>>  {
   private selectorButton: HTMLElement | null;
 
   constructor(props: ISelectorComboProps<T>) {
