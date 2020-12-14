@@ -518,6 +518,7 @@ export default class FeedbackBoardMetadataForm
               <option value="start-stop-continue">Start-Stop-Continue</option>
             </select>
           </div>
+          <div className="board-metadata-form-section-subheader" style={{ fontSize:"12px", color:"#ccb100" }}>Warning: Existing feedbacks may not be available after changing board template!</div>
           <List
             items={this.state.columnCards}
             onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
