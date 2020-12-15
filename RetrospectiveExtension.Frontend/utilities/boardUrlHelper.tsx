@@ -6,7 +6,6 @@
  * @param boardId Id of selected board
  */
 export const getBoardUrl = (teamId: string, boardId: string): string => {
-
   const ctx = VSS.getWebContext();
 
   const queryParams = new URLSearchParams();
