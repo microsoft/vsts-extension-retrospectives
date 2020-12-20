@@ -1,5 +1,4 @@
 import { IdentityRef } from 'VSS/WebApi/Contracts';
-import { buildAvatarUrl } from './urlHelper';
 
 let userIdentity: IdentityRef;
 
