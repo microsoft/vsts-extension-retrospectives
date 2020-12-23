@@ -145,7 +145,6 @@ class ItemDataService {
     return updatedBoardItem;
   }
 
-
   /**
    * Increment/Decrement the vote of the feedback item.
    */
@@ -157,20 +156,19 @@ class ItemDataService {
       return undefined;
     }
     const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
-    
+
     if (boardItem == undefined) {
       console.log(`Cannot retrieve board for the feedback. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
      }
-    
 
     if (decrement) {
       if (feedbackItem.upvotes<=0) {
-        console.log(`Cannot decrement upvote as votes must be >0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
+        console.log(`Cannot decrement upvote as votes must be > 0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
         return undefined;
       } else {
-        if (feedbackItem.voteCollection[userId] == null || feedbackItem.voteCollection[userId] == 0) {
-          console.log(`Cannot decrement upvote as your votes must be >0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
+        if (feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
+          console.log(`Cannot decrement upvote as your votes must be > 0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
           return undefined;
         }
         else {
@@ -180,19 +178,24 @@ class ItemDataService {
         }
       }
     } else {
-     if (boardItem.boardVoteCollection[userId] == null){ 
+      if (boardItem.boardVoteCollection === undefined || boardItem.boardVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
+        boardItem.boardVoteCollection = {};
         boardItem.boardVoteCollection[userId] = 1;
-      }
-      else {
-        if (boardItem.boardVoteCollection[userId] >= boardItem.maxvotesPerUser) {
-          console.log(`User has reached max votes for the board. Board: ${boardId}, Max Votes: ${boardItem.maxvotesPerUser}`);
+      } else {
+        if (boardItem.boardVoteCollection[userId] >= boardItem.maxVotesPerUser) {
+          console.log(`User has reached max votes for the board. Board: ${boardId}, Max Votes: ${boardItem.maxVotesPerUser}`);
+
           return undefined;
         }
         else boardItem.boardVoteCollection[userId]++;
       }
-      if (feedbackItem.voteCollection[userId] == null) feedbackItem.voteCollection[userId] = 1;
-      else  feedbackItem.voteCollection[userId]++;
-      feedbackItem.upvotes++;
+
+      if (feedbackItem.voteCollection[userId] === null)
+        feedbackItem.voteCollection[userId] = 0;
+      else
+        feedbackItem.voteCollection[userId]++;
+
+        feedbackItem.upvotes++;
     }
     await this.updateBoardItem(teamId, boardItem);
     reflectBackendService.broadcastUpdatedBoard(teamId, boardId);
