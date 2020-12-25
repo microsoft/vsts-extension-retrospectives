@@ -14,7 +14,6 @@ import {
   SelectionMode,
   IColumn,
 } from 'office-ui-fabric-react/lib/DetailsList';
-import * as moment from 'moment';
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
