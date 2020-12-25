@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import {
@@ -296,7 +296,6 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
           }
         </div>
       </div>
-
     );
   }
 }
