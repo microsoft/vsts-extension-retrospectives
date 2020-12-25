@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import {
@@ -111,7 +111,7 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
         ariaLabel: 'Work item changed date.',
         onRender: (props: IActionItemsTableProps) => {
           const changedDate = new Date(props.changedDate);
-          return <div className="overflow-ellipsis">{moment(changedDate).format('MMM Do, YYYY')}</div>;
+          return <div className="overflow-ellipsis">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(changedDate)}</div>;
         },
         onColumnClick: this.onColumnClick,
       },
