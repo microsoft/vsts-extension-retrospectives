@@ -27,7 +27,7 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y apt-transport-https \
     && apt-get update \
-    && apt-get install -y dotnet-sdk-5 \
+    && apt-get install -y dotnet-sdk-5.0 \
     #
     # Install node
     && apt install -y nodejs \
