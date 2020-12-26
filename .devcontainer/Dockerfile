@@ -30,6 +30,7 @@ RUN apt-get update \
     && apt-get install -y dotnet-sdk-5 \
     #
     # Install node
+    && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
     && apt install -y nodejs \
     #
     # Install npm
