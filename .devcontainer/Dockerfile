@@ -33,9 +33,6 @@ RUN apt-get update \
     && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
     && apt install -y nodejs \
     #
-    # Install npm
-    && apt install -y npm \
-    #
     # Install npm-check-updates tool globally
     && npm install -g npm-check-updates \
     #
