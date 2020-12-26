@@ -22,7 +22,7 @@ RUN apt-get update \
     #
     # Install dotnet core 5
     && cd /tmp \
-    && wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
+    && wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
     && dpkg -i packages-microsoft-prod.deb \
     && apt-get update \
     && apt-get install -y apt-transport-https \
@@ -30,6 +30,7 @@ RUN apt-get update \
     && apt-get install -y dotnet-sdk-5 \
     #
     # Install node
+    && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
     && apt install -y nodejs \
     #
     # Install npm
