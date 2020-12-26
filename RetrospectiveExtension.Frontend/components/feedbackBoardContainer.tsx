@@ -361,9 +361,9 @@ export default class FeedbackBoardContainer
 
     // Attempt to use query params to pre-select a specific team and board.
     let queryParams: URLSearchParams;
-    
+
     try {
-      queryParams = (new URL(document.referrer)).searchParams;
+      queryParams = (new URL(document.location.href)).searchParams;
 
       if (!queryParams) {
         if (!isHostedAzureDevOps)
@@ -374,17 +374,17 @@ export default class FeedbackBoardContainer
           throw new Error("URL-related issue occurred with this URL: (Empty URL)");
         }
         else {
-          const indexVisualStudioCom = document.referrer.indexOf("visualstudio.com");
-          const indexDevAzureCom = document.referrer.indexOf("dev.azure.com");
+          const indexVisualStudioCom = document.location.href.indexOf("visualstudio.com");
+          const indexDevAzureCom = document.location.href.indexOf("dev.azure.com");
 
           if (indexVisualStudioCom >= 0) {
-            const indexSecondSlashAfterVisualStudioCom = document.referrer.indexOf("/", indexVisualStudioCom + "visualstudio.com/".length);
-            throw new Error("URL-related issue occurred with this URL: " + document.referrer.substring(indexSecondSlashAfterVisualStudioCom));
+            const indexSecondSlashAfterVisualStudioCom = document.location.href.indexOf("/", indexVisualStudioCom + "visualstudio.com/".length);
+            throw new Error("URL-related issue occurred with this URL: " + document.location.href.substring(indexSecondSlashAfterVisualStudioCom));
           }
           else if (indexDevAzureCom >= 0) {
-            const indexSecondSlashAfterDevAzureCom = document.referrer.indexOf("/", indexDevAzureCom + "dev.azure.com/".length);
-            const indexThirdSlashAfterDevAzureCom = document.referrer.indexOf("/", indexSecondSlashAfterDevAzureCom + 1);
-            throw new Error("URL-related issue occurred with this URL: " + document.referrer.substring(indexThirdSlashAfterDevAzureCom));
+            const indexSecondSlashAfterDevAzureCom = document.location.href.indexOf("/", indexDevAzureCom + "dev.azure.com/".length);
+            const indexThirdSlashAfterDevAzureCom = document.location.href.indexOf("/", indexSecondSlashAfterDevAzureCom + 1);
+            throw new Error("URL-related issue occurred with this URL: " + document.location.href.substring(indexThirdSlashAfterDevAzureCom));
           }
           else {
             throw new Error("URL-related issue occurred with hosted Azure DevOps but document referrer does not contain dev.azure.com or visualstudio.com");
