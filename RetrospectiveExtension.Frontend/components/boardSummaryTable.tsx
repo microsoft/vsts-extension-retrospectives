@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import ReactTable, { Column } from 'react-table';
 import BoardDataService from '../dal/boardDataService';
@@ -22,7 +22,7 @@ const boardSummaryColumns: Column[] = [
     accessor: 'createdDate',
     Cell: (row: any) => {
       return (
-        moment(row.original.createdDate).format('MMM Do, YYYY')
+        new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(row.original.createdDate)
       )
     },
     width: 175,
