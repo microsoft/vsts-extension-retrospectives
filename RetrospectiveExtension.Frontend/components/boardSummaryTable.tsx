@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import ReactTable, { Column } from 'react-table';
 import BoardDataService from '../dal/boardDataService';
@@ -6,7 +6,6 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
-import * as moment from 'moment';
 import { appInsightsClient } from '../utilities/appInsightsClient';
 import classNames from 'classnames';
 
