@@ -394,8 +394,8 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     },
   ];
 
-  private onVote = async (feedbackItemId: string) => {
-    const updatedFeedbackItem = await itemDataService.incrementUpvote(this.props.boardId, feedbackItemId);
+  private onVote = async (feedbackItemId: string,  decrement: boolean=false) => {
+    const updatedFeedbackItem = await itemDataService.updateVote(this.props.boardId, feedbackItemId, decrement);
     appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUpvoted);
 
     if (updatedFeedbackItem) {
@@ -633,6 +633,32 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                     }}>
                     <i className="fas fa-arrow-circle-up" />
                     <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
+                  </button>
+                }
+                {showVotes && this.props.isInteractable &&
+                  // Using standard button tag here due to no onAnimationEnd support in fabricUI
+                  <button
+                    title="UnVote"
+                    aria-live="polite"
+                    aria-label={'Click to unvote On feedback. Current vote count is ' + this.props.upvotes}
+                    tabIndex={0}
+                    disabled={!isMainItem || !showVoteButton}
+                    className={classNames(
+                      'feedback-action-button',
+                      'feedback-add-vote',
+                      { voteAnimation: this.state.showVotedAnimation }
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      this.setState({ showVotedAnimation: true });
+                      this.onVote(this.props.id, true);
+                    }}
+                    onAnimationEnd={() => {
+                      this.setState({ showVotedAnimation: false });
+                    }}>
+                    <i className="fas fa-arrow-circle-down" />
+                    
                   </button>
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&

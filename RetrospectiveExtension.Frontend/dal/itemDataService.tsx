@@ -122,9 +122,9 @@ class ItemDataService {
   }
 
   /**
-   * Increment the upvote of the feedback item.
+   * Increment/Decrement the vote of the feedback item.
    */
-  public incrementUpvote = async (boardId: string, feedbackItemId: string): Promise<IFeedbackItemDocument> => {
+  public updateVote = async (boardId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
@@ -132,7 +132,16 @@ class ItemDataService {
       return undefined;
     }
 
-    feedbackItem.upvotes++;
+    if (decrement) {
+      if (feedbackItem.upvotes<=0) {
+        console.log(`Cannot decrement upvote as votes must be >0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
+        return undefined;
+      } else {
+        feedbackItem.upvotes--;
+      }
+    } else {
+      feedbackItem.upvotes++;
+    }
 
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
     return updatedFeedbackItem;
