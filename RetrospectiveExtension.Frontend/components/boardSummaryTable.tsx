@@ -269,7 +269,7 @@ export class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, 
       },
       tabIndex: 0,
       'aria-label': 'Board summary row. Click row to expand and view more statistics for this board.',
-      onKeyPress: (e: any) => {
+      onKeyPress: (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
           this.expandSummaryRow(state, rowInfo, instance);
         }
