@@ -25,7 +25,7 @@ class ShareBoardHelper {
         description: feedbackItem.title,
         votes: feedbackItem.upvotes,
         createdDate: feedbackItem.createdDate,
-        createdBy: feedbackItem.createdBy.displayName
+        createdBy: feedbackItem.createdBy?.displayName
       });
 
       if (feedbackItem.childFeedbackItemIds && feedbackItem.childFeedbackItemIds.length) {
@@ -43,7 +43,7 @@ class ShareBoardHelper {
                 description: child.title,
                 votes: child.upvotes,
                 createdDate: child.createdDate,
-                createdBy: child.createdBy.displayName
+                createdBy: child.createdBy?.displayName
               });
             }
           }
