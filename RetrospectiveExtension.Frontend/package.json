@@ -40,6 +40,7 @@
   "devDependencies": {
     "@fortawesome/fontawesome-free": "5.15.1",
     "@types/applicationinsights-js": "1.0.9",
+    "@types/classnames": "2.2.11",
     "@types/crypto-js": "4.0.1",
     "@types/file-saver": "2.0.1",
     "@types/jsonwebtoken": "8.5.0",
