@@ -17,7 +17,7 @@ interface IExtensionSettingsMenuProps {
 }
 
 export default class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
-  constructor(props: any) {
+  constructor(props: IExtensionSettingsMenuProps) {
     super(props);
 
     this.state = {
