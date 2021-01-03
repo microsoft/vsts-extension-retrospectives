@@ -41,12 +41,7 @@ export default class FeedbackCarousel extends React.Component<IFeedbackCarouselP
     return (
       <div className="feedback-carousel-item">
         <FeedbackItem
-          {...FeedbackColumn.createFeedbackItemProps(
-            feedbackColumnProps,
-            feedbackColumnProps.columnItems
-              // Carousel only shows main item cards.
-              .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)[0],
-            true)}
+          {...FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, feedbackColumnProps.columnItems.filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)[0], true)}
         />
       </div>
     );
