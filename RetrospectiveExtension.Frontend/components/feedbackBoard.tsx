@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { WebApiTeam } from 'TFS/Core/Contracts';
 import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
 
@@ -8,11 +8,7 @@ import BoardDataService from '../dal/boardDataService';
 import { itemDataService } from '../dal/itemDataService';
 import { reflectBackendService } from '../dal/reflectBackendService';
 import FeedbackColumn from './feedbackColumn';
-import {
-  IFeedbackBoardDocument,
-  IFeedbackColumn,
-  IFeedbackItemDocument,
-} from '../interfaces/feedback';
+import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { ExceptionCode } from '../interfaces/retrospectiveState';
 import { WorkflowPhase } from '../interfaces/workItem';
 
