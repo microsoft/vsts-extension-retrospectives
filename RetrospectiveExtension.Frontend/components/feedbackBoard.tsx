@@ -14,7 +14,6 @@ import { WorkflowPhase } from '../interfaces/workItem';
 
 import FeedbackItemCarousel from './feedbackCarousel';
 import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog';
-import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 
 export interface FeedbackBoardProps {
