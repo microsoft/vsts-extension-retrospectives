@@ -211,11 +211,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
     const teamFieldValues = await workService.getTeamFieldValues(teamId);
     const defaultAreaPath = (teamFieldValues && teamFieldValues.values && teamFieldValues.values.length) ? teamFieldValues.values[0].value : '';
 
-    this.setState(
-      {
-        defaultActionItemAreaPath: defaultAreaPath,
-        defaultActionItemIteration: defaultIteration,
-      });
+    this.setState({ defaultActionItemAreaPath: defaultAreaPath, defaultActionItemIteration: defaultIteration });
   }
 
   private getColumnsWithReleasedFocus = (currentFeedbackBoardState: FeedbackBoardState) => {
