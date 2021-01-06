@@ -37,3 +37,15 @@ _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 **New Features**
 
 * _Export CSV Content_ button generates and downloads current Retrospective board content in CSV format
+
+## v1.0.50
+
+**Fixes**
+
+* _Copy Retrospective Link_ button generates correct url in some edge cases
+
+**New Features**
+
+* _What's New_ button added to the UI
+* Button added to _What's New_ dialog to launch this page in a new tab
+* Participants may uncast votes on feedbacks
