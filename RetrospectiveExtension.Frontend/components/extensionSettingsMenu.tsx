@@ -47,6 +47,11 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
   private showWhatsNewDialog = () => {
     this.setState({ isWhatsNewDialogHidden: false });
   }
+
+  private hideWhatsNewDialog = () => {
+    this.setState({ isWhatsNewDialogHidden: true });
+  }
+
   private hideMobileExtensionSettingsMenuDialog = () => {
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
