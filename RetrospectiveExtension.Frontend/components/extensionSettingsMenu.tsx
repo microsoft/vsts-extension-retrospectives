@@ -8,6 +8,7 @@ import { ViewMode } from '../config/constants';
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
   isMobileExtensionSettingsDialogHidden: boolean;
+  isWhatsNewDialogHidden: boolean;
 }
 
 interface IExtensionSettingsMenuProps {
