@@ -27,3 +27,13 @@ _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
 * Templates added to _Create new retrospective_ dialog, so it's now possible to create a board from one of those templates, such as, _Mad-Sad-Glad_, _Start-Stop-Continue_, etc.
 * New icon and color options added for columns
+
+## v1.0.49
+
+**Fixes**
+
+* _Copy Retrospective Link_ button generates correct url
+
+**New Features**
+
+* _Export CSV Content_ button generates and downloads current Retrospective board content in CSV format
