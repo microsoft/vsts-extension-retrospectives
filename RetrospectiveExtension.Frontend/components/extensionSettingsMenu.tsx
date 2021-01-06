@@ -22,7 +22,8 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
 
     this.state = {
       isClearVisitHistoryDialogHidden: true,
-      isMobileExtensionSettingsDialogHidden: true
+      isMobileExtensionSettingsDialogHidden: true,
+      isWhatsNewDialogHidden: true
     };
   }
 
