@@ -128,6 +128,25 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           onClick={this.showWhatsNewDialog}
         />
         <Dialog
+          hidden={this.state.isWhatsNewDialogHidden}
+          onDismiss={this.hideWhatsNewDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'What\'s New',
+            subText: 'With version 1.0.49 Retrospective Session participants may revoke already casted votes. Important note : participants may revoke more than they already cast votes. Max vote limit and limit to uncast more than the vote participant cast will come with version 1.0.50',
+          }}
+          minWidth={450}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-visit-history-cleared-info-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogFooter>
+            <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
+            <PrimaryButton onClick={this.hideWhatsNewDialog} text="Close" />
+          </DialogFooter>
+        </Dialog>
+        <Dialog
           hidden={this.state.isMobileExtensionSettingsDialogHidden}
           onDismiss={this.hideMobileExtensionSettingsMenuDialog}
           modalProps={{
