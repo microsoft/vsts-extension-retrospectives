@@ -20,3 +20,10 @@ _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
 * Maximum number of columns per Retrospective Board increased to 5 from 4
 * Support for collecting feedbacks anonymously in Collect phase
+
+## v1.0.48
+
+**New Features**
+
+* Templates added to _Create new retrospective_ dialog, so it's now possible to create a board from one of those templates, such as, _Mad-Sad-Glad_, _Start-Stop-Continue_, etc.
+* New icon and color options added for columns
