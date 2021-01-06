@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "team-retrospectives",
   "publisher": "ms-devlabs",
-  "version": "1.0.46",
+  "version": "1.0.49",
   "name": "Retrospectives",
   "description": "An Azure DevOps extension for efficient retrospectives.",
   "public": true,

@@ -8,6 +8,7 @@ import { ViewMode } from '../config/constants';
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
   isMobileExtensionSettingsDialogHidden: boolean;
+  isWhatsNewDialogHidden: boolean;
 }
 
 interface IExtensionSettingsMenuProps {
@@ -21,7 +22,8 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
 
     this.state = {
       isClearVisitHistoryDialogHidden: true,
-      isMobileExtensionSettingsDialogHidden: true
+      isMobileExtensionSettingsDialogHidden: true,
+      isWhatsNewDialogHidden: true
     };
   }
 
@@ -42,8 +44,20 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
     this.setState({ isMobileExtensionSettingsDialogHidden: false });
   }
 
+  private showWhatsNewDialog = () => {
+    this.setState({ isWhatsNewDialogHidden: false });
+  }
+
+  private hideWhatsNewDialog = () => {
+    this.setState({ isWhatsNewDialogHidden: true });
+  }
+
   private hideMobileExtensionSettingsMenuDialog = () => {
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
+  }
+
+  private onChangeLogClicked = () => {
+    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/master/CHANGELOG.md', '_blank');
   }
 
   private onContactUsClicked = () => {
@@ -105,6 +119,33 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           title="User Settings Menu"
           onClick={this.showMobileExtensionSettingsMenuDialog}
         />
+        <DefaultButton
+          className="contextual-menu-button"
+          aria-label="What's New"
+          iconProps={{ iconName: '12PointStar' }}
+          title="What's New"
+          text="What's New"
+          onClick={this.showWhatsNewDialog}
+        />
+        <Dialog
+          hidden={this.state.isWhatsNewDialogHidden}
+          onDismiss={this.hideWhatsNewDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'What\'s New',
+            subText: 'With version 1.0.49 Retrospective Session participants may revoke already casted votes. Important note : participants may revoke more than they already cast votes. Max vote limit and limit to uncast more than the vote participant cast will come with version 1.0.50',
+          }}
+          minWidth={450}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-visit-history-cleared-info-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogFooter>
+            <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
+            <PrimaryButton onClick={this.hideWhatsNewDialog} text="Close" />
+          </DialogFooter>
+        </Dialog>
         <Dialog
           hidden={this.state.isMobileExtensionSettingsDialogHidden}
           onDismiss={this.hideMobileExtensionSettingsMenuDialog}
