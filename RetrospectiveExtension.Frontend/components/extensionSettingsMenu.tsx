@@ -119,6 +119,14 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           title="User Settings Menu"
           onClick={this.showMobileExtensionSettingsMenuDialog}
         />
+        <DefaultButton
+          className="contextual-menu-button"
+          aria-label="What's New"
+          iconProps={{ iconName: '12PointStar' }}
+          title="What's New"
+          text="What's New"
+          onClick={this.showWhatsNewDialog}
+        />
         <Dialog
           hidden={this.state.isMobileExtensionSettingsDialogHidden}
           onDismiss={this.hideMobileExtensionSettingsMenuDialog}
