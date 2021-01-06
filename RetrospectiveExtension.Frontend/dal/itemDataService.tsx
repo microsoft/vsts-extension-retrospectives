@@ -22,12 +22,14 @@ class ItemDataService {
       createdDate: new Date(Date.now()),
       id: itemId,
       title,
+      voteCollection: {},
       upvotes: 0,
       userIdRef: userIdentity.id,
     };
 
     const createdItem: IFeedbackItemDocument =
       await ExtensionDataService.createDocument<IFeedbackItemDocument>(boardId, feedbackItem);
+    createdItem.voteCollection = {};
 
     return createdItem;
   }
@@ -124,7 +126,7 @@ class ItemDataService {
   /**
    * Increment/Decrement the vote of the feedback item.
    */
-  public updateVote = async (boardId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
+  public updateVote = async (boardId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
@@ -137,9 +139,16 @@ class ItemDataService {
         console.log(`Cannot decrement upvote as votes must be >0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
         return undefined;
       } else {
+        if (feedbackItem.voteCollection[userId] == null || feedbackItem.voteCollection[userId] == 0) {
+          console.log(`Cannot decrement upvote as your votes must be >0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
+          return undefined;
+        }
+        else feedbackItem.voteCollection[userId]--;
         feedbackItem.upvotes--;
       }
     } else {
+      if (feedbackItem.voteCollection[userId] == null) feedbackItem.voteCollection[userId] = 1;
+      else  feedbackItem.voteCollection[userId]++;
       feedbackItem.upvotes++;
     }
 

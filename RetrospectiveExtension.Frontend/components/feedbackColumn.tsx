@@ -83,6 +83,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       createdDate: new Date(Date.now()),
       id: 'emptyFeedbackItem',
       title: '',
+      voteCollection: {},
       upvotes: 0,
       userIdRef: userIdentity.id,
     };
