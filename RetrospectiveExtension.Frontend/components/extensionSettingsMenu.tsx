@@ -56,6 +56,10 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
+  private onChangeLogClicked = () => {
+    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/master/CHANGELOG.md', '_blank');
+  }
+
   private onContactUsClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/issues', '_blank');
   }
