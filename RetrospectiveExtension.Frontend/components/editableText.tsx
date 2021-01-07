@@ -51,6 +51,8 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
       newText: newValue.replace(/\r?\n|\r/g, ""),
       hasErrors: !newValue.trim()
     });
+
+    this.props.onSave(newValue.replace(/\r?\n|\r/g, ""));
   }
 
   private handleEdit = (event: React.MouseEvent<HTMLParagraphElement>) => {
