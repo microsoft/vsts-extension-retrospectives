@@ -151,6 +151,7 @@ export default class ActionItem extends React.Component<ActionItemProps, ActionI
     const workItemState: WorkItemStateColor = workItemStates ? workItemStates.find(wisc => wisc.name === this.props.actionItem.fields['System.State']) : null;
     const resolvedBorderRight: string = workItemState && (workItemState.category === 'Completed' || workItemState.category === 'Resolved') ? 'resolved-border-right' : '';
 
+    const systemTitle: string = this.props.actionItem.fields['System.Title'];
     return (
       <DocumentCard
         key={this.props.actionItem.id + 'card'} 
