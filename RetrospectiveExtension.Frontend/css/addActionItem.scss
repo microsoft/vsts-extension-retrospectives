@@ -52,7 +52,7 @@
 
 .add-action-item-wrapper {
   display: flex;
-  max-width: $main_item_card_max_width - 2px;
+  max-width: $main_item_card_max_width - 1px;
   background-color: $azure_devops_navigator_light_grey;
 
   .feedback-spacer {
