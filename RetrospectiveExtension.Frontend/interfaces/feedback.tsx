@@ -33,6 +33,7 @@ export interface IFeedbackColumn {
   accentColor: string;
 }
 
+
 export interface IFeedbackItemDocument {
   id: string;
   __etag?: number;
@@ -44,6 +45,7 @@ export interface IFeedbackItemDocument {
   associatedActionItemIds?: number[];
   columnId: string;
   upvotes: number;
+  voteCollection : { [voter: string]: number};
   createdBy?: IdentityRef;
   createdDate: Date;
   modifedDate?: Date;

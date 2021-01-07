@@ -395,7 +395,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
   ];
 
   private onVote = async (feedbackItemId: string,  decrement: boolean=false) => {
-    const updatedFeedbackItem = await itemDataService.updateVote(this.props.boardId, feedbackItemId, decrement);
+    const updatedFeedbackItem = await itemDataService.updateVote(this.props.boardId, getUserIdentity().id, feedbackItemId, decrement);
     appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUpvoted);
 
     if (updatedFeedbackItem) {
