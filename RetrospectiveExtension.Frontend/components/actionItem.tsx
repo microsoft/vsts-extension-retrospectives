@@ -173,7 +173,7 @@ export default class ActionItem extends React.Component<ActionItemProps, ActionI
             }
           }}
           onClick={this.showWorkItemForm}>
-          <DocumentCardTitle key={this.props.actionItem.id + 'title'} title={this.props.actionItem.fields['System.Title']} shouldTruncate={false} />
+          <DocumentCardTitle key={this.props.actionItem.id + 'title'} title={title} shouldTruncate={true} />
         </div>
         {!this.props.areActionIconsHidden &&
           <DocumentCardActions
