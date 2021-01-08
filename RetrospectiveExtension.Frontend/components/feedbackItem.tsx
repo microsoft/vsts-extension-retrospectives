@@ -345,11 +345,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Delete feedback',
         title: 'Delete feedback',
       },
-      workflowPhases: [
-        WorkflowPhase.Collect,
-        WorkflowPhase.Group,
-        WorkflowPhase.Vote,
-        WorkflowPhase.Act],
+      workflowPhases: [ WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act ],
     },
     {
       menuItem: {
