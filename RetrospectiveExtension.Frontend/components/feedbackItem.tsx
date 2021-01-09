@@ -355,8 +355,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Move feedback to different column',
         title: 'Move feedback to different column',
       },
-      workflowPhases: [
-        WorkflowPhase.Group],
+      workflowPhases: [ WorkflowPhase.Group ],
       hideMobile: true,
     },
     {
