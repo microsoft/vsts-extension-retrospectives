@@ -377,8 +377,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Remove feedback from group',
         title: 'Remove feedback from group',
       },
-      workflowPhases: [
-        WorkflowPhase.Group],
+      workflowPhases: [ WorkflowPhase.Group ],
       hideMobile: true,
       hideMainItem: true,
     },
