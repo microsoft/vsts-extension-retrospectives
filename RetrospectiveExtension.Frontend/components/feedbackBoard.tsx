@@ -58,6 +58,7 @@ export interface FeedbackBoardState {
 export default class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
   constructor(props: FeedbackBoardProps) {
     super(props);
+
     this.state = {
       columnIds: [],
       columns: {},
