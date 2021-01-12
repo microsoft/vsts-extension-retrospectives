@@ -468,10 +468,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
 
   private handleFeedbackItemSearchInputChange = async (event?: React.ChangeEvent<HTMLInputElement>, searchTerm?: string) => {
     if (!searchTerm || !searchTerm.trim()) {
-      this.setState({
-        searchTerm: searchTerm,
-        searchedFeedbackItems: []
-      });
+      this.setState({ searchTerm: searchTerm, searchedFeedbackItems: [] });
       return;
     }
 
