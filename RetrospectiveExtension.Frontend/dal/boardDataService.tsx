@@ -10,7 +10,7 @@ class BoardDataService {
   public readonly legacyNegativeColumnId: string = 'whatdidntgowell';
 
   public createBoardForTeam = async (
-    teamId: string, title: string, columns: IFeedbackColumn[],
+    teamId: string, title: string, maxxvotesPerUser: number, columns: IFeedbackColumn[],
     isAnonymous?: boolean, shouldShowFeedbackAfterCollect?: boolean, startDate?: Date, endDate?: Date) => {
     const boardId: string = uuid();
     const userIdentity = getUserIdentity();
@@ -25,9 +25,11 @@ class BoardDataService {
       isAnonymous: isAnonymous ? isAnonymous : false,
       modifiedDate: new Date(Date.now()),
       shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ? shouldShowFeedbackAfterCollect : false,
+      maxvotesPerUser: maxxvotesPerUser,
       startDate,
       teamId,
       title,
+      boardVoteCollection: {},
     }
 
     return await ExtensionDataService.createDocument<IFeedbackBoardDocument>(teamId, board);
@@ -75,7 +77,7 @@ class BoardDataService {
     await ExtensionDataService.deleteDocument(teamId, boardId);
   }
 
-  public updateBoardMetadata = async (teamId: string, boardId: string, title: string, newColumns: IFeedbackColumn[]): Promise<IFeedbackBoardDocument> => {
+  public updateBoardMetadata = async (teamId: string, boardId: string, maxvotesPerUser:number, title: string, newColumns: IFeedbackColumn[]): Promise<IFeedbackBoardDocument> => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
 
     // Check in case board was deleted by other user after option to update was selected by current user
@@ -85,6 +87,7 @@ class BoardDataService {
     }
 
     board.title = title;
+    board.maxvotesPerUser = maxvotesPerUser;
     board.columns = newColumns;
     board.modifiedDate = new Date(Date.now());
 

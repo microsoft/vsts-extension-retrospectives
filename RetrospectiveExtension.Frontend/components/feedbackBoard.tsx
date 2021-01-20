@@ -18,6 +18,8 @@ import { WorkflowPhase } from '../interfaces/workItem';
 
 import FeedbackItemCarousel from './feedbackCarousel';
 import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog';
+import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import { getUserIdentity } from '../utilities/userIdentityHelper';
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -426,6 +428,13 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
 
     return (
       <div className="feedback-board">
+        <div className="feedback-maxvotes-per-user">         
+            <label> {"Max Votes per User: "}</label>
+            <label> {this.props.board.maxvotesPerUser.toString()}</label>
+            <label> {"|  Your Total Votes: "}</label>
+            <label> {this.props.board.boardVoteCollection[getUserIdentity().id]==null? "0" : this.props.board.boardVoteCollection[getUserIdentity().id].toString()}</label>
+        </div>      
+ 
         <div className="feedback-columns-container">
           {this.state.isDataLoaded &&
             feedbackColumnPropsList.map((columnProps) => {

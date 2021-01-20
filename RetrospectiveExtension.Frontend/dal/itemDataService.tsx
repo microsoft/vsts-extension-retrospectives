@@ -1,10 +1,13 @@
 import * as ExtensionDataService from './dataService';
-import { IFeedbackItemDocument } from '../interfaces/feedback';
+import { IFeedbackItemDocument, IFeedbackBoardDocument } from '../interfaces/feedback';
 import { WorkItem } from 'TFS/WorkItemTracking/Contracts';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
 import { v4 as uuid } from 'uuid';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
+
+/// <reference types="vss-web-extension-sdk" />
+import { reflectBackendService } from '../dal/reflectBackendService';
 
 class ItemDataService {
   /**
@@ -41,6 +44,17 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument =
       await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
     return feedbackItem;
+  }
+
+  /**
+   * Get the board item.
+   */
+  public getBoardItem = async (teamId:string, boardId: string): Promise<IFeedbackBoardDocument> => {
+
+    // Can we get it this way? [const boardItem:  IFeedbackBoardDocument = await boardDataService.getBoardForTeamById(VSS.getWebContext().team.id, boardId);]
+    const boardItem: IFeedbackBoardDocument =
+    await ExtensionDataService.readDocument<IFeedbackBoardDocument>(teamId, boardId);   
+    return boardItem;
   }
 
   /**
@@ -124,15 +138,31 @@ class ItemDataService {
   }
 
   /**
+   * Update the board item.
+   */
+  private updateBoardItem = async (teamId: string, boardItem: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
+    const updatedBoardItem: IFeedbackBoardDocument = await ExtensionDataService.updateDocument<IFeedbackBoardDocument>(teamId, boardItem);
+    return updatedBoardItem;
+  }
+
+
+  /**
    * Increment/Decrement the vote of the feedback item.
    */
-  public updateVote = async (boardId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
+  public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
       console.log(`Cannot increment upvote for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
+    const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
+    
+    if (boardItem == undefined) {
+      console.log(`Cannot retrieve board for the feedback. Board: ${boardId}, Item: ${feedbackItemId}`);
+      return undefined;
+     }
+    
 
     if (decrement) {
       if (feedbackItem.upvotes<=0) {
@@ -143,15 +173,29 @@ class ItemDataService {
           console.log(`Cannot decrement upvote as your votes must be >0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
           return undefined;
         }
-        else feedbackItem.voteCollection[userId]--;
-        feedbackItem.upvotes--;
+        else {
+          feedbackItem.voteCollection[userId]--;
+          feedbackItem.upvotes--;
+          boardItem.boardVoteCollection[userId]--;
+        }
       }
     } else {
+     if (boardItem.boardVoteCollection[userId] == null){ 
+        boardItem.boardVoteCollection[userId] = 1;
+      }
+      else {
+        if (boardItem.boardVoteCollection[userId] >= boardItem.maxvotesPerUser) {
+          console.log(`User has reached max votes for the board. Board: ${boardId}, Max Votes: ${boardItem.maxvotesPerUser}`);
+          return undefined;
+        }
+        else boardItem.boardVoteCollection[userId]++;
+      }
       if (feedbackItem.voteCollection[userId] == null) feedbackItem.voteCollection[userId] = 1;
       else  feedbackItem.voteCollection[userId]++;
       feedbackItem.upvotes++;
     }
-
+    await this.updateBoardItem(teamId, boardItem);
+    reflectBackendService.broadcastUpdatedBoard(teamId, boardId);
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
     return updatedFeedbackItem;
   }
