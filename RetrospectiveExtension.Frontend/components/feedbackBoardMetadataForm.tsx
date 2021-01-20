@@ -19,7 +19,8 @@ interface IFeedbackBoardMetadataFormProps {
   teamId: string;
   placeholderText: string;
   initialValue: string;
-  onFormSubmit: (title: string, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean) => void;
+  maxvotesPerUser: number;
+  onFormSubmit: (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean ) => void;
   onFormCancel: () => void;
 }
 
@@ -30,12 +31,14 @@ interface IFeedbackBoardMetadataFormState {
   columnCards: IFeedbackColumnCard[];
   isBoardAnonymous: boolean;
   shouldShowFeedbackAfterCollect: boolean;
+  maxvotesPerUser: number;
   isDeleteColumnConfirmationDialogHidden: boolean;
   isChooseColumnIconDialogHidden: boolean;
   isChooseColumnAccentColorDialogHidden: boolean;
   columnCardBeingEdited: IFeedbackColumnCard;
   selectedIconKey: string;
   selectedAccentColorKey: string;
+  boardVoteCollection : { [voter: string]: number};
 }
 
 interface IFeedbackColumnCard {
@@ -80,6 +83,8 @@ export default class FeedbackBoardMetadataForm
       }),
       isBoardAnonymous: this.props.isNewBoardCreation ?
         false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
+      maxvotesPerUser: this.props.isNewBoardCreation ?
+      5 : this.props.currentBoard.maxvotesPerUser,
       isBoardNameTaken: false,
       isChooseColumnAccentColorDialogHidden: true,
       isChooseColumnIconDialogHidden: true,
@@ -94,6 +99,7 @@ export default class FeedbackBoardMetadataForm
         this.props.currentBoard.shouldShowFeedbackAfterCollect : false
       ),
       title: this.props.initialValue,
+      boardVoteCollection: {},
     };
   }
 
@@ -126,10 +132,11 @@ export default class FeedbackBoardMetadataForm
     }
 
     this.props.onFormSubmit(
-      this.state.title.trim(),
+      this.state.title.trim(),  this.state.maxvotesPerUser,
       this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
       this.state.isBoardAnonymous,
-      this.state.shouldShowFeedbackAfterCollect);
+      this.state.shouldShowFeedbackAfterCollect,
+     );
   }
 
   private handleIsAnonymousCheckboxChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
@@ -143,6 +150,13 @@ export default class FeedbackBoardMetadataForm
       shouldShowFeedbackAfterCollect: checked,
     });
   }
+
+  private handleMaxVotePerUserChange = (ev: ChangeEvent<HTMLInputElement>) => {
+    this.setState({
+      maxvotesPerUser: Number(ev.target.value),
+    });
+  }
+
 
   private showDeleteColumnConfirmationDialog = () => {
     this.setState({
@@ -503,6 +517,15 @@ export default class FeedbackBoardMetadataForm
               }} />
               Note: These selections cannot be modified after board creation.
           </div>
+          <div className="board-metadata-form-section-max-votes">
+            <br></br>
+            <label>Max Votes per User (Current:{this.props.isNewBoardCreation? 5 : this.props.currentBoard.maxvotesPerUser}) :  </label>
+            <input type="number" min="1" max="10" value={this.state.maxvotesPerUser}
+              aria-Label="The maximum total number of votes per user."
+              onChange={this.handleMaxVotePerUserChange}
+            />
+          </div>
+                  
         </div>
         <div className="board-metadata-form-edit-column-section hide-mobile">
           <div className="board-metadata-form-section-header">Columns</div>

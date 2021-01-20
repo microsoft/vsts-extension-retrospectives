@@ -32,6 +32,7 @@ import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import moment = require('moment');
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
+import { TextField } from 'office-ui-fabric-react/lib/TextField';
 
 export interface FeedbackBoardContainerProps {
   projectId: string;
@@ -49,6 +50,7 @@ export interface FeedbackBoardContainerState {
   isSummaryDashboardVisible: boolean;
   isTeamDataLoaded: boolean;
   isAllTeamsLoaded: boolean;
+  maxvotesPerUser: number;
   userTeams: WebApiTeam[];
   projectTeams: WebApiTeam[];
   nonHiddenWorkItemTypes: WorkItemType[];
@@ -107,6 +109,7 @@ export default class FeedbackBoardContainer
       teamBoardDeletedDialogMessage: '',
       teamBoardDeletedDialogTitle: '',
       userTeams: [],
+      maxvotesPerUser: 5,
     };
   }
 
@@ -361,7 +364,7 @@ export default class FeedbackBoardContainer
 
     // Attempt to use query params to pre-select a specific team and board.
     let queryParams: URLSearchParams;
-
+    
     try {
       queryParams = (new URL(document.location.href)).searchParams;
 
@@ -675,8 +678,8 @@ export default class FeedbackBoardContainer
     });
   }
 
-  private createBoard = async (title: string, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean) => {
-    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect);
+  private createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean) => {
+    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxvotesPerUser, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -699,9 +702,9 @@ export default class FeedbackBoardContainer
     this.setState({ isPreviewEmailDialogHidden: true });
   }
 
-  private updateBoardMetadata = async (title: string, columns: IFeedbackColumn[]) => {
+  private updateBoardMetadata = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[]) => {
     const updatedBoard =
-      await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, title, columns);
+      await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxvotesPerUser, title, columns);
     
     this.updateBoardAndBroadcast(updatedBoard);
   }
@@ -782,7 +785,7 @@ export default class FeedbackBoardContainer
     placeholderText: string,
     initialValue: string,
     onSubmit: (
-        title: string, columns: IFeedbackColumn[],
+        title: string, maxvotesPerUser: number, columns: IFeedbackColumn[],
         isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean,
       ) => void,
     onCancel: () => void) => {
@@ -802,6 +805,7 @@ export default class FeedbackBoardContainer
           isNewBoardCreation={isNewBoardCreation}
           currentBoard={this.state.currentBoard}
           teamId={this.state.currentTeam.id}
+          maxvotesPerUser = {this.state.maxvotesPerUser}
           placeholderText={placeholderText}
           initialValue={initialValue}
           onFormSubmit={onSubmit}
