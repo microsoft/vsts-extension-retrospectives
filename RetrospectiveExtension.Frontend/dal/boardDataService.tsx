@@ -10,8 +10,7 @@ class BoardDataService {
   public readonly legacyNegativeColumnId: string = 'whatdidntgowell';
 
   public createBoardForTeam = async (
-    teamId: string, title: string, maxxvotesPerUser: number, columns: IFeedbackColumn[],
-    isAnonymous?: boolean, shouldShowFeedbackAfterCollect?: boolean, startDate?: Date, endDate?: Date) => {
+    teamId: string, title: string, maxVotesPerUser: number, columns: IFeedbackColumn[],
     const boardId: string = uuid();
     const userIdentity = getUserIdentity();
 
