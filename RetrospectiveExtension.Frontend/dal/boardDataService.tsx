@@ -86,7 +86,7 @@ class BoardDataService {
     }
 
     board.title = title;
-    board.maxvotesPerUser = maxvotesPerUser;
+    board.maxVotesPerUser = maxvotesPerUser;
     board.columns = newColumns;
     board.modifiedDate = new Date(Date.now());
 
