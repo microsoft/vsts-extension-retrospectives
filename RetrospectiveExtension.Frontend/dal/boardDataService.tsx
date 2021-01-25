@@ -24,7 +24,7 @@ class BoardDataService {
       isAnonymous: isAnonymous ? isAnonymous : false,
       modifiedDate: new Date(Date.now()),
       shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ? shouldShowFeedbackAfterCollect : false,
-      maxvotesPerUser: maxxvotesPerUser,
+      maxVotesPerUser: maxVotesPerUser,
       startDate,
       teamId,
       title,
