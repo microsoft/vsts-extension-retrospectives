@@ -1,11 +1,11 @@
 @import "_variables.scss";
 
 .feedbackItem {
-    margin: 0px 12px 12px 0px;
-    break-inside: avoid-column;
-    display: inline-block;
-    vertical-align: top;
-    flex-basis: $main_item_card_max_width;
+  margin: 0px 12px 12px 0px;
+  break-inside: avoid-column;
+  display: inline-block;
+  vertical-align: top;
+  flex-basis: $main_item_card_max_width;
 
   &.newFeedbackItem {
     .ms-DocumentCard {
@@ -64,7 +64,7 @@
           border: none;
           display: flex;
           justify-content: center;
-          
+
           i {
             line-height: $feedback_item_action_button_height - 5px;
             color: var(--text-secondary-color);
@@ -90,7 +90,7 @@
 
           &.voteAnimation {
             animation: push .3s linear 1;
-            
+
             i {
               color: $main_blue !important;
             }
@@ -112,13 +112,13 @@
           }
         }
       }
-      
+
       .card-content {
         display: flex;
         margin-right: 16px;
         margin-left: 16px;
       }
-  
+
       .ms-DocumentCardActivity {
         .msDocumentCardActivity-details {
           padding-left: 5px;
@@ -130,7 +130,7 @@
         display: block;
         font-size: 12px;
         font-weight: 400;
-        color: #666666;
+        color: var(--text-secondary-color);
         line-height: 18px;
         overflow: hidden;
         word-wrap: break-word;
