@@ -213,7 +213,6 @@ $team_selector_list_item_width: 450px;
   .feedback-workflow-wrapper {
     display: flex;
     align-items: center;
-    margin-top: 12px;
     margin-left: 35px;
     background-color: rgba(0,0,0,0.04);
 
@@ -224,6 +223,7 @@ $team_selector_list_item_width: 450px;
       display: flex;
       text-align: center;
       align-items: center;
+      margin-top: 12px;
 
       .stage-text {
         font-size: 12px;
