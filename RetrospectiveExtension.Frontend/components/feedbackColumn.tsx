@@ -70,6 +70,9 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   }
 
   public createEmptyFeedbackItem = () => {
+    if (this.props.workflowPhase !== WorkflowPhase.Collect)
+      return;
+
     const item = this.props.columnItems.find((x) => x.feedbackItem.id === 'emptyFeedbackItem');
     if (item) {
       // Don't create another empty feedback item if one already exists.
