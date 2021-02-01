@@ -1028,22 +1028,22 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                     </div>
                     <div className="feedback-workflow-wrapper">
                       <WorkflowStage
-                        display="Collect "
+                        display="Collect"
                         value={WorkflowPhase.Collect}
                         isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect}
                         clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage
-                        display=" Group "
+                        display="Group"
                         value={WorkflowPhase.Group}
                         isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group}
                         clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage
-                        display=" Vote "
+                        display="Vote"
                         value={WorkflowPhase.Vote}
                         isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote}
                         clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage
-                        display=" Act"
+                        display="Act"
                         value={WorkflowPhase.Act}
                         isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act}
                         clickEventCallback={this.clickWorkflowStateCallback} />
