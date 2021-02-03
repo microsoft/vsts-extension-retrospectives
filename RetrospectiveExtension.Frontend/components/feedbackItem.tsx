@@ -724,6 +724,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                 {this.props.isInteractable && <EditableDocumentCardTitle
                   isMultiline={true}
                   title={this.props.title}
+                  isChangeEventRequired={false}
                   onSave={this.onDocumentCardTitleSave}
                 />}
                 {!this.props.isInteractable &&
