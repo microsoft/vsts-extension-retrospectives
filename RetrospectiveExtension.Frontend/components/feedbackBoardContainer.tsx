@@ -1,9 +1,10 @@
-import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+﻿import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
+import { Suspense } from 'react';
 import * as React from 'react';
 import * as vssClipboard from 'VSS/Utils/Clipboard';
 
@@ -12,11 +13,12 @@ import { WorkflowPhase } from '../interfaces/workItem';
 import WorkflowStage from './workflowStage';
 import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback';
-import FeedbackBoard from '../components/feedbackBoard';
-import FeedbackBoardMetadataForm from './feedbackBoardMetadataForm';
 import { reflectBackendService } from '../dal/reflectBackendService';
+
 const BoardSummaryTable = React.lazy(() => import('./boardSummaryTable'));
 const FeedbackBoardMetadataForm = React.lazy(() => import('./feedbackBoardMetadataForm'));
+const FeedbackBoard = React.lazy(() => import('../components/feedbackBoard'));
+
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { WebApiTeam } from 'TFS/Core/Contracts';
@@ -54,7 +56,6 @@ export interface FeedbackBoardContainerState {
   projectTeams: WebApiTeam[];
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
-
   isPreviewEmailDialogHidden: boolean;
   isBoardCreationDialogHidden: boolean;
   isBoardUpdateDialogHidden: boolean;
@@ -68,13 +69,11 @@ export interface FeedbackBoardContainerState {
   isCarouselDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
-
   isDesktop: boolean;
   isAutoResizeEnabled: boolean;
 }
 
-export default class FeedbackBoardContainer
-  extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
+export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
   constructor(props: FeedbackBoardContainerProps) {
     super(props);
     this.state = {
@@ -1117,21 +1116,23 @@ export default class FeedbackBoardContainer
                     </MessageBar>
                   }
                   <div className="feedback-board-container">
-                    <FeedbackBoard
-                      board={this.state.currentBoard}
-                      team={this.state.currentTeam}
-                      displayBoard={true}
-                      workflowPhase={this.state.currentBoard.activePhase}
-                      nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
-                      allWorkItemTypes={this.state.allWorkItemTypes}
-                      isCarouselDialogHidden={this.state.isCarouselDialogHidden}
-                      hideCarouselDialog={this.hideCarouselDialog}
-                      isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
-                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? 
-                        this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
-                        false
-                      }
-                    />
+                    <Suspense fallback={<div>Loading...</div>}>
+                      <FeedbackBoard
+                        board={this.state.currentBoard}
+                        team={this.state.currentTeam}
+                        displayBoard={true}
+                        workflowPhase={this.state.currentBoard.activePhase}
+                        nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
+                        allWorkItemTypes={this.state.allWorkItemTypes}
+                        isCarouselDialogHidden={this.state.isCarouselDialogHidden}
+                        hideCarouselDialog={this.hideCarouselDialog}
+                        isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
+                        hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? 
+                          this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
+                          false
+                        }
+                      />
+                    </Suspense>
                   </div>
                   <Dialog
                     hidden={this.state.isDeleteBoardConfirmationDialogHidden}
@@ -1155,7 +1156,9 @@ export default class FeedbackBoardContainer
               }
             </PivotItem>
             <PivotItem headerText="History">
+              <Suspense fallback={<div>Loading...</div>}>
                 <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} />
+              </Suspense>
             </PivotItem>
           </Pivot>
         </div>
