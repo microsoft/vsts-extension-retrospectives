@@ -29,6 +29,7 @@ export default class EditableDocumentCardTitle extends React.Component<EditableD
           isMultiline={this.props.isMultiline}
           maxLength={this.props.maxLength}
           text={this.props.title}
+          isChangeEventRequired={this.props.isChangeEventRequired}
           onSave={this.props.onSave}
         />
       </div>
