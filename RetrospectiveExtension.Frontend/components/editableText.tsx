@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 
 export interface EditableTextProps {
@@ -6,6 +6,7 @@ export interface EditableTextProps {
   isMultiline?: boolean;
   maxLength?: number;
   text: string;
+  isChangeEventRequired: boolean;
   onSave: (newText: string) => void;
 }
 
