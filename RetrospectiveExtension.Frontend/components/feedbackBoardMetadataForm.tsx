@@ -360,8 +360,50 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
           ]
         });
         break;
-      default:
+      case 'wlai':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Went Well',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'Learned',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'far fa-eye',
+                id: uuid(),
+                title: 'Accelerators',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'far fa-eye',
+                id: uuid(),
+                title: 'Impediments',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
         break;
+      default:
+      break;
     }
   };
 
