@@ -16,6 +16,7 @@ import FeedbackBoard from '../components/feedbackBoard';
 import FeedbackBoardMetadataForm from './feedbackBoardMetadataForm';
 import { reflectBackendService } from '../dal/reflectBackendService';
 const BoardSummaryTable = React.lazy(() => import('./boardSummaryTable'));
+const FeedbackBoardMetadataForm = React.lazy(() => import('./feedbackBoardMetadataForm'));
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { WebApiTeam } from 'TFS/Core/Contracts';
