@@ -43,8 +43,7 @@ interface IFeedbackColumnCard {
   markedForDeletion: boolean;
 }
 
-export default class FeedbackBoardMetadataForm 
-  extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
+export default class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
   constructor(props: any) {
     super(props);
 
