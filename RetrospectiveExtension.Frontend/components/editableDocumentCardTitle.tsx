@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import EditableText from './editableText';
 
 export interface EditableDocumentCardTitleProps {
