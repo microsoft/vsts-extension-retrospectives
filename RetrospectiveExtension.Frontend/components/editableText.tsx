@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 
 export interface EditableTextProps {
@@ -53,7 +53,9 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
       hasErrors: !newValue.trim()
     });
 
-    this.props.onSave(newValue.replace(/\r?\n|\r/g, ""));
+    if (this.props.isChangeEventRequired) {
+      this.props.onSave(newValue.replace(/\r?\n|\r/g, ""));
+    }
   }
 
   private handleEdit = (event: React.MouseEvent<HTMLParagraphElement>) => {
