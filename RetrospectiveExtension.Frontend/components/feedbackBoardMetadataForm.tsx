@@ -563,6 +563,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
                   isMultiline={false}
                   maxLength={25}
                   title={columnCard.column.title}
+                  isChangeEventRequired={true}
                   onSave={(newText: string) => {
                     columnCard.column.title = newText
                     this.setState({
