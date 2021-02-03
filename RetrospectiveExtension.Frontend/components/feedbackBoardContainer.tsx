@@ -1,4 +1,4 @@
-﻿import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -15,7 +15,7 @@ import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback'
 import FeedbackBoard from '../components/feedbackBoard';
 import FeedbackBoardMetadataForm from './feedbackBoardMetadataForm';
 import { reflectBackendService } from '../dal/reflectBackendService';
-import { BoardSummaryTable } from './boardSummaryTable';
+const BoardSummaryTable = React.lazy(() => import('./boardSummaryTable'));
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { WebApiTeam } from 'TFS/Core/Contracts';
