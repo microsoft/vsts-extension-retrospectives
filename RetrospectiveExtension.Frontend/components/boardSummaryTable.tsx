@@ -70,7 +70,7 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-export class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardSummaryTableState> {
+export default class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardSummaryTableState> {
   constructor(props: IBoardSummaryTableProps) {
     super(props);
 
