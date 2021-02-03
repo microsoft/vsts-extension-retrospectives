@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import EditableText from './editableText';
 
 export interface EditableDocumentCardTitleProps {
@@ -6,6 +6,7 @@ export interface EditableDocumentCardTitleProps {
   isMultiline?: boolean;
   maxLength?: number;
   title: string;
+  isChangeEventRequired: boolean;
   onSave: (newText: string) => void;
 }
 
