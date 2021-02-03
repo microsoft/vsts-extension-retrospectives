@@ -6,6 +6,7 @@ export interface EditableTextProps {
   isMultiline?: boolean;
   maxLength?: number;
   text: string;
+  isChangeEventRequired: boolean;
   onSave: (newText: string) => void;
 }
 
@@ -52,7 +53,9 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
       hasErrors: !newValue.trim()
     });
 
-    this.props.onSave(newValue.replace(/\r?\n|\r/g, ""));
+    if (this.props.isChangeEventRequired) {
+      this.props.onSave(newValue.replace(/\r?\n|\r/g, ""));
+    }
   }
 
   private handleEdit = (event: React.MouseEvent<HTMLParagraphElement>) => {

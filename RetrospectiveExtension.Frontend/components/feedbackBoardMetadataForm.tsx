@@ -46,8 +46,7 @@ interface IFeedbackColumnCard {
   markedForDeletion: boolean;
 }
 
-export default class FeedbackBoardMetadataForm 
-  extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
+export default class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
   constructor(props: any) {
     super(props);
 
@@ -375,8 +374,50 @@ export default class FeedbackBoardMetadataForm
           ]
         });
         break;
-      default:
+      case 'wlai':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'Went Well',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'Learned',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'far fa-eye',
+                id: uuid(),
+                title: 'Accelerators',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#f6af08',
+                iconClass: 'far fa-eye',
+                id: uuid(),
+                title: 'Impediments',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
         break;
+      default:
+      break;
     }
   };
 
@@ -539,6 +580,7 @@ export default class FeedbackBoardMetadataForm
               <option value="mad-sad-glad">Mad-Sad-Glad</option>
               <option value="good-bad-ideas">Good-Bad-Ideas</option>
               <option value="start-stop-continue">Start-Stop-Continue</option>
+              <option value="wlai">WentWell-Learned-Accelerators-Impediments</option>
             </select>
           </div>
           { !this.props.isNewBoardCreation &&
@@ -586,6 +628,7 @@ export default class FeedbackBoardMetadataForm
                   isMultiline={false}
                   maxLength={25}
                   title={columnCard.column.title}
+                  isChangeEventRequired={true}
                   onSave={(newText: string) => {
                     columnCard.column.title = newText
                     this.setState({

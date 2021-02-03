@@ -133,7 +133,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           dialogContentProps={{
             type: DialogType.close,
             title: 'What\'s New',
-            subText: 'With version 1.0.49 Retrospective Session participants may revoke already casted votes. Important note : participants may revoke more than they already cast votes. Max vote limit and limit to uncast more than the vote participant cast will come with version 1.0.50',
+            subText: 'With version 1.0.50 Retrospective Session participants may revoke already casted votes. Max vote limit will come with version 1.0.60 🥳',
           }}
           minWidth={450}
           modalProps={{
