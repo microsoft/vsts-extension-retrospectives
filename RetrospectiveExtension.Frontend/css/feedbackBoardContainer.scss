@@ -272,3 +272,14 @@ $team_selector_list_item_width: 450px;
     }
   }
 }
+
+.prime-directive-dialog {
+  .ms-Dialog-content {
+    .ms-Dialog-header {
+      display: none;
+    }
+    .ms-Dialog-inner {
+      padding: 0 3px 5px;
+    }
+  }
+}
