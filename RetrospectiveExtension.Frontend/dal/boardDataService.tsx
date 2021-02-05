@@ -11,6 +11,7 @@ class BoardDataService {
 
   public createBoardForTeam = async (
     teamId: string, title: string, maxVotesPerUser: number, columns: IFeedbackColumn[],
+    isAnonymous?: boolean, shouldShowFeedbackAfterCollect?: boolean, displayPrimeDirective?: boolean, startDate?: Date, endDate?: Date) => {
     const boardId: string = uuid();
     const userIdentity = getUserIdentity();
 
@@ -24,6 +25,7 @@ class BoardDataService {
       isAnonymous: isAnonymous ? isAnonymous : false,
       modifiedDate: new Date(Date.now()),
       shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ? shouldShowFeedbackAfterCollect : false,
+      displayPrimeDirective: displayPrimeDirective ? displayPrimeDirective : false,
       maxVotesPerUser: maxVotesPerUser,
       startDate,
       teamId,
