@@ -1040,6 +1040,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                             className: 'retrospectives-dialog-modal',
                           }}>
                             <DialogFooter>
+                              <DefaultButton onClick={() => { window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank'); }} text="Open Retrospective Wiki Page" />
                               <PrimaryButton onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }} text="Close" />
                             </DialogFooter>
                         </Dialog>
