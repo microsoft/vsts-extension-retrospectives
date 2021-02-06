@@ -47,7 +47,7 @@ interface IFeedbackColumnCard {
 }
 
 export default class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
-  constructor(props: any) {
+  constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
     const defaultColumnCards: IFeedbackColumnCard[] = [{
