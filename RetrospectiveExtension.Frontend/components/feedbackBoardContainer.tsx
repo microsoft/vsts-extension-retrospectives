@@ -1026,6 +1026,20 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                       </div>
                     </div>
                     <div className="feedback-workflow-wrapper">
+                        <Dialog
+                          hidden={this.state.isPrimeDirectiveDialogHidden}
+                          onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
+                          dialogContentProps={{
+                            type: DialogType.close,
+                            title: 'The Prime Directive',
+                          }}
+                          minWidth={600}
+                          modalProps={{
+                            isBlocking: true,
+                            containerClassName: 'prime-directive-dialog',
+                            className: 'retrospectives-dialog-modal',
+                          }}>
+                        </Dialog>
                         <TooltipHost
                           hostClassName="toggle-carousel-button-tooltip-wrapper"
                           content="Prime Directive"
