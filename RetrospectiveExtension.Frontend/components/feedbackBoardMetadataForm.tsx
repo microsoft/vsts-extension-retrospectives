@@ -39,7 +39,6 @@ interface IFeedbackBoardMetadataFormState {
   columnCardBeingEdited: IFeedbackColumnCard;
   selectedIconKey: string;
   selectedAccentColorKey: string;
-  boardVoteCollection : { [voter: string]: number};
 }
 
 interface IFeedbackColumnCard {
