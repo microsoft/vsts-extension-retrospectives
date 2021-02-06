@@ -784,9 +784,9 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     placeholderText: string,
     initialValue: string,
     onSubmit: (
-        title: string, maxvotesPerUser: number, columns: IFeedbackColumn[],
-        isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean,
-      ) => void,
+      title: string, maxVotesPerUser: number, columns: IFeedbackColumn[],
+      isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean
+    ) => void,
     onCancel: () => void) => {
     return (
       <Dialog
