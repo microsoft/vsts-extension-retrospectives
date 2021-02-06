@@ -1,4 +1,4 @@
-import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+﻿import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -1026,6 +1026,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                       </div>
                     </div>
                     <div className="feedback-workflow-wrapper">
+                      { this.state.currentBoard.displayPrimeDirective &&
+                      <>
                         <Dialog
                           hidden={this.state.isPrimeDirectiveDialogHidden}
                           onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
@@ -1062,6 +1064,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                             onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: false }); }}>
                           </ActionButton>
                         </TooltipHost>
+                      </>
+                      }
                       <WorkflowStage
                         display="Collect"
                         value={WorkflowPhase.Collect}
