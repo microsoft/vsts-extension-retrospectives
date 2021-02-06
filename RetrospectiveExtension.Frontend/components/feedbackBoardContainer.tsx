@@ -1039,6 +1039,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                             containerClassName: 'prime-directive-dialog',
                             className: 'retrospectives-dialog-modal',
                           }}>
+                            <DialogFooter>
+                            </DialogFooter>
                         </Dialog>
                         <TooltipHost
                           hostClassName="toggle-carousel-button-tooltip-wrapper"
