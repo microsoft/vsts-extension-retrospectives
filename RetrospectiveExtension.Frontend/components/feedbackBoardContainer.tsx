@@ -1119,23 +1119,21 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                     </MessageBar>
                   }
                   <div className="feedback-board-container">
-                    <Suspense fallback={<div>Loading...</div>}>
-                      <FeedbackBoard
-                        board={this.state.currentBoard}
-                        team={this.state.currentTeam}
-                        displayBoard={true}
-                        workflowPhase={this.state.currentBoard.activePhase}
-                        nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
-                        allWorkItemTypes={this.state.allWorkItemTypes}
-                        isCarouselDialogHidden={this.state.isCarouselDialogHidden}
-                        hideCarouselDialog={this.hideCarouselDialog}
-                        isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
-                        hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? 
-                          this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
-                          false
-                        }
-                      />
-                    </Suspense>
+                    <FeedbackBoard
+                      board={this.state.currentBoard}
+                      team={this.state.currentTeam}
+                      displayBoard={true}
+                      workflowPhase={this.state.currentBoard.activePhase}
+                      nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
+                      allWorkItemTypes={this.state.allWorkItemTypes}
+                      isCarouselDialogHidden={this.state.isCarouselDialogHidden}
+                      hideCarouselDialog={this.hideCarouselDialog}
+                      isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
+                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? 
+                        this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
+                        false
+                      }
+                    />
                   </div>
                   <Dialog
                     hidden={this.state.isDeleteBoardConfirmationDialogHidden}
