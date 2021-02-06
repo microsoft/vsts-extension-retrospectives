@@ -1039,6 +1039,13 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                             containerClassName: 'prime-directive-dialog',
                             className: 'retrospectives-dialog-modal',
                           }}>
+                            <DialogContent>
+                              The purpose of the Prime Directive is to assure that a retrospective has the right culture to make it a positive and result oriented event. It makes a retrospective become an effective team gathering to learn and find solutions to improve the way of working.
+                              <br /><br />
+                              <strong>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</strong>
+                              <br /><br />
+                              <em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
+                            </DialogContent>
                             <DialogFooter>
                               <DefaultButton onClick={() => { window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank'); }} text="Open Retrospective Wiki Page" />
                               <PrimaryButton onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }} text="Close" />
