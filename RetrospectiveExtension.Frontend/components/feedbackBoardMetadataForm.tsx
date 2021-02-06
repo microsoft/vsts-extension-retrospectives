@@ -80,10 +80,8 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
           markedForDeletion: false,
         };
       }),
-      isBoardAnonymous: this.props.isNewBoardCreation ?
-        false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
-      maxvotesPerUser: this.props.isNewBoardCreation ?
-      5 : this.props.currentBoard.maxvotesPerUser,
+      isBoardAnonymous: this.props.isNewBoardCreation ? false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
+      maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,
       isBoardNameTaken: false,
       isChooseColumnAccentColorDialogHidden: true,
       isChooseColumnIconDialogHidden: true,
