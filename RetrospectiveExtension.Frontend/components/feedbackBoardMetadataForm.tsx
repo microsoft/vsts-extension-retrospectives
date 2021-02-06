@@ -89,6 +89,12 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
       placeholderText: this.props.placeholderText,
       selectedAccentColorKey: undefined,
       selectedIconKey: undefined,
+      displayPrimeDirective: this.props.isNewBoardCreation ?
+      false :
+      (
+        this.props.currentBoard.displayPrimeDirective ?
+        this.props.currentBoard.displayPrimeDirective : false
+      ),
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ?
       false :
       (
