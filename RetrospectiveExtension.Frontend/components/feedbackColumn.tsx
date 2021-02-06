@@ -1,4 +1,4 @@
-﻿import classNames from 'classnames';
+import classNames from 'classnames';
 import * as React from 'react';
 
 import { WorkflowPhase } from '../interfaces/workItem';
@@ -35,6 +35,7 @@ export interface FeedbackColumnProps {
   isBoardAnonymous: boolean;
   shouldFocusOnCreateFeedback: boolean;
   hideFeedbackItems: boolean;
+  onVoteCasted: () => void;
 
   addFeedbackItems: (
     columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
