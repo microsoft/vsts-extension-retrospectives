@@ -1157,9 +1157,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
               }
             </PivotItem>
             <PivotItem headerText="History">
-              <Suspense fallback={<div>Loading...</div>}>
-                <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} />
-              </Suspense>
+              <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} />
             </PivotItem>
           </Pivot>
         </div>
