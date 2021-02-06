@@ -163,7 +163,7 @@ class ItemDataService {
      }
 
     if (decrement) {
-      if (feedbackItem.upvotes<=0) {
+      if (feedbackItem.upvotes <= 0) {
         console.log(`Cannot decrement upvote as votes must be > 0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
         return undefined;
       } else {
