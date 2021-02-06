@@ -134,7 +134,8 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
     }
 
     this.props.onFormSubmit(
-      this.state.title.trim(),  this.state.maxvotesPerUser,
+      this.state.title.trim(),
+      this.state.maxVotesPerUser,
       this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect,
