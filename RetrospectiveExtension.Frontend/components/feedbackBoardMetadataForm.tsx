@@ -139,6 +139,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
       this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect,
+      this.state.displayPrimeDirective
      );
   }
 
