@@ -51,6 +51,7 @@ export interface IFeedbackItemProps {
   shouldHaveFocus: boolean;
   hideFeedbackItems: boolean;
   userIdRef: string;
+  onVoteCasted: () => void;
 
   addFeedbackItems: (
     columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
