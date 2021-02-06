@@ -1,4 +1,4 @@
-﻿import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -14,10 +14,9 @@ import WorkflowStage from './workflowStage';
 import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback';
 import { reflectBackendService } from '../dal/reflectBackendService';
-
-const BoardSummaryTable = React.lazy(() => import('./boardSummaryTable'));
-const FeedbackBoardMetadataForm = React.lazy(() => import('./feedbackBoardMetadataForm'));
-const FeedbackBoard = React.lazy(() => import('../components/feedbackBoard'));
+import BoardSummaryTable  from './boardSummaryTable';
+import FeedbackBoardMetadataForm from './feedbackBoardMetadataForm';
+import FeedbackBoard from '../components/feedbackBoard';
 
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
