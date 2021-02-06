@@ -31,9 +31,7 @@ import { ToastContainer, toast, Slide } from 'react-toastify';
 import { WorkItemType, WorkItemTypeReference } from 'TFS/WorkItemTracking/Contracts';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
-import moment = require('moment');
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
-import { TextField } from 'office-ui-fabric-react/lib/TextField';
 
 export interface FeedbackBoardContainerProps {
   projectId: string;
