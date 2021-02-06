@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+﻿import classNames from 'classnames';
 import * as React from 'react';
 
 import { WorkflowPhase } from '../interfaces/workItem';
