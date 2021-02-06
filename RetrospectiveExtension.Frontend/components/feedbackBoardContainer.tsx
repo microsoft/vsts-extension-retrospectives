@@ -1026,12 +1026,17 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                       </div>
                     </div>
                     <div className="feedback-workflow-wrapper">
+                        <TooltipHost
+                          hostClassName="toggle-carousel-button-tooltip-wrapper"
+                          content="Prime Directive"
+                          calloutProps={{ gapSpace: 0 }}>
                           <ActionButton
                             className="toggle-carousel-button"
                             text="Prime Directive"
                             iconProps={{ iconName: 'BookAnswers' }}
                             onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: false }); }}>
                           </ActionButton>
+                        </TooltipHost>
                       <WorkflowStage
                         display="Collect"
                         value={WorkflowPhase.Collect}
