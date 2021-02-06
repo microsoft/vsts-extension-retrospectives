@@ -589,15 +589,11 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
           <div className="board-metadata-form-section-subheader">
             Note: These selections cannot be modified after board creation.
           </div>
-          <div className="board-metadata-form-section-max-votes">
-            <br></br>
-            <label>Max Votes per User (Current:{this.props.isNewBoardCreation? 5 : this.props.currentBoard.maxvotesPerUser}) :  </label>
-            <input type="number" min="1" max="10" value={this.state.maxvotesPerUser}
-              aria-Label="The maximum total number of votes per user."
-              onChange={this.handleMaxVotePerUserChange}
-            />
+
+          <div className="board-metadata-form-section-header">
+            Max Votes per User (Current:{this.props.isNewBoardCreation? 5 : this.props.currentBoard.maxVotesPerUser}) :
+            <TextField className="title-input-container" type="number" min="3" max="12" value={this.state.maxVotesPerUser?.toString()} onChange={this.handleMaxVotePerUserChange} />
           </div>
-                  
         </div>
         <div className="board-metadata-form-edit-column-section hide-mobile">
           <div className="board-metadata-form-section-header">Columns</div>
