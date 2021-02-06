@@ -155,6 +155,12 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
     });
   }
 
+  private handleDisplayPrimeDirectiveChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+    this.setState({
+      displayPrimeDirective: checked,
+    });
+  }
+
   private handleMaxVotePerUserChange = (ev: ChangeEvent<HTMLInputElement>) => {
     this.setState({
       maxvotesPerUser: Number(ev.target.value),
