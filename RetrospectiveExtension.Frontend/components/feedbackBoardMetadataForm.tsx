@@ -399,8 +399,8 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
             },
             {
               column: {
-                accentColor: '#cc293d',
-                iconClass: 'far fa-frown',
+                accentColor: '#8063bf',
+                iconClass: 'fas fa-book',
                 id: uuid(),
                 title: 'Learned',
               },
