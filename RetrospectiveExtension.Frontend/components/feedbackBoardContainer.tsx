@@ -1040,6 +1040,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                             className: 'retrospectives-dialog-modal',
                           }}>
                             <DialogFooter>
+                              <PrimaryButton onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }} text="Close" />
                             </DialogFooter>
                         </Dialog>
                         <TooltipHost
