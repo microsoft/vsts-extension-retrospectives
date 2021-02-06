@@ -1177,7 +1177,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
           this.state.isBoardCreationDialogHidden,
           this.hideBoardCreationDialog,
           'Create new retrospective',
-          `Example: Retrospective ${moment().format('MMM Do, YYYY')}`,
+          `Example: Retrospective ${new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date())}`,
           '',
           this.createBoard,
           this.hideBoardCreationDialog)}
