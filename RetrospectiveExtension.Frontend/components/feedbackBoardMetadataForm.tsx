@@ -567,6 +567,8 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
                   display: 'flex',
                 },
               }} />
+          </div>
+
           <div className="board-metadata-form-section-subheader">
             <Checkbox
               label="Display 'Retrospective Prime Directive'"
@@ -583,7 +585,9 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
                 },
               }} />
           </div>
-              Note: These selections cannot be modified after board creation.
+
+          <div className="board-metadata-form-section-subheader">
+            Note: These selections cannot be modified after board creation.
           </div>
           <div className="board-metadata-form-section-max-votes">
             <br></br>
