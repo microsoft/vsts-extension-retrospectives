@@ -20,7 +20,7 @@ interface IFeedbackBoardMetadataFormProps {
   placeholderText: string;
   initialValue: string;
   maxvotesPerUser: number;
-  onFormSubmit: (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean ) => void;
+  onFormSubmit: (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => void;
   onFormCancel: () => void;
 }
 
