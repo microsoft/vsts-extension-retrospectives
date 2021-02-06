@@ -3,10 +3,7 @@ import * as moment from 'moment';
 import { ActionButton, PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
-import {
-  DocumentCard,
-  DocumentCardActivity,
-} from 'office-ui-fabric-react/lib/DocumentCard';
+import { DocumentCard, DocumentCardActivity } from 'office-ui-fabric-react/lib/DocumentCard';
 import * as React from 'react';
 
 import { WorkflowPhase } from '../interfaces/workItem';
@@ -54,13 +51,13 @@ export interface IFeedbackItemProps {
   shouldHaveFocus: boolean;
   hideFeedbackItems: boolean;
   userIdRef: string;
+  onVoteCasted: () => void;
 
   addFeedbackItems: (
     columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
     newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
 
-  removeFeedbackItemFromColumn: (
-    columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
+  removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
 
   refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void;
 
@@ -349,11 +346,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Delete feedback',
         title: 'Delete feedback',
       },
-      workflowPhases: [
-        WorkflowPhase.Collect,
-        WorkflowPhase.Group,
-        WorkflowPhase.Vote,
-        WorkflowPhase.Act],
+      workflowPhases: [ WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act ],
     },
     {
       menuItem: {
@@ -363,8 +356,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Move feedback to different column',
         title: 'Move feedback to different column',
       },
-      workflowPhases: [
-        WorkflowPhase.Group],
+      workflowPhases: [ WorkflowPhase.Group ],
       hideMobile: true,
     },
     {
@@ -375,8 +367,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Group feedback',
         title: 'Group feedback',
       },
-      workflowPhases: [
-        WorkflowPhase.Group],
+      workflowPhases: [ WorkflowPhase.Group ],
       hideMobile: true,
     },
     {
@@ -387,8 +378,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Remove feedback from group',
         title: 'Remove feedback from group',
       },
-      workflowPhases: [
-        WorkflowPhase.Group],
+      workflowPhases: [ WorkflowPhase.Group ],
       hideMobile: true,
       hideMainItem: true,
     },
@@ -479,10 +469,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
 
   private handleFeedbackItemSearchInputChange = async (event?: React.ChangeEvent<HTMLInputElement>, searchTerm?: string) => {
     if (!searchTerm || !searchTerm.trim()) {
-      this.setState({
-        searchTerm: searchTerm,
-        searchedFeedbackItems: []
-      });
+      this.setState({ searchTerm: searchTerm, searchedFeedbackItems: [] });
       return;
     }
 
@@ -626,7 +613,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                       e.preventDefault();
                       e.stopPropagation();
                       this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id);
+                      this.onVote(this.props.id).then(() => this.props.onVoteCasted());
                     }}
                     onAnimationEnd={() => {
                       this.setState({ showVotedAnimation: false });
@@ -652,7 +639,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                       e.preventDefault();
                       e.stopPropagation();
                       this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id, true);
+                      this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
                     }}
                     onAnimationEnd={() => {
                       this.setState({ showVotedAnimation: false });

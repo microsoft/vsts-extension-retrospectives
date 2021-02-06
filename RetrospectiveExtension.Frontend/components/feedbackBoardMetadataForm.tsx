@@ -20,7 +20,7 @@ interface IFeedbackBoardMetadataFormProps {
   placeholderText: string;
   initialValue: string;
   maxvotesPerUser: number;
-  onFormSubmit: (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean ) => void;
+  onFormSubmit: (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => void;
   onFormCancel: () => void;
 }
 
@@ -31,14 +31,14 @@ interface IFeedbackBoardMetadataFormState {
   columnCards: IFeedbackColumnCard[];
   isBoardAnonymous: boolean;
   shouldShowFeedbackAfterCollect: boolean;
-  maxvotesPerUser: number;
+  displayPrimeDirective: boolean;
+  maxVotesPerUser: number;
   isDeleteColumnConfirmationDialogHidden: boolean;
   isChooseColumnIconDialogHidden: boolean;
   isChooseColumnAccentColorDialogHidden: boolean;
   columnCardBeingEdited: IFeedbackColumnCard;
   selectedIconKey: string;
   selectedAccentColorKey: string;
-  boardVoteCollection : { [voter: string]: number};
 }
 
 interface IFeedbackColumnCard {
@@ -47,7 +47,7 @@ interface IFeedbackColumnCard {
 }
 
 export default class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
-  constructor(props: any) {
+  constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
     const defaultColumnCards: IFeedbackColumnCard[] = [{
@@ -80,10 +80,8 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
           markedForDeletion: false,
         };
       }),
-      isBoardAnonymous: this.props.isNewBoardCreation ?
-        false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
-      maxvotesPerUser: this.props.isNewBoardCreation ?
-      5 : this.props.currentBoard.maxvotesPerUser,
+      isBoardAnonymous: this.props.isNewBoardCreation ? false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
+      maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,
       isBoardNameTaken: false,
       isChooseColumnAccentColorDialogHidden: true,
       isChooseColumnIconDialogHidden: true,
@@ -91,14 +89,19 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
       placeholderText: this.props.placeholderText,
       selectedAccentColorKey: undefined,
       selectedIconKey: undefined,
+      displayPrimeDirective: this.props.isNewBoardCreation ?
+      false :
+      (
+        this.props.currentBoard.displayPrimeDirective ?
+        this.props.currentBoard.displayPrimeDirective : false
+      ),
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ?
       false :
       (
         this.props.currentBoard.shouldShowFeedbackAfterCollect ?
         this.props.currentBoard.shouldShowFeedbackAfterCollect : false
       ),
-      title: this.props.initialValue,
-      boardVoteCollection: {},
+      title: this.props.initialValue
     };
   }
 
@@ -131,10 +134,12 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
     }
 
     this.props.onFormSubmit(
-      this.state.title.trim(),  this.state.maxvotesPerUser,
+      this.state.title.trim(),
+      this.state.maxVotesPerUser,
       this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect,
+      this.state.displayPrimeDirective
      );
   }
 
@@ -150,9 +155,15 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
     });
   }
 
+  private handleDisplayPrimeDirectiveChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+    this.setState({
+      displayPrimeDirective: checked,
+    });
+  }
+
   private handleMaxVotePerUserChange = (ev: ChangeEvent<HTMLInputElement>) => {
     this.setState({
-      maxvotesPerUser: Number(ev.target.value),
+      maxVotesPerUser: Number(ev.target.value),
     });
   }
 
@@ -388,8 +399,8 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
             },
             {
               column: {
-                accentColor: '#cc293d',
-                iconClass: 'far fa-frown',
+                accentColor: '#8063bf',
+                iconClass: 'fas fa-book',
                 id: uuid(),
                 title: 'Learned',
               },
@@ -397,8 +408,8 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
             },
             {
               column: {
-                accentColor: '#f6af08',
-                iconClass: 'far fa-eye',
+                accentColor: '#0078d4',
+                iconClass: 'far fa-compass',
                 id: uuid(),
                 title: 'Accelerators',
               },
@@ -406,8 +417,8 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
             },
             {
               column: {
-                accentColor: '#f6af08',
-                iconClass: 'far fa-eye',
+                accentColor: '#cc293d',
+                iconClass: 'fas fa-question',
                 id: uuid(),
                 title: 'Impediments',
               },
@@ -556,17 +567,33 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
                   display: 'flex',
                 },
               }} />
-              Note: These selections cannot be modified after board creation.
           </div>
-          <div className="board-metadata-form-section-max-votes">
-            <br></br>
-            <label>Max Votes per User (Current:{this.props.isNewBoardCreation? 5 : this.props.currentBoard.maxvotesPerUser}) :  </label>
-            <input type="number" min="1" max="10" value={this.state.maxvotesPerUser}
-              aria-Label="The maximum total number of votes per user."
-              onChange={this.handleMaxVotePerUserChange}
-            />
+
+          <div className="board-metadata-form-section-subheader">
+            <Checkbox
+              label="Display 'Retrospective Prime Directive'"
+              ariaLabel="Display 'Retrospective Prime Directive'"
+              boxSide="end"
+              defaultChecked={this.state.displayPrimeDirective}
+              disabled={!this.props.isNewBoardCreation}
+              onChange={this.handleDisplayPrimeDirectiveChange}
+              styles={{
+                root: {
+                  justifyContent: 'center',
+                  width: '100%',
+                  display: 'flex',
+                },
+              }} />
           </div>
-                  
+
+          <div className="board-metadata-form-section-subheader">
+            Note: These selections cannot be modified after board creation.
+          </div>
+
+          <div className="board-metadata-form-section-header">
+            Max Votes per User (Current:{this.props.isNewBoardCreation? 5 : this.props.currentBoard.maxVotesPerUser}) :
+            <TextField className="title-input-container" type="number" min="3" max="12" value={this.state.maxVotesPerUser?.toString()} onChange={this.handleMaxVotePerUserChange} />
+          </div>
         </div>
         <div className="board-metadata-form-edit-column-section hide-mobile">
           <div className="board-metadata-form-section-header">Columns</div>

@@ -24,7 +24,8 @@ export interface IFeedbackBoardDocument {
   activePhase: WorkflowPhase;
   isAnonymous?: boolean;
   shouldShowFeedbackAfterCollect?: boolean;
-  maxvotesPerUser: number;
+  displayPrimeDirective?: boolean;
+  maxVotesPerUser: number;
   boardVoteCollection : { [voter: string]: number};
 }
 
@@ -34,7 +35,6 @@ export interface IFeedbackColumn {
   iconClass: string;
   accentColor: string;
 }
-
 
 export interface IFeedbackItemDocument {
   id: string;

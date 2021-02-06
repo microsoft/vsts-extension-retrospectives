@@ -10,8 +10,8 @@ class BoardDataService {
   public readonly legacyNegativeColumnId: string = 'whatdidntgowell';
 
   public createBoardForTeam = async (
-    teamId: string, title: string, maxxvotesPerUser: number, columns: IFeedbackColumn[],
-    isAnonymous?: boolean, shouldShowFeedbackAfterCollect?: boolean, startDate?: Date, endDate?: Date) => {
+    teamId: string, title: string, maxVotesPerUser: number, columns: IFeedbackColumn[],
+    isAnonymous?: boolean, shouldShowFeedbackAfterCollect?: boolean, displayPrimeDirective?: boolean, startDate?: Date, endDate?: Date) => {
     const boardId: string = uuid();
     const userIdentity = getUserIdentity();
 
@@ -25,7 +25,8 @@ class BoardDataService {
       isAnonymous: isAnonymous ? isAnonymous : false,
       modifiedDate: new Date(Date.now()),
       shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ? shouldShowFeedbackAfterCollect : false,
-      maxvotesPerUser: maxxvotesPerUser,
+      displayPrimeDirective: displayPrimeDirective ? displayPrimeDirective : false,
+      maxVotesPerUser: maxVotesPerUser,
       startDate,
       teamId,
       title,
@@ -87,7 +88,7 @@ class BoardDataService {
     }
 
     board.title = title;
-    board.maxvotesPerUser = maxvotesPerUser;
+    board.maxVotesPerUser = maxvotesPerUser;
     board.columns = newColumns;
     board.modifiedDate = new Date(Date.now());
 

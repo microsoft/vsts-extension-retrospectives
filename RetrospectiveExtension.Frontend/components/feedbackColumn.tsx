@@ -35,6 +35,7 @@ export interface FeedbackColumnProps {
   isBoardAnonymous: boolean;
   shouldFocusOnCreateFeedback: boolean;
   hideFeedbackItems: boolean;
+  onVoteCasted: () => void;
 
   addFeedbackItems: (
     columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
@@ -69,6 +70,9 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   }
 
   public createEmptyFeedbackItem = () => {
+    if (this.props.workflowPhase !== WorkflowPhase.Collect)
+      return;
+
     const item = this.props.columnItems.find((x) => x.feedbackItem.id === 'emptyFeedbackItem');
     if (item) {
       // Don't create another empty feedback item if one already exists.
@@ -173,6 +177,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       shouldHaveFocus: columnItem.shouldHaveFocus ? true : false,
       hideFeedbackItems: columnProps.hideFeedbackItems,
       userIdRef: columnItem.feedbackItem.userIdRef,
+      onVoteCasted: columnProps.onVoteCasted
     }
   }
 
@@ -225,6 +230,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   private renderFeedbackColumn = () => {
     return (
       <div className="feedback-column"
+        onDoubleClick={this.createEmptyFeedbackItem}
         onDrop={this.handleDropFeedbackItemOnColumnSpace}
         onDragOver={this.dragFeedbackItemOverColumn}>
         <div className="hide-mobile feedback-column-header">

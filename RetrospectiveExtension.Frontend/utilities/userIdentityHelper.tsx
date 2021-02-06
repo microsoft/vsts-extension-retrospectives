@@ -1,5 +1,4 @@
 import { IdentityRef } from 'VSS/WebApi/Contracts';
-import { buildAvatarUrl } from './urlHelper';
 
 let userIdentity: IdentityRef;
 
@@ -8,8 +7,10 @@ let userIdentity: IdentityRef;
  */
 export const getUserIdentity = (): IdentityRef => {
   if (!userIdentity){
-    const currentUser: UserContext = VSS.getWebContext().user;
-    const avatarUrl: string = buildAvatarUrl(currentUser.id);
+    const context = VSS.getWebContext();
+    const currentUser: UserContext = context.user;
+    const hostUri = context.host.uri;
+    const avatarUrl: string = (!(currentUser.id == null || currentUser.id.trim() === '')) ? `${hostUri}/_api/_common/IdentityImage?id=${currentUser.id}` : "";
 
     userIdentity = {
       id: currentUser.id,
@@ -25,4 +26,4 @@ export const getUserIdentity = (): IdentityRef => {
   }
 
   return userIdentity;
-} 
+}

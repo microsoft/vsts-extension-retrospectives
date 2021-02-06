@@ -1,10 +1,9 @@
 ﻿import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
-import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
+import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
-import { Suspense } from 'react';
 import * as React from 'react';
 import * as vssClipboard from 'VSS/Utils/Clipboard';
 
@@ -14,10 +13,9 @@ import WorkflowStage from './workflowStage';
 import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback';
 import { reflectBackendService } from '../dal/reflectBackendService';
-
-const BoardSummaryTable = React.lazy(() => import('./boardSummaryTable'));
-const FeedbackBoardMetadataForm = React.lazy(() => import('./feedbackBoardMetadataForm'));
-const FeedbackBoard = React.lazy(() => import('../components/feedbackBoard'));
+import BoardSummaryTable  from './boardSummaryTable';
+import FeedbackBoardMetadataForm from './feedbackBoardMetadataForm';
+import FeedbackBoard from '../components/feedbackBoard';
 
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
@@ -33,9 +31,7 @@ import { ToastContainer, toast, Slide } from 'react-toastify';
 import { WorkItemType, WorkItemTypeReference } from 'TFS/WorkItemTracking/Contracts';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
-import moment = require('moment');
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
-import { TextField } from 'office-ui-fabric-react/lib/TextField';
 
 export interface FeedbackBoardContainerProps {
   projectId: string;
@@ -69,6 +65,7 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogMessage: string;
   teamBoardDeletedDialogTitle: string;
   isCarouselDialogHidden: boolean;
+  isPrimeDirectiveDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
   isDesktop: boolean;
@@ -92,6 +89,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       isBoardCreationDialogHidden: true,
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
+      isPrimeDirectiveDialogHidden: true,
       isDeleteBoardConfirmationDialogHidden: true,
       isDesktop: true,
       isDropIssueInEdgeMessageBarVisible: true,
@@ -678,8 +676,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     });
   }
 
-  private createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean) => {
-    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxvotesPerUser, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect);
+  private createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => {
+    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxVotesPerUser, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect, displayPrimeDirective);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -785,9 +783,9 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     placeholderText: string,
     initialValue: string,
     onSubmit: (
-        title: string, maxvotesPerUser: number, columns: IFeedbackColumn[],
-        isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean,
-      ) => void,
+      title: string, maxVotesPerUser: number, columns: IFeedbackColumn[],
+      isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean
+    ) => void,
     onCancel: () => void) => {
     return (
       <Dialog
@@ -1028,23 +1026,63 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                       </div>
                     </div>
                     <div className="feedback-workflow-wrapper">
+                      { this.state.currentBoard.displayPrimeDirective &&
+                      <>
+                        <Dialog
+                          hidden={this.state.isPrimeDirectiveDialogHidden}
+                          onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
+                          dialogContentProps={{
+                            type: DialogType.close,
+                            title: 'The Prime Directive',
+                          }}
+                          minWidth={600}
+                          modalProps={{
+                            isBlocking: true,
+                            containerClassName: 'prime-directive-dialog',
+                            className: 'retrospectives-dialog-modal',
+                          }}>
+                            <DialogContent>
+                              The purpose of the Prime Directive is to assure that a retrospective has the right culture to make it a positive and result oriented event. It makes a retrospective become an effective team gathering to learn and find solutions to improve the way of working.
+                              <br /><br />
+                              <strong>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</strong>
+                              <br /><br />
+                              <em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
+                            </DialogContent>
+                            <DialogFooter>
+                              <DefaultButton onClick={() => { window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank'); }} text="Open Retrospective Wiki Page" />
+                              <PrimaryButton onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }} text="Close" />
+                            </DialogFooter>
+                        </Dialog>
+                        <TooltipHost
+                          hostClassName="toggle-carousel-button-tooltip-wrapper"
+                          content="Prime Directive"
+                          calloutProps={{ gapSpace: 0 }}>
+                          <ActionButton
+                            className="toggle-carousel-button"
+                            text="Prime Directive"
+                            iconProps={{ iconName: 'BookAnswers' }}
+                            onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: false }); }}>
+                          </ActionButton>
+                        </TooltipHost>
+                      </>
+                      }
                       <WorkflowStage
-                        display="Collect "
+                        display="Collect"
                         value={WorkflowPhase.Collect}
                         isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect}
                         clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage
-                        display=" Group "
+                        display="Group"
                         value={WorkflowPhase.Group}
                         isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group}
                         clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage
-                        display=" Vote "
+                        display="Vote"
                         value={WorkflowPhase.Vote}
                         isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote}
                         clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage
-                        display=" Act"
+                        display="Act"
                         value={WorkflowPhase.Act}
                         isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act}
                         clickEventCallback={this.clickWorkflowStateCallback} />
@@ -1120,23 +1158,21 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                     </MessageBar>
                   }
                   <div className="feedback-board-container">
-                    <Suspense fallback={<div>Loading...</div>}>
-                      <FeedbackBoard
-                        board={this.state.currentBoard}
-                        team={this.state.currentTeam}
-                        displayBoard={true}
-                        workflowPhase={this.state.currentBoard.activePhase}
-                        nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
-                        allWorkItemTypes={this.state.allWorkItemTypes}
-                        isCarouselDialogHidden={this.state.isCarouselDialogHidden}
-                        hideCarouselDialog={this.hideCarouselDialog}
-                        isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
-                        hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? 
-                          this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
-                          false
-                        }
-                      />
-                    </Suspense>
+                    <FeedbackBoard
+                      board={this.state.currentBoard}
+                      team={this.state.currentTeam}
+                      displayBoard={true}
+                      workflowPhase={this.state.currentBoard.activePhase}
+                      nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
+                      allWorkItemTypes={this.state.allWorkItemTypes}
+                      isCarouselDialogHidden={this.state.isCarouselDialogHidden}
+                      hideCarouselDialog={this.hideCarouselDialog}
+                      isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
+                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? 
+                        this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
+                        false
+                      }
+                    />
                   </div>
                   <Dialog
                     hidden={this.state.isDeleteBoardConfirmationDialogHidden}
@@ -1160,9 +1196,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
               }
             </PivotItem>
             <PivotItem headerText="History">
-              <Suspense fallback={<div>Loading...</div>}>
-                <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} />
-              </Suspense>
+              <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} />
             </PivotItem>
           </Pivot>
         </div>
@@ -1182,7 +1216,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
           this.state.isBoardCreationDialogHidden,
           this.hideBoardCreationDialog,
           'Create new retrospective',
-          `Example: Retrospective ${moment().format('MMM Do, YYYY')}`,
+          `Example: Retrospective ${new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date())}`,
           '',
           this.createBoard,
           this.hideBoardCreationDialog)}

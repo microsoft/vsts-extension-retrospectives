@@ -6,7 +6,6 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
-import * as moment from 'moment';
 import { appInsightsClient } from '../utilities/appInsightsClient';
 import classNames from 'classnames';
 
@@ -22,7 +21,7 @@ const boardSummaryColumns: Column[] = [
     accessor: 'createdDate',
     Cell: (row: any) => {
       return (
-        moment(row.original.createdDate).format('MMM Do, YYYY')
+        new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(row.original.createdDate)
       )
     },
     width: 175,

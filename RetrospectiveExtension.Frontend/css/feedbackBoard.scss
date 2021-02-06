@@ -8,4 +8,12 @@
 
     background-color: rgba(var(--palette-neutral-2, 248, 248, 248), 1);
   }
+
+  .feedback-maxvotes-per-user {
+    margin: 1em;
+
+    span {
+      margin: 1em;
+    }
+  }
 }

@@ -17,7 +17,7 @@ interface IExtensionSettingsMenuProps {
 }
 
 export default class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
-  constructor(props: any) {
+  constructor(props: IExtensionSettingsMenuProps) {
     super(props);
 
     this.state = {
@@ -133,7 +133,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           dialogContentProps={{
             type: DialogType.close,
             title: 'What\'s New',
-            subText: 'With version 1.0.50 Retrospective Session participants may revoke already casted votes. Max vote limit will come with version 1.0.60 🥳',
+            subText: 'With version 1.0.52 Prime Directive may appear on screen, also participants have max vote limits 🥳',
           }}
           minWidth={450}
           modalProps={{
