@@ -53,6 +53,7 @@ export interface FeedbackBoardState {
   hasItems: boolean;
   defaultActionItemIteration: string;
   defaultActionItemAreaPath: string;
+  currentVoteCount: string;
 }
 
 export default class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
