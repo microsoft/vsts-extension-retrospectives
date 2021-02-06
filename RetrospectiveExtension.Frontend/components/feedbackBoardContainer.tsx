@@ -89,6 +89,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       isBoardCreationDialogHidden: true,
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
+      isPrimeDirectiveDialogHidden: true,
       isDeleteBoardConfirmationDialogHidden: true,
       isDesktop: true,
       isDropIssueInEdgeMessageBarVisible: true,
