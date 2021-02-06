@@ -31,7 +31,8 @@ interface IFeedbackBoardMetadataFormState {
   columnCards: IFeedbackColumnCard[];
   isBoardAnonymous: boolean;
   shouldShowFeedbackAfterCollect: boolean;
-  maxvotesPerUser: number;
+  displayPrimeDirective: boolean;
+  maxVotesPerUser: number;
   isDeleteColumnConfirmationDialogHidden: boolean;
   isChooseColumnIconDialogHidden: boolean;
   isChooseColumnAccentColorDialogHidden: boolean;
