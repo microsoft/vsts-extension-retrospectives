@@ -65,6 +65,7 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogMessage: string;
   teamBoardDeletedDialogTitle: string;
   isCarouselDialogHidden: boolean;
+  isPrimeDirectiveDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
   isDesktop: boolean;
