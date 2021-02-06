@@ -639,7 +639,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                       e.preventDefault();
                       e.stopPropagation();
                       this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id, true);
+                      this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
                     }}
                     onAnimationEnd={() => {
                       this.setState({ showVotedAnimation: false });
