@@ -178,24 +178,28 @@ class ItemDataService {
         }
       }
     } else {
-      if (boardItem.boardVoteCollection === undefined || boardItem.boardVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
-        boardItem.boardVoteCollection = {};
-        boardItem.boardVoteCollection[userId] = 1;
-      } else {
-        if (boardItem.boardVoteCollection[userId] >= boardItem.maxVotesPerUser) {
-          console.log(`User has reached max votes for the board. Board: ${boardId}, Max Votes: ${boardItem.maxVotesPerUser}`);
-
-          return undefined;
-        }
-        else boardItem.boardVoteCollection[userId]++;
+      if (feedbackItem.voteCollection === undefined || feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null) {
+        feedbackItem.voteCollection = {};
+        feedbackItem.voteCollection[userId] = 0;
       }
 
-      if (feedbackItem.voteCollection[userId] === null)
-        feedbackItem.voteCollection[userId] = 0;
-      else
-        feedbackItem.voteCollection[userId]++;
+      if (boardItem.boardVoteCollection === undefined || boardItem.boardVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
+        boardItem.boardVoteCollection = {};
+        boardItem.boardVoteCollection[userId] = 0;
+      }
 
-        feedbackItem.upvotes++;
+      if (boardItem.boardVoteCollection[userId] >= boardItem.maxVotesPerUser) {
+        console.log(`User has reached max votes for the board. Board: ${boardId}, Max Votes: ${boardItem.maxVotesPerUser}`);
+
+        return undefined;
+      }
+      else {
+        boardItem.boardVoteCollection[userId]++;
+      }
+
+      feedbackItem.voteCollection[userId]++;
+
+      feedbackItem.upvotes++;
     }
     await this.updateBoardItem(teamId, boardItem);
     reflectBackendService.broadcastUpdatedBoard(teamId, boardId);
