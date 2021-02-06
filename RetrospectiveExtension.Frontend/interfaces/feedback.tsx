@@ -36,7 +36,6 @@ export interface IFeedbackColumn {
   accentColor: string;
 }
 
-
 export interface IFeedbackItemDocument {
   id: string;
   __etag?: number;
