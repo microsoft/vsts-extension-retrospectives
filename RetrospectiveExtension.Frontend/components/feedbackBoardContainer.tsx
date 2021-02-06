@@ -677,8 +677,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     });
   }
 
-  private createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean) => {
-    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxvotesPerUser, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect);
+  private createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => {
+    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxVotesPerUser, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect, displayPrimeDirective);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
