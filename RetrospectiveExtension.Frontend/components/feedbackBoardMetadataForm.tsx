@@ -163,7 +163,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
 
   private handleMaxVotePerUserChange = (ev: ChangeEvent<HTMLInputElement>) => {
     this.setState({
-      maxvotesPerUser: Number(ev.target.value),
+      maxVotesPerUser: Number(ev.target.value),
     });
   }
 
