@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { WebApiTeam } from 'TFS/Core/Contracts';
 import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
 
@@ -69,6 +69,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       defaultActionItemIteration: '',
       hasItems: false,
       isDataLoaded: false,
+      currentVoteCount: props.board.boardVoteCollection === undefined ? "0" : props.board.boardVoteCollection[userId] === undefined ? "0" : props.board.boardVoteCollection[userId].toString()
     };
   }
 
@@ -392,50 +393,50 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       return (<div> An unexpected exception occurred. </div>);
     }
 
-    const feedbackColumnPropsList =
-      this.state.columnIds.map((columnId) => {
-        return {
-          key: columnId,
-          columns: this.state.columns,
-          columnIds: this.state.columnIds,
-          columnName: this.state.columns[columnId].columnProperties.title,
-          columnId: columnId,
-          columnItems: this.state.columns[columnId].columnItems,
-          accentColor: this.state.columns[columnId].columnProperties.accentColor,
-          team: this.props.team,
-          boardId: this.props.board.id,
-          boardTitle: this.props.board.title,
-          isDataLoaded: this.state.isDataLoaded,
-          iconClass: this.state.columns[columnId].columnProperties.iconClass,
-          workflowPhase: this.props.workflowPhase,
-          addFeedbackItems: this.addFeedbackItems,
-          removeFeedbackItemFromColumn: this.removeFeedbackItemFromColumn,
-          refreshFeedbackItems: this.refreshFeedbackItems,
-          defaultActionItemAreaPath: this.state.defaultActionItemAreaPath,
-          defaultActionItemIteration: this.state.defaultActionItemIteration,
-          nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
-          allWorkItemTypes: this.props.allWorkItemTypes,
-          isBoardAnonymous: this.props.isAnonymous,
-          shouldFocusOnCreateFeedback: this.state.columns[columnId].shouldFocusOnCreateFeedback ? true : false,
-          hideFeedbackItems: this.props.hideFeedbackItems,
-        };
-      });
+    const feedbackColumnPropsList = this.state.columnIds.map((columnId) => {
+      return {
+        key: columnId,
+        columns: this.state.columns,
+        columnIds: this.state.columnIds,
+        columnName: this.state.columns[columnId].columnProperties.title,
+        columnId: columnId,
+        columnItems: this.state.columns[columnId].columnItems,
+        accentColor: this.state.columns[columnId].columnProperties.accentColor,
+        team: this.props.team,
+        boardId: this.props.board.id,
+        boardTitle: this.props.board.title,
+        isDataLoaded: this.state.isDataLoaded,
+        iconClass: this.state.columns[columnId].columnProperties.iconClass,
+        workflowPhase: this.props.workflowPhase,
+        addFeedbackItems: this.addFeedbackItems,
+        removeFeedbackItemFromColumn: this.removeFeedbackItemFromColumn,
+        refreshFeedbackItems: this.refreshFeedbackItems,
+        defaultActionItemAreaPath: this.state.defaultActionItemAreaPath,
+        defaultActionItemIteration: this.state.defaultActionItemIteration,
+        nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
+        allWorkItemTypes: this.props.allWorkItemTypes,
+        isBoardAnonymous: this.props.isAnonymous,
+        shouldFocusOnCreateFeedback: this.state.columns[columnId].shouldFocusOnCreateFeedback ? true : false,
+        hideFeedbackItems: this.props.hideFeedbackItems,
+        onVoteCasted: () => {
+          itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
+            const voteCollection = boardItem.boardVoteCollection;
+
+            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[userId] === undefined ? "0" : voteCollection[userId].toString() });
+          });
+        }
+      };
+    });
 
     return (
       <div className="feedback-board">
-        <div className="feedback-maxvotes-per-user">         
-            <label> {"Max Votes per User: "}</label>
-            <label> {this.props.board.maxvotesPerUser.toString()}</label>
-            <label> {"|  Your Total Votes: "}</label>
-            <label> {this.props.board.boardVoteCollection[getUserIdentity().id]==null? "0" : this.props.board.boardVoteCollection[getUserIdentity().id].toString()}</label>
-        </div>      
- 
+        { this.props.workflowPhase === WorkflowPhase.Vote &&
+        <div className="feedback-maxvotes-per-user">
+          <label>Max Votes per User: {this.props.board?.maxVotesPerUser?.toString()}<span>·</span>Your Total Votes: {this.state.currentVoteCount}</label>
+        </div>
+        }
         <div className="feedback-columns-container">
-          {this.state.isDataLoaded &&
-            feedbackColumnPropsList.map((columnProps) => {
-              return (<FeedbackColumn {...columnProps} />);
-            })
-          }
+          { this.state.isDataLoaded && feedbackColumnPropsList.map((columnProps) => { return (<FeedbackColumn {...columnProps} />); }) }
         </div>
         <Dialog
           hidden={this.props.isCarouselDialogHidden}
