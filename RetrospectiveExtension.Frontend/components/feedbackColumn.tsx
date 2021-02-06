@@ -177,6 +177,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       shouldHaveFocus: columnItem.shouldHaveFocus ? true : false,
       hideFeedbackItems: columnProps.hideFeedbackItems,
       userIdRef: columnItem.feedbackItem.userIdRef,
+      onVoteCasted: columnProps.onVoteCasted
     }
   }
 
