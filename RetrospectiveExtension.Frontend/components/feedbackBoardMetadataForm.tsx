@@ -101,8 +101,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
         this.props.currentBoard.shouldShowFeedbackAfterCollect ?
         this.props.currentBoard.shouldShowFeedbackAfterCollect : false
       ),
-      title: this.props.initialValue,
-      boardVoteCollection: {},
+      title: this.props.initialValue
     };
   }
 
