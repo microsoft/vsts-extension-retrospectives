@@ -56,6 +56,8 @@ export interface FeedbackBoardState {
   currentVoteCount: string;
 }
 
+const userId: string = getUserIdentity().id;
+
 export default class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
   constructor(props: FeedbackBoardProps) {
     super(props);
