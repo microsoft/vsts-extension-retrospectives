@@ -24,7 +24,8 @@ export interface IFeedbackBoardDocument {
   activePhase: WorkflowPhase;
   isAnonymous?: boolean;
   shouldShowFeedbackAfterCollect?: boolean;
-  maxvotesPerUser: number;
+  displayPrimeDirective?: boolean;
+  maxVotesPerUser: number;
   boardVoteCollection : { [voter: string]: number};
 }
 
