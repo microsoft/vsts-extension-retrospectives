@@ -6,11 +6,13 @@ Retrospectives are an important part of the software engineering cycle. Teams of
 
 ## Table of Contents
 
-- [Features](#features)
-- [Install](#install)
-- [Use](#use)
-- [Contribute](#contribute)
-- [License](#license)
+- [Retrospectives](#retrospectives)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Install](#install)
+  - [Use](#use)
+  - [Contribute](#contribute)
+  - [License](#license)
 
 ## Features
 
@@ -38,8 +40,19 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/createretrospective.png)
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/createretrospective2.png)
+  When you select **New Board** or **Create new baord** as above, you will see the following dialog: 
+  ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/createretrospectivewithmaxvotes.png)
+</br>
+  Please enter the appropriate information:
+   - **Retrospective Title**: Enter appropriate text 
+   - **Make all feedback anonymous**: When you select this checkbox, user identities for the item creators will not be displayed
+   - **Only show feedback after Collect phase**: When selected, users cannot see other users input till the Collect phase is completed by moving to another phase
+   - **Max Votes per User (Current 5)**: This options lets the board creator control how many total votes (across all columns) that each user can have. Default is 5. While this option can be updated through the _Edit retrospective_ option, please note that this update cannot decrement votes already in place. 
+   - **Colums**: You can either Apply from a preselected templates or individually select and configure columns
+  </br> </br>Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Ones the title is provided, the [Save] button is enabled. Save the retrospective using the [Save] button.
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/navigatetoretrospective.png)
+  Once you have created the retrospective boards and you want to select a board different from the currently displayed board, click on the board name (e.g. Demo board in the image) and select the desired board. You can use the search box to find the appropriate boards if you have a large number of boards. 
 
 4. If you created a new retrospective in step 3, give your retrospective an appropriate name and click 'Save'. This will create and navigate you to your newly created retrospective.
 
@@ -49,7 +62,7 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/boardlink.png)
 
-6. Each Retrospective has 2 columns, one for things that went well and another for those that did not. Performing a retrospective is divided into 4 phases.
+6. Each Retrospective by default has 2 columns, one for things that went well and another for those that did not. Performing a retrospective is divided into 4 phases.
 
   - **Collect** - In this phase feedback is collected from all participants. Users can add feedback under either of the columns using the 'Add new card' button. Once feedback from all users is collected, move onto the next phase.
 
@@ -59,9 +72,9 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/groupfeedback.png)
 
-  - **Vote** - In this phase, participants will individually go through all the feedback items and vote on the ones they feel are important, by clicking on the 'Upvote' icon. Once everyone is done voting, move on to the next phase.
+  - **Vote** - In this phase, participants will individually go through all the feedback items and vote on the ones they feel are important, by clicking on the 'Upvote' icon. Users can reduce their number of votes on a specific item by clicking on the 'Downvote' icon. </br> Note the _Max Votes per User_ set by the board creator are displayed above the board along with the votes used by the user. Votes used by the user are updated in real time as the user clicks on 'Upvote' and 'Downvote' icons.</br></br> Once everyone is done voting, move on to the next phase.
 
-  ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/votingphase.png)
+  ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/maxvotes.png)
 
   - **Act** - In this phase, the team will go through each feedback item and create work items in Azure DevOps if needed. Click on the 'Add action item' button on a feedback card, and select the type of work item that needs to be created. This will open up the standard Azure DevOps work item creation form. Enter the work item details and save. This will create the work item in your Azure DevOps account and also associate it to the feedback item.
 
