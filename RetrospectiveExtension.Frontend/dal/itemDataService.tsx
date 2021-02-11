@@ -202,7 +202,6 @@ class ItemDataService {
       feedbackItem.upvotes++;
     }
     await this.updateBoardItem(teamId, boardItem);
-    reflectBackendService.broadcastUpdatedBoard(teamId, boardId);
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
     return updatedFeedbackItem;
   }
