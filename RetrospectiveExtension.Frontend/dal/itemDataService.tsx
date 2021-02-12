@@ -178,27 +178,31 @@ class ItemDataService {
         }
       }
     } else {
-      if (feedbackItem.voteCollection === undefined || feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null) {
+      if (feedbackItem.voteCollection === undefined) {
         feedbackItem.voteCollection = {};
+      }
+      if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null) {
         feedbackItem.voteCollection[userId] = 0;
       }
+      
 
-      if (boardItem.boardVoteCollection === undefined || boardItem.boardVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
+      if (boardItem.boardVoteCollection === undefined) {
         boardItem.boardVoteCollection = {};
+      }
+      if (boardItem.boardVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
         boardItem.boardVoteCollection[userId] = 0;
       }
+
 
       if (boardItem.boardVoteCollection[userId] >= boardItem.maxVotesPerUser) {
         console.log(`User has reached max votes for the board. Board: ${boardId}, Max Votes: ${boardItem.maxVotesPerUser}`);
 
         return undefined;
       }
-      else {
-        boardItem.boardVoteCollection[userId]++;
-      }
+
+      boardItem.boardVoteCollection[userId]++;
 
       feedbackItem.voteCollection[userId]++;
-
       feedbackItem.upvotes++;
     }
     await this.updateBoardItem(teamId, boardItem);
