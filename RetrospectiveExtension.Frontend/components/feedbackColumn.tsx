@@ -230,6 +230,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   private renderFeedbackColumn = () => {
     return (
       <div className="feedback-column"
+        onDoubleClick={this.createEmptyFeedbackItem}
         onDrop={this.handleDropFeedbackItemOnColumnSpace}
         onDragOver={this.dragFeedbackItemOverColumn}>
         <div className="hide-mobile feedback-column-header">
