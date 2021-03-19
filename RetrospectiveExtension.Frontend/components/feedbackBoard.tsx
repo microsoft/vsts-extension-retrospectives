@@ -69,7 +69,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       defaultActionItemIteration: '',
       hasItems: false,
       isDataLoaded: false,
-      currentVoteCount: props.board.boardVoteCollection === undefined ? "0" : props.board.boardVoteCollection[userId] === undefined ? "0" : props.board.boardVoteCollection[userId].toString()
+      currentVoteCount: (props.board.boardVoteCollection === undefined || props.board.boardVoteCollection === null) ? "0" : (props.board.boardVoteCollection[userId] === undefined || props.board.boardVoteCollection[userId] === null) ? "0" : props.board.boardVoteCollection[userId]?.toString()
     };
   }
 
