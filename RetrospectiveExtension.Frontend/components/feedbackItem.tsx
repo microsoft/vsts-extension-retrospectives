@@ -51,6 +51,9 @@ export interface IFeedbackItemProps {
   shouldHaveFocus: boolean;
   hideFeedbackItems: boolean;
   userIdRef: string;
+  timerSecs: number;
+  timerState: boolean;
+  timerId: any;
   onVoteCasted: () => void;
 
   addFeedbackItems: (
@@ -93,6 +96,7 @@ export interface IFeedbackItemState {
   searchedFeedbackItems: IColumnItem[];
   searchTerm: string;
   hideFeedbackItems: boolean;
+  userVotes: string;
 }
 
 interface FeedbackItemEllipsisMenuItem {
@@ -122,6 +126,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
       searchTerm: '',
       searchedFeedbackItems: [],
       showVotedAnimation: false,
+      userVotes:"0",
     };
 
     this.itemElement = null;
@@ -129,6 +134,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
   }
 
   public async componentDidMount() {
+    await this.isVoted(this.props.id);
     if (this.props.groupedItemProps && this.props.groupedItemProps.isMainItem) {
       this.updateFeedbackItemGroupShadowCardHeight();
     }
@@ -389,10 +395,83 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUpvoted);
 
     if (updatedFeedbackItem) {
+      await this.isVoted(this.props.id);
       this.props.refreshFeedbackItems([updatedFeedbackItem], true);
     } else {
       // TODO: Show pop-up indicating voting failed. This can be a common scenario due to race condition.
     }
+  }
+
+
+  private timerSwich =  async (feedbackItemId: string) =>
+  {
+    
+    let updatedFeedbackItem;
+    const boardId:string = this.props.boardId;
+
+    // function to handle timer count update
+    const incTimer = async () => {
+      if (this.props.timerState === true) {
+        updatedFeedbackItem = await itemDataService.updateTimer(boardId, feedbackItemId);
+        if (updatedFeedbackItem) {
+
+          this.props.refreshFeedbackItems([updatedFeedbackItem], true);
+        } else {
+          // TODO: Show pop-up indicating timer count update failed.
+        }
+      }
+
+    }
+    
+    // flip the timer and start/stop count
+    if (this.props.timerState===false)
+    {
+
+      updatedFeedbackItem = await itemDataService.updateTimer(boardId, feedbackItemId, true);
+      if (updatedFeedbackItem) {
+        this.props.refreshFeedbackItems([updatedFeedbackItem], true);
+      } else {
+        // TODO: Show pop-up indicating timer count update failed.
+      }
+      if (this.props.timerId == null) {
+        
+        const tid = setInterval(incTimer, 1000);
+        updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, tid);
+        if (updatedFeedbackItem) {
+          this.props.refreshFeedbackItems([updatedFeedbackItem], true);
+        } else {
+          // TODO: Show pop-up indicating timer could not be flipped.
+        }
+      } else {
+        updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, this.props.timerId);
+        if (updatedFeedbackItem) {
+          this.props.refreshFeedbackItems([updatedFeedbackItem], true);
+        } else {
+          // TODO: Show pop-up indicating timer could not be flipped.
+        }
+       
+      }
+
+    }
+    else 
+    {
+      clearInterval(this.props.timerId);
+      updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, null);
+      if (updatedFeedbackItem) {
+        this.props.refreshFeedbackItems([updatedFeedbackItem], true);
+      } else {
+        // TODO: Show pop-up indicating timer could not be flipped.
+      }
+
+    }
+    
+  }
+
+  private isVoted = async (
+    feedbackItemId: string) => {
+      itemDataService.isVoted(this.props.boardId, getUserIdentity().id, feedbackItemId).then(result => {
+        this.setState({ userVotes: result });
+      })
   }
 
   private removeFeedbackItem = (
@@ -545,7 +624,9 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     const groupItemsCount = this.props && this.props.groupedItemProps && this.props.groupedItemProps.groupedCount + 1;
     const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : 'Feedback group main item. Group has ' + groupItemsCount + ' items.'); 
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.createdBy ? this.props.userIdRef !== getUserIdentity().id : false);
-
+    const curTimerState = this.props.timerState;
+    
+    
     return (
       <div
         ref={this.itemElementRef}
@@ -722,8 +803,16 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                     </p>
                   </div>
                 }
+
+                {showVotes && this.props.isInteractable && 
+                
+                  <div>
+                    <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
+                  </div>
+                }
               </div>
               {this.feedbackCreationInformationContent()}
+              <div> {this.props.columns[this.props.columnId].columnItems.findIndex((columnItem) => columnItem.feedbackItem.id === this.props.id)} </div>
             </div>
             <div className="card-action-item-part">
               {showAddActionItem &&
@@ -742,6 +831,31 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                   allowAddNewActionItem={isMainItem}
                 />}
             </div>
+            <div id="actionTimer" className="card-action-timer">
+              {showAddActionItem &&
+              
+              <button
+               title="Timer"
+               aria-live="polite"
+               aria-label={'Start/stop'}
+               tabIndex={0}
+               
+               className={classNames(
+                 'feedback-action-button',
+               )}
+               onClick={(e) => {
+                 e.preventDefault();
+                 e.stopPropagation();
+                 this.timerSwich(this.props.id);
+               }}
+               >
+              <i className={curTimerState ? "fa fa-stop": "fa fa-play-circle"} />
+              <span>  {this.props.timerSecs} (seconds)</span>
+             </button> 
+             
+              }
+            </div>
+
           </DocumentCard>
         </div>
         {!this.state.isDeleteItemConfirmationDialogHidden &&
@@ -869,6 +983,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
             </DialogFooter>
           </Dialog>
         }
-      </div>);
+      </div>
+    );
   }
 }

@@ -28,6 +28,9 @@ class ItemDataService {
       voteCollection: {},
       upvotes: 0,
       userIdRef: userIdentity.id,
+      timerSecs: 0,
+      timerstate: false,
+      timerId: null,
     };
 
     const createdItem: IFeedbackItemDocument =
@@ -143,6 +146,84 @@ class ItemDataService {
   private updateBoardItem = async (teamId: string, boardItem: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
     const updatedBoardItem: IFeedbackBoardDocument = await ExtensionDataService.updateDocument<IFeedbackBoardDocument>(teamId, boardItem);
     return updatedBoardItem;
+  }
+
+  /**
+   * Check if the user has voted on this item.
+   */
+
+  public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> =>
+  {
+    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
+
+    if (!feedbackItem) {
+      console.log(`Cannot increment upvote for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
+      return undefined;
+    }
+
+
+    if (feedbackItem.upvotes <= 0) {
+      return "0";
+    } else {
+      if (feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
+        return "0";
+      }
+      else {
+        return feedbackItem.voteCollection[userId].toString();
+      }
+    }
+
+  }
+
+  /**
+   * flip the timer state.
+   */
+
+  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> =>
+  {
+    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
+
+    if (!feedbackItem) {
+      console.log(`Cannot flip the timer state for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
+      return undefined;
+    }
+
+    if (feedbackItem.timerstate === false) {
+      feedbackItem.timerstate = true;
+    }
+    else {
+      feedbackItem.timerstate = false;
+    }
+    feedbackItem.timerId = timerid;
+    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+    return updatedFeedbackItem;
+  }
+
+
+
+  /**
+   * update the timer count.
+   */
+
+  public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean=false): Promise<IFeedbackItemDocument> =>
+  {
+    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
+
+    if (!feedbackItem) {
+      console.log(`Cannot increment the timer seconds for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
+      return undefined;
+    }
+
+    if (setZero)
+    {
+      feedbackItem.timerSecs = 0;
+    }
+    else 
+    {
+      feedbackItem.timerSecs++;
+    }
+    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+    return updatedFeedbackItem;
   }
 
   /**

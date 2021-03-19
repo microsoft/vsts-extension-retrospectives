@@ -53,4 +53,7 @@ export interface IFeedbackItemDocument {
   modifedDate?: Date;
   modifiedBy?: IdentityRef;
   userIdRef: string;
+  timerSecs: number;
+  timerstate: boolean;
+  timerId: any;
 }
