@@ -804,7 +804,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                   </div>
                 }
 
-                {showVotes && this.props.isInteractable && 
+                {showVoteButton && this.props.isInteractable && 
                 
                   <div>
                     <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
