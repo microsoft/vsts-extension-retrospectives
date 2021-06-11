@@ -849,7 +849,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                  this.timerSwich(this.props.id);
                }}
                >
-              <i className={curTimerState ? "fa fa-stop": "fa fa-play-circle"} />
+              <i className={curTimerState ? "fa fa-stop-circle": "fa fa-play-circle"} />
               <span>  {this.props.timerSecs} (seconds)</span>
              </button> 
              
