@@ -804,7 +804,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                   </div>
                 }
 
-                {showVotes && this.props.isInteractable &&
+                {showVoteButton && this.props.isInteractable &&
                   <div>
                     <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
                   </div>
@@ -848,7 +848,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                  this.timerSwich(this.props.id);
                }}
                >
-              <i className={curTimerState ? "fa fa-stop": "fa fa-play-circle"} />
+              <i className={curTimerState ? "fa fa-stop-circle": "fa fa-play-circle"} />
               <span>  {this.props.timerSecs} (seconds)</span>
              </button> 
              
