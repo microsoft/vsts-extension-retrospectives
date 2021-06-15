@@ -2,7 +2,7 @@ import * as ExtensionDataService from './dataService';
 import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { v4 as uuid } from 'uuid';
 import { WorkflowPhase } from '../interfaces/workItem';
-import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
+// TODO (enpolat) : import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 
 class BoardDataService {
@@ -55,7 +55,7 @@ class BoardDataService {
       teamBoards = await ExtensionDataService.readDocuments<IFeedbackBoardDocument>(teamId, false, true);
     } catch (e) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
-        appInsightsClient.trackTrace(TelemetryExceptions.BoardsNotFoundForTeam, e, AI.SeverityLevel.Warning);
+        // TODO (enpolat) : appInsightsClient.trackTrace(TelemetryExceptions.BoardsNotFoundForTeam, e, AI.SeverityLevel.Warning);
       }
     }
 
