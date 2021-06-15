@@ -385,6 +385,48 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
           ]
         });
         break;
+      case 'psy-safety':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#8063bf',
+                iconClass: 'fas fa-balance-scale-right',
+                id: uuid(),
+                title: 'Psychological Safety Score',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'What makes it safe',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'What hinders safety',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-exclamation',
+                id: uuid(),
+                title: 'Specific Actions',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
       case 'wlai':
         this.setState({
           columnCards: [
@@ -607,6 +649,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
               <option value="mad-sad-glad">Mad-Sad-Glad</option>
               <option value="good-bad-ideas">Good-Bad-Ideas</option>
               <option value="start-stop-continue">Start-Stop-Continue</option>
+              <option value="psy-safety">Psychological Safety</option>
               <option value="wlai">WentWell-Learned-Accelerators-Impediments</option>
             </select>
           </div>
