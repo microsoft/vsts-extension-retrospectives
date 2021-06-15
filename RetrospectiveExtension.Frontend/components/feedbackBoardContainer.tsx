@@ -1,4 +1,4 @@
-﻿import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -22,7 +22,7 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { WebApiTeam } from 'TFS/Core/Contracts';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import NoFeedbackBoardsView from './noFeedbackBoardsView';
-import { appInsightsClient, TelemetryEvents, TelemetryEventProperties } from '../utilities/appInsightsClient';
+// TODO (enpolat) : import { appInsightsClient, TelemetryEvents, TelemetryEventProperties } from '../utilities/appInsightsClient';
 import { userDataService } from '../dal/userDataService';
 import ExtensionSettingsMenu from './extensionSettingsMenu';
 import SelectorCombo, { ISelectorList } from './selectorCombo';
