@@ -2,12 +2,9 @@ import * as ExtensionDataService from './dataService';
 import { IFeedbackItemDocument, IFeedbackBoardDocument } from '../interfaces/feedback';
 import { WorkItem } from 'TFS/WorkItemTracking/Contracts';
 import { workItemService } from './azureDevOpsWorkItemService';
-import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
+// TODO (enpolat) : import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
 import { v4 as uuid } from 'uuid';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-
-/// <reference types="vss-web-extension-sdk" />
-import { reflectBackendService } from '../dal/reflectBackendService';
 
 class ItemDataService {
   /**
@@ -70,7 +67,7 @@ class ItemDataService {
       feedbackItems = await ExtensionDataService.readDocuments<IFeedbackItemDocument>(boardId, false, true);
     } catch (e) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
-        appInsightsClient.trackTrace(TelemetryExceptions.ItemsNotFoundForBoard, e, AI.SeverityLevel.Warning);
+        // TODO (enpolat) : appInsightsClient.trackTrace(TelemetryExceptions.ItemsNotFoundForBoard, e, AI.SeverityLevel.Warning);
       }
     }
 
@@ -483,7 +480,7 @@ class ItemDataService {
       updatedFeedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
     }
     catch (e) {
-      appInsightsClient.trackException(new Error(e.message));
+      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
       console.log(`Failed to read Feedback item with id: ${feedbackItemId}.`);
       updatedFeedbackItem = undefined;
     }
@@ -516,7 +513,7 @@ class ItemDataService {
       updatedFeedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
     }
     catch (e) {
-      appInsightsClient.trackException(new Error(e.message));
+      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
       console.log(`Failed to read Feedback item with id: ${feedbackItemId}.`);
       updatedFeedbackItem = undefined;
     }
@@ -541,7 +538,7 @@ class ItemDataService {
       feedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
     }
     catch (e) {
-      appInsightsClient.trackException(new Error(e.message));
+      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
       throw new Error(`Failed to read Feedback item with id: ${feedbackItemId}.`);
     }
 
@@ -569,7 +566,7 @@ class ItemDataService {
       workItems = await workItemService.getWorkItemsByIds([associatedWorkItemId]);
     }
     catch (e) {
-      appInsightsClient.trackException(new Error(e.message));
+      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
       return await this.removeAssociatedActionItem(boardId, feedbackItemId, associatedWorkItemId);
     }
 
