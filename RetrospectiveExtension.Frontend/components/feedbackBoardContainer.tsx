@@ -143,7 +143,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     }
     catch (e) {
       // TODO: Better error handling.
-      appInsightsClient.trackException(e);
+      // TODO (enpolat) : appInsightsClient.trackException(e);
     }
 
     this.setState({ isAppInitialized: true });
@@ -151,7 +151,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
   public componentDidUpdate(prevProps: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
     if (prevState.currentTeam !== this.state.currentTeam) {
-      appInsightsClient.updateTeamInfo(this.state.currentTeam);
+      // TODO (enpolat) : appInsightsClient.updateTeamInfo(this.state.currentTeam);
     }
 
     if (prevState.currentBoard !== this.state.currentBoard) {
