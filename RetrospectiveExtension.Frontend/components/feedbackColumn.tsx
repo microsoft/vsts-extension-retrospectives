@@ -8,7 +8,7 @@ import FeedbackItem, { IFeedbackItemProps } from './feedbackItem';
 import FeedbackItemGroup from './feedbackItemGroup';
 import { IColumnItem, IColumn } from './feedbackBoard';
 import localStorageHelper from '../utilities/localStorageHelper';
-import { TelemetryEvents, appInsightsClient } from '../utilities/appInsightsClient';
+// TODO (enpolat) : import { TelemetryEvents, appInsightsClient } from '../utilities/appInsightsClient';
 import { WebApiTeam } from 'TFS/Core/Contracts';
 import { ActionButton, IButton } from 'office-ui-fabric-react/lib/Button';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
@@ -138,7 +138,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       true
     );
 
-    appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUngrouped);
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUngrouped);
 
     // TODO: Inform user when not all updates are successful due to race conditions.
   };
