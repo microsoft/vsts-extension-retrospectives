@@ -118,7 +118,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     try {
       const backendConnectionResult = await reflectBackendService.startConnection();
       this.setState({ isBackendServiceConnected: backendConnectionResult });
-      window.addEventListener('error', this.handleErrorEvent);
+      // TODO (enpolat) : window.addEventListener('error', this.handleErrorEvent);
 
       const initalizedTeamAndBoardState = await this.initializeFeedbackBoard();
       this.setState({
