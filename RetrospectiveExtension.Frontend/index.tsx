@@ -8,11 +8,11 @@ import * as ReactDOM from 'react-dom';
 import './css/main.scss';
 
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from './components/feedbackBoardContainer';
-import { appInsightsClient, TelemetryEvents } from './utilities/appInsightsClient'
+// TODO (enpolat) : import { appInsightsClient, TelemetryEvents } from './utilities/appInsightsClient'
 
 initializeIcons();
 
-appInsightsClient.trackEvent(TelemetryEvents.ExtensionLaunched);
+// TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.ExtensionLaunched);
 
 const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
   projectId: VSS.getWebContext().project.id
