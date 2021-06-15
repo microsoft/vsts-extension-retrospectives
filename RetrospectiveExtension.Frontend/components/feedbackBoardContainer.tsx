@@ -1,4 +1,4 @@
-import { ActionButton, DefaultButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+﻿import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -1144,11 +1144,20 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                               labelPosition="right"
                               className="info-message-bar-action-spinner" />}
                           {!this.state.isReconnectingToBackendService &&
+                            <>
                             <MessageBarButton
                               className="info-message-bar-action-button"
                               onClick={this.tryReconnectToBackend}
                               disabled={this.state.isReconnectingToBackendService}
-                              text="Reconnect" />}
+                              text="Reconnect" />
+                            <IconButton
+                              className="info-message-bar-action-button"
+                              iconProps={{ iconName: 'Clear' }}
+                              onClick={() => { this.setState({ isBackendServiceConnected: true }) }}
+                              disabled={this.state.isReconnectingToBackendService}
+                              title="Hide" />
+                            </>
+                          }
                         </div>
                       }>
                       <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
