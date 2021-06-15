@@ -8,7 +8,7 @@ import { WorkItemFormNavigationService } from 'TFS/WorkItemTracking/Services';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
-import { TelemetryEvents, TelemetryEventProperties, appInsightsClient } from '../utilities/appInsightsClient'
+// TODO (enpolat) : import { TelemetryEvents, TelemetryEventProperties, appInsightsClient } from '../utilities/appInsightsClient'
 import { FocusTrapCallout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
@@ -81,7 +81,7 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
 
     if (workItem) {
       const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(this.props.boardId, this.props.feedbackItemId, workItem.id);
-      appInsightsClient.trackEvent(TelemetryEvents.WorkItemCreated, { [TelemetryEventProperties.WorkItemType]: workItemTypeName });
+      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.WorkItemCreated, { [TelemetryEventProperties.WorkItemType]: workItemTypeName });
       this.props.onUpdateActionItem(updatedFeedbackItem);
     }
   }
@@ -171,7 +171,7 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
 
     if (this.state.linkedWorkItem) {
       const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(this.props.boardId, this.props.feedbackItemId, this.state.linkedWorkItem.id);
-      appInsightsClient.trackEvent(TelemetryEvents.ExistingWorkItemLinked, { [TelemetryEventProperties.WorkItemType]: this.state.linkedWorkItem.fields['System.WorkItemType'] });
+      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.ExistingWorkItemLinked, { [TelemetryEventProperties.WorkItemType]: this.state.linkedWorkItem.fields['System.WorkItemType'] });
       this.props.onUpdateActionItem(updatedFeedbackItem);
     }
   }
