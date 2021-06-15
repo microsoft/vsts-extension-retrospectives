@@ -156,7 +156,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
     if (prevState.currentBoard !== this.state.currentBoard) {
       reflectBackendService.switchToBoard(this.state.currentBoard ? this.state.currentBoard.id : undefined);
-      appInsightsClient.updateBoardInfo(this.state.currentBoard);
+      // TODO (enpolat) : appInsightsClient.updateBoardInfo(this.state.currentBoard);
       if (this.state.isAppInitialized) {
         userDataService.addVisit(this.state.currentTeam.id, this.state.currentBoard ? this.state.currentBoard.id : undefined);
       }
@@ -166,7 +166,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
   public componentWillUnmount() {
     // Remove event listeners.
     window.removeEventListener('resize', this.handleResolutionChange);
-    window.removeEventListener('error', this.handleErrorEvent);
+    // TODO (enpolat) : window.removeEventListener('error', this.handleErrorEvent);
     reflectBackendService.removeOnReceiveNewBoard(this.handleNewBoardAvailable);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
