@@ -1,6 +1,6 @@
 import Work_Contracts = require('TFS/Work/Contracts');
 import WorkClient = require('TFS/Work/RestClient');
-import { appInsightsClient } from '../utilities/appInsightsClient';
+// TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 
 class WorkService {
   private _httpWorkClient: WorkClient.WorkHttpClient2_3;
@@ -34,7 +34,7 @@ class WorkService {
         // appInsightsClient.trackTrace(TelemetryExceptions.CurrentTeamIterationNotFound, e);
       }
       else {
-        appInsightsClient.trackException(new Error(e.message));
+        // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
         console.error('An exception occurred while trying to get the team iterations ', e);  
       }
     }
@@ -60,7 +60,7 @@ class WorkService {
       teamFieldValues = await this._httpWorkClient.getTeamFieldValues(teamContext);
     }
     catch (e) {
-      appInsightsClient.trackException(new Error(e.message));
+      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
       console.error('An exception occurred while trying to get the team field values: ', e);
     }
 
