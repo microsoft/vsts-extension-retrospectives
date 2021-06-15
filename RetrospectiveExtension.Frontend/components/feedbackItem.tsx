@@ -811,7 +811,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                 }
               </div>
               {this.feedbackCreationInformationContent()}
-              <div> {this.props.columns[this.props.columnId].columnItems.findIndex((columnItem) => columnItem.feedbackItem.id === this.props.id)} </div>
+              <div className="card-id">#{this.props.columns[this.props.columnId].columnItems.findIndex((columnItem) => columnItem.feedbackItem.id === this.props.id)}</div>
             </div>
             <div className="card-action-item-part">
               {showAddActionItem &&
