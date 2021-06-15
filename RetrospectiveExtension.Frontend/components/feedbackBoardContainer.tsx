@@ -764,7 +764,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     await this.reloadBoardsForCurrentTeam();
     this.hideDeleteBoardConfirmationDialog();
-    appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardDeleted);
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardDeleted);
   }
 
   private copyBoardUrl = () => {
@@ -817,7 +817,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
     this.hideBoardUpdateDialog();
     reflectBackendService.broadcastUpdatedBoard(this.state.currentTeam.id, updatedBoard.id);
-    appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardMetadataUpdated);
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardMetadataUpdated);
   }
 
   // If an action needs to be hidden on desktop or mobile view, use the item's className property
@@ -887,7 +887,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
   private showCarouselDialog = () => {
     this.setState({ isCarouselDialogHidden: false });
-    appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemCarouselLaunched);
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemCarouselLaunched);
   }
 
   private hideCarouselDialog = () => {
