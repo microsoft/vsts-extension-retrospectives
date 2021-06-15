@@ -6,7 +6,7 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
-import { appInsightsClient } from '../utilities/appInsightsClient';
+// TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 import classNames from 'classnames';
 
 import 'react-table/react-table.css'
@@ -89,7 +89,7 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
     }
     catch (e) {
       // TODO: Better error handling.
-      appInsightsClient.trackException(e);
+      // TODO (enpolat) : appInsightsClient.trackException(e);
     }
   }
 
