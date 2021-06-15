@@ -15,7 +15,7 @@ import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
 import localStorageHelper from '../utilities/localStorageHelper';
 import { reflectBackendService } from '../dal/reflectBackendService';
 import { WebApiTeam } from 'TFS/Core/Contracts';
-import { appInsightsClient, TelemetryEvents } from '../utilities/appInsightsClient';
+// TODO (enpolat) : import { appInsightsClient, TelemetryEvents } from '../utilities/appInsightsClient';
 import { IColumn, IColumnItem } from './feedbackBoard';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
@@ -278,7 +278,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     }
 
     const updatedItems = await itemDataService.deleteFeedbackItem(this.props.boardId, this.props.id);
-    appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemDeleted);
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemDeleted);
     reflectBackendService.broadcastDeletedItem(
       'dummyColumn',
       this.props.id,
@@ -392,7 +392,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
 
   private onVote = async (feedbackItemId: string,  decrement: boolean=false) => {
     const updatedFeedbackItem = await itemDataService.updateVote(this.props.boardId, this.props.team.id, getUserIdentity().id, feedbackItemId, decrement);
-    appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUpvoted);
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUpvoted);
 
     if (updatedFeedbackItem) {
       await this.isVoted(this.props.id);
@@ -493,7 +493,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     if (newlyCreated) {
       const newFeedbackItem = await itemDataService.createItemForBoard(
         this.props.boardId, newTitle, this.props.columnId, !this.props.createdBy);
-      appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemCreated);
+      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemCreated);
 
       // Replace empty card UI with populated feedback item
       this.removeFeedbackItem(feedbackItemId);
@@ -511,7 +511,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     }
 
     const updatedFeedbackItem = await itemDataService.updateTitle(this.props.boardId, feedbackItemId, newTitle);
-    appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemTitleEdited);
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemTitleEdited);
 
     if (updatedFeedbackItem) {
       this.props.refreshFeedbackItems([updatedFeedbackItem], true);
@@ -541,7 +541,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
       ].filter((item) => item),
       true
     );
-    appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemGrouped);
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemGrouped);
 
     // TODO: Inform user when not all updates are successful due to race conditions.
   }
