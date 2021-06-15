@@ -191,9 +191,9 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     }
   }
 
-  private handleErrorEvent = async (errorEvent: ErrorEvent) => {
-    appInsightsClient.trackException(errorEvent.error);
-  }
+  // private handleErrorEvent = async (errorEvent: ErrorEvent) => {
+    // TODO (enpolat) : appInsightsClient.trackException(errorEvent.error);
+  // }
 
   private handleNewBoardAvailable = async (teamId: string, boardId: string) => {
     if (!teamId || this.state.currentTeam.id !== teamId) {
