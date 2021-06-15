@@ -394,7 +394,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       }
     }
     catch (e) {
-      appInsightsClient.trackException(e);
+      // TODO (enpolat) : appInsightsClient.trackException(e);
     }
 
     if (!queryParams || !queryParams.has('teamId')) {
@@ -649,22 +649,19 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       }
 
       this.setCurrentTeam(team.id);
-      appInsightsClient.trackEvent(TelemetryEvents.TeamSelectionChanged);
+      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.TeamSelectionChanged);
     }
   }
 
   private changeSelectedBoard = (board: IFeedbackBoardDocument) => {
     if (board) {
       this.setCurrentBoard(board);
-      appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardSelectionChanged);
+      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardSelectionChanged);
     }
   }
 
   private clickWorkflowStateCallback = (clickedElement: React.MouseEvent<HTMLElement>, newPhase: WorkflowPhase) => {
-    appInsightsClient.trackEvent(TelemetryEvents.WorkflowPhaseChanged, {
-      [TelemetryEventProperties.OldWorkflowPhase]: this.state.currentBoard.activePhase,
-      [TelemetryEventProperties.NewWorkflowPhase]: newPhase
-    });
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.WorkflowPhaseChanged, { [TelemetryEventProperties.OldWorkflowPhase]: this.state.currentBoard.activePhase, [TelemetryEventProperties.NewWorkflowPhase]: newPhase });
 
     this.setState(prevState => {
       const updatedCurrentBoard = prevState.currentBoard;
@@ -681,7 +678,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
-    appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardCreated);
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardCreated);
   }
 
   private showBoardCreationDialog = (): void => {
