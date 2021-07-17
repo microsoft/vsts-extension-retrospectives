@@ -1,18 +1,18 @@
-import CoreClient = require('TFS/Core/RestClient');
-import VssService = require('VSS/Service');
-import Core_Contracts = require('TFS/Core/Contracts');
+import { CoreHttpClient4_1 } from 'TFS/Core/RestClient';
+import { getCollectionClient } from 'VSS/Service';
+import { WebApiTeam } from 'TFS/Core/Contracts';
 
 class AzureDevOpsCoreService {
-  private _httpCoreClient: CoreClient.CoreHttpClient4_1;
+  private _httpCoreClient: CoreHttpClient4_1;
   private readonly maxTeamsPerRequest = 100;
 
   constructor() {
     if (!this._httpCoreClient) {
-      this._httpCoreClient = VssService.getCollectionClient(CoreClient.CoreHttpClient4_1);
+      this._httpCoreClient = getCollectionClient(CoreHttpClient4_1);
     }
   }
 
-  public async getDefaultTeam(projectId: string): Promise<Core_Contracts.WebApiTeam> {
+  public async getDefaultTeam(projectId: string): Promise<WebApiTeam> {
     return (await this._httpCoreClient.getTeams(projectId, false, 1))[0];
   }
 
@@ -21,7 +21,7 @@ class AzureDevOpsCoreService {
    * @param projectId The project id.
    * @param teamId The team id.
    */
-  public async getTeam(projectId: string, teamId: string): Promise<Core_Contracts.WebApiTeam> {
+  public async getTeam(projectId: string, teamId: string): Promise<WebApiTeam> {
     try {
       return await this._httpCoreClient.getTeam(projectId, teamId);
     }
@@ -35,12 +35,11 @@ class AzureDevOpsCoreService {
    * @param projectId The project id.
    * @param forCurrentUserOnly If true, return teams the requesting user is a member of. If false, return teams the user can see in this project.
    */
-  public async getAllTeams(projectId: string, forCurrentUserOnly: boolean):
-    Promise<Core_Contracts.WebApiTeam[]> {
-    const allTeams: Core_Contracts.WebApiTeam[] = [];
-    
+  public async getAllTeams(projectId: string, forCurrentUserOnly: boolean): Promise<WebApiTeam[]> {
+    const allTeams: WebApiTeam[] = [];
+
     const getTeamBatch = async (skip: number) => {
-      const teamBatch: Core_Contracts.WebApiTeam[] =
+      const teamBatch: WebApiTeam[] =
         await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, this.maxTeamsPerRequest, skip);
       
       if (teamBatch.length > 0) {
