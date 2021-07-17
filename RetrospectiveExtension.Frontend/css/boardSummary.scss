@@ -31,6 +31,22 @@
   box-shadow: inset 0 -2px 0 0 rgba(var(--palette-neutral-100, 0, 0, 0), 1);
 }
 
+.action-items-summary-card div[role=row] {
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
+  padding-top: 0;
+}
+
+.action-items-summary-card .ms-DetailsHeader-cell[role=columnheader] {
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
+  border-bottom: 1px solid #fff;
+}
+
+.action-items-summary-card .ms-DetailsHeader-cell[role=columnheader]:hover {
+  color: var(--text-primary-color);
+}
+
 .board-summary-table-container {
   .ReactTable {
     height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
@@ -65,9 +81,8 @@
   }
 
   .pending-action-item-count {
-    color: $bug_red;
+    color: var(--status-warning-text);
     font-weight: 600;
-    border-left: 3px solid $bug_red;
   }
 
   .rt-tr {
@@ -96,7 +111,7 @@
     min-width: 270px;
 
     .resolved-green {
-      color: $resolved_green;
+      color: var(--status-success-text);
     }
 
     .board-summary-card-title {
@@ -107,6 +122,7 @@
         padding: 0;
         margin-bottom: 20px;
         height: auto;
+        color: var(--text-primary-color);
       }
     }
   }
@@ -152,10 +168,10 @@
 
   .board-summary-card, .action-items-summary-card {
     margin: 8px;
-    border: 1px solid #eaeaea;
-    box-shadow: 0 4px 8px rgba(0,0,0,.08);
+    border: 0px solid #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, .08);
     border-radius: 4px;
-    background-color: rgba(255,255,255,1);
+    background-color: var(--background-color);
     min-height: 285px;
 
     .items-stats-container {
@@ -163,7 +179,7 @@
       margin-bottom: 12px;
 
       .pending-action-item-color {
-        color: $bug_red;
+        color: var(--status-warning-text);
       }
 
       .count-and-text {
@@ -176,14 +192,13 @@
 
         .text {
           font-size: 12px;
-          color: rgba(0,0,0,.55);
+          color: var(--text-primary-color);
         }
       }
 
       .stats-icon {
         height: 32px;
         width: 32px;
-        background-color: rgba(244,244,244,1);
         font-size: 16px;
         padding: 8px;
       }

@@ -73,10 +73,10 @@ $team_selector_list_item_width: 450px;
     color: var(--text-primary-color);
 
     &:hover {
-      color: $main_blue;
+      color: var(--status-info-foreground);
 
       .ms-Button-icon {
-        color: $main_blue !important;
+        color: var(--status-info-foreground) !important;
       }
     }
 
@@ -214,24 +214,29 @@ $team_selector_list_item_width: 450px;
     display: flex;
     align-items: center;
     margin-left: 35px;
+    margin-top: 8px;
     background-color: rgba(0,0,0,0.04);
 
     .retrospective-workflowState {
       width: 72px;
-      height: 36px;
+      height: 40px;
       cursor: pointer;
       display: flex;
       text-align: center;
       align-items: center;
-      margin-top: 12px;
 
       .stage-text {
         font-size: 12px;
         width: 100%;
       }
 
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: var(--text-primary-color);
+      }
+
       &.active {
-        color: $main_blue;
+        color: var(--status-info-foreground);
         font-weight: bold;
 
         &::before {
@@ -242,7 +247,7 @@ $team_selector_list_item_width: 450px;
           width: 44px;
           margin-left: 14px;
           box-sizing: border-box;
-          border-bottom: 2px solid $main_blue;
+          border-bottom: 2px solid var(--status-info-foreground);
         }
       }
     }
@@ -282,4 +287,17 @@ $team_selector_list_item_width: 450px;
       padding: 0 3px 5px;
     }
   }
+}
+
+.board-actions-menu {
+  background-color: var(--background-color);
+}
+
+.board-actions-menu button.ms-ContextualMenu-link {
+  color: var(--text-primary-color);
+}
+
+.board-actions-menu button.ms-ContextualMenu-link:hover {
+  background-color: rgba(var(--palette-neutral-0), 0.05);
+  color: var(--text-primary-color);
 }
