@@ -283,3 +283,16 @@ $team_selector_list_item_width: 450px;
     }
   }
 }
+
+.board-actions-menu {
+  background-color: var(--background-color);
+}
+
+.board-actions-menu button.ms-ContextualMenu-link {
+  color: var(--text-primary-color);
+}
+
+.board-actions-menu button.ms-ContextualMenu-link:hover {
+  background-color: rgba(var(--palette-neutral-0), 0.05);
+  color: var(--text-primary-color);
+}
