@@ -81,9 +81,8 @@
   }
 
   .pending-action-item-count {
-    color: $bug_red;
+    color: var(--status-warning-text);
     font-weight: 600;
-    border-left: 3px solid $bug_red;
   }
 
   .rt-tr {
