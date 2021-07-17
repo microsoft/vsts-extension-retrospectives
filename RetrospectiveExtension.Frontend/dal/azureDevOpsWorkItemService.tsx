@@ -1,5 +1,5 @@
 import { Wiql, WorkItemExpand, WorkItemRelation, WorkItemErrorPolicy } from 'TFS/WorkItemTracking/Contracts';
-import WorkitemRestClient = require('TFS/WorkItemTracking/RestClient');
+import { WorkItemTrackingHttpClient4_1, getClient } from 'TFS/WorkItemTracking/RestClient';
 import { JsonPatchDocument, Operation } from 'VSS/WebApi/Contracts';
 import { IRetrospectiveItemCreate, IRetrospectiveItemsQuery, RelationshipType } from '../interfaces/workItem';
 
@@ -8,11 +8,11 @@ class WorkItemService {
   public static readonly task_type = 'Task';
   public ProjectId = '';
 
-  private _httpClient: WorkitemRestClient.WorkItemTrackingHttpClient4_1;
+  private _httpClient: WorkItemTrackingHttpClient4_1;
 
   constructor() {
     if (!this._httpClient) {
-      this._httpClient = WorkitemRestClient.getClient();
+      this._httpClient = getClient();
     }
 
     this.ProjectId = VSS.getWebContext().project.id;
