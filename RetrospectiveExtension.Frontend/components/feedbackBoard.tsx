@@ -432,7 +432,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       <div className="feedback-board">
         { this.props.workflowPhase === WorkflowPhase.Vote &&
         <div className="feedback-maxvotes-per-user">
-          <label>Max Votes per User: {this.props.board?.maxVotesPerUser?.toString()}<span>·</span>Your Total Votes: {this.state.currentVoteCount}</label>
+          <label>Votes: {this.state.currentVoteCount} / {this.props.board?.maxVotesPerUser?.toString()}</label>
         </div>
         }
         <div className="feedback-columns-container">
