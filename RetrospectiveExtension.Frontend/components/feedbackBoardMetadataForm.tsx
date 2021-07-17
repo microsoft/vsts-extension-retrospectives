@@ -8,7 +8,7 @@ import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
-import classNames = require('classnames');
+import classNames from 'classnames'
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
 import { v4 as uuid } from 'uuid';
 import { ChangeEvent } from 'react';
