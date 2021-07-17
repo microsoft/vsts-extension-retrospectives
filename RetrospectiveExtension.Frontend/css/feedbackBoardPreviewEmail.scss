@@ -2,6 +2,21 @@
   max-width: none;
   width: 800px;
   height: 500px;
+  background-color: var(--background-color);
+  border: 1px solid #605e5c;
+}
+
+.retrospectives-preview-email-dialog div[role=heading] {
+  color: var(--text-primary-color);
+}
+
+.retrospectives-preview-email-dialog .copy-email-button {
+  color: var(--text-primary-color);
+}
+
+.retrospectives-preview-email-dialog textarea {
+  background-color: rgba(var(--palette-neutral-2, 248, 248, 248), 1);
+  color: var(--text-primary-color);
 }
 
 .preview-email-spinner {
