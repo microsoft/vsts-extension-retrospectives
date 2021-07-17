@@ -1,4 +1,4 @@
-﻿import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -975,7 +975,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                       <div className="board-actions-menu">
                         <DefaultButton
                           className="contextual-menu-button hide-mobile"
-                          aria-label="Board Actions Menu"   
+                          aria-label="Board Actions Menu"
                           iconProps={{ iconName: 'More' }}
                           title="Board actions"
                           menuProps={{
