@@ -5,7 +5,11 @@
     "-v", "/var/run/docker.sock:/var/run/docker.sock"
   ],
   "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash",
+    "terminal.integrated.profiles.linux": {
+      "bash": {
+        "path": "/bin/bash"
+      }
+    },
     "workbench.iconTheme": "vscode-icons"
   },
   "extensions": [
