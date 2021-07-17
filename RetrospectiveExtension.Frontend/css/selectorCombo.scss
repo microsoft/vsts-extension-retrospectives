@@ -61,8 +61,8 @@
   cursor: pointer;
 
   &:hover {
-    background-color: rgb(59, 58, 57);
-    color: white;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary-color);
   }
 
   i.selector-button-icon{
