@@ -744,12 +744,6 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                           })
                       }}
                     />
-                    <DefaultButton className="contextual-menu-button hide-desktop"
-                      aria-label="Feedback Options Menu"
-                      iconProps={{ iconName: 'MoreVertical' }}
-                      title="Feedback actions"
-                      onClick={this.showMobileFeedbackItemActionsDialog}
-                    />
                     <Dialog
                       hidden={this.state.isMobileFeedbackItemActionsDialogHidden}
                       onDismiss={this.hideMobileFeedbackItemActionsDialog}
