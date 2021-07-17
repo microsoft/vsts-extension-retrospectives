@@ -1,23 +1,23 @@
-import ProcessRestClient = require("TFS/WorkItemTracking/ProcessRestClient");
+import { WorkItemTrackingProcessHttpClient4_1, getClient } from "TFS/WorkItemTracking/ProcessRestClient";
 import { GetProcessExpandLevel } from "TFS/WorkItemTracking/ProcessContracts";
-import ProcessDefinitionsRestClient = require("TFS/WorkItemTracking/ProcessDefinitionsRestClient");
+import { WorkItemTrackingProcessDefinitionsHttpClient4_1, getClient as getProcessDefinitionsClient } from "TFS/WorkItemTracking/ProcessDefinitionsRestClient";
 import * as ProcessDefinitionsContracts  from 'TFS/WorkItemTracking/ProcessDefinitionsContracts';
 import { retrospectiveWorkItemTypeModel } from '../interfaces/retrospectiveWorkItemType';
 import { workItemService } from './azureDevOpsWorkItemService';
 
 export class ProcessService {
-    private workItemTrackingProcessHttpClient: ProcessRestClient.WorkItemTrackingProcessHttpClient4_1;
-    private workItemTrackingProcessDefinitionsHttpClient: ProcessDefinitionsRestClient.WorkItemTrackingProcessDefinitionsHttpClient4_1;
+    private workItemTrackingProcessHttpClient: WorkItemTrackingProcessHttpClient4_1;
+    private workItemTrackingProcessDefinitionsHttpClient: WorkItemTrackingProcessDefinitionsHttpClient4_1;
 
     static readonly retrospective_type = "Retrospective";
 
     constructor() {
         if (!this.workItemTrackingProcessHttpClient) {
-            this.workItemTrackingProcessHttpClient = ProcessRestClient.getClient();
+            this.workItemTrackingProcessHttpClient = getClient();
         }
 
         if (!this.workItemTrackingProcessDefinitionsHttpClient) {
-            this.workItemTrackingProcessDefinitionsHttpClient = ProcessDefinitionsRestClient.getClient();
+            this.workItemTrackingProcessDefinitionsHttpClient = getProcessDefinitionsClient();
         }
     }
 
