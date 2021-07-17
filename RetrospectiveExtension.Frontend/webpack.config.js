@@ -18,7 +18,7 @@ module.exports = {
     /^VSS\/.*/, /^TFS\/.*/
   ],
   resolve: {
-    extensions: ['.Webpack.js', '.web.js', '.ts', '.js', '.jsx', '.tsx']
+    extensions: ['.ts', '.js', '.jsx', '.tsx']
   },
   module: {
     rules: [
