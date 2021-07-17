@@ -1,4 +1,4 @@
-﻿@import "_variables.scss";
+@import "_variables.scss";
 
 #feedback-board-summary-table-header {
   display: flex;
@@ -29,6 +29,22 @@
 
 .ReactTable .rt-thead .rt-th.-sort-desc, .ReactTable .rt-thead .rt-td.-sort-desc {
   box-shadow: inset 0 -2px 0 0 rgba(var(--palette-neutral-100, 0, 0, 0), 1);
+}
+
+.action-items-summary-card div[role=row] {
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
+  padding-top: 0;
+}
+
+.action-items-summary-card .ms-DetailsHeader-cell[role=columnheader] {
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
+  border-bottom: 1px solid #fff;
+}
+
+.action-items-summary-card .ms-DetailsHeader-cell[role=columnheader]:hover {
+  color: var(--text-primary-color);
 }
 
 .board-summary-table-container {
