@@ -979,6 +979,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                           iconProps={{ iconName: 'More' }}
                           title="Board actions"
                           menuProps={{
+                            className: "board-actions-menu",
                             items: this.boardActionContexualMenuItems,
                           }}
                         />
