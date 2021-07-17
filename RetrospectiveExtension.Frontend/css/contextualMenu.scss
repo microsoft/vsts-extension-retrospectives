@@ -11,7 +11,8 @@
   }
 
   &:hover {
-    background-color: rgb(59, 58, 57);
-    color: white;
+    background-color: rgba(var(--palette-neutral-0), 0.05);
+    color: var(--text-primary-color);
   }
+}
 }
