@@ -1,7 +1,7 @@
 {
   "name": "retrospective-vsts-extension",
   "version": "1.0.0",
-  "description": "Reflect is an VSTS retrospective extension",
+  "description": "Azure DevOps Retrospective Extension",
   "main": "index.tsx",
   "scripts": {
     "build": "set NODE_ENV=production && rm -rf ./dist && webpack --mode=production",
