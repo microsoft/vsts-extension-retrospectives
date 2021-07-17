@@ -983,13 +983,6 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                             items: this.boardActionContexualMenuItems,
                           }}
                         />
-                        <DefaultButton
-                          className="contextual-menu-button hide-desktop"
-                          aria-label="Board Actions Menu"   
-                          iconProps={{ iconName: 'More' }}
-                          title="Board actions"
-                          onClick={this.showMobileBoardActionsDialog}
-                        />
                         <Dialog
                           hidden={this.state.isMobileBoardActionsDialogHidden}
                           onDismiss={this.hideMobileBoardActionsDialog}
