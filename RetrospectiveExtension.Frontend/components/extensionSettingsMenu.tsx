@@ -131,8 +131,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           minWidth={450}
           modalProps={{
             isBlocking: true,
-            containerClassName: 'retrospectives-visit-history-cleared-info-dialog',
-            className: 'retrospectives-dialog-modal',
+            containerClassName: 'whatsnew-dialog',
           }}>
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
