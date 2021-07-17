@@ -15,4 +15,17 @@
     color: var(--text-primary-color);
   }
 }
+
+.user-settings-menu {
+  background-color: var(--callout-background-color);
+}
+
+.user-settings-menu button.ms-ContextualMenu-link {
+  color: var(--text-primary-color);
+}
+
+.user-settings-menu button.ms-ContextualMenu-link:hover {
+  background-color: rgba(var(--palette-neutral-0), 0.05);
+  color: var(--text-primary-color);
+}
 }
