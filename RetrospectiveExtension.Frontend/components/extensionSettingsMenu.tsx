@@ -109,7 +109,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           title="User Settings Menu"
           menuProps={{
             items: this.extensionSettingsMenuItem,
-            className: this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile,
+            className: "user-settings-menu",
           }}
         />
         <DefaultButton
