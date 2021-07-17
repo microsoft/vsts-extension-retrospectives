@@ -112,7 +112,7 @@ class ShareBoardHelper {
           for (const childId of feedbackItem.childFeedbackItemIds) {
             const child: IFeedbackItemDocument = feedbackItems.find(f => f.id === childId);
             if (child) {
-              columnContent[feedbackItem.columnId] += `\t  - ${child.title} [${child.upvotes.toString()} votes]\n`;
+              columnContent[feedbackItem.columnId] += `\t\t- ${child.title} [${child.upvotes.toString()} votes]\n`;
             }
           }
         }
