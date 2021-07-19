@@ -150,6 +150,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
         this.setState({ actionItemIds: [...this.state.actionItemIds].concat(actionItems) });
       });
 
+      const contributors = feedbackItems.map(e => { return { id: e.createdBy?.id, name: e.createdBy?.displayName, imageUrl: e.createdBy?.imageUrl } }).filter((v, i, a) => a.indexOf(v) === i);
       reflectBackendService.onConnectionClose(() => {
         this.setState({
           isBackendServiceConnected: false,
