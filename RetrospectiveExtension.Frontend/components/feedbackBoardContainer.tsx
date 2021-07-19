@@ -1,4 +1,4 @@
-﻿import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -77,6 +77,7 @@ export interface FeedbackBoardContainerState {
   contributors: {id: string, name: string, imageUrl: string}[];
   actionItemIds: number[];
   members: TeamMember[];
+  castedVoteCount: number;
 }
 
 export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
