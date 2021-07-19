@@ -160,6 +160,9 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
       this.setState({ members: members });
 
+      const votes = Object.values(this.state.currentBoard?.boardVoteCollection || []);
+      this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0 }) ;
+
       reflectBackendService.onConnectionClose(() => {
         this.setState({
           isBackendServiceConnected: false,
