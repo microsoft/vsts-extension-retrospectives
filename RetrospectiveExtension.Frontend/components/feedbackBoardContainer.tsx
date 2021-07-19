@@ -1301,6 +1301,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
             className: 'retrospectives-dialog-modal',
           }}>
             <div>{this.state.feedbackItems.length} feedback items created</div>
+            <div>{this.state.members.length} people in the team, {this.state.contributors.length} participants contributed</div>
         </Dialog>
         <Dialog
           hidden={this.state.isTeamBoardDeletedInfoDialogHidden}
