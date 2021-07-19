@@ -76,6 +76,7 @@ export interface FeedbackBoardContainerState {
   feedbackItems: IFeedbackItemDocument[];
   contributors: {id: string, name: string, imageUrl: string}[];
   actionItemIds: number[];
+  members: TeamMember[];
 }
 
 export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
