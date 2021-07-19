@@ -903,6 +903,14 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       title: 'Create email summary',
     },
     {
+      key: 'retroSummary',
+      className: 'hide-mobile',
+      iconProps: { iconName: 'ReportDocument' },
+      onClick: this.showRetroSummaryDialog,
+      text: 'Show Retrospective Summary',
+      title: 'Show Retrospective Summary',
+    },
+    {
       key: 'deleteBoard',
       iconProps: { iconName: 'Delete' },
       onClick: this.showDeleteBoardConfirmationDialog,
