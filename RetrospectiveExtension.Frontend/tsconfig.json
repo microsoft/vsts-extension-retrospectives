@@ -1,8 +1,9 @@
-﻿{
+{
   "compilerOptions": {
     "outDir": "./dist",
     "module": "amd",
     "target": "es5",
+    "downlevelIteration": true,
     "lib": ["es6", "dom"],
     "sourceMap": true,
     "allowJs": true,
