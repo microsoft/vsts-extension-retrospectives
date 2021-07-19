@@ -646,6 +646,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
               <option value="">Select a template</option>
               <option value="4ls">4Ls</option>
               <option value="1to1">1-to-1</option>
+              <option value="daki">Drop-Add-Keep-Improve</option>
               <option value="mad-sad-glad">Mad-Sad-Glad</option>
               <option value="good-bad-ideas">Good-Bad-Ideas</option>
               <option value="start-stop-continue">Start-Stop-Continue</option>
