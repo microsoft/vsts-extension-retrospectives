@@ -143,6 +143,13 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       const feedbackItems = await itemDataService.getFeedbackItemsForBoard(this.state.currentBoard.id);
 
       this.setState({ feedbackItems: feedbackItems });
+
+      feedbackItems.forEach(async item => {
+        const actionItems = await itemDataService.getAssociatedActionItemIds(this.state.currentBoard.id, item.id);
+
+        this.setState({ actionItemIds: [...this.state.actionItemIds].concat(actionItems) });
+      });
+
       reflectBackendService.onConnectionClose(() => {
         this.setState({
           isBackendServiceConnected: false,
