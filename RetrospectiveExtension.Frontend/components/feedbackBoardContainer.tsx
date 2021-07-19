@@ -1307,7 +1307,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
           }}>
             <div>{this.state.feedbackItems.length} feedback items created</div>
             <div>{this.state.members.length} people in the team, {this.state.contributors.length} participants contributed</div>
-            <div>{Object.keys(this.state.currentBoard.boardVoteCollection).length} participants casted {Object.values(this.state.currentBoard.boardVoteCollection).reduce((a, b) => a + b)} votes</div>
+            <div>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted { this.state.castedVoteCount } votes</div>
             <div>{this.state.actionItemIds.length} action items created</div>
             <div>Board created by <img className="avatar" src={this.state.currentBoard.createdBy.imageUrl} /> {this.state.currentBoard.createdBy.displayName}</div>
             <div>Contributors:</div>
