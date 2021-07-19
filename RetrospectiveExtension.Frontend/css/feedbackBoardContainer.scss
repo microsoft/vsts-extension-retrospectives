@@ -22,12 +22,13 @@ $team_selector_list_item_width: 450px;
 }
 
 .feedback-board-container-header-spacer {
-  margin-top: $extension_header_height + 45;
   background: $azure_devops_navigator_dark_grey;
   height: 1px;
   z-index: 2;
   width: 100%;
   position: fixed;
+  margin-top: 40px;
+}
 }
 
 .extension-header-spacer {
