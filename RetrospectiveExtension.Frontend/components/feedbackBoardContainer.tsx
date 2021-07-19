@@ -153,6 +153,9 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       const contributors = feedbackItems.map(e => { return { id: e.createdBy?.id, name: e.createdBy?.displayName, imageUrl: e.createdBy?.imageUrl } }).filter((v, i, a) => a.indexOf(v) === i);
 
       this.setState({ contributors: [...new Set(contributors.map(e => e.imageUrl))].map(e => contributors.find(i => i.imageUrl === e)) });
+
+      const members = await azureDevOpsCoreService.getMembers(this.state.currentTeam.projectId, this.state.currentTeam.id);
+
       reflectBackendService.onConnectionClose(() => {
         this.setState({
           isBackendServiceConnected: false,
