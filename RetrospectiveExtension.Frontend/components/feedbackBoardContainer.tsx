@@ -998,6 +998,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
             selectorListItemOnClick={this.changeSelectedTeam}
             title={"Team"}
           />
+          <div style={{flexGrow:1}}></div>
           <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.toggleAndFixResolution} />
         </div>
         <div className="pivot-container">
