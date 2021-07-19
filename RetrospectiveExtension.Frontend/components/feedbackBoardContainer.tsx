@@ -118,6 +118,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       maxvotesPerUser: 5,
       feedbackItems: [],
       contributors: [],
+      actionItemIds: [],
     };
   }
 
