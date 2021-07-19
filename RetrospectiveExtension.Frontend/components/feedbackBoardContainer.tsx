@@ -73,6 +73,7 @@ export interface FeedbackBoardContainerState {
   isDropIssueInEdgeMessageBarVisible: boolean;
   isDesktop: boolean;
   isAutoResizeEnabled: boolean;
+  feedbackItems: IFeedbackItemDocument[];
 }
 
 export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
