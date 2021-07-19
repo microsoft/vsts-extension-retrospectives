@@ -4,6 +4,12 @@ You can find the changelog of the Restorpective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.0.54
+
+**New Features**
+
+* New templates added to _Create Retrospective Board_ dialog
+
 ## v1.0.53
 
 **Fixes**
