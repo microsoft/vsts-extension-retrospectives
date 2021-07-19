@@ -32,6 +32,8 @@ import { WorkItemType, WorkItemTypeReference } from 'TFS/WorkItemTracking/Contra
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
+import { itemDataService } from '../dal/itemDataService';
+import { TeamMember } from 'VSS/WebApi/Contracts';
 
 export interface FeedbackBoardContainerProps {
   projectId: string;
