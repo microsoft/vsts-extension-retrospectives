@@ -723,6 +723,10 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     this.setState({ isPreviewEmailDialogHidden: false });
   }
 
+  private showRetroSummaryDialog = (): void => {
+    this.setState({ isRetroSummaryDialogHidden: false });
+  }
+
   private hidePreviewEmailDialog = (): void => {
     this.setState({ isPreviewEmailDialogHidden: true });
   }
