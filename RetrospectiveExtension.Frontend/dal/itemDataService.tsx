@@ -50,11 +50,8 @@ class ItemDataService {
    * Get the board item.
    */
   public getBoardItem = async (teamId:string, boardId: string): Promise<IFeedbackBoardDocument> => {
-
     // Can we get it this way? [const boardItem:  IFeedbackBoardDocument = await boardDataService.getBoardForTeamById(VSS.getWebContext().team.id, boardId);]
-    const boardItem: IFeedbackBoardDocument =
-    await ExtensionDataService.readDocument<IFeedbackBoardDocument>(teamId, boardId);   
-    return boardItem;
+    return await ExtensionDataService.readDocument<IFeedbackBoardDocument>(teamId, boardId);
   }
 
   /**
