@@ -1,6 +1,7 @@
 import { CoreHttpClient4_1 } from 'TFS/Core/RestClient';
 import { getCollectionClient } from 'VSS/Service';
 import { WebApiTeam } from 'TFS/Core/Contracts';
+import { TeamMember } from 'VSS/WebApi/Contracts';
 
 class AzureDevOpsCoreService {
   private _httpCoreClient: CoreHttpClient4_1;
@@ -24,6 +25,20 @@ class AzureDevOpsCoreService {
   public async getTeam(projectId: string, teamId: string): Promise<WebApiTeam> {
     try {
       return await this._httpCoreClient.getTeam(projectId, teamId);
+    }
+    catch {
+      return null;
+    }
+  }
+
+  /**
+   * Gets the members of teams for the current project id.
+   * @param projectId The project id.
+   * @param teamId The team id.
+   */
+  public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
+    try {
+      return await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, 0);
     }
     catch {
       return null;
