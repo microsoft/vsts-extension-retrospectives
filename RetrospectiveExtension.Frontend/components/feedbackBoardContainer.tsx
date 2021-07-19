@@ -1,4 +1,4 @@
-﻿import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -11,7 +11,7 @@ import { ViewMode, MobileWidthBreakpoint } from '../config/constants';
 import { WorkflowPhase } from '../interfaces/workItem';
 import WorkflowStage from './workflowStage';
 import BoardDataService from '../dal/boardDataService';
-import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback';
+import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { reflectBackendService } from '../dal/reflectBackendService';
 import BoardSummaryTable  from './boardSummaryTable';
 import FeedbackBoardMetadataForm from './feedbackBoardMetadataForm';
