@@ -29,6 +29,11 @@ $team_selector_list_item_width: 450px;
   position: fixed;
   margin-top: 40px;
 }
+
+.retrospectives-retro-summary-dialog {
+  max-width: none;
+  width: 40%;
+}
 }
 
 .extension-header-spacer {
