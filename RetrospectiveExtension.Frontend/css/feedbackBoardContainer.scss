@@ -34,6 +34,12 @@ $team_selector_list_item_width: 450px;
   max-width: none;
   width: 40%;
 }
+
+.retrospectives-retro-summary-dialog img.avatar {
+  height: 1.8em;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-top: -5px;
 }
 
 .extension-header-spacer {
