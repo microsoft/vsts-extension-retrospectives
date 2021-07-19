@@ -57,6 +57,7 @@ export interface FeedbackBoardContainerState {
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   isPreviewEmailDialogHidden: boolean;
+  isRetroSummaryDialogHidden: boolean;
   isBoardCreationDialogHidden: boolean;
   isBoardUpdateDialogHidden: boolean;
   isDeleteBoardConfirmationDialogHidden: boolean;
