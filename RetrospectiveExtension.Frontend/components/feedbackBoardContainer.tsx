@@ -104,6 +104,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       isMobileBoardActionsDialogHidden: true,
       isMobileTeamSelectorDialogHidden: true,
       isPreviewEmailDialogHidden: true,
+      isRetroSummaryDialogHidden: true,
       isReconnectingToBackendService: false,
       isSummaryDashboardVisible: false,
       isTeamBoardDeletedInfoDialogHidden: true,
