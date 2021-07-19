@@ -1290,6 +1290,18 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
           <FeedbackBoardPreviewEmail teamId={this.state.currentTeam.id} board={this.state.currentBoard} onCopy={this.showEmailCopiedToast} />
         </Dialog>
         <Dialog
+          hidden={this.state.isRetroSummaryDialogHidden}
+          onDismiss={this.hideRetroSummaryDialog}
+          dialogContentProps={{
+            type: DialogType.normal,
+            title: 'Retrospective Session Summary',
+          }}
+          modalProps={{
+            containerClassName: 'retrospectives-retro-summary-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+        </Dialog>
+        <Dialog
           hidden={this.state.isTeamBoardDeletedInfoDialogHidden}
           onDismiss={this.hideTeamBoardDeletedInfoDialog}
           dialogContentProps={{
