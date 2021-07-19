@@ -649,6 +649,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
               <option value="daki">Drop-Add-Keep-Improve</option>
               <option value="mad-sad-glad">Mad-Sad-Glad</option>
               <option value="good-bad-ideas">Good-Bad-Ideas</option>
+              <option value="kalm">Keep-Add-Less-More</option>
               <option value="start-stop-continue">Start-Stop-Continue</option>
               <option value="psy-safety">Psychological Safety</option>
               <option value="wlai">WentWell-Learned-Accelerators-Impediments</option>
