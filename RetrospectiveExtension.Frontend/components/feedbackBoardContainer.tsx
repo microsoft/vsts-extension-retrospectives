@@ -1,4 +1,4 @@
-import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+﻿import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -1309,7 +1309,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
             <div>{this.state.members.length} people in the team, {this.state.contributors.length} participants contributed</div>
             <div>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted { this.state.castedVoteCount } votes</div>
             <div>{this.state.actionItemIds.length} action items created</div>
-            <div>Board created by <img className="avatar" src={this.state.currentBoard.createdBy.imageUrl} /> {this.state.currentBoard.createdBy.displayName}</div>
+            <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
             <div>Contributors:</div>
           {
             this.state.contributors.map((contributor, index) =>
