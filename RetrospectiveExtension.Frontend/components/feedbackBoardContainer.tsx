@@ -75,6 +75,7 @@ export interface FeedbackBoardContainerState {
   isAutoResizeEnabled: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: {id: string, name: string, imageUrl: string}[];
+  actionItemIds: number[];
 }
 
 export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
