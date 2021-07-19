@@ -286,6 +286,48 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
           ]
         });
         break;
+      case 'daki':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-exclamation',
+                id: uuid(),
+                title: 'Drop',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'fas fa-smile',
+                id: uuid(),
+                title: 'Add',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-book',
+                id: uuid(),
+                title: 'Keep',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#8063bf',
+                iconClass: 'far fa-compass',
+                id: uuid(),
+                title: 'Improve',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
       case 'mad-sad-glad':
         this.setState({
           columnCards: [
