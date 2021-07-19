@@ -1302,6 +1302,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
           }}>
             <div>{this.state.feedbackItems.length} feedback items created</div>
             <div>{this.state.members.length} people in the team, {this.state.contributors.length} participants contributed</div>
+            <div>{Object.keys(this.state.currentBoard.boardVoteCollection).length} participants casted {Object.values(this.state.currentBoard.boardVoteCollection).reduce((a, b) => a + b)} votes</div>
         </Dialog>
         <Dialog
           hidden={this.state.isTeamBoardDeletedInfoDialogHidden}
