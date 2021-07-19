@@ -126,7 +126,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           dialogContentProps={{
             type: DialogType.close,
             title: 'What\'s New',
-            subText: 'With version 1.0.52 Prime Directive may appear on screen, also participants have max vote limits 🥳',
+            subText: 'Summary of the Retrospective Dialog added, new templates introduced in the "Create Retrospective Board" dialog 🥳',
           }}
           minWidth={450}
           modalProps={{
