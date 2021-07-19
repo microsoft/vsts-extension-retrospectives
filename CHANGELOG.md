@@ -4,6 +4,16 @@ You can find the changelog of the Restorpective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.0.53
+
+**Fixes**
+
+* DOM elements reduced to make the page rendered quickly
+
+**New Features**
+
+* Exporting the Retrospective Board content as a CSV file
+
 ## v1.0.52
 
 **Fixes**
