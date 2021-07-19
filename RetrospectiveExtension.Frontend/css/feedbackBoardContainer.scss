@@ -96,14 +96,11 @@ $team_selector_list_item_width: 450px;
 
 #extension-header {
   display: flex;
-  position: fixed;
   z-index: 2;
   width: 100%;
-  height: $extension_header_height;
   align-items: center;
   justify-content: flex-start;
-  padding-left: $header_horizontal_spacing;
-  padding-right: $header_horizontal_spacing;
+  padding: 10px 15px;
 
   .extension-title-text{
     font-size: 26px;
