@@ -140,6 +140,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
       this.setSupportedWorkItemTypesForProject();
 
+      const feedbackItems = await itemDataService.getFeedbackItemsForBoard(this.state.currentBoard.id);
       reflectBackendService.onConnectionClose(() => {
         this.setState({
           isBackendServiceConnected: false,
