@@ -581,7 +581,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
             <Checkbox
               label="Make all feedback anonymous"
               ariaLabel="Make all feedback anonymous. This selection cannot be modified after board creation."
-              boxSide="end"
+              boxSide="start"
               defaultChecked={this.state.isBoardAnonymous}
               disabled={!this.props.isNewBoardCreation}
               onChange={this.handleIsAnonymousCheckboxChange}
@@ -598,7 +598,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
             <Checkbox
               label="Only show feedback after Collect phase"
               ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
-              boxSide="end"
+              boxSide="start"
               defaultChecked={this.state.shouldShowFeedbackAfterCollect}
               disabled={!this.props.isNewBoardCreation}
               onChange={this.handleShouldShowFeedbackAfterCollectChange}
@@ -615,7 +615,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
             <Checkbox
               label="Display 'Retrospective Prime Directive'"
               ariaLabel="Display 'Retrospective Prime Directive'"
-              boxSide="end"
+              boxSide="start"
               defaultChecked={this.state.displayPrimeDirective}
               disabled={!this.props.isNewBoardCreation}
               onChange={this.handleDisplayPrimeDirectiveChange}
