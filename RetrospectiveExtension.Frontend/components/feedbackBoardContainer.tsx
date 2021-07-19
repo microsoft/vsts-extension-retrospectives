@@ -156,6 +156,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
       const members = await azureDevOpsCoreService.getMembers(this.state.currentTeam.projectId, this.state.currentTeam.id);
 
+      this.setState({ members: members });
+
       reflectBackendService.onConnectionClose(() => {
         this.setState({
           isBackendServiceConnected: false,
