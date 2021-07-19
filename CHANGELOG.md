@@ -4,6 +4,17 @@ You can find the changelog of the Restorpective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.0.57
+
+**Fixes**
+
+* Lots of fixes to styling of elements, they're more responsive to the selected theme of the _Azure DevOps_
+
+**New Features**
+
+* New templates added to _Create Retrospective Board_ dialog
+* _Retrospective Board Summary_ dialog added
+
 ## v1.0.56
 
 **New Features**
