@@ -194,4 +194,8 @@
       }
     }
   }
+
+  .ms-DocumentCardActivity-avatar::after {
+    border: 1px solid var(--text-primary-color);
+  }
 }
