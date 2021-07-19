@@ -731,6 +731,10 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     this.setState({ isPreviewEmailDialogHidden: true });
   }
 
+  private hideRetroSummaryDialog = (): void => {
+    this.setState({ isRetroSummaryDialogHidden: true });
+  }
+
   private updateBoardMetadata = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[]) => {
     const updatedBoard =
       await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxvotesPerUser, title, columns);
