@@ -49,12 +49,12 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
     }
 
     this.setState({
-      newText: newValue.replace(/\r?\n|\r/g, ""),
+      newText: newValue.replace(/\r?|\r/g, ""),
       hasErrors: !newValue.trim()
     });
 
     if (this.props.isChangeEventRequired) {
-      this.props.onSave(newValue.replace(/\r?\n|\r/g, ""));
+      this.props.onSave(newValue.replace(/\r?|\r/g, ""));
     }
   }
 
@@ -128,6 +128,20 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
       this.props.onSave(this.state.newText);
       this.setState({
         isEditing: false,
+        hasErrors: false
+      });
+    }
+
+    // Enter + Ctrl
+    if (event.keyCode === 13 && event.ctrlKey) {
+      if (!this.state.newText.trim()) {
+        this.setState({ hasErrors: true });
+        return;
+      }
+
+      this.setState({
+        newText: `${this.state.newText} \n`,
+        isEditing: true,
         hasErrors: false
       });
     }
