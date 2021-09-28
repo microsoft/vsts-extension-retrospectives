@@ -1311,14 +1311,19 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
             <div>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted { this.state.castedVoteCount } votes</div>
             <div>{this.state.actionItemIds.length} action items created</div>
             <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
-            <div>Contributors:</div>
-          {
-            this.state.contributors.map((contributor, index) =>
-              <div key={index}>
-                <img className="avatar" src={contributor.imageUrl} /> {contributor.name}
-              </div>
-            )
-          }
+            {!this.state.currentBoard.isAnonymous ?
+              <>
+                <div>Contributors:</div>
+                {this.state.contributors.map((contributor, index) =>
+                  <div key={index}>
+                    <img className="avatar" src={contributor.imageUrl} /> {contributor.name}
+                  </div>
+                  )}
+              </>
+            : <div>Board is anonymous</div>}
+            {this.state.currentBoard.isAnonymous &&
+              <div>Retrospective was Anonymous</div>
+            }
         </Dialog>
         <Dialog
           hidden={this.state.isTeamBoardDeletedInfoDialogHidden}
