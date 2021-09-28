@@ -1305,6 +1305,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
             containerClassName: 'retrospectives-retro-summary-dialog',
             className: 'retrospectives-dialog-modal',
           }}>
+            <div>Retrospective session date is {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
             <div>{this.state.feedbackItems.length} feedback items created</div>
             <div>{this.state.members.length} people in the team, {this.state.contributors.length} participants contributed</div>
             <div>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted { this.state.castedVoteCount } votes</div>
