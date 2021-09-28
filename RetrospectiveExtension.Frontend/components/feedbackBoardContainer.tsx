@@ -1,4 +1,4 @@
-﻿import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -1299,7 +1299,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
           onDismiss={this.hideRetroSummaryDialog}
           dialogContentProps={{
             type: DialogType.normal,
-            title: 'Retrospective Session Summary',
+            title: `${this.state.currentBoard.title} Summary`,
           }}
           modalProps={{
             containerClassName: 'retrospectives-retro-summary-dialog',
