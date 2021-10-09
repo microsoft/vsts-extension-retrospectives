@@ -287,6 +287,14 @@ $team_selector_list_item_width: 450px;
   }
 }
 
+.team-effectiveness-measurement-table {
+  width: 100%;
+
+  tr th {
+    font-weight: 400;
+  }
+}
+
 .prime-directive-dialog {
   .ms-Dialog-content {
     .ms-Dialog-header {
