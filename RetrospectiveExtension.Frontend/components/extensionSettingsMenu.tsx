@@ -126,7 +126,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           dialogContentProps={{
             type: DialogType.close,
             title: 'What\'s New',
-            subText: 'Summary of the Retrospective Dialog added, new templates introduced in the "Create Retrospective Board" dialog 🥳',
+            subText: "Lot's of fixes , new Measure Team Effectiveness feature added 🥳",
           }}
           minWidth={450}
           modalProps={{
