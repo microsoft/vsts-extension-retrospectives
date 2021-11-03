@@ -253,7 +253,6 @@ class ItemDataService {
       if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null) {
         feedbackItem.voteCollection[userId] = 0;
       }
-      
 
       if (boardItem.boardVoteCollection === undefined) {
         boardItem.boardVoteCollection = {};
@@ -261,7 +260,6 @@ class ItemDataService {
       if (boardItem.boardVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
         boardItem.boardVoteCollection[userId] = 0;
       }
-
 
       if (boardItem.boardVoteCollection[userId] >= boardItem.maxVotesPerUser) {
         console.log(`User has reached max votes for the board. Board: ${boardId}, Max Votes: ${boardItem.maxVotesPerUser}`);
