@@ -289,13 +289,23 @@ $team_selector_list_item_width: 450px;
 
 .team-effectiveness-measurement-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 0.5em;
 
   tr th {
     font-weight: 400;
+    text-align: center;
   }
 
-  tr:hover {background-color: #ddd;}
+  tbody tr:hover {background-color: #ddd;}
+
+  tr td button {
+    color: darkslategray !important;
+  }
+
+  tr td button:hover {
+    color: darkslategray !important;
+  }
 }
 
 .prime-directive-dialog {

@@ -83,10 +83,7 @@ class ItemDataService {
   /**
    * Delete the feedback item and propagate the changes to the parent and children feedback items (if any).
    */
-  public deleteFeedbackItem = async (boardId: string, feedbackItemId: string): Promise<{
-    updatedParentFeedbackItem: IFeedbackItemDocument
-    updatedChildFeedbackItems: IFeedbackItemDocument[]
-  }> => {
+  public deleteFeedbackItem = async (boardId: string, feedbackItemId: string): Promise<{ updatedParentFeedbackItem: IFeedbackItemDocument, updatedChildFeedbackItems: IFeedbackItemDocument[] }> => {
 
     let updatedParentFeedbackItem: IFeedbackItemDocument = null;
     let updatedChildFeedbackItems: IFeedbackItemDocument[] = [];
@@ -193,12 +190,9 @@ class ItemDataService {
     return updatedFeedbackItem;
   }
 
-
-
   /**
    * update the timer count.
    */
-
   public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean=false): Promise<IFeedbackItemDocument> =>
   {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
@@ -259,7 +253,6 @@ class ItemDataService {
       if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null) {
         feedbackItem.voteCollection[userId] = 0;
       }
-      
 
       if (boardItem.boardVoteCollection === undefined) {
         boardItem.boardVoteCollection = {};
@@ -267,7 +260,6 @@ class ItemDataService {
       if (boardItem.boardVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
         boardItem.boardVoteCollection[userId] = 0;
       }
-
 
       if (boardItem.boardVoteCollection[userId] >= boardItem.maxVotesPerUser) {
         console.log(`User has reached max votes for the board. Board: ${boardId}, Max Votes: ${boardItem.maxVotesPerUser}`);
@@ -283,6 +275,32 @@ class ItemDataService {
     await this.updateBoardItem(teamId, boardItem);
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
     return updatedFeedbackItem;
+  }
+
+  /**
+   * Update the team effectiveness measurement.
+   */
+   public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectiveMeasurementVoteCollection: { [voter: string]: {questionId: string, selection: number}[]}): Promise<IFeedbackBoardDocument> => {
+    const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
+
+    if (boardItem === undefined) {
+      console.log(`Cannot retrieve board for the feedback. Board: ${boardId}`);
+      return undefined;
+    }
+
+    if (boardItem.teamEffectiveMeasurementVoteCollection === undefined) {
+      boardItem.teamEffectiveMeasurementVoteCollection = {};
+    }
+
+    if (boardItem.teamEffectiveMeasurementVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
+      boardItem.teamEffectiveMeasurementVoteCollection[userId] = [];
+    }
+
+    boardItem.teamEffectiveMeasurementVoteCollection[userId] = teamEffectiveMeasurementVoteCollection[userId];
+
+    await this.updateBoardItem(teamId, boardItem);
+
+    return boardItem;
   }
 
   /**
