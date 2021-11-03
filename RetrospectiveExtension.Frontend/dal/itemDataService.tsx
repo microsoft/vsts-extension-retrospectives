@@ -83,10 +83,7 @@ class ItemDataService {
   /**
    * Delete the feedback item and propagate the changes to the parent and children feedback items (if any).
    */
-  public deleteFeedbackItem = async (boardId: string, feedbackItemId: string): Promise<{
-    updatedParentFeedbackItem: IFeedbackItemDocument
-    updatedChildFeedbackItems: IFeedbackItemDocument[]
-  }> => {
+  public deleteFeedbackItem = async (boardId: string, feedbackItemId: string): Promise<{ updatedParentFeedbackItem: IFeedbackItemDocument, updatedChildFeedbackItems: IFeedbackItemDocument[] }> => {
 
     let updatedParentFeedbackItem: IFeedbackItemDocument = null;
     let updatedChildFeedbackItems: IFeedbackItemDocument[] = [];
