@@ -11,7 +11,7 @@ class BoardDataService {
 
   public createBoardForTeam = async (
     teamId: string, title: string, maxVotesPerUser: number, columns: IFeedbackColumn[],
-    isAnonymous?: boolean, shouldShowFeedbackAfterCollect?: boolean, displayPrimeDirective?: boolean, startDate?: Date, endDate?: Date) => {
+    isIncludeTeamEffectivenessMeasurement?: boolean, isAnonymous?: boolean, shouldShowFeedbackAfterCollect?: boolean, displayPrimeDirective?: boolean, startDate?: Date, endDate?: Date) => {
     const boardId: string = uuid();
     const userIdentity = getUserIdentity();
 
@@ -22,6 +22,7 @@ class BoardDataService {
       createdDate: new Date(Date.now()),
       endDate,
       id: boardId,
+      isIncludeTeamEffectivenessMeasurement: isIncludeTeamEffectivenessMeasurement ? isIncludeTeamEffectivenessMeasurement : false,
       isAnonymous: isAnonymous ? isAnonymous : false,
       modifiedDate: new Date(Date.now()),
       shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ? shouldShowFeedbackAfterCollect : false,
@@ -31,6 +32,7 @@ class BoardDataService {
       teamId,
       title,
       boardVoteCollection: {},
+      teamEffectiveMeasurementVoteCollection: {},
     }
 
     return await ExtensionDataService.createDocument<IFeedbackBoardDocument>(teamId, board);
