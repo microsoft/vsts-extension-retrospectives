@@ -740,7 +740,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
             </select>
           </div>
           { !this.props.isNewBoardCreation &&
-          <div className="board-metadata-form-section-subheader" style={{ fontSize:"12px", color:"#ccb100" }}>Warning: Existing feedbacks may not be available after changing board template!</div>
+          <div className="board-metadata-form-section-subheader" style={{ fontSize:"12px", color:"#f6a608" }}>Warning: Existing feedbacks may not be available after changing board template!</div>
           }
           <List
             items={this.state.columnCards}
