@@ -405,7 +405,6 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
 
   private timerSwich =  async (feedbackItemId: string) =>
   {
-    
     let updatedFeedbackItem;
     const boardId:string = this.props.boardId;
 
@@ -420,13 +419,10 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
           // TODO: Show pop-up indicating timer count update failed.
         }
       }
-
     }
-    
-    // flip the timer and start/stop count
-    if (this.props.timerState===false)
-    {
 
+    // flip the timer and start/stop count
+    if (!this.props.timerState) {
       updatedFeedbackItem = await itemDataService.updateTimer(boardId, feedbackItemId, true);
       if (updatedFeedbackItem) {
         this.props.refreshFeedbackItems([updatedFeedbackItem], true);
@@ -434,7 +430,6 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         // TODO: Show pop-up indicating timer count update failed.
       }
       if (this.props.timerId == null) {
-        
         const tid = setInterval(incTimer, 1000);
         updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, tid);
         if (updatedFeedbackItem) {
@@ -449,12 +444,8 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         } else {
           // TODO: Show pop-up indicating timer could not be flipped.
         }
-       
       }
-
-    }
-    else 
-    {
+    } else {
       clearInterval(this.props.timerId);
       updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, null);
       if (updatedFeedbackItem) {
@@ -462,9 +453,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
       } else {
         // TODO: Show pop-up indicating timer could not be flipped.
       }
-
     }
-    
   }
 
   private isVoted = async (
@@ -486,7 +475,6 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
       if (newlyCreated) {
         this.removeFeedbackItem(feedbackItemId);
       }
-
       return;
     }
 
@@ -625,8 +613,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : 'Feedback group main item. Group has ' + groupItemsCount + ' items.'); 
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.createdBy ? this.props.userIdRef !== getUserIdentity().id : false);
     const curTimerState = this.props.timerState;
-    
-    
+
     return (
       <div
         ref={this.itemElementRef}
@@ -826,29 +813,25 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
             </div>
             <div id="actionTimer" className="card-action-timer">
               {showAddActionItem &&
-              
               <button
-               title="Timer"
-               aria-live="polite"
-               aria-label={'Start/stop'}
-               tabIndex={0}
-               
-               className={classNames(
-                 'feedback-action-button',
-               )}
-               onClick={(e) => {
-                 e.preventDefault();
-                 e.stopPropagation();
-                 this.timerSwich(this.props.id);
-               }}
-               >
-              <i className={curTimerState ? "fa fa-stop-circle": "fa fa-play-circle"} />
-              <span>  {this.props.timerSecs} (seconds)</span>
-             </button> 
-             
+                title="Timer"
+                aria-live="polite"
+                aria-label={'Start/stop'}
+                tabIndex={0}
+                className={classNames(
+                  'feedback-action-button',
+                )}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  this.timerSwich(this.props.id);
+                }}
+              >
+                <i className={curTimerState ? "fa fa-stop-circle": "fa fa-play-circle"} />
+                <span>  {this.props.timerSecs} (seconds)</span>
+              </button>
               }
             </div>
-
           </DocumentCard>
         </div>
         {!this.state.isDeleteItemConfirmationDialogHidden &&
