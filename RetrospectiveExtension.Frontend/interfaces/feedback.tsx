@@ -22,11 +22,13 @@ export interface IFeedbackBoardDocument {
   modifiedDate?: Date;
   modifiedBy?: IdentityRef;
   activePhase: WorkflowPhase;
+  isIncludeTeamEffectivenessMeasurement?: boolean;
   isAnonymous?: boolean;
   shouldShowFeedbackAfterCollect?: boolean;
   displayPrimeDirective?: boolean;
   maxVotesPerUser: number;
   boardVoteCollection : { [voter: string]: number};
+  teamEffectiveMeasurementVoteCollection : { [voter: string]: {questionId: string, selection: number}[]};
 }
 
 export interface IFeedbackColumn {
