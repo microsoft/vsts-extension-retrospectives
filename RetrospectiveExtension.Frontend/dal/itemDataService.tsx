@@ -190,12 +190,9 @@ class ItemDataService {
     return updatedFeedbackItem;
   }
 
-
-
   /**
    * update the timer count.
    */
-
   public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean=false): Promise<IFeedbackItemDocument> =>
   {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
