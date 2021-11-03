@@ -278,6 +278,32 @@ class ItemDataService {
   }
 
   /**
+   * Update the team effectiveness measurement.
+   */
+   public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectiveMeasurementVoteCollection: { [voter: string]: {questionId: string, selection: number}[]}): Promise<IFeedbackBoardDocument> => {
+    const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
+
+    if (boardItem === undefined) {
+      console.log(`Cannot retrieve board for the feedback. Board: ${boardId}`);
+      return undefined;
+    }
+
+    if (boardItem.teamEffectiveMeasurementVoteCollection === undefined) {
+      boardItem.teamEffectiveMeasurementVoteCollection = {};
+    }
+
+    if (boardItem.teamEffectiveMeasurementVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
+      boardItem.teamEffectiveMeasurementVoteCollection[userId] = [];
+    }
+
+    boardItem.teamEffectiveMeasurementVoteCollection[userId] = teamEffectiveMeasurementVoteCollection[userId];
+
+    await this.updateBoardItem(teamId, boardItem);
+
+    return boardItem;
+  }
+
+  /**
    * Update the title of the feedback item.
    */
   public updateTitle = async (boardId: string, feedbackItemId: string, title: string): Promise<IFeedbackItemDocument> => {
