@@ -20,8 +20,8 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
   constructor(props: EffectivenessMeasurementRowProps) {
     super(props);
     const currentUserId = getUserIdentity().id;
-    const votes = this.props.votes || {};
-    const vote = votes[currentUserId] || [];
+    const votes = this.props.votes || [];
+    const vote = votes.find(e => e.userId === currentUserId)?.responses || [];
     const currentVote = vote.filter(vote => vote.questionId === this.props.questionId || "");
     this.state = {
       selected: currentVote.length > 0 ? currentVote[0].selection : 0,
