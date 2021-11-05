@@ -1,6 +1,8 @@
 import * as React from 'react';
 
 import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
+
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 
 import { ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
@@ -41,10 +43,15 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
       <tr>
         <td>{this.props.title}</td>
         <td>
-          <DefaultButton
-            className="contextual-menu-button hide-mobile"
-            iconProps={{ iconName: 'Error' }}
-          />
+          <TooltipHost
+            hostClassName="toggle-carousel-button-tooltip-wrapper"
+            content={ this.props.tooltip }
+            calloutProps={{ gapSpace: 0 }}>
+            <DefaultButton
+              className="contextual-menu-button hide-mobile"
+              iconProps={{ iconName: 'Error' }}
+            />
+          </TooltipHost>
         </td>
         <td>
           <DefaultButton
