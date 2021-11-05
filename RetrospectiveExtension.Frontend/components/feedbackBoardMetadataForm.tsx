@@ -20,7 +20,7 @@ interface IFeedbackBoardMetadataFormProps {
   placeholderText: string;
   initialValue: string;
   maxvotesPerUser: number;
-  onFormSubmit: (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => void;
+  onFormSubmit: (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => void;
   onFormCancel: () => void;
 }
 
@@ -29,6 +29,7 @@ interface IFeedbackBoardMetadataFormState {
   isBoardNameTaken: boolean;
   placeholderText: string;
   columnCards: IFeedbackColumnCard[];
+  isIncludeTeamEffectivenessMeasurement: boolean;
   isBoardAnonymous: boolean;
   shouldShowFeedbackAfterCollect: boolean;
   displayPrimeDirective: boolean;
@@ -80,6 +81,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
           markedForDeletion: false,
         };
       }),
+      isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? false : (this.props.currentBoard.isIncludeTeamEffectivenessMeasurement ? this.props.currentBoard.isIncludeTeamEffectivenessMeasurement : false),
       isBoardAnonymous: this.props.isNewBoardCreation ? false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
       maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,
       isBoardNameTaken: false,
@@ -132,15 +134,22 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
 
       return;
     }
-
+console.log(this.state);
     this.props.onFormSubmit(
       this.state.title.trim(),
       this.state.maxVotesPerUser,
       this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
+      this.state.isIncludeTeamEffectivenessMeasurement,
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect,
       this.state.displayPrimeDirective
      );
+  }
+
+  private handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+    this.setState({
+      isIncludeTeamEffectivenessMeasurement: checked,
+    });
   }
 
   private handleIsAnonymousCheckboxChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
@@ -661,6 +670,22 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
           onChange={this.handleInputChange} />
         {this.state.isBoardNameTaken && <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>}
         <div className="board-metadata-form-anonymous-feedback-section hide-mobile">
+          <div className="board-metadata-form-section-subheader">
+            <Checkbox
+              label="Include Team Effectiveness Measurement"
+              ariaLabel="Include Team Effectiveness Measurement. This selection cannot be modified after board creation."
+              boxSide="start"
+              defaultChecked={this.state.isIncludeTeamEffectivenessMeasurement}
+              disabled={!this.props.isNewBoardCreation}
+              onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
+              styles={{
+                root: {
+                  justifyContent: 'center',
+                  width: '100%',
+                },
+              }} />
+          </div>
+
           <div className="board-metadata-form-section-subheader">
             <Checkbox
               label="Make all feedback anonymous"
