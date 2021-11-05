@@ -3,10 +3,12 @@ import * as React from 'react';
 import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 
+import { ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
+
 export interface EffectivenessMeasurementRowProps {
   title: string;
   questionId?: string;
-  votes?: { [voter: string]: {questionId: string, selection: number}[]};
+  votes?: ITeamEffectivenessMeasurementVoteCollection[];
   selected?: number;
 
   onSelectedChange: (selected: number) => void;
