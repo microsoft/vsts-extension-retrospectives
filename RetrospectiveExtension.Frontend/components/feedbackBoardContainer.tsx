@@ -1028,18 +1028,21 @@ console.log(createdBoard);
 
       const currentBoard = this.state.currentBoard;
 
-      if (currentBoard.teamEffectiveMeasurementVoteCollection === undefined) {
-        currentBoard.teamEffectiveMeasurementVoteCollection = {};
+      if (currentBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
+        currentBoard.teamEffectivenessMeasurementVoteCollection = [];
       }
 
-      if (currentBoard.teamEffectiveMeasurementVoteCollection[userId] === undefined) {
-        currentBoard.teamEffectiveMeasurementVoteCollection[userId] = [];
+      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId) === undefined) {
+        currentBoard.teamEffectivenessMeasurementVoteCollection.push({
+          userId: userId,
+          responses: [],
+        });
       }
 
-      const currentVote = currentBoard.teamEffectiveMeasurementVoteCollection[userId].filter(vote => vote.questionId === questionId)[0];
+      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses.find(e => e.questionId === questionId);
 
       if (!currentVote) {
-        currentBoard.teamEffectiveMeasurementVoteCollection[userId].push({
+        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses.push({
           questionId: questionId,
           selection: selected,
         });
