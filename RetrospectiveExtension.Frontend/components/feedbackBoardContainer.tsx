@@ -1,4 +1,4 @@
-﻿import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -494,8 +494,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     const boardIdQueryParam = queryParams.get('boardId');
     const matchedBoard = boardsForMatchedTeam.find((board) => board.id === boardIdQueryParam);
 
-    if (matchedBoard.teamEffectiveMeasurementVoteCollection === undefined) {
-      matchedBoard.teamEffectiveMeasurementVoteCollection = {};
+    if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
+      matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
     }
 
     if (matchedBoard) {
@@ -667,8 +667,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
   private setCurrentBoard = (selectedBoard: IFeedbackBoardDocument) => {
     const matchedBoard = this.state.boards.find((board) => board.id === selectedBoard.id);
 
-    if (matchedBoard.teamEffectiveMeasurementVoteCollection === undefined) {
-      matchedBoard.teamEffectiveMeasurementVoteCollection = {};
+    if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
+      matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
     }
 
     if (matchedBoard) {
