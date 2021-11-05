@@ -1,4 +1,4 @@
-# Retrospectives.
+# Retrospectives
 
 Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform _smart and efficient retrospectives from within the Azure DevOps pipeline._
 
