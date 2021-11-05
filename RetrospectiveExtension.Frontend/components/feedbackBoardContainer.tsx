@@ -1,4 +1,4 @@
-import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+﻿import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -740,13 +740,11 @@ console.log(createdBoard);
 
   private showRetroSummaryDialog = (): void => {
     const measurements: { id: string, selected: number }[] = [];
-    for (const key in this.state.currentBoard.teamEffectiveMeasurementVoteCollection) {
-      const value = this.state.currentBoard.teamEffectiveMeasurementVoteCollection[key];
-
-      value.forEach(e => {
-        measurements.push({ id: e.questionId, selected: e.selection });
+    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
+      vote.responses.forEach(response => {
+        measurements.push({ id: response.questionId, selected: response.selection });
       });
-    }
+    });
 
     const average: { question: string, average: number }[] = [];
 
@@ -1018,7 +1016,7 @@ console.log(createdBoard);
     };
 
     const saveTeamEffectivenessMeasurement = () => {
-      itemDataService.updateTeamEffectivenessMeasurement(this.state.currentBoard.id, this.state.currentTeam.id, this.state.currentUserId, this.state.currentBoard.teamEffectiveMeasurementVoteCollection);
+      itemDataService.updateTeamEffectivenessMeasurement(this.state.currentBoard.id, this.state.currentTeam.id, this.state.currentUserId, this.state.currentBoard.teamEffectivenessMeasurementVoteCollection);
 
       this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
     };
@@ -1169,10 +1167,10 @@ console.log(createdBoard);
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  <EffectivenessMeasurementRow questionId="1" votes={this.state.currentBoard.teamEffectiveMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("1", selected)} title={getQuestionName("1")} />
-                                  <EffectivenessMeasurementRow questionId="2" votes={this.state.currentBoard.teamEffectiveMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("2", selected)} title={getQuestionName("2")} />
-                                  <EffectivenessMeasurementRow questionId="3" votes={this.state.currentBoard.teamEffectiveMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("3", selected)} title={getQuestionName("3")} />
-                                  <EffectivenessMeasurementRow questionId="4" votes={this.state.currentBoard.teamEffectiveMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("4", selected)} title={getQuestionName("4")} />
+                                  <EffectivenessMeasurementRow questionId="1" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("1", selected)} title={getQuestionName("1")} />
+                                  <EffectivenessMeasurementRow questionId="2" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("2", selected)} title={getQuestionName("2")} />
+                                  <EffectivenessMeasurementRow questionId="3" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("3", selected)} title={getQuestionName("3")} />
+                                  <EffectivenessMeasurementRow questionId="4" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("4", selected)} title={getQuestionName("4")} />
                                 </tbody>
                               </table>
                             </DialogContent>
