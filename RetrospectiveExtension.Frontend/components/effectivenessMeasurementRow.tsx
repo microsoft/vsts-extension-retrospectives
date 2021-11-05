@@ -10,6 +10,7 @@ export interface EffectivenessMeasurementRowProps {
 }
 
 export interface EffectivenessMeasurementRowState {
+  selected: number;
 }
 
 export default class EffectivenessMeasurementRow extends React.Component<EffectivenessMeasurementRowProps, EffectivenessMeasurementRowState> {
