@@ -34,6 +34,10 @@ import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
 import { itemDataService } from '../dal/itemDataService';
 import { TeamMember } from 'VSS/WebApi/Contracts';
+import EffectivenessMeasurementRow from './effectivenessMeasurementRow';
+
+import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { getQuestionName } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 export interface FeedbackBoardContainerProps {
   projectId: string;
@@ -41,6 +45,7 @@ export interface FeedbackBoardContainerProps {
 
 export interface FeedbackBoardContainerState {
   boards: IFeedbackBoardDocument[];
+  currentUserId: string;
   currentBoard: IFeedbackBoardDocument;
   currentTeam: WebApiTeam;
   filteredProjectTeams: WebApiTeam[];
@@ -68,6 +73,7 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogMessage: string;
   teamBoardDeletedDialogTitle: string;
   isCarouselDialogHidden: boolean;
+  isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
   isPrimeDirectiveDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
@@ -75,6 +81,7 @@ export interface FeedbackBoardContainerState {
   isAutoResizeEnabled: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: {id: string, name: string, imageUrl: string}[];
+  effectivenessMeasurementSummary: { question: string, average: number }[];
   actionItemIds: number[];
   members: TeamMember[];
   castedVoteCount: number;
@@ -86,6 +93,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     this.state = {
       allWorkItemTypes: [],
       boards: [],
+      currentUserId: getUserIdentity().id,
       currentBoard: undefined,
       currentTeam: undefined,
       filteredProjectTeams: [],
@@ -97,6 +105,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       isBoardCreationDialogHidden: true,
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
+      isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
       isDeleteBoardConfirmationDialogHidden: true,
       isDesktop: true,
@@ -119,6 +128,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       maxvotesPerUser: 5,
       feedbackItems: [],
       contributors: [],
+      effectivenessMeasurementSummary: [],
       actionItemIds: [],
       members: [],
       castedVoteCount: 0,
@@ -161,7 +171,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       this.setState({ members: members });
 
       const votes = Object.values(this.state.currentBoard?.boardVoteCollection || []);
-      this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0 }) ;
+      this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0 });
 
       reflectBackendService.onConnectionClose(() => {
         this.setState({
@@ -269,9 +279,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
     const hiddenWorkItemTypeNames = hiddenWorkItemTypes.map((workItemType) => workItemType.name);
     
-    const nonHiddenWorkItemTypes = allWorkItemTypes.filter(
-      (workItemType) => hiddenWorkItemTypeNames.indexOf(workItemType.name) === -1
-    );
+    const nonHiddenWorkItemTypes = allWorkItemTypes.filter(workItemType => hiddenWorkItemTypeNames.indexOf(workItemType.name) === -1);
 
     this.setState({
       nonHiddenWorkItemTypes: nonHiddenWorkItemTypes,
@@ -281,12 +289,9 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
   private replaceBoard = (updatedBoard: IFeedbackBoardDocument) => {
     this.setState(prevState => {
-      const newBoards = prevState.boards.map((board) =>
-        board.id === updatedBoard.id ? updatedBoard : board);
+      const newBoards = prevState.boards.map((board) => board.id === updatedBoard.id ? updatedBoard : board);
 
-      const newCurrentBoard = this.state.currentBoard && this.state.currentBoard.id === updatedBoard.id
-        ? updatedBoard
-        : this.state.currentBoard;
+      const newCurrentBoard = this.state.currentBoard && this.state.currentBoard.id === updatedBoard.id ? updatedBoard : this.state.currentBoard;
 
       return {
         boards: newBoards,
@@ -380,9 +385,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     }
 
     // Default to select first user team or the project's default team.
-    const defaultTeam = (userTeams && userTeams.length)
-      ? userTeams[0]
-      : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
+    const defaultTeam = (userTeams && userTeams.length) ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
 
     const baseTeamState = {
       userTeams,
@@ -491,6 +494,10 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     const boardIdQueryParam = queryParams.get('boardId');
     const matchedBoard = boardsForMatchedTeam.find((board) => board.id === boardIdQueryParam);
 
+    if (matchedBoard.teamEffectiveMeasurementVoteCollection === undefined) {
+      matchedBoard.teamEffectiveMeasurementVoteCollection = {};
+    }
+
     if (matchedBoard) {
       return {
         ...queryParamTeamAndDefaultBoardState,
@@ -546,9 +553,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
         const recentVisitState = {
           boards: boardsForTeam,
-          currentBoard: (boardsForTeam && boardsForTeam.length)
-            ? boardsForTeam[0]
-            : null,
+          currentBoard: (boardsForTeam && boardsForTeam.length) ? boardsForTeam[0] : null,
           currentTeam: mostRecentTeam,
         };
 
@@ -662,6 +667,10 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
   private setCurrentBoard = (selectedBoard: IFeedbackBoardDocument) => {
     const matchedBoard = this.state.boards.find((board) => board.id === selectedBoard.id);
 
+    if (matchedBoard.teamEffectiveMeasurementVoteCollection === undefined) {
+      matchedBoard.teamEffectiveMeasurementVoteCollection = {};
+    }
+
     if (matchedBoard) {
       // @ts-ignore TS2345
       this.setState(prevState => {
@@ -708,8 +717,9 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     });
   }
 
-  private createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => {
-    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxVotesPerUser, columns, isBoardAnonymous, shouldShowFeedbackAfterCollect, displayPrimeDirective);
+  private createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => {
+const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxvotesPerUser, columns, isIncludeTeamEffectivenessMeasurement, isBoardAnonymous, shouldShowFeedbackAfterCollect, displayPrimeDirective);
+console.log(createdBoard);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -729,7 +739,25 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
   }
 
   private showRetroSummaryDialog = (): void => {
-    this.setState({ isRetroSummaryDialogHidden: false });
+    const measurements: { id: string, selected: number }[] = [];
+    for (const key in this.state.currentBoard.teamEffectiveMeasurementVoteCollection) {
+      const value = this.state.currentBoard.teamEffectiveMeasurementVoteCollection[key];
+
+      value.forEach(e => {
+        measurements.push({ id: e.questionId, selected: e.selection });
+      });
+    }
+
+    const average: { question: string, average: number }[] = [];
+
+    [...new Set(measurements.map(item => item.id))].forEach(e => {
+      average.push({ question: getQuestionName(e), average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
+    });
+
+    this.setState({
+      isRetroSummaryDialogHidden: false,
+      effectivenessMeasurementSummary: average,
+    });
   }
 
   private hidePreviewEmailDialog = (): void => {
@@ -824,7 +852,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     initialValue: string,
     onSubmit: (
       title: string, maxVotesPerUser: number, columns: IFeedbackColumn[],
-      isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean
+      isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean,
+      shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean
     ) => void,
     onCancel: () => void) => {
     return (
@@ -988,6 +1017,39 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       ],
     };
 
+    const saveTeamEffectivenessMeasurement = () => {
+      itemDataService.updateTeamEffectivenessMeasurement(this.state.currentBoard.id, this.state.currentTeam.id, this.state.currentUserId, this.state.currentBoard.teamEffectiveMeasurementVoteCollection);
+
+      this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+    };
+
+    const effectivenessMeasurementSelectionChanged = (questionId: string, selected: number) => {
+      const userId: string = getUserIdentity().id;
+
+      const currentBoard = this.state.currentBoard;
+
+      if (currentBoard.teamEffectiveMeasurementVoteCollection === undefined) {
+        currentBoard.teamEffectiveMeasurementVoteCollection = {};
+      }
+
+      if (currentBoard.teamEffectiveMeasurementVoteCollection[userId] === undefined) {
+        currentBoard.teamEffectiveMeasurementVoteCollection[userId] = [];
+      }
+
+      const currentVote = currentBoard.teamEffectiveMeasurementVoteCollection[userId].filter(vote => vote.questionId === questionId)[0];
+
+      if (!currentVote) {
+        currentBoard.teamEffectiveMeasurementVoteCollection[userId].push({
+          questionId: questionId,
+          selection: selected,
+        });
+      } else {
+        currentVote.selection = selected;
+      }
+
+      this.setState({ currentBoard });
+    }
+
     return (
       <div className={this.state.isDesktop? ViewMode.Desktop : ViewMode.Mobile}>
         <div id="extension-header">
@@ -1069,6 +1131,66 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                       </div>
                     </div>
                     <div className="feedback-workflow-wrapper">
+                    { this.state.currentBoard.isIncludeTeamEffectivenessMeasurement &&
+                      <>
+                        <Dialog
+                          hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                          onDismiss={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true }); }}
+                          dialogContentProps={{
+                            type: DialogType.close,
+                          }}
+                          minWidth={640}
+                          modalProps={{
+                            isBlocking: true,
+                            containerClassName: 'prime-directive-dialog',
+                            className: 'retrospectives-dialog-modal',
+                          }}>
+                            <DialogContent>
+                              <div style={{ color:"#008000" }}><i className="fa fa-info-circle" />&nbsp;All answers will be saved anonymously</div>
+                              <div>Legend: 1 is Strongly Disagree, 10 is Strongly Agree</div>
+                              <table className="team-effectiveness-measurement-table">
+                                <thead>
+                                  <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th>1</th>
+                                    <th>2</th>
+                                    <th>3</th>
+                                    <th>4</th>
+                                    <th>5</th>
+                                    <th>6</th>
+                                    <th>7</th>
+                                    <th>8</th>
+                                    <th>9</th>
+                                    <th>10</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <EffectivenessMeasurementRow questionId="1" votes={this.state.currentBoard.teamEffectiveMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("1", selected)} title={getQuestionName("1")} />
+                                  <EffectivenessMeasurementRow questionId="2" votes={this.state.currentBoard.teamEffectiveMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("2", selected)} title={getQuestionName("2")} />
+                                  <EffectivenessMeasurementRow questionId="3" votes={this.state.currentBoard.teamEffectiveMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("3", selected)} title={getQuestionName("3")} />
+                                  <EffectivenessMeasurementRow questionId="4" votes={this.state.currentBoard.teamEffectiveMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("4", selected)} title={getQuestionName("4")} />
+                                </tbody>
+                              </table>
+                            </DialogContent>
+                            <DialogFooter>
+                              <DefaultButton onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true }); }} text="Cancel" />
+                              <PrimaryButton onClick={() => { saveTeamEffectivenessMeasurement(); }} text="Submit" />
+                            </DialogFooter>
+                        </Dialog>
+                        <TooltipHost
+                          hostClassName="toggle-carousel-button-tooltip-wrapper"
+                          content="Measure Team Effectiveness"
+                          calloutProps={{ gapSpace: 0 }}>
+                          <ActionButton
+                            className="toggle-carousel-button"
+                            text="Measure Team Effectiveness"
+                            iconProps={{ iconName: 'Financial' }}
+                            onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false }); }}>
+                          </ActionButton>
+                        </TooltipHost>
+                      </>
+                      }
                       { this.state.currentBoard.displayPrimeDirective &&
                       <>
                         <Dialog
@@ -1299,30 +1421,39 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
           onDismiss={this.hideRetroSummaryDialog}
           dialogContentProps={{
             type: DialogType.normal,
-            title: `${this.state.currentBoard.title} Summary`,
+            title: `Retrospective Board Summary`,
           }}
           modalProps={{
             containerClassName: 'retrospectives-retro-summary-dialog',
             className: 'retrospectives-dialog-modal',
           }}>
-            <div>Retrospective session date is {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
-            <div>{this.state.feedbackItems.length} feedback items created</div>
-            <div>{this.state.members.length} people in the team, {this.state.contributors.length} participants contributed</div>
-            <div>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted { this.state.castedVoteCount } votes</div>
-            <div>{this.state.actionItemIds.length} action items created</div>
-            <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
-            {!this.state.currentBoard.isAnonymous ?
-              <>
-                <div>Contributors:</div>
-                {this.state.contributors.map((contributor, index) =>
-                  <div key={index}>
-                    <img className="avatar" src={contributor.imageUrl} /> {contributor.name}
-                  </div>
-                  )}
+            { this.state.currentBoard &&
+            <>
+              <div>Retrospective session date is {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
+              <div>{this.state.feedbackItems.length} feedback items created</div>
+              <div>{this.state.members.length} people in the team, {this.state.contributors.length} participants contributed</div>
+              <div>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted { this.state.castedVoteCount } votes</div>
+              <div>{this.state.actionItemIds.length} action items created</div>
+              <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
+              <div>
+                Effectiveness Scores:
+                { this.state.effectivenessMeasurementSummary.map((measurement, index) => {
+                    return <div key={index}>{measurement.question}: {measurement.average}</div>
+                  })
+                }
+              </div>
+              {!this.state.currentBoard.isAnonymous ?
+                <>
+                  <div>Contributors:</div>
+                  {this.state.contributors.map((contributor, index) =>
+                    <div key={index}>
+                      <img className="avatar" src={contributor.imageUrl} /> {contributor.name}
+                    </div>
+                    )}
+                </>
+              : <div>Board is anonymous</div>}
+              { this.state.currentBoard.isAnonymous && <div>Retrospective was Anonymous</div> }
               </>
-            : <div>Board is anonymous</div>}
-            {this.state.currentBoard.isAnonymous &&
-              <div>Retrospective was Anonymous</div>
             }
         </Dialog>
         <Dialog
