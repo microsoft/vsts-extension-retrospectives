@@ -28,7 +28,12 @@ export interface IFeedbackBoardDocument {
   displayPrimeDirective?: boolean;
   maxVotesPerUser: number;
   boardVoteCollection : { [voter: string]: number};
-  teamEffectiveMeasurementVoteCollection : { [voter: string]: {questionId: string, selection: number}[]};
+  teamEffectivenessMeasurementVoteCollection : ITeamEffectivenessMeasurementVoteCollection[];
+}
+
+export interface ITeamEffectivenessMeasurementVoteCollection {
+  userId: string;
+  responses: {questionId: string, selection: number}[]
 }
 
 export interface IFeedbackColumn {
