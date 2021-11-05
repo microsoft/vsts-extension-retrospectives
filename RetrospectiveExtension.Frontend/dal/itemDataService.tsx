@@ -1,5 +1,5 @@
 import * as ExtensionDataService from './dataService';
-import { IFeedbackItemDocument, IFeedbackBoardDocument } from '../interfaces/feedback';
+import { IFeedbackItemDocument, IFeedbackBoardDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { WorkItem } from 'TFS/WorkItemTracking/Contracts';
 import { workItemService } from './azureDevOpsWorkItemService';
 // TODO (enpolat) : import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
@@ -280,7 +280,7 @@ class ItemDataService {
   /**
    * Update the team effectiveness measurement.
    */
-   public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectiveMeasurementVoteCollection: { [voter: string]: {questionId: string, selection: number}[]}): Promise<IFeedbackBoardDocument> => {
+   public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[]): Promise<IFeedbackBoardDocument> => {
     const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
 
     if (boardItem === undefined) {
