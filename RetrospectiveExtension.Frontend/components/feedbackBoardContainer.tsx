@@ -37,7 +37,7 @@ import { TeamMember } from 'VSS/WebApi/Contracts';
 import EffectivenessMeasurementRow from './effectivenessMeasurementRow';
 
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-import { getQuestionName } from '../utilities/effectivenessMeasurementQuestionHelper';
+import { getQuestionName, getQuestionTooltip } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 export interface FeedbackBoardContainerProps {
   projectId: string;
@@ -1167,10 +1167,10 @@ console.log(createdBoard);
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  <EffectivenessMeasurementRow questionId="1" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("1", selected)} title={getQuestionName("1")} />
-                                  <EffectivenessMeasurementRow questionId="2" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("2", selected)} title={getQuestionName("2")} />
-                                  <EffectivenessMeasurementRow questionId="3" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("3", selected)} title={getQuestionName("3")} />
-                                  <EffectivenessMeasurementRow questionId="4" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("4", selected)} title={getQuestionName("4")} />
+                                  <EffectivenessMeasurementRow questionId="1" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("1", selected)} title={getQuestionName("1")} tooltip={getQuestionTooltip("1")} />
+                                  <EffectivenessMeasurementRow questionId="2" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("2", selected)} title={getQuestionName("2")} tooltip={getQuestionTooltip("2")} />
+                                  <EffectivenessMeasurementRow questionId="3" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("3", selected)} title={getQuestionName("3")} tooltip={getQuestionTooltip("3")} />
+                                  <EffectivenessMeasurementRow questionId="4" votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged("4", selected)} title={getQuestionName("4")} tooltip={getQuestionTooltip("4")} />
                                 </tbody>
                               </table>
                             </DialogContent>
