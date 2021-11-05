@@ -288,15 +288,15 @@ class ItemDataService {
       return undefined;
     }
 
-    if (boardItem.teamEffectiveMeasurementVoteCollection === undefined) {
-      boardItem.teamEffectiveMeasurementVoteCollection = {};
+    if (boardItem.teamEffectivenessMeasurementVoteCollection === undefined) {
+      boardItem.teamEffectivenessMeasurementVoteCollection = [];
     }
 
-    if (boardItem.teamEffectiveMeasurementVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
-      boardItem.teamEffectiveMeasurementVoteCollection[userId] = [];
+    if (boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId) === undefined || boardItem.boardVoteCollection[userId] === null) {
+      boardItem.teamEffectivenessMeasurementVoteCollection.push({ userId: userId, responses: []});
     }
 
-    boardItem.teamEffectiveMeasurementVoteCollection[userId] = teamEffectiveMeasurementVoteCollection[userId];
+    boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses = teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses;
 
     await this.updateBoardItem(teamId, boardItem);
 
