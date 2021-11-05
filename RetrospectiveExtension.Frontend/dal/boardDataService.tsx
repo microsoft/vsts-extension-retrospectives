@@ -32,7 +32,7 @@ class BoardDataService {
       teamId,
       title,
       boardVoteCollection: {},
-      teamEffectiveMeasurementVoteCollection: {},
+      teamEffectivenessMeasurementVoteCollection: [],
     }
 
     return await ExtensionDataService.createDocument<IFeedbackBoardDocument>(teamId, board);
