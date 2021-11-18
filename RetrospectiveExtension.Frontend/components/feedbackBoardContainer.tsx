@@ -1151,19 +1151,26 @@ console.log(createdBoard);
                               <div>Legend: 1 is Strongly Disagree, 10 is Strongly Agree</div>
                               <table className="team-effectiveness-measurement-table">
                                 <thead>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th colSpan={6} style={{ borderLeft: "1px solid black", borderRight: "1px solid black" }}>Unfavorable</th>
+                                    <th colSpan={2} style={{ borderRight: "1px solid black" }}>Neutral</th>
+                                    <th colSpan={2} style={{ borderRight: "1px solid black" }}>Favorable</th>
+                                  </tr>
                                   <tr>
                                     <th></th>
                                     <th></th>
-                                    <th>1</th>
-                                    <th>2</th>
-                                    <th>3</th>
-                                    <th>4</th>
-                                    <th>5</th>
-                                    <th>6</th>
-                                    <th>7</th>
-                                    <th>8</th>
-                                    <th>9</th>
-                                    <th>10</th>
+                                    <th style={{ backgroundColor: "#F8696B" }}>1</th>
+                                    <th style={{ backgroundColor: "#F98570" }}>2</th>
+                                    <th style={{ backgroundColor: "#FBA276" }}>3</th>
+                                    <th style={{ backgroundColor: "#FCBF7B" }}>4</th>
+                                    <th style={{ backgroundColor: "#FEDC81" }}>5</th>
+                                    <th style={{ backgroundColor: "#EEE683" }}>6</th>
+                                    <th style={{ backgroundColor: "#CCDD82" }}>7</th>
+                                    <th style={{ backgroundColor: "#A9D27F" }}>8</th>
+                                    <th style={{ backgroundColor: "#86C97E" }}>9</th>
+                                    <th style={{ backgroundColor: "#63BE7B" }}>10</th>
                                   </tr>
                                 </thead>
                                 <tbody>
