@@ -1353,10 +1353,11 @@ console.log(createdBoard);
                               text="Reconnect" />
                             <IconButton
                               className="info-message-bar-action-button"
-                              iconProps={{ iconName: 'Clear' }}
                               onClick={() => { this.setState({ isBackendServiceConnected: true }) }}
                               disabled={this.state.isReconnectingToBackendService}
-                              title="Hide" />
+                              title="Hide">
+                                <span className="ms-Button-icon"><i className="fas fa-times"></i></span>
+                              </IconButton>
                             </>
                           }
                         </div>
