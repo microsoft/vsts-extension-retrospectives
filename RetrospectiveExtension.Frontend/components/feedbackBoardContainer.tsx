@@ -1217,9 +1217,9 @@ console.log(createdBoard);
                           calloutProps={{ gapSpace: 0 }}>
                           <ActionButton
                             className="toggle-carousel-button"
-                            text="Measure Team Effectiveness"
-                            iconProps={{ iconName: 'Financial' }}
                             onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false }); }}>
+                            <span className="ms-Button-icon"><i className="fas fa-chart-line"></i></span>&nbsp;
+                            <span className="ms-Button-label">Measure Team Effectiveness</span> 
                           </ActionButton>
                         </TooltipHost>
                       </>
