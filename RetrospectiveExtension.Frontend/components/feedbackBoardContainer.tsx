@@ -1081,7 +1081,7 @@ console.log(createdBoard);
                         <SelectorCombo<IFeedbackBoardDocument>
                           className="board-selector"
                           currentValue={this.state.currentBoard}
-                          iconName="BacklogBoard"
+                          iconName="sitemap"
                           nameGetter={(feedbackBoard) => feedbackBoard.title}
                           selectorList={boardSelectorList}
                           selectorListItemOnClick={this.changeSelectedBoard}
