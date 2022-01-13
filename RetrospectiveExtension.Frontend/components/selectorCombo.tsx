@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import { FocusTrapCallout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
 import { Dialog } from 'office-ui-fabric-react/lib/Dialog';
-import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
@@ -64,15 +63,13 @@ export default class SelectorCombo<T> extends React.Component<ISelectorComboProp
           onClick={this.openMobileSelectorDialog}
           onKeyDown={this.handleKeyPressTeamListMobile}
           aria-expanded={!this.state.isSelectorDialogHidden}>
-          <Icon
-            className="selector-button-icon"
-            iconName={this.props.iconName} />
+          <i className={"selector-button-icon fas fa-" + this.props.iconName}></i>
           <span className="selector-button-text-wrapper">
             <div className="selector-button-text">
               {selectorButtonText}
             </div>
           </span>
-          <Icon className="selector-button-chevron" iconName="ChevronDown" />
+          <i className={"selector-button-chevron fas fa-chevron-down"}></i>
         </div>
         <Dialog
           hidden={this.state.isSelectorDialogHidden}
@@ -97,15 +94,13 @@ export default class SelectorCombo<T> extends React.Component<ISelectorComboProp
           onClick={this.toggleSelectorCallout}
           tabIndex={0}
           onKeyDown={this.handleKeyPressSelectorButton}>
-          <Icon
-            className="selector-button-icon"
-            iconName={this.props.iconName} />
+          <i className={"selector-button-icon fas fa-" + this.props.iconName}></i>
           <span className="selector-button-text-wrapper">
             <div className="selector-button-text">
               {selectorButtonText}
             </div>
           </span>
-          <Icon className="selector-button-chevron" iconName="ChevronDown" />
+          <i className={"selector-button-chevron fas fa-chevron-down"}></i>
         </div>
         <FocusTrapCallout
           className={classNames('selector-callout', this.props.className)}
@@ -176,7 +171,6 @@ export default class SelectorCombo<T> extends React.Component<ISelectorComboProp
     items: T[],
     shouldVirtualizeItems: boolean
   ) => {
-
     return (<div className="selector-list" key={header.id}>
       {!header.isHidden && <div className="selector-list-header">
         <div className="selector-list-header-text">{header.title}</div>
@@ -202,7 +196,7 @@ export default class SelectorCombo<T> extends React.Component<ISelectorComboProp
               onKeyDown={(e) => this.handleKeyPressTeamList(e, item)}
               tabIndex={0}
               aria-label={ariaLabel}>
-              <Icon iconName={this.props.iconName} />
+              <i className={"fas fa-" + this.props.iconName}></i>
               <div title={itemName} className="selector-list-item-text">
                 {itemName}
               </div>
