@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking/Contracts';
@@ -277,7 +277,7 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
     return (
         <div className="board-summary-table-container">
         {/*
-          // @ts-ignore TS2786 */}
+         // @ts-ignore TS2786 */}
         <ReactTable
           data={this.state.boardsTableItems}
           TbodyComponent={this.getCustomTbodyComponent}
