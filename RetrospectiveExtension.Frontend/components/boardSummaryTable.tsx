@@ -1,6 +1,5 @@
 ﻿import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
-import ReactTable, { Column } from 'react-table';
 import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking/Contracts';
 import { itemDataService } from '../dal/itemDataService';
@@ -8,35 +7,6 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
 // TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 import classNames from 'classnames';
-
-import 'react-table/react-table.css'
-
-const boardSummaryColumns: Column[] = [
-  {
-    Header: 'Retrospective Name',
-    accessor: 'boardName',
-  },
-  {
-    Header: 'Created Date',
-    accessor: 'createdDate',
-    Cell: (row: any) => {
-      return (
-        new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(row.original.createdDate)
-      )
-    },
-    width: 175,
-  },
-  {
-    Header: 'Pending Work Items',
-    accessor: 'pendingWorkItemsCount',
-    width: 170,
-  },
-  {
-    Header: 'Total Work Items',
-    accessor: 'totalWorkItemsCount',
-    width: 170,
-  },
-];
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -311,7 +281,32 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
         <ReactTable
           data={this.state.boardsTableItems}
           TbodyComponent={this.getCustomTbodyComponent}
-          columns={boardSummaryColumns}
+          columns={[
+            {
+              Header: 'Retrospective Name',
+              accessor: 'boardName',
+            },
+            {
+              Header: 'Created Date',
+              accessor: 'createdDate',
+              Cell: (row: any) => {
+                return (
+                  new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(row.original.createdDate)
+                )
+              },
+              width: 175,
+            },
+            {
+              Header: 'Pending Work Items',
+              accessor: 'pendingWorkItemsCount',
+              width: 170,
+            },
+            {
+              Header: 'Total Work Items',
+              accessor: 'totalWorkItemsCount',
+              width: 170,
+            },
+          ]}
           defaultSorted={[
             {
               id: "createdDate",
