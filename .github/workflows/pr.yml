@@ -1,4 +1,4 @@
-name: PRWorkflow
+name: pr
 
 on:
   pull_request:
@@ -11,8 +11,4 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - run: cd "RetrospectiveExtension.Frontend"
-    - run: npm install
-    - run: npm run lint
-    - run: npm run build
-    - run: npm run pack
+    - run: cd "RetrospectiveExtension.Frontend" && npm install && npm run lint && npm run build:p && npm run pack:p
