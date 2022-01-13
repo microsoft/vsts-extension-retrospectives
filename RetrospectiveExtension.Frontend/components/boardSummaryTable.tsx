@@ -8,6 +8,10 @@ import BoardSummary from './boardSummary';
 // TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 import classNames from 'classnames';
 
+import ReactTable from 'react-table-6';
+
+import 'react-table-6/react-table.css'
+
 export interface IBoardSummaryTableProps {
   teamId: string;
   supportedWorkItemTypes: WorkItemType[];
