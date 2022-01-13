@@ -1091,13 +1091,14 @@ console.log(createdBoard);
                         <DefaultButton
                           className="contextual-menu-button hide-mobile"
                           aria-label="Board Actions Menu"
-                          iconProps={{ iconName: 'More' }}
                           title="Board actions"
                           menuProps={{
                             className: "board-actions-menu",
                             items: this.boardActionContexualMenuItems,
                           }}
-                        />
+                        >
+                          <span className="ms-Button-icon"><i className="fas fa-ellipsis-h"></i></span>&nbsp;
+                        </DefaultButton>
                         <Dialog
                           hidden={this.state.isMobileBoardActionsDialogHidden}
                           onDismiss={this.hideMobileBoardActionsDialog}
