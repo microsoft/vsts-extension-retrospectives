@@ -105,21 +105,23 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
         <DefaultButton
           className="contextual-menu-button hide-mobile"
           aria-label="User Settings Menu"
-          iconProps={{ iconName: 'CollapseMenu' }}
           title="User Settings Menu"
           menuProps={{
             items: this.extensionSettingsMenuItem,
             className: "user-settings-menu",
           }}
-        />
+        >
+          <span className="ms-Button-icon"><i className="fas fa-bars"></i></span>
+        </DefaultButton>
         <DefaultButton
           className="contextual-menu-button"
           aria-label="What's New"
-          iconProps={{ iconName: '12PointStar' }}
           title="What's New"
-          text="What's New"
           onClick={this.showWhatsNewDialog}
-        />
+        >
+          <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
+          <span className="ms-Button-label">What's New</span>
+        </DefaultButton>
         <Dialog
           hidden={this.state.isWhatsNewDialogHidden}
           onDismiss={this.hideWhatsNewDialog}
@@ -161,7 +163,10 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
                   }}
                   text={extensionSettingsMenuItem.text}
                   title={extensionSettingsMenuItem.title}
-                />
+                >
+                  <span className="ms-Button-icon"><i className={"fas fa-" + extensionSettingsMenuItem.iconProps}></i></span>&nbsp;
+                  <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span> 
+                </ActionButton>
               )
             }
           </div>
