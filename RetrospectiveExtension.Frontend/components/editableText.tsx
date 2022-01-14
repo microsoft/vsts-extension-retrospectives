@@ -118,6 +118,22 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
       return;
     }
 
+    // Enter + Ctrl
+    if (event.keyCode === 13 && event.ctrlKey) {
+      if (!this.state.newText.trim()) {
+        this.setState({ hasErrors: true });
+        return;
+      }
+
+      this.setState({
+        newText: `${this.state.newText} \n`,
+        isEditing: true,
+        hasErrors: false
+      });
+
+      return;
+    }
+
     // Enter or tab
     if (event.keyCode === 13 || event.keyCode === 9) {
       if (!this.state.newText.trim()) {
@@ -132,19 +148,6 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
       });
     }
 
-    // Enter + Ctrl
-    if (event.keyCode === 13 && event.ctrlKey) {
-      if (!this.state.newText.trim()) {
-        this.setState({ hasErrors: true });
-        return;
-      }
-
-      this.setState({
-        newText: `${this.state.newText} \n`,
-        isEditing: true,
-        hasErrors: false
-      });
-    }
   }
 
   public render(): JSX.Element {
