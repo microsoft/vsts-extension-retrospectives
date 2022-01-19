@@ -1,6 +1,6 @@
 {
   "name": "Retrospective Extension Development Environment",
-  "dockerFile": "Dockerfile",
+  "dockerFile": "Dockerfile.dev",
   "runArgs": [
     "-v", "/var/run/docker.sock:/var/run/docker.sock"
   ],
