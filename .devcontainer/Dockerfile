@@ -36,6 +36,8 @@ RUN apt-get update \
     # Install npm-check-updates tool globally
     && npm install -g npm-check-updates \
     #
+    # Install jest-cli testing framework globally
+    && npm install -g jest-cli \
     # [Optional] Add sudo support for the non-root user
     && apt-get install -y sudo \
     #
