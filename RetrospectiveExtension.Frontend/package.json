@@ -55,6 +55,7 @@
     "eslint-loader": "4.0.2",
     "eslint-plugin-react": "7.24.0",
     "file-loader": "6.2.0",
+    "jest": "^27.4.7",
     "moment-locales-webpack-plugin": "1.2.0",
     "node-sass": "5.0.0",
     "sass-loader": "10.1.1",
