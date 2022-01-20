@@ -232,6 +232,13 @@ class ItemDataService {
      }
 
     if (decrement) {
+      if(!boardItem.boardVoteCollection ||
+        !boardItem.boardVoteCollection[userId] ||
+        boardItem.boardVoteCollection[userId] <= 0) {
+          console.log(`Cannot decrement item with zero or less votes. Board ${boardId}, Item: ${feedbackItemId}`);
+          return undefined;
+      }
+
       if (feedbackItem.upvotes <= 0) {
         console.log(`Cannot decrement upvote as votes must be > 0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
         return undefined;
@@ -272,8 +279,30 @@ class ItemDataService {
       feedbackItem.voteCollection[userId]++;
       feedbackItem.upvotes++;
     }
-    await this.updateBoardItem(teamId, boardItem);
+
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+
+    if(!updatedFeedbackItem) {
+      console.log(`The feedback item was not incremented or decremented. Board: ${boardId}, Item: ${feedbackItemId}`);
+      return undefined;
+    }
+
+    const updatedBoardItem = await this.updateBoardItem(teamId, boardItem);
+    if(!updatedBoardItem) {
+      console.log(`Could not update board, votes will be removed from or added to the feedback item.
+        Board: ${boardId}, Item: ${feedbackItemId}`);
+
+      updatedFeedbackItem.voteCollection[userId] = decrement ?
+        updatedFeedbackItem.voteCollection[userId]++ : updatedFeedbackItem.voteCollection[userId]--;
+      updatedFeedbackItem.upvotes = decrement ? updatedFeedbackItem.upvotes++ : updatedFeedbackItem.upvotes--;
+
+      const feedbackItemWithOriginalVotes = await this.updateFeedbackItem(boardId, updatedFeedbackItem);
+      if (feedbackItemWithOriginalVotes) {
+        return feedbackItemWithOriginalVotes;
+      }
+      console.log(`Cannot remove or add votes from feedback item. Board ${boardId}, Item: ${updatedFeedbackItem.id}`);
+    }
+
     return updatedFeedbackItem;
   }
 
