@@ -1,6 +1,5 @@
 ﻿/// <reference types="vss-web-extension-sdk" />
 
-import '@fortawesome/fontawesome-free/css/all.css'
 import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
 
 import * as React from 'react';
