@@ -120,7 +120,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           onClick={this.showWhatsNewDialog}
         >
           <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
-          <span className="ms-Button-label">What's New</span>
+          <span className="ms-Button-label">What&apos;s New</span>
         </DefaultButton>
         <Dialog
           hidden={this.state.isWhatsNewDialogHidden}

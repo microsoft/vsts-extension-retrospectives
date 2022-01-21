@@ -29,7 +29,7 @@ export default class FeedbackBoardPreviewEmail extends React.Component<IFeedback
   }
 
   public async componentDidMount() {
-    const url = getBoardUrl(this.props.teamId, this.props.board.id);
+    const url = await getBoardUrl(this.props.teamId, this.props.board.id);
     const previewContent: string = await shareBoardHelper.generateEmailText(this.props.board, url, false);
     this.setState({ emailContent: previewContent });
   }

@@ -73,10 +73,6 @@
       "addressable": true
     },
     {
-      "path": "node_modules/vss-web-extension-sdk/lib",
-      "addressable": true
-    },
-    {
       "path": "dist/reflect-bundle.js",
       "addressable": true
     },

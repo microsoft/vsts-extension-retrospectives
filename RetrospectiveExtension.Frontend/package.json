@@ -22,6 +22,8 @@
   "dependencies": {
     "@aspnet/signalr": "1.1.4",
     "applicationinsights-js": "1.0.21",
+    "azure-devops-extension-api": "~1.157.0",
+    "azure-devops-extension-sdk": "~2.0.11",
     "classnames": "2.3.1",
     "copy-to-clipboard": "3.3.1",
     "file-saver": "2.0.5",
@@ -35,8 +37,7 @@
     "react-toastify": "8.1.0",
     "slick-carousel": "1.8.1",
     "telemetryclient-team-services-extension": "1.0.10",
-    "uuid": "8.3.2",
-    "vss-web-extension-sdk": "5.141.0"
+    "uuid": "8.3.2"
   },
   "devDependencies": {
     "@types/applicationinsights-js": "1.0.9",

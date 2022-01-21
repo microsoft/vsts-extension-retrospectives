@@ -1,4 +1,4 @@
-﻿import { WorkItem } from 'TFS/WorkItemTracking/Contracts';
+﻿import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 
 export interface WorkItemGroup {
   name: string;

@@ -10,8 +10,8 @@
 //---------------------------------------------------------------------
 // Source: https://github.com/ALM-Rangers/telemetryclient-vsts-extension 
 
-/// <reference types="vss-web-extension-sdk" />
-import { AppInsights } from "applicationinsights-js"
+import { AppInsights } from "applicationinsights-js";
+import { getUser } from "azure-devops-extension-sdk";
 
 export class TelemetryClientSettings {
   public key: string;
@@ -52,10 +52,10 @@ export class TelemetryClient {
     this.ExtensionContext = settings.extensioncontext;
 
     try {
-      const webContext = VSS.getWebContext();
+      const user = getUser();
 
       AppInsights.downloadAndSetup(config);
-      AppInsights.setAuthenticatedUserContext(webContext.user.id, webContext.collection.id);
+      AppInsights.setAuthenticatedUserContext(user.id, user.name);
     }
     catch (e) {
       console.log(e);

@@ -1,5 +1,3 @@
-/// <reference types="vss-web-extension-sdk" />
-
 /**
  * Helpers for Effectiveness Measurement Questions.
  *

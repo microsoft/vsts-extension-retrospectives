@@ -9,10 +9,10 @@ import FeedbackItemGroup from './feedbackItemGroup';
 import { IColumnItem, IColumn } from './feedbackBoard';
 import localStorageHelper from '../utilities/localStorageHelper';
 // TODO (enpolat) : import { TelemetryEvents, appInsightsClient } from '../utilities/appInsightsClient';
-import { WebApiTeam } from 'TFS/Core/Contracts';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { ActionButton, IButton } from 'office-ui-fabric-react/lib/Button';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-import { WorkItemType } from 'TFS/WorkItemTracking/Contracts';
+import { WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
