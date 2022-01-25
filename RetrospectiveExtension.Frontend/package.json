@@ -11,6 +11,7 @@
     "pack:p": "tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
     "publish:d": "npm run build && npm run pack:d && tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
     "publish:p": "npm run build && npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
+    "start:dev": "webpack-dev-server --mode development",
     "test": "jest"
   },
   "repository": {
@@ -72,6 +73,7 @@
     "url-loader": "4.1.1",
     "util": "0.12.4",
     "webpack": "5.66.0",
-    "webpack-cli": "4.9.1"
+    "webpack-cli": "4.9.1",
+    "webpack-dev-server": "^4.7.2"
   }
 }

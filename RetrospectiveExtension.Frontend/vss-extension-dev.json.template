@@ -1,11 +1,12 @@
 {
   "manifestVersion": 1,
   "id": "retrospective-vsts-extension-dev",
-  "publisher": "<publisher id>",
+  "publisher": <publisher id>,
   "version": "0.0.1",
   "name": "Retrospectives (Dev)",
   "description": "An Azure DevOps extension for efficient retrospectives.",
   "public": false,
+  "baseUri": "https://localhost:3000",
   "icons": {
     "small": "images/logos/logo_small.png",
     "branding": "images/logos/logo_branding.png",

@@ -64,6 +64,80 @@ Clone the repository to your local machine from the Azure DevOps endpoint.
 
 - For updates, simple rebuild and package your extension and publish an update from the Azure DevOps marketplace. That will automatically update the extension in your project.
 
+- For the real time live syncing to work, our service needs to know your publisher id and your extension's unique key. To enable real time updates for your test extension, please [reach out to us](https://github.com/microsoft/vsts-extension-retrospectives/issues) with your publisher id and the unique key of your extension. [Instructions on how to download the unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key).
+
+### Test using Hot Reload and Debug
+
+Test changes by directly loading changes locally, without having to re-package and re-publish the extension in the marketplace.
+
+Reference: [Azure DevOps Extension Hot Reload and Debug](https://github.com/microsoft/azure-devops-extension-hot-reload-and-debug)
+
+**Note:** You will need [Visual Studio Code](https://code.visualstudio.com/download), [Firefox](https://www.mozilla.org/en-US/firefox/) and the [Debugger for Firefox](https://marketplace.visualstudio.com/items?itemName=firefox-devtools.vscode-firefox-debug) VS Code extension.
+
+- In the 'RetrospectiveExtension.Frontend' folder, create the 'vss-extension-dev.json' file using the template file `vss-extension-dev.json.template` for reference.
+
+- Update the 'webpack.config.js' to enable source maps. Set the devtool property to `inline-source-map`. Also set devServer.https to true and devServer.port to 3000.
+
+  ```js
+  module.exports = {
+    devtool: 'inline-source-map',
+    devServer: {
+      https: true,
+      port: 3000,
+      static: {
+        directory: path.join(__dirname),
+      }
+    },
+  ...
+  ```
+
+- Set `output.publicPath` to `/dist/` in the webpack.config.json file. This will allow webpack to serve files from `https://localhost:3000/dist`.
+
+  ```js
+  module.exports = {
+      output: {
+        publicPath: "/dist/"
+        // ...
+      }
+      // ..
+  };
+  ```
+
+- In the root of the project, create a folder named `.vscode`. In there, create a file named `launch.json`, which will help to set up a debug configuration for VS Code that launches Firefox with the correct path mappings. Inside of this file, you will add a path mapping with `url` set to `webpack:///` and have the path set to `${workspaceFolder}/RetrospectiveExtension.Frontend/`. Also set the reAttach property on the configuration to true to avoid restarting Fiefox every time you debug.
+  
+  ```json
+  {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Launch Firefox",
+        "type": "firefox",
+        "request": "launch",
+        "url": "https://localhost:3000/",
+        "reAttach": true,
+        "pathMappings": [
+          {
+            "url": "webpack:///",
+            "path": "${workspaceFolder}/RetrospectiveExtension.Frontend/"
+          }
+        ]
+      }
+    ]
+  }
+  ```
+
+- Navigate to the '/RetrospectiveExtension.Frontend' folder, run `npm install` to download all the dependent packages listed in 'package.json'.
+
+- Run `npm run build:d` to build the project.
+
+- Run `npm run start:dev` to start the webpack-dev-server
+
+- Start debugger (making sure the webpack-dev-server is still running). The default launch configuration should be set to Launch Firefox.
+
+- Once Firefox starts up, you should get an untrusted certificate error page. Select Advanced and then select **Accept the Risk and Continue** and log into your Azure DevOps account. From now on, if you leave this Firefox window open, the debugger will reattach instead of starting a clean Firefox instance each time.
+
+- Once you are logged in to Azure DevOps, your extension should be running. Set a breakpoint in a method in VS Code and you should see that breakpoint hit when that method executes.
+
 ### Storage
 
 The Retrospectives tool uses the [Azure DevOps data service](https://docs.microsoft.com/en-us/azure/devops/extend/develop/data-storage?view=vsts) for handling all its storage.
