@@ -6,33 +6,36 @@ on:
       - master
       - dev
       - 'releases/**'
-    paths-ignore:
-      - 'RetrospectiveExtension.Backend/**'
   pull_request:
     branches:
       - master
       - dev
       - 'releases/**'
-    paths-ignore:
-      - 'RetrospectiveExtension.Backend/**'
   workflow_dispatch:
 
 jobs:
   build:
-
+    name: Frontend - Build and Test  
     runs-on: ubuntu-latest
-
-    name: Build and Test
-
     steps:
-    - uses: actions/checkout@v2
-      name: Check out repository
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            src:
+              - '.github/**'
+              - 'RetrospectiveExtension.Frontend/**'
 
-    - run: |
-        npm install
-        npm run lint
-        npm run build:p
-        npm run test
-        npm run pack:p
-      name: Build and Test
-      working-directory: 'RetrospectiveExtension.Frontend'
+      - if: steps.changes.outputs.src == 'true'
+        uses: actions/checkout@v2
+        name: Check out repository
+
+      - if: steps.changes.outputs.src == 'true'
+        run: |
+          npm install
+          npm run lint
+          npm run build:p
+          npm run test
+          npm run pack:p
+        name: Build and Test
+        working-directory: 'RetrospectiveExtension.Frontend'

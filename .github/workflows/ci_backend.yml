@@ -6,34 +6,39 @@ on:
       - master
       - dev
       - 'releases/**'
-    paths:
-      - 'RetrospectiveExtension.Backend/**'
   pull_request:
     branches:
       - master
       - dev
       - 'releases/**'
-    paths:
-      - 'RetrospectiveExtension.Backend/**'
   workflow_dispatch:
 
 jobs:
   build:
-
-    strategy:
-      fail-fast: false
-
+    name: Backend - Build and Test
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            src:
+              - '.github/**'
+              - 'RetrospectiveExtension.Backend/**'
+              - 'RetrospectiveExtension.Backend.Tests/**'
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      - if: steps.changes.outputs.src == 'true'
+        name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+      - if: steps.changes.outputs.src == 'true'
+        name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      - if: steps.changes.outputs.src == 'true'
+        name: Autobuild
+        uses: github/codeql-action/autobuild@v1
+
+      - if: steps.changes.outputs.src == 'true'
+        name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
