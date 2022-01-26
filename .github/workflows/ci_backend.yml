@@ -20,7 +20,7 @@ on:
 jobs:
   build:
 
-    name: Build and Test
+    name: Backend - Build and Test
 
     runs-on: ubuntu-latest
 

@@ -22,7 +22,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    name: Build and Test
+    name: Frontend - Build and Test
 
     steps:
     - uses: actions/checkout@v2
