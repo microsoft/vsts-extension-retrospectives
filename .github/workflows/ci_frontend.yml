@@ -1,0 +1,39 @@
+name: 'CI - Frontend'
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+      - 'releases/**'
+    paths-ignore:
+      - 'RetrospectiveExtension.Backend/**'
+  pull_request:
+    branches:
+      - master
+      - dev
+      - 'releases/**'
+    paths-ignore:
+      - 'RetrospectiveExtension.Backend/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    name: Build and Test
+
+    steps:
+    - uses: actions/checkout@v2
+      name: Check out repository
+
+    - run: |
+        npm install
+        npm run lint
+        npm run build:p
+        npm run test
+        npm run pack:d
+        npm run pack:p
+      name: Build and Test
+      working-directory: 'RetrospectiveExtension.Frontend'
