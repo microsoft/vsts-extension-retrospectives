@@ -6,15 +6,15 @@ on:
       - master
       - dev
       - 'releases/**'
-    paths:
-      - 'RetrospectiveExtension.Frontend/**'
+    paths-ignore:
+      - 'RetrospectiveExtension.Backend/**'
   pull_request:
     branches:
       - master
       - dev
       - 'releases/**'
-    paths:
-      - 'RetrospectiveExtension.Frontend/**'
+    paths-ignore:
+      - 'RetrospectiveExtension.Backend/**'
   workflow_dispatch:
 
 jobs:
@@ -22,6 +22,17 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    name: Build and Test
+
     steps:
     - uses: actions/checkout@v2
-    - run: cd 'RetrospectiveExtension.Frontend' && npm install && npm run lint && npm run build:p && npm run pack:p
+      name: Check out repository
+
+    - run: |
+        npm install
+        npm run lint
+        npm run build:p
+        npm run test
+        npm run pack:p
+      name: Build and Test
+      working-directory: 'RetrospectiveExtension.Frontend'
