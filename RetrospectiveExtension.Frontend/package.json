@@ -25,9 +25,11 @@
     "applicationinsights-js": "1.0.21",
     "azure-devops-extension-api": "~1.157.0",
     "azure-devops-extension-sdk": "~2.0.11",
+    "babel-jest": "^27.4.6",
     "classnames": "2.3.1",
     "copy-to-clipboard": "3.3.1",
     "file-saver": "2.0.5",
+    "jest-junit-reporter": "^1.1.0",
     "jsonwebtoken": "8.5.1",
     "moment": "2.29.1",
     "office-ui-fabric-react": "7.180.3",
@@ -75,5 +77,29 @@
     "webpack": "5.66.0",
     "webpack-cli": "4.9.1",
     "webpack-dev-server": "^4.7.2"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.(js|ts|tsx|jsx)$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)"
+    ],
+    "moduleNameMapper": {
+      "office-ui-fabric-react/lib/(.*)$": "office-ui-fabric-react/lib-commonjs/$1"
+    },
+    "preset": "ts-jest/presets/js-with-babel",
+    "testResultsProcessor": "./node_modules/jest-junit-reporter",
+    "collectCoverage": true,
+    "coverageReporters": [
+      "json",
+      "html",
+      "cobertura"
+    ],
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.test.json"
+      }
+    }
   }
 }
