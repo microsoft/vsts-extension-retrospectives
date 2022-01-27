@@ -17,6 +17,8 @@ import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { IconType } from 'office-ui-fabric-react/lib/Icon';
 import Dialog, { DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface ActionItemProps extends IButtonProps {
   feedbackItemId: string;
@@ -36,7 +38,7 @@ export interface ActionItemState {
   workItemSearchTextboxHasErrors: boolean;
 }
 
-export default class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
+class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
   constructor(props: ActionItemProps) {
     super(props);
 
@@ -215,3 +217,5 @@ export default class ActionItem extends React.Component<ActionItemProps, ActionI
     );
   }
 }
+
+export default withAITracking(reactPlugin, ActionItem);

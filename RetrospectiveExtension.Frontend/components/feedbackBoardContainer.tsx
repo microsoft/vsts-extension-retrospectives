@@ -37,6 +37,9 @@ import EffectivenessMeasurementRow from './effectivenessMeasurementRow';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { getQuestionName } from '../utilities/effectivenessMeasurementQuestionHelper';
 
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
   projectId: string;
@@ -86,7 +89,7 @@ export interface FeedbackBoardContainerState {
   castedVoteCount: number;
 }
 
-export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
+ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
   constructor(props: FeedbackBoardContainerProps) {
     super(props);
     this.state = {
@@ -1517,3 +1520,5 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     );
   }
 }
+
+export default withAITracking(reactPlugin, FeedbackBoardContainer);

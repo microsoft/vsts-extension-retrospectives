@@ -14,6 +14,8 @@ import {
   SelectionMode,
   IColumn,
 } from 'office-ui-fabric-react/lib/DetailsList';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
@@ -49,7 +51,7 @@ interface IActionItemsTableProps {
   onActionItemClick: (id: number) => void;
 }
 
-export default class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryState> {
+class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryState> {
   constructor(props: IBoardSummaryProps) {
     super (props);
 
@@ -299,3 +301,5 @@ export default class BoardSummary extends React.Component<IBoardSummaryProps, IB
     );
   }
 }
+
+export default withAITracking(reactPlugin, BoardSummary);

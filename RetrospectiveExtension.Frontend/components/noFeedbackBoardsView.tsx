@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface NoFeedbackBoardsViewProps {
   onCreateBoardClick: () => void
 }
 
-export default class NoFeedbackBoardsView extends React.Component<NoFeedbackBoardsViewProps> {
+class NoFeedbackBoardsView extends React.Component<NoFeedbackBoardsViewProps> {
   constructor(props: NoFeedbackBoardsViewProps) {
     super(props);
   }
@@ -24,3 +26,5 @@ export default class NoFeedbackBoardsView extends React.Component<NoFeedbackBoar
     )
   }
 }
+
+export default withAITracking(reactPlugin,NoFeedbackBoardsView);

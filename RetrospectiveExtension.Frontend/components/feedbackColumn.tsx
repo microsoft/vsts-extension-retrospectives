@@ -13,6 +13,8 @@ import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { ActionButton, IButton } from 'office-ui-fabric-react/lib/Button';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -50,7 +52,7 @@ export interface FeedbackColumnState {
   isCarouselHidden: boolean;
 }
 
-export default class FeedbackColumn extends React.Component<FeedbackColumnProps, FeedbackColumnState> {
+class FeedbackColumn extends React.Component<FeedbackColumnProps, FeedbackColumnState> {
   private createFeedbackButton: IButton;
 
   constructor(props: FeedbackColumnProps) {
@@ -122,10 +124,10 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
   }
 
-  private static moveFeedbackItem = async (
+  public static moveFeedbackItem = async (
     refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void,
-    boardId: string, 
-    feedbackItemId: string, 
+    boardId: string,
+    feedbackItemId: string,
     columnId: string) => {
     const updatedFeedbackItems = await itemDataService.addFeedbackItemAsMainItemToColumn(boardId, feedbackItemId, columnId);
 
@@ -143,50 +145,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     // TODO: Inform user when not all updates are successful due to race conditions.
   };
 
-  public static createFeedbackItemProps = (
-    columnProps: FeedbackColumnProps, 
-    columnItem: IColumnItem,
-    isInteractable: boolean): IFeedbackItemProps => {
-    return {
-      id: columnItem.feedbackItem.id,
-      title: columnItem.feedbackItem.title,
-      createdBy:  columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy.displayName : null,
-      createdByProfileImage: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy._links.avatar.href : null,
-      lastEditedDate: columnItem.feedbackItem.modifedDate ? columnItem.feedbackItem.modifedDate.toString() : '',
-      upvotes: columnItem.feedbackItem.upvotes,
-      timerSecs: columnItem.feedbackItem.timerSecs,
-      timerState: columnItem.feedbackItem.timerstate,
-      timerId: columnItem.feedbackItem.timerId,
-      workflowPhase: columnProps.workflowPhase,
-      accentColor: columnProps.accentColor,
-      iconClass: columnProps.iconClass,
-      createdDate: columnItem.feedbackItem.createdDate.toString(),
-      team: columnProps.team,
-      columnProps: columnProps,
-      columns: columnProps.columns,
-      columnIds: columnProps.columnIds,
-      columnId: columnProps.columnId,
-      boardId: columnProps.boardId,
-      boardTitle: columnProps.boardTitle,
-      defaultActionItemAreaPath: columnProps.defaultActionItemAreaPath,
-      defaultActionItemIteration: columnProps.defaultActionItemIteration,
-      actionItems: columnItem.actionItems,
-      newlyCreated: columnItem.newlyCreated,
-      showAddedAnimation: columnItem.showAddedAnimation,
-      addFeedbackItems: columnProps.addFeedbackItems,
-      removeFeedbackItemFromColumn: columnProps.removeFeedbackItemFromColumn,
-      refreshFeedbackItems: columnProps.refreshFeedbackItems,
-      moveFeedbackItem: FeedbackColumn.moveFeedbackItem,
-      nonHiddenWorkItemTypes: columnProps.nonHiddenWorkItemTypes,
-      allWorkItemTypes: columnProps.allWorkItemTypes,
-      isInteractable: isInteractable,
-      shouldHaveFocus: columnItem.shouldHaveFocus ? true : false,
-      hideFeedbackItems: columnProps.hideFeedbackItems,
-      userIdRef: columnItem.feedbackItem.userIdRef,
-      onVoteCasted: columnProps.onVoteCasted
-    }
-  }
-
   private renderFeedbackItems = () => {
     const sortItems = this.props.workflowPhase === WorkflowPhase.Act;
 
@@ -200,12 +158,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     return columnItems
       .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
       .map((columnItem) => {
-        const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem, true);
+        const feedbackItemProps = FeedbackColumnHelper.createFeedbackItemProps(this.props, columnItem, true);
 
         if (columnItem.feedbackItem.childFeedbackItemIds && columnItem.feedbackItem.childFeedbackItemIds.length) {
           const childItemsToGroup = this.props.columnItems
             .filter((childColumnItem) => columnItem.feedbackItem.childFeedbackItemIds.some((childId) => childId === childColumnItem.feedbackItem.id))
-            .map((childColumnItem) => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem, true));
+            .map((childColumnItem) => FeedbackColumnHelper.createFeedbackItemProps(this.props, childColumnItem, true));
 
           return (
             <FeedbackItemGroup
@@ -300,3 +258,52 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     return this.renderFeedbackColumn();
   }
 }
+
+export class FeedbackColumnHelper
+{
+  public static createFeedbackItemProps = (
+    columnProps: FeedbackColumnProps,
+    columnItem: IColumnItem,
+    isInteractable: boolean): IFeedbackItemProps => {
+    return {
+      id: columnItem.feedbackItem.id,
+      title: columnItem.feedbackItem.title,
+      createdBy:  columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy.displayName : null,
+      createdByProfileImage: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy._links.avatar.href : null,
+      lastEditedDate: columnItem.feedbackItem.modifedDate ? columnItem.feedbackItem.modifedDate.toString() : '',
+      upvotes: columnItem.feedbackItem.upvotes,
+      timerSecs: columnItem.feedbackItem.timerSecs,
+      timerState: columnItem.feedbackItem.timerstate,
+      timerId: columnItem.feedbackItem.timerId,
+      workflowPhase: columnProps.workflowPhase,
+      accentColor: columnProps.accentColor,
+      iconClass: columnProps.iconClass,
+      createdDate: columnItem.feedbackItem.createdDate.toString(),
+      team: columnProps.team,
+      columnProps: columnProps,
+      columns: columnProps.columns,
+      columnIds: columnProps.columnIds,
+      columnId: columnProps.columnId,
+      boardId: columnProps.boardId,
+      boardTitle: columnProps.boardTitle,
+      defaultActionItemAreaPath: columnProps.defaultActionItemAreaPath,
+      defaultActionItemIteration: columnProps.defaultActionItemIteration,
+      actionItems: columnItem.actionItems,
+      newlyCreated: columnItem.newlyCreated,
+      showAddedAnimation: columnItem.showAddedAnimation,
+      addFeedbackItems: columnProps.addFeedbackItems,
+      removeFeedbackItemFromColumn: columnProps.removeFeedbackItemFromColumn,
+      refreshFeedbackItems: columnProps.refreshFeedbackItems,
+      moveFeedbackItem: FeedbackColumn.moveFeedbackItem,
+      nonHiddenWorkItemTypes: columnProps.nonHiddenWorkItemTypes,
+      allWorkItemTypes: columnProps.allWorkItemTypes,
+      isInteractable: isInteractable,
+      shouldHaveFocus: columnItem.shouldHaveFocus ? true : false,
+      hideFeedbackItems: columnProps.hideFeedbackItems,
+      userIdRef: columnItem.feedbackItem.userIdRef,
+      onVoteCasted: columnProps.onVoteCasted
+    }
+  }
+}
+
+export default withAITracking(reactPlugin, FeedbackColumn);

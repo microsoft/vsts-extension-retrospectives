@@ -6,13 +6,11 @@ import { init as sdkInit }  from 'azure-devops-extension-sdk';
 import { isHostedAzureDevOps } from './utilities/azureDevOpsContextHelper';
 import { getProjectId } from './utilities/servicesHelper';
 import './css/main.scss';
+import { appInsights } from './utilities/external/telemetryClient';
 
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from './components/feedbackBoardContainer';
-// TODO (enpolat) : import { appInsightsClient, TelemetryEvents } from './utilities/appInsightsClient'
 
 initializeIcons();
-
-// TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.ExtensionLaunched);
 
 sdkInit()
   .then(() => {

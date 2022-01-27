@@ -16,6 +16,8 @@ import { getBoardUrl } from '../utilities/boardUrlHelper';
 import Dialog, { DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import ActionItem from './actionItem';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface ActionItemDisplayProps extends IButtonProps {
   feedbackItemId: string;
@@ -42,7 +44,7 @@ export interface ActionItemDisplayState {
   initialRender: boolean;
 }
 
-export default class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionItemDisplayState> {
+class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionItemDisplayState> {
   constructor(props: ActionItemDisplayProps) {
     super(props);
 
@@ -316,3 +318,5 @@ export default class ActionItemDisplay extends React.Component<ActionItemDisplay
     );
   }
 }
+
+export default withAITracking(reactPlugin, ActionItemDisplay);

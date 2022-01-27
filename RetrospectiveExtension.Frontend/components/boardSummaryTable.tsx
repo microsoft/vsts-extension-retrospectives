@@ -11,6 +11,8 @@ import classNames from 'classnames';
 import ReactTable from 'react-table-6';
 
 import 'react-table-6/react-table.css'
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -43,7 +45,7 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-export default class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardSummaryTableState> {
+class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardSummaryTableState> {
   constructor(props: IBoardSummaryTableProps) {
     super(props);
 
@@ -344,3 +346,5 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
     );
   }
 }
+
+export default withAITracking(reactPlugin, BoardSummaryTable);

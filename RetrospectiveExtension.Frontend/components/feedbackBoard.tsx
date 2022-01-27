@@ -15,6 +15,8 @@ import { WorkflowPhase } from '../interfaces/workItem';
 import FeedbackItemCarousel from './feedbackCarousel';
 import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -57,7 +59,7 @@ export interface FeedbackBoardState {
   currentVoteCount: string;
 }
 
-export default class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
+class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
   constructor(props: FeedbackBoardProps) {
     super(props);
 
@@ -456,3 +458,5 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       </div>);
   }
 }
+
+export default withAITracking(reactPlugin, FeedbackBoard);
