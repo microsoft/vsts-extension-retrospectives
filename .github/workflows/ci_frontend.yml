@@ -18,6 +18,9 @@ jobs:
     name: Frontend - Build and Test  
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        name: Check out repository
+
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -25,10 +28,6 @@ jobs:
             src:
               - '.github/**'
               - 'RetrospectiveExtension.Frontend/**'
-
-      - if: steps.changes.outputs.src == 'true'
-        uses: actions/checkout@v2
-        name: Check out repository
 
       - if: steps.changes.outputs.src == 'true'
         run: |

@@ -18,6 +18,9 @@ jobs:
     name: Backend - Build and Test
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        name: Check out repository
+
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -26,10 +29,6 @@ jobs:
               - '.github/**'
               - 'RetrospectiveExtension.Backend/**'
               - 'RetrospectiveExtension.Backend.Tests/**'
-
-      - if: steps.changes.outputs.src == 'true'
-        name: Checkout repository
-        uses: actions/checkout@v2
 
       - if: steps.changes.outputs.src == 'true'
         name: Initialize CodeQL
