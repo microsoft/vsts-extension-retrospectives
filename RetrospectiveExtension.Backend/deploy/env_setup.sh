@@ -8,7 +8,7 @@
 ## - Resource group
 ## - SignalR service
 ## - Azure Web App
-##
+## - Application Insights
 
 (
     # Configure environment variables
@@ -24,7 +24,7 @@
     resource_name_suffix="${RESOURCE_NAME_SUFFIX}"
     resource_group="rg-${RESOURCE_NAME_SUFFIX}"
     location="${LOCATION}"
-    
+
     # Login to Azure via Service Principal
 
     # Set service principal information
@@ -62,7 +62,22 @@
     az appservice plan create \
         --name "plan-${resource_name_suffix}" \
         --resource-group "$resource_group"
-    
+
+    # https://docs.microsoft.com/en-us/cli/azure/monitor/app-insights/component?view=azure-cli-latest#az-monitor-app-insights-component-create
+    # Create Application Insights resource
+    echo "### Creating Application Insights resource"
+    az monitor app-insights component create \
+        --app "ai-${resource_name_suffix}" \
+        --location "$location" \
+        --resource-group "$resource_group"
+
+    ai_instrumentation_key=$( \
+        az monitor app-insights component show \
+        --app "ai-${resource_name_suffix}" \
+        --resource-group "$resource_group" \
+        --query instrumentationKey \
+        --output tsv)
+
     # https://docs.azure.cn/en-us/cli/webapp?view=azure-cli-latest#az_webapp_create
     # Create WebApp
     az webapp create \
@@ -84,7 +99,7 @@
     az webapp config appsettings set \
         --resource-group "$resource_group" \
         --name "app-${resource_name_suffix}" \
-        --settings Azure__SignalR__ConnectionString=$signalr_connection_string "@dev_certs.json" "@allowed_origins.json"
+        --settings Azure__SignalR__ConnectionString=$signalr_connection_string ApplicationInsights__InstrumentationKey=$ai_instrumentation_key "@dev_certs.json" "@allowed_origins.json"
 
     #Create Output directory to publish the dotnet project artifacts to be published to the Azure Web Apps Instance
 
@@ -92,14 +107,14 @@
 
     dotnet build
     # Publish the Dotnet project
-    dotnet publish -c Release 
+    dotnet publish -c Release
 
     cd  bin/Release/net5/publish/
     # Zip the deployed artifact
     zip -r "../../../website.zip" .
 
     cd ../../../..
-   
+
     # https://docs.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webapp-deploy
     # Deploy the web app
     az webapp deploy --resource-group "$resource_group" \
@@ -111,6 +126,6 @@
         --query defaultHostName --output tsv)
 
     backend_health_check="https://${backend_service_url}/health"
-   
+
     echo "Backend service successfully deployed at ${backend_service_url}. To check the health of the deployment visit ${backend_health_check}"
 )

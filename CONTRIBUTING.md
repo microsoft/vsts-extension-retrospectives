@@ -162,7 +162,7 @@ deploy a single backend to support multiple developer test extensions.
 
 1. Copy `/deploy/.env.template` to `/deploy/.env` and make the following
 changes:
-   - Add the Service Principal values used by the `env_setup.sh` script. 
+   - Add the Service Principal values used by the `env_setup.sh` script.
    [Instructions on how to create a Service Principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli#password-based-authentication).
    - Add the `RESOURCE_NAME_SUFFIX` value. This will be used for naming
    all Azure resources including the App Service name - `https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
@@ -183,9 +183,11 @@ secrets. Remember to increment the name index to add additional secrets.
 1. Once the script completes, it will output the url of the backend service. You can navigate to the [Azure Portal](https://portal.azure.com)
 and validate that the `rg-<RESOURCE_NAME_SUFFIX>` resource group exists and
 contains the App Service, App Service Plan and SignalR resources.
-1. You will need to update the `RetrospectiveExtension.FrontEnd/config/environment.tsx`
-CollaborationStateServiceUrl value to the App Service URL -
-`https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net` and redeploy the extension.
+1. Update the `RetrospectiveExtension.FrontEnd/config/environment.tsx` to reflect changes to:
+   - `CollaborationStateServiceUrl` value to the App Service URL -
+`https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
+   - `AppInsightsInstrumentKey` value to Application Insights' Instrumentation Key for the resource `ai-<RESOURCE_NAME_SUFFIX>`.
+1. After updating the above values redeploy the extension.
 
 ## Style Guidelines for Backend Project
 
