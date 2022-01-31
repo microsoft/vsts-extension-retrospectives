@@ -20,6 +20,12 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y docker-ce-cli \
     #
+    # Install Azure CLI
+    && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
+    #
+    # Install zip
+    && apt-get install zip \
+    #
     # Install dotnet core 5
     && cd /tmp \
     && wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \

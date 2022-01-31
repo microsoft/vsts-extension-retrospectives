@@ -112,8 +112,8 @@ Reference: [Azure DevOps Extension Hot Reload and Debug](https://github.com/micr
   };
   ```
 
-- In the root of the project, create a folder named `.vscode`. In there, create a file named `launch.json`, which will help to set up a debug configuration for VS Code that launches Firefox with the correct path mappings. Inside of this file, you will add a path mapping with `url` set to `webpack:///` and have the path set to `${workspaceFolder}/RetrospectiveExtension.Frontend/`. Also set the reAttach property on the configuration to true to avoid restarting Fiefox every time you debug.
-  
+- In the root of the project, create a folder named `.vscode`. In there, create a file named `launch.json`, which will help to set up a debug configuration for VS Code that launches Firefox with the correct path mappings. Inside of this file, you will add a path mapping with `url` set to `webpack:///` and have the path set to `${workspaceFolder}/RetrospectiveExtension.Frontend/`. Also set the reAttach property on the configuration to true to avoid restarting Firefox every time you debug.
+
   ```json
   {
     "version": "0.2.0",
@@ -153,12 +153,26 @@ The Retrospectives tool uses the [Azure DevOps data service](https://docs.micros
 
 ### Backend
 
+#### Overview
+
 The Retrospectives tool uses the [Azure SignalR service](https://azure.microsoft.com/en-us/services/signalr-service/) to add real time support. The backend codebase can be found [here](https://github.com/microsoft/vsts-extension-retrospectives/tree/master/RetrospectiveExtension.Backend).
 
-To enable real time updates from your test extension you will need to deploy
-the backend to Azure specifying your publisher id and the unique key of your
-extension. **Note:** If you are part of a team working on the retro tool you can
-deploy a single backend to support multiple developer test extensions.
+To enable real time updates from your test extension you will need to deploy the backend to Azure
+specifying your publisher id and the unique key of your extension. **Note:**
+
+- This setup is ***not*** required for contributing to this extension, but can be helpful if you want
+certain debugging options available to you.
+- If you are part of a team working on the retro tool you can deploy a single backend to support multiple developer test extensions.
+
+#### Setup
+
+Before starting, ensure these dependencies are installed:
+
+- Azure CLI - [installation instructions here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- dotnet CLI - the CLI comes as a part of the [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet/5.0)
+- the `zip` CLI tool - via `brew install zip` or `apt-get install zip` in a unix-flavored environment
+
+To setup:
 
 1. Copy `/deploy/.env.template` to `/deploy/.env` and make the following
 changes:
@@ -167,7 +181,7 @@ changes:
    - Add the `RESOURCE_NAME_SUFFIX` value. This will be used for naming
    all Azure resources including the App Service name - `https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
    **Note:** The app name must be globally unique so select something accordingly.
-   - Add the `LOCATION `value i.e. "eastus", "westus", etc.
+   - Add the `LOCATION`value i.e. "eastus", "westus", etc.
 1. Copy `/allowed_origins.json.template` to `/allowed_origins.json` and replace
 the `<publisher id>` with your publisher id. This id uniquely identifies your
 publisher in the Visual Studio Marketplace. If you are part of a team working
