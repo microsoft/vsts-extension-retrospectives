@@ -17,7 +17,7 @@ import Dialog, { DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dia
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import ActionItem from './actionItem';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface ActionItemDisplayProps extends IButtonProps {
   feedbackItemId: string;

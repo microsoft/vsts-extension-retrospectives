@@ -29,11 +29,11 @@ export class ProcessService {
     }
 
     public createField = (field: ProcessDefinitionsContracts.FieldModel, processId: string) => {
-        return this.workItemTrackingProcessDefinitionsHttpClient.createField(field,processId);
+        return this.workItemTrackingProcessDefinitionsHttpClient.createField(field, processId);
     }
 
     public addFieldToWorkItemType = (field: ProcessDefinitionsContracts.WorkItemTypeFieldModel, processId: string, witRefNameForFields: string) => {
-        return this.workItemTrackingProcessDefinitionsHttpClient.addFieldToWorkItemType(field,processId,witRefNameForFields);
+        return this.workItemTrackingProcessDefinitionsHttpClient.addFieldToWorkItemType(field, processId, witRefNameForFields);
     }
 
     public createRetrospectiveWorkItemTypeForProcess = (processId: string) => {

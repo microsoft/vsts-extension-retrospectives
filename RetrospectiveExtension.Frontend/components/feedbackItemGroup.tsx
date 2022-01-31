@@ -5,7 +5,7 @@ import { WorkflowPhase } from '../interfaces/workItem';
 import FeedbackItem, { FeedbackItemHelper, IFeedbackItemProps } from './feedbackItem';
 import localStorageHelper from '../utilities/localStorageHelper';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface IFeedbackItemGroupProps {
   groupedWorkItems: IFeedbackItemProps[];

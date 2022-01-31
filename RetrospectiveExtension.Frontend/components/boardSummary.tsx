@@ -15,7 +15,7 @@ import {
   IColumn,
 } from 'office-ui-fabric-react/lib/DetailsList';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
@@ -39,6 +39,7 @@ interface IIconProps {
 }
 
 interface IActionItemsTableProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
   icon: IIconProps;
   title: string;

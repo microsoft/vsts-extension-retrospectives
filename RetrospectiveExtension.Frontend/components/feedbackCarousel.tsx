@@ -1,13 +1,13 @@
 import * as React from 'react';
 import Slider, { Settings } from "react-slick";
-import FeedbackColumn, { FeedbackColumnProps, FeedbackColumnHelper } from './feedbackColumn';
+import { FeedbackColumnProps, FeedbackColumnHelper } from './feedbackColumn';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import FeedbackItem from './feedbackItem';
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface IFeedbackCarouselProps {
   feedbackColumnPropsList: FeedbackColumnProps[];

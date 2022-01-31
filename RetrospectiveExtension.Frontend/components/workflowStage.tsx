@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface IWorkflowStageProps {
   display: string;
@@ -54,4 +54,4 @@ export interface IWorkflowStageState {
   }
 }
 
-export default withAITracking(reactPlugin,WorkflowStage);
+export default withAITracking(reactPlugin, WorkflowStage);

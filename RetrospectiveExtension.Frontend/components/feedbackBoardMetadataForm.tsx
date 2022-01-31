@@ -13,7 +13,7 @@ import EditableDocumentCardTitle from './editableDocumentCardTitle';
 import { v4 as uuid } from 'uuid';
 import { ChangeEvent } from 'react';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -111,6 +111,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
   private maxColumnCount = 5;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public handleInputChange = (event: any, newValue: string) => {
     this.setState({
       title: newValue,
@@ -118,6 +119,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public handleFormSubmit = async (event: any) => {
     event.preventDefault();
     event.stopPropagation();
@@ -177,7 +179,6 @@ console.log(this.state);
       maxVotesPerUser: Number(ev.target.value),
     });
   }
-
 
   private showDeleteColumnConfirmationDialog = () => {
     this.setState({

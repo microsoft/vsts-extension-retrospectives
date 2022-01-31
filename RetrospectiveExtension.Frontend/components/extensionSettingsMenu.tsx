@@ -5,7 +5,7 @@ import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { ViewMode } from '../config/constants';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
@@ -167,7 +167,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
                   title={extensionSettingsMenuItem.title}
                 >
                   <span className="ms-Button-icon"><i className={"fas fa-" + extensionSettingsMenuItem.iconProps}></i></span>&nbsp;
-                  <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span> 
+                  <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span>
                 </ActionButton>
               )
             }
@@ -182,7 +182,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           dialogContentProps={{
             type: DialogType.close,
             title: 'Clear Visit History',
-            subText: 'This extension maintains records of the teams and boards you visited. ' + 
+            subText: 'This extension maintains records of the teams and boards you visited. ' +
             'Clearing visit history means that the next time you use the extension, ' +
             'you will not be automatically directed to the your last visited board.',
           }}

@@ -12,7 +12,7 @@ import ReactTable from 'react-table-6';
 
 import 'react-table-6/react-table.css'
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -224,6 +224,7 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
     />);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private expandSummaryRow = (state: any, rowInfo: any, instance: any) => {
     const { expanded } = state;
     const path = rowInfo.nestingPath[0];
@@ -237,6 +238,7 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getTrProps = (state: any, rowInfo: any, col: any, instance: any) => {
     return {
       onClick: () => {
@@ -252,6 +254,7 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
     };
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getTdProps = (state: any, rowInfo: any, col: any) => {
     const hasPendingItems: boolean =
       (rowInfo && rowInfo.original && rowInfo.original.pendingWorkItemsCount && rowInfo.original.pendingWorkItemsCount > 0) ?
@@ -273,6 +276,7 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
     };
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getCustomTbodyComponent = (props: any) => (
     <div {...props} className={classNames("rt-tbody", props.className || [])}>
       {props.children}
@@ -295,6 +299,7 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
             {
               Header: 'Created Date',
               accessor: 'createdDate',
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               Cell: (row: any) => {
                 return (
                   new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(row.original.createdDate)

@@ -38,7 +38,7 @@ import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { getQuestionName } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -623,8 +623,8 @@ export interface FeedbackBoardContainerState {
       });
     }
 
-    // TODO: 
-    // Show error message in case there's an unexpected case of a chosen team not found 
+    // TODO:
+    // Show error message in case there's an unexpected case of a chosen team not found
     // instead of showing the loading indefinitely.
   }
 
@@ -880,7 +880,7 @@ export interface FeedbackBoardContainerState {
   }
 
   private updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
-    if (!updatedBoard) { 
+    if (!updatedBoard) {
       this.handleBoardDeleted(this.state.currentTeam.id, this.state.currentBoard.id);
     }
 
@@ -1220,7 +1220,7 @@ export interface FeedbackBoardContainerState {
                             className="toggle-carousel-button"
                             onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false }); }}>
                             <span className="ms-Button-icon"><i className="fas fa-chart-line"></i></span>&nbsp;
-                            <span className="ms-Button-label">Measure Team Effectiveness</span> 
+                            <span className="ms-Button-label">Measure Team Effectiveness</span>
                           </ActionButton>
                         </TooltipHost>
                       </>
@@ -1377,8 +1377,8 @@ export interface FeedbackBoardContainerState {
                       isCarouselDialogHidden={this.state.isCarouselDialogHidden}
                       hideCarouselDialog={this.hideCarouselDialog}
                       isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
-                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? 
-                        this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
+                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ?
+                        this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect :
                         false
                       }
                       userId={this.state.currentUserId}

@@ -39,7 +39,7 @@ class WorkService {
       }
       else {
         // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
-        console.error('An exception occurred while trying to get the team iterations ', e);  
+        console.error('An exception occurred while trying to get the team iterations ', e);
       }
     }
 

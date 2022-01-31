@@ -210,7 +210,7 @@ class ReflectBackendService {
       teamId,
       boardId
     );
-  }  
+  }
 
   /**
    * Sends a BroadcastUpdatedItem signal for other instances.

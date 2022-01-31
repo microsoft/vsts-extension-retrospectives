@@ -36,9 +36,9 @@ export const WorkflowPhase = {
     get Act(): WorkflowPhase { return 'Act'; },
     getState(str: string): WorkflowPhase {
       if ( str === 'Collect') return WorkflowPhase.Collect;
-      if ( str === 'Group') return WorkflowPhase.Group; 
-      if ( str === 'Vote') return WorkflowPhase.Vote; 
-      if ( str === 'Discuss') return WorkflowPhase.Discuss; 
+      if ( str === 'Group') return WorkflowPhase.Group;
+      if ( str === 'Vote') return WorkflowPhase.Vote;
+      if ( str === 'Discuss') return WorkflowPhase.Discuss;
       if ( str === 'Act') return WorkflowPhase.Act;
       return undefined;
     }

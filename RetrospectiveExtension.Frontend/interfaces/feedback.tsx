@@ -62,5 +62,6 @@ export interface IFeedbackItemDocument {
   userIdRef: string;
   timerSecs: number;
   timerstate: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   timerId: any;
 }

@@ -7,7 +7,7 @@ import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 interface IFeedbackBoardPreviewEmailState {
   emailContent: string;

@@ -156,7 +156,6 @@ class ItemDataService {
       return undefined;
     }
 
-
     if (feedbackItem.upvotes <= 0) {
       return "0";
     } else {
@@ -173,7 +172,7 @@ class ItemDataService {
   /**
    * flip the timer state.
    */
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> =>
   {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
@@ -210,7 +209,7 @@ class ItemDataService {
     {
       feedbackItem.timerSecs = 0;
     }
-    else 
+    else
     {
       feedbackItem.timerSecs++;
     }
@@ -357,9 +356,9 @@ class ItemDataService {
    * Add a feedback item as a child feedback item of another feedback item.
    * This method also ensures that
    *   1) an existing parent-child association is removed from the old parent if the childFeedbackItem already had one.
-   *   2) the existing children of the child feedback item (if any) become children of the specified parent 
+   *   2) the existing children of the child feedback item (if any) become children of the specified parent
    *   feedback item as well.
-   *   3) that the child feedback item and the existing children of the child feedback item (if any) are 
+   *   3) that the child feedback item and the existing children of the child feedback item (if any) are
    *   assigned the same columnId as the parent feedback item.
    */
   public addFeedbackItemAsChild = async (boardId: string, parentFeedbackItemId: string, childFeedbackItemId: string):
@@ -605,7 +604,7 @@ class ItemDataService {
    * Checks if the work item exists in VSTS and if not, removes it.
    * This handles the special case for when a work item is deleted in VSTS. Currently, when a work item is updated using the navigation form service
    * there is no way to determine if the item was deleted.
-   * https://github.com/MicrosoftDocs/vsts-docs/issues/1545 
+   * https://github.com/MicrosoftDocs/vsts-docs/issues/1545
    */
   public removeAssociatedItemIfNotExistsInVsts = async (boardId: string, feedbackItemId: string, associatedWorkItemId: number): Promise<IFeedbackItemDocument> => {
     let workItems: WorkItem[];

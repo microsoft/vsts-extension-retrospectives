@@ -18,7 +18,7 @@ import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { IconType } from 'office-ui-fabric-react/lib/Icon';
 import Dialog, { DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface ActionItemProps extends IButtonProps {
   feedbackItemId: string;
@@ -146,7 +146,7 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
   }
 
   public render() {
-    const workItemType: any = this.props.allWorkItemTypes.find(wit => wit.name === this.props.actionItem.fields['System.WorkItemType']);
+    const workItemType: WorkItemType = this.props.allWorkItemTypes.find(wit => wit.name === this.props.actionItem.fields['System.WorkItemType']);
     const iconProps: IDocumentCardPreviewProps = this.getWorkItemTypeIconProps(workItemType);
 
     // Explicitly cast, since the returned contract contains states, but the interface defined does not
@@ -159,13 +159,13 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
 
     return (
       <DocumentCard
-        key={this.props.actionItem.id + 'card'} 
+        key={this.props.actionItem.id + 'card'}
         className={`related-task-sub-card ${resolvedBorderRight}`}
         type={DocumentCardType.compact}>
         <DocumentCardPreview key={this.props.actionItem.id + 'preview'} {...iconProps} />
         <div
           ref={(element: HTMLElement) => this.openWorkItemButton = element}
-          key={this.props.actionItem.id + 'details'} 
+          key={this.props.actionItem.id + 'details'}
           className="ms-DocumentCard-details"
           tabIndex={0}
           role="button"

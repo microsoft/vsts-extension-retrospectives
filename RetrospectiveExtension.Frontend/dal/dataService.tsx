@@ -32,7 +32,7 @@ export async function readDocuments<T>(
     }
 
     // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
-    console.error('An exception occurred while trying to read the documents: ', e); 
+    console.error('An exception occurred while trying to read the documents: ', e);
 
     data = [];
   }
