@@ -38,3 +38,12 @@ jobs:
           npm run pack:p
         name: Build and Test
         working-directory: 'RetrospectiveExtension.Frontend'
+
+      - if: steps.changes.outputs.src == 'true'
+        name: Upload test report
+        uses: dorny/test-reporter@v1.5.0
+        with:
+          name: JEST Tests
+          path: reports/jest-*.xml
+          reporter: jest-junit
+          working-directory: 'RetrospectiveExtension.Frontend'
