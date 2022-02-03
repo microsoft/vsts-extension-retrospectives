@@ -31,7 +31,6 @@
     "copy-to-clipboard": "3.3.1",
     "file-saver": "2.0.5",
     "jest-junit-reporter": "^1.1.0",
-    "jsonwebtoken": "8.5.1",
     "moment": "2.29.1",
     "office-ui-fabric-react": "7.180.3",
     "react": "17.0.2",
