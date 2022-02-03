@@ -171,7 +171,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         state: workItem.fields['System.State'],
         type: workItem.fields['System.WorkItemType'],
         changedDate: workItem.fields['System.ChangedDate'],
-        assignedTo: workItem.fields['System.AssignedTo'],
+        assignedTo: workItem.fields['System.AssignedTo'].displayName,
         priority: workItem.fields['Microsoft.VSTS.Common.Priority'],
         id: workItem.id,
         onActionItemClick: async (id: number) => {

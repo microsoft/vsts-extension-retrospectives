@@ -18,7 +18,7 @@ import { WebApiTeam } from 'azure-devops-extension-api/Core';
 // TODO (enpolat) : import { appInsightsClient, TelemetryEvents } from '../utilities/appInsightsClient';
 import { IColumn, IColumnItem } from './feedbackBoard';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
-import { FeedbackColumnProps, FeedbackColumnHelper } from './feedbackColumn';
+import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/external/telemetryClient';
@@ -918,7 +918,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               }
               {this.state.searchedFeedbackItems
                 .map((columnItem) => {
-                  const feedbackItemProps = FeedbackColumnHelper.createFeedbackItemProps(
+                  const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(
                     this.props.columnProps,
                     columnItem,
                     false)
