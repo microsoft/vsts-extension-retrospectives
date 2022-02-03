@@ -3,9 +3,20 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using static ReflectBackend.ReflectBackendSignals;
 
 namespace ReflectBackend
 {
+  public enum ReflectBackendSignals
+  {
+    receiveNewItem,
+    receiveUpdatedItem,
+    receiveUpdatedBoard,
+    receiveDeletedItem,
+    receiveDeletedBoard,
+    receiveNewBoard
+  }
+
   [Authorize]
   public class ReflectHub : Hub
   {
@@ -26,7 +37,7 @@ namespace ReflectBackend
     public Task BroadcastDeletedBoard(string teamId, string reflectBoardId)
     {
       _insights.TrackEvent("Broadcasting delete board");
-      return Clients.Others.SendAsync("receiveDeletedBoard", teamId, reflectBoardId);
+      return Clients.Others.SendAsync(receiveDeletedBoard.ToString(), teamId, reflectBoardId);
     }
 
     /// <summary>
@@ -38,7 +49,7 @@ namespace ReflectBackend
     public Task BroadcastDeletedItem(string reflectBoardId, string columnId, string feedbackItemId)
     {
       _insights.TrackEvent("Broadcasting delete item");
-      return Clients.OthersInGroup(reflectBoardId).SendAsync("receiveDeletedItem", columnId, feedbackItemId);
+      return Clients.OthersInGroup(reflectBoardId).SendAsync(receiveDeletedItem.ToString(), columnId, feedbackItemId);
     }
 
     /// <summary>
@@ -49,7 +60,7 @@ namespace ReflectBackend
     public Task BroadcastNewBoard(string teamId, string reflectBoardId)
     {
       _insights.TrackEvent("Broadcasting new board");
-      return Clients.Others.SendAsync("receiveNewBoard", teamId, reflectBoardId);
+      return Clients.Others.SendAsync(receiveNewBoard.ToString(), teamId, reflectBoardId);
     }
 
     /// <summary>
@@ -61,7 +72,7 @@ namespace ReflectBackend
     public Task BroadcastNewItem(string reflectBoardId, string columnId, string feedbackItemId)
     {
       _insights.TrackEvent("Broadcasting new item");
-      return Clients.OthersInGroup(reflectBoardId).SendAsync("receiveNewItem", columnId, feedbackItemId);
+      return Clients.OthersInGroup(reflectBoardId).SendAsync(receiveNewItem.ToString(), columnId, feedbackItemId);
     }
 
     /// <summary>
@@ -72,7 +83,7 @@ namespace ReflectBackend
     public Task BroadcastUpdatedBoard(string teamId, string reflectBoardId)
     {
       _insights.TrackEvent("Broadcasting board update");
-      return Clients.Others.SendAsync("receiveUpdatedBoard", teamId, reflectBoardId);
+      return Clients.Others.SendAsync(receiveUpdatedBoard.ToString(), teamId, reflectBoardId);
     }
 
     /// <summary>
@@ -84,7 +95,7 @@ namespace ReflectBackend
     public Task BroadcastUpdatedItem(string reflectBoardId, string columnId, string feedbackItemId)
     {
       _insights.TrackEvent("Broadcasting item update");
-      return Clients.OthersInGroup(reflectBoardId).SendAsync("receiveUpdatedItem", columnId, feedbackItemId);
+      return Clients.OthersInGroup(reflectBoardId).SendAsync(receiveUpdatedItem.ToString(), columnId, feedbackItemId);
     }
 
     /// <summary>
