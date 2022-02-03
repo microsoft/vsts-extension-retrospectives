@@ -47,7 +47,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
         newText: "",
         hasErrors: true
       });
-    return;
+      return;
     }
 
     this.setState({
@@ -176,9 +176,9 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
               e.stopPropagation();
             }}
           />
-            {this.state.hasErrors && <span className="input-validation-message">This cannot be empty.</span>}
-          </div>
-        );
+          {this.state.hasErrors && <span className="input-validation-message">This cannot be empty.</span>}
+        </div>
+      );
     }
 
     return (
@@ -186,9 +186,9 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
         className="editable-text-container">
         <p className="editable-text"
           tabIndex={0}
-          onKeyDown={this.props.isDisabled ? () => {} : this.handleEditKeyDown}
-          onClick={this.props.isDisabled ? () => {} : this.handleEdit}
-          aria-label={'Feedback title is' + this.props.text + '. Click to edit.'}
+          onKeyDown={this.props.isDisabled ? () => { } : this.handleEditKeyDown}
+          onClick={this.props.isDisabled ? () => { } : this.handleEdit}
+          aria-label={'Feedback title is ' + (this.props.isDisabled ? 'obscured during collection.' : this.props.text + '. Click to edit.')}
           aria-required={true}>
           {this.props.text}
         </p>

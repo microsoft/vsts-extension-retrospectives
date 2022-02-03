@@ -131,7 +131,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       searchTerm: '',
       searchedFeedbackItems: [],
       showVotedAnimation: false,
-      userVotes:"0",
+      userVotes: "0",
     };
 
     this.itemElement = null;
@@ -262,7 +262,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   private setDisabledFeedbackItemDeletion = async (boardId: string, id: string) => {
     const feedbackItem = await itemDataService.getFeedbackItem(boardId, id);
     if (feedbackItem) {
-      this.setState({isDeletionDisabled: feedbackItem.upvotes > 0});
+      this.setState({ isDeletionDisabled: feedbackItem.upvotes > 0 });
     }
   }
 
@@ -365,7 +365,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         text: 'Delete feedback',
         title: 'Delete feedback (disabled when there are active votes)',
       },
-      workflowPhases: [ WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act ],
+      workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act],
     },
     {
       menuItem: {
@@ -375,7 +375,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         text: 'Move feedback to different column',
         title: 'Move feedback to different column',
       },
-      workflowPhases: [ WorkflowPhase.Group ],
+      workflowPhases: [WorkflowPhase.Group],
       hideMobile: true,
     },
     {
@@ -386,7 +386,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         text: 'Group feedback',
         title: 'Group feedback',
       },
-      workflowPhases: [ WorkflowPhase.Group ],
+      workflowPhases: [WorkflowPhase.Group],
       hideMobile: true,
     },
     {
@@ -397,13 +397,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         text: 'Remove feedback from group',
         title: 'Remove feedback from group',
       },
-      workflowPhases: [ WorkflowPhase.Group ],
+      workflowPhases: [WorkflowPhase.Group],
       hideMobile: true,
       hideMainItem: true,
     },
   ];
 
-  private onVote = async (feedbackItemId: string,  decrement: boolean=false) => {
+  private onVote = async (feedbackItemId: string, decrement: boolean = false) => {
     const updatedFeedbackItem = await itemDataService.updateVote(this.props.boardId, this.props.team.id, getUserIdentity().id, feedbackItemId, decrement);
     // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUpvoted);
 
@@ -416,10 +416,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     }
   }
 
-  private timerSwich =  async (feedbackItemId: string) =>
-  {
+  private timerSwich = async (feedbackItemId: string) => {
     let updatedFeedbackItem;
-    const boardId:string = this.props.boardId;
+    const boardId: string = this.props.boardId;
 
     // function to handle timer count update
     const incTimer = async () => {
@@ -471,9 +470,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
   private isVoted = async (
     feedbackItemId: string) => {
-      itemDataService.isVoted(this.props.boardId, getUserIdentity().id, feedbackItemId).then(result => {
-        this.setState({ userVotes: result });
-      })
+    itemDataService.isVoted(this.props.boardId, getUserIdentity().id, feedbackItemId).then(result => {
+      this.setState({ userVotes: result });
+    })
   }
 
   private removeFeedbackItem = (
@@ -606,7 +605,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isMainItem = isNotGroupedItem || this.props.groupedItemProps.isMainItem;
     const groupItemsCount = this.props && this.props.groupedItemProps && this.props.groupedItemProps.groupedCount + 1;
     const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : 'Feedback group main item. Group has ' + groupItemsCount + ' items.');
-    const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.createdBy ? this.props.userIdRef !== getUserIdentity().id : false);
+    const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
 
     return (
@@ -657,7 +656,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       'fa-chevron-right': !this.props.groupedItemProps.isGroupExpanded
                     })} />
                     {groupItemsCount} Items
-                </button>
+                  </button>
                 }
                 {showVotes && this.props.isInteractable &&
                   // Using standard button tag here due to no onAnimationEnd support in fabricUI
@@ -708,7 +707,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       this.setState({ showVotedAnimation: false });
                     }}>
                     <i className="fas fa-arrow-circle-down" />
-                    
+
                   </button>
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
@@ -811,23 +810,23 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             </div>
             <div id="actionTimer" className="card-action-timer">
               {showAddActionItem &&
-              <button
-                title="Timer"
-                aria-live="polite"
-                aria-label={'Start/stop'}
-                tabIndex={0}
-                className={classNames(
-                  'feedback-action-button',
-                )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  this.timerSwich(this.props.id);
-                }}
-              >
-                <i className={curTimerState ? "fa fa-stop-circle": "fa fa-play-circle"} />
-                <span>  {this.props.timerSecs} (seconds)</span>
-              </button>
+                <button
+                  title="Timer"
+                  aria-live="polite"
+                  aria-label={'Start/stop'}
+                  tabIndex={0}
+                  className={classNames(
+                    'feedback-action-button',
+                  )}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.timerSwich(this.props.id);
+                  }}
+                >
+                  <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
+                  <span>  {this.props.timerSecs} (seconds)</span>
+                </button>
               }
             </div>
           </DocumentCard>

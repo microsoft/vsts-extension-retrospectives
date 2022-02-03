@@ -74,15 +74,15 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     this.state = {
       columnCardBeingEdited: undefined,
       columnCards: this.props.isNewBoardCreation ?
-      defaultColumnCards :
-      this.props.currentBoard.columns.map((column) => {
-        return {
-          // Need a deep copy of the column object here to avoid making changes to the original column.
-          // This ensures no changes are made when the user hits Cancel.
-          column: { ...column },
-          markedForDeletion: false,
-        };
-      }),
+        defaultColumnCards :
+        this.props.currentBoard.columns.map((column) => {
+          return {
+            // Need a deep copy of the column object here to avoid making changes to the original column.
+            // This ensures no changes are made when the user hits Cancel.
+            column: { ...column },
+            markedForDeletion: false,
+          };
+        }),
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? false : (this.props.currentBoard.isIncludeTeamEffectivenessMeasurement ? this.props.currentBoard.isIncludeTeamEffectivenessMeasurement : false),
       isBoardAnonymous: this.props.isNewBoardCreation ? false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
       maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,
@@ -94,17 +94,17 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       selectedAccentColorKey: undefined,
       selectedIconKey: undefined,
       displayPrimeDirective: this.props.isNewBoardCreation ?
-      false :
-      (
-        this.props.currentBoard.displayPrimeDirective ?
-        this.props.currentBoard.displayPrimeDirective : false
-      ),
+        false :
+        (
+          this.props.currentBoard.displayPrimeDirective ?
+            this.props.currentBoard.displayPrimeDirective : false
+        ),
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ?
-      false :
-      (
-        this.props.currentBoard.shouldShowFeedbackAfterCollect ?
-        this.props.currentBoard.shouldShowFeedbackAfterCollect : false
-      ),
+        false :
+        (
+          this.props.currentBoard.shouldShowFeedbackAfterCollect ?
+            this.props.currentBoard.shouldShowFeedbackAfterCollect : false
+        ),
       title: this.props.initialValue
     };
   }
@@ -138,7 +138,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
       return;
     }
-console.log(this.state);
     this.props.onFormSubmit(
       this.state.title.trim(),
       this.state.maxVotesPerUser,
@@ -147,7 +146,7 @@ console.log(this.state);
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect,
       this.state.displayPrimeDirective
-     );
+    );
   }
 
   private handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
@@ -566,7 +565,7 @@ console.log(this.state);
         });
         break;
       default:
-      break;
+        break;
     }
   };
 
@@ -708,7 +707,7 @@ console.log(this.state);
 
           <div className="board-metadata-form-section-subheader">
             <Checkbox
-              label="Only show feedback after Collect phase"
+              label="Obscure the feedback of others until after Collect phase."
               ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
               boxSide="start"
               defaultChecked={this.state.shouldShowFeedbackAfterCollect}
@@ -745,7 +744,7 @@ console.log(this.state);
           </div>
 
           <div className="board-metadata-form-section-header">
-            Max Votes per User (Current:{this.props.isNewBoardCreation? 5 : this.props.currentBoard.maxVotesPerUser}) :
+            Max Votes per User (Current:{this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser}) :
             <TextField className="title-input-container" type="number" min="3" max="12" value={this.state.maxVotesPerUser?.toString()} onChange={this.handleMaxVotePerUserChange} />
           </div>
         </div>
@@ -767,8 +766,8 @@ console.log(this.state);
               <option value="wlai">WentWell-Learned-Accelerators-Impediments</option>
             </select>
           </div>
-          { !this.props.isNewBoardCreation &&
-          <div className="board-metadata-form-section-subheader" style={{ fontSize:"12px", color:"#f6a608" }}>Warning: Existing feedbacks may not be available after changing board template!</div>
+          {!this.props.isNewBoardCreation &&
+            <div className="board-metadata-form-section-subheader" style={{ fontSize: "12px", color: "#f6a608" }}>Warning: Existing feedbacks may not be available after changing board template!</div>
           }
           <List
             items={this.state.columnCards}
@@ -897,7 +896,7 @@ console.log(this.state);
                 });
               }}>
               Add new column
-          </ActionButton>
+            </ActionButton>
           </div>
         </div>
         <DialogFooter>

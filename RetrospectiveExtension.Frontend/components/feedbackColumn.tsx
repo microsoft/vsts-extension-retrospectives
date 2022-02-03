@@ -150,7 +150,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     return {
       id: columnItem.feedbackItem.id,
       title: columnItem.feedbackItem.title,
-      createdBy:  columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy.displayName : null,
+      createdBy: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy.displayName : null,
       createdByProfileImage: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy._links.avatar.href : null,
       lastEditedDate: columnItem.feedbackItem.modifedDate ? columnItem.feedbackItem.modifedDate.toString() : '',
       upvotes: columnItem.feedbackItem.upvotes,
@@ -274,7 +274,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           {this.props.workflowPhase === WorkflowPhase.Collect &&
             <div className="create-container" aria-label="Create Feedback Item">
               <ActionButton iconProps={{ iconName: 'Add' }}
-                componentRef={(element: IButton) => {this.createFeedbackButton = element;}}
+                componentRef={(element: IButton) => { this.createFeedbackButton = element; }}
                 onClick={this.createEmptyFeedbackItem}
                 aria-label="Create Feedback Item"
                 className="create-button">
