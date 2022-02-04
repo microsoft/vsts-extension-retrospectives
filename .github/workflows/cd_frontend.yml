@@ -1,0 +1,28 @@
+name: 'CD - Frontend'
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+      - 'releases/**'
+  pull_request:
+    branches:
+      - master
+      - dev
+      - 'releases/**'
+  workflow_dispatch:
+
+jobs:
+  package:
+    name: Frontend - Prepare package
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      name: Check out repository
+
+    - run: |
+        npm install
+        npm run build:p
+      name: Build and Test
+      working-directory: 'RetrospectiveExtension.Frontend'
