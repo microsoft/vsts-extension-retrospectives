@@ -1,5 +1,5 @@
 import * as SignalR from '@aspnet/signalr';
-import * as moment from 'moment';
+import  moment from 'moment';
 import { getAppToken } from 'azure-devops-extension-sdk';
 
 import Environment from '../config/environment';

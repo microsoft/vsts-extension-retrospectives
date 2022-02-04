@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ActionButton, PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
