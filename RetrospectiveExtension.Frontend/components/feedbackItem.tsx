@@ -831,131 +831,125 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             </div>
           </DocumentCard>
         </div>
-        {!this.state.isDeleteItemConfirmationDialogHidden &&
-          <Dialog
-            hidden={false}
-            onDismiss={this.hideDeleteItemConfirmationDialog}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: 'Delete Feedback',
-              subText: `Are you sure you want to delete the feedback '${this.props.title}'?
-                ${!isNotGroupedItem && isMainItem
-                  ? 'Any feedback grouped underneath this one will be ungrouped.'
-                  : ''}`,
-            }}
-            modalProps={{
-              isBlocking: true,
-              containerClassName: 'retrospectives-delete-feedback-item-dialog',
-              className: 'retrospectives-dialog-modal',
-            }}>
-            <DialogFooter>
-              <PrimaryButton onClick={this.onConfirmDeleteFeedbackItem} text="Delete" />
-              <DefaultButton onClick={this.hideDeleteItemConfirmationDialog} text="Cancel" />
-            </DialogFooter>
-          </Dialog>
-        }
-        {!this.state.isMoveFeedbackItemDialogHidden &&
-          <Dialog
-            hidden={false}
-            maxWidth={500}
-            minWidth={500}
-            onDismiss={this.hideMoveFeedbackItemDialog}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: 'Move Feedback to Different Column',
-              subText: 'Choose the column you want to move this feedback to',
-            }}
-            modalProps={{
-              isBlocking: false,
-              containerClassName: 'retrospectives-move-feedback-item-dialog',
-              className: 'retrospectives-dialog-modal',
-            }}>
-            {this.props.columnIds
-              .filter((columnId) => columnId != this.props.columnId)
-              .map((columnId) => {
-                return <DefaultButton
-                  key={columnId}
-                  className="move-feedback-item-column-button"
-                  onClick={async () => {
-                    await this.props.moveFeedbackItem(
-                      this.props.refreshFeedbackItems,
-                      this.props.boardId,
-                      this.props.id,
-                      columnId);
-                  }}>
-                  <i className={this.props.columns[columnId].columnProperties.iconClass} />
-                  {this.props.columns[columnId].columnProperties.title}
-                </DefaultButton>
+        <Dialog
+          hidden={this.state.isDeleteItemConfirmationDialogHidden}
+          onDismiss={this.hideDeleteItemConfirmationDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Delete Feedback',
+            subText: `Are you sure you want to delete the feedback '${this.props.title}'?
+              ${!isNotGroupedItem && isMainItem
+                ? 'Any feedback grouped underneath this one will be ungrouped.'
+                : ''}`,
+          }}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-delete-feedback-item-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogFooter>
+            <PrimaryButton onClick={this.onConfirmDeleteFeedbackItem} text="Delete" />
+            <DefaultButton onClick={this.hideDeleteItemConfirmationDialog} text="Cancel" />
+          </DialogFooter>
+        </Dialog>
+        <Dialog
+          hidden={this.state.isMoveFeedbackItemDialogHidden}
+          maxWidth={500}
+          minWidth={500}
+          onDismiss={this.hideMoveFeedbackItemDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Move Feedback to Different Column',
+            subText: 'Choose the column you want to move this feedback to',
+          }}
+          modalProps={{
+            isBlocking: false,
+            containerClassName: 'retrospectives-move-feedback-item-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          {this.props.columnIds
+            .filter((columnId) => columnId != this.props.columnId)
+            .map((columnId) => {
+              return <DefaultButton
+                key={columnId}
+                className="move-feedback-item-column-button"
+                onClick={async () => {
+                  await this.props.moveFeedbackItem(
+                    this.props.refreshFeedbackItems,
+                    this.props.boardId,
+                    this.props.id,
+                    columnId);
+                }}>
+                <i className={this.props.columns[columnId].columnProperties.iconClass} />
+                {this.props.columns[columnId].columnProperties.title}
+              </DefaultButton>
+            })}
+        </Dialog>
+        <Dialog
+          hidden={this.state.isGroupFeedbackItemDialogHidden}
+          maxWidth={600}
+          minWidth={600}
+          onDismiss={this.hideGroupFeedbackItemDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Group Feedback',
+            subText: 'Search and select the feedback under which to group the current feedback.'
+          }}
+          modalProps={{
+            isBlocking: false,
+            containerClassName: 'retrospectives-group-feedback-item-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <SearchBox
+            autoFocus={true}
+            placeholder="Enter the feedback title"
+            aria-label="Enter the feedback title"
+            onChange={this.handleFeedbackItemSearchInputChange}
+            className="feedback-item-name-input"
+          />
+          <div className="output-container">
+            {!this.state.searchedFeedbackItems.length && this.state.searchTerm &&
+              <p className="no-matching-feedback-message">No feedback with title containing your input.</p>
+            }
+            {this.state.searchedFeedbackItems
+              .map((columnItem) => {
+                const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(
+                  this.props.columnProps,
+                  columnItem,
+                  false)
+                return <div
+                  key={feedbackItemProps.id}
+                  className="feedback-item-search-result-item"
+                  onClick={(e) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
+                  onKeyDown={(e) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
+                  tabIndex={0}
+                >
+                  <FeedbackItem {...feedbackItemProps}>
+                  </FeedbackItem>
+                </div>
               })}
-          </Dialog>}
-        {!this.state.isGroupFeedbackItemDialogHidden &&
-          <Dialog
-            hidden={false}
-            maxWidth={600}
-            minWidth={600}
-            onDismiss={this.hideGroupFeedbackItemDialog}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: 'Group Feedback',
-              subText: 'Search and select the feedback under which to group the current feedback.'
-            }}
-            modalProps={{
-              isBlocking: false,
-              containerClassName: 'retrospectives-group-feedback-item-dialog',
-              className: 'retrospectives-dialog-modal',
-            }}>
-            <SearchBox
-              autoFocus={true}
-              placeholder="Enter the feedback title"
-              aria-label="Enter the feedback title"
-              onChange={this.handleFeedbackItemSearchInputChange}
-              className="feedback-item-name-input"
-            />
-            <div className="output-container">
-              {!this.state.searchedFeedbackItems.length && this.state.searchTerm &&
-                <p className="no-matching-feedback-message">No feedback with title containing your input.</p>
-              }
-              {this.state.searchedFeedbackItems
-                .map((columnItem) => {
-                  const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(
-                    this.props.columnProps,
-                    columnItem,
-                    false)
-                  return <div
-                    key={feedbackItemProps.id}
-                    className="feedback-item-search-result-item"
-                    onClick={(e) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
-                    onKeyDown={(e) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
-                    tabIndex={0}
-                  >
-                    <FeedbackItem {...feedbackItemProps}>
-                    </FeedbackItem>
-                  </div>
-                })}
-            </div>
-          </Dialog>}
-        {!this.state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden &&
-          <Dialog
-            hidden={false}
-            maxWidth={700}
-            minWidth={700}
-            onDismiss={this.hideRemoveFeedbackItemFromGroupConfirmationDialog}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: 'Remove Feedback from Group',
-              subText: `Are you sure you want to remove the feedback '${this.props.title}' from its current group?`
-            }}
-            modalProps={{
-              isBlocking: true,
-              containerClassName: 'retrospectives-remove-feedback-item-from-group-dialog',
-              className: 'retrospectives-dialog-modal',
-            }}>
-            <DialogFooter>
-              <PrimaryButton onClick={this.onConfirmRemoveFeedbackItemFromGroup} text="Remove Feedback from Group" />
-              <DefaultButton onClick={this.hideRemoveFeedbackItemFromGroupConfirmationDialog} text="Cancel" />
-            </DialogFooter>
-          </Dialog>
-        }
+          </div>
+        </Dialog>
+        <Dialog
+          hidden={this.state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden}
+          maxWidth={700}
+          minWidth={700}
+          onDismiss={this.hideRemoveFeedbackItemFromGroupConfirmationDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Remove Feedback from Group',
+            subText: `Are you sure you want to remove the feedback '${this.props.title}' from its current group?`
+          }}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-remove-feedback-item-from-group-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogFooter>
+            <PrimaryButton onClick={this.onConfirmRemoveFeedbackItemFromGroup} text="Remove Feedback from Group" />
+            <DefaultButton onClick={this.hideRemoveFeedbackItemFromGroupConfirmationDialog} text="Cancel" />
+          </DialogFooter>
+        </Dialog>
       </div>
     );
   }

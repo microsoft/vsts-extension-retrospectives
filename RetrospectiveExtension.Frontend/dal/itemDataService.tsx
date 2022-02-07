@@ -62,7 +62,7 @@ class ItemDataService {
 
     try {
       feedbackItems = await ExtensionDataService.readDocuments<IFeedbackItemDocument>(boardId, false, true);
-    } catch (e) {
+    } catch (e: any) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
         // TODO (enpolat) : appInsightsClient.trackTrace(TelemetryExceptions.ItemsNotFoundForBoard, e, AI.SeverityLevel.Warning);
       }

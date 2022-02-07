@@ -24,7 +24,7 @@ export async function readDocuments<T>(
 
   try {
     data = await dataService.getDocuments(collectionName, isPrivate ? { scopeType: 'User' } : undefined);
-  } catch (e) {
+  } catch (e: any) {
     if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
       if (throwCollectionDoesNotExistException) {
         throw e;

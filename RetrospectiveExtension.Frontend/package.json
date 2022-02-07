@@ -12,7 +12,8 @@
     "publish:d": "npm run build && npm run pack:d && tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
     "publish:p": "npm run build && npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
     "start:dev": "webpack-dev-server --mode development",
-    "test": "jest --ci --testResultsProcessor=jest-junit"
+    "test": "jest --env=jsdom --silent -ci --testResultsProcessor=jest-junit",
+    "test:watch": "jest --env=jsdom --watch"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "babel-jest": "^27.4.6",
     "classnames": "2.3.1",
     "copy-to-clipboard": "3.3.1",
+    "enzyme-to-json": "^3.6.2",
     "file-saver": "2.0.5",
     "jest-junit-reporter": "^1.1.0",
     "moment": "2.29.1",
@@ -44,10 +46,13 @@
   },
   "devDependencies": {
     "@types/classnames": "2.3.0",
+    "@types/enzyme": "^3.10.11",
+    "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/file-saver": "2.0.5",
     "@types/jest": "^27.4.0",
+    "@types/jsdom": "^16.2.14",
     "@types/jsonwebtoken": "8.5.7",
-    "@types/node": "17.0.8",
+    "@types/node": "^17.0.8",
     "@types/react": "17.0.38",
     "@types/react-dom": "17.0.11",
     "@types/react-slick": "0.23.8",
@@ -56,6 +61,8 @@
     "@typescript-eslint/parser": "5.9.1",
     "crypto-browserify": "3.12.0",
     "css-loader": "6.5.1",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.6",
     "eslint": "8.6.0",
     "eslint-plugin-react": "7.28.0",
     "eslint-webpack-plugin": "3.1.1",
@@ -79,16 +86,25 @@
     "webpack-dev-server": "^4.7.2"
   },
   "jest": {
+    "testPathIgnorePatterns": [
+      "./components/__tests__/setupTests.tsx"
+    ],
     "transform": {
       "^.+\\.(js|ts|tsx|jsx)$": "ts-jest"
     },
     "transformIgnorePatterns": [
       "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)"
     ],
+    "setupFiles": [
+      "./components/__tests__/setupTests.tsx"
+    ],
     "moduleNameMapper": {
       "office-ui-fabric-react/lib/(.*)$": "office-ui-fabric-react/lib-commonjs/$1"
     },
     "preset": "ts-jest/presets/js-with-babel",
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
     "testResultsProcessor": "./node_modules/jest-junit-reporter",
     "collectCoverage": true,
     "coverageReporters": [
