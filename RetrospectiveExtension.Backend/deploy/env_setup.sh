@@ -61,6 +61,7 @@
     # Create AppService plan
     az appservice plan create \
         --name "plan-${resource_name_suffix}" \
+        --sku "B1"\
         --resource-group "$resource_group"
 
     # https://docs.microsoft.com/en-us/cli/azure/monitor/app-insights/component?view=azure-cli-latest#az-monitor-app-insights-component-create
