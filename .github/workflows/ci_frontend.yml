@@ -32,7 +32,6 @@ jobs:
         npm install
         npm run lint
         npm run build:p
-        npm run test
         npm run pack:p
       name: Build and Test
       working-directory: 'RetrospectiveExtension.Frontend'

@@ -9,8 +9,9 @@ class ShareBoardHelper {
   // Builds CSV content which lists the given board's feedback and work items
   public generateCSVContent = async (board: IFeedbackBoardDocument) => {
     const feedbackItems: IFeedbackItemDocument[] = await itemDataService.getFeedbackItemsForBoard(board.id);
+    const boardUrl = await getBoardUrl(board.teamId, board.id);
 
-    let content: string = `Retrospectives Summary for "${board.title}" (${getBoardUrl(board.teamId, board.id)})\n`;
+    let content: string = `Retrospectives Summary for "${board.title}" (${boardUrl})\n`;
     content += "\n\nFeedback Items\nType,Description,Votes,CreatedDate,CreatedBy\n"
 
     const contentList: {type: string, description: string, votes: number, createdDate: Date, createdBy: string}[] = [];

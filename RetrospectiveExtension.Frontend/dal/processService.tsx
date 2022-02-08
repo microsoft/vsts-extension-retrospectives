@@ -1,23 +1,26 @@
-import { WorkItemTrackingProcessHttpClient4_1, getClient } from "TFS/WorkItemTracking/ProcessRestClient";
-import { GetProcessExpandLevel } from "TFS/WorkItemTracking/ProcessContracts";
-import { WorkItemTrackingProcessDefinitionsHttpClient4_1, getClient as getProcessDefinitionsClient } from "TFS/WorkItemTracking/ProcessDefinitionsRestClient";
-import * as ProcessDefinitionsContracts  from 'TFS/WorkItemTracking/ProcessDefinitionsContracts';
+import { WorkItemTrackingProcessRestClient } from 'azure-devops-extension-api/WorkItemTrackingProcess/WorkItemTrackingProcessClient';
+import { getClient } from 'azure-devops-extension-api/Common';
+import { GetProcessExpandLevel } from 'azure-devops-extension-api/WorkItemTrackingProcess';
+import { WorkItemTrackingProcessDefinitionsRestClient } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+
+import * as ProcessDefinitionsContracts  from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
 import { retrospectiveWorkItemTypeModel } from '../interfaces/retrospectiveWorkItemType';
 import { workItemService } from './azureDevOpsWorkItemService';
+import { getProjectId } from '../utilities/servicesHelper';
 
 export class ProcessService {
-    private workItemTrackingProcessHttpClient: WorkItemTrackingProcessHttpClient4_1;
-    private workItemTrackingProcessDefinitionsHttpClient: WorkItemTrackingProcessDefinitionsHttpClient4_1;
+    private workItemTrackingProcessHttpClient: WorkItemTrackingProcessRestClient;
+    private workItemTrackingProcessDefinitionsHttpClient: WorkItemTrackingProcessDefinitionsRestClient;
 
-    static readonly retrospective_type = "Retrospective";
+    static readonly retrospective_type = 'Retrospective';
 
     constructor() {
         if (!this.workItemTrackingProcessHttpClient) {
-            this.workItemTrackingProcessHttpClient = getClient();
+            this.workItemTrackingProcessHttpClient = getClient(WorkItemTrackingProcessRestClient);
         }
 
         if (!this.workItemTrackingProcessDefinitionsHttpClient) {
-            this.workItemTrackingProcessDefinitionsHttpClient = getProcessDefinitionsClient();
+            this.workItemTrackingProcessDefinitionsHttpClient = getClient(WorkItemTrackingProcessDefinitionsRestClient);
         }
     }
 
@@ -36,13 +39,13 @@ export class ProcessService {
     public createRetrospectiveWorkItemTypeForProcess = (processId: string) => {
         return this.workItemTrackingProcessDefinitionsHttpClient.createWorkItemType(retrospectiveWorkItemTypeModel, processId);
     }
-    
+
     private getProcesses = () => {
-        return this.workItemTrackingProcessHttpClient.getProcesses(GetProcessExpandLevel.Projects);
+        return this.workItemTrackingProcessHttpClient.getListOfProcesses(GetProcessExpandLevel.Projects);
     }
 
-    public getFieldsForProcess = (processId:string) => {
-        return this.workItemTrackingProcessHttpClient.getFields(processId);
+    public getFieldsForProcess = (processId: string, witRefName: string) => {
+        return this.workItemTrackingProcessDefinitionsHttpClient.getWorkItemTypeFields(processId, witRefName);
     }
 
     public getWorkItemTypes = (processId: string) => {
@@ -52,7 +55,7 @@ export class ProcessService {
     public getWorkItemType = (processId: string, witRefName: string) => {
         return this.workItemTrackingProcessDefinitionsHttpClient.getWorkItemType(processId, witRefName);
     }
-    
+
     public getFormLayoutPage = (processId: string, witRefName: string): PromiseLike<ProcessDefinitionsContracts.Page|undefined> => {
         return this.workItemTrackingProcessDefinitionsHttpClient.getFormLayout(processId, witRefName).then(layout => {
             return layout.pages.find(page => page.pageType === ProcessDefinitionsContracts.PageType.Custom);
@@ -77,13 +80,13 @@ export class ProcessService {
     }
 
     public getProcessForCurrentProject = () => {
-        const currentProjectId = VSS.getWebContext().project.id;
-
-        return this.getProcesses().then(processModels => {
-            return processModels.find((process) => {
-                const projects = process.projects ? process.projects : [];
-                return projects.some((project) => project.id === currentProjectId);
-            });       
+        return getProjectId().then(currentProjectId => {
+            return this.getProcesses().then(processModels => {
+                return processModels.find(process => {
+                    const projects = process.projects ? process.projects : [];
+                    return projects.some((project) => project.id === currentProjectId);
+                });
+            });
         });
     }
 

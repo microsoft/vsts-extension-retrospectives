@@ -14,17 +14,13 @@ module.exports = {
     path: BUILD_DIR,
     publicPath: './',
     filename: './reflect-bundle.js',
-    libraryTarget: 'amd'
   },
-  externals: [
-    /^VSS\/.*/, /^TFS\/.*/
-  ],
   resolve: {
     fallback: {
       assert: require.resolve('assert'),
       buffer: require.resolve('buffer'),
       crypto: require.resolve('crypto-browserify'),
-      process: "process/browser",
+      process: 'process/browser',
       stream: require.resolve('stream-browserify'),
       util: require.resolve('util'),
     },
