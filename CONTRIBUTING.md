@@ -283,6 +283,11 @@ Follow the coding guidelines here - [C# Coding Conventions (C# Programming Guide
      }
      ```
 
+## Application Monitoring and Telemetry
+
+1. The Retro tool uses [Azure Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) to capture application logs, telemetry and performance data.
+2. A custom Azure portal is deployed as part of the backend deployment script that enables real time monitoring of the application. The dashboard includes useful telemetry data such as number of active user sessions, histogram of React Components visited, HTTP requests made, page load times, backend and front end exceptions and other metrics.
+
 ## License Information
 
 Copyright (c) Microsoft Corporation. All rights reserved.

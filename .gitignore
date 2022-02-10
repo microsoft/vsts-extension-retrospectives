@@ -273,3 +273,6 @@ RetrospectiveExtension.FrontEnd/coverage/
 
 # Dotnet test results
 RetrospectiveExtension.Backend.Tests/TestResults
+
+#Application Insights Dashboard description
+ai-dashboard.json 
