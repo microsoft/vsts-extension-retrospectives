@@ -1,21 +1,18 @@
 ﻿import * as React from 'react';
-import { getService } from 'azure-devops-extension-sdk';
-import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
 import {
   DocumentCard,
   DocumentCardTitle,
   DocumentCardType,
 } from 'office-ui-fabric-react/lib/DocumentCard';
 import { Image } from 'office-ui-fabric-react/lib/Image';
-import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
+import { WorkItemFormNavigationService } from 'TFS/WorkItemTracking/Services';
 import {
   DetailsList,
   DetailsListLayoutMode,
   SelectionMode,
   IColumn,
 } from 'office-ui-fabric-react/lib/DetailsList';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
@@ -51,7 +48,7 @@ interface IActionItemsTableProps {
   onActionItemClick: (id: number) => void;
 }
 
-class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryState> {
+export default class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryState> {
   constructor(props: IBoardSummaryProps) {
     super (props);
 
@@ -170,12 +167,12 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         state: workItem.fields['System.State'],
         type: workItem.fields['System.WorkItemType'],
         changedDate: workItem.fields['System.ChangedDate'],
-        assignedTo: workItem.fields['System.AssignedTo'].displayName,
+        assignedTo: workItem.fields['System.AssignedTo'],
         priority: workItem.fields['Microsoft.VSTS.Common.Priority'],
         id: workItem.id,
         onActionItemClick: async (id: number) => {
           // TODO: Update specific table summary after work item is updated.
-          const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+          const workItemNavSvc = await WorkItemFormNavigationService.getService();
           await workItemNavSvc.openWorkItem(id);
         }
       };
@@ -212,7 +209,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
   }
 
   private onItemInvoked = async (item: { id: number }) => {
-    const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+    const workItemNavSvc = await WorkItemFormNavigationService.getService();
     await workItemNavSvc.openWorkItem(item.id);
   }
 
@@ -301,5 +298,3 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
     );
   }
 }
-
-export default withAITracking(reactPlugin, BoardSummary);

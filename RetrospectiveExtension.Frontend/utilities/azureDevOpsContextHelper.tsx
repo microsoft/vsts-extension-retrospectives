@@ -1,6 +1,3 @@
-import { getHost } from 'azure-devops-extension-sdk';
-import { getHostAuthority } from '../utilities/servicesHelper';
-
 const internalOrgNames = [
   'reflect-retrospective-hackathon',
   'reflect-demo',
@@ -15,8 +12,8 @@ const internalOrgNames = [
  * Returns whether the current org in VSTS context is a recognized internal org.
  */
 export const isInternalOrg = () => {
-  const host = getHost();
-  const isInternal = internalOrgNames.indexOf(host.name.toLowerCase().trim()) !== -1;
+  const webContext: WebContext = VSS.getWebContext();
+  const isInternal = internalOrgNames.indexOf(webContext.host.name.toLowerCase().trim()) !== -1;
 
   return isInternal;
 };
@@ -26,10 +23,10 @@ export const isInternalOrg = () => {
  * In Azure DevOps terms, hosted environment is also known as "Azure DevOps Services" and on-premise environment is known as
  * "Team Foundation Server" or "Azure DevOps Server".
  */
-export const isHostedAzureDevOps = async () => {
-  const hostAuthority = await getHostAuthority();
-  const isHosted = hostAuthority === 'dev.azure.com'
-    || hostAuthority.endsWith('.visualstudio.com');
+export const isHostedAzureDevOps = () => {
+  const webContext: WebContext = VSS.getWebContext();
+  const isHosted = webContext.host.authority === 'dev.azure.com'
+    || webContext.host.authority.endsWith('.visualstudio.com');
 
   return isHosted;
 };

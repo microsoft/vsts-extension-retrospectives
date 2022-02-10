@@ -1,4 +1,4 @@
-import { getHostBaseUrl, getProjectName } from '../utilities/servicesHelper';
+/// <reference types="vss-web-extension-sdk" />
 
 /**
  * Generates a URL-safe deep link for board.
@@ -8,16 +8,15 @@ import { getHostBaseUrl, getProjectName } from '../utilities/servicesHelper';
  *
  * @returns the URL-safe (encoded) URL
  */
-export const getBoardUrl = async (teamId: string, boardId: string): Promise<string> => {
-  const hostBase = await getHostBaseUrl();
-  const projectName = await getProjectName();
+export const getBoardUrl = (teamId: string, boardId: string): string => {
+  const ctx = VSS.getWebContext();
 
   const queryParams = new URLSearchParams();
 
   queryParams.append('teamId', teamId);
   queryParams.append('boardId', boardId);
 
-  const boardDeepLinkUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home?${queryParams.toString()}`;
+  const boardDeepLinkUrl = `${ctx.host.uri}${ctx.project.name}/_apps/hub/ms-devlabs.team-retrospectives.home?${queryParams.toString()}`;
 
   return encodeURI(boardDeepLinkUrl);
 }

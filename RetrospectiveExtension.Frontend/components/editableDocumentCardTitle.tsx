@@ -1,7 +1,5 @@
 ﻿import * as React from 'react';
 import EditableText from './editableText';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface EditableDocumentCardTitleProps {
   isDisabled?: boolean;
@@ -15,7 +13,7 @@ export interface EditableDocumentCardTitleProps {
 export interface EditableDocumentCardTitleState {
 }
 
-class EditableDocumentCardTitle extends React.Component<EditableDocumentCardTitleProps, EditableDocumentCardTitleState> {
+export default class EditableDocumentCardTitle extends React.Component<EditableDocumentCardTitleProps, EditableDocumentCardTitleState> {
   constructor(props: EditableDocumentCardTitleProps) {
     super(props);
 
@@ -38,5 +36,3 @@ class EditableDocumentCardTitle extends React.Component<EditableDocumentCardTitl
     );
   }
 }
-
-export default withAITracking(reactPlugin, EditableDocumentCardTitle);

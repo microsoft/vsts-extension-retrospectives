@@ -1,16 +1,13 @@
-import { TeamFieldValues, TeamSettingsIteration } from 'azure-devops-extension-api/Work';
-import { WorkRestClient } from 'azure-devops-extension-api/Work/WorkClient';
-import { getClient } from 'azure-devops-extension-api/Common';
+import { TeamFieldValues, TeamSettingsIteration } from 'TFS/Work/Contracts';
+import { getClient, WorkHttpClient2_3 } from 'TFS/Work/RestClient';
 // TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 
-import { getProjectId } from '../utilities/servicesHelper';
-
 class WorkService {
-  private _httpWorkClient: WorkRestClient;
+  private _httpWorkClient: WorkHttpClient2_3;
 
   constructor() {
     if (!this._httpWorkClient) {
-      this._httpWorkClient = getClient(WorkRestClient);
+      this._httpWorkClient = getClient();
     }
   }
 
@@ -19,10 +16,9 @@ class WorkService {
    */
   public async getIterations(teamId: string, timeframe?: string):
     Promise<TeamSettingsIteration[]> {
-    const projectId = await getProjectId();
     const teamContext = {
       project: '',
-      projectId,
+      projectId: VSS.getWebContext().project.id,
       team: '',
       teamId
     };
@@ -51,10 +47,9 @@ class WorkService {
    */
   public async getTeamFieldValues(teamId: string):
     Promise<TeamFieldValues> {
-    const projectId = await getProjectId();
     const teamContext = {
       project: '',
-      projectId,
+      projectId: VSS.getWebContext().project.id,
       team: '',
       teamId
     };

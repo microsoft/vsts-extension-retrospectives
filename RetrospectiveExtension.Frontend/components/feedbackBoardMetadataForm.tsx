@@ -12,8 +12,6 @@ import classNames from 'classnames'
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
 import { v4 as uuid } from 'uuid';
 import { ChangeEvent } from 'react';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -49,7 +47,7 @@ interface IFeedbackColumnCard {
   markedForDeletion: boolean;
 }
 
-class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
+export default class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
   constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
@@ -1008,5 +1006,3 @@ console.log(this.state);
     );
   }
 }
-
-export default withAITracking(reactPlugin, FeedbackBoardMetadataForm);

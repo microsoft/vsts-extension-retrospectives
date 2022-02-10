@@ -1,8 +1,6 @@
 ﻿import classNames from 'classnames';
 import * as React from 'react';
 import { WorkflowPhase } from '../interfaces/workItem';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface IWorkflowStageProps {
   display: string;
@@ -14,7 +12,7 @@ export interface IWorkflowStageProps {
 export interface IWorkflowStageState {
 }
 
- class WorkflowStage extends React.Component<IWorkflowStageProps, IWorkflowStageState> {
+export default class WorkflowStage extends React.Component<IWorkflowStageProps, IWorkflowStageState> {
   constructor(props: IWorkflowStageProps) {
     super(props);
     this.state = { };
@@ -53,5 +51,3 @@ export interface IWorkflowStageState {
     return;
   }
 }
-
-export default withAITracking(reactPlugin,WorkflowStage);

@@ -5,6 +5,7 @@ import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import * as React from 'react';
+import * as vssClipboard from 'VSS/Utils/Clipboard';
 
 import { ViewMode, MobileWidthBreakpoint } from '../config/constants';
 import { WorkflowPhase } from '../interfaces/workItem';
@@ -18,7 +19,7 @@ import FeedbackBoard from '../components/feedbackBoard';
 
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
+import { WebApiTeam } from 'TFS/Core/Contracts';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import NoFeedbackBoardsView from './noFeedbackBoardsView';
 // TODO (enpolat) : import { appInsightsClient, TelemetryEvents, TelemetryEventProperties } from '../utilities/appInsightsClient';
@@ -27,21 +28,18 @@ import ExtensionSettingsMenu from './extensionSettingsMenu';
 import SelectorCombo, { ISelectorList } from './selectorCombo';
 import FeedbackBoardPreviewEmail from './feedbackBoardPreviewEmail';
 import { ToastContainer, toast, Slide } from 'react-toastify';
-import { WorkItemType, WorkItemTypeReference } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { WorkItemType, WorkItemTypeReference } from 'TFS/WorkItemTracking/Contracts';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
+import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
 import { itemDataService } from '../dal/itemDataService';
-import { TeamMember } from 'azure-devops-extension-api/WebApi';
+import { TeamMember } from 'VSS/WebApi/Contracts';
 import EffectivenessMeasurementRow from './effectivenessMeasurementRow';
 
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { getQuestionName } from '../utilities/effectivenessMeasurementQuestionHelper';
 
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
-
 export interface FeedbackBoardContainerProps {
-  isHostedAzureDevOps: boolean;
   projectId: string;
 }
 
@@ -89,7 +87,7 @@ export interface FeedbackBoardContainerState {
   castedVoteCount: number;
 }
 
- class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
+export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
   constructor(props: FeedbackBoardContainerProps) {
     super(props);
     this.state = {
@@ -221,7 +219,7 @@ export interface FeedbackBoardContainerState {
 
   private toggleAndFixResolution = () => {
     const newView = !this.state.isDesktop;
-
+    
     this.setState({
       isAutoResizeEnabled: false,
       isDesktop: newView,
@@ -280,7 +278,7 @@ export interface FeedbackBoardContainerState {
     const hiddenWorkItemTypes: WorkItemTypeReference[] = await workItemService.getHiddenWorkItemTypes();
 
     const hiddenWorkItemTypeNames = hiddenWorkItemTypes.map((workItemType) => workItemType.name);
-
+    
     const nonHiddenWorkItemTypes = allWorkItemTypes.filter(workItemType => hiddenWorkItemTypeNames.indexOf(workItemType.name) === -1);
 
     this.setState({
@@ -402,12 +400,12 @@ export interface FeedbackBoardContainerState {
 
     // Attempt to use query params to pre-select a specific team and board.
     let queryParams: URLSearchParams;
-
+    
     try {
       queryParams = (new URL(document.location.href)).searchParams;
 
       if (!queryParams) {
-        if (!this.props.isHostedAzureDevOps)
+        if (!isHostedAzureDevOps)
         {
           throw new Error("URL-related issue occurred with on-premise Azure DevOps");
         }
@@ -720,7 +718,8 @@ export interface FeedbackBoardContainerState {
   }
 
   private createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => {
-    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxvotesPerUser, columns, isIncludeTeamEffectivenessMeasurement, isBoardAnonymous, shouldShowFeedbackAfterCollect, displayPrimeDirective);
+const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxvotesPerUser, columns, isIncludeTeamEffectivenessMeasurement, isBoardAnonymous, shouldShowFeedbackAfterCollect, displayPrimeDirective);
+console.log(createdBoard);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -770,7 +769,7 @@ export interface FeedbackBoardContainerState {
   private updateBoardMetadata = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[]) => {
     const updatedBoard =
       await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxvotesPerUser, title, columns);
-
+    
     this.updateBoardAndBroadcast(updatedBoard);
   }
 
@@ -837,9 +836,9 @@ export interface FeedbackBoardContainerState {
     // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardDeleted);
   }
 
-  private copyBoardUrl = async () => {
-    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
-    navigator.clipboard.writeText(boardDeepLinkUrl);
+  private copyBoardUrl = () => {
+    const boardDeepLinkUrl = getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
+    vssClipboard.copyToClipboard(boardDeepLinkUrl);
   }
 
   private renderBoardUpdateMetadataFormDialog = (
@@ -912,8 +911,8 @@ export interface FeedbackBoardContainerState {
     {
       key: 'copyLink',
       iconProps: { iconName: 'Link' },
-      onClick: async () => {
-        await this.copyBoardUrl();
+      onClick: () => {
+        this.copyBoardUrl();
         this.showBoardUrlCopiedToast();
       },
       text: 'Copy retrospective link',
@@ -1302,7 +1301,7 @@ export interface FeedbackBoardContainerState {
                     }
                   </div>
                   {
-                    !this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected &&
+                    !isHostedAzureDevOps() && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected &&
                     <MessageBar
                       className="info-message-bar"
                       messageBarType={MessageBarType.info}
@@ -1321,7 +1320,7 @@ export interface FeedbackBoardContainerState {
                     </MessageBar>
                   }
                   {
-                    !this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected &&
+                    !isHostedAzureDevOps() && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected &&
                     <MessageBar
                       className="info-message-bar"
                       messageBarType={MessageBarType.warning}
@@ -1333,7 +1332,7 @@ export interface FeedbackBoardContainerState {
                     </MessageBar>
                   }
                   {
-                    this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected &&
+                    isHostedAzureDevOps() && !this.state.isBackendServiceConnected &&
                     <MessageBar
                       className="info-message-bar"
                       messageBarType={MessageBarType.warning}
@@ -1381,7 +1380,6 @@ export interface FeedbackBoardContainerState {
                         this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
                         false
                       }
-                      userId={this.state.currentUserId}
                     />
                   </div>
                   <Dialog
@@ -1520,5 +1518,3 @@ export interface FeedbackBoardContainerState {
     );
   }
 }
-
-export default withAITracking(reactPlugin, FeedbackBoardContainer);

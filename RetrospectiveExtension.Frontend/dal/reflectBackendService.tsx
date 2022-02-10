@@ -1,7 +1,6 @@
 import * as SignalR from '@aspnet/signalr';
 import * as jsonwebtoken from 'jsonwebtoken';
 import * as moment from 'moment';
-import { getAppToken } from 'azure-devops-extension-sdk';
 
 import Environment from '../config/environment';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
@@ -28,7 +27,7 @@ class ReflectBackendService {
 
   private _currentBoardId: string;
   private _signalRConnection: SignalR.HubConnection;
-  private _appToken: string;
+  private _appToken: ISessionToken;
   private _tokenExpiry: Date;
   private _connectionAvailable: boolean;
 
@@ -61,31 +60,29 @@ class ReflectBackendService {
       return false;
     }
 
-    try {
-      await this._signalRConnection.start();
-      this._connectionAvailable = true;
-    }
-    catch (error) {
+    this._connectionAvailable = await this._signalRConnection.start()
+    .then(() => true)
+    .catch((error) => {
       console.error('Error when trying to start signalR connection: ', error);
       console.debug('Unable to establish signalR connection, live syncing will be affected.');
-      this._connectionAvailable = false;
-    }
+      return false;
+    });
 
     return this._connectionAvailable;
   }
 
   private retrieveValidToken = (that = this) => {
     if (that._tokenExpiry && moment().isBefore(that._tokenExpiry)) {
-      return that._appToken;
+      return that._appToken.token;
     }
 
-    return Promise.resolve(getAppToken().then((appToken) => {
+    return Promise.resolve(VSS.getAppToken().then((appToken) => {
       that._appToken = appToken;
 
-      const tokenData = jsonwebtoken.decode(that._appToken, {json: true});
+      const tokenData = jsonwebtoken.decode(that._appToken.token, {json: true});
       if (typeof tokenData === 'object') {
         that._tokenExpiry = moment.unix(tokenData.exp).toDate();
-        return that._appToken;
+        return that._appToken.token;
       }
 
       throw new Error('VSTS returned a malformed appToken value!');

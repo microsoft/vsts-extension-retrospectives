@@ -8,17 +8,14 @@ import {
   IDocumentCardPreviewProps
 } from 'office-ui-fabric-react/lib/DocumentCard';
 import * as React from 'react';
-import { getService } from 'azure-devops-extension-sdk';
-import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
+import { WorkItem, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking/Contracts';
+import { WorkItemFormNavigationService } from 'TFS/WorkItemTracking/Services';
 
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { IconType } from 'office-ui-fabric-react/lib/Icon';
 import Dialog, { DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface ActionItemProps extends IButtonProps {
   feedbackItemId: string;
@@ -38,7 +35,7 @@ export interface ActionItemState {
   workItemSearchTextboxHasErrors: boolean;
 }
 
-class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
+export default class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
   constructor(props: ActionItemProps) {
     super(props);
 
@@ -79,7 +76,7 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
   }
 
   private onActionItemClick = async (workItemId: number) => {
-    const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+    const workItemNavSvc = await WorkItemFormNavigationService.getService();
 
     await workItemNavSvc.openWorkItem(workItemId);
 
@@ -217,5 +214,3 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
     );
   }
 }
-
-export default withAITracking(reactPlugin, ActionItem);

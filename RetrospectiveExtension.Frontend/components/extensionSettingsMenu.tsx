@@ -4,8 +4,6 @@ import { Dialog, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dia
 import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { ViewMode } from '../config/constants';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
@@ -18,7 +16,7 @@ interface IExtensionSettingsMenuProps {
   isDesktop: boolean;
 }
 
-class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
+export default class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
   constructor(props: IExtensionSettingsMenuProps) {
     super(props);
 
@@ -122,7 +120,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           onClick={this.showWhatsNewDialog}
         >
           <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
-          <span className="ms-Button-label">What&apos;s New</span>
+          <span className="ms-Button-label">What's New</span>
         </DefaultButton>
         <Dialog
           hidden={this.state.isWhatsNewDialogHidden}
@@ -201,5 +199,3 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     );
   }
 }
-
-export default withAITracking(reactPlugin, ExtensionSettingsMenu);
