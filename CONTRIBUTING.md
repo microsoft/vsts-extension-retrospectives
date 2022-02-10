@@ -75,6 +75,25 @@ Clone the repository to your local machine from the Azure DevOps endpoint.
 
 - For the real time live syncing to work, our service needs to know your publisher id and your extension's unique key. To enable real time updates for your test extension, please [reach out to us](https://github.com/microsoft/vsts-extension-retrospectives/issues) with your publisher id and the unique key of your extension. [Instructions on how to download the unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key).
 
+### Continuous Integration (CI) Script and Pre-commit Hook
+
+The `RetrospectiveExtension.Frontend/scripts` folder includes a ci script,
+[`ci.sh`](RetrospectiveExtension.Frontend/scripts/ci.sh).
+The script runs all CI steps locally. If you are using the
+projects dev container all script dependencies are already installed.
+If you are not using the dev container you can run the
+[`setup_ci.sh`](RetrospectiveExtension.Frontend/scripts/setup_ci.sh) script
+to install all dependencies.
+
+In addition to running the CI script manually the dev container is
+configured to install a
+[pre-commit hook](https://git-scm.com/docs/githooks#_pre_commit) using the
+[Python pre-commit framework](https://pre-commit.com/). The pre-commit
+hook will run the [`ci.sh`](RetrospectiveExtension.Frontend/scripts/ci.sh)
+script before each commit and abort the commit on error. To
+disable the pre-commit hook run `pre-commit uninstall` from the
+root folder.
+
 ### Testing Component Rendering and Functionality
 
 Components functionality is tested using the [Jest Testing Framework](https://jestjs.io/), and the
