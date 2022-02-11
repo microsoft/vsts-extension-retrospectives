@@ -110,6 +110,8 @@ necessary (including bug fixes) and include these tests in your pull requests.
 
 To run tests in "watch" mode, as you make changes to components, run `npm run test:watch`.
 
+To automatically generate the test coverage report, add the `--coverage` flag to the `test` script defined in [package.json](RetrospectiveExtension.Frontend/package.json). After the test run is completed, coverage statistics will then be reported in the newly created `coverage` directory.
+
 #### Mocks
 
 In order to simulate API calls and some external module functionality, jest mocks were created and utilized. Mocks that

@@ -9,5 +9,7 @@ const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
 };
 
 describe(`The Feedback Board Component`, () => {
-  it("Renders a Feedback Board Container Component", () => {});
+  it("Renders a Feedback Board Container Component", () => {
+    console.log(feedbackBoardContainerProps);
+  });
 });

@@ -44,7 +44,7 @@ const testGroupedItemProps = mocked({
   isGroupExpanded: false,
   isMainItem: true,
   parentItemId: '',
-  setIsGroupBeingDragged: jest.fn((isBeingDragged) => { }),
+  setIsGroupBeingDragged: jest.fn(() => { }),
   toggleGroupExpand: jest.fn(() => {}),
   updateGroupCardStackHeight: jest.fn(() => {}),
 });
@@ -78,6 +78,7 @@ const testColumnItem = mocked({
 });
 
 const testColumnIds: string[] = [testColumnUuidOne, testColumnUuidTwo];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const testColumnsObj: any = {};
 testColumnsObj[testColumnUuidOne] = {
   columnProperties:
@@ -157,13 +158,9 @@ const testColumnProps = mocked({
   shouldFocusOnCreateFeedback: false,
   hideFeedbackItems: false,
   onVoteCasted: jest.fn(() => { }),
-  addFeedbackItems: jest.fn((
-    columnId, columnItems, shouldBroadcast, newlyCreated, showAddedAnimation, shouldHaveFocus, hideFeedbackItems) => {
-
-  }),
-  removeFeedbackItemFromColumn: jest.fn((
-    columnIdToDeleteFrom, feedbackItemIdToDelete, shouldSetFocusOnFirstAvailableItem) => { }),
-  refreshFeedbackItems: jest.fn((feedbackItems, shouldBroadcast) => { }),
+  addFeedbackItems: jest.fn(() => {}),
+  removeFeedbackItemFromColumn: jest.fn(() => {}),
+  refreshFeedbackItems: jest.fn(() => { }),
 });
 
 describe('Feedback Item', () => {
