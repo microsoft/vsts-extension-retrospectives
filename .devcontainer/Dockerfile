@@ -36,7 +36,7 @@ RUN apt-get update \
     && apt-get install -y dotnet-sdk-5.0 \
     #
     # Install node
-    && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt install -y nodejs \
     #
     # Install npm-check-updates tool globally
