@@ -1,15 +1,15 @@
-import { CoreHttpClient4_1 } from 'TFS/Core/RestClient';
-import { getCollectionClient } from 'VSS/Service';
-import { WebApiTeam } from 'TFS/Core/Contracts';
-import { TeamMember } from 'VSS/WebApi/Contracts';
+import { CoreRestClient } from 'azure-devops-extension-api/Core/CoreClient';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
+import { TeamMember } from 'azure-devops-extension-api/WebApi';
+import { getClient } from 'azure-devops-extension-api/Common';
 
 class AzureDevOpsCoreService {
-  private _httpCoreClient: CoreHttpClient4_1;
+  private _httpCoreClient: CoreRestClient;
   private readonly maxTeamsPerRequest = 100;
 
   constructor() {
     if (!this._httpCoreClient) {
-      this._httpCoreClient = getCollectionClient(CoreHttpClient4_1);
+      this._httpCoreClient = getClient(CoreRestClient);
     }
   }
 
@@ -56,7 +56,7 @@ class AzureDevOpsCoreService {
     const getTeamBatch = async (skip: number) => {
       const teamBatch: WebApiTeam[] =
         await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, this.maxTeamsPerRequest, skip);
-      
+
       if (teamBatch.length > 0) {
         allTeams.push(...teamBatch);
       }

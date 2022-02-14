@@ -9,10 +9,10 @@ import FeedbackItemGroup from './feedbackItemGroup';
 import { IColumnItem, IColumn } from './feedbackBoard';
 import localStorageHelper from '../utilities/localStorageHelper';
 // TODO (enpolat) : import { TelemetryEvents, appInsightsClient } from '../utilities/appInsightsClient';
-import { WebApiTeam } from 'TFS/Core/Contracts';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { ActionButton, IButton } from 'office-ui-fabric-react/lib/Button';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-import { WorkItemType } from 'TFS/WorkItemTracking/Contracts';
+import { WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -122,10 +122,10 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
   }
 
-  private static moveFeedbackItem = async (
+  public static moveFeedbackItem = async (
     refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void,
-    boardId: string, 
-    feedbackItemId: string, 
+    boardId: string,
+    feedbackItemId: string,
     columnId: string) => {
     const updatedFeedbackItems = await itemDataService.addFeedbackItemAsMainItemToColumn(boardId, feedbackItemId, columnId);
 
@@ -144,7 +144,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   };
 
   public static createFeedbackItemProps = (
-    columnProps: FeedbackColumnProps, 
+    columnProps: FeedbackColumnProps,
     columnItem: IColumnItem,
     isInteractable: boolean): IFeedbackItemProps => {
     return {

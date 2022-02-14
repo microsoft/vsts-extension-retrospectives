@@ -1,7 +1,7 @@
 ﻿import { processService } from '../dal/processService';
 import * as RetrospectiveItemContract from '../interfaces/retrospectiveWorkItemType';
-import * as ProcessDefinitionsContracts  from 'TFS/WorkItemTracking/ProcessDefinitionsContracts';
-import { ProcessClass } from 'TFS/WorkItemTracking/ProcessContracts';
+import * as ProcessDefinitionsContracts  from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+import { CustomizationType } from 'azure-devops-extension-api/WorkItemTrackingProcess';
 import { ExceptionCode, InitialRetrospectiveState } from '../interfaces/retrospectiveState';
 
 const getCurrentProcess = processService.getProcessForCurrentProject();
@@ -149,7 +149,7 @@ export const initializeRetrospectiveWorkItemType = () => {
   });
 
   const isInherited = getCurrentProcess.then(curProcess => {
-    return curProcess && (curProcess.properties.class != ProcessClass.System);
+    return curProcess && (curProcess.customizationType != CustomizationType.System);
   });
 
   const initialState = isInherited.then(inherited => {
