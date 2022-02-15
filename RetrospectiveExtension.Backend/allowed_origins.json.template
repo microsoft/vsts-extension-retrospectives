@@ -1,0 +1,10 @@
+[
+    {
+        "name": "AllowedOrigin:0",
+        "value": "https://<publisher id>.gallerycdn.vsassets.io"
+    },
+    {
+        "name": "AllowedOrigin:1",
+        "value": "https://<publisher id>.gallery.vsassets.io"
+    }
+]

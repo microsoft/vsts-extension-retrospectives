@@ -1,6 +1,6 @@
 import * as ExtensionDataService from './dataService';
 import { IFeedbackItemDocument, IFeedbackBoardDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
-import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { WorkItem } from 'TFS/WorkItemTracking/Contracts';
 import { workItemService } from './azureDevOpsWorkItemService';
 // TODO (enpolat) : import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
 import { v4 as uuid } from 'uuid';

@@ -1,5 +1,4 @@
-import { IdentityRef } from 'azure-devops-extension-api/WebApi';
-import { IUserContext, getUser } from 'azure-devops-extension-sdk';
+import { IdentityRef } from 'VSS/WebApi/Contracts';
 
 let userIdentity: IdentityRef;
 
@@ -8,16 +7,19 @@ let userIdentity: IdentityRef;
  */
 export const getUserIdentity = (): IdentityRef => {
   if (!userIdentity){
-    const currentUser: IUserContext = getUser();
+    const context = VSS.getWebContext();
+    const currentUser: UserContext = context.user;
+    const hostUri = context.host.uri;
+    const avatarUrl: string = (!(currentUser.id == null || currentUser.id.trim() === '')) ? `${hostUri}/_api/_common/IdentityImage?id=${currentUser.id}` : "";
 
     userIdentity = {
       id: currentUser.id,
-      displayName: currentUser.displayName,
-      uniqueName: currentUser.name,
-      imageUrl: currentUser.imageUrl,
+      displayName: currentUser.name,
+      uniqueName: currentUser.uniqueName || currentUser.email,
+      imageUrl: avatarUrl,
       _links: {
         avatar: {
-          href: currentUser.imageUrl,
+          href: avatarUrl,
         },
       },
     } as IdentityRef;

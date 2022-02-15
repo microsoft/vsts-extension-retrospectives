@@ -1,4 +1,4 @@
-import { IdentityRef } from 'azure-devops-extension-api/WebApi';
+import { IdentityRef } from 'VSS/WebApi/Contracts';
 import { WorkflowPhase } from './workItem';
 
 export interface IUserVisit {

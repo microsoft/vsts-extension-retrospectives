@@ -1,4 +1,4 @@
-﻿import {WorkItemTypeModel, FieldModel} from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+﻿import {WorkItemTypeModel, FieldModel} from 'TFS/WorkItemTracking/ProcessDefinitionsContracts';
 
 export interface CustomWorkItemType {
     workItemTypeModel: WorkItemTypeModel;

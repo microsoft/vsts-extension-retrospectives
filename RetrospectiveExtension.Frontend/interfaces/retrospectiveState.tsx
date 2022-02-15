@@ -1,4 +1,4 @@
-import { WorkItemTypeModel } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+import { WorkItemTypeModel } from 'TFS/WorkItemTracking/ProcessDefinitionsContracts';
 
 export enum ExceptionCode {
     Unexpected = 0,

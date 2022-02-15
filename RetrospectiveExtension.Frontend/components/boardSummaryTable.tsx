@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
-import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { WorkItem, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking/Contracts';
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
@@ -11,8 +11,6 @@ import classNames from 'classnames';
 import ReactTable from 'react-table-6';
 
 import 'react-table-6/react-table.css'
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -45,7 +43,7 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardSummaryTableState> {
+export default class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardSummaryTableState> {
   constructor(props: IBoardSummaryTableProps) {
     super(props);
 
@@ -346,5 +344,3 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
     );
   }
 }
-
-export default withAITracking(reactPlugin, BoardSummaryTable);

@@ -1,10 +1,9 @@
 import { DefaultButton, IButtonProps, ActionButton, Button, BaseButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { Image } from 'office-ui-fabric-react/lib/Image';
 import * as React from 'react';
-import { getService, getUser } from 'azure-devops-extension-sdk';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
-import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
+import { WebApiTeam } from 'TFS/Core/Contracts';
+import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
+import { WorkItemFormNavigationService } from 'TFS/WorkItemTracking/Services';
 
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { itemDataService } from '../dal/itemDataService';
@@ -16,8 +15,6 @@ import { getBoardUrl } from '../utilities/boardUrlHelper';
 import Dialog, { DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import ActionItem from './actionItem';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface ActionItemDisplayProps extends IButtonProps {
   feedbackItemId: string;
@@ -44,7 +41,7 @@ export interface ActionItemDisplayState {
   initialRender: boolean;
 }
 
-class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionItemDisplayState> {
+export default class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionItemDisplayState> {
   constructor(props: ActionItemDisplayProps) {
     super(props);
 
@@ -67,17 +64,16 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
   private addActionItemButtonWrapper: HTMLElement | null;
 
   private createAndLinkActionItem = async (workItemTypeName: string) => {
-    const boardUrl = await getBoardUrl(this.props.team.id, this.props.boardId);
-    const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+    const workItemNavSvc = await WorkItemFormNavigationService.getService();
     const workItem = await workItemNavSvc.openNewWorkItem(workItemTypeName, {
-      'System.AssignedTo': getUser().name,
+      'System.AssignedTo': VSS.getWebContext().user.name,
       'Tags': 'feedback;reflect-hub',
       'Title': '',
       'Description': `${this.props.feedbackItemTitle}`,
       'priority': 1,
       'System.History': `Created by Retrospectives |` +
         ` Team [ ${this.props.team.name} ] Retrospective [ ${this.props.boardTitle} ] Item [ ${this.props.feedbackItemTitle} ]` +
-        ` Link [ ${boardUrl} ]`,
+        ` Link [ ${getBoardUrl(this.props.team.id, this.props.boardId)} ]`,
       'System.AreaPath': this.props.defaultAreaPath,
       'System.IterationPath': this.props.defaultIteration,
     });
@@ -318,5 +314,3 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     );
   }
 }
-
-export default withAITracking(reactPlugin, ActionItemDisplay);

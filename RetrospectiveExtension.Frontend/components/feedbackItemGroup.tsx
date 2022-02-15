@@ -2,10 +2,8 @@ import classNames from 'classnames';
 import * as React from 'react';
 
 import { WorkflowPhase } from '../interfaces/workItem';
-import FeedbackItem, { FeedbackItemHelper, IFeedbackItemProps } from './feedbackItem';
+import FeedbackItem, { IFeedbackItemProps } from './feedbackItem';
 import localStorageHelper from '../utilities/localStorageHelper';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface IFeedbackItemGroupProps {
   groupedWorkItems: IFeedbackItemProps[];
@@ -19,7 +17,7 @@ export interface RetrospectiveItemGroupState {
   itemCardsStackHeight: number;
 }
 
-class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, RetrospectiveItemGroupState> {
+export default class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, RetrospectiveItemGroupState> {
   constructor(props: IFeedbackItemGroupProps) {
     super(props);
     this.state = {
@@ -51,7 +49,7 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
     // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
     // const droppedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
-    FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(this.props.mainFeedbackItem, droppedItemId, this.props.mainFeedbackItem.id);
+    FeedbackItem.handleDropFeedbackItemOnFeedbackItem(this.props.mainFeedbackItem, droppedItemId, this.props.mainFeedbackItem.id);
     e.stopPropagation();
   }
 
@@ -111,5 +109,3 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
     );
   }
 }
-
-export default withAITracking(reactPlugin, FeedbackItemGroup);

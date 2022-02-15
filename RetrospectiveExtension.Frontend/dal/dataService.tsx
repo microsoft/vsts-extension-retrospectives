@@ -1,17 +1,14 @@
-import { getAccessToken, getExtensionContext, getService } from 'azure-devops-extension-sdk';
-import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from 'azure-devops-extension-api';
+import { ExtensionDataService } from 'VSS/SDK/Services/ExtensionData';
 // TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 
-let extensionDataManager: IExtensionDataManager;
+let extensionDataService: ExtensionDataService;
 
-async function getDataService(): Promise<IExtensionDataManager> {
-  if (!extensionDataManager) {
-    const accessToken = await getAccessToken();
-    const extensionDataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
-    extensionDataManager = await extensionDataService.getExtensionDataManager(getExtensionContext().id, accessToken);
+async function getDataService(): Promise<ExtensionDataService> {
+  if (!extensionDataService) {
+    extensionDataService = await VSS.getService<ExtensionDataService>(VSS.ServiceIds.ExtensionData);
   }
 
-  return extensionDataManager;
+  return extensionDataService;
 }
 
 /**
@@ -19,7 +16,7 @@ async function getDataService(): Promise<IExtensionDataManager> {
  */
 export async function readDocuments<T>(
   collectionName: string, isPrivate?: boolean, throwCollectionDoesNotExistException?: boolean): Promise<T[]> {
-  const dataService: IExtensionDataManager = await getDataService();
+  const dataService: ExtensionDataService = await getDataService();
   let data: T[];
 
   try {
@@ -44,7 +41,7 @@ export async function readDocuments<T>(
  * Read a specific user/account scoped document.
  */
 export async function readDocument<T>(collectionName: string, id: string, isPrivate?: boolean): Promise<T> {
-  const dataService: IExtensionDataManager = await getDataService();
+  const dataService: ExtensionDataService = await getDataService();
   let data: T;
   try {
     data = await dataService.getDocument(collectionName, id, isPrivate ? { scopeType: 'User' } : undefined);
@@ -61,7 +58,7 @@ export async function readDocument<T>(collectionName: string, id: string, isPriv
  * Create user/account scoped document.
  */
 export async function createDocument<T>(collectionName: string, data: T, isPrivate?: boolean): Promise<T> {
-  const dataService: IExtensionDataManager = await getDataService();
+  const dataService: ExtensionDataService = await getDataService();
   return dataService.createDocument(collectionName, data, isPrivate ? { scopeType: 'User' } : undefined);
 }
 
@@ -69,7 +66,7 @@ export async function createDocument<T>(collectionName: string, data: T, isPriva
  * Create or Update user/account scoped document.
  */
 export async function createOrUpdateDocument<T>(collectionName: string, data: T, isPrivate?: boolean): Promise<T> {
-  const dataService: IExtensionDataManager = await getDataService();
+  const dataService: ExtensionDataService = await getDataService();
   return dataService.setDocument(collectionName, data, isPrivate ? { scopeType: 'User' } : undefined);
 }
 
@@ -77,7 +74,7 @@ export async function createOrUpdateDocument<T>(collectionName: string, data: T,
  * Update user/account scoped document.
  */
 export async function updateDocument<T>(collectionName: string, data: T, isPrivate?: boolean): Promise<T> {
-  const dataService: IExtensionDataManager = await getDataService();
+  const dataService: ExtensionDataService = await getDataService();
 
   let updatedData: T;
   try {
@@ -95,7 +92,7 @@ export async function updateDocument<T>(collectionName: string, data: T, isPriva
  * Delete user/account scoped document.
  */
 export async function deleteDocument(collectionName: string, id: string, isPrivate?: boolean): Promise<void> {
-  const dataService: IExtensionDataManager = await getDataService();
+  const dataService: ExtensionDataService = await getDataService();
   return dataService.deleteDocument(collectionName, id, isPrivate ? { scopeType: 'User' } : undefined);
 }
 
@@ -103,7 +100,7 @@ export async function deleteDocument(collectionName: string, id: string, isPriva
  * Set user/account scoped value.
  */
 export async function setValue<T>(id: string, data: T, isPrivate?: boolean): Promise<T> {
-  const dataService: IExtensionDataManager = await getDataService();
+  const dataService: ExtensionDataService = await getDataService();
 
   let updatedData: T;
   try {
@@ -121,7 +118,7 @@ export async function setValue<T>(id: string, data: T, isPrivate?: boolean): Pro
  * Get user/account scoped value.
  */
 export async function getValue<T>(id: string, isPrivate?: boolean): Promise<T> {
-  const dataService: IExtensionDataManager = await getDataService();
+  const dataService: ExtensionDataService = await getDataService();
 
   let data: T;
   try {

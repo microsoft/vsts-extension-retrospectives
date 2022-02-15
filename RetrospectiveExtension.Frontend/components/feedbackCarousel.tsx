@@ -6,8 +6,6 @@ import FeedbackItem from './feedbackItem';
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface IFeedbackCarouselProps {
   feedbackColumnPropsList: FeedbackColumnProps[];
@@ -17,7 +15,7 @@ export interface IFeedbackCarouselProps {
 export interface IFeedbackCarouselState {
 }
 
-class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
+export default class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
   private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
     const columnItems = feedbackColumnProps.columnItems.sort((item1, item2) => item2.feedbackItem.upvotes - item1.feedbackItem.upvotes);
 
@@ -26,7 +24,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
       .map((columnItem) => {
         const feedbackItemProps =
-        FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);
+          FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);
 
         return (
           <div key={feedbackItemProps.id} className="feedback-carousel-item">
@@ -79,7 +77,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
             {mainCardCount >= 2 &&
               // @ts-ignore TS2786
               <Slider {...settings}>
-                {React.Children.map(this.renderFeedbackCarouselItems(columnProps), (child: React.ReactElement<typeof FeedbackItem>) => {
+                {React.Children.map(this.renderFeedbackCarouselItems(columnProps), (child: React.ReactElement<FeedbackItem>) => {
                   return (
                     <div
                       className="feedback-carousel-item-wrapper"
@@ -96,5 +94,3 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
     );
   }
 }
-
-export default withAITracking(reactPlugin, FeedbackCarousel);
