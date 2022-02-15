@@ -87,8 +87,7 @@
   },
   "jest": {
     "testPathIgnorePatterns": [
-      "./components/__tests__/setupTests.tsx",
-      "./components/__tests__/mocked_components/*"
+      "./components/__tests__/setupTests.tsx"
     ],
     "transform": {
       "^.+\\.(js|ts|tsx|jsx)$": "ts-jest"
@@ -100,9 +99,11 @@
       "./components/__tests__/setupTests.tsx"
     ],
     "moduleNameMapper": {
-      "office-ui-fabric-react/lib/(.*)$": "office-ui-fabric-react/lib-commonjs/$1"
+      "office-ui-fabric-react/lib/(.*)$": "office-ui-fabric-react/lib-commonjs/$1",
+      "^.+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx"
     },
     "preset": "ts-jest/presets/js-with-babel",
+    "resetMocks": true,
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
     ],

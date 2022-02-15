@@ -705,7 +705,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
-  private clickWorkflowStateCallback = (clickedElement: React.MouseEvent<HTMLElement>, newPhase: WorkflowPhase) => {
+  private clickWorkflowStateCallback = (clickedElement: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => {
     // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.WorkflowPhaseChanged, { [TelemetryEventProperties.OldWorkflowPhase]: this.state.currentBoard.activePhase, [TelemetryEventProperties.NewWorkflowPhase]: newPhase });
 
     this.setState(prevState => {

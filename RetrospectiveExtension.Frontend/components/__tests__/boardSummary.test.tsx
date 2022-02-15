@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { shallow, ShallowWrapper} from 'enzyme';
 import { DetailsList } from 'office-ui-fabric-react/lib/DetailsList';
-import { mockWorkItem, mockWorkItemType } from './mocked_components/WorkItemTracking';
+import { mockWorkItem, mockWorkItemType } from '../__mocks__/mocked_components/mockedWorkItemTracking';
 import BoardSummary, { IBoardSummaryProps } from '../boardSummary';
 
 const mockedDefaultProps: IBoardSummaryProps = {

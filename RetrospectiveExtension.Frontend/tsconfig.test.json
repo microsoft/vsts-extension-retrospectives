@@ -9,6 +9,7 @@
       "strict": true,
       "strictNullChecks": false,
       "target": "es5",
+      "downlevelIteration": true,
       "rootDir": "src/",
       "outDir": "dist/",
       "jsx": "react",

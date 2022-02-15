@@ -55,8 +55,9 @@ class BoardDataService {
 
     try {
       teamBoards = await ExtensionDataService.readDocuments<IFeedbackBoardDocument>(teamId, false, true);
-    } catch (e) {
-      if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
         // TODO (enpolat) : appInsightsClient.trackTrace(TelemetryExceptions.BoardsNotFoundForTeam, e, AI.SeverityLevel.Warning);
       }
     }

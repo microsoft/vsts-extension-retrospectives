@@ -32,7 +32,8 @@ class WorkService {
     try {
       teamIterations = await this._httpWorkClient.getTeamIterations(teamContext, timeframe);
     }
-    catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (e: any) {
       if (e.serverError.typeKey === 'CurrentIterationDoesNotExistException') {
         // TODO: Enable once trackTrace is supported
         // appInsightsClient.trackTrace(TelemetryExceptions.CurrentTeamIterationNotFound, e);

@@ -2,7 +2,7 @@ repos:
   - repo: local
     hooks:
       - id: frontend-ci
-        name: Run the fontend ci tasks
+        name: Run the frontend ci tasks
         entry: RetrospectiveExtension.Frontend/scripts/ci.sh
         language: script
         types: [file]
