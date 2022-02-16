@@ -36,7 +36,6 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         run: |
-          cp config/environment.tsx.template config/environment.tsx
           scripts/setup_ci.sh
           scripts/ci.sh
         name: Build and Test (CI script)

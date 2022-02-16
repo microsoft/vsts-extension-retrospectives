@@ -1,6 +1,6 @@
 import { ReactPlugin } from '@microsoft/applicationinsights-react-js';
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
-import environment from '../../config/environment';
+import { config as environment } from '../../config/config';
 
 const reactPlugin = new ReactPlugin();
 const appInsights = new ApplicationInsights({
@@ -20,11 +20,11 @@ appInsights.loadAppInsights();
 // but also sends error messages to Application insights as well.
 const updatedConsoleError = ((oldErrorFunction) => {
   return {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      error: function(message?: any, ...optionalParams: any[]){
-        oldErrorFunction(message, optionalParams);
-          appInsights.trackException({error:{message:message, name:"console.error"}});
-      },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    error: function (message?: any, ...optionalParams: any[]) {
+      oldErrorFunction(message, optionalParams);
+      appInsights.trackException({ error: { message: message, name: "console.error" } });
+    },
   };
 })(window.console.error);
 //Then redefine the old console

@@ -60,17 +60,6 @@ jobs:
       name: Install tools used for deployment
 
     - run: |
-        # Create environment.tsx from template
-        cp config/environment.tsx.template config/environment.tsx
-
-        # Inject default backend service url
-        service_url='https:\/\/${{ secrets.BACKEND_WEBAPP }}.azurewebsites.net'
-        sed -i -e "s/https:\/\/my-backend-service\.com/$service_url/g" config/environment.tsx
-        cat config/environment.tsx
-      name: Prepare environment.tsx
-      working-directory: 'RetrospectiveExtension.Frontend'
-
-    - run: |
         # Create vss-extension-dev.json from template
         cp vss-extension-dev.json.template vss-extension-dev.json
 
@@ -91,6 +80,9 @@ jobs:
         npm run pack:d
       name: Prepare extension package
       working-directory: 'RetrospectiveExtension.Frontend'
+      env:
+        REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
+        REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
 
     - run: >
         tfx extension publish
@@ -136,7 +128,7 @@ jobs:
           ${{ secrets.SERVICE_PRINCIPAL_ID }} \
           ${{ secrets.SERVICE_PRINCIPAL_SECRET }} \
           ${{ secrets.BACKEND_RESOURCE_GROUP }} \
-          ${{ secrets.BACKEND_WEBAPP }} \
+          ${{ secrets.BACKEND_WEBAPPNAME }} \
           $cert
       name: Update backend configuration
       working-directory: 'RetrospectiveExtension.Frontend'

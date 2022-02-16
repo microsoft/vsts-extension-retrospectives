@@ -1,8 +1,8 @@
 import * as SignalR from '@aspnet/signalr';
-import  moment from 'moment';
+import moment from 'moment';
 import { getAppToken } from 'azure-devops-extension-sdk';
 
-import Environment from '../config/environment';
+import { config } from '../config/config';
 import { decodeJwt } from '../utilities/tokenHelper';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 
@@ -24,7 +24,7 @@ const enum ReflectBackendSignals {
 }
 
 class ReflectBackendService {
-  private static signalRHubUrl = new URL('/collaborationUpdates', Environment.CollaborationStateServiceUrl);
+  private static signalRHubUrl = new URL('/collaborationUpdates', config.CollaborationStateServiceUrl);
 
   private _currentBoardId: string;
   private _signalRConnection: SignalR.HubConnection;
@@ -39,11 +39,11 @@ class ReflectBackendService {
 
     if (!this._signalRConnection) {
       this._signalRConnection = new SignalR.HubConnectionBuilder()
-      .withUrl(ReflectBackendService.signalRHubUrl.href, {
-        accessTokenFactory: this.retrieveValidToken,
-      })
-      .configureLogging(SignalR.LogLevel.Error)
-      .build();
+        .withUrl(ReflectBackendService.signalRHubUrl.href, {
+          accessTokenFactory: this.retrieveValidToken,
+        })
+        .configureLogging(SignalR.LogLevel.Error)
+        .build();
       this._connectionAvailable = false;
 
       this._signalRConnection.onclose((error) => {

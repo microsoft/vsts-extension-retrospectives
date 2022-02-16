@@ -259,9 +259,6 @@ paket-files/
 # MacOS
 .DS_Store
 
-# dev files
-environment.tsx
-
 # Backend config files
 .env
 allowed_origins.json
