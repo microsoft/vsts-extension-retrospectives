@@ -1,0 +1,142 @@
+name: 'CD - Frontend'
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+  deploy:
+    name: Frontend - Deploy package
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      name: Check out repository
+
+    - run: |
+        # Current/target branches' names
+        branch=${GITHUB_REF#refs/heads/}
+        target_branch="${{ github.event.pull_request.base.ref }}"
+
+        # Extension Publishers
+        rc_publisher=retroextcd-rc
+        pr_publisher=retroextcd-prval
+
+        # Extension Prefix
+        # Remove all forward slashes to use for Extension Id
+        rc_ext_prefix=${branch//\//}
+        pr_branch=${{ github.event.pull_request.head.ref }}
+        if [[ "$pr_branch" ]]; then
+          pr_ext_prefix=${pr_branch//\//}
+        fi
+
+        # Test Organizations
+        rc_test_organization=retroextcd-rc
+        pr_test_organization=retroextcd-prval
+
+        if [[ "$branch" == master ]] || [[ "$branch" == dev ]]; then
+          echo "Setting config for Release Candidate (RC) environment"
+          echo "##[set-output name=publisher;]$rc_publisher"
+          echo "##[set-output name=ext_prefix;]$rc_ext_prefix"
+          echo "##[set-output name=test_organization;]$rc_test_organization"
+        elif [[ "$target_branch" == master ]] || [[ "$target_branch" == dev ]]; then
+          echo "Setting config for PR validation"
+          echo "##[set-output name=publisher;]$pr_publisher"
+          echo "##[set-output name=ext_prefix;]$pr_ext_prefix"
+          echo "##[set-output name=test_organization;]$pr_test_organization"
+        fi
+      name: Set up default variables
+      id: config
+
+    - run: |
+        npm install -g \
+          tfx-cli \
+          node-jq
+      name: Install tools used for deployment
+
+    - run: |
+        # Create environment.tsx from template
+        cp config/environment.tsx.template config/environment.tsx
+
+        # Inject default backend service url
+        service_url='https:\/\/${{ secrets.BACKEND_WEBAPP }}.azurewebsites.net'
+        sed -i -e "s/https:\/\/my-backend-service\.com/$service_url/g" config/environment.tsx
+        cat config/environment.tsx
+      name: Prepare environment.tsx
+      working-directory: 'RetrospectiveExtension.Frontend'
+
+    - run: |
+        # Create vss-extension-dev.json from template
+        cp vss-extension-dev.json.template vss-extension-dev.json
+
+        # Update vss-extension-dev.json
+        scripts/update_ext_manifest.sh \
+          vss-extension-dev.json \
+          ${{ steps.config.outputs.publisher }} \
+          ${{ steps.config.outputs.ext_prefix }} \
+          ${{ secrets.AZURE_DEVOPS_TOKEN }}
+
+        cat vss-extension-dev.json
+      name: Prepare vss-extension-dev.json
+      working-directory: 'RetrospectiveExtension.Frontend'
+
+    - run: |
+        npm install
+        npm run build:p
+        npm run pack:d
+      name: Prepare extension package
+      working-directory: 'RetrospectiveExtension.Frontend'
+
+    - run: >
+        tfx extension publish
+        --manifests vss-extension-dev.json
+        --vsix ./dist/*.vsix
+        --token ${{ secrets.AZURE_DEVOPS_TOKEN }}
+      name: Publish extension
+      working-directory: 'RetrospectiveExtension.Frontend'
+
+    - run: >
+        tfx extension share
+        --no-prompt
+        --publisher ${{ steps.config.outputs.publisher }}
+        --extensionId ${{ steps.config.outputs.ext_prefix }}-retrospective-vsts-extension-dev
+        --shareWith ${{ steps.config.outputs.test_organization }}
+        --token ${{ secrets.AZURE_DEVOPS_TOKEN }}
+      name: Share extension
+      working-directory: 'RetrospectiveExtension.Frontend'
+
+    - run: >
+        tfx extension install
+        --no-prompt
+        --publisher ${{ steps.config.outputs.publisher }}
+        --extensionId ${{ steps.config.outputs.ext_prefix }}-retrospective-vsts-extension-dev
+        --serviceUrl https://dev.azure.com/${{ steps.config.outputs.test_organization }}
+        --token ${{ secrets.AZURE_DEVOPS_TOKEN }}
+      name: Install extension
+      working-directory: 'RetrospectiveExtension.Frontend'
+
+    - run: |
+        # Download developer certificate
+        cert_file=cert.txt
+        scripts/download_dev_cert.sh \
+          ${{ secrets.AZURE_DEVOPS_TOKEN }} \
+          ${{ steps.config.outputs.publisher }} \
+          ${{ steps.config.outputs.ext_prefix }}-retrospective-vsts-extension-dev \
+          $cert_file
+
+        # Update app settings
+        cert=$(cat $cert_file)
+        scripts/update_app_conf.sh \
+          ${{ secrets.TENANT_ID }} \
+          ${{ secrets.SERVICE_PRINCIPAL_ID }} \
+          ${{ secrets.SERVICE_PRINCIPAL_SECRET }} \
+          ${{ secrets.BACKEND_RESOURCE_GROUP }} \
+          ${{ secrets.BACKEND_WEBAPP }} \
+          $cert
+      name: Update backend configuration
+      working-directory: 'RetrospectiveExtension.Frontend'
