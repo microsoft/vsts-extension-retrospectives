@@ -132,12 +132,12 @@ $team_selector_list_item_width: 450px;
     &:hover {
       background-color: $hover_grey;
     }
-    
+
     i {
       color: black;
     }
   }
-  
+
   .team-selector {
     font-weight: 400;
     display: flex;
@@ -247,6 +247,7 @@ $team_selector_list_item_width: 450px;
       &.active {
         color: var(--status-info-foreground);
         font-weight: bold;
+        background-color: #c9c9c9;
 
         &::before {
           background-color: transparent;

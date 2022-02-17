@@ -81,6 +81,27 @@
           }
         }
 
+        .feedback-expand-group-focus {
+          height: $feedback_item_header_height;
+          max-width: 150px;
+          z-index: 1;
+          margin: 0 auto 0 0;
+          padding: 0 5px 0 0;
+          background-color: inherit;
+          border: none;
+          display: flex;
+          line-height: $feedback_item_header_height;
+          font-size: 12px;
+          font-weight: 600;
+
+          i {
+            width: 36px;
+            margin-left: 2px;
+            line-height: inherit;
+            margin-right: -4px;
+          }
+        }
+
         .feedback-add-vote {
           &:hover:not(:disabled) {
             i {
@@ -115,8 +136,13 @@
 
       .card-content {
         display: flex;
+        flex-direction: column;
         margin-right: 16px;
         margin-left: 16px;
+
+        .feedback-yourvote-count {
+          font-size: 1em;
+        }
       }
 
       .card-id {
@@ -140,6 +166,40 @@
         overflow: hidden;
         word-wrap: break-word;
         height: 45px;
+      }
+    }
+
+    .card-action-timer {
+      margin-bottom: 10px;
+    }
+
+    .group-child-feedback-stack {
+      .related-feedback-header {
+        font-variant: small-caps;
+      }
+
+      ul {
+        list-style: none;
+      }
+      .fa-ul {
+        margin-top: 0;
+        margin-left: 45px;
+
+        .fa-li {
+          background-color: lightgrey;
+          border: 1px darkgrey solid;
+          height: 30px;
+        }
+        li {
+          word-wrap: break-word;
+          padding: 2px;
+          line-height: 30px;
+          border-bottom: lightgrey 1px solid;
+
+          .related-feedback-title {
+            margin-left: 10px;
+          }
+        }
       }
     }
   }

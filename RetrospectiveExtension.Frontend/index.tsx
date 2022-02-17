@@ -2,7 +2,7 @@ import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { init as sdkInit }  from 'azure-devops-extension-sdk';
+import { init as sdkInit } from 'azure-devops-extension-sdk';
 import { isHostedAzureDevOps } from './utilities/azureDevOpsContextHelper';
 import { getProjectId } from './utilities/servicesHelper';
 import './css/main.scss';
@@ -22,7 +22,7 @@ sdkInit()
 
       ReactDOM.render(
         <AppInsightsErrorBoundary onError={() => <h1>We detected an error in the application</h1>} appInsights={reactPlugin}>
-            <FeedbackBoardContainer {...feedbackBoardContainerProps}/>
+          <FeedbackBoardContainer {...feedbackBoardContainerProps} />
         </AppInsightsErrorBoundary>,
         document.getElementById('root') as HTMLElement,
       );

@@ -4,7 +4,7 @@
 @import "./editableDocumentCardTitle.scss";
 @import "./feedbackBoardContainer.scss";
 @import "./noFeedbackBoardsView.scss";
-@import "./feedbackBoardMetadataForm.scss"; 
+@import "./feedbackBoardMetadataForm.scss";
 @import "./feedbackBoardPreviewEmail.scss";
 @import "./feedbackBoard.scss";
 @import "./feedbackColumn.scss";
@@ -38,7 +38,7 @@ button:hover:not(.ms-Button), button:focus:not(.ms-Button){
   border: none;
 
   // !important required to override the "bold !important" style in VSS bundle.
-  font-weight: normal !important; 
+  font-weight: normal !important;
 }
 
 #vss_1 {

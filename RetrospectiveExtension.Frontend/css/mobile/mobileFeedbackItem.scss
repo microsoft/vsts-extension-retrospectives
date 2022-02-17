@@ -13,6 +13,9 @@
     max-width: calc(100vw - 45px);
 
     .card-integral-part {
+      border-left-width: 10px;
+      border-left-style: solid;
+
       .card-header {
         height: $mobile_feedback_item_header_height;
 
@@ -30,6 +33,7 @@
             line-height: 1.3;
             font-size: $mobile_font_size_main;
           }
+
         }
 
         .feedback-add-vote {
@@ -62,6 +66,22 @@
             }
           }
         }
+      }
+      .card-content {
+        .feedback-yourvote-count {
+          font-size: 2em;
+        }
+        .card-action-timer {
+          button {
+            width: 33%;
+            min-height: 45px;
+            font-size: 2em;
+          }
+        }
+      }
+
+      .card-id {
+        font-size: 2em;
       }
 
       .ms-DocumentCardActivity, .anonymous-created-date {

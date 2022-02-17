@@ -7,7 +7,7 @@ import { TooltipOverflowMode } from 'office-ui-fabric-react';
 export const testTeamId = uuid();
 export const testBoardId = uuid();
 export const testWorkItemType = mocked({
-  _links:[],
+  _links: [],
   color: '#cc293d',
   description: 'Test Work Item Type Description',
   fieldInstances: [],
@@ -19,7 +19,7 @@ export const testWorkItemType = mocked({
   isDisabled: true,
   name: 'Test Work Item Type Name',
   referenceName: 'Test Work Item Type Reference Name',
-  states:[],
+  states: [],
   transitions: {},
   url: '',
   xmlForm: '',
@@ -34,14 +34,14 @@ export const testGroupedItemProps = mocked({
   isMainItem: true,
   parentItemId: '',
   setIsGroupBeingDragged: jest.fn(() => { }),
-  toggleGroupExpand: jest.fn(() => {}),
-  updateGroupCardStackHeight: jest.fn(() => {}),
+  toggleGroupExpand: jest.fn(() => { }),
+  updateGroupCardStackHeight: jest.fn(() => { }),
 });
 export const testFeedbackItem = mocked({
   id: uuid(),
   element: mocked({
-    innerText:'Test Inner Text',
-    innerHtml:'<div>Test Inner HTML</div>'
+    innerText: 'Test Inner Text',
+    innerHtml: '<div>Test Inner HTML</div>'
   }),
   boardId: testBoardId,
   title: 'Test Feedback Item',
@@ -56,6 +56,8 @@ export const testFeedbackItem = mocked({
   timerSecs: Math.floor(Math.random() * 60),
   timerstate: false,
   timerId: uuid(),
+  groupTitles: ['example one', 'example two'],
+  isGroupedCarouselItem: false,
 });
 export const testColumnItem = mocked({
   feedbackItem: testFeedbackItem,
@@ -109,26 +111,26 @@ export const testColumnProps = mocked({
   columnItems: testColumns[testColumnUuidOne].columnItems,
   team: {
     id: uuid(),
-    identity:{
-      customDisplayName:'Test Web API Identity Custom Display Name',
-      descriptor:{
-        identifier:'Test Identifier',
-        identityType:'Test Identity Type'
+    identity: {
+      customDisplayName: 'Test Web API Identity Custom Display Name',
+      descriptor: {
+        identifier: 'Test Identifier',
+        identityType: 'Test Identity Type'
       },
       id: uuid(),
       isActive: true,
       isContainer: false,
       masterId: uuid(),
-      memberIds:[],
-      memberOf:[],
-      members:[],
-      metaTypeId:5,
-      properties:[],
-      providerDisplayName:'Test Web API Identity Provider Display Name',
-      resourceVersion:10,
-      socialDescriptor:'Test Social Descriptor',
-      subjectDescriptor:'Test Subject Descriptor',
-      uniqueUserId:500,
+      memberIds: [],
+      memberOf: [],
+      members: [],
+      metaTypeId: 5,
+      properties: [],
+      providerDisplayName: 'Test Web API Identity Provider Display Name',
+      resourceVersion: 10,
+      socialDescriptor: 'Test Social Descriptor',
+      subjectDescriptor: 'Test Subject Descriptor',
+      uniqueUserId: 500,
     },
     name: 'Test Web API Team Name',
     description: 'Test Web API Team Description',
@@ -146,8 +148,10 @@ export const testColumnProps = mocked({
   isBoardAnonymous: false,
   shouldFocusOnCreateFeedback: false,
   hideFeedbackItems: false,
-  onVoteCasted: jest.fn(() => {}),
-  addFeedbackItems: jest.fn(() => {}),
-  removeFeedbackItemFromColumn: jest.fn(() => {}),
-  refreshFeedbackItems: jest.fn(() => {}),
+  groupTitles: ['example one', 'example two'],
+  isFocusModalHidden: false,
+  onVoteCasted: jest.fn(() => { }),
+  addFeedbackItems: jest.fn(() => { }),
+  removeFeedbackItemFromColumn: jest.fn(() => { }),
+  refreshFeedbackItems: jest.fn(() => { }),
 });

@@ -57,6 +57,11 @@ export interface IFeedbackItemProps {
   timerState: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   timerId: any;
+  groupCount: number;
+  isGroupedCarouselItem: boolean;
+  groupTitles: String[];
+  isShowingGroupedChildrenTitles: boolean;
+  isFocusModalHidden: boolean;
   onVoteCasted: () => void;
 
   addFeedbackItems: (
@@ -101,6 +106,7 @@ export interface IFeedbackItemState {
   searchTerm: string;
   hideFeedbackItems: boolean;
   userVotes: string;
+  isShowingGroupedChildrenTitles: boolean;
 }
 
 interface FeedbackItemEllipsisMenuItem {
@@ -132,6 +138,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       searchedFeedbackItems: [],
       showVotedAnimation: false,
       userVotes: "0",
+      isShowingGroupedChildrenTitles: false
     };
 
     this.itemElement = null;
@@ -354,6 +361,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       searchedFeedbackItems: [],
       searchTerm: '',
     });
+  }
+
+  private toggleShowGroupedChildrenTitles = () => {
+    this.setState((previousState) => ({ isShowingGroupedChildrenTitles: !previousState.isShowingGroupedChildrenTitles }))
   }
 
   private readonly feedbackItemEllipsisMenuItems: FeedbackItemEllipsisMenuItem[] = [
@@ -603,10 +614,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isDraggable = this.props.isInteractable && this.props.workflowPhase === WorkflowPhase.Group && !this.state.isMarkedForDeletion;
     const isNotGroupedItem = !this.props.groupedItemProps;
     const isMainItem = isNotGroupedItem || this.props.groupedItemProps.isMainItem;
+    const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const groupItemsCount = this.props && this.props.groupedItemProps && this.props.groupedItemProps.groupedCount + 1;
     const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : 'Feedback group main item. Group has ' + groupItemsCount + ' items.');
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
+    const childrenTitlesShort = this.props.groupTitles;
+    const isFocusModalHidden = this.props.isFocusModalHidden;
 
     return (
       <div
@@ -639,7 +653,30 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 borderLeftColor: this.props.accentColor
               }}>
               <div className="card-header">
-                {!isNotGroupedItem && isMainItem &&
+                {
+                  // This controls the top-level feedback item in the action phase on the carousel
+                  isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
+                  <button className="feedback-expand-group-focus"
+                    aria-live="polite"
+                    aria-label={this.props.groupedItemProps
+                      && !this.props.groupedItemProps.isGroupExpanded
+                      ? 'Expand Feedback Group button. Group has ' + groupItemsCount + ' items.'
+                      : 'Collapse Feedback Group button. Group has ' + groupItemsCount + ' items.'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      this.toggleShowGroupedChildrenTitles();
+                    }}>
+                    <i className={classNames('fa', {
+                      'fa-angle-double-down': this.state.isShowingGroupedChildrenTitles,
+                      'fa-angle-double-right': !this.state.isShowingGroupedChildrenTitles
+                    })} />&nbsp;
+                    {this.props.groupCount + 1} Items <i className="far fa-comments" />
+                  </button>
+                }
+                {
+                  // This controls the top level feedback item in a group in the vote phase
+                  // and outside the focus mode
+                  !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
                   <button className="feedback-expand-group"
                     aria-live="polite"
                     aria-label={this.props.groupedItemProps
@@ -663,7 +700,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   <button
                     title="Vote"
                     aria-live="polite"
-                    aria-label={'Click to vote On feedback. Current vote count is ' + this.props.upvotes}
+                    aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
                     tabIndex={0}
                     disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
                     className={classNames(
@@ -689,7 +726,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   <button
                     title="UnVote"
                     aria-live="polite"
-                    aria-label={'Click to unvote On feedback. Current vote count is ' + this.props.upvotes}
+                    aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
                     tabIndex={0}
                     disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
                     className={classNames(
@@ -767,6 +804,27 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </div>}
               </div>
               <div className="card-content">
+                <div id="actionTimer" className="card-action-timer">
+                  {showAddActionItem &&
+                    <button
+                      title="Timer"
+                      aria-live="polite"
+                      aria-label={'Start/stop'}
+                      tabIndex={0}
+                      className={classNames(
+                        'feedback-action-button',
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.timerSwich(this.props.id);
+                      }}
+                    >
+                      <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
+                      <span>  {this.props.timerSecs} (seconds)</span>
+                    </button>
+                  }
+                </div>
                 {this.props.isInteractable && <EditableDocumentCardTitle
                   isMultiline={true}
                   title={this.props.title}
@@ -808,27 +866,23 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   allowAddNewActionItem={isMainItem}
                 />}
             </div>
-            <div id="actionTimer" className="card-action-timer">
-              {showAddActionItem &&
-                <button
-                  title="Timer"
-                  aria-live="polite"
-                  aria-label={'Start/stop'}
-                  tabIndex={0}
-                  className={classNames(
-                    'feedback-action-button',
-                  )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.timerSwich(this.props.id);
-                  }}
-                >
-                  <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
-                  <span>  {this.props.timerSecs} (seconds)</span>
-                </button>
-              }
-            </div>
+            {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles &&
+              <div className="group-child-feedback-stack"
+                style={{
+                  width: "300px"
+                }}><span className="related-feedback-header">Related Feedback</span>
+                <ul className="fa-ul">
+                  {childrenTitlesShort.map((title: String, index: React.Key) =>
+                    <li key={index}><span className="fa-li"><i className="far fa-comment-dots" /></span>
+                      <span className="related-feedback-title"
+                        aria-label={'Title of the feedback is ' + title}>
+                        {title}
+                      </span></li>
+                  )
+                  }
+                </ul>
+              </div>
+            }
           </DocumentCard>
         </div>
         <Dialog

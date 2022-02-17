@@ -28,6 +28,8 @@ class ItemDataService {
       timerSecs: 0,
       timerstate: false,
       timerId: null,
+      groupTitles: [],
+      isGroupedCarouselItem: false
     };
 
     const createdItem: IFeedbackItemDocument =
@@ -49,7 +51,7 @@ class ItemDataService {
   /**
    * Get the board item.
    */
-  public getBoardItem = async (teamId:string, boardId: string): Promise<IFeedbackBoardDocument> => {
+  public getBoardItem = async (teamId: string, boardId: string): Promise<IFeedbackBoardDocument> => {
     // Can we get it this way? [const boardItem:  IFeedbackBoardDocument = await boardDataService.getBoardForTeamById(VSS.getWebContext().team.id, boardId);]
     return await ExtensionDataService.readDocument<IFeedbackBoardDocument>(teamId, boardId);
   }
@@ -90,7 +92,7 @@ class ItemDataService {
     let updatedChildFeedbackItems: IFeedbackItemDocument[] = [];
 
     const feedbackItem: IFeedbackItemDocument = await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
-    if(feedbackItem && feedbackItem.upvotes > 0) {
+    if (feedbackItem && feedbackItem.upvotes > 0) {
       console.log(`Cannot delete a feedback item which has upvotes. Board: ${boardId} Item: ${feedbackItemId}`);
       return undefined;
     }
@@ -148,8 +150,7 @@ class ItemDataService {
    * Check if the user has voted on this item.
    */
 
-  public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> =>
-  {
+  public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
@@ -174,8 +175,7 @@ class ItemDataService {
    * flip the timer state.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> =>
-  {
+  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
@@ -197,8 +197,7 @@ class ItemDataService {
   /**
    * update the timer count.
    */
-  public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean=false): Promise<IFeedbackItemDocument> =>
-  {
+  public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean = false): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
@@ -206,12 +205,10 @@ class ItemDataService {
       return undefined;
     }
 
-    if (setZero)
-    {
+    if (setZero) {
       feedbackItem.timerSecs = 0;
     }
-    else
-    {
+    else {
       feedbackItem.timerSecs++;
     }
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
@@ -233,14 +230,14 @@ class ItemDataService {
     if (boardItem == undefined) {
       console.log(`Cannot retrieve board for the feedback. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
-     }
+    }
 
     if (decrement) {
-      if(!boardItem.boardVoteCollection ||
+      if (!boardItem.boardVoteCollection ||
         !boardItem.boardVoteCollection[userId] ||
         boardItem.boardVoteCollection[userId] <= 0) {
-          console.log(`Cannot decrement item with zero or less votes. Board ${boardId}, Item: ${feedbackItemId}`);
-          return undefined;
+        console.log(`Cannot decrement item with zero or less votes. Board ${boardId}, Item: ${feedbackItemId}`);
+        return undefined;
       }
 
       if (feedbackItem.upvotes <= 0) {
@@ -286,13 +283,13 @@ class ItemDataService {
 
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
 
-    if(!updatedFeedbackItem) {
+    if (!updatedFeedbackItem) {
       console.log(`The feedback item was not incremented or decremented. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
 
     const updatedBoardItem = await this.updateBoardItem(teamId, boardItem);
-    if(!updatedBoardItem) {
+    if (!updatedBoardItem) {
       console.log(`Could not update board, votes will be removed from or added to the feedback item.
         Board: ${boardId}, Item: ${feedbackItemId}`);
 
@@ -313,7 +310,7 @@ class ItemDataService {
   /**
    * Update the team effectiveness measurement.
    */
-   public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[]): Promise<IFeedbackBoardDocument> => {
+  public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[]): Promise<IFeedbackBoardDocument> => {
     const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
 
     if (boardItem === undefined) {
@@ -326,7 +323,7 @@ class ItemDataService {
     }
 
     if (boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId) === undefined || boardItem.boardVoteCollection[userId] === null) {
-      boardItem.teamEffectivenessMeasurementVoteCollection.push({ userId: userId, responses: []});
+      boardItem.teamEffectivenessMeasurementVoteCollection.push({ userId: userId, responses: [] });
     }
 
     boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses = teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses;
@@ -373,8 +370,8 @@ class ItemDataService {
     const childFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, childFeedbackItemId);
 
     if (!parentFeedbackItem || !childFeedbackItem) {
-      console.log(`Cannot add child for a non-existent feedback item. 
-                Board: ${boardId}, 
+      console.log(`Cannot add child for a non-existent feedback item.
+                Board: ${boardId},
                 Parent Item: ${parentFeedbackItemId},
                 Child Item: ${childFeedbackItemId}`);
       return undefined;
@@ -383,7 +380,7 @@ class ItemDataService {
     // The parent feedback item must not be a child of another group.
     if (parentFeedbackItem.parentFeedbackItemId) {
       console.log(`Cannot add child if parent is already a child in another group.
-                Board: ${boardId}, 
+                Board: ${boardId},
                 Parent Item: ${parentFeedbackItemId}`);
       return undefined;
     }
@@ -458,8 +455,8 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
-      console.log(`Cannot move a non-existent feedback item. 
-              Board: ${boardId}, 
+      console.log(`Cannot move a non-existent feedback item.
+              Board: ${boardId},
               Parent Item: ${feedbackItem.parentFeedbackItemId},
               Child Item: ${feedbackItemId}`);
       return undefined;
@@ -470,8 +467,8 @@ class ItemDataService {
     if (feedbackItem.parentFeedbackItemId) {
       const parentFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItem.parentFeedbackItemId);
       if (!parentFeedbackItem) {
-        console.log(`The given feedback item has a non-existent parent. 
-                Board: ${boardId}, 
+        console.log(`The given feedback item has a non-existent parent.
+                Board: ${boardId},
                 Parent Item: ${feedbackItem.parentFeedbackItemId},
                 Child Item: ${feedbackItemId}`);
         return undefined;
@@ -499,7 +496,7 @@ class ItemDataService {
 
       const updatedChildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = childFeedbackItems.map((childFeedbackItem) =>
         this.updateFeedbackItem(boardId, childFeedbackItem));
-  
+
       updatedChildFeedbackItems =
         await Promise.all(updatedChildFeedbackItemPromises).then((promiseResults) => {
           return promiseResults.map((updatedChildFeedbackItem) => updatedChildFeedbackItem)

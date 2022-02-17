@@ -12,6 +12,7 @@ import { reactPlugin } from '../utilities/external/telemetryClient';
 export interface IFeedbackCarouselProps {
   feedbackColumnPropsList: FeedbackColumnProps[];
   isFeedbackAnonymous: boolean;
+  isFocusModalHidden: boolean;
 }
 
 export interface IFeedbackCarouselState {
@@ -26,7 +27,12 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
       .map((columnItem) => {
         const feedbackItemProps =
-        FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);
+          FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);
+
+        const isFocusModalHidden = this.props.isFocusModalHidden;
+
+        feedbackItemProps.isGroupedCarouselItem = !isFocusModalHidden && columnItem.feedbackItem.childFeedbackItemIds ? (columnItem.feedbackItem.childFeedbackItemIds.length > 0 ? true : false) : false;
+        feedbackItemProps.isFocusModalHidden = isFocusModalHidden;
 
         return (
           <div key={feedbackItemProps.id} className="feedback-carousel-item">
@@ -43,7 +49,8 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
     return (
       <div className="feedback-carousel-item">
         <FeedbackItem
-          {...FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, feedbackColumnProps.columnItems.filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)[0], true)}
+          {...FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, feedbackColumnProps.columnItems.filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)[0], true)
+          }
         />
       </div>
     );
@@ -62,16 +69,47 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       accessibility: true,
     };
 
+    // Change this value to adjust what "two lines" is considered
+    const childTitleLengthMax = 200;
+
     return (
       <Pivot
         className="feedback-carousel-pivot">
         {this.props.feedbackColumnPropsList.map((columnProps) => {
           const mainCardCount = columnProps.columnItems.filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId).length;
 
+          columnProps.columnItems.forEach(columnItem => {
+            const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(columnProps, columnItem, true);
+
+            // Establish whether an item in the column has children feedback grouped beneath it,
+            // and therefore will be the parent
+            const isGroupedCarouselItem = columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length > 0 : false;
+
+            // Set that property for later
+            columnItem.feedbackItem.isGroupedCarouselItem = columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length > 0 : false;
+
+            if (isGroupedCarouselItem) {
+              // If an item in the column is a parent, get the title of the children
+              // to show in 'Related Feedback' section
+              const columnItemChildrenIds = columnItem.feedbackItem.childFeedbackItemIds;
+              const childrenTitlesShort: String[] = [];
+              columnItemChildrenIds.forEach(childId => {
+                // For every child item in the group, limit to 2 lines (~200 characters)
+                const childFeedbackItem = columnProps.columnItems.find(childItem => childItem.feedbackItem.id == childId)
+                const origTitle = childFeedbackItem.feedbackItem.title
+                const shortTitle = origTitle.length > childTitleLengthMax ? origTitle.substring(0, childTitleLengthMax) + '...' : origTitle;
+                childrenTitlesShort.push(shortTitle)
+              });
+
+              columnItem.feedbackItem.groupTitles = childrenTitlesShort;
+            }
+          });
+
           return <PivotItem
             key={columnProps.columnId}
             headerText={columnProps.columnName}
             className="feedback-carousel-pivot-item"
+            {...columnProps}
           >
             {mainCardCount === 1 &&
               this.renderSingleFeedbackCarouselItem(columnProps)

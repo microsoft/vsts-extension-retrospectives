@@ -27,13 +27,13 @@ export interface IFeedbackBoardDocument {
   shouldShowFeedbackAfterCollect?: boolean;
   displayPrimeDirective?: boolean;
   maxVotesPerUser: number;
-  boardVoteCollection : { [voter: string]: number};
-  teamEffectivenessMeasurementVoteCollection : ITeamEffectivenessMeasurementVoteCollection[];
+  boardVoteCollection: { [voter: string]: number };
+  teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[];
 }
 
 export interface ITeamEffectivenessMeasurementVoteCollection {
   userId: string;
-  responses: {questionId: string, selection: number}[]
+  responses: { questionId: string, selection: number }[]
 }
 
 export interface IFeedbackColumn {
@@ -54,7 +54,7 @@ export interface IFeedbackItemDocument {
   associatedActionItemIds?: number[];
   columnId: string;
   upvotes: number;
-  voteCollection : { [voter: string]: number};
+  voteCollection: { [voter: string]: number };
   createdBy?: IdentityRef;
   createdDate: Date;
   modifedDate?: Date;
@@ -64,4 +64,6 @@ export interface IFeedbackItemDocument {
   timerstate: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   timerId: any;
+  groupTitles: String[];
+  isGroupedCarouselItem: boolean;
 }
