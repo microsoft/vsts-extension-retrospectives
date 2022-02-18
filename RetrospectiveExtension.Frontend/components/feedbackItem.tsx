@@ -607,6 +607,15 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     />);
   };
 
+  public formatTimer = (timeInSeconds: number) => {
+    // Handle the timer display - total seconds into 00:00
+    // Doesn't handle formatting hours since that may be excessive
+    const timerMinutes = Math.floor(timeInSeconds / 60);
+    const timerSeconds = timeInSeconds % 60;
+    const showLeadingZeroInSeconds = timerSeconds < 10;
+    return showLeadingZeroInSeconds ? (timerMinutes + ':0' + timerSeconds) : (timerMinutes + ':' + timerSeconds);
+  }
+
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
     const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
@@ -821,7 +830,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       }}
                     >
                       <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
-                      <span>  {this.props.timerSecs} (seconds)</span>
+                      <span> {this.formatTimer(this.props.timerSecs)} elapsed</span>
                     </button>
                   }
                 </div>

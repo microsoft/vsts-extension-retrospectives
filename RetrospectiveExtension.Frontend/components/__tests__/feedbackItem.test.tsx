@@ -79,8 +79,13 @@ describe('Feedback Item', () => {
     expect(actionItemDisplay.prop("boardId")).toEqual(testBoardId);
     expect(actionItemDisplay.prop("boardTitle")).toEqual(testColumnProps.boardTitle);
 
+    // Same formating function
+    const timerMinutes = Math.floor(testFeedbackItem.timerSecs / 60);
+    const timerSeconds = testFeedbackItem.timerSecs % 60;
+    const showLeadingZeroInSeconds = timerSeconds < 10;
+    const formatTimer = showLeadingZeroInSeconds ? (timerMinutes + ':0' + timerSeconds) : (timerMinutes + ':' + timerSeconds);
+
     expect(component.findWhere((child) =>
-      child.prop("title") === "Timer").html()).
-      toContain(`${testFeedbackItem.timerSecs} (seconds)`);
+      child.prop("title") === "Timer").html()).toContain(`${formatTimer} elapsed`);
   });
 });
