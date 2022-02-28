@@ -9,7 +9,7 @@ import * as React from 'react';
 import { WorkflowPhase } from '../interfaces/workItem';
 import ActionItemDisplay from './actionItemDisplay';
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
-import { IFeedbackItemDocument } from '../interfaces/feedback';
+import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
 import { itemDataService } from '../dal/itemDataService';
 import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import localStorageHelper from '../utilities/localStorageHelper';
@@ -38,6 +38,7 @@ export interface IFeedbackItemProps {
   iconClass: string;
   workflowPhase: WorkflowPhase;
   team: WebApiTeam;
+  originalColumnId: string;
   columnId: string;
   boardId: string;
   boardTitle: string;
@@ -65,8 +66,13 @@ export interface IFeedbackItemProps {
   onVoteCasted: () => void;
 
   addFeedbackItems: (
-    columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
-    newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
+    columnId: string,
+    columnItems: IFeedbackItemDocument[],
+    shouldBroadcast: boolean,
+    newlyCreated: boolean,
+    showAddedAnimation: boolean,
+    shouldHaveFocus: boolean,
+    hideFeedbackItems: boolean) => void;
 
   removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
 
@@ -212,14 +218,22 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     this.setState({ isBeingDragged: false });
   }
 
-  private dropFeedbackItemOnFeedbackItem = (e: React.DragEvent<HTMLDivElement>) => {
+  private dropFeedbackItemOnFeedbackItem = async (e: React.DragEvent<HTMLDivElement>) => {
     // Using localStorage as a temporary solution for Edge issue
     // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
     // const droppedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
+    const droppedItemProps = await itemDataService.getFeedbackItem(this.props.boardId, droppedItemId);
+
+    const boardItem: IFeedbackBoardDocument = await itemDataService.getBoardItem(this.props.team.id, this.props.boardId);
+    const allowCrossColumnGroups = boardItem.allowCrossColumnGroups;
+
     if (this.props.id !== droppedItemId) {
-      FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(this.props, droppedItemId, this.props.id);
+      if (allowCrossColumnGroups || this.props.columnId === droppedItemProps.originalColumnId) {
+        FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(this.props, droppedItemId, this.props.id);
+      }
     }
+
     e.stopPropagation();
   }
 
@@ -628,6 +642,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : 'Feedback group main item. Group has ' + groupItemsCount + ' items.');
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
+    const originalColumnId = this.props.originalColumnId;
+    const originalColumnTitle = originalColumnId ? this.props.columns[originalColumnId].columnProperties.title : 'n/a';
+    // showing `n/a` will be for older boards who don't have this property
     const childrenTitlesShort = this.props.groupTitles;
     const isFocusModalHidden = this.props.isFocusModalHidden;
 
@@ -848,7 +865,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     </p>
                   </div>
                 }
-
+                {(this.props.workflowPhase !== WorkflowPhase.Collect) && (this.props.columnId !== this.props.originalColumnId) &&
+                  <div className="original-column-info">Original Column: <br />{originalColumnTitle}</div>
+                }
                 {showVoteButton && this.props.isInteractable &&
                   <div>
                     <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>

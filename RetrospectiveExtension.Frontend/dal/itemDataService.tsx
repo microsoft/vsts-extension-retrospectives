@@ -18,6 +18,7 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument = {
       boardId,
       columnId,
+      originalColumnId: columnId,
       createdBy: isAnonymous ? null : userIdentity,
       createdDate: new Date(Date.now()),
       id: itemId,
@@ -64,7 +65,7 @@ class ItemDataService {
 
     try {
       feedbackItems = await ExtensionDataService.readDocuments<IFeedbackItemDocument>(boardId, false, true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
         // TODO (enpolat) : appInsightsClient.trackTrace(TelemetryExceptions.ItemsNotFoundForBoard, e, AI.SeverityLevel.Warning);

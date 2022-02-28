@@ -22,7 +22,15 @@ interface IFeedbackBoardMetadataFormProps {
   placeholderText: string;
   initialValue: string;
   maxvotesPerUser: number;
-  onFormSubmit: (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => void;
+  onFormSubmit: (
+    title: string,
+    maxvotesPerUser: number,
+    columns: IFeedbackColumn[],
+    isIncludeTeamEffectivenessMeasurement: boolean,
+    isBoardAnonymous: boolean,
+    shouldShowFeedbackAfterCollect: boolean,
+    displayPrimeDirective: boolean,
+    allowCrossColumnGroups: boolean) => void;
   onFormCancel: () => void;
 }
 
@@ -42,6 +50,7 @@ interface IFeedbackBoardMetadataFormState {
   columnCardBeingEdited: IFeedbackColumnCard;
   selectedIconKey: string;
   selectedAccentColorKey: string;
+  allowCrossColumnGroups: boolean;
 }
 
 interface IFeedbackColumnCard {
@@ -83,8 +92,10 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
             markedForDeletion: false,
           };
         }),
-      isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? false : (this.props.currentBoard.isIncludeTeamEffectivenessMeasurement ? this.props.currentBoard.isIncludeTeamEffectivenessMeasurement : false),
-      isBoardAnonymous: this.props.isNewBoardCreation ? false : (this.props.currentBoard.isAnonymous ? this.props.currentBoard.isAnonymous : false),
+      isIncludeTeamEffectivenessMeasurement: !this.props.isNewBoardCreation &&
+        this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
+      isBoardAnonymous: !this.props.isNewBoardCreation &&
+        this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,
       isBoardNameTaken: false,
       isChooseColumnAccentColorDialogHidden: true,
@@ -93,18 +104,12 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       placeholderText: this.props.placeholderText,
       selectedAccentColorKey: undefined,
       selectedIconKey: undefined,
-      displayPrimeDirective: this.props.isNewBoardCreation ?
-        false :
-        (
-          this.props.currentBoard.displayPrimeDirective ?
-            this.props.currentBoard.displayPrimeDirective : false
-        ),
-      shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ?
-        false :
-        (
-          this.props.currentBoard.shouldShowFeedbackAfterCollect ?
-            this.props.currentBoard.shouldShowFeedbackAfterCollect : false
-        ),
+      displayPrimeDirective: !this.props.isNewBoardCreation &&
+        this.props.currentBoard.displayPrimeDirective,
+      shouldShowFeedbackAfterCollect: !this.props.isNewBoardCreation &&
+        this.props.currentBoard.shouldShowFeedbackAfterCollect,
+      allowCrossColumnGroups: !this.props.isNewBoardCreation &&
+        this.props.currentBoard.allowCrossColumnGroups,
       title: this.props.initialValue
     };
   }
@@ -145,7 +150,8 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       this.state.isIncludeTeamEffectivenessMeasurement,
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect,
-      this.state.displayPrimeDirective
+      this.state.displayPrimeDirective,
+      this.state.allowCrossColumnGroups
     );
   }
 
@@ -170,6 +176,12 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   private handleDisplayPrimeDirectiveChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
     this.setState({
       displayPrimeDirective: checked,
+    });
+  }
+
+  private handleAllowCrossColumnGroups = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+    this.setState({
+      allowCrossColumnGroups: checked,
     });
   }
 
@@ -213,7 +225,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
   private handleColumnsTemplateChange = (event: ChangeEvent<HTMLSelectElement>) => {
     switch (event.target.value) {
-      case '4ls':
+      case '4ls': // The 4 Ls - Like, Learned, Lacked, Longed For
         this.setState({
           columnCards: [
             {
@@ -255,7 +267,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           ]
         });
         break;
-      case '1to1':
+      case '1to1': // 1-to-1 - Good, So-so, Improve, Done
         this.setState({
           columnCards: [
             {
@@ -297,7 +309,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           ]
         });
         break;
-      case 'daki':
+      case 'daki': // Drop, Add, Keep, Improve
         this.setState({
           columnCards: [
             {
@@ -405,7 +417,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           ]
         });
         break;
-      case 'kalm':
+      case 'kalm': // Keep, Add, Less, More
         this.setState({
           columnCards: [
             {
@@ -522,7 +534,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           ]
         });
         break;
-      case 'wlai':
+      case 'wlai': // Went Well, Learned, Impediments, Accelerators
         this.setState({
           columnCards: [
             {
@@ -662,16 +674,26 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   public render() {
     return (
       <div className="board-metadata-form">
-        <div className="board-metadata-form-section-header">Retrospective Title</div>
-        <TextField autoFocus
-          ariaLabel="Please enter new retrospective name"
-          placeholder={this.props.placeholderText}
-          className="title-input-container"
-          value={this.state.title}
-          maxLength={100}
-          onChange={this.handleInputChange} />
-        {this.state.isBoardNameTaken && <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>}
-        <div className="board-metadata-form-anonymous-feedback-section hide-mobile">
+        <section className="board-metadata-form-board-settings hide-mobile">
+          <h3 className="board-metadata-form-section-header">Board Settings</h3>
+          <div className="board-metadata-form-section-information">
+            <i className="fas fa-exclamation-circle"></i>&nbsp;Some of these settings cannot be modified after board creation.
+          </div>
+          <div className="board-metadata-form-section-subheader">
+            <label htmlFor="title-input-container">Title:</label>
+            <TextField
+              ariaLabel="Please enter new retrospective name"
+              placeholder={this.props.placeholderText}
+              className="title-input-container"
+              id="retrospective-title-input"
+              value={this.state.title}
+              maxLength={100}
+              onChange={this.handleInputChange} />
+            {this.state.isBoardNameTaken &&
+              <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>
+            }
+          </div>
+          <hr></hr>
           <div className="board-metadata-form-section-subheader">
             <Checkbox
               label="Include Team Effectiveness Measurement"
@@ -680,12 +702,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               defaultChecked={this.state.isIncludeTeamEffectivenessMeasurement}
               disabled={!this.props.isNewBoardCreation}
               onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
-              styles={{
-                root: {
-                  justifyContent: 'center',
-                  width: '100%',
-                },
-              }} />
+            />
           </div>
 
           <div className="board-metadata-form-section-subheader">
@@ -696,64 +713,75 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               defaultChecked={this.state.isBoardAnonymous}
               disabled={!this.props.isNewBoardCreation}
               onChange={this.handleIsAnonymousCheckboxChange}
-              styles={{
-                root: {
-                  justifyContent: 'center',
-                  width: '100%',
-                  display: 'flex',
-                },
-              }} />
+            />
           </div>
 
           <div className="board-metadata-form-section-subheader">
             <Checkbox
-              label="Obscure the feedback of others until after Collect phase."
+              label="Obscure the feedback of others until after Collect phase"
               ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
               boxSide="start"
               defaultChecked={this.state.shouldShowFeedbackAfterCollect}
               disabled={!this.props.isNewBoardCreation}
               onChange={this.handleShouldShowFeedbackAfterCollectChange}
-              styles={{
-                root: {
-                  justifyContent: 'center',
-                  width: '100%',
-                  display: 'flex',
-                },
-              }} />
+            />
           </div>
 
           <div className="board-metadata-form-section-subheader">
             <Checkbox
               label="Display 'Retrospective Prime Directive'"
-              ariaLabel="Display 'Retrospective Prime Directive'"
+              ariaLabel="Display 'Retrospective Prime Directive.' This selection cannot be modified after board creation."
               boxSide="start"
               defaultChecked={this.state.displayPrimeDirective}
               disabled={!this.props.isNewBoardCreation}
               onChange={this.handleDisplayPrimeDirectiveChange}
-              styles={{
-                root: {
-                  justifyContent: 'center',
-                  width: '100%',
-                  display: 'flex',
-                },
-              }} />
+            />
           </div>
 
           <div className="board-metadata-form-section-subheader">
-            Note: These selections cannot be modified after board creation.
+            <Checkbox
+              label="Group feedback across columns"
+              ariaLabel="Group Feedback Across Columns. This selection cannot be modified after board creation."
+              boxSide="start"
+              defaultChecked={this.state.allowCrossColumnGroups}
+              disabled={!this.props.isNewBoardCreation}
+              onChange={this.handleAllowCrossColumnGroups}
+            />
           </div>
-
-          <div className="board-metadata-form-section-header">
-            Max Votes per User (Current:{this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser}) :
-            <TextField className="title-input-container" type="number" min="3" max="12" value={this.state.maxVotesPerUser?.toString()} onChange={this.handleMaxVotePerUserChange} />
+          <hr></hr>
+          <div className="board-metadata-form-section-subheader">
+            <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
+              Max Votes per User (Current: {this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser}):
+            </label>
+            <TextField
+              className="title-input-container max-vote-counter"
+              id="max-vote-counter"
+              type="number"
+              min="3"
+              max="12"
+              value={this.state.maxVotesPerUser?.toString()}
+              onChange={this.handleMaxVotePerUserChange}
+            />
           </div>
-        </div>
-        <div className="board-metadata-form-edit-column-section hide-mobile">
-          <div className="board-metadata-form-section-header">Columns</div>
-          <div className="board-metadata-form-section-subheader">You can create a maximum of {this.maxColumnCount} columns in a retrospective.</div>
-          <div className="board-metadata-form-section-header">
-            Apply template :
-            <select onChange={this.handleColumnsTemplateChange} className="title-input-container" style={{ display: 'inline-flex', backgroundColor: '#fff', fontWeight: 'normal', marginLeft: '10px' }}>
+        </section>
+        <section className="board-metadata-edit-column-settings hide-mobile">
+          <h3 className="board-metadata-form-section-header">Column Settings</h3>
+          <div className="board-metadata-form-section-information">
+            <i className="fas fa-exclamation-circle"></i>&nbsp;You can create a maximum of {this.maxColumnCount} columns in a retrospective.
+          </div>
+          {!this.props.isNewBoardCreation &&
+            <div className="board-metadata-form-section-information warning-information">
+              <i className="fas fa-exclamation-triangle"></i>&nbsp;Warning:
+              <br />Existing feedbacks may not be available after changing board template!
+            </div>
+          }
+          <div className="board-metadata-form-section-subheader">
+            <label htmlFor="column-template-dropdown">Apply template:</label>
+            <select
+              onChange={this.handleColumnsTemplateChange}
+              id="column-template-dropdown"
+              className="title-input-container column-template-dropdown"
+            >
               <option value="">Select a template</option>
               <option value="4ls">4Ls</option>
               <option value="1to1">1-to-1</option>
@@ -763,12 +791,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               <option value="kalm">Keep-Add-Less-More</option>
               <option value="start-stop-continue">Start-Stop-Continue</option>
               <option value="psy-safety">Psychological Safety</option>
-              <option value="wlai">WentWell-Learned-Accelerators-Impediments</option>
+              <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
             </select>
           </div>
-          {!this.props.isNewBoardCreation &&
-            <div className="board-metadata-form-section-subheader" style={{ fontSize: "12px", color: "#f6a608" }}>Warning: Existing feedbacks may not be available after changing board template!</div>
-          }
           <List
             items={this.state.columnCards}
             onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
@@ -898,7 +923,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               Add new column
             </ActionButton>
           </div>
-        </div>
+        </section>
         <DialogFooter>
           <PrimaryButton
             disabled={!this.isSaveButtonEnabled()}

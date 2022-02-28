@@ -140,6 +140,13 @@
         margin-right: 16px;
         margin-left: 16px;
 
+        .original-column-info {
+          text-align: right;
+          font-weight: 300;
+          font-style: italic;
+          font-size: 0.75em;
+        }
+        
         .feedback-yourvote-count {
           font-size: 1em;
         }

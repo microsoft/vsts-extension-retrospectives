@@ -84,6 +84,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     const feedbackItem: IFeedbackItemDocument = {
       boardId: this.props.boardId,
       columnId: this.props.columnId,
+      originalColumnId: this.props.columnId,
       createdBy: this.props.isBoardAnonymous ? null : userIdentity,
       createdDate: new Date(Date.now()),
       id: 'emptyFeedbackItem',
@@ -121,8 +122,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
     // const draggedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
+    const boardItem = await itemDataService.getBoardItem(this.props.team.id, this.props.boardId);
 
-    await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
+    // only drop into another column if that's allowed
+    if (boardItem.allowCrossColumnGroups) {
+      await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
+    }
   }
 
   public static moveFeedbackItem = async (
@@ -130,6 +135,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     boardId: string,
     feedbackItemId: string,
     columnId: string) => {
+
     const updatedFeedbackItems = await itemDataService.addFeedbackItemAsMainItemToColumn(boardId, feedbackItemId, columnId);
 
     refreshFeedbackItems(
@@ -169,6 +175,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       columns: columnProps.columns,
       columnIds: columnProps.columnIds,
       columnId: columnProps.columnId,
+      originalColumnId: columnItem.feedbackItem.originalColumnId,
       boardId: columnProps.boardId,
       boardTitle: columnProps.boardTitle,
       defaultActionItemAreaPath: columnProps.defaultActionItemAreaPath,
