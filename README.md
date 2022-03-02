@@ -1,5 +1,7 @@
 # Retrospectives
 
+![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mhassaninmsft/b414faf6b91eaaa6ec7d82882be36935/raw/retrotool__heads_dev.json)
+
 Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform _smart and efficient retrospectives from within the Azure DevOps pipeline._
 
 Retrospectives are an important part of the software engineering cycle. Teams often use external
