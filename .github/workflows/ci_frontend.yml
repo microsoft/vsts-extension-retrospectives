@@ -42,7 +42,7 @@ jobs:
         shell: bash
         working-directory: 'RetrospectiveExtension.Frontend'
 
-      - if: steps.changes.outputs.src == 'true'
+      - if: steps.changes.outputs.src == 'true' && github.event_name != 'pull_request'
         name: Upload test report
         uses: dorny/test-reporter@v1.5.0
         with:
@@ -72,7 +72,7 @@ jobs:
           # process.env.BRANCH = 'pull_27';
           echo "BRANCH=$(echo ${BRANCH_NAME})" >> $GITHUB_ENV
 
-      - if: steps.changes.outputs.src == 'true'
+      - if: steps.changes.outputs.src == 'true' && github.event_name != 'pull_request'
         name: Create the Badge
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
@@ -84,7 +84,7 @@ jobs:
           color: green
           namedLogo: jest
         
-      - if: steps.changes.outputs.src == 'true'
+      - if: steps.changes.outputs.src == 'true' && github.event_name != 'pull_request'
         name: Test Coverage PR comment
         uses: thollander/actions-comment-pull-request@v1
         with:
