@@ -27,7 +27,7 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
 
 ## Use
 
-1. Navigate to the Azure 'Boards' tab in your account. Select the 'Retrospectives' tab under boards.
+1. Navigate to the Azure 'Boards' tab in your account. Select the 'Retrospectives' tab under 'Boards'.
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/boardandretrospectivestab.png)
 
@@ -35,20 +35,20 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/teamselection.png)
 
-3. Create a new retrospective using the 'Create Board' button. If you have created retrospectives before, use the selector to go to a particular retrospective, or create a new one using the options button and then clicking on 'Create new board'.
+3. Create a new retrospective using the 'Create Board' button. If you have created retrospectives before, use the selector to go to a particular retrospective, or create a new one using the 'Board actions' drop-down ('...') and then clicking on 'Create new board'.
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/createretrospective.png)
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/createretrospective2.png)
-  When you select **New Board** or **Create new baord** as above, you will see the following dialog: 
+  When you select **New Board** or **Create new board** as above, you will see the following dialog: 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/createretrospectivewithmaxvotes.png)
 </br>
   Please enter the appropriate information:
    - **Retrospective Title**: Enter appropriate text 
    - **Make all feedback anonymous**: When you select this checkbox, user identities for the item creators will not be displayed
    - **Only show feedback after Collect phase**: When selected, users cannot see other users input till the Collect phase is completed by moving to another phase
-   - **Max Votes per User (Current 5)**: This options lets the board creator control how many total votes (across all columns) that each user can have. Default is 5. While this option can be updated through the _Edit retrospective_ option, please note that this update cannot decrement votes already in place. 
-   - **Colums**: You can either Apply from a preselected templates or individually select and configure columns
+   - **Max Votes per User (Current 5)**: This option lets the board creator control how many total votes (across all columns) that each user can have. The default is 5. While this option can be updated through the _Edit retrospective_ option, please note that this update cannot decrement votes already in place. 
+   - **Columns**: You can either Apply from a preselected templates or individually select and configure columns
   </br> </br>Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Ones the title is provided, the [Save] button is enabled. Save the retrospective using the [Save] button.
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/navigatetoretrospective.png)
@@ -58,7 +58,7 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/createretrospectiveform.png)
 
-5. Once you create a new retrospective, you can share a link to it to all participants. Users can then access that link even from their mobile browsers to participate in the retrospective. The extension offers real time synchronisation, so all users will see the most upto date information without having to refresh the page.
+5. Once you create a new retrospective, you can share a link to it to all participants. Users can then access that link even from their mobile browsers to participate in the retrospective. The extension offers real time synchronisation, so all users will see the most up-to-date information without having to refresh the page.
 
   ![Group](https://github.com/microsoft/vsts-extension-retrospectives/raw/master/RetrospectiveExtension.Frontend/images/usage/boardlink.png)
 
