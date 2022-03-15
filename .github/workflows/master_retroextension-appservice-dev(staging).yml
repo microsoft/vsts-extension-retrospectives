@@ -15,6 +15,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      
+      - run: cd "RetrospectiveExtension.Backend"
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
