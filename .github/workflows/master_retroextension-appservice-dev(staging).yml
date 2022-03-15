@@ -15,8 +15,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
-      - run: cd "RetrospectiveExtension.Backend"
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -25,10 +23,10 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: cd "RetrospectiveExtension.Backend" && dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: cd "RetrospectiveExtension.Backend" && dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
