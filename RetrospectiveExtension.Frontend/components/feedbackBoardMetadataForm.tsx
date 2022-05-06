@@ -134,7 +134,7 @@ export default class FeedbackBoardMetadataForm extends React.Component<IFeedback
 
       return;
     }
-console.log(this.state);
+
     this.props.onFormSubmit(
       this.state.title.trim(),
       this.state.maxVotesPerUser,
