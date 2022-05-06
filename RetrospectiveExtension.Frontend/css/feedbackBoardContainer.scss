@@ -42,6 +42,60 @@ $team_selector_list_item_width: 450px;
   margin-top: -5px;
 }
 
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores {
+  clear: both;
+  position: relative;
+  min-width: 100px;
+  min-height: 100px;
+  padding: 0;
+}
+
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart {
+  flex-direction: row;
+  padding: 0;
+  margin: 10px 0;
+  width: 100%;
+  list-style: none;
+}
+
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li div {
+  display: inline-block;
+  min-height: 0.655em;
+  padding: 8px;
+
+  color: #ffffff;
+  box-sizing: border-box;
+  border: 1px solid #ffffff;
+}
+
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend {
+  display: flex;
+  align-items: center;
+}
+
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend section {
+  display: flex;
+  margin-right: 10px;
+}
+
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend > span {
+  width: 150px;
+  font-size: large;
+  justify-content: flex-end;
+  padding-right: 10px;
+}
+
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend section div {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores > * > * {
+  display: flex;
+}
+
 .extension-header-spacer {
   padding-bottom: $extension_header_height;
 }
