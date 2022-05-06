@@ -254,3 +254,8 @@ paket-files/
 
 # VSTS Extension package
 *.vsix
+
+# Backend config files
+.env
+allowed_origins.json
+dev_certs.json
