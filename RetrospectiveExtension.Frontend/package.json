@@ -10,7 +10,8 @@
     "pack:d": "tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
     "pack:p": "tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
     "publish:d": "npm run build:d && npm run pack:d && tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
-    "publish:p": "npm run build:p && npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix"
+    "publish:p": "npm run build:p && npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
