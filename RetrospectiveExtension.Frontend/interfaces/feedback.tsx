@@ -33,7 +33,7 @@ export interface IFeedbackBoardDocument {
 
 export interface ITeamEffectivenessMeasurementVoteCollection {
   userId: string;
-  responses: {questionId: string, selection: number}[]
+  responses: {questionId: number, selection: number}[]
 }
 
 export interface IFeedbackColumn {
