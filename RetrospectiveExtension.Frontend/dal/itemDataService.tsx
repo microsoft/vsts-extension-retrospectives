@@ -236,6 +236,11 @@ class ItemDataService {
      }
 
     if (decrement) {
+      if(!boardItem.boardVoteCollection || !boardItem.boardVoteCollection[userId] || boardItem.boardVoteCollection[userId] <= 0) {
+          console.log(`Cannot decrement item with zero or less votes. Board ${boardId}, Item: ${feedbackItemId}`);
+          return undefined;
+      }
+
       if (feedbackItem.upvotes <= 0) {
         console.log(`Cannot decrement upvote as votes must be > 0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
         return undefined;
