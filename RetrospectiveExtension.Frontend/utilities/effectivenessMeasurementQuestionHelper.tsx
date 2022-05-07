@@ -23,3 +23,20 @@ export const getQuestionName = (questionId: string): string => {
       return "";
   }
 }
+
+export const getQuestionShortName = (questionId: string): string => {
+  switch (questionId) {
+    case "1":
+      return "Clarity";
+    case "2":
+      return "Energy";
+    case "3":
+      return "Psychological Safety";
+    case "4":
+      return "Sustainability";
+    case "5":
+      return "Sustainability";
+    default:
+      return "";
+  }
+}
