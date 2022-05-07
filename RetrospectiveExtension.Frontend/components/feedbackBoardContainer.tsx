@@ -81,7 +81,9 @@ export interface FeedbackBoardContainerState {
   isAutoResizeEnabled: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: {id: string, name: string, imageUrl: string}[];
-  effectivenessMeasurementSummary: { question: string, average: number }[];
+  effectivenessMeasurementSummary: { questionId: string, question: string, average: number }[];
+  effectivenessMeasurementChartData: { questionId: string, red: number, yellow: number, green: number }[];
+  teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   members: TeamMember[];
   castedVoteCount: number;
@@ -129,6 +131,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       feedbackItems: [],
       contributors: [],
       effectivenessMeasurementSummary: [],
+      effectivenessMeasurementChartData: [],
+      teamEffectivenessMeasurementAverageVisibilityClassName: "hidden",
       actionItemIds: [],
       members: [],
       castedVoteCount: 0,
@@ -749,11 +753,32 @@ console.log(createdBoard);
     const average: { question: string, average: number }[] = [];
 
     [...new Set(measurements.map(item => item.id))].forEach(e => {
-      average.push({ question: getQuestionName(e), average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
+      average.push({ questionId: e.toString(), question: getQuestionName(e.toString()), average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
+    });
+
+    const chartData: { questionId: string, red: number, yellow: number, green: number }[] = [];
+
+    [...Array(4).keys()].forEach(e => {
+      chartData.push({ questionId: (e+1).toString(), red: 0, yellow: 0, green: 0 });
+    });
+
+    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
+      [...Array(4).keys()].forEach(e => {
+        const selection = vote.responses.find(response => response.questionId.toString() === (e+1).toString()).selection;
+        const data = chartData.find(d => d.questionId === (e+1).toString());
+        if (selection <= 6) {
+          data.red++;
+        } else if (selection <= 8) {
+          data.yellow++;
+        } else {
+          data.green++;
+        }
+      });
     });
 
     this.setState({
       isRetroSummaryDialogHidden: false,
+      effectivenessMeasurementChartData: chartData,
       effectivenessMeasurementSummary: average,
     });
   }
@@ -1470,11 +1495,58 @@ console.log(createdBoard);
               <div>{this.state.actionItemIds.length} action items created</div>
               <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
               <div>
-                Effectiveness Scores:
+              Effectiveness Scores ({ this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length } people responded)<br />
+                <div className="retro-summary-effectiveness-scores">
+                  <ul className="chart">
+                  { this.state.effectivenessMeasurementChartData.map((data, index) => { return (
+                      <li key={index}>
+                        <div style={{ width: "200px", color: "#000", textAlign: "end" }}>
+                          { getQuestionShortName(data.questionId) }
+                        </div>
+                        { data.red > 0 &&
+                        <div style={{ backgroundColor: "#d6201f", width: `${((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                          {((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                        </div>
+                        }
+                        { data.yellow > 0 &&
+                        <div style={{ backgroundColor: "#ffd302", width: `${((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                          {((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                        </div>
+                        }
+                        { data.green > 0 &&
+                        <div style={{ backgroundColor: "#006b3d", width: `${((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                          {((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                        </div>
+                        }
+                      </li>
+                    )})
+                  }
+                  </ul>
+                  <div className="legend">
+                    <span>Favorability</span>
+                    <div style={{ display: "flex" }}>
+                      <section>
+                        <div style={{ backgroundColor: "#d6201f" }}></div>
+                        <span>Unfavorable</span>
+                      </section>
+                      <section>
+                        <div style={{ backgroundColor: "#ffd302" }}></div>
+                        <span>Neutral</span>
+                      </section>
+                      <section>
+                        <div style={{ backgroundColor: "#006b3d" }}></div>
+                        <span>Favorable</span>
+                      </section>
+                    </div>
+                  </div>
+                </div>
+                <a onClick={() => { this.setState({ teamEffectivenessMeasurementAverageVisibilityClassName: this.state.teamEffectivenessMeasurementAverageVisibilityClassName === "visible" ? "hidden" : "visible" }) }}>Show average points for each question:</a>
+                <div className={this.state.teamEffectivenessMeasurementAverageVisibilityClassName}>
                 { this.state.effectivenessMeasurementSummary.map((measurement, index) => {
                     return <div key={index}><strong>{getQuestionShortName(measurement.questionId)}</strong> - {measurement.question}: {measurement.average}</div>
                   })
                 }
+                </div>
               </div>
               {!this.state.currentBoard.isAnonymous ?
                 <>
