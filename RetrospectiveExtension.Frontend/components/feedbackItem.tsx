@@ -755,8 +755,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                           .filter((menuItem) => !menuItem.hideMobile)
                           .filter((menuItem) => !(isMainItem && menuItem.hideMainItem))
                           .map((menuItem) => {
-                            menuItem.menuItem.disabled =
-                              menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
+                            menuItem.menuItem.disabled = this.state.isDeletionDisabled || menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
 
                             return <ActionButton
                               key={menuItem.menuItem.key}
