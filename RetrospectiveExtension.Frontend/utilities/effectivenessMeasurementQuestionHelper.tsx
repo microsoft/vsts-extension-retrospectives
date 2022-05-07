@@ -7,7 +7,7 @@
  *
  * @returns name of the question
  */
- export const getQuestionName = (questionId: string): string => {
+export const getQuestionName = (questionId: string): string => {
   switch (questionId) {
     case "1":
       return "I clearly understand what is expected of me on this team";
