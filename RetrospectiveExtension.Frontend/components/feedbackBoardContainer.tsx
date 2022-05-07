@@ -722,8 +722,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
   }
 
   private createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => {
-const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxvotesPerUser, columns, isIncludeTeamEffectivenessMeasurement, isBoardAnonymous, shouldShowFeedbackAfterCollect, displayPrimeDirective);
-console.log(createdBoard);
+    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxvotesPerUser, columns, isIncludeTeamEffectivenessMeasurement, isBoardAnonymous, shouldShowFeedbackAfterCollect, displayPrimeDirective);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -743,14 +742,15 @@ console.log(createdBoard);
   }
 
   private showRetroSummaryDialog = (): void => {
-    const measurements: { id: string, selected: number }[] = [];
+    // TODO (enpolat) : go and fetch the current data from the custom data store for all of the users team effectiveness measurement answers
+    const measurements: { id: number, selected: number }[] = [];
     this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
       vote.responses.forEach(response => {
         measurements.push({ id: response.questionId, selected: response.selection });
       });
     });
 
-    const average: { question: string, average: number }[] = [];
+    const average: { questionId: string, question: string, average: number }[] = [];
 
     [...new Set(measurements.map(item => item.id))].forEach(e => {
       average.push({ questionId: e.toString(), question: getQuestionName(e.toString()), average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
@@ -1046,7 +1046,7 @@ console.log(createdBoard);
       this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
     };
 
-    const effectivenessMeasurementSelectionChanged = (questionId: string, selected: number) => {
+    const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
       const userId: string = getUserIdentity().id;
 
       const currentBoard = this.state.currentBoard;
