@@ -1472,7 +1472,7 @@ console.log(createdBoard);
               <div>
                 Effectiveness Scores:
                 { this.state.effectivenessMeasurementSummary.map((measurement, index) => {
-                    return <div key={index}>{measurement.question}: {measurement.average}</div>
+                    return <div key={index}><strong>{getQuestionShortName(measurement.questionId)}</strong> - {measurement.question}: {measurement.average}</div>
                   })
                 }
               </div>
