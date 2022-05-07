@@ -17,6 +17,8 @@
       return "I feel safe and do not fear making mistakes, raising tough issues, taking risks, or asking for help";
     case "4":
       return "My typical workload allows me to achieve an acceptable level of work-life balance";
+    case "5":
+      return "I'm confident our team will be successful";
     default:
       return "";
   }
