@@ -37,7 +37,7 @@ import { TeamMember } from 'VSS/WebApi/Contracts';
 import EffectivenessMeasurementRow from './effectivenessMeasurementRow';
 
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-import { getQuestionName, getQuestionShortName } from '../utilities/effectivenessMeasurementQuestionHelper';
+import { getQuestionName, getQuestionShortName, getQuestionTooltip } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 export interface FeedbackBoardContainerProps {
   projectId: string;
