@@ -5,6 +5,7 @@ import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import * as React from 'react';
+import * as vssClipboard from 'VSS/Utils/Clipboard';
 
 import { ViewMode, MobileWidthBreakpoint } from '../config/constants';
 import { WorkflowPhase } from '../interfaces/workItem';
@@ -18,7 +19,7 @@ import FeedbackBoard from '../components/feedbackBoard';
 
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
+import { WebApiTeam } from 'TFS/Core/Contracts';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import NoFeedbackBoardsView from './noFeedbackBoardsView';
 // TODO (enpolat) : import { appInsightsClient, TelemetryEvents, TelemetryEventProperties } from '../utilities/appInsightsClient';
@@ -27,21 +28,18 @@ import ExtensionSettingsMenu from './extensionSettingsMenu';
 import SelectorCombo, { ISelectorList } from './selectorCombo';
 import FeedbackBoardPreviewEmail from './feedbackBoardPreviewEmail';
 import { ToastContainer, toast, Slide } from 'react-toastify';
-import { WorkItemType, WorkItemTypeReference } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { WorkItemType, WorkItemTypeReference } from 'TFS/WorkItemTracking/Contracts';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
+import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
 import { itemDataService } from '../dal/itemDataService';
-import { TeamMember } from 'azure-devops-extension-api/WebApi';
+import { TeamMember } from 'VSS/WebApi/Contracts';
 import EffectivenessMeasurementRow from './effectivenessMeasurementRow';
 
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-import { getQuestionName } from '../utilities/effectivenessMeasurementQuestionHelper';
-
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
+import { getQuestionName, getQuestionShortName } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 export interface FeedbackBoardContainerProps {
-  isHostedAzureDevOps: boolean;
   projectId: string;
 }
 
@@ -83,13 +81,15 @@ export interface FeedbackBoardContainerState {
   isAutoResizeEnabled: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: {id: string, name: string, imageUrl: string}[];
-  effectivenessMeasurementSummary: { question: string, average: number }[];
+  effectivenessMeasurementSummary: { questionId: string, question: string, average: number }[];
+  effectivenessMeasurementChartData: { questionId: string, red: number, yellow: number, green: number }[];
+  teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   members: TeamMember[];
   castedVoteCount: number;
 }
 
- class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
+export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
   constructor(props: FeedbackBoardContainerProps) {
     super(props);
     this.state = {
@@ -131,6 +131,8 @@ export interface FeedbackBoardContainerState {
       feedbackItems: [],
       contributors: [],
       effectivenessMeasurementSummary: [],
+      effectivenessMeasurementChartData: [],
+      teamEffectivenessMeasurementAverageVisibilityClassName: "hidden",
       actionItemIds: [],
       members: [],
       castedVoteCount: 0,
@@ -221,7 +223,7 @@ export interface FeedbackBoardContainerState {
 
   private toggleAndFixResolution = () => {
     const newView = !this.state.isDesktop;
-
+    
     this.setState({
       isAutoResizeEnabled: false,
       isDesktop: newView,
@@ -280,7 +282,7 @@ export interface FeedbackBoardContainerState {
     const hiddenWorkItemTypes: WorkItemTypeReference[] = await workItemService.getHiddenWorkItemTypes();
 
     const hiddenWorkItemTypeNames = hiddenWorkItemTypes.map((workItemType) => workItemType.name);
-
+    
     const nonHiddenWorkItemTypes = allWorkItemTypes.filter(workItemType => hiddenWorkItemTypeNames.indexOf(workItemType.name) === -1);
 
     this.setState({
@@ -402,12 +404,12 @@ export interface FeedbackBoardContainerState {
 
     // Attempt to use query params to pre-select a specific team and board.
     let queryParams: URLSearchParams;
-
+    
     try {
       queryParams = (new URL(document.location.href)).searchParams;
 
       if (!queryParams) {
-        if (!this.props.isHostedAzureDevOps)
+        if (!isHostedAzureDevOps)
         {
           throw new Error("URL-related issue occurred with on-premise Azure DevOps");
         }
@@ -740,21 +742,43 @@ export interface FeedbackBoardContainerState {
   }
 
   private showRetroSummaryDialog = (): void => {
-    const measurements: { id: string, selected: number }[] = [];
+    // TODO (enpolat) : go and fetch the current data from the custom data store for all of the users team effectiveness measurement answers
+    const measurements: { id: number, selected: number }[] = [];
     this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
       vote.responses.forEach(response => {
         measurements.push({ id: response.questionId, selected: response.selection });
       });
     });
 
-    const average: { question: string, average: number }[] = [];
+    const average: { questionId: string, question: string, average: number }[] = [];
 
     [...new Set(measurements.map(item => item.id))].forEach(e => {
-      average.push({ question: getQuestionName(e), average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
+      average.push({ questionId: e.toString(), question: getQuestionName(e.toString()), average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
+    });
+
+    const chartData: { questionId: string, red: number, yellow: number, green: number }[] = [];
+
+    [...Array(4).keys()].forEach(e => {
+      chartData.push({ questionId: (e+1).toString(), red: 0, yellow: 0, green: 0 });
+    });
+
+    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
+      [...Array(4).keys()].forEach(e => {
+        const selection = vote.responses.find(response => response.questionId.toString() === (e+1).toString()).selection;
+        const data = chartData.find(d => d.questionId === (e+1).toString());
+        if (selection <= 6) {
+          data.red++;
+        } else if (selection <= 8) {
+          data.yellow++;
+        } else {
+          data.green++;
+        }
+      });
     });
 
     this.setState({
       isRetroSummaryDialogHidden: false,
+      effectivenessMeasurementChartData: chartData,
       effectivenessMeasurementSummary: average,
     });
   }
@@ -770,7 +794,7 @@ export interface FeedbackBoardContainerState {
   private updateBoardMetadata = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[]) => {
     const updatedBoard =
       await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxvotesPerUser, title, columns);
-
+    
     this.updateBoardAndBroadcast(updatedBoard);
   }
 
@@ -837,9 +861,9 @@ export interface FeedbackBoardContainerState {
     // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardDeleted);
   }
 
-  private copyBoardUrl = async () => {
-    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
-    navigator.clipboard.writeText(boardDeepLinkUrl);
+  private copyBoardUrl = () => {
+    const boardDeepLinkUrl = getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
+    vssClipboard.copyToClipboard(boardDeepLinkUrl);
   }
 
   private renderBoardUpdateMetadataFormDialog = (
@@ -912,8 +936,8 @@ export interface FeedbackBoardContainerState {
     {
       key: 'copyLink',
       iconProps: { iconName: 'Link' },
-      onClick: async () => {
-        await this.copyBoardUrl();
+      onClick: () => {
+        this.copyBoardUrl();
         this.showBoardUrlCopiedToast();
       },
       text: 'Copy retrospective link',
@@ -1022,7 +1046,7 @@ export interface FeedbackBoardContainerState {
       this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
     };
 
-    const effectivenessMeasurementSelectionChanged = (questionId: string, selected: number) => {
+    const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
       const userId: string = getUserIdentity().id;
 
       const currentBoard = this.state.currentBoard;
@@ -1177,31 +1201,31 @@ export interface FeedbackBoardContainerState {
                                 </thead>
                                 <tbody>
                                   <EffectivenessMeasurementRow
-                                    questionId="1"
+                                    questionId={1}
                                     votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection}
-                                    onSelectedChange={selected => effectivenessMeasurementSelectionChanged("1", selected)}
-                                    title={getQuestionName("1")}
+                                    onSelectedChange={selected => effectivenessMeasurementSelectionChanged(1, selected)}
+                                    title={`${getQuestionShortName("1")} - ${getQuestionName("1")}`}
                                     tooltip={<>Only about 50% employees strongly indicate they know what is expected of them at work according to <a target="_blank" rel="noreferrer" href="https://www.gallup.com/workplace/236567/obsolete-annual-reviews-gallup-advice.aspx">Gallup</a>. Furthermore, clarity of expectations is statistically linked to many important organizational outcomes. Getting expectations right relates to better customer perceptions of service quality, productivity, retention of employees and safety. Substantial gains in clarity of expectations connect to productivity gains of 5% to 10%, and link to 10% to 20% fewer safety incidents, for example.</>}
                                   />
                                   <EffectivenessMeasurementRow
-                                    questionId="2"
+                                    questionId={2}
                                     votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection}
-                                    onSelectedChange={selected => effectivenessMeasurementSelectionChanged("2", selected)}
-                                    title={getQuestionName("2")}
+                                    onSelectedChange={selected => effectivenessMeasurementSelectionChanged(2, selected)}
+                                    title={`${getQuestionShortName("2")} - ${getQuestionName("2")}`}
                                     tooltip={<>Only 2 out of 10 employees strongly indicate that they use their strengths every day at work according to <a target="_blank" rel="noreferrer" href="https://www.marcusbuckingham.com/business-case-for-strengths/">Marcus Buckingham</a>, yet those who do have 38% higher productivity, 44% higher customer satisfaction scores, and 50% higher retention. Using your strengths every day at work. Using your strengths at work results in being excited to work and is one of the strongest predictors of whether you are on a high performing team. Furthermore, <a target="_blank" rel="noreferrer" href="https://www.marcusbuckingham.com/spend-a-week/">Marcus Buckingham</a> argues that if we spend less than 20% of our time at work doing what we love we are much more likely to burnout.</>}
                                   />
                                   <EffectivenessMeasurementRow
-                                    questionId="3"
+                                    questionId={3}
                                     votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection}
-                                    onSelectedChange={selected => effectivenessMeasurementSelectionChanged("3", selected)}
-                                    title={getQuestionName("3")}
+                                    onSelectedChange={selected => effectivenessMeasurementSelectionChanged(3, selected)}
+                                    title={`${getQuestionShortName("3")} - ${getQuestionName("3")}`}
                                     tooltip={<>Psychological safety is the #1 predictor of team success according to a <a target="_blank" rel="noreferrer" href="https://rework.withgoogle.com/">study done by Google</a> as well as numerous studies including those outlined in the book <a target="_blank" rel="noreferrer" href="https://www.amazon.com/Fearless-Organization-Psychological-Workplace-Innovation/dp/1119477247">The Fearless Organization by Amy Edmonson</a>. Furthermore, data shows that psychological safety results in a 12% increase in productivity, a 27% reduction in turnover, and a 40% reduction in mistakes according to <a target="_blank" rel="noreferrer" href="https://www.gallup.com/workplace/236198/create-culture-psychological-safety.aspx">Gallup</a>.</>}
                                   />
                                   <EffectivenessMeasurementRow
-                                    questionId="4"
+                                    questionId={4}
                                     votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection}
-                                    onSelectedChange={selected => effectivenessMeasurementSelectionChanged("4", selected)}
-                                    title={getQuestionName("4")}
+                                    onSelectedChange={selected => effectivenessMeasurementSelectionChanged(4, selected)}
+                                    title={`${getQuestionShortName("4")} - ${getQuestionName("4")}`}
                                     tooltip={<>Self-assessed productivity in 2021 was the same or higher than in previous years for many employees (82%), but at a human cost. One in five global survey respondents say their employer doesn’t care about their work-life balance. 54% of workers feel overworked and 39% feel exhausted according to the <a target="_blank" rel="noreferrer" href="https://www.microsoft.com/en-us/worklab/work-trend-index/hybrid-work">2021 Work Trend Index from Microsoft</a>.</>}
                                   />
                                 </tbody>
@@ -1302,7 +1326,7 @@ export interface FeedbackBoardContainerState {
                     }
                   </div>
                   {
-                    !this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected &&
+                    !isHostedAzureDevOps() && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected &&
                     <MessageBar
                       className="info-message-bar"
                       messageBarType={MessageBarType.info}
@@ -1321,7 +1345,7 @@ export interface FeedbackBoardContainerState {
                     </MessageBar>
                   }
                   {
-                    !this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected &&
+                    !isHostedAzureDevOps() && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected &&
                     <MessageBar
                       className="info-message-bar"
                       messageBarType={MessageBarType.warning}
@@ -1333,7 +1357,7 @@ export interface FeedbackBoardContainerState {
                     </MessageBar>
                   }
                   {
-                    this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected &&
+                    isHostedAzureDevOps() && !this.state.isBackendServiceConnected &&
                     <MessageBar
                       className="info-message-bar"
                       messageBarType={MessageBarType.warning}
@@ -1381,7 +1405,6 @@ export interface FeedbackBoardContainerState {
                         this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
                         false
                       }
-                      userId={this.state.currentUserId}
                     />
                   </div>
                   <Dialog
@@ -1472,11 +1495,58 @@ export interface FeedbackBoardContainerState {
               <div>{this.state.actionItemIds.length} action items created</div>
               <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
               <div>
-                Effectiveness Scores:
+              Effectiveness Scores ({ this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length } people responded)<br />
+                <div className="retro-summary-effectiveness-scores">
+                  <ul className="chart">
+                  { this.state.effectivenessMeasurementChartData.map((data, index) => { return (
+                      <li key={index}>
+                        <div style={{ width: "200px", color: "#000", textAlign: "end" }}>
+                          { getQuestionShortName(data.questionId) }
+                        </div>
+                        { data.red > 0 &&
+                        <div style={{ backgroundColor: "#d6201f", width: `${((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                          {((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                        </div>
+                        }
+                        { data.yellow > 0 &&
+                        <div style={{ backgroundColor: "#ffd302", width: `${((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                          {((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                        </div>
+                        }
+                        { data.green > 0 &&
+                        <div style={{ backgroundColor: "#006b3d", width: `${((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                          {((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                        </div>
+                        }
+                      </li>
+                    )})
+                  }
+                  </ul>
+                  <div className="legend">
+                    <span>Favorability</span>
+                    <div style={{ display: "flex" }}>
+                      <section>
+                        <div style={{ backgroundColor: "#d6201f" }}></div>
+                        <span>Unfavorable</span>
+                      </section>
+                      <section>
+                        <div style={{ backgroundColor: "#ffd302" }}></div>
+                        <span>Neutral</span>
+                      </section>
+                      <section>
+                        <div style={{ backgroundColor: "#006b3d" }}></div>
+                        <span>Favorable</span>
+                      </section>
+                    </div>
+                  </div>
+                </div>
+                <a onClick={() => { this.setState({ teamEffectivenessMeasurementAverageVisibilityClassName: this.state.teamEffectivenessMeasurementAverageVisibilityClassName === "visible" ? "hidden" : "visible" }) }}>Show average points for each question:</a>
+                <div className={this.state.teamEffectivenessMeasurementAverageVisibilityClassName}>
                 { this.state.effectivenessMeasurementSummary.map((measurement, index) => {
-                    return <div key={index}>{measurement.question}: {measurement.average}</div>
+                    return <div key={index}><strong>{getQuestionShortName(measurement.questionId)}</strong> - {measurement.question}: {measurement.average}</div>
                   })
                 }
+                </div>
               </div>
               {!this.state.currentBoard.isAnonymous ?
                 <>
@@ -1520,5 +1590,3 @@ export interface FeedbackBoardContainerState {
     );
   }
 }
-
-export default withAITracking(reactPlugin, FeedbackBoardContainer);

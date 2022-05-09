@@ -1,3 +1,5 @@
+/// <reference types="vss-web-extension-sdk" />
+
 /**
  * Helpers for Effectiveness Measurement Questions.
  *
@@ -5,7 +7,7 @@
  *
  * @returns name of the question
  */
- export const getQuestionName = (questionId: string): string => {
+export const getQuestionName = (questionId: string): string => {
   switch (questionId) {
     case "1":
       return "I clearly understand what is expected of me on this team";
@@ -15,6 +17,25 @@
       return "I feel safe and do not fear making mistakes, raising tough issues, taking risks, or asking for help";
     case "4":
       return "My typical workload allows me to achieve an acceptable level of work-life balance";
+    case "5":
+      return "I'm confident our team will be successful";
+    default:
+      return "";
+  }
+}
+
+export const getQuestionShortName = (questionId: string): string => {
+  switch (questionId) {
+    case "1":
+      return "Clarity";
+    case "2":
+      return "Energy";
+    case "3":
+      return "Psychological Safety";
+    case "4":
+      return "Sustainability";
+    case "5":
+      return "Sustainability";
     default:
       return "";
   }

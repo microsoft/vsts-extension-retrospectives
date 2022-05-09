@@ -20,14 +20,14 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y docker-ce-cli \
     #
-    # Install dotnet core 5
+    # Install dotnet 6
     && cd /tmp \
     && wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
     && dpkg -i packages-microsoft-prod.deb \
     && apt-get update \
     && apt-get install -y apt-transport-https \
     && apt-get update \
-    && apt-get install -y dotnet-sdk-5.0 \
+    && apt-get install -y dotnet-sdk-6.0 \
     #
     # Install node
     && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
@@ -35,6 +35,9 @@ RUN apt-get update \
     #
     # Install npm-check-updates tool globally
     && npm install -g npm-check-updates \
+    #
+    # Install jest-cli testing framework globally
+    && npm install -g jest-cli \
     #
     # [Optional] Add sudo support for the non-root user
     && apt-get install -y sudo \

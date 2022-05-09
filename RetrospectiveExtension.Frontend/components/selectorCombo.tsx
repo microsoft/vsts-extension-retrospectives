@@ -5,8 +5,6 @@ import { List } from 'office-ui-fabric-react/lib/List';
 import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import * as React from 'react';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface ISelectorComboProps<T> {
   className: string;
@@ -41,7 +39,7 @@ export interface ISelectorComboState<T> {
   isSelectorDialogHidden: boolean;
 }
 
-class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelectorComboState<T>>  {
+export default class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelectorComboState<T>>  {
   private selectorButton: HTMLElement | null;
 
   constructor(props: ISelectorComboProps<T>) {
@@ -302,5 +300,3 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
     });
   }
 }
-
-export default SelectorCombo;

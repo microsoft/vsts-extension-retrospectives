@@ -1,7 +1,7 @@
 const environment = {
-  CollaborationStateServiceUrl: 'https://my-backend-service.com', // change this to the deployed backend service
+  CollaborationStateServiceUrl: 'https://retrospectivesbackendservice.azurewebsites.net',
   CurrentEnvironment: process.env.NODE_ENV,
-  AppInsightsInstrumentKey: 'my_instrumentation_key' // put Instrumentation key here
+  AppInsightsInstrumentKey: '5fc71d68-349e-4a15-a894-9fb382e47f76'
 };
 
 export default environment;

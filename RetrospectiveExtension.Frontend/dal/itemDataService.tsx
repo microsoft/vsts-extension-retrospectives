@@ -1,6 +1,6 @@
 import * as ExtensionDataService from './dataService';
 import { IFeedbackItemDocument, IFeedbackBoardDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
-import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { WorkItem } from 'TFS/WorkItemTracking/Contracts';
 import { workItemService } from './azureDevOpsWorkItemService';
 // TODO (enpolat) : import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
 import { v4 as uuid } from 'uuid';
@@ -90,13 +90,17 @@ class ItemDataService {
 
     const feedbackItem: IFeedbackItemDocument = await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
 
+    if(feedbackItem && feedbackItem.upvotes > 0) {
+      console.log(`Cannot delete a feedback item which has upvotes. Board: ${boardId} Item: ${feedbackItemId}`);
+      return undefined;
+    }
+
     if (feedbackItem.parentFeedbackItemId) {
-      const parentFeedbackItem: IFeedbackItemDocument =
-        await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItem.parentFeedbackItemId);
+      const parentFeedbackItem: IFeedbackItemDocument = await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItem.parentFeedbackItemId);
 
       parentFeedbackItem.childFeedbackItemIds = parentFeedbackItem.childFeedbackItemIds.filter(id => id !== feedbackItemId);
-      updatedParentFeedbackItem = await this.updateFeedbackItem(boardId, parentFeedbackItem);
 
+      updatedParentFeedbackItem = await this.updateFeedbackItem(boardId, parentFeedbackItem);
     }
     else if (feedbackItem.childFeedbackItemIds) {
       const childFeedbackItemPromises = feedbackItem.childFeedbackItemIds.map((childFeedbackItemId) => {
@@ -232,6 +236,11 @@ class ItemDataService {
      }
 
     if (decrement) {
+      if(!boardItem.boardVoteCollection || !boardItem.boardVoteCollection[userId] || boardItem.boardVoteCollection[userId] <= 0) {
+          console.log(`Cannot decrement item with zero or less votes. Board ${boardId}, Item: ${feedbackItemId}`);
+          return undefined;
+      }
+
       if (feedbackItem.upvotes <= 0) {
         console.log(`Cannot decrement upvote as votes must be > 0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
         return undefined;
@@ -272,15 +281,35 @@ class ItemDataService {
       feedbackItem.voteCollection[userId]++;
       feedbackItem.upvotes++;
     }
-    await this.updateBoardItem(teamId, boardItem);
+
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+
+    if(!updatedFeedbackItem) {
+      console.log(`The feedback item was not incremented or decremented. Board: ${boardId}, Item: ${feedbackItemId}`);
+      return undefined;
+    }
+
+    const updatedBoardItem = await this.updateBoardItem(teamId, boardItem);
+    if(!updatedBoardItem) {
+      console.log(`Could not update board, votes will be removed from or added to the feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
+
+      updatedFeedbackItem.voteCollection[userId] = decrement ? updatedFeedbackItem.voteCollection[userId]++ : updatedFeedbackItem.voteCollection[userId]--;
+      updatedFeedbackItem.upvotes = decrement ? updatedFeedbackItem.upvotes++ : updatedFeedbackItem.upvotes--;
+
+      const feedbackItemWithOriginalVotes = await this.updateFeedbackItem(boardId, updatedFeedbackItem);
+      if (feedbackItemWithOriginalVotes) {
+        return feedbackItemWithOriginalVotes;
+      }
+      console.log(`Cannot remove or add votes from feedback item. Board ${boardId}, Item: ${updatedFeedbackItem.id}`);
+    }
+
     return updatedFeedbackItem;
   }
 
   /**
    * Update the team effectiveness measurement.
    */
-   public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[]): Promise<IFeedbackBoardDocument> => {
+  public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[]): Promise<IFeedbackBoardDocument> => {
     const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
 
     if (boardItem === undefined) {

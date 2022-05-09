@@ -1,4 +1,4 @@
-import { IdentityRef } from 'azure-devops-extension-api/WebApi';
+import { IdentityRef } from 'VSS/WebApi/Contracts';
 import { WorkflowPhase } from './workItem';
 
 export interface IUserVisit {
@@ -33,7 +33,7 @@ export interface IFeedbackBoardDocument {
 
 export interface ITeamEffectivenessMeasurementVoteCollection {
   userId: string;
-  responses: {questionId: string, selection: number}[]
+  responses: {questionId: number, selection: number}[]
 }
 
 export interface IFeedbackColumn {

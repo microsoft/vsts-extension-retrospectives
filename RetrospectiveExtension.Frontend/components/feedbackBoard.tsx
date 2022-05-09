@@ -1,6 +1,6 @@
 ﻿import * as React from 'react';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
-import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { WebApiTeam } from 'TFS/Core/Contracts';
+import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
 
 import { workService } from '../dal/azureDevOpsWorkService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
@@ -15,8 +15,6 @@ import { WorkflowPhase } from '../interfaces/workItem';
 import FeedbackItemCarousel from './feedbackCarousel';
 import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin, appInsights } from '../utilities/external/telemetryClient';
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -31,7 +29,6 @@ export interface FeedbackBoardProps {
 
   isCarouselDialogHidden: boolean;
   hideCarouselDialog: () => void;
-  userId: string;
 }
 
 export interface IColumn {
@@ -59,7 +56,9 @@ export interface FeedbackBoardState {
   currentVoteCount: string;
 }
 
-class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
+const userId: string = getUserIdentity().id;
+
+export default class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
   constructor(props: FeedbackBoardProps) {
     super(props);
 
@@ -70,7 +69,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       defaultActionItemIteration: '',
       hasItems: false,
       isDataLoaded: false,
-      currentVoteCount: (props.board.boardVoteCollection === undefined || props.board.boardVoteCollection === null) ? "0" : (props.board.boardVoteCollection[this.props.userId] === undefined || props.board.boardVoteCollection[this.props.userId] === null) ? "0" : props.board.boardVoteCollection[this.props.userId]?.toString()
+      currentVoteCount: (props.board.boardVoteCollection === undefined || props.board.boardVoteCollection === null) ? "0" : (props.board.boardVoteCollection[userId] === undefined || props.board.boardVoteCollection[userId] === null) ? "0" : props.board.boardVoteCollection[userId]?.toString()
     };
   }
 
@@ -423,7 +422,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
           itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
             const voteCollection = boardItem.boardVoteCollection;
 
-            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[this.props.userId] === undefined ? "0" : voteCollection[this.props.userId].toString() });
+            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[userId] === undefined ? "0" : voteCollection[userId].toString() });
           });
         }
       };
@@ -458,5 +457,3 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       </div>);
   }
 }
-
-export default withAITracking(reactPlugin, FeedbackBoard);

@@ -1,4 +1,4 @@
-import * as ProcessDefinitionsContracts from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+import * as ProcessDefinitionsContracts from 'TFS/WorkItemTracking/ProcessDefinitionsContracts';
 
 export const feedbackType: ProcessDefinitionsContracts.FieldModel = {
     description: 'The type of feedback.',

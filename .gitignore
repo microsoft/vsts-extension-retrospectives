@@ -255,12 +255,6 @@ paket-files/
 # VSTS Extension package
 *.vsix
 
-# MacOS
-.DS_Store
-
-# dev files
-environment.tsx
-
 # Backend config files
 .env
 allowed_origins.json
