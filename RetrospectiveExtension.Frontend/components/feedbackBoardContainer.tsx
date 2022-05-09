@@ -758,13 +758,13 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
     const chartData: { questionId: string, red: number, yellow: number, green: number }[] = [];
 
-    [...Array(4).keys()].forEach(e => {
+    [...Array(5).keys()].forEach(e => {
       chartData.push({ questionId: (e+1).toString(), red: 0, yellow: 0, green: 0 });
     });
 
     this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
-      [...Array(4).keys()].forEach(e => {
-        const selection = vote.responses.find(response => response.questionId.toString() === (e+1).toString()).selection;
+      [...Array(5).keys()].forEach(e => {
+        const selection = vote.responses.find(response => response.questionId.toString() === (e+1).toString())?.selection;
         const data = chartData.find(d => d.questionId === (e+1).toString());
         if (selection <= 6) {
           data.red++;
