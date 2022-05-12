@@ -4,14 +4,17 @@
   "description": "Azure DevOps Retrospective Extension",
   "main": "index.tsx",
   "scripts": {
-    "build:d": "rm -rf ./dist && webpack --mode=development",
-    "build:p": "rm -rf ./dist && webpack --mode=production",
+    "build:d": "rm -rf ./dist && webpack --mode=development ",
+    "build:p": "rm -rf ./dist && webpack --mode=production ",
     "lint": "eslint . --ext .ts,.tsx",
     "pack:d": "tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
     "pack:p": "tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
-    "publish:d": "npm run build:d && npm run pack:d && tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
-    "publish:p": "npm run build:p && npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
-    "test": "jest"
+    "publish:d": "npm run build && npm run pack:d && tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
+    "publish:p": "npm run build && npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
+    "start:dev": "webpack-dev-server --mode development",
+    "test": "jest --env=jsdom --silent -ci --testResultsProcessor=jest-junit",
+    "pack:test": "tfx extension create --manifests vss-extension-prod.json --output-path ./dist/",
+    "test:watch": "jest --env=jsdom --watch"
   },
   "repository": {
     "type": "git",
@@ -21,12 +24,18 @@
   "license": "ISC",
   "dependencies": {
     "@aspnet/signalr": "1.1.4",
-    "applicationinsights-js": "1.0.21",
+    "@microsoft/applicationinsights-react-js": "^3.2.3",
+    "@microsoft/applicationinsights-web": "^2.7.3",
+    "azure-devops-extension-api": "~1.157.0",
+    "azure-devops-extension-sdk": "~2.0.11",
+    "babel-jest": "^27.4.6",
     "classnames": "2.3.1",
     "copy-to-clipboard": "3.3.1",
+    "dotenv-webpack": "^7.1.0",
+    "enzyme-to-json": "^3.6.2",
     "file-saver": "2.0.5",
-    "jsonwebtoken": "8.5.1",
-    "moment": "2.29.2",
+    "jest-junit-reporter": "^1.1.0",
+    "moment": "2.29.1",
     "office-ui-fabric-react": "7.180.3",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -35,29 +44,32 @@
     "react-toastify": "8.1.0",
     "slick-carousel": "1.8.1",
     "telemetryclient-team-services-extension": "1.0.10",
-    "uuid": "8.3.2",
-    "vss-web-extension-sdk": "5.141.0"
+    "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@types/applicationinsights-js": "1.0.9",
     "@types/classnames": "2.3.0",
+    "@types/enzyme": "^3.10.11",
     "@types/file-saver": "2.0.5",
-    "@types/jest": "27.4.0",
+    "@types/jest": "^27.4.0",
+    "@types/jsdom": "^16.2.14",
     "@types/jsonwebtoken": "8.5.7",
-    "@types/node": "17.0.8",
+    "@types/node": "^17.0.8",
     "@types/react": "17.0.38",
     "@types/react-dom": "17.0.11",
     "@types/react-slick": "0.23.8",
     "@types/uuid": "8.3.4",
     "@typescript-eslint/eslint-plugin": "5.9.1",
     "@typescript-eslint/parser": "5.9.1",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
     "crypto-browserify": "3.12.0",
     "css-loader": "6.5.1",
+    "enzyme": "^3.11.0",
     "eslint": "8.6.0",
     "eslint-plugin-react": "7.28.0",
     "eslint-webpack-plugin": "3.1.1",
     "file-loader": "6.2.0",
-    "jest": "27.4.7",
+    "jest": "^27.4.7",
+    "jest-junit": "^13.0.0",
     "moment-locales-webpack-plugin": "1.2.0",
     "node-sass": "7.0.1",
     "process": "0.11.10",
@@ -65,12 +77,57 @@
     "stream-browserify": "3.0.0",
     "style-loader": "3.3.1",
     "tfx-cli": "0.10.0",
-    "ts-jest": "27.1.3",
+    "ts-jest": "^27.1.3",
     "ts-loader": "9.2.6",
     "typescript": "4.5.4",
     "url-loader": "4.1.1",
     "util": "0.12.4",
     "webpack": "5.66.0",
-    "webpack-cli": "4.9.1"
+    "webpack-cli": "4.9.1",
+    "webpack-dev-server": "^4.7.2"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "./components/__tests__/setupTests.tsx"
+    ],
+    "transform": {
+      "^.+\\.(js|ts|tsx|jsx)$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)"
+    ],
+    "setupFiles": [
+      "./components/__tests__/setupTests.tsx"
+    ],
+    "moduleNameMapper": {
+      "office-ui-fabric-react/lib/(.*)$": "office-ui-fabric-react/lib-commonjs/$1",
+      "^.+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx"
+    },
+    "preset": "ts-jest/presets/js-with-babel",
+    "resetMocks": true,
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "testResultsProcessor": "./node_modules/jest-junit-reporter",
+    "collectCoverage": true,
+    "coverageReporters": [
+      "json",
+      "html",
+      "cobertura"
+    ],
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.test.json"
+      }
+    }
+  },
+  "jest-junit": {
+    "outputDirectory": "reports",
+    "outputName": "jest-junit.xml",
+    "ancestorSeparator": " › ",
+    "uniqueOutputName": "false",
+    "suiteNameTemplate": "{filepath}",
+    "classNameTemplate": "{classname}",
+    "titleTemplate": "{title}"
   }
 }

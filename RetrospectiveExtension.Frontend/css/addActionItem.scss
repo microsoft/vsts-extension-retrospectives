@@ -29,7 +29,7 @@
 
   &.resolved-border-right {
     border-right: 3px solid rgb(51, 153, 51);
-  
+
     &:hover {
       border-right-color: rgb(51, 153, 51);
     }
@@ -112,7 +112,7 @@
         background-color: inherit;
         width: 100%;
         border: 0px hidden;
-        overflow: hidden; 
+        overflow: hidden;
 
         &:hover {
           background-color: $azure_devops_navigator_light_grey;
@@ -149,7 +149,7 @@
   .error-container {
     height: 20px;
   }
-  
+
   .output-container {
     height: 40px;
   }
@@ -162,7 +162,7 @@
   .work-item-not-found {
     width: 100%;
   }
-  
+
   .input-validation-message {
     color: $bug_red;
   }

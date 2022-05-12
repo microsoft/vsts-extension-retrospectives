@@ -1,5 +1,7 @@
 ﻿import * as React from 'react';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface EditableTextProps {
   isDisabled?: boolean;
@@ -16,7 +18,7 @@ export interface EditableTextState {
   hasErrors: boolean;
 }
 
-export default class EditableText extends React.Component<EditableTextProps, EditableTextState> {
+class EditableText extends React.Component<EditableTextProps, EditableTextState> {
   constructor(props: EditableTextProps) {
     super(props);
 
@@ -45,7 +47,7 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
         newText: "",
         hasErrors: true
       });
-    return;
+      return;
     }
 
     this.setState({
@@ -174,9 +176,9 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
               e.stopPropagation();
             }}
           />
-            {this.state.hasErrors && <span className="input-validation-message">This cannot be empty.</span>}
-          </div>
-        );
+          {this.state.hasErrors && <span className="input-validation-message">This cannot be empty.</span>}
+        </div>
+      );
     }
 
     return (
@@ -184,9 +186,9 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
         className="editable-text-container">
         <p className="editable-text"
           tabIndex={0}
-          onKeyDown={this.props.isDisabled ? () => {} : this.handleEditKeyDown}
-          onClick={this.props.isDisabled ? () => {} : this.handleEdit}
-          aria-label={'Feedback title is' + this.props.text + '. Click to edit.'}
+          onKeyDown={this.props.isDisabled ? () => { } : this.handleEditKeyDown}
+          onClick={this.props.isDisabled ? () => { } : this.handleEdit}
+          aria-label={'Feedback title is ' + (this.props.isDisabled ? 'obscured during collection.' : this.props.text + '. Click to edit.')}
           aria-required={true}>
           {this.props.text}
         </p>
@@ -194,3 +196,5 @@ export default class EditableText extends React.Component<EditableTextProps, Edi
     );
   }
 }
+
+export default withAITracking(reactPlugin, EditableText);

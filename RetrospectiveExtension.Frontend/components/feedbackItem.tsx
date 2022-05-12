@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ActionButton, PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
@@ -9,17 +9,19 @@ import * as React from 'react';
 import { WorkflowPhase } from '../interfaces/workItem';
 import ActionItemDisplay from './actionItemDisplay';
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
-import { IFeedbackItemDocument } from '../interfaces/feedback';
+import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
 import { itemDataService } from '../dal/itemDataService';
-import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
+import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import localStorageHelper from '../utilities/localStorageHelper';
 import { reflectBackendService } from '../dal/reflectBackendService';
-import { WebApiTeam } from 'TFS/Core/Contracts';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
 // TODO (enpolat) : import { appInsightsClient, TelemetryEvents } from '../utilities/appInsightsClient';
 import { IColumn, IColumnItem } from './feedbackBoard';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface IFeedbackItemProps {
   id: string;
@@ -36,6 +38,7 @@ export interface IFeedbackItemProps {
   iconClass: string;
   workflowPhase: WorkflowPhase;
   team: WebApiTeam;
+  originalColumnId: string;
   columnId: string;
   boardId: string;
   boardTitle: string;
@@ -53,12 +56,23 @@ export interface IFeedbackItemProps {
   userIdRef: string;
   timerSecs: number;
   timerState: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   timerId: any;
+  groupCount: number;
+  isGroupedCarouselItem: boolean;
+  groupTitles: String[];
+  isShowingGroupedChildrenTitles: boolean;
+  isFocusModalHidden: boolean;
   onVoteCasted: () => void;
 
   addFeedbackItems: (
-    columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
-    newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
+    columnId: string,
+    columnItems: IFeedbackItemDocument[],
+    shouldBroadcast: boolean,
+    newlyCreated: boolean,
+    showAddedAnimation: boolean,
+    shouldHaveFocus: boolean,
+    hideFeedbackItems: boolean) => void;
 
   removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
 
@@ -98,6 +112,7 @@ export interface IFeedbackItemState {
   searchTerm: string;
   hideFeedbackItems: boolean;
   userVotes: string;
+  isShowingGroupedChildrenTitles: boolean;
 }
 
 interface FeedbackItemEllipsisMenuItem {
@@ -107,7 +122,7 @@ interface FeedbackItemEllipsisMenuItem {
   hideMainItem?: boolean;
 }
 
-export default class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemState> {
+class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemState> {
   private itemElement: HTMLElement;
   private itemElementRef: (element: HTMLElement) => void;
 
@@ -128,7 +143,8 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
       searchTerm: '',
       searchedFeedbackItems: [],
       showVotedAnimation: false,
-      userVotes:"0",
+      userVotes: "0",
+      isShowingGroupedChildrenTitles: false
     };
 
     this.itemElement = null;
@@ -202,14 +218,22 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     this.setState({ isBeingDragged: false });
   }
 
-  private dropFeedbackItemOnFeedbackItem = (e: React.DragEvent<HTMLDivElement>) => {
+  private dropFeedbackItemOnFeedbackItem = async (e: React.DragEvent<HTMLDivElement>) => {
     // Using localStorage as a temporary solution for Edge issue
     // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
     // const droppedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
+    const droppedItemProps = await itemDataService.getFeedbackItem(this.props.boardId, droppedItemId);
+
+    const boardItem: IFeedbackBoardDocument = await itemDataService.getBoardItem(this.props.team.id, this.props.boardId);
+    const allowCrossColumnGroups = boardItem.allowCrossColumnGroups;
+
     if (this.props.id !== droppedItemId) {
-      FeedbackItem.handleDropFeedbackItemOnFeedbackItem(this.props, droppedItemId, this.props.id);
+      if (allowCrossColumnGroups || this.props.columnId === droppedItemProps.originalColumnId) {
+        FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(this.props, droppedItemId, this.props.id);
+      }
     }
+
     e.stopPropagation();
   }
 
@@ -259,7 +283,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
   private setDisabledFeedbackItemDeletion = async (boardId: string, id: string) => {
     const feedbackItem = await itemDataService.getFeedbackItem(boardId, id);
     if (feedbackItem) {
-      this.setState({isDeletionDisabled: feedbackItem.upvotes > 0});
+      this.setState({ isDeletionDisabled: feedbackItem.upvotes > 0 });
     }
   }
 
@@ -353,6 +377,10 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     });
   }
 
+  private toggleShowGroupedChildrenTitles = () => {
+    this.setState((previousState) => ({ isShowingGroupedChildrenTitles: !previousState.isShowingGroupedChildrenTitles }))
+  }
+
   private readonly feedbackItemEllipsisMenuItems: FeedbackItemEllipsisMenuItem[] = [
     {
       menuItem: {
@@ -362,7 +390,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Delete feedback',
         title: 'Delete feedback (disabled when there are active votes)',
       },
-      workflowPhases: [ WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act ],
+      workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act],
     },
     {
       menuItem: {
@@ -372,7 +400,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Move feedback to different column',
         title: 'Move feedback to different column',
       },
-      workflowPhases: [ WorkflowPhase.Group ],
+      workflowPhases: [WorkflowPhase.Group],
       hideMobile: true,
     },
     {
@@ -383,7 +411,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Group feedback',
         title: 'Group feedback',
       },
-      workflowPhases: [ WorkflowPhase.Group ],
+      workflowPhases: [WorkflowPhase.Group],
       hideMobile: true,
     },
     {
@@ -394,13 +422,13 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
         text: 'Remove feedback from group',
         title: 'Remove feedback from group',
       },
-      workflowPhases: [ WorkflowPhase.Group ],
+      workflowPhases: [WorkflowPhase.Group],
       hideMobile: true,
       hideMainItem: true,
     },
   ];
 
-  private onVote = async (feedbackItemId: string,  decrement: boolean=false) => {
+  private onVote = async (feedbackItemId: string, decrement: boolean = false) => {
     const updatedFeedbackItem = await itemDataService.updateVote(this.props.boardId, this.props.team.id, getUserIdentity().id, feedbackItemId, decrement);
     // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUpvoted);
 
@@ -413,11 +441,9 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     }
   }
 
-
-  private timerSwich =  async (feedbackItemId: string) =>
-  {
+  private timerSwich = async (feedbackItemId: string) => {
     let updatedFeedbackItem;
-    const boardId:string = this.props.boardId;
+    const boardId: string = this.props.boardId;
 
     // function to handle timer count update
     const incTimer = async () => {
@@ -469,9 +495,9 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
 
   private isVoted = async (
     feedbackItemId: string) => {
-      itemDataService.isVoted(this.props.boardId, getUserIdentity().id, feedbackItemId).then(result => {
-        this.setState({ userVotes: result });
-      })
+    itemDataService.isVoted(this.props.boardId, getUserIdentity().id, feedbackItemId).then(result => {
+      this.setState({ userVotes: result });
+    })
   }
 
   private removeFeedbackItem = (
@@ -499,9 +525,9 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
 
       this.props.addFeedbackItems(
         this.props.columnId,
-        [newFeedbackItem], 
+        [newFeedbackItem],
         /*shouldBroadcast*/ true,
-        /*newlyCreated*/ false, 
+        /*newlyCreated*/ false,
         /*showAddedAnimation*/ false,
         /*shouldHaveFocus*/ true,
         /*hideFeedbackItems*/ false);
@@ -527,24 +553,6 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     }
   }
 
-  // Handle linking/grouping workitems and reload any updated items.
-  public static handleDropFeedbackItemOnFeedbackItem = async (feedbackItemProps: IFeedbackItemProps, droppedItemId: string, targetItemId: string) => {
-    const updatedFeedbackItems = await itemDataService.addFeedbackItemAsChild(feedbackItemProps.boardId, targetItemId, droppedItemId);
-
-    feedbackItemProps.refreshFeedbackItems(
-      [
-        updatedFeedbackItems.updatedParentFeedbackItem,
-        updatedFeedbackItems.updatedChildFeedbackItem,
-        ...updatedFeedbackItems.updatedGrandchildFeedbackItems,
-        updatedFeedbackItems.updatedOldParentFeedbackItem,
-      ].filter((item) => item),
-      true
-    );
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemGrouped);
-
-    // TODO: Inform user when not all updates are successful due to race conditions.
-  }
-
   private handleFeedbackItemSearchInputChange = async (event?: React.ChangeEvent<HTMLInputElement>, searchTerm?: string) => {
     if (!searchTerm || !searchTerm.trim()) {
       this.setState({ searchTerm: searchTerm, searchedFeedbackItems: [] });
@@ -567,7 +575,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
 
   private clickSearchedFeedbackItem = (event: React.MouseEvent<HTMLDivElement>, feedbackItemProps: IFeedbackItemProps) => {
     event.stopPropagation();
-    FeedbackItem.handleDropFeedbackItemOnFeedbackItem(
+    FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(
       feedbackItemProps,
       this.props.id,
       feedbackItemProps.id
@@ -581,7 +589,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
 
     // Enter
     if (event.keyCode === 13) {
-      FeedbackItem.handleDropFeedbackItemOnFeedbackItem(
+      FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(
         feedbackItemProps,
         this.props.id,
         feedbackItemProps.id
@@ -613,6 +621,15 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     />);
   };
 
+  public formatTimer = (timeInSeconds: number) => {
+    // Handle the timer display - total seconds into 00:00
+    // Doesn't handle formatting hours since that may be excessive
+    const timerMinutes = Math.floor(timeInSeconds / 60);
+    const timerSeconds = timeInSeconds % 60;
+    const showLeadingZeroInSeconds = timerSeconds < 10;
+    return showLeadingZeroInSeconds ? (timerMinutes + ':0' + timerSeconds) : (timerMinutes + ':' + timerSeconds);
+  }
+
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
     const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
@@ -620,10 +637,16 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
     const isDraggable = this.props.isInteractable && this.props.workflowPhase === WorkflowPhase.Group && !this.state.isMarkedForDeletion;
     const isNotGroupedItem = !this.props.groupedItemProps;
     const isMainItem = isNotGroupedItem || this.props.groupedItemProps.isMainItem;
+    const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const groupItemsCount = this.props && this.props.groupedItemProps && this.props.groupedItemProps.groupedCount + 1;
-    const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : 'Feedback group main item. Group has ' + groupItemsCount + ' items.'); 
-    const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.createdBy ? this.props.userIdRef !== getUserIdentity().id : false);
+    const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : 'Feedback group main item. Group has ' + groupItemsCount + ' items.');
+    const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
+    const originalColumnId = this.props.originalColumnId;
+    const originalColumnTitle = originalColumnId ? this.props.columns[originalColumnId].columnProperties.title : 'n/a';
+    // showing `n/a` will be for older boards who don't have this property
+    const childrenTitlesShort = this.props.groupTitles;
+    const isFocusModalHidden = this.props.isFocusModalHidden;
 
     return (
       <div
@@ -656,7 +679,30 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                 borderLeftColor: this.props.accentColor
               }}>
               <div className="card-header">
-                {!isNotGroupedItem && isMainItem &&
+                {
+                  // This controls the top-level feedback item in the action phase on the carousel
+                  isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
+                  <button className="feedback-expand-group-focus"
+                    aria-live="polite"
+                    aria-label={this.props.groupedItemProps
+                      && !this.props.groupedItemProps.isGroupExpanded
+                      ? 'Expand Feedback Group button. Group has ' + groupItemsCount + ' items.'
+                      : 'Collapse Feedback Group button. Group has ' + groupItemsCount + ' items.'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      this.toggleShowGroupedChildrenTitles();
+                    }}>
+                    <i className={classNames('fa', {
+                      'fa-angle-double-down': this.state.isShowingGroupedChildrenTitles,
+                      'fa-angle-double-right': !this.state.isShowingGroupedChildrenTitles
+                    })} />&nbsp;
+                    {this.props.groupCount + 1} Items <i className="far fa-comments" />
+                  </button>
+                }
+                {
+                  // This controls the top level feedback item in a group in the vote phase
+                  // and outside the focus mode
+                  !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
                   <button className="feedback-expand-group"
                     aria-live="polite"
                     aria-label={this.props.groupedItemProps
@@ -673,14 +719,14 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                       'fa-chevron-right': !this.props.groupedItemProps.isGroupExpanded
                     })} />
                     {groupItemsCount} Items
-                </button>
+                  </button>
                 }
                 {showVotes && this.props.isInteractable &&
                   // Using standard button tag here due to no onAnimationEnd support in fabricUI
                   <button
                     title="Vote"
                     aria-live="polite"
-                    aria-label={'Click to vote On feedback. Current vote count is ' + this.props.upvotes}
+                    aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
                     tabIndex={0}
                     disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
                     className={classNames(
@@ -706,7 +752,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                   <button
                     title="UnVote"
                     aria-live="polite"
-                    aria-label={'Click to unvote On feedback. Current vote count is ' + this.props.upvotes}
+                    aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
                     tabIndex={0}
                     disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
                     className={classNames(
@@ -724,7 +770,7 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                       this.setState({ showVotedAnimation: false });
                     }}>
                     <i className="fas fa-arrow-circle-down" />
-                    
+
                   </button>
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
@@ -737,7 +783,9 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                         items: this.feedbackItemEllipsisMenuItems
                           .filter((menuItem) => !(isMainItem && menuItem.hideMainItem))
                           .map((menuItem) => {
-                            menuItem.menuItem.disabled = this.state.isDeletionDisabled || menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
+                            menuItem.menuItem.disabled =
+                              this.state.isDeletionDisabled ||
+                              menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
                             return menuItem.menuItem;
                           })
                       }}
@@ -755,7 +803,9 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                           .filter((menuItem) => !menuItem.hideMobile)
                           .filter((menuItem) => !(isMainItem && menuItem.hideMainItem))
                           .map((menuItem) => {
-                            menuItem.menuItem.disabled = this.state.isDeletionDisabled || menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
+                            menuItem.menuItem.disabled =
+                              this.state.isDeletionDisabled ||
+                              menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
 
                             return <ActionButton
                               key={menuItem.menuItem.key}
@@ -780,6 +830,27 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                   </div>}
               </div>
               <div className="card-content">
+                <div id="actionTimer" className="card-action-timer">
+                  {showAddActionItem &&
+                    <button
+                      title="Timer"
+                      aria-live="polite"
+                      aria-label={'Start/stop'}
+                      tabIndex={0}
+                      className={classNames(
+                        'feedback-action-button',
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.timerSwich(this.props.id);
+                      }}
+                    >
+                      <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
+                      <span> {this.formatTimer(this.props.timerSecs)} elapsed</span>
+                    </button>
+                  }
+                </div>
                 {this.props.isInteractable && <EditableDocumentCardTitle
                   isMultiline={true}
                   title={this.props.title}
@@ -794,7 +865,9 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                     </p>
                   </div>
                 }
-
+                {(this.props.workflowPhase !== WorkflowPhase.Collect) && (this.props.columnId !== this.props.originalColumnId) &&
+                  <div className="original-column-info">Original Column: <br />{originalColumnTitle}</div>
+                }
                 {showVoteButton && this.props.isInteractable &&
                   <div>
                     <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
@@ -821,155 +894,167 @@ export default class FeedbackItem extends React.Component<IFeedbackItemProps, IF
                   allowAddNewActionItem={isMainItem}
                 />}
             </div>
-            <div id="actionTimer" className="card-action-timer">
-              {showAddActionItem &&
-              <button
-                title="Timer"
-                aria-live="polite"
-                aria-label={'Start/stop'}
-                tabIndex={0}
-                className={classNames(
-                  'feedback-action-button',
-                )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  this.timerSwich(this.props.id);
-                }}
-              >
-                <i className={curTimerState ? "fa fa-stop-circle": "fa fa-play-circle"} />
-                <span>  {this.props.timerSecs} (seconds)</span>
-              </button>
-              }
-            </div>
+            {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles &&
+              <div className="group-child-feedback-stack"
+                style={{
+                  width: "300px"
+                }}><span className="related-feedback-header">Related Feedback</span>
+                <ul className="fa-ul">
+                  {childrenTitlesShort.map((title: String, index: React.Key) =>
+                    <li key={index}><span className="fa-li"><i className="far fa-comment-dots" /></span>
+                      <span className="related-feedback-title"
+                        aria-label={'Title of the feedback is ' + title}>
+                        {title}
+                      </span></li>
+                  )
+                  }
+                </ul>
+              </div>
+            }
           </DocumentCard>
         </div>
-        {!this.state.isDeleteItemConfirmationDialogHidden &&
-          <Dialog
-            hidden={false}
-            onDismiss={this.hideDeleteItemConfirmationDialog}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: 'Delete Feedback',
-              subText: `Are you sure you want to delete the feedback '${this.props.title}'?
-                ${!isNotGroupedItem && isMainItem
-                  ? 'Any feedback grouped underneath this one will be ungrouped.'
-                  : ''}`,
-            }}
-            modalProps={{
-              isBlocking: true,
-              containerClassName: 'retrospectives-delete-feedback-item-dialog',
-              className: 'retrospectives-dialog-modal',
-            }}>
-            <DialogFooter>
-              <PrimaryButton onClick={this.onConfirmDeleteFeedbackItem} text="Delete" />
-              <DefaultButton onClick={this.hideDeleteItemConfirmationDialog} text="Cancel" />
-            </DialogFooter>
-          </Dialog>
-        }
-        {!this.state.isMoveFeedbackItemDialogHidden &&
-          <Dialog
-            hidden={false}
-            maxWidth={500}
-            minWidth={500}
-            onDismiss={this.hideMoveFeedbackItemDialog}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: 'Move Feedback to Different Column',
-              subText: 'Choose the column you want to move this feedback to',
-            }}
-            modalProps={{
-              isBlocking: false,
-              containerClassName: 'retrospectives-move-feedback-item-dialog',
-              className: 'retrospectives-dialog-modal',
-            }}>
-            {this.props.columnIds
-              .filter((columnId) => columnId != this.props.columnId)
-              .map((columnId) => {
-                return <DefaultButton
-                  key={columnId}
-                  className="move-feedback-item-column-button"
-                  onClick={async () => {
-                    await this.props.moveFeedbackItem(
-                      this.props.refreshFeedbackItems,
-                      this.props.boardId,
-                      this.props.id,
-                      columnId);
-                  }}>
-                  <i className={this.props.columns[columnId].columnProperties.iconClass} />
-                  {this.props.columns[columnId].columnProperties.title}
-                </DefaultButton>
+        <Dialog
+          hidden={this.state.isDeleteItemConfirmationDialogHidden}
+          onDismiss={this.hideDeleteItemConfirmationDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Delete Feedback',
+            subText: `Are you sure you want to delete the feedback '${this.props.title}'?
+              ${!isNotGroupedItem && isMainItem
+                ? 'Any feedback grouped underneath this one will be ungrouped.'
+                : ''}`,
+          }}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-delete-feedback-item-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogFooter>
+            <PrimaryButton onClick={this.onConfirmDeleteFeedbackItem} text="Delete" />
+            <DefaultButton onClick={this.hideDeleteItemConfirmationDialog} text="Cancel" />
+          </DialogFooter>
+        </Dialog>
+        <Dialog
+          hidden={this.state.isMoveFeedbackItemDialogHidden}
+          maxWidth={500}
+          minWidth={500}
+          onDismiss={this.hideMoveFeedbackItemDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Move Feedback to Different Column',
+            subText: 'Choose the column you want to move this feedback to',
+          }}
+          modalProps={{
+            isBlocking: false,
+            containerClassName: 'retrospectives-move-feedback-item-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          {this.props.columnIds
+            .filter((columnId) => columnId != this.props.columnId)
+            .map((columnId) => {
+              return <DefaultButton
+                key={columnId}
+                className="move-feedback-item-column-button"
+                onClick={async () => {
+                  await this.props.moveFeedbackItem(
+                    this.props.refreshFeedbackItems,
+                    this.props.boardId,
+                    this.props.id,
+                    columnId);
+                }}>
+                <i className={this.props.columns[columnId].columnProperties.iconClass} />
+                {this.props.columns[columnId].columnProperties.title}
+              </DefaultButton>
+            })}
+        </Dialog>
+        <Dialog
+          hidden={this.state.isGroupFeedbackItemDialogHidden}
+          maxWidth={600}
+          minWidth={600}
+          onDismiss={this.hideGroupFeedbackItemDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Group Feedback',
+            subText: 'Search and select the feedback under which to group the current feedback.'
+          }}
+          modalProps={{
+            isBlocking: false,
+            containerClassName: 'retrospectives-group-feedback-item-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <SearchBox
+            autoFocus={true}
+            placeholder="Enter the feedback title"
+            aria-label="Enter the feedback title"
+            onChange={this.handleFeedbackItemSearchInputChange}
+            className="feedback-item-name-input"
+          />
+          <div className="output-container">
+            {!this.state.searchedFeedbackItems.length && this.state.searchTerm &&
+              <p className="no-matching-feedback-message">No feedback with title containing your input.</p>
+            }
+            {this.state.searchedFeedbackItems
+              .map((columnItem) => {
+                const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(
+                  this.props.columnProps,
+                  columnItem,
+                  false)
+                return <div
+                  key={feedbackItemProps.id}
+                  className="feedback-item-search-result-item"
+                  onClick={(e) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
+                  onKeyDown={(e) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
+                  tabIndex={0}
+                >
+                  <FeedbackItem {...feedbackItemProps}>
+                  </FeedbackItem>
+                </div>
               })}
-          </Dialog>}
-        {!this.state.isGroupFeedbackItemDialogHidden &&
-          <Dialog
-            hidden={false}
-            maxWidth={600}
-            minWidth={600}
-            onDismiss={this.hideGroupFeedbackItemDialog}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: 'Group Feedback',
-              subText: 'Search and select the feedback under which to group the current feedback.'
-            }}
-            modalProps={{
-              isBlocking: false,
-              containerClassName: 'retrospectives-group-feedback-item-dialog',
-              className: 'retrospectives-dialog-modal',
-            }}>
-            <SearchBox
-              autoFocus={true}
-              placeholder="Enter the feedback title"
-              aria-label="Enter the feedback title"
-              onChange={this.handleFeedbackItemSearchInputChange}
-              className="feedback-item-name-input"
-            />
-            <div className="output-container">
-              {!this.state.searchedFeedbackItems.length && this.state.searchTerm &&
-                <p className="no-matching-feedback-message">No feedback with title containing your input.</p>
-              }
-              {this.state.searchedFeedbackItems
-                .map((columnItem) => {
-                  const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(
-                    this.props.columnProps,
-                    columnItem,
-                    false)
-                  return <div
-                    key={feedbackItemProps.id}
-                    className="feedback-item-search-result-item"
-                    onClick={(e) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
-                    onKeyDown={(e) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
-                    tabIndex={0}
-                  >
-                    <FeedbackItem {...feedbackItemProps}>
-                    </FeedbackItem>
-                  </div>
-                })}
-            </div>
-          </Dialog>}
-        {!this.state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden &&
-          <Dialog
-            hidden={false}
-            maxWidth={700}
-            minWidth={700}
-            onDismiss={this.hideRemoveFeedbackItemFromGroupConfirmationDialog}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: 'Remove Feedback from Group',
-              subText: `Are you sure you want to remove the feedback '${this.props.title}' from its current group?`
-            }}
-            modalProps={{
-              isBlocking: true,
-              containerClassName: 'retrospectives-remove-feedback-item-from-group-dialog',
-              className: 'retrospectives-dialog-modal',
-            }}>
-            <DialogFooter>
-              <PrimaryButton onClick={this.onConfirmRemoveFeedbackItemFromGroup} text="Remove Feedback from Group" />
-              <DefaultButton onClick={this.hideRemoveFeedbackItemFromGroupConfirmationDialog} text="Cancel" />
-            </DialogFooter>
-          </Dialog>
-        }
+          </div>
+        </Dialog>
+        <Dialog
+          hidden={this.state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden}
+          maxWidth={700}
+          minWidth={700}
+          onDismiss={this.hideRemoveFeedbackItemFromGroupConfirmationDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Remove Feedback from Group',
+            subText: `Are you sure you want to remove the feedback '${this.props.title}' from its current group?`
+          }}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-remove-feedback-item-from-group-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogFooter>
+            <PrimaryButton onClick={this.onConfirmRemoveFeedbackItemFromGroup} text="Remove Feedback from Group" />
+            <DefaultButton onClick={this.hideRemoveFeedbackItemFromGroupConfirmationDialog} text="Cancel" />
+          </DialogFooter>
+        </Dialog>
       </div>
     );
   }
 }
+
+export class FeedbackItemHelper {
+  // Handle linking/grouping workitems and reload any updated items.
+  public static handleDropFeedbackItemOnFeedbackItem = async (feedbackItemProps: IFeedbackItemProps, droppedItemId: string, targetItemId: string) => {
+    const updatedFeedbackItems = await itemDataService.addFeedbackItemAsChild(feedbackItemProps.boardId, targetItemId, droppedItemId);
+
+    feedbackItemProps.refreshFeedbackItems(
+      [
+        updatedFeedbackItems.updatedParentFeedbackItem,
+        updatedFeedbackItems.updatedChildFeedbackItem,
+        ...updatedFeedbackItems.updatedGrandchildFeedbackItems,
+        updatedFeedbackItems.updatedOldParentFeedbackItem,
+      ].filter((item) => item),
+      true
+    );
+    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemGrouped);
+
+    // TODO: Inform user when not all updates are successful due to race conditions.
+  }
+}
+
+export default withAITracking(reactPlugin, FeedbackItem);

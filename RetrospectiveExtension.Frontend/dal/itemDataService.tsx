@@ -1,6 +1,6 @@
 import * as ExtensionDataService from './dataService';
 import { IFeedbackItemDocument, IFeedbackBoardDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
-import { WorkItem } from 'TFS/WorkItemTracking/Contracts';
+import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { workItemService } from './azureDevOpsWorkItemService';
 // TODO (enpolat) : import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
 import { v4 as uuid } from 'uuid';
@@ -18,6 +18,7 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument = {
       boardId,
       columnId,
+      originalColumnId: columnId,
       createdBy: isAnonymous ? null : userIdentity,
       createdDate: new Date(Date.now()),
       id: itemId,
@@ -28,6 +29,8 @@ class ItemDataService {
       timerSecs: 0,
       timerstate: false,
       timerId: null,
+      groupTitles: [],
+      isGroupedCarouselItem: false
     };
 
     const createdItem: IFeedbackItemDocument =
@@ -49,7 +52,7 @@ class ItemDataService {
   /**
    * Get the board item.
    */
-  public getBoardItem = async (teamId:string, boardId: string): Promise<IFeedbackBoardDocument> => {
+  public getBoardItem = async (teamId: string, boardId: string): Promise<IFeedbackBoardDocument> => {
     // Can we get it this way? [const boardItem:  IFeedbackBoardDocument = await boardDataService.getBoardForTeamById(VSS.getWebContext().team.id, boardId);]
     return await ExtensionDataService.readDocument<IFeedbackBoardDocument>(teamId, boardId);
   }
@@ -62,7 +65,8 @@ class ItemDataService {
 
     try {
       feedbackItems = await ExtensionDataService.readDocuments<IFeedbackItemDocument>(boardId, false, true);
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
         // TODO (enpolat) : appInsightsClient.trackTrace(TelemetryExceptions.ItemsNotFoundForBoard, e, AI.SeverityLevel.Warning);
       }
@@ -89,6 +93,10 @@ class ItemDataService {
     let updatedChildFeedbackItems: IFeedbackItemDocument[] = [];
 
     const feedbackItem: IFeedbackItemDocument = await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
+    if (feedbackItem && feedbackItem.upvotes > 0) {
+      console.log(`Cannot delete a feedback item which has upvotes. Board: ${boardId} Item: ${feedbackItemId}`);
+      return undefined;
+    }
 
     if(feedbackItem && feedbackItem.upvotes > 0) {
       console.log(`Cannot delete a feedback item which has upvotes. Board: ${boardId} Item: ${feedbackItemId}`);
@@ -147,15 +155,13 @@ class ItemDataService {
    * Check if the user has voted on this item.
    */
 
-  public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> =>
-  {
+  public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
       console.log(`Cannot increment upvote for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
-
 
     if (feedbackItem.upvotes <= 0) {
       return "0";
@@ -173,9 +179,8 @@ class ItemDataService {
   /**
    * flip the timer state.
    */
-
-  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> =>
-  {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
@@ -197,8 +202,7 @@ class ItemDataService {
   /**
    * update the timer count.
    */
-  public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean=false): Promise<IFeedbackItemDocument> =>
-  {
+  public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean = false): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
@@ -206,12 +210,10 @@ class ItemDataService {
       return undefined;
     }
 
-    if (setZero)
-    {
+    if (setZero) {
       feedbackItem.timerSecs = 0;
     }
-    else 
-    {
+    else {
       feedbackItem.timerSecs++;
     }
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
@@ -233,12 +235,14 @@ class ItemDataService {
     if (boardItem == undefined) {
       console.log(`Cannot retrieve board for the feedback. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
-     }
+    }
 
     if (decrement) {
-      if(!boardItem.boardVoteCollection || !boardItem.boardVoteCollection[userId] || boardItem.boardVoteCollection[userId] <= 0) {
-          console.log(`Cannot decrement item with zero or less votes. Board ${boardId}, Item: ${feedbackItemId}`);
-          return undefined;
+      if (!boardItem.boardVoteCollection ||
+        !boardItem.boardVoteCollection[userId] ||
+        boardItem.boardVoteCollection[userId] <= 0) {
+        console.log(`Cannot decrement item with zero or less votes. Board ${boardId}, Item: ${feedbackItemId}`);
+        return undefined;
       }
 
       if (feedbackItem.upvotes <= 0) {
@@ -284,16 +288,18 @@ class ItemDataService {
 
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
 
-    if(!updatedFeedbackItem) {
+    if (!updatedFeedbackItem) {
       console.log(`The feedback item was not incremented or decremented. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
 
     const updatedBoardItem = await this.updateBoardItem(teamId, boardItem);
-    if(!updatedBoardItem) {
-      console.log(`Could not update board, votes will be removed from or added to the feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
+    if (!updatedBoardItem) {
+      console.log(`Could not update board, votes will be removed from or added to the feedback item.
+        Board: ${boardId}, Item: ${feedbackItemId}`);
 
-      updatedFeedbackItem.voteCollection[userId] = decrement ? updatedFeedbackItem.voteCollection[userId]++ : updatedFeedbackItem.voteCollection[userId]--;
+      updatedFeedbackItem.voteCollection[userId] = decrement ?
+        updatedFeedbackItem.voteCollection[userId]++ : updatedFeedbackItem.voteCollection[userId]--;
       updatedFeedbackItem.upvotes = decrement ? updatedFeedbackItem.upvotes++ : updatedFeedbackItem.upvotes--;
 
       const feedbackItemWithOriginalVotes = await this.updateFeedbackItem(boardId, updatedFeedbackItem);
@@ -322,7 +328,7 @@ class ItemDataService {
     }
 
     if (boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId) === undefined || boardItem.boardVoteCollection[userId] === null) {
-      boardItem.teamEffectivenessMeasurementVoteCollection.push({ userId: userId, responses: []});
+      boardItem.teamEffectivenessMeasurementVoteCollection.push({ userId: userId, responses: [] });
     }
 
     boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses = teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses;
@@ -353,9 +359,9 @@ class ItemDataService {
    * Add a feedback item as a child feedback item of another feedback item.
    * This method also ensures that
    *   1) an existing parent-child association is removed from the old parent if the childFeedbackItem already had one.
-   *   2) the existing children of the child feedback item (if any) become children of the specified parent 
+   *   2) the existing children of the child feedback item (if any) become children of the specified parent
    *   feedback item as well.
-   *   3) that the child feedback item and the existing children of the child feedback item (if any) are 
+   *   3) that the child feedback item and the existing children of the child feedback item (if any) are
    *   assigned the same columnId as the parent feedback item.
    */
   public addFeedbackItemAsChild = async (boardId: string, parentFeedbackItemId: string, childFeedbackItemId: string):
@@ -369,8 +375,8 @@ class ItemDataService {
     const childFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, childFeedbackItemId);
 
     if (!parentFeedbackItem || !childFeedbackItem) {
-      console.log(`Cannot add child for a non-existent feedback item. 
-                Board: ${boardId}, 
+      console.log(`Cannot add child for a non-existent feedback item.
+                Board: ${boardId},
                 Parent Item: ${parentFeedbackItemId},
                 Child Item: ${childFeedbackItemId}`);
       return undefined;
@@ -379,7 +385,7 @@ class ItemDataService {
     // The parent feedback item must not be a child of another group.
     if (parentFeedbackItem.parentFeedbackItemId) {
       console.log(`Cannot add child if parent is already a child in another group.
-                Board: ${boardId}, 
+                Board: ${boardId},
                 Parent Item: ${parentFeedbackItemId}`);
       return undefined;
     }
@@ -454,8 +460,8 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
-      console.log(`Cannot move a non-existent feedback item. 
-              Board: ${boardId}, 
+      console.log(`Cannot move a non-existent feedback item.
+              Board: ${boardId},
               Parent Item: ${feedbackItem.parentFeedbackItemId},
               Child Item: ${feedbackItemId}`);
       return undefined;
@@ -466,8 +472,8 @@ class ItemDataService {
     if (feedbackItem.parentFeedbackItemId) {
       const parentFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItem.parentFeedbackItemId);
       if (!parentFeedbackItem) {
-        console.log(`The given feedback item has a non-existent parent. 
-                Board: ${boardId}, 
+        console.log(`The given feedback item has a non-existent parent.
+                Board: ${boardId},
                 Parent Item: ${feedbackItem.parentFeedbackItemId},
                 Child Item: ${feedbackItemId}`);
         return undefined;
@@ -495,7 +501,7 @@ class ItemDataService {
 
       const updatedChildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = childFeedbackItems.map((childFeedbackItem) =>
         this.updateFeedbackItem(boardId, childFeedbackItem));
-  
+
       updatedChildFeedbackItems =
         await Promise.all(updatedChildFeedbackItemPromises).then((promiseResults) => {
           return promiseResults.map((updatedChildFeedbackItem) => updatedChildFeedbackItem)
@@ -601,7 +607,7 @@ class ItemDataService {
    * Checks if the work item exists in VSTS and if not, removes it.
    * This handles the special case for when a work item is deleted in VSTS. Currently, when a work item is updated using the navigation form service
    * there is no way to determine if the item was deleted.
-   * https://github.com/MicrosoftDocs/vsts-docs/issues/1545 
+   * https://github.com/MicrosoftDocs/vsts-docs/issues/1545
    */
   public removeAssociatedItemIfNotExistsInVsts = async (boardId: string, feedbackItemId: string, associatedWorkItemId: number): Promise<IFeedbackItemDocument> => {
     let workItems: WorkItem[];

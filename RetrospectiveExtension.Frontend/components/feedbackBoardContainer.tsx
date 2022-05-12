@@ -5,7 +5,6 @@ import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import * as React from 'react';
-import * as vssClipboard from 'VSS/Utils/Clipboard';
 
 import { ViewMode, MobileWidthBreakpoint } from '../config/constants';
 import { WorkflowPhase } from '../interfaces/workItem';
@@ -13,13 +12,13 @@ import WorkflowStage from './workflowStage';
 import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { reflectBackendService } from '../dal/reflectBackendService';
-import BoardSummaryTable  from './boardSummaryTable';
+import BoardSummaryTable from './boardSummaryTable';
 import FeedbackBoardMetadataForm from './feedbackBoardMetadataForm';
 import FeedbackBoard from '../components/feedbackBoard';
 
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
-import { WebApiTeam } from 'TFS/Core/Contracts';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import NoFeedbackBoardsView from './noFeedbackBoardsView';
 // TODO (enpolat) : import { appInsightsClient, TelemetryEvents, TelemetryEventProperties } from '../utilities/appInsightsClient';
@@ -28,18 +27,21 @@ import ExtensionSettingsMenu from './extensionSettingsMenu';
 import SelectorCombo, { ISelectorList } from './selectorCombo';
 import FeedbackBoardPreviewEmail from './feedbackBoardPreviewEmail';
 import { ToastContainer, toast, Slide } from 'react-toastify';
-import { WorkItemType, WorkItemTypeReference } from 'TFS/WorkItemTracking/Contracts';
+import { WorkItemType, WorkItemTypeReference } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
-import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
 import { itemDataService } from '../dal/itemDataService';
-import { TeamMember } from 'VSS/WebApi/Contracts';
+import { TeamMember } from 'azure-devops-extension-api/WebApi';
 import EffectivenessMeasurementRow from './effectivenessMeasurementRow';
 
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { getQuestionName, getQuestionShortName, getQuestionTooltip } from '../utilities/effectivenessMeasurementQuestionHelper';
 
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../utilities/external/telemetryClient';
+
 export interface FeedbackBoardContainerProps {
+  isHostedAzureDevOps: boolean;
   projectId: string;
 }
 
@@ -79,6 +81,7 @@ export interface FeedbackBoardContainerState {
   isDropIssueInEdgeMessageBarVisible: boolean;
   isDesktop: boolean;
   isAutoResizeEnabled: boolean;
+  allowCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: {id: string, name: string, imageUrl: string}[];
   effectivenessMeasurementSummary: { questionId: string, question: string, average: number }[];
@@ -89,11 +92,12 @@ export interface FeedbackBoardContainerState {
   castedVoteCount: number;
 }
 
-export default class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
+class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
   constructor(props: FeedbackBoardContainerProps) {
     super(props);
     this.state = {
       allWorkItemTypes: [],
+      allowCrossColumnGroups: false,
       boards: [],
       currentUserId: getUserIdentity().id,
       currentBoard: undefined,
@@ -223,7 +227,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
   private toggleAndFixResolution = () => {
     const newView = !this.state.isDesktop;
-    
+
     this.setState({
       isAutoResizeEnabled: false,
       isDesktop: newView,
@@ -241,7 +245,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
   }
 
   // private handleErrorEvent = async (errorEvent: ErrorEvent) => {
-    // TODO (enpolat) : appInsightsClient.trackException(errorEvent.error);
+  // TODO (enpolat) : appInsightsClient.trackException(errorEvent.error);
   // }
 
   private handleNewBoardAvailable = async (teamId: string, boardId: string) => {
@@ -282,7 +286,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     const hiddenWorkItemTypes: WorkItemTypeReference[] = await workItemService.getHiddenWorkItemTypes();
 
     const hiddenWorkItemTypeNames = hiddenWorkItemTypes.map((workItemType) => workItemType.name);
-    
+
     const nonHiddenWorkItemTypes = allWorkItemTypes.filter(workItemType => hiddenWorkItemTypeNames.indexOf(workItemType.name) === -1);
 
     this.setState({
@@ -404,16 +408,15 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
 
     // Attempt to use query params to pre-select a specific team and board.
     let queryParams: URLSearchParams;
-    
+
     try {
       queryParams = (new URL(document.location.href)).searchParams;
 
       if (!queryParams) {
-        if (!isHostedAzureDevOps)
-        {
+        if (!this.props.isHostedAzureDevOps) {
           throw new Error("URL-related issue occurred with on-premise Azure DevOps");
         }
-        else if (!document.referrer){
+        else if (!document.referrer) {
           throw new Error("URL-related issue occurred with this URL: (Empty URL)");
         }
         else {
@@ -625,8 +628,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
       });
     }
 
-    // TODO: 
-    // Show error message in case there's an unexpected case of a chosen team not found 
+    // TODO:
+    // Show error message in case there's an unexpected case of a chosen team not found
     // instead of showing the loading indefinitely.
   }
 
@@ -708,7 +711,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     }
   }
 
-  private clickWorkflowStateCallback = (clickedElement: React.MouseEvent<HTMLElement>, newPhase: WorkflowPhase) => {
+  private clickWorkflowStateCallback = (clickedElement: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => {
     // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.WorkflowPhaseChanged, { [TelemetryEventProperties.OldWorkflowPhase]: this.state.currentBoard.activePhase, [TelemetryEventProperties.NewWorkflowPhase]: newPhase });
 
     this.setState(prevState => {
@@ -721,8 +724,24 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     });
   }
 
-  private createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean) => {
-    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id, title, maxvotesPerUser, columns, isIncludeTeamEffectivenessMeasurement, isBoardAnonymous, shouldShowFeedbackAfterCollect, displayPrimeDirective);
+  private createBoard = async (
+    title: string,
+    maxvotesPerUser: number,
+    columns: IFeedbackColumn[],
+    isIncludeTeamEffectivenessMeasurement: boolean,
+    isBoardAnonymous: boolean,
+    shouldShowFeedbackAfterCollect: boolean,
+    displayPrimeDirective: boolean,
+    allowCrossColumnGroups: boolean) => {
+    const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
+      title,
+      maxvotesPerUser,
+      columns,
+      isIncludeTeamEffectivenessMeasurement,
+      isBoardAnonymous,
+      shouldShowFeedbackAfterCollect,
+      displayPrimeDirective,
+      allowCrossColumnGroups);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -794,7 +813,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
   private updateBoardMetadata = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[]) => {
     const updatedBoard =
       await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxvotesPerUser, title, columns);
-    
+
     this.updateBoardAndBroadcast(updatedBoard);
   }
 
@@ -861,9 +880,9 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardDeleted);
   }
 
-  private copyBoardUrl = () => {
-    const boardDeepLinkUrl = getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
-    vssClipboard.copyToClipboard(boardDeepLinkUrl);
+  private copyBoardUrl = async () => {
+    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
+    navigator.clipboard.writeText(boardDeepLinkUrl);
   }
 
   private renderBoardUpdateMetadataFormDialog = (
@@ -874,9 +893,14 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     placeholderText: string,
     initialValue: string,
     onSubmit: (
-      title: string, maxVotesPerUser: number, columns: IFeedbackColumn[],
-      isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean,
-      shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean
+      title: string,
+      maxVotesPerUser: number,
+      columns: IFeedbackColumn[],
+      isIncludeTeamEffectivenessMeasurement: boolean,
+      isBoardAnonymous: boolean,
+      shouldShowFeedbackAfterCollect: boolean,
+      displayPrimeDirective: boolean,
+      allowCrossColumnGroups: boolean
     ) => void,
     onCancel: () => void) => {
     return (
@@ -895,7 +919,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
           isNewBoardCreation={isNewBoardCreation}
           currentBoard={this.state.currentBoard}
           teamId={this.state.currentTeam.id}
-          maxvotesPerUser = {this.state.maxvotesPerUser}
+          maxvotesPerUser={this.state.maxvotesPerUser}
           placeholderText={placeholderText}
           initialValue={initialValue}
           onFormSubmit={onSubmit}
@@ -904,7 +928,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
   }
 
   private updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
-    if (!updatedBoard) { 
+    if (!updatedBoard) {
       this.handleBoardDeleted(this.state.currentTeam.id, this.state.currentBoard.id);
     }
 
@@ -936,8 +960,8 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     {
       key: 'copyLink',
       iconProps: { iconName: 'Link' },
-      onClick: () => {
-        this.copyBoardUrl();
+      onClick: async () => {
+        await this.copyBoardUrl();
         this.showBoardUrlCopiedToast();
       },
       text: 'Copy retrospective link',
@@ -1077,7 +1101,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     }
 
     return (
-      <div className={this.state.isDesktop? ViewMode.Desktop : ViewMode.Mobile}>
+      <div className={this.state.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}>
         <div id="extension-header">
           <div className="extension-title-text" aria-label="Retrospectives">
             Retrospectives
@@ -1091,7 +1115,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
             selectorListItemOnClick={this.changeSelectedTeam}
             title={"Team"}
           />
-          <div style={{flexGrow:1}}></div>
+          <div style={{ flexGrow: 1 }}></div>
           <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.toggleAndFixResolution} />
         </div>
         <div className="pivot-container">
@@ -1158,26 +1182,26 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                       </div>
                     </div>
                     <div className="feedback-workflow-wrapper">
-                    { this.state.currentBoard.isIncludeTeamEffectivenessMeasurement &&
-                      <>
-                        <Dialog
-                          hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
-                          onDismiss={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true }); }}
-                          dialogContentProps={{
-                            type: DialogType.close,
-                          }}
-                          minWidth={640}
-                          modalProps={{
-                            isBlocking: true,
-                            containerClassName: 'prime-directive-dialog',
-                            className: 'retrospectives-dialog-modal',
-                          }}>
+                      {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement &&
+                        <>
+                          <Dialog
+                            hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                            onDismiss={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true }); }}
+                            dialogContentProps={{
+                              type: DialogType.close,
+                            }}
+                            minWidth={640}
+                            modalProps={{
+                              isBlocking: true,
+                              containerClassName: 'prime-directive-dialog',
+                              className: 'retrospectives-dialog-modal',
+                            }}>
                             <DialogContent>
-                              <div style={{ color:"#008000" }}><i className="fa fa-info-circle" />&nbsp;All answers will be saved anonymously</div>
+                              <div style={{ color: "#008000" }}><i className="fa fa-info-circle" />&nbsp;All answers will be saved anonymously</div>
                               <div>Legend: 1 is Strongly Disagree, 10 is Strongly Agree</div>
                               <table className="team-effectiveness-measurement-table">
                                 <thead>
-                                <tr>
+                                  <tr>
                                     <th></th>
                                     <th></th>
                                     <th colSpan={6} style={{ borderLeft: "1px solid black", borderRight: "1px solid black" }}>Unfavorable</th>
@@ -1219,35 +1243,35 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                               <DefaultButton onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true }); }} text="Cancel" />
                               <PrimaryButton onClick={() => { saveTeamEffectivenessMeasurement(); }} text="Submit" />
                             </DialogFooter>
-                        </Dialog>
-                        <TooltipHost
-                          hostClassName="toggle-carousel-button-tooltip-wrapper"
-                          content="Measure Team Effectiveness"
-                          calloutProps={{ gapSpace: 0 }}>
-                          <ActionButton
-                            className="toggle-carousel-button"
-                            onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false }); }}>
-                            <span className="ms-Button-icon"><i className="fas fa-chart-line"></i></span>&nbsp;
-                            <span className="ms-Button-label">Measure Team Effectiveness</span> 
-                          </ActionButton>
-                        </TooltipHost>
-                      </>
+                          </Dialog>
+                          <TooltipHost
+                            hostClassName="toggle-carousel-button-tooltip-wrapper"
+                            content="Measure Team Effectiveness"
+                            calloutProps={{ gapSpace: 0 }}>
+                            <ActionButton
+                              className="toggle-carousel-button"
+                              onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false }); }}>
+                              <span className="ms-Button-icon"><i className="fas fa-chart-line"></i></span>&nbsp;
+                              <span className="ms-Button-label">Measure Team Effectiveness</span>
+                            </ActionButton>
+                          </TooltipHost>
+                        </>
                       }
-                      { this.state.currentBoard.displayPrimeDirective &&
-                      <>
-                        <Dialog
-                          hidden={this.state.isPrimeDirectiveDialogHidden}
-                          onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
-                          dialogContentProps={{
-                            type: DialogType.close,
-                            title: 'The Prime Directive',
-                          }}
-                          minWidth={600}
-                          modalProps={{
-                            isBlocking: true,
-                            containerClassName: 'prime-directive-dialog',
-                            className: 'retrospectives-dialog-modal',
-                          }}>
+                      {this.state.currentBoard.displayPrimeDirective &&
+                        <>
+                          <Dialog
+                            hidden={this.state.isPrimeDirectiveDialogHidden}
+                            onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
+                            dialogContentProps={{
+                              type: DialogType.close,
+                              title: 'The Prime Directive',
+                            }}
+                            minWidth={600}
+                            modalProps={{
+                              isBlocking: true,
+                              containerClassName: 'prime-directive-dialog',
+                              className: 'retrospectives-dialog-modal',
+                            }}>
                             <DialogContent>
                               The purpose of the Prime Directive is to assure that a retrospective has the right culture to make it a positive and result oriented event. It makes a retrospective become an effective team gathering to learn and find solutions to improve the way of working.
                               <br /><br />
@@ -1259,19 +1283,19 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                               <DefaultButton onClick={() => { window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank'); }} text="Open Retrospective Wiki Page" />
                               <PrimaryButton onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }} text="Close" />
                             </DialogFooter>
-                        </Dialog>
-                        <TooltipHost
-                          hostClassName="toggle-carousel-button-tooltip-wrapper"
-                          content="Prime Directive"
-                          calloutProps={{ gapSpace: 0 }}>
-                          <ActionButton
-                            className="toggle-carousel-button"
-                            text="Prime Directive"
-                            iconProps={{ iconName: 'BookAnswers' }}
-                            onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: false }); }}>
-                          </ActionButton>
-                        </TooltipHost>
-                      </>
+                          </Dialog>
+                          <TooltipHost
+                            hostClassName="toggle-carousel-button-tooltip-wrapper"
+                            content="Prime Directive"
+                            calloutProps={{ gapSpace: 0 }}>
+                            <ActionButton
+                              className="toggle-carousel-button"
+                              text="Prime Directive"
+                              iconProps={{ iconName: 'BookAnswers' }}
+                              onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: false }); }}>
+                            </ActionButton>
+                          </TooltipHost>
+                        </>
                       }
                       <WorkflowStage
                         display="Collect"
@@ -1310,7 +1334,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                     }
                   </div>
                   {
-                    !isHostedAzureDevOps() && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected &&
+                    !this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected &&
                     <MessageBar
                       className="info-message-bar"
                       messageBarType={MessageBarType.info}
@@ -1329,7 +1353,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                     </MessageBar>
                   }
                   {
-                    !isHostedAzureDevOps() && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected &&
+                    !this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected &&
                     <MessageBar
                       className="info-message-bar"
                       messageBarType={MessageBarType.warning}
@@ -1341,7 +1365,7 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                     </MessageBar>
                   }
                   {
-                    isHostedAzureDevOps() && !this.state.isBackendServiceConnected &&
+                    this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected &&
                     <MessageBar
                       className="info-message-bar"
                       messageBarType={MessageBarType.warning}
@@ -1355,16 +1379,16 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                               className="info-message-bar-action-spinner" />}
                           {!this.state.isReconnectingToBackendService &&
                             <>
-                            <MessageBarButton
-                              className="info-message-bar-action-button"
-                              onClick={this.tryReconnectToBackend}
-                              disabled={this.state.isReconnectingToBackendService}
-                              text="Reconnect" />
-                            <IconButton
-                              className="info-message-bar-action-button"
-                              onClick={() => { this.setState({ isBackendServiceConnected: true }) }}
-                              disabled={this.state.isReconnectingToBackendService}
-                              title="Hide">
+                              <MessageBarButton
+                                className="info-message-bar-action-button"
+                                onClick={this.tryReconnectToBackend}
+                                disabled={this.state.isReconnectingToBackendService}
+                                text="Reconnect" />
+                              <IconButton
+                                className="info-message-bar-action-button"
+                                onClick={() => { this.setState({ isBackendServiceConnected: true }) }}
+                                disabled={this.state.isReconnectingToBackendService}
+                                title="Hide">
                                 <span className="ms-Button-icon"><i className="fas fa-times"></i></span>
                               </IconButton>
                             </>
@@ -1385,10 +1409,11 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                       isCarouselDialogHidden={this.state.isCarouselDialogHidden}
                       hideCarouselDialog={this.hideCarouselDialog}
                       isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
-                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? 
-                        this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : 
+                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ?
+                        this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect :
                         false
                       }
+                      userId={this.state.currentUserId}
                     />
                   </div>
                   <Dialog
@@ -1470,12 +1495,12 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
             containerClassName: 'retrospectives-retro-summary-dialog',
             className: 'retrospectives-dialog-modal',
           }}>
-            { this.state.currentBoard &&
+          {this.state.currentBoard &&
             <>
               <div>Retrospective session date is {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
               <div>{this.state.feedbackItems.length} feedback items created</div>
               <div>{this.state.members.length} people in the team, {this.state.contributors.length} participants contributed</div>
-              <div>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted { this.state.castedVoteCount } votes</div>
+              <div>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted {this.state.castedVoteCount} votes</div>
               <div>{this.state.actionItemIds.length} action items created</div>
               <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
               <div>
@@ -1539,12 +1564,12 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
                     <div key={index}>
                       <img className="avatar" src={contributor.imageUrl} /> {contributor.name}
                     </div>
-                    )}
+                  )}
                 </>
-              : <div>Board is anonymous</div>}
-              { this.state.currentBoard.isAnonymous && <div>Retrospective was Anonymous</div> }
-              </>
-            }
+                : <div>Board is anonymous</div>}
+              {this.state.currentBoard.isAnonymous && <div>Retrospective was Anonymous</div>}
+            </>
+          }
         </Dialog>
         <Dialog
           hidden={this.state.isTeamBoardDeletedInfoDialogHidden}
@@ -1574,3 +1599,5 @@ export default class FeedbackBoardContainer extends React.Component<FeedbackBoar
     );
   }
 }
+
+export default withAITracking(reactPlugin, FeedbackBoardContainer);

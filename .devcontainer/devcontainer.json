@@ -1,6 +1,9 @@
 {
   "name": "Retrospective Extension Development Environment",
-  "dockerFile": "Dockerfile",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
   "runArgs": [
     "-v", "/var/run/docker.sock:/var/run/docker.sock"
   ],
@@ -22,5 +25,6 @@
     "donjayamanne.githistory",
     "eamodio.gitlens",
     "davidanson.vscode-markdownlint"
-  ]
+  ],
+  "postCreateCommand": "pre-commit install"
 }

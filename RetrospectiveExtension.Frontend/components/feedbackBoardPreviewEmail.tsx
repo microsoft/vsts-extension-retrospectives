@@ -1,4 +1,4 @@
-import * as copy from 'copy-to-clipboard';
+import copy from 'copy-to-clipboard';
 import { ActionButton } from 'office-ui-fabric-react/lib/Button';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { ITextField, TextField } from 'office-ui-fabric-react/lib/TextField';
@@ -6,6 +6,8 @@ import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import { shareBoardHelper } from '../utilities/shareBoardHelper';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 interface IFeedbackBoardPreviewEmailState {
   emailContent: string;
@@ -17,19 +19,18 @@ interface IFeedbackBoardPreviewEmailProps {
   onCopy: () => void;
 }
 
-export default class FeedbackBoardPreviewEmail extends React.Component<IFeedbackBoardPreviewEmailProps, IFeedbackBoardPreviewEmailState> {
+class FeedbackBoardPreviewEmail extends React.Component<IFeedbackBoardPreviewEmailProps, IFeedbackBoardPreviewEmailState> {
   private emailTextField: ITextField;
 
   constructor(props: IFeedbackBoardPreviewEmailProps) {
     super(props);
-
     this.state = {
       emailContent: '',
     };
   }
 
   public async componentDidMount() {
-    const url = getBoardUrl(this.props.teamId, this.props.board.id);
+    const url = await getBoardUrl(this.props.teamId, this.props.board.id);
     const previewContent: string = await shareBoardHelper.generateEmailText(this.props.board, url, false);
     this.setState({ emailContent: previewContent });
   }
@@ -71,3 +72,5 @@ export default class FeedbackBoardPreviewEmail extends React.Component<IFeedback
     );
   }
 }
+
+export default withAITracking(reactPlugin, FeedbackBoardPreviewEmail);

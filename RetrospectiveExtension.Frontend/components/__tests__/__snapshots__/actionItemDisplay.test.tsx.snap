@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Action Item Display component renders correctly when there are no action items. 1`] = `
+<div
+  className="action-items"
+>
+  <Dialog
+    dialogContentProps={
+      Object {
+        "title": "Link existing work item",
+        "type": 0,
+      }
+    }
+    hidden={true}
+    modalProps={
+      Object {
+        "className": "retrospectives-dialog-modal",
+        "containerClassName": "retrospectives-link-existing-work-item-dialog",
+        "isBlocking": true,
+      }
+    }
+    onDismiss={[Function]}
+  >
+    <StyledSearchBoxBase
+      aria-label="Enter the exact work item id"
+      autoFocus={true}
+      className="work-item-id-input"
+      onChange={[Function]}
+      placeholder="Enter the exact work item id"
+    />
+    <div
+      className="error-container"
+    />
+    <div
+      className="output-container"
+    />
+    <StyledDialogFooterBase>
+      <CustomizedPrimaryButton
+        disabled={true}
+        onClick={[Function]}
+        text="Link work item"
+      />
+      <CustomizedDefaultButton
+        onClick={[Function]}
+        text="Cancel"
+      />
+    </StyledDialogFooterBase>
+  </Dialog>
+</div>
+`;

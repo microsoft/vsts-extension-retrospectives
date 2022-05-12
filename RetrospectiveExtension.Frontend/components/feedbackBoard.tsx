@@ -1,6 +1,6 @@
 ﻿import * as React from 'react';
-import { WebApiTeam } from 'TFS/Core/Contracts';
-import { WorkItem, WorkItemType } from 'TFS/WorkItemTracking/Contracts';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
+import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 
 import { workService } from '../dal/azureDevOpsWorkService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
@@ -14,7 +14,8 @@ import { WorkflowPhase } from '../interfaces/workItem';
 
 import FeedbackItemCarousel from './feedbackCarousel';
 import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog';
-import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -29,6 +30,7 @@ export interface FeedbackBoardProps {
 
   isCarouselDialogHidden: boolean;
   hideCarouselDialog: () => void;
+  userId: string;
 }
 
 export interface IColumn {
@@ -56,9 +58,7 @@ export interface FeedbackBoardState {
   currentVoteCount: string;
 }
 
-const userId: string = getUserIdentity().id;
-
-export default class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
+class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
   constructor(props: FeedbackBoardProps) {
     super(props);
 
@@ -69,7 +69,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       defaultActionItemIteration: '',
       hasItems: false,
       isDataLoaded: false,
-      currentVoteCount: (props.board.boardVoteCollection === undefined || props.board.boardVoteCollection === null) ? "0" : (props.board.boardVoteCollection[userId] === undefined || props.board.boardVoteCollection[userId] === null) ? "0" : props.board.boardVoteCollection[userId]?.toString()
+      currentVoteCount: (props.board.boardVoteCollection === undefined || props.board.boardVoteCollection === null) ? "0" : (props.board.boardVoteCollection[this.props.userId] === undefined || props.board.boardVoteCollection[this.props.userId] === null) ? "0" : props.board.boardVoteCollection[this.props.userId]?.toString()
     };
   }
 
@@ -191,7 +191,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
     this.setState((prevState) => {
       columnItems.forEach((columnItem) => {
         // Some columns might have been deleted. Only add items to columns that still exist.
-        if ( this.state.columnIds.indexOf(columnItem.feedbackItem.columnId) >= 0 ) {
+        if (this.state.columnIds.indexOf(columnItem.feedbackItem.columnId) >= 0) {
           prevState.columns[columnItem.feedbackItem.columnId].columnItems.push(columnItem);
         }
       });
@@ -220,7 +220,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
   }
 
   private getColumnsWithReleasedFocus = (currentFeedbackBoardState: FeedbackBoardState) => {
-    const resetFocusForStateColumns = {...currentFeedbackBoardState.columns};
+    const resetFocusForStateColumns = { ...currentFeedbackBoardState.columns };
 
     for (const columnIdKey in currentFeedbackBoardState.columns) {
       if (resetFocusForStateColumns[columnIdKey].shouldFocusOnCreateFeedback) {
@@ -228,7 +228,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       }
 
       const resetColumnItems = currentFeedbackBoardState.columns[columnIdKey].columnItems.map(columnItem => {
-        return {...columnItem, shouldHaveFocus: false};
+        return { ...columnItem, shouldHaveFocus: false };
       });
 
       resetFocusForStateColumns[columnIdKey].columnItems = resetColumnItems;
@@ -268,7 +268,7 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
         },
       ).concat(resetFocusForStateColumns[columnId].columnItems);
 
-      const newColumns = {...resetFocusForStateColumns};
+      const newColumns = { ...resetFocusForStateColumns };
       newColumns[columnId].columnItems = updatedColumnItems;
 
       return {
@@ -300,11 +300,11 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
       if (shouldSetFocusOnFirstAvailableItem) {
         if (updatedColumnItems.length > 0 && updatedColumnItems[0]) {
           updatedColumnItemsWithActiveFocus = updatedColumnItems.map((columnItem): IColumnItem => {
-            return {...columnItem, shouldHaveFocus: false};
+            return { ...columnItem, shouldHaveFocus: false };
           });
 
           const nextAvailableItemIndex = removedItemIndex >= updatedColumnItemsWithActiveFocus.length ? 0 : removedItemIndex;
-          updatedColumnItemsWithActiveFocus[nextAvailableItemIndex] = {...updatedColumnItemsWithActiveFocus[nextAvailableItemIndex], shouldHaveFocus: true};
+          updatedColumnItemsWithActiveFocus[nextAvailableItemIndex] = { ...updatedColumnItemsWithActiveFocus[nextAvailableItemIndex], shouldHaveFocus: true };
         }
         else {
           // If no items in colummn, set focus to column's create feedback button
@@ -418,42 +418,49 @@ export default class FeedbackBoard extends React.Component<FeedbackBoardProps, F
         isBoardAnonymous: this.props.isAnonymous,
         shouldFocusOnCreateFeedback: this.state.columns[columnId].shouldFocusOnCreateFeedback ? true : false,
         hideFeedbackItems: this.props.hideFeedbackItems,
+        isFocusModalHidden: true,
         onVoteCasted: () => {
           itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
             const voteCollection = boardItem.boardVoteCollection;
 
-            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[userId] === undefined ? "0" : voteCollection[userId].toString() });
+            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[this.props.userId] === undefined ? "0" : voteCollection[this.props.userId].toString() });
           });
-        }
+        },
+        groupTitles: []
       };
     });
 
     return (
       <div className="feedback-board">
-        { this.props.workflowPhase === WorkflowPhase.Vote &&
-        <div className="feedback-maxvotes-per-user">
-          <label>Votes: {this.state.currentVoteCount} / {this.props.board?.maxVotesPerUser?.toString()}</label>
-        </div>
+        {this.props.workflowPhase === WorkflowPhase.Vote &&
+          <div className="feedback-maxvotes-per-user">
+            <label>Votes: {this.state.currentVoteCount} / {this.props.board?.maxVotesPerUser?.toString()}</label>
+          </div>
         }
         <div className="feedback-columns-container">
-          { this.state.isDataLoaded && feedbackColumnPropsList.map((columnProps) => { return (<FeedbackColumn {...columnProps} />); }) }
+          {this.state.isDataLoaded && feedbackColumnPropsList.map((columnProps) => { return (<FeedbackColumn {...columnProps} />); })}
         </div>
         <Dialog
           hidden={this.props.isCarouselDialogHidden}
           onDismiss={this.props.hideCarouselDialog}
           minWidth={900}
           dialogContentProps={{
-            type: DialogType.normal,
+            type: DialogType.close,
             title: 'Focus Mode',
             subText: 'Now is the time to focus! Discuss one feedback item at a time and create actionable work items',
           }}
           modalProps={{
             containerClassName: 'retrospectives-carousel-dialog',
             className: 'retrospectives-carousel-dialog-modal hide-mobile',
+            isBlocking: true
           }}>
           <FeedbackItemCarousel
-            feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} />
+            feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous}
+            isFocusModalHidden={this.props.isCarouselDialogHidden}
+          />
         </Dialog>
       </div>);
   }
 }
+
+export default withAITracking(reactPlugin, FeedbackBoard);

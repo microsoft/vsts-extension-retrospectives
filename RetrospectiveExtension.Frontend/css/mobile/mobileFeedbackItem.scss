@@ -3,14 +3,22 @@
 .feedbackItem {
   flex-basis: 100%;
 
+  &.hideFeedbackItem .card-content {
+    filter: blur(15px);
+    pointer-events: none;
+  }
+
   .mainItemCard {
     min-width: calc(100vw - 45px);
     max-width: calc(100vw - 45px);
 
     .card-integral-part {
+      border-left-width: 10px;
+      border-left-style: solid;
+
       .card-header {
         height: $mobile_feedback_item_header_height;
-  
+
         .feedback-action-button {
           height: 65px;
           min-width: $mobile_feedback_item_action_button_width;
@@ -19,12 +27,13 @@
           margin-left: 15px;
           margin-top: 10px;
           padding: 1px 7px;
-  
+
           i {
             height: 65px;
             line-height: 1.3;
             font-size: $mobile_font_size_main;
           }
+
         }
 
         .feedback-add-vote {
@@ -47,7 +56,7 @@
           .contextual-menu-button {
             height: 60px;
             width: 45px;
-  
+
             i {
               height: 65px;
               width: 45px;
@@ -57,6 +66,22 @@
             }
           }
         }
+      }
+      .card-content {
+        .feedback-yourvote-count {
+          font-size: 2em;
+        }
+        .card-action-timer {
+          button {
+            width: 33%;
+            min-height: 45px;
+            font-size: 2em;
+          }
+        }
+      }
+
+      .card-id {
+        font-size: 2em;
       }
 
       .ms-DocumentCardActivity, .anonymous-created-date {
