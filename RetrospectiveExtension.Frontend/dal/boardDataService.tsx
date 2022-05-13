@@ -17,7 +17,6 @@ class BoardDataService {
     isAnonymous?: boolean,
     shouldShowFeedbackAfterCollect?: boolean,
     displayPrimeDirective?: boolean,
-    preventCrossColumnGroups?: boolean,
     startDate?: Date,
     endDate?: Date) => {
     const boardId: string = uuid();
@@ -30,14 +29,12 @@ class BoardDataService {
       createdDate: new Date(Date.now()),
       endDate,
       id: boardId,
-      isIncludeTeamEffectivenessMeasurement:
-        isIncludeTeamEffectivenessMeasurement ?? false,
+      isIncludeTeamEffectivenessMeasurement: isIncludeTeamEffectivenessMeasurement ?? false,
       isAnonymous: isAnonymous ?? false,
       modifiedDate: new Date(Date.now()),
       shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ?? false,
       displayPrimeDirective: displayPrimeDirective ?? false,
-      preventCrossColumnGroups: preventCrossColumnGroups ?? false,
-      maxVotesPerUser: maxVotesPerUser,
+      maxVotesPerUser,
       startDate,
       teamId,
       title,
