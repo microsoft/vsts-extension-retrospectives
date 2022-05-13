@@ -1246,13 +1246,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           </Dialog>
                           <TooltipHost
                             hostClassName="toggle-carousel-button-tooltip-wrapper"
-                            content="Measure Team Effectiveness"
+                            content="Team Assessment"
                             calloutProps={{ gapSpace: 0 }}>
                             <ActionButton
                               className="toggle-carousel-button"
                               onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false }); }}>
                               <span className="ms-Button-icon"><i className="fas fa-chart-line"></i></span>&nbsp;
-                              <span className="ms-Button-label">Measure Team Effectiveness</span>
+                              <span className="ms-Button-label">Team Assessment</span>
                             </ActionButton>
                           </TooltipHost>
                         </>
@@ -1504,7 +1504,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <div>{this.state.actionItemIds.length} action items created</div>
               <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
               <div>
-                Effectiveness Scores ({this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length} people responded)<br />
+              Assessment Scores ({ this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.length } people responded)<br />
                 <div className="retro-summary-effectiveness-scores">
                   <ul className="chart">
                     {this.state.effectivenessMeasurementChartData.map((data, index) => {
@@ -1568,7 +1568,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     </div>
                   )}
                 </>
-                : <div>Board is anonymous</div>}
+                : <div>Assessment is anonymous</div>}
               {this.state.currentBoard.isAnonymous && <div>Retrospective was Anonymous</div>}
             </>
           }
