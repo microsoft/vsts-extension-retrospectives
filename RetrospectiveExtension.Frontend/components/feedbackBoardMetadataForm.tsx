@@ -13,7 +13,7 @@ import EditableDocumentCardTitle from './editableDocumentCardTitle';
 import { v4 as uuid } from 'uuid';
 import { ChangeEvent } from 'react';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/telemetryClient';
 
 interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;

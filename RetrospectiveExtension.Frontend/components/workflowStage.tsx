@@ -2,7 +2,7 @@
 import classNames from 'classnames';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/telemetryClient';
 
 export interface IWorkflowStageProps {
   display: string;

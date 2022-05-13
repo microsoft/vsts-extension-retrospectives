@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import EditableText from './editableText';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/telemetryClient';
 
 export interface EditableDocumentCardTitleProps {
   isDisabled?: boolean;

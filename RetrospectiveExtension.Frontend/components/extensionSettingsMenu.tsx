@@ -5,7 +5,7 @@ import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { ViewMode } from '../config/constants';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/telemetryClient';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;

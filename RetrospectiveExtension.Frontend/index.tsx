@@ -6,7 +6,7 @@ import { init as sdkInit } from 'azure-devops-extension-sdk';
 import { isHostedAzureDevOps } from './utilities/azureDevOpsContextHelper';
 import { getProjectId } from './utilities/servicesHelper';
 import './css/main.scss';
-import { reactPlugin } from './utilities/external/telemetryClient';
+import { reactPlugin } from './utilities/telemetryClient';
 import { AppInsightsErrorBoundary } from '@microsoft/applicationinsights-react-js';
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from './components/feedbackBoardContainer';
 

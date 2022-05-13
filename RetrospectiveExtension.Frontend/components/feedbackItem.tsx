@@ -21,7 +21,7 @@ import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/telemetryClient';
 
 export interface IFeedbackItemProps {
   id: string;

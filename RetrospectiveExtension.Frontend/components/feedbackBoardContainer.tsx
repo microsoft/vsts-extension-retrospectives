@@ -38,7 +38,7 @@ import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { getQuestionName, getQuestionShortName, getQuestionTooltip, questions } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
 
 export interface FeedbackBoardContainerProps {

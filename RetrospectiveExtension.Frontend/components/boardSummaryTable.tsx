@@ -12,7 +12,7 @@ import ReactTable from 'react-table-6';
 
 import 'react-table-6/react-table.css'
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/telemetryClient';
 
 export interface IBoardSummaryTableProps {
   teamId: string;

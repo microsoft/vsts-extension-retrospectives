@@ -15,7 +15,7 @@ import { WorkflowPhase } from '../interfaces/workItem';
 import FeedbackItemCarousel from './feedbackCarousel';
 import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/external/telemetryClient';
+import { reactPlugin } from '../utilities/telemetryClient';
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
