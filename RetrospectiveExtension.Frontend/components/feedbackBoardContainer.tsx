@@ -81,7 +81,7 @@ export interface FeedbackBoardContainerState {
   isDropIssueInEdgeMessageBarVisible: boolean;
   isDesktop: boolean;
   isAutoResizeEnabled: boolean;
-  preventCrossColumnGroups: boolean;
+  allowCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: {id: string, name: string, imageUrl: string}[];
   effectivenessMeasurementSummary: { questionId: number, question: string, average: number }[];
@@ -97,7 +97,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     super(props);
     this.state = {
       allWorkItemTypes: [],
-      preventCrossColumnGroups: false,
+      allowCrossColumnGroups: false,
       boards: [],
       currentUserId: getUserIdentity().id,
       currentBoard: undefined,
@@ -732,7 +732,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     isBoardAnonymous: boolean,
     shouldShowFeedbackAfterCollect: boolean,
     displayPrimeDirective: boolean,
-    preventCrossColumnGroups: boolean) => {
+    allowCrossColumnGroups: boolean) => {
     const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
       title,
       maxvotesPerUser,
@@ -741,7 +741,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isBoardAnonymous,
       shouldShowFeedbackAfterCollect,
       displayPrimeDirective,
-      preventCrossColumnGroups);
+      allowCrossColumnGroups);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -900,7 +900,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isBoardAnonymous: boolean,
       shouldShowFeedbackAfterCollect: boolean,
       displayPrimeDirective: boolean,
-      preventCrossColumnGroups: boolean
+      allowCrossColumnGroups: boolean
     ) => void,
     onCancel: () => void) => {
     return (
