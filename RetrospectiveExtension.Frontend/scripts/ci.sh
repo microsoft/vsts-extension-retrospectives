@@ -6,13 +6,13 @@
     cd "$(dirname "$0")/.." || exit
     set -euo pipefail
 
-    npm install
+    npm install --force
     echo "install dependencies"
 
     npm run lint
     echo "eslint passed"
 
-    npm run build:p
+    # npm run build:p
     echo "build passed"
 
     npm run test
