@@ -829,17 +829,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
           <div className="board-metadata-form-section-subheader">
             <Checkbox
-              label="Display user information on feedback cards"
-              ariaLabel="Display user information on feedback cards. This selection cannot be modified after board creation."
-              boxSide="start"
-              defaultChecked={this.state.isBoardAnonymous}
-              disabled={!this.props.isNewBoardCreation}
-              onChange={this.handleIsAnonymousCheckboxChange}
-            />
-          </div>
-
-          <div className="board-metadata-form-section-subheader">
-            <Checkbox
               label="Obscure the feedback of others until after Collect phase"
               ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
               boxSide="start"
@@ -860,6 +849,16 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
             />
           </div>
 
+          <div className="board-metadata-form-section-subheader">
+            <Checkbox
+              label="Make all feedback anonymous"
+              ariaLabel="Make all feedback anonymous. This selection cannot be modified after board creation."
+              boxSide="start"
+              defaultChecked={this.state.isBoardAnonymous}
+              disabled={!this.props.isNewBoardCreation}
+              onChange={this.handleIsAnonymousCheckboxChange}
+            />
+          </div>
           <hr></hr>
           <div className="board-metadata-form-section-subheader">
             <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
