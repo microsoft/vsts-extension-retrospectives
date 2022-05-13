@@ -860,16 +860,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
             />
           </div>
 
-          <div className="board-metadata-form-section-subheader">
-            <Checkbox
-              label="Prevent grouping feedback across columns"
-              ariaLabel="Prevent grouping Feedback Across Columns. This selection cannot be modified after board creation."
-              boxSide="start"
-              defaultChecked={this.state.preventCrossColumnGroups}
-              disabled={!this.props.isNewBoardCreation}
-              onChange={this.handlePreventCrossColumnGroups}
-            />
-          </div>
           <hr></hr>
           <div className="board-metadata-form-section-subheader">
             <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
