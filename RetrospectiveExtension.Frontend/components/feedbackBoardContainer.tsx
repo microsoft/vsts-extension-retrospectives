@@ -763,8 +763,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private showRetroSummaryDialog = (): void => {
     // TODO (enpolat) : go and fetch the current data from the custom data store for all of the users team effectiveness measurement answers
     const measurements: { id: number, selected: number }[] = [];
-    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
-      vote.responses.forEach(response => {
+    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.forEach(vote => {
+      vote?.responses?.forEach(response => {
         measurements.push({ id: response.questionId, selected: response.selection });
       });
     });
@@ -781,7 +781,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       chartData.push({ questionId: (e+1), red: 0, yellow: 0, green: 0 });
     });
 
-    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
+    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.forEach(vote => {
       [...Array(5).keys()].forEach(e => {
         const selection = vote.responses.find(response => response.questionId === (e+1))?.selection;
         const data = chartData.find(d => d.questionId === (e+1));
