@@ -95,7 +95,7 @@
       "./components/__tests__/setupTests.tsx"
     ],
     "transform": {
-      "^.+\\.(js|ts|tsx|jsx)$": "ts-jest"
+      ".+\\.(js|ts|tsx|jsx)$": "ts-jest"
     },
     "transformIgnorePatterns": [
       "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)"
@@ -105,7 +105,7 @@
     ],
     "moduleNameMapper": {
       "office-ui-fabric-react/lib/(.*)$": "office-ui-fabric-react/lib-commonjs/$1",
-      "^.+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx"
+      ".+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx"
     },
     "preset": "ts-jest/presets/js-with-babel",
     "resetMocks": true,
