@@ -258,6 +258,10 @@ paket-files/
 # MacOS
 .DS_Store
 
+# frontend files
+vss-extension-dev.json
+bundle.css
+
 # Backend config files
 .env
 allowed_origins.json
