@@ -29,8 +29,7 @@ interface IFeedbackBoardMetadataFormProps {
     isIncludeTeamEffectivenessMeasurement: boolean,
     isBoardAnonymous: boolean,
     shouldShowFeedbackAfterCollect: boolean,
-    displayPrimeDirective: boolean,
-    preventCrossColumnGroups: boolean) => void;
+    displayPrimeDirective: boolean) => void;
   onFormCancel: () => void;
 }
 
@@ -50,7 +49,6 @@ interface IFeedbackBoardMetadataFormState {
   columnCardBeingEdited: IFeedbackColumnCard;
   selectedIconKey: string;
   selectedAccentColorKey: string;
-  preventCrossColumnGroups: boolean;
 }
 
 interface IFeedbackColumnCard {
@@ -104,7 +102,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       selectedIconKey: undefined,
       displayPrimeDirective: !this.props.isNewBoardCreation && this.props.currentBoard.displayPrimeDirective,
       shouldShowFeedbackAfterCollect: !this.props.isNewBoardCreation && this.props.currentBoard.shouldShowFeedbackAfterCollect,
-      preventCrossColumnGroups: !this.props.isNewBoardCreation && this.props.currentBoard.preventCrossColumnGroups,
       title: this.props.initialValue
     };
   }
@@ -145,8 +142,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       this.state.isIncludeTeamEffectivenessMeasurement,
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect,
-      this.state.displayPrimeDirective,
-      this.state.preventCrossColumnGroups
+      this.state.displayPrimeDirective
     );
   }
 
@@ -171,12 +167,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   private handleDisplayPrimeDirectiveChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
     this.setState({
       displayPrimeDirective: checked,
-    });
-  }
-
-  private handlePreventCrossColumnGroups = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
-    this.setState({
-      preventCrossColumnGroups: checked,
     });
   }
 
