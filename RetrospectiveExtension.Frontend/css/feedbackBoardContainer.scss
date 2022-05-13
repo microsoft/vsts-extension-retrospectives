@@ -19,6 +19,11 @@ $team_selector_list_item_width: 450px;
 .retrospectives-board-metadata-dialog {
   width: 500px;
   max-width: 500px;
+  max-height: 100%;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  position: absolute;
 }
 
 .feedback-board-container-header-spacer {
@@ -301,7 +306,6 @@ $team_selector_list_item_width: 450px;
       &.active {
         color: var(--status-info-foreground);
         font-weight: bold;
-        background-color: #c9c9c9;
 
         &::before {
           background-color: transparent;
