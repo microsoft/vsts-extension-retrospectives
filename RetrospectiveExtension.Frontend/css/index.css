@@ -12,3 +12,7 @@
   background-color: rgb(0, 120, 212);;
   color: #fff;
 }
+
+.ms-Button--default {
+  background-color: #fff;
+}
