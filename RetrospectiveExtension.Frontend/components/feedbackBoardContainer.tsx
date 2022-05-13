@@ -1563,8 +1563,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     </div>
                   )}
                 </>
-                : <div>Assessment is anonymous</div>}
-              {this.state.currentBoard.isAnonymous && <div>Retrospective was Anonymous</div>}
+                : <div>User information for team assessment answers always stored anonymously</div>}
             </>
           }
         </Dialog>
