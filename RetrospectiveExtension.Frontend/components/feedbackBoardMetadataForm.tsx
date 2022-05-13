@@ -522,7 +522,139 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 accentColor: '#0078d4',
                 iconClass: 'fas fa-exclamation',
                 id: uuid(),
-                title: 'Specific Actions',
+                title: 'Specific actions',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'clarity':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'What provides clarity',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'What hinders clarity',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-exclamation',
+                id: uuid(),
+                title: 'Specific actions',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'energy':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'What provides energy',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'What drains energy',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-exclamation',
+                id: uuid(),
+                title: 'Specific actions',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'wlb':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'What helps work-life balance',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'What hinders work-life balance',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-exclamation',
+                id: uuid(),
+                title: 'Specific actions',
+              },
+              markedForDeletion: false,
+            },
+          ]
+        });
+        break;
+      case 'team-confidence':
+        this.setState({
+          columnCards: [
+            {
+              column: {
+                accentColor: '#008000',
+                iconClass: 'far fa-smile',
+                id: uuid(),
+                title: 'What increases confidence in team',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#cc293d',
+                iconClass: 'far fa-frown',
+                id: uuid(),
+                title: 'What decreases confidence in team',
+              },
+              markedForDeletion: false,
+            },
+            {
+              column: {
+                accentColor: '#0078d4',
+                iconClass: 'fas fa-exclamation',
+                id: uuid(),
+                title: 'Specific actions',
               },
               markedForDeletion: false,
             },
