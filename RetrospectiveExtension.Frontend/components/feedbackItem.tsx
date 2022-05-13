@@ -226,10 +226,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const droppedItemProps = await itemDataService.getFeedbackItem(this.props.boardId, droppedItemId);
 
     const boardItem: IFeedbackBoardDocument = await itemDataService.getBoardItem(this.props.team.id, this.props.boardId);
-    const allowCrossColumnGroups = boardItem.allowCrossColumnGroups;
+    const preventCrossColumnGroups = boardItem.preventCrossColumnGroups;
 
     if (this.props.id !== droppedItemId) {
-      if (allowCrossColumnGroups || this.props.columnId === droppedItemProps.originalColumnId) {
+      if (!preventCrossColumnGroups || this.props.columnId === droppedItemProps.originalColumnId) {
         FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(this.props, droppedItemId, this.props.id);
       }
     }

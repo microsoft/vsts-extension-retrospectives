@@ -150,7 +150,7 @@ export const testColumnProps = mocked({
   isBoardAnonymous: false,
   shouldFocusOnCreateFeedback: false,
   hideFeedbackItems: false,
-  allowCrossColumnGroups: true,
+  preventCrossColumnGroups: false,
   groupTitles: ['example one', 'example two'],
   isFocusModalHidden: false,
   onVoteCasted: jest.fn(() => { }),
