@@ -191,7 +191,7 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
               onClick={() => {
                 this.chooseItem(item);
               }}
-              onKeyDown={(e) => this.handleKeyPressTeamList(e, item)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.handleKeyPressTeamList(e, item)}
               tabIndex={0}
               aria-label={ariaLabel}>
               <i className={"fas fa-" + this.props.iconName}></i>
