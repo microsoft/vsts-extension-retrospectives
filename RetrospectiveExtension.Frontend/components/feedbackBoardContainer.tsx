@@ -1120,7 +1120,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         </div>
         <div className="pivot-container">
           <Pivot>
-            <PivotItem headerText="Retrospectives">
+            <PivotItem headerText="Board">
               {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible &&
                 <div className="pivot-content-wrapper">
                   <div className="feedback-board-container-header">
