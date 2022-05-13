@@ -170,7 +170,7 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
           tabIndex={0}
           role="button"
           aria-label={`${this.props.actionItem.fields['System.WorkItemType']} ${this.props.actionItem.fields['System.Title']}, click to open work item`}
-          onKeyPress={(e) => {
+          onKeyPress={(e: React.KeyboardEvent<HTMLDivElement>) => {
             if (e.key === 'Enter') {
               this.showWorkItemForm(e);
             }
