@@ -939,98 +939,102 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   'marked-for-deletion': columnCard.markedForDeletion,
                 })}
                 type={DocumentCardType.compact}>
-                <DefaultButton
-                  className="feedback-column-card-icon-button"
-                  ariaLabel="Change column icon"
-                  disabled={columnCard.markedForDeletion}
-                  onClick={
-                    () => {
+                <div className="flex grow items-center">
+                  <DefaultButton
+                    className="feedback-column-card-icon-button"
+                    ariaLabel="Change column icon"
+                    disabled={columnCard.markedForDeletion}
+                    onClick={
+                      () => {
+                        this.setState({
+                          columnCardBeingEdited: columnCard,
+                          isChooseColumnIconDialogHidden: false,
+                        });
+                      }}>
+                    <i className={classNames('feedback-column-card-icon', columnCard.column.iconClass)} />
+                  </DefaultButton>
+                  <DefaultButton
+                    className="feedback-column-card-accent-color-button"
+                    ariaLabel="Change column color"
+                    disabled={columnCard.markedForDeletion}
+                    onClick={
+                      () => {
+                        this.setState({
+                          columnCardBeingEdited: columnCard,
+                          isChooseColumnAccentColorDialogHidden: false,
+                        });
+                      }}>
+                    <i className={classNames('feedback-column-card-accent-color', 'fas fa-square')}
+                      style={{ color: columnCard.column.accentColor }}
+                    />
+                  </DefaultButton>
+                  <EditableDocumentCardTitle
+                    isDisabled={columnCard.markedForDeletion}
+                    isMultiline={false}
+                    maxLength={25}
+                    title={columnCard.column.title}
+                    isChangeEventRequired={true}
+                    onSave={(newText: string) => {
+                      columnCard.column.title = newText
                       this.setState({
-                        columnCardBeingEdited: columnCard,
-                        isChooseColumnIconDialogHidden: false,
+                        columnCards: [].concat(this.state.columnCards),
                       });
-                    }}>
-                  <i className={classNames('feedback-column-card-icon', columnCard.column.iconClass)} />
-                </DefaultButton>
-                <DefaultButton
-                  className="feedback-column-card-accent-color-button"
-                  ariaLabel="Change column color"
-                  disabled={columnCard.markedForDeletion}
-                  onClick={
-                    () => {
-                      this.setState({
-                        columnCardBeingEdited: columnCard,
-                        isChooseColumnAccentColorDialogHidden: false,
-                      });
-                    }}>
-                  <i className={classNames('feedback-column-card-accent-color', 'fas fa-square')}
-                    style={{ color: columnCard.column.accentColor }}
-                  />
-                </DefaultButton>
-                <EditableDocumentCardTitle
-                  isDisabled={columnCard.markedForDeletion}
-                  isMultiline={false}
-                  maxLength={25}
-                  title={columnCard.column.title}
-                  isChangeEventRequired={true}
-                  onSave={(newText: string) => {
-                    columnCard.column.title = newText
-                    this.setState({
-                      columnCards: [].concat(this.state.columnCards),
-                    });
-                  }} />
-                <IconButton
-                  className="feedback-column-card-move-up-button"
-                  iconProps={{ iconName: 'Up' }}
-                  title="Move Up"
-                  ariaLabel="Move Up"
-                  disabled={columnCard.markedForDeletion || index === 0}
-                  onClick={() => {
-                    const newColumns = [].concat(this.state.columnCards);
-                    [newColumns[index], newColumns[index - 1]] = [newColumns[index - 1], newColumns[index]];
-                    this.setState({
-                      columnCards: newColumns,
-                    });
-                  }} />
-                <IconButton
-                  className="feedback-column-card-move-down-button"
-                  iconProps={{ iconName: 'Down' }}
-                  title="Move Down"
-                  ariaLabel="Move Down"
-                  disabled={columnCard.markedForDeletion || index === this.state.columnCards.length - 1}
-                  onClick={() => {
-                    const newColumns = [].concat(this.state.columnCards);
-                    [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
-                    this.setState({
-                      columnCards: newColumns,
-                    });
-                  }} />
-                {!columnCard.markedForDeletion &&
+                    }} />
+                </div>
+                <div className="flex flex-none items-center">
                   <IconButton
-                    className="feedback-column-card-delete-button"
-                    iconProps={{ iconName: 'Delete' }} title="Delete" ariaLabel="Delete"
-                    disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length <= 1}
+                    className="feedback-column-card-move-up-button"
+                    iconProps={{ iconName: 'Up' }}
+                    title="Move Up"
+                    ariaLabel="Move Up"
+                    disabled={columnCard.markedForDeletion || index === 0}
                     onClick={() => {
                       const newColumns = [].concat(this.state.columnCards);
-                      newColumns[index].markedForDeletion = true;
+                      [newColumns[index], newColumns[index - 1]] = [newColumns[index - 1], newColumns[index]];
                       this.setState({
                         columnCards: newColumns,
                       });
-                    }}
-                  />}
-                {columnCard.markedForDeletion &&
+                    }} />
                   <IconButton
-                    className="feedback-column-card-undelete-button"
-                    iconProps={{ iconName: 'Undo' }} title="Undo Delete" ariaLabel="Undo Delete"
-                    disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length >= this.maxColumnCount}
+                    className="feedback-column-card-move-down-button"
+                    iconProps={{ iconName: 'Down' }}
+                    title="Move Down"
+                    ariaLabel="Move Down"
+                    disabled={columnCard.markedForDeletion || index === this.state.columnCards.length - 1}
                     onClick={() => {
                       const newColumns = [].concat(this.state.columnCards);
-                      newColumns[index].markedForDeletion = false;
+                      [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
                       this.setState({
                         columnCards: newColumns,
                       });
-                    }}
-                  />}
+                    }} />
+                  {!columnCard.markedForDeletion &&
+                    <IconButton
+                      className="feedback-column-card-delete-button"
+                      iconProps={{ iconName: 'Delete' }} title="Delete" ariaLabel="Delete"
+                      disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length <= 1}
+                      onClick={() => {
+                        const newColumns = [].concat(this.state.columnCards);
+                        newColumns[index].markedForDeletion = true;
+                        this.setState({
+                          columnCards: newColumns,
+                        });
+                      }}
+                    />}
+                  {columnCard.markedForDeletion &&
+                    <IconButton
+                      className="feedback-column-card-undelete-button"
+                      iconProps={{ iconName: 'Undo' }} title="Undo Delete" ariaLabel="Undo Delete"
+                      disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length >= this.maxColumnCount}
+                      onClick={() => {
+                        const newColumns = [].concat(this.state.columnCards);
+                        newColumns[index].markedForDeletion = false;
+                        this.setState({
+                          columnCards: newColumns,
+                        });
+                      }}
+                    />}
+                </div>
               </DocumentCard>);
             }} />
           <div className="create-feedback-column-card-button-wrapper">
