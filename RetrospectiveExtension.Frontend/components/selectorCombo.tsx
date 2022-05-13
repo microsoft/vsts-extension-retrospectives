@@ -185,9 +185,7 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
         onRenderCell={(item: T, itemIndex: number) => {
           const itemName: string = this.props.nameGetter(item);
           const itemPosition: number = itemIndex + 1;
-          const ariaLabel: string = header.isHidden
-            ? this.props.title + ' ' + itemPosition + ' of ' + items.length + '. ' + itemName
-            : header.title + ' collection. ' + this.props.title + ' ' + itemPosition + ' of ' + items.length + '. ' + itemName;
+          const ariaLabel: string = header.isHidden ? this.props.title + ' ' + itemPosition + ' of ' + items.length + '. ' + itemName : header.title + ' collection. ' + this.props.title + ' ' + itemPosition + ' of ' + items.length + '. ' + itemName;
           return (
             <div className="selector-list-item"
               onClick={() => {
