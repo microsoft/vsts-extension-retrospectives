@@ -26,9 +26,9 @@
   "author": "Microsoft",
   "license": "ISC",
   "dependencies": {
-    "@aspnet/signalr": "1.1.4",
     "@microsoft/applicationinsights-react-js": "3.3.3",
     "@microsoft/applicationinsights-web": "2.8.3",
+    "@microsoft/signalr": "6.0.5",
     "azure-devops-extension-api": "1.158.0",
     "azure-devops-extension-sdk": "2.0.11",
     "babel-jest": "28.1.0",
