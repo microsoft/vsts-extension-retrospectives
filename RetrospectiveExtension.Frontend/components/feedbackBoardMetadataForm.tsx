@@ -30,7 +30,7 @@ interface IFeedbackBoardMetadataFormProps {
     isBoardAnonymous: boolean,
     shouldShowFeedbackAfterCollect: boolean,
     displayPrimeDirective: boolean,
-    allowCrossColumnGroups: boolean) => void;
+    preventCrossColumnGroups: boolean) => void;
   onFormCancel: () => void;
 }
 
@@ -50,7 +50,7 @@ interface IFeedbackBoardMetadataFormState {
   columnCardBeingEdited: IFeedbackColumnCard;
   selectedIconKey: string;
   selectedAccentColorKey: string;
-  allowCrossColumnGroups: boolean;
+  preventCrossColumnGroups: boolean;
 }
 
 interface IFeedbackColumnCard {
@@ -108,8 +108,8 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         this.props.currentBoard.displayPrimeDirective,
       shouldShowFeedbackAfterCollect: !this.props.isNewBoardCreation &&
         this.props.currentBoard.shouldShowFeedbackAfterCollect,
-      allowCrossColumnGroups: !this.props.isNewBoardCreation &&
-        this.props.currentBoard.allowCrossColumnGroups,
+      preventCrossColumnGroups: !this.props.isNewBoardCreation &&
+        this.props.currentBoard.preventCrossColumnGroups,
       title: this.props.initialValue
     };
   }
@@ -151,7 +151,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect,
       this.state.displayPrimeDirective,
-      this.state.allowCrossColumnGroups
+      this.state.preventCrossColumnGroups
     );
   }
 
@@ -179,9 +179,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     });
   }
 
-  private handleAllowCrossColumnGroups = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+  private handlePreventCrossColumnGroups = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
     this.setState({
-      allowCrossColumnGroups: checked,
+      preventCrossColumnGroups: checked,
     });
   }
 
@@ -740,12 +740,12 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
           <div className="board-metadata-form-section-subheader">
             <Checkbox
-              label="Group feedback across columns"
-              ariaLabel="Group Feedback Across Columns. This selection cannot be modified after board creation."
+              label="Prevent grouping feedback across columns"
+              ariaLabel="Prevent grouping Feedback Across Columns. This selection cannot be modified after board creation."
               boxSide="start"
-              defaultChecked={this.state.allowCrossColumnGroups}
+              defaultChecked={this.state.preventCrossColumnGroups}
               disabled={!this.props.isNewBoardCreation}
-              onChange={this.handleAllowCrossColumnGroups}
+              onChange={this.handlePreventCrossColumnGroups}
             />
           </div>
           <hr></hr>

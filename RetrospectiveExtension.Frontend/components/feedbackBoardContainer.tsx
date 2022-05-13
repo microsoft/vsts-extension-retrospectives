@@ -81,9 +81,9 @@ export interface FeedbackBoardContainerState {
   isDropIssueInEdgeMessageBarVisible: boolean;
   isDesktop: boolean;
   isAutoResizeEnabled: boolean;
-  allowCrossColumnGroups: boolean;
+  preventCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
-  contributors: {id: string, name: string, imageUrl: string}[];
+  contributors: { id: string, name: string, imageUrl: string }[];
   effectivenessMeasurementSummary: { questionId: string, question: string, average: number }[];
   effectivenessMeasurementChartData: { questionId: string, red: number, yellow: number, green: number }[];
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
@@ -97,7 +97,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     super(props);
     this.state = {
       allWorkItemTypes: [],
-      allowCrossColumnGroups: false,
+      preventCrossColumnGroups: false,
       boards: [],
       currentUserId: getUserIdentity().id,
       currentBoard: undefined,
@@ -732,7 +732,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     isBoardAnonymous: boolean,
     shouldShowFeedbackAfterCollect: boolean,
     displayPrimeDirective: boolean,
-    allowCrossColumnGroups: boolean) => {
+    preventCrossColumnGroups: boolean) => {
     const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
       title,
       maxvotesPerUser,
@@ -741,7 +741,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isBoardAnonymous,
       shouldShowFeedbackAfterCollect,
       displayPrimeDirective,
-      allowCrossColumnGroups);
+      preventCrossColumnGroups);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -778,13 +778,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const chartData: { questionId: string, red: number, yellow: number, green: number }[] = [];
 
     [...Array(5).keys()].forEach(e => {
-      chartData.push({ questionId: (e+1).toString(), red: 0, yellow: 0, green: 0 });
+      chartData.push({ questionId: (e + 1).toString(), red: 0, yellow: 0, green: 0 });
     });
 
     this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
       [...Array(5).keys()].forEach(e => {
-        const selection = vote.responses.find(response => response.questionId.toString() === (e+1).toString())?.selection;
-        const data = chartData.find(d => d.questionId === (e+1).toString());
+        const selection = vote.responses.find(response => response.questionId.toString() === (e + 1).toString())?.selection;
+        const data = chartData.find(d => d.questionId === (e + 1).toString());
         if (selection <= 6) {
           data.red++;
         } else if (selection <= 8) {
@@ -900,7 +900,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isBoardAnonymous: boolean,
       shouldShowFeedbackAfterCollect: boolean,
       displayPrimeDirective: boolean,
-      allowCrossColumnGroups: boolean
+      preventCrossColumnGroups: boolean
     ) => void,
     onCancel: () => void) => {
     return (
@@ -1225,7 +1225,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                 </thead>
                                 <tbody>
                                   {[...Array(5).keys()].map(e => {
-                                    const questionId = (e+1);
+                                    const questionId = (e + 1);
                                     return (
                                       <EffectivenessMeasurementRow
                                         questionId={questionId}
@@ -1504,32 +1504,34 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <div>{this.state.actionItemIds.length} action items created</div>
               <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
               <div>
-              Effectiveness Scores ({ this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length } people responded)<br />
+                Effectiveness Scores ({this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length} people responded)<br />
                 <div className="retro-summary-effectiveness-scores">
                   <ul className="chart">
-                  { this.state.effectivenessMeasurementChartData.map((data, index) => { return (
-                      <li key={index}>
-                        <div style={{ width: "200px", color: "#000", textAlign: "end" }}>
-                          { getQuestionShortName(data.questionId) }
-                        </div>
-                        { data.red > 0 &&
-                        <div style={{ backgroundColor: "#d6201f", width: `${((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
-                          {((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
-                        </div>
-                        }
-                        { data.yellow > 0 &&
-                        <div style={{ backgroundColor: "#ffd302", width: `${((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
-                          {((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
-                        </div>
-                        }
-                        { data.green > 0 &&
-                        <div style={{ backgroundColor: "#006b3d", width: `${((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
-                          {((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
-                        </div>
-                        }
-                      </li>
-                    )})
-                  }
+                    {this.state.effectivenessMeasurementChartData.map((data, index) => {
+                      return (
+                        <li key={index}>
+                          <div style={{ width: "200px", color: "#000", textAlign: "end" }}>
+                            {getQuestionShortName(data.questionId)}
+                          </div>
+                          {data.red > 0 &&
+                            <div style={{ backgroundColor: "#d6201f", width: `${((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                              {((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                            </div>
+                          }
+                          {data.yellow > 0 &&
+                            <div style={{ backgroundColor: "#ffd302", width: `${((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                              {((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                            </div>
+                          }
+                          {data.green > 0 &&
+                            <div style={{ backgroundColor: "#006b3d", width: `${((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                              {((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                            </div>
+                          }
+                        </li>
+                      )
+                    })
+                    }
                   </ul>
                   <div className="legend">
                     <span>Favorability</span>
@@ -1551,10 +1553,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 </div>
                 <a onClick={() => { this.setState({ teamEffectivenessMeasurementAverageVisibilityClassName: this.state.teamEffectivenessMeasurementAverageVisibilityClassName === "visible" ? "hidden" : "visible" }) }}>Show average points for each question:</a>
                 <div className={this.state.teamEffectivenessMeasurementAverageVisibilityClassName}>
-                { this.state.effectivenessMeasurementSummary.map((measurement, index) => {
+                  {this.state.effectivenessMeasurementSummary.map((measurement, index) => {
                     return <div key={index}><strong>{getQuestionShortName(measurement.questionId)}</strong> - {measurement.question}: {measurement.average}</div>
                   })
-                }
+                  }
                 </div>
               </div>
               {!this.state.currentBoard.isAnonymous ?

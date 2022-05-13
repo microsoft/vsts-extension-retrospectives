@@ -125,7 +125,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     const boardItem = await itemDataService.getBoardItem(this.props.team.id, this.props.boardId);
 
     // only drop into another column if that's allowed
-    if (boardItem.allowCrossColumnGroups) {
+    if (!boardItem.preventCrossColumnGroups) {
       await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
     }
   }
