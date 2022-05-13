@@ -822,14 +822,19 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           </div>
           <hr></hr>
           <div className="board-metadata-form-section-subheader">
-            <Checkbox
-              label="Include Team Effectiveness Measurement"
-              ariaLabel="Include Team Effectiveness Measurement. This selection cannot be modified after board creation."
-              boxSide="start"
-              defaultChecked={this.state.isIncludeTeamEffectivenessMeasurement}
-              disabled={!this.props.isNewBoardCreation}
-              onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
-            />
+          <div className="flex flex-col">
+              <Checkbox
+                label="Include Team Assessment"
+                ariaLabel="Include Team Assessment. This selection cannot be modified after board creation."
+                boxSide="start"
+                defaultChecked={this.state.isIncludeTeamEffectivenessMeasurement}
+                disabled={!this.props.isNewBoardCreation}
+                onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
+              />
+              <div>
+                Note: All user information for assessment answers is always stored anonymously.
+              </div>
+            </div>
           </div>
 
           <div className="board-metadata-form-section-subheader">
