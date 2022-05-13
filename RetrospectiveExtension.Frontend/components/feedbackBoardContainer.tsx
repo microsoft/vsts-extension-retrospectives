@@ -769,22 +769,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     });
 
-    const average: { questionId: string, question: string, average: number }[] = [];
+    const average: { questionId: number, question: string, average: number }[] = [];
 
     [...new Set(measurements.map(item => item.id))].forEach(e => {
-      average.push({ questionId: e.toString(), question: getQuestionName(e.toString()), average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
+      average.push({ questionId: e, question: getQuestionName(e), average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
     });
 
-    const chartData: { questionId: string, red: number, yellow: number, green: number }[] = [];
+    const chartData: { questionId: number, red: number, yellow: number, green: number }[] = [];
 
     [...Array(5).keys()].forEach(e => {
-      chartData.push({ questionId: (e + 1).toString(), red: 0, yellow: 0, green: 0 });
+      chartData.push({ questionId: (e+1), red: 0, yellow: 0, green: 0 });
     });
 
     this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.forEach(vote => {
       [...Array(5).keys()].forEach(e => {
-        const selection = vote.responses.find(response => response.questionId.toString() === (e + 1).toString())?.selection;
-        const data = chartData.find(d => d.questionId === (e + 1).toString());
+        const selection = vote.responses.find(response => response.questionId === (e+1))?.selection;
+        const data = chartData.find(d => d.questionId === (e+1));
         if (selection <= 6) {
           data.red++;
         } else if (selection <= 8) {
