@@ -25,16 +25,17 @@ $feedback_column_card_height: 60px;
     display: flex;
   }
 
+  .board-metadata-form-anonymous-feedback-section {
+    margin: 20px 40px;
+  }
+
   .board-metadata-form-section-header {
-    padding-bottom: 10px;
+    padding: 5px 10px;
     font-size: 16px;
     font-weight: 500;
-    width: 97%;
     margin: 0px;
-    padding-right: 10px;
     background-color: #0078d483;
     text-align: right;
-
 
     &.bottom-padding-zero {
       padding-bottom: 0;
