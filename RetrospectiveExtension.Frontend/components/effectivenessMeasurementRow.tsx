@@ -6,8 +6,6 @@ import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 
 import { ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface EffectivenessMeasurementRowProps {
   title: string;
@@ -23,7 +21,7 @@ export interface EffectivenessMeasurementRowState {
   selected: number;
 }
 
- class EffectivenessMeasurementRow extends React.Component<EffectivenessMeasurementRowProps, EffectivenessMeasurementRowState> {
+export default class EffectivenessMeasurementRow extends React.Component<EffectivenessMeasurementRowProps, EffectivenessMeasurementRowState> {
   constructor(props: EffectivenessMeasurementRowProps) {
     super(props);
     const currentUserId = getUserIdentity().id;
@@ -139,5 +137,3 @@ export interface EffectivenessMeasurementRowState {
     );
   }
 }
-
-export default withAITracking(reactPlugin, EffectivenessMeasurementRow);
