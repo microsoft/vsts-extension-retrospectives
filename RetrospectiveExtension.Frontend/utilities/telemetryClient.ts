@@ -1,6 +1,6 @@
 import { ReactPlugin } from '@microsoft/applicationinsights-react-js';
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
-import { config as environment } from '../../config/config';
+import { config as environment } from '../config/config';
 
 const reactPlugin = new ReactPlugin();
 const appInsights = new ApplicationInsights({
