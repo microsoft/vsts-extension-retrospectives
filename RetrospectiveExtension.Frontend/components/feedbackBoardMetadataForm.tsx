@@ -92,10 +92,8 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
             markedForDeletion: false,
           };
         }),
-      isIncludeTeamEffectivenessMeasurement: !this.props.isNewBoardCreation &&
-        this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
-      isBoardAnonymous: !this.props.isNewBoardCreation &&
-        this.props.currentBoard.isAnonymous,
+      isIncludeTeamEffectivenessMeasurement: !this.props.isNewBoardCreation && this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
+      isBoardAnonymous: !this.props.isNewBoardCreation && this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,
       isBoardNameTaken: false,
       isChooseColumnAccentColorDialogHidden: true,
@@ -104,12 +102,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       placeholderText: this.props.placeholderText,
       selectedAccentColorKey: undefined,
       selectedIconKey: undefined,
-      displayPrimeDirective: !this.props.isNewBoardCreation &&
-        this.props.currentBoard.displayPrimeDirective,
-      shouldShowFeedbackAfterCollect: !this.props.isNewBoardCreation &&
-        this.props.currentBoard.shouldShowFeedbackAfterCollect,
-      preventCrossColumnGroups: !this.props.isNewBoardCreation &&
-        this.props.currentBoard.preventCrossColumnGroups,
+      displayPrimeDirective: !this.props.isNewBoardCreation && this.props.currentBoard.displayPrimeDirective,
+      shouldShowFeedbackAfterCollect: !this.props.isNewBoardCreation && this.props.currentBoard.shouldShowFeedbackAfterCollect,
+      preventCrossColumnGroups: !this.props.isNewBoardCreation && this.props.currentBoard.preventCrossColumnGroups,
       title: this.props.initialValue
     };
   }
