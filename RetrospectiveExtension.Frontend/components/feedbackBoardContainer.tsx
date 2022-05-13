@@ -1551,7 +1551,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     </div>
                   </div>
                 </div>
-                <a onClick={() => { this.setState({ teamEffectivenessMeasurementAverageVisibilityClassName: this.state.teamEffectivenessMeasurementAverageVisibilityClassName === "visible" ? "hidden" : "visible" }) }}>Show average points for each question:</a>
+                <a href="#" onClick={(e) => { e.preventDefault(); this.setState({ teamEffectivenessMeasurementAverageVisibilityClassName: this.state.teamEffectivenessMeasurementAverageVisibilityClassName === "visible" ? "hidden" : "visible" }) }}>Show average points for each question:</a>
                 <div className={this.state.teamEffectivenessMeasurementAverageVisibilityClassName}>
                   {this.state.effectivenessMeasurementSummary.map((measurement, index) => {
                     return <div key={index}><strong>{getQuestionShortName(measurement.questionId)}</strong> - {measurement.question}: {measurement.average}</div>
