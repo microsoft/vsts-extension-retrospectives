@@ -1224,15 +1224,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {[...Array(5).keys()].map(e => {
-                                    const questionId = (e + 1);
+                                  {questions.map(question => {
                                     return (
                                       <EffectivenessMeasurementRow
-                                        questionId={questionId}
+                                        key={question.id}
+                                        questionId={question.id}
                                         votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection}
-                                        onSelectedChange={selected => effectivenessMeasurementSelectionChanged(questionId, selected)}
-                                        title={`${getQuestionShortName(questionId.toString())} - ${getQuestionName(questionId.toString())}`}
-                                        tooltip={<>{getQuestionTooltip(questionId.toString())}</>}
+                                        onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)}
+                                        title={`${getQuestionShortName(question.id)} - ${getQuestionName(question.id)}`}
+                                        tooltip={<>{getQuestionTooltip(question.id)}</>}
                                       />
                                     )
                                   })}
