@@ -1,4 +1,4 @@
-import * as ExtensionDataService from './dataService';
+import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { IFeedbackItemDocument, IFeedbackBoardDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { workItemService } from './azureDevOpsWorkItemService';
@@ -34,7 +34,7 @@ class ItemDataService {
     };
 
     const createdItem: IFeedbackItemDocument =
-      await ExtensionDataService.createDocument<IFeedbackItemDocument>(boardId, feedbackItem);
+      await createDocument<IFeedbackItemDocument>(boardId, feedbackItem);
     createdItem.voteCollection = {};
 
     return createdItem;
@@ -45,7 +45,7 @@ class ItemDataService {
    */
   public getFeedbackItem = async (boardId: string, feedbackItemId: string): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument =
-      await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
+      await readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
     return feedbackItem;
   }
 
@@ -54,7 +54,7 @@ class ItemDataService {
    */
   public getBoardItem = async (teamId: string, boardId: string): Promise<IFeedbackBoardDocument> => {
     // Can we get it this way? [const boardItem:  IFeedbackBoardDocument = await boardDataService.getBoardForTeamById(VSS.getWebContext().team.id, boardId);]
-    return await ExtensionDataService.readDocument<IFeedbackBoardDocument>(teamId, boardId);
+    return await readDocument<IFeedbackBoardDocument>(teamId, boardId);
   }
 
   /**
@@ -64,7 +64,7 @@ class ItemDataService {
     let feedbackItems: IFeedbackItemDocument[] = [];
 
     try {
-      feedbackItems = await ExtensionDataService.readDocuments<IFeedbackItemDocument>(boardId, false, true);
+      feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
@@ -92,7 +92,7 @@ class ItemDataService {
     let updatedParentFeedbackItem: IFeedbackItemDocument = null;
     let updatedChildFeedbackItems: IFeedbackItemDocument[] = [];
 
-    const feedbackItem: IFeedbackItemDocument = await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
+    const feedbackItem: IFeedbackItemDocument = await readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
     if (feedbackItem && feedbackItem.upvotes > 0) {
       console.log(`Cannot delete a feedback item which has upvotes. Board: ${boardId} Item: ${feedbackItemId}`);
       return undefined;
@@ -104,7 +104,7 @@ class ItemDataService {
     }
 
     if (feedbackItem.parentFeedbackItemId) {
-      const parentFeedbackItem: IFeedbackItemDocument = await ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, feedbackItem.parentFeedbackItemId);
+      const parentFeedbackItem: IFeedbackItemDocument = await readDocument<IFeedbackItemDocument>(boardId, feedbackItem.parentFeedbackItemId);
 
       parentFeedbackItem.childFeedbackItemIds = parentFeedbackItem.childFeedbackItemIds.filter(id => id !== feedbackItemId);
 
@@ -112,7 +112,7 @@ class ItemDataService {
     }
     else if (feedbackItem.childFeedbackItemIds) {
       const childFeedbackItemPromises = feedbackItem.childFeedbackItemIds.map((childFeedbackItemId) => {
-        return ExtensionDataService.readDocument<IFeedbackItemDocument>(boardId, childFeedbackItemId);
+        return readDocument<IFeedbackItemDocument>(boardId, childFeedbackItemId);
       });
 
       const updatedChildFeedbackItemPromises = await Promise.all(childFeedbackItemPromises).then((childFeedbackItems) => {
@@ -127,7 +127,7 @@ class ItemDataService {
       });
     }
 
-    await ExtensionDataService.deleteDocument(boardId, feedbackItemId);
+    await deleteDocument(boardId, feedbackItemId);
 
     return {
       updatedParentFeedbackItem,
@@ -139,7 +139,7 @@ class ItemDataService {
    * Update the feedback item.
    */
   private updateFeedbackItem = async (boardId: string, feedbackItem: IFeedbackItemDocument): Promise<IFeedbackItemDocument> => {
-    const updatedFeedbackItem: IFeedbackItemDocument = await ExtensionDataService.updateDocument<IFeedbackItemDocument>(boardId, feedbackItem);
+    const updatedFeedbackItem: IFeedbackItemDocument = await updateDocument<IFeedbackItemDocument>(boardId, feedbackItem);
     return updatedFeedbackItem;
   }
 
@@ -147,7 +147,7 @@ class ItemDataService {
    * Update the board item.
    */
   private updateBoardItem = async (teamId: string, boardItem: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
-    const updatedBoardItem: IFeedbackBoardDocument = await ExtensionDataService.updateDocument<IFeedbackBoardDocument>(teamId, boardItem);
+    const updatedBoardItem: IFeedbackBoardDocument = await updateDocument<IFeedbackBoardDocument>(teamId, boardItem);
     return updatedBoardItem;
   }
 

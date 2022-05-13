@@ -3,7 +3,7 @@ import { getClient } from 'azure-devops-extension-api/Common';
 import { GetProcessExpandLevel } from 'azure-devops-extension-api/WorkItemTrackingProcess';
 import { WorkItemTrackingProcessDefinitionsRestClient } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
 
-import * as ProcessDefinitionsContracts  from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+import { Control, FieldModel, Group, Page, PageType, PickListModel, WorkItemTypeFieldModel } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
 import { retrospectiveWorkItemTypeModel } from '../interfaces/retrospectiveWorkItemType';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { getProjectId } from '../utilities/servicesHelper';
@@ -24,15 +24,15 @@ export class ProcessService {
         }
     }
 
-    public createList = (listModel: ProcessDefinitionsContracts.PickListModel) => {
+    public createList = (listModel: PickListModel) => {
         return this.workItemTrackingProcessDefinitionsHttpClient.createList(listModel);
     }
 
-    public createField = (field: ProcessDefinitionsContracts.FieldModel, processId: string) => {
+    public createField = (field: FieldModel, processId: string) => {
         return this.workItemTrackingProcessDefinitionsHttpClient.createField(field, processId);
     }
 
-    public addFieldToWorkItemType = (field: ProcessDefinitionsContracts.WorkItemTypeFieldModel, processId: string, witRefNameForFields: string) => {
+    public addFieldToWorkItemType = (field: WorkItemTypeFieldModel, processId: string, witRefNameForFields: string) => {
         return this.workItemTrackingProcessDefinitionsHttpClient.addFieldToWorkItemType(field, processId, witRefNameForFields);
     }
 
@@ -56,14 +56,14 @@ export class ProcessService {
         return this.workItemTrackingProcessDefinitionsHttpClient.getWorkItemType(processId, witRefName);
     }
 
-    public getFormLayoutPage = (processId: string, witRefName: string): PromiseLike<ProcessDefinitionsContracts.Page|undefined> => {
+    public getFormLayoutPage = (processId: string, witRefName: string): PromiseLike<Page|undefined> => {
         return this.workItemTrackingProcessDefinitionsHttpClient.getFormLayout(processId, witRefName).then(layout => {
-            return layout.pages.find(page => page.pageType === ProcessDefinitionsContracts.PageType.Custom);
+            return layout.pages.find(page => page.pageType === PageType.Custom);
         });
     }
 
-    public addGroupToPage = (controls: ProcessDefinitionsContracts.Control[], processId: string, witRefName: string, pageId: string, sectionId: string) => {
-        const customRetrospectiveGroup: ProcessDefinitionsContracts.Group = {
+    public addGroupToPage = (controls: Control[], processId: string, witRefName: string, pageId: string, sectionId: string) => {
+        const customRetrospectiveGroup: Group = {
             contribution: null,
             controls: controls,
             height: null,

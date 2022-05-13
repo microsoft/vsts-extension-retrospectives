@@ -1,8 +1,7 @@
-import * as ExtensionDataService from './dataService';
+import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { v4 as uuid } from 'uuid';
 import { WorkflowPhase } from '../interfaces/workItem';
-// TODO (enpolat) : import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 
 class BoardDataService {
@@ -46,7 +45,7 @@ class BoardDataService {
       teamEffectivenessMeasurementVoteCollection: [],
     }
 
-    return await ExtensionDataService.createDocument<IFeedbackBoardDocument>(teamId, board);
+    return await createDocument<IFeedbackBoardDocument>(teamId, board);
   }
 
   public checkIfBoardNameIsTaken = async (teamId: string, boardName: string) => {
@@ -65,7 +64,7 @@ class BoardDataService {
     let teamBoards: IFeedbackBoardDocument[] = [];
 
     try {
-      teamBoards = await ExtensionDataService.readDocuments<IFeedbackBoardDocument>(teamId, false, true);
+      teamBoards = await readDocuments<IFeedbackBoardDocument>(teamId, false, true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
@@ -77,19 +76,19 @@ class BoardDataService {
   }
 
   public getBoardForTeamById = async (teamId: string, boardId: string) => {
-    return await ExtensionDataService.readDocument<IFeedbackBoardDocument>(teamId, boardId);
+    return await readDocument<IFeedbackBoardDocument>(teamId, boardId);
   }
 
   public deleteFeedbackBoard = async (teamId: string, boardId: string) => {
     // Delete all documents in this board's collection.
-    const boardItems = await ExtensionDataService.readDocuments<IFeedbackItemDocument>(boardId);
+    const boardItems = await readDocuments<IFeedbackItemDocument>(boardId);
     if (boardItems && boardItems.length) {
       boardItems.forEach(async (item) => {
-        await ExtensionDataService.deleteDocument(boardId, item.id);
+        await deleteDocument(boardId, item.id);
       });
     }
 
-    await ExtensionDataService.deleteDocument(teamId, boardId);
+    await deleteDocument(teamId, boardId);
   }
 
   public updateBoardMetadata = async (teamId: string, boardId: string, maxvotesPerUser: number, title: string, newColumns: IFeedbackColumn[]): Promise<IFeedbackBoardDocument> => {
@@ -111,7 +110,7 @@ class BoardDataService {
 
   // Update the board document.
   private updateBoard = async (teamId: string, board: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
-    return await ExtensionDataService.updateDocument<IFeedbackBoardDocument>(teamId, board);
+    return await updateDocument<IFeedbackBoardDocument>(teamId, board);
   }
 }
 

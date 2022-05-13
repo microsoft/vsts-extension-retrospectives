@@ -1,6 +1,6 @@
-import * as ProcessDefinitionsContracts from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+import { FieldModel, FieldType, PickListModel, WorkItemTypeClass, WorkItemTypeModel } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
 
-export const feedbackType: ProcessDefinitionsContracts.FieldModel = {
+export const feedbackType: FieldModel = {
     description: 'The type of feedback.',
     id: null,
     name: 'Feedback Type',
@@ -9,18 +9,18 @@ export const feedbackType: ProcessDefinitionsContracts.FieldModel = {
     url: null,
 };
 
-export const upvotes: ProcessDefinitionsContracts.FieldModel = {
+export const upvotes: FieldModel = {
     description: 'Upvote count',
     id: null,
     name: 'Upvotes',
     pickList: null,
-    type: ProcessDefinitionsContracts.FieldType.Integer,
+    type: FieldType.Integer,
     url: null,
 };
 
-export const retrospectiveWorkItemTypeModel: ProcessDefinitionsContracts.WorkItemTypeModel = {
+export const retrospectiveWorkItemTypeModel: WorkItemTypeModel = {
     behaviors: [],
-    class: ProcessDefinitionsContracts.WorkItemTypeClass.Custom,
+    class: WorkItemTypeClass.Custom,
     color: '60af49',
     description: 'Tracks retrospective feedback.',
     icon: 'icon_chat_bubble',
@@ -33,7 +33,7 @@ export const retrospectiveWorkItemTypeModel: ProcessDefinitionsContracts.WorkIte
     url: null,
 };
 
-export const feedbackPickList: ProcessDefinitionsContracts.PickListModel = {
+export const feedbackPickList: PickListModel = {
     id: null,
     isSuggested: false,
     items: [{ value: 'Negative', id: null }, { value: 'Neutral', id: null }, { value: 'Positive', id: null }],
@@ -48,7 +48,7 @@ export enum ExceptionCode {
 }
 
 export interface InitialRetrospectiveState {
-    retrospectiveWorkItemType?: ProcessDefinitionsContracts.WorkItemTypeModel;
+    retrospectiveWorkItemType?: WorkItemTypeModel;
     isInheritedProcess: boolean;
     displayBoard: boolean;
     exceptionCode?: ExceptionCode;
