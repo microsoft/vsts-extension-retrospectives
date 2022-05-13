@@ -1003,7 +1003,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   key={feedbackItemProps.id}
                   className="feedback-item-search-result-item"
                   onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
-                  onKeyDown={(e) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
                   tabIndex={0}
                 >
                   <FeedbackItem {...feedbackItemProps}>
