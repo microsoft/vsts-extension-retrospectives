@@ -84,8 +84,8 @@ export interface FeedbackBoardContainerState {
   preventCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: { id: string, name: string, imageUrl: string }[];
-  effectivenessMeasurementSummary: { questionId: string, question: string, average: number }[];
-  effectivenessMeasurementChartData: { questionId: string, red: number, yellow: number, green: number }[];
+  effectivenessMeasurementSummary: { questionId: number, question: string, average: number }[];
+  effectivenessMeasurementChartData: { questionId: number, red: number, yellow: number, green: number }[];
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   members: TeamMember[];
