@@ -1,6 +1,6 @@
 import { DefaultButton, IButtonProps, ActionButton, Button, BaseButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { Image } from 'office-ui-fabric-react/lib/Image';
-import * as React from 'react';
+import React from 'react';
 import { getService, getUser } from 'azure-devops-extension-sdk';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { PrimaryButton, DefaultButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
 import { Dialog, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { userDataService } from '../dal/userDataService';

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { shallow } from 'enzyme';
 import FeedbackCarousel from '../../components/feedbackCarousel';
 import { testColumnProps } from '../__mocks__/mocked_components/mockedFeedbackColumn';

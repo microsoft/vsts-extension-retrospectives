@@ -1,13 +1,6 @@
+import React from 'react';
 import { DefaultButton, IButtonProps, PrimaryButton, BaseButton, Button } from 'office-ui-fabric-react/lib/Button';
-import {
-  DocumentCard,
-  DocumentCardActions,
-  DocumentCardTitle,
-  DocumentCardType,
-  DocumentCardPreview,
-  IDocumentCardPreviewProps
-} from 'office-ui-fabric-react/lib/DocumentCard';
-import * as React from 'react';
+import { DocumentCard, DocumentCardActions, DocumentCardTitle, DocumentCardType, DocumentCardPreview, IDocumentCardPreviewProps } from 'office-ui-fabric-react/lib/DocumentCard';
 import { getService } from 'azure-devops-extension-sdk';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
