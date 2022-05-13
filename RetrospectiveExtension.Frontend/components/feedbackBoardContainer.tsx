@@ -35,7 +35,7 @@ import { TeamMember } from 'azure-devops-extension-api/WebApi';
 import EffectivenessMeasurementRow from './effectivenessMeasurementRow';
 
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-import { getQuestionName, getQuestionShortName, getQuestionTooltip } from '../utilities/effectivenessMeasurementQuestionHelper';
+import { getQuestionName, getQuestionShortName, getQuestionTooltip, questions } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/external/telemetryClient';
