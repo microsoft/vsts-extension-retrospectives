@@ -268,8 +268,8 @@ allowed_origins.json
 dev_certs.json
 
 # Jest test report
-RetrospectiveExtension.FrontEnd/reports/
-RetrospectiveExtension.FrontEnd/coverage/
+reports
+coverage
 
 # Dotnet test results
 RetrospectiveExtension.Backend.Tests/TestResults
