@@ -1,5 +1,5 @@
-﻿import classNames from 'classnames';
-import * as React from 'react';
+﻿import * as React from 'react';
+import classNames from 'classnames';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/external/telemetryClient';
@@ -25,12 +25,8 @@ export interface IWorkflowStageState {
   }
 
   public render() {
-    const classes = classNames( 'retrospective-workflowState', {
-      active: ( this.props.isActive ),
-    });
-    const ariaLabel = this.props.isActive
-      ? 'Selected ' + this.props.display + ' workflow stage'
-      : 'Not selected ' + this.props.display + ' workflow stage';
+    const classes = classNames( 'retrospective-workflowState', { active: ( this.props.isActive ) });
+    const ariaLabel = this.props.isActive ? 'Selected ' + this.props.display + ' workflow stage' : 'Not selected ' + this.props.display + ' workflow stage';
 
     return (
       <div className={classes}
