@@ -39,6 +39,7 @@ import { getQuestionName, getQuestionShortName, getQuestionTooltip, questions } 
 
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/external/telemetryClient';
+import copyToClipboard from 'copy-to-clipboard';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -880,7 +881,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private copyBoardUrl = async () => {
     const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
-    navigator.clipboard.writeText(boardDeepLinkUrl);
+    copyToClipboard(boardDeepLinkUrl);
   }
 
   private renderBoardUpdateMetadataFormDialog = (
