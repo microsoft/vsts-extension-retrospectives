@@ -821,7 +821,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 disabled={!this.props.isNewBoardCreation}
                 onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
               />
-              <div>
+              <div className="italic text-sm font-thin text-left">
                 Note: All user information for assessment answers is always stored anonymously.
               </div>
             </div>
