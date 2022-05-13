@@ -33,13 +33,13 @@ export interface ISelectorListItemHeader {
   title: string;
 }
 
-export interface ISelectorComboState<T> {
+export interface ISelectorComboState {
   currentFilterText: string;
   isSelectorCalloutVisible: boolean;
   isSelectorDialogHidden: boolean;
 }
 
-export default class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelectorComboState<T>>  {
+class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelectorComboState>  {
   private selectorButton: HTMLElement | null;
 
   constructor(props: ISelectorComboProps<T>) {
@@ -258,11 +258,11 @@ export default class SelectorCombo<T> extends React.Component<ISelectorComboProp
       selectorList.selectorListItems.map(selectorListItem => {
         if (selectorListItem && selectorListItem.items) {
           itemCount += selectorListItem.items.length;
-        } 
+        }
       });
 
       searchResultsAriaLabel = itemCount === 1
-        ? 'Found 1 result.' 
+        ? 'Found 1 result.'
         :'Found ' + itemCount + ' results.';
     }
 
@@ -300,3 +300,5 @@ export default class SelectorCombo<T> extends React.Component<ISelectorComboProp
     });
   }
 }
+
+export default SelectorCombo;

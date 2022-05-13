@@ -1,0 +1,94 @@
+name: 'CI - Frontend'
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+      - 'releases/**'
+  pull_request:
+    branches:
+      - master
+      - dev
+      - 'releases/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Frontend - Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Check out repository
+
+      - uses: actions/setup-node@v2
+        name: Setup node
+        with:
+          node-version: '16'
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            src:
+              - '.github/**'
+              - 'RetrospectiveExtension.Frontend/**'
+
+      - if: steps.changes.outputs.src == 'true'
+        run: |
+          scripts/setup_ci.sh
+          scripts/ci.sh
+        name: Build and Test (CI script)
+        shell: bash
+        working-directory: 'RetrospectiveExtension.Frontend'
+
+      - if: steps.changes.outputs.src == 'true'
+        name: Upload test report
+        uses: dorny/test-reporter@v1.5.0
+        with:
+          name: JEST Tests
+          path: reports/jest-*.xml
+          reporter: jest-junit
+          working-directory: 'RetrospectiveExtension.Frontend'
+
+      - if: steps.changes.outputs.src == 'true'
+        name: Get Coverage for badge
+        working-directory: 'RetrospectiveExtension.Frontend'
+        run: |
+          SUMMARY="$(npm test -- --coverageReporters='text-summary' | tail -2 | head -1)"
+          TOKENS=($SUMMARY)
+          # process.env.COVERAGE = '31.93%';
+          echo "COVERAGE=$(echo ${TOKENS[2]})" >> $GITHUB_ENV
+          # var REF = 'refs/pull/27/merge.json';
+          REF=${{ github.ref }}
+          # console.log('github.ref: ' + REF);
+          echo "github.ref: $REF"
+          # var PATHS = REF.split('/');
+          IFS='/' read -ra PATHS <<< "$REF"
+          # var BRANCH_NAME = PATHS[1] + PATHS[2];
+          BRANCH_NAME="${PATHS[1]}_${PATHS[2]}"
+          # console.log(BRANCH_NAME); // 'pull_27'
+          echo $BRANCH_NAME
+          # process.env.BRANCH = 'pull_27';
+          echo "BRANCH=$(echo ${BRANCH_NAME})" >> $GITHUB_ENV
+
+      - if: steps.changes.outputs.src == 'true'
+        name: Create the Badge
+        uses: schneegans/dynamic-badges-action@v1.0.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: b414faf6b91eaaa6ec7d82882be36935
+          filename: retrotool__${{ env.BRANCH }}.json
+          label: Test Coverage
+          message: ${{ env.COVERAGE }}
+          color: green
+          namedLogo: jest
+
+      # We do not leave a PR Comment when merging since there is no PR,
+      # opened means that the PR is still open and the comment will only be left then
+      - if: (steps.changes.outputs.src == 'true' &&  github.event.action=='opened' )
+        name: Test Coverage PR comment
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: 'Test Coverage! ![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mhassaninmsft/b414faf6b91eaaa6ec7d82882be36935/raw/retrotool__${{ env.BRANCH }}.json)'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

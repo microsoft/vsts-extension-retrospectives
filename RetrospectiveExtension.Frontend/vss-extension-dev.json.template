@@ -6,6 +6,7 @@
   "name": "Retrospectives (Dev)",
   "description": "An Azure DevOps extension for efficient retrospectives.",
   "public": false,
+  "baseUri": "https://localhost:3000",
   "icons": {
     "small": "images/logos/logo_small.png",
     "branding": "images/logos/logo_branding.png",
@@ -70,10 +71,6 @@
   "files": [
     {
       "path": "src",
-      "addressable": true
-    },
-    {
-      "path": "node_modules/vss-web-extension-sdk/lib",
       "addressable": true
     },
     {

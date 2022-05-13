@@ -1,8 +1,9 @@
 import * as SignalR from '@aspnet/signalr';
-import * as jsonwebtoken from 'jsonwebtoken';
-import * as moment from 'moment';
+import moment from 'moment';
+import { getAppToken } from 'azure-devops-extension-sdk';
 
-import Environment from '../config/environment';
+import { config } from '../config/config';
+import { decodeJwt } from '../utilities/tokenHelper';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 
 const enum ReflectBackendSignals {
@@ -23,11 +24,11 @@ const enum ReflectBackendSignals {
 }
 
 class ReflectBackendService {
-  private static signalRHubUrl = new URL('/collaborationUpdates', Environment.CollaborationStateServiceUrl);
+  private static signalRHubUrl = new URL('/collaborationUpdates', config.CollaborationStateServiceUrl);
 
   private _currentBoardId: string;
   private _signalRConnection: SignalR.HubConnection;
-  private _appToken: ISessionToken;
+  private _appToken: string;
   private _tokenExpiry: Date;
   private _connectionAvailable: boolean;
 
@@ -38,11 +39,11 @@ class ReflectBackendService {
 
     if (!this._signalRConnection) {
       this._signalRConnection = new SignalR.HubConnectionBuilder()
-      .withUrl(ReflectBackendService.signalRHubUrl.href, {
-        accessTokenFactory: this.retrieveValidToken,
-      })
-      .configureLogging(SignalR.LogLevel.Error)
-      .build();
+        .withUrl(ReflectBackendService.signalRHubUrl.href, {
+          accessTokenFactory: this.retrieveValidToken,
+        })
+        .configureLogging(SignalR.LogLevel.Error)
+        .build();
       this._connectionAvailable = false;
 
       this._signalRConnection.onclose((error) => {
@@ -60,31 +61,34 @@ class ReflectBackendService {
       return false;
     }
 
-    this._connectionAvailable = await this._signalRConnection.start()
-    .then(() => true)
-    .catch((error) => {
+    try {
+      await this._signalRConnection.start();
+      this._connectionAvailable = true;
+    }
+    catch (error) {
       console.error('Error when trying to start signalR connection: ', error);
       console.debug('Unable to establish signalR connection, live syncing will be affected.');
-      return false;
-    });
+      this._connectionAvailable = false;
+    }
 
     return this._connectionAvailable;
   }
 
   private retrieveValidToken = (that = this) => {
     if (that._tokenExpiry && moment().isBefore(that._tokenExpiry)) {
-      return that._appToken.token;
+      return that._appToken;
     }
 
-    return Promise.resolve(VSS.getAppToken().then((appToken) => {
+    return Promise.resolve(getAppToken().then((appToken) => {
       that._appToken = appToken;
 
-      const tokenData = jsonwebtoken.decode(that._appToken.token, {json: true});
-      if (typeof tokenData === 'object') {
+      const tokenData = decodeJwt(that._appToken);
+      if (tokenData) {
         that._tokenExpiry = moment.unix(tokenData.exp).toDate();
-        return that._appToken.token;
+        return that._appToken;
       }
 
+      // TODO (phongcao) : appInsightsClient.trackException(new Error(e.message));
       throw new Error('VSTS returned a malformed appToken value!');
     }));
   }
@@ -207,7 +211,7 @@ class ReflectBackendService {
       teamId,
       boardId
     );
-  }  
+  }
 
   /**
    * Sends a BroadcastUpdatedItem signal for other instances.

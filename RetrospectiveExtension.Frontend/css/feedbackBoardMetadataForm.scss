@@ -1,29 +1,69 @@
+@import "_variables.scss";
+
 $feedback_column_card_height: 60px;
 
 .board-metadata-form {
   text-align: center;
 
-  .board-metadata-form-anonymous-feedback-section {
-    padding-top: 20px;
+  hr {
+    border: 0.5px solid #0078d4; // AzDO blue
+  }
+
+  .board-metadata-form-section-information {
+    border-radius: 8px;
+    border: 3px #dedede solid;
+    background-color: #dedede;
+    margin: 5px 0 10px 0;
+    padding: 3px;
+
+    &.warning-information {
+      background-color: #f6a608;
+      border: none;
+    }
+  }
+
+  .board-metadata-form-setting-label {
+    display: flex;
   }
 
   .board-metadata-form-section-header {
-    padding-top: 10px;
     padding-bottom: 10px;
     font-size: 16px;
-    font-weight: 200;
-    width: 100%;
+    font-weight: 500;
+    width: 97%;
+    margin: 0px;
+    padding-right: 10px;
+    background-color: #0078d483;
+    text-align: right;
+
 
     &.bottom-padding-zero {
       padding-bottom: 0;
     }
   }
 
+  .board-metadata-form-board-settings {
+    padding-top: 20px;
+    border: $border_grey 1px solid;
+    padding: 10px;
+    margin-bottom: 5px;
+  }
+
+  .board-metadata-edit-column-settings {
+    border: $border_grey 1px solid;
+    padding: 10px;
+  }
+
   .board-metadata-form-section-subheader {
     font-size: 14px;
-    font-style: italic;
-    font-weight: 200;
+    font-weight: 600;
     width: 100%;
+    display: flex;
+    margin: 3px;
+
+    label {
+      margin-right: 10px;
+    }
   }
 
   .feedback-column-card {
@@ -152,11 +192,27 @@ $feedback_column_card_height: 60px;
     flex-direction: column;
     align-items: center;
     padding-bottom: 2px;
-    
+
+    &.column-template-dropdown {
+      display: inline-flex;
+      background-color: #fff;
+      font-weight: normal;
+      margin-left: 10px;
+      width: 66%;
+    }
+
+    &.max-vote-counter {
+      .ms-TextField-wrapper {
+        .ms-TextField-fieldGroup {
+          width: 50px;
+        }
+      }
+    }
+
     .ms-TextField-wrapper {
       display: flex;
       align-items: center;
-      
+
       .ms-Label {
         width: 50px;
       }

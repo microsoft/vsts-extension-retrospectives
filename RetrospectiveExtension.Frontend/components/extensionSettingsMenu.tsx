@@ -4,6 +4,8 @@ import { Dialog, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dia
 import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { ViewMode } from '../config/constants';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
@@ -16,7 +18,7 @@ interface IExtensionSettingsMenuProps {
   isDesktop: boolean;
 }
 
-export default class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
+class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
   constructor(props: IExtensionSettingsMenuProps) {
     super(props);
 
@@ -120,7 +122,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           onClick={this.showWhatsNewDialog}
         >
           <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
-          <span className="ms-Button-label">What's New</span>
+          <span className="ms-Button-label">What&apos;s New</span>
         </DefaultButton>
         <Dialog
           hidden={this.state.isWhatsNewDialogHidden}
@@ -165,7 +167,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
                   title={extensionSettingsMenuItem.title}
                 >
                   <span className="ms-Button-icon"><i className={"fas fa-" + extensionSettingsMenuItem.iconProps}></i></span>&nbsp;
-                  <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span> 
+                  <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span>
                 </ActionButton>
               )
             }
@@ -180,7 +182,7 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
           dialogContentProps={{
             type: DialogType.close,
             title: 'Clear Visit History',
-            subText: 'This extension maintains records of the teams and boards you visited. ' + 
+            subText: 'This extension maintains records of the teams and boards you visited. ' +
             'Clearing visit history means that the next time you use the extension, ' +
             'you will not be automatically directed to the your last visited board.',
           }}
@@ -199,3 +201,5 @@ export default class ExtensionSettingsMenu extends React.Component<IExtensionSet
     );
   }
 }
+
+export default withAITracking(reactPlugin, ExtensionSettingsMenu);

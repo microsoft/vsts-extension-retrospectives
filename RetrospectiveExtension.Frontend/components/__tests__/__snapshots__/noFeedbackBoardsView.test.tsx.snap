@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`No Feedback Boards View component renders correctly. 1`] = `
+<div
+  className="no-boards-container"
+>
+  <div
+    className="no-boards-text"
+  >
+    Get started with your first Retrospective
+  </div>
+  <div
+    className="no-boards-sub-text"
+  >
+    Create a new board to start collecting feedback and create new work items.
+  </div>
+  <CustomizedDefaultButton
+    className="create-new-board-button"
+    onClick={[MockFunction]}
+    primary={true}
+    text="Create Board"
+  />
+</div>
+`;

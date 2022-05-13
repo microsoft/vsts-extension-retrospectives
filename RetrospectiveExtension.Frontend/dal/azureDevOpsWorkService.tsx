@@ -1,13 +1,16 @@
-import { TeamFieldValues, TeamSettingsIteration } from 'TFS/Work/Contracts';
-import { getClient, WorkHttpClient2_3 } from 'TFS/Work/RestClient';
+import { TeamFieldValues, TeamSettingsIteration } from 'azure-devops-extension-api/Work';
+import { WorkRestClient } from 'azure-devops-extension-api/Work/WorkClient';
+import { getClient } from 'azure-devops-extension-api/Common';
 // TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 
+import { getProjectId } from '../utilities/servicesHelper';
+
 class WorkService {
-  private _httpWorkClient: WorkHttpClient2_3;
+  private _httpWorkClient: WorkRestClient;
 
   constructor() {
     if (!this._httpWorkClient) {
-      this._httpWorkClient = getClient();
+      this._httpWorkClient = getClient(WorkRestClient);
     }
   }
 
@@ -16,9 +19,10 @@ class WorkService {
    */
   public async getIterations(teamId: string, timeframe?: string):
     Promise<TeamSettingsIteration[]> {
+    const projectId = await getProjectId();
     const teamContext = {
       project: '',
-      projectId: VSS.getWebContext().project.id,
+      projectId,
       team: '',
       teamId
     };
@@ -28,14 +32,15 @@ class WorkService {
     try {
       teamIterations = await this._httpWorkClient.getTeamIterations(teamContext, timeframe);
     }
-    catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (e: any) {
       if (e.serverError.typeKey === 'CurrentIterationDoesNotExistException') {
         // TODO: Enable once trackTrace is supported
         // appInsightsClient.trackTrace(TelemetryExceptions.CurrentTeamIterationNotFound, e);
       }
       else {
         // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
-        console.error('An exception occurred while trying to get the team iterations ', e);  
+        console.error('An exception occurred while trying to get the team iterations ', e);
       }
     }
 
@@ -47,9 +52,10 @@ class WorkService {
    */
   public async getTeamFieldValues(teamId: string):
     Promise<TeamFieldValues> {
+    const projectId = await getProjectId();
     const teamContext = {
       project: '',
-      projectId: VSS.getWebContext().project.id,
+      projectId,
       team: '',
       teamId
     };

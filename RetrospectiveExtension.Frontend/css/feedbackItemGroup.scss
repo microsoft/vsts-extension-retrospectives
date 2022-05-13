@@ -1,6 +1,6 @@
 .feedback-item-group {
   @extend .feedbackItem;
-  
+
   .item-cards {
     display: flex;
     flex-direction: column;
@@ -12,7 +12,7 @@
         }
       }
     }
-    
+
     .item-cards-stack {
       display: none;
     }
@@ -52,7 +52,7 @@
       .groupedItemCard {
         @extend .mainItemCard;
         margin-top: 0px;
-  
+
         .card-integral-part {
           border-left-width: 3px;
         }

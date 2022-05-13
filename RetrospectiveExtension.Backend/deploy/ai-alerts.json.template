@@ -1,0 +1,249 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "browser_exceptions_alert_name": {
+            "defaultValue": "Browser Exceptions Alert",
+            "type": "string"
+        },
+        "failed_requests_alert_name": {
+            "defaultValue": "Failed Requests Alert",
+            "type": "string"
+        },
+        "server_exceptions_alert_name": {
+            "defaultValue": "Server Exceptions Alert",
+            "type": "string"
+        },
+        "server_respone_time_alert_name": {
+            "defaultValue": "Server Respone Time Alert",
+            "type": "string"
+        },
+        "action_group_name":{
+            "defaultValue": "ag-VARRGSUFFIX",
+            "type": "string"
+        },
+        "action_group_short_name": {
+            "type": "string",
+            "defaultValue": "VARRGSUFFIX",
+            "metadata": {
+              "description": "Short name (maximum 12 characters) for the Action group."
+            }
+        },
+        "recipient_email":{
+            "type": "string",
+            "defaultValue": "VAREMAIL"
+        },
+        "ai_externalid": {
+            "defaultValue": "/subscriptions/VARSUBSCRIPTIONID/resourceGroups/VARRGNAME/providers/Microsoft.Insights/components/VARAIRESOURCENAME",
+            "type": "string"
+        },
+        "actiongroups_externalid": {
+            "defaultValue": "/subscriptions/VARSUBSCRIPTIONID/resourceGroups/VARRGNAME/providers/Microsoft.Insights/actionGroups/ag-VARRGSUFFIX",
+            "type": "string"
+        }, 
+        "location": {
+            "defaultValue": "global",
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Insights/actionGroups",
+            "apiVersion": "2021-09-01",
+            "name": "[parameters('action_group_name')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "groupShortName": "[parameters('action_group_short_name')]",
+                "enabled": true,
+                "emailReceivers": [
+                    {
+                        "name": "VARRGSUFFIX-email",
+                        "emailAddress": "[parameters('recipient_email')]",
+                        "useCommonAlertSchema": false
+                    }
+                ]
+            }
+        },
+        {
+            "type": "microsoft.insights/metricalerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('browser_exceptions_alert_name')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [ 
+                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]" 
+            ],
+            "properties": {
+                "description": "Dynamic threshold with Medium sensitivity",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[parameters('ai_externalid')]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT5M",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "alertSensitivity": "Medium",
+                            "failingPeriods": {
+                                "numberOfEvaluationPeriods": 4,
+                                "minFailingPeriodsToAlert": 4
+                            },
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "exceptions/browser",
+                            "operator": "GreaterOrLessThan",
+                            "timeAggregation": "Count",
+                            "criterionType": "DynamicThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "microsoft.insights/components",
+                "actions": [
+                    {
+                        "actionGroupId": "[parameters('actiongroups_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        },
+        {
+            "type": "microsoft.insights/metricalerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('failed_requests_alert_name')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [ 
+                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]" 
+            ],
+            "properties": {
+                "description": "Dynamic threshold with Medium sensitivity",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[parameters('ai_externalid')]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT5M",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "alertSensitivity": "Medium",
+                            "failingPeriods": {
+                                "numberOfEvaluationPeriods": 4,
+                                "minFailingPeriodsToAlert": 4
+                            },
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "requests/failed",
+                            "operator": "GreaterOrLessThan",
+                            "timeAggregation": "Count",
+                            "criterionType": "DynamicThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "microsoft.insights/components",
+                "actions": [
+                    {
+                        "actionGroupId": "[parameters('actiongroups_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        },
+        {
+            "type": "microsoft.insights/metricalerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('server_exceptions_alert_name')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [ 
+                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]" 
+            ],
+            "properties": {
+                "description": "Dynamic threshold with Medium sensitivity",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[parameters('ai_externalid')]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT5M",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "alertSensitivity": "Medium",
+                            "failingPeriods": {
+                                "numberOfEvaluationPeriods": 4,
+                                "minFailingPeriodsToAlert": 4
+                            },
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "exceptions/server",
+                            "operator": "GreaterOrLessThan",
+                            "timeAggregation": "Count",
+                            "criterionType": "DynamicThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "microsoft.insights/components",
+                "actions": [
+                    {
+                        "actionGroupId": "[parameters('actionGroups_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        },
+        {
+            "type": "microsoft.insights/metricalerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('server_respone_time_alert_name')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [ 
+                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]" 
+            ],
+            "properties": {
+                "description": "Dynamic threshold with Medium sensitivity",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[parameters('ai_externalid')]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT5M",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "alertSensitivity": "Medium",
+                            "failingPeriods": {
+                                "numberOfEvaluationPeriods": 4,
+                                "minFailingPeriodsToAlert": 4
+                            },
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "requests/duration",
+                            "operator": "GreaterOrLessThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "DynamicThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "microsoft.insights/components",
+                "actions": [
+                    {
+                        "actionGroupId": "[parameters('actiongroups_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }
+    ]
+}

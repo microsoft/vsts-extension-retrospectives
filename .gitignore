@@ -255,7 +255,23 @@ paket-files/
 # VSTS Extension package
 *.vsix
 
+# MacOS
+.DS_Store
+
 # Backend config files
 .env
 allowed_origins.json
 dev_certs.json
+
+# Jest test report
+RetrospectiveExtension.FrontEnd/reports/
+RetrospectiveExtension.FrontEnd/coverage/
+
+# Dotnet test results
+RetrospectiveExtension.Backend.Tests/TestResults
+
+#Application Insights Dashboard description
+ai-dashboard.json
+
+# Alerts template
+ai-alerts.json

@@ -1,5 +1,6 @@
 ﻿{
   "compilerOptions": {
+    "esModuleInterop": true,
     "outDir": "./dist",
     "module": "amd",
     "target": "es5",
@@ -13,7 +14,8 @@
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "allowSyntheticDefaultImports": true,
   },
   "exclude": [
     "node_modules"

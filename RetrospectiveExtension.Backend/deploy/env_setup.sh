@@ -25,6 +25,9 @@
     resource_group="rg-${RESOURCE_NAME_SUFFIX}"
     location="${LOCATION}"
 
+    # Set email for alerts
+    alert_recipient_email=${ALERT_RECIPIENT_EMAIL}
+
     # Login to Azure via Service Principal
 
     # Set service principal information
@@ -79,6 +82,21 @@
         --query instrumentationKey \
         --output tsv)
 
+    # Add an Application Insights dashboard
+    dashboard_file="./deploy/ai-dashboard.json"
+
+    cp ./deploy/ai-dashboard.json.template ${dashboard_file}
+
+    perl -pi -e s,VARRGNAME,${resource_group},g ${dashboard_file}
+    perl -pi -e s,VARSUBSCRIPTIONID,${subscription_id},g ${dashboard_file}
+    perl -pi -e s,VARAIRESOURCENAME,ai-${resource_name_suffix},g ${dashboard_file}
+
+    # https://docs.microsoft.com/en-us/cli/azure/portal/dashboard?view=azure-cli-latest
+    az portal dashboard create --location "eastus" \
+        --name "dashboard-${resource_name_suffix}" \
+        --resource-group ${resource_group} --input-path ${dashboard_file}
+
+
     # https://docs.azure.cn/en-us/cli/webapp?view=azure-cli-latest#az_webapp_create
     # Create WebApp
     az webapp create \
@@ -93,6 +111,22 @@
             --resource-group "$resource_group" \
             --query primaryConnectionString \
             --output tsv)
+
+    # Create Alerts and Action Group
+    alerts_file="./deploy/ai-alerts.json"
+
+    cp ./deploy/ai-alerts.json.template ${alerts_file}
+
+    perl -pi -e s,VARRGNAME,${resource_group},g ${alerts_file}
+    perl -pi -e s,VARSUBSCRIPTIONID,${subscription_id},g ${alerts_file}
+    perl -pi -e s,VARAIRESOURCENAME,ai-${resource_name_suffix},g ${alerts_file}
+    perl -pi -e s,VARRGSUFFIX,${resource_name_suffix},g ${alerts_file}
+    perl -pi -e s,VAREMAIL,${alert_recipient_email},g ${alerts_file}
+
+    # https://docs.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-metric-create-templates
+    az deployment group create \
+        --resource-group "$resource_group" \
+        --template-file "$alerts_file"
 
     echo "#### Deploying App Settings ####"
     # https://docs.microsoft.com/en-us/cli/azure/webapp/config/appsettings?view=azure-cli-latest#az-webapp-config-appsettings-set

@@ -9,10 +9,10 @@ import FeedbackItemGroup from './feedbackItemGroup';
 import { IColumnItem, IColumn } from './feedbackBoard';
 import localStorageHelper from '../utilities/localStorageHelper';
 // TODO (enpolat) : import { TelemetryEvents, appInsightsClient } from '../utilities/appInsightsClient';
-import { WebApiTeam } from 'TFS/Core/Contracts';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { ActionButton, IButton } from 'office-ui-fabric-react/lib/Button';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
-import { WorkItemType } from 'TFS/WorkItemTracking/Contracts';
+import { WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -35,6 +35,7 @@ export interface FeedbackColumnProps {
   isBoardAnonymous: boolean;
   shouldFocusOnCreateFeedback: boolean;
   hideFeedbackItems: boolean;
+  groupTitles: String[];
   onVoteCasted: () => void;
 
   addFeedbackItems: (
@@ -83,6 +84,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     const feedbackItem: IFeedbackItemDocument = {
       boardId: this.props.boardId,
       columnId: this.props.columnId,
+      originalColumnId: this.props.columnId,
       createdBy: this.props.isBoardAnonymous ? null : userIdentity,
       createdDate: new Date(Date.now()),
       id: 'emptyFeedbackItem',
@@ -93,6 +95,8 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       timerSecs: 0,
       timerstate: false,
       timerId: null,
+      groupTitles: [],
+      isGroupedCarouselItem: false
     };
 
     this.props.addFeedbackItems(
@@ -118,15 +122,20 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
     // const draggedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
+    const boardItem = await itemDataService.getBoardItem(this.props.team.id, this.props.boardId);
 
-    await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
+    // only drop into another column if that's allowed
+    if (boardItem.allowCrossColumnGroups) {
+      await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
+    }
   }
 
-  private static moveFeedbackItem = async (
+  public static moveFeedbackItem = async (
     refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void,
-    boardId: string, 
-    feedbackItemId: string, 
+    boardId: string,
+    feedbackItemId: string,
     columnId: string) => {
+
     const updatedFeedbackItems = await itemDataService.addFeedbackItemAsMainItemToColumn(boardId, feedbackItemId, columnId);
 
     refreshFeedbackItems(
@@ -144,13 +153,13 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   };
 
   public static createFeedbackItemProps = (
-    columnProps: FeedbackColumnProps, 
+    columnProps: FeedbackColumnProps,
     columnItem: IColumnItem,
     isInteractable: boolean): IFeedbackItemProps => {
     return {
       id: columnItem.feedbackItem.id,
       title: columnItem.feedbackItem.title,
-      createdBy:  columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy.displayName : null,
+      createdBy: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy.displayName : null,
       createdByProfileImage: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy._links.avatar.href : null,
       lastEditedDate: columnItem.feedbackItem.modifedDate ? columnItem.feedbackItem.modifedDate.toString() : '',
       upvotes: columnItem.feedbackItem.upvotes,
@@ -166,6 +175,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       columns: columnProps.columns,
       columnIds: columnProps.columnIds,
       columnId: columnProps.columnId,
+      originalColumnId: columnItem.feedbackItem.originalColumnId,
       boardId: columnProps.boardId,
       boardTitle: columnProps.boardTitle,
       defaultActionItemAreaPath: columnProps.defaultActionItemAreaPath,
@@ -183,7 +193,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       shouldHaveFocus: columnItem.shouldHaveFocus ? true : false,
       hideFeedbackItems: columnProps.hideFeedbackItems,
       userIdRef: columnItem.feedbackItem.userIdRef,
-      onVoteCasted: columnProps.onVoteCasted
+      onVoteCasted: columnProps.onVoteCasted,
+      groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
+      isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
+      groupTitles: columnItem.feedbackItem.groupTitles,
+      isShowingGroupedChildrenTitles: false,
+      isFocusModalHidden: true
     }
   }
 
@@ -266,7 +281,9 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
                 <i className="fa fa-caret-down" />}
             </div>
             <div className="feedback-column-name">
-              {this.props.columnName}
+              {this.props.columnName}&nbsp;
+              <i className={this.props.iconClass}
+                style={{ color: this.props.accentColor }}></i>
             </div>
           </div>
         </div>
@@ -274,7 +291,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           {this.props.workflowPhase === WorkflowPhase.Collect &&
             <div className="create-container" aria-label="Create Feedback Item">
               <ActionButton iconProps={{ iconName: 'Add' }}
-                componentRef={(element: IButton) => {this.createFeedbackButton = element;}}
+                componentRef={(element: IButton) => { this.createFeedbackButton = element; }}
                 onClick={this.createEmptyFeedbackItem}
                 aria-label="Create Feedback Item"
                 className="create-button">

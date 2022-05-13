@@ -1,4 +1,4 @@
-import { IdentityRef } from 'VSS/WebApi/Contracts';
+import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 import { WorkflowPhase } from './workItem';
 
 export interface IUserVisit {
@@ -26,9 +26,10 @@ export interface IFeedbackBoardDocument {
   isAnonymous?: boolean;
   shouldShowFeedbackAfterCollect?: boolean;
   displayPrimeDirective?: boolean;
+  allowCrossColumnGroups?: boolean;
   maxVotesPerUser: number;
-  boardVoteCollection : { [voter: string]: number};
-  teamEffectivenessMeasurementVoteCollection : ITeamEffectivenessMeasurementVoteCollection[];
+  boardVoteCollection: { [voter: string]: number };
+  teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[];
 }
 
 export interface ITeamEffectivenessMeasurementVoteCollection {
@@ -53,8 +54,9 @@ export interface IFeedbackItemDocument {
   parentFeedbackItemId?: string;
   associatedActionItemIds?: number[];
   columnId: string;
+  originalColumnId: string;
   upvotes: number;
-  voteCollection : { [voter: string]: number};
+  voteCollection: { [voter: string]: number };
   createdBy?: IdentityRef;
   createdDate: Date;
   modifedDate?: Date;
@@ -62,5 +64,8 @@ export interface IFeedbackItemDocument {
   userIdRef: string;
   timerSecs: number;
   timerstate: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   timerId: any;
+  groupTitles: String[];
+  isGroupedCarouselItem: boolean;
 }

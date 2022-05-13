@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
-import { WorkItem, WorkItemType, WorkItemStateColor } from 'TFS/WorkItemTracking/Contracts';
+import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
@@ -11,6 +11,8 @@ import classNames from 'classnames';
 import ReactTable from 'react-table-6';
 
 import 'react-table-6/react-table.css'
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../utilities/external/telemetryClient';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -43,7 +45,7 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-export default class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardSummaryTableState> {
+class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardSummaryTableState> {
   constructor(props: IBoardSummaryTableProps) {
     super(props);
 
@@ -222,6 +224,7 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
     />);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private expandSummaryRow = (state: any, rowInfo: any, instance: any) => {
     const { expanded } = state;
     const path = rowInfo.nestingPath[0];
@@ -235,6 +238,7 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getTrProps = (state: any, rowInfo: any, col: any, instance: any) => {
     return {
       onClick: () => {
@@ -250,6 +254,7 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
     };
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getTdProps = (state: any, rowInfo: any, col: any) => {
     const hasPendingItems: boolean =
       (rowInfo && rowInfo.original && rowInfo.original.pendingWorkItemsCount && rowInfo.original.pendingWorkItemsCount > 0) ?
@@ -271,6 +276,7 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
     };
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getCustomTbodyComponent = (props: any) => (
     <div {...props} className={classNames("rt-tbody", props.className || [])}>
       {props.children}
@@ -293,6 +299,7 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
             {
               Header: 'Created Date',
               accessor: 'createdDate',
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               Cell: (row: any) => {
                 return (
                   new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(row.original.createdDate)
@@ -344,3 +351,5 @@ export default class BoardSummaryTable extends React.Component<IBoardSummaryTabl
     );
   }
 }
+
+export default withAITracking(reactPlugin, BoardSummaryTable);

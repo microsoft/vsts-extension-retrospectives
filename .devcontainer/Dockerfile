@@ -20,6 +20,12 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y docker-ce-cli \
     #
+    # Install Azure CLI
+    && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
+    #
+    # Install zip
+    && apt-get install zip \
+    #
     # Install dotnet 6
     && cd /tmp \
     && wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
@@ -30,7 +36,7 @@ RUN apt-get update \
     && apt-get install -y dotnet-sdk-6.0 \
     #
     # Install node
-    && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt install -y nodejs \
     #
     # Install npm-check-updates tool globally
@@ -38,7 +44,6 @@ RUN apt-get update \
     #
     # Install jest-cli testing framework globally
     && npm install -g jest-cli \
-    #
     # [Optional] Add sudo support for the non-root user
     && apt-get install -y sudo \
     #
@@ -46,6 +51,9 @@ RUN apt-get update \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
+
+COPY ./RetrospectiveExtension.Frontend/scripts /tmp/scripts
+RUN /tmp/scripts/setup_ci.sh
 
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=
