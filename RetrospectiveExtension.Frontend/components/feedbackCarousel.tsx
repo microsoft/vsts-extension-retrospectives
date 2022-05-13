@@ -79,8 +79,6 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
           const mainCardCount = columnProps.columnItems.filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId).length;
 
           columnProps.columnItems.forEach(columnItem => {
-            const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(columnProps, columnItem, true);
-
             // Establish whether an item in the column has children feedback grouped beneath it,
             // and therefore will be the parent
             const isGroupedCarouselItem = columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length > 0 : false;
