@@ -37,7 +37,7 @@ export interface IWorkflowStageState {
         aria-label={ariaLabel}
         role="tab"
         onClick={ (e) => this.clickWorkflowState(e, this.props.value) }
-        onKeyDown={ (e) => this.handleKeyPressWorkFlowState(e, this.props.value) }
+        onKeyDown={ (e: React.KeyboardEvent<HTMLDivElement>) => this.handleKeyPressWorkFlowState(e, this.props.value) }
         tabIndex={0}>
         <p className="stage-text">
           {this.props.display}
