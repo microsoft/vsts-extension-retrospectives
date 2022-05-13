@@ -21,7 +21,6 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import NoFeedbackBoardsView from './noFeedbackBoardsView';
-// TODO (enpolat) : import { appInsightsClient, TelemetryEvents, TelemetryEventProperties } from '../utilities/appInsightsClient';
 import { userDataService } from '../dal/userDataService';
 import ExtensionSettingsMenu from './extensionSettingsMenu';
 import SelectorCombo, { ISelectorList } from './selectorCombo';

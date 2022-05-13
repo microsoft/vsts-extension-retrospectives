@@ -8,7 +8,6 @@ import FeedbackItem, { IFeedbackItemProps } from './feedbackItem';
 import FeedbackItemGroup from './feedbackItemGroup';
 import { IColumnItem, IColumn } from './feedbackBoard';
 import localStorageHelper from '../utilities/localStorageHelper';
-// TODO (enpolat) : import { TelemetryEvents, appInsightsClient } from '../utilities/appInsightsClient';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { ActionButton, IButton } from 'office-ui-fabric-react/lib/Button';
 import { getUserIdentity } from '../utilities/userIdentityHelper';

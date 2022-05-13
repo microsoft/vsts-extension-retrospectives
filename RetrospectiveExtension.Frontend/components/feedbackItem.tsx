@@ -15,7 +15,6 @@ import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTrack
 import localStorageHelper from '../utilities/localStorageHelper';
 import { reflectBackendService } from '../dal/reflectBackendService';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
-// TODO (enpolat) : import { appInsightsClient, TelemetryEvents } from '../utilities/appInsightsClient';
 import { IColumn, IColumnItem } from './feedbackBoard';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';

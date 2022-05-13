@@ -2,7 +2,6 @@ import { createDocument, deleteDocument, readDocument, readDocuments, updateDocu
 import { IFeedbackItemDocument, IFeedbackBoardDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { workItemService } from './azureDevOpsWorkItemService';
-// TODO (enpolat) : import { appInsightsClient, TelemetryExceptions } from '../utilities/appInsightsClient';
 import { v4 as uuid } from 'uuid';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 

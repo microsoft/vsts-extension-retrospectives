@@ -9,7 +9,6 @@ import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azur
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
-// TODO (enpolat) : import { TelemetryEvents, TelemetryEventProperties, appInsightsClient } from '../utilities/appInsightsClient'
 import { FocusTrapCallout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { getBoardUrl } from '../utilities/boardUrlHelper';

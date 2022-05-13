@@ -5,7 +5,6 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extensi
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
-// TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 import classNames from 'classnames';
 
 import ReactTable from 'react-table-6';

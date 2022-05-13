@@ -1,7 +1,6 @@
 import { TeamFieldValues, TeamSettingsIteration } from 'azure-devops-extension-api/Work';
 import { WorkRestClient } from 'azure-devops-extension-api/Work/WorkClient';
 import { getClient } from 'azure-devops-extension-api/Common';
-// TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 
 import { getProjectId } from '../utilities/servicesHelper';
 

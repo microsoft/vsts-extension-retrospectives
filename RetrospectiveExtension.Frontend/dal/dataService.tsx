@@ -1,6 +1,5 @@
 import { getAccessToken, getExtensionContext, getService } from 'azure-devops-extension-sdk';
 import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from 'azure-devops-extension-api';
-// TODO (enpolat) : import { appInsightsClient } from '../utilities/appInsightsClient';
 
 let extensionDataManager: IExtensionDataManager;
 
