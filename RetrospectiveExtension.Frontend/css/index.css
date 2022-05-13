@@ -2,3 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+.ms-Button--primary {
+  background-color: #fff;
+  color: rgb(0, 120, 212);
+  border: 1px solid rgb(0, 120, 212);
+}
+
+.ms-Button--primary:hover {
+  background-color: rgb(0, 120, 212);;
+  color: #fff;
+}
