@@ -9,7 +9,7 @@ import { DocumentCard, DocumentCardActivity } from 'office-ui-fabric-react/lib/D
 import { WorkflowPhase } from '../interfaces/workItem';
 import ActionItemDisplay from './actionItemDisplay';
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
-import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
+import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { itemDataService } from '../dal/itemDataService';
 import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import localStorageHelper from '../utilities/localStorageHelper';
