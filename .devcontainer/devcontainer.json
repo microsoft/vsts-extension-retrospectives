@@ -16,6 +16,11 @@
     "workbench.iconTheme": "vscode-icons"
   },
 	"remoteUser": "vscode",
+	"features": {
+		"docker-from-docker": "latest",
+		"github-cli": "latest",
+		"azure-cli": "latest"
+	},
   "extensions": [
     "ms-dotnettools.csharp",
     "ms-azuretools.vscode-docker",
