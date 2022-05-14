@@ -3,12 +3,13 @@ FROM mcr.microsoft.com/vscode/devcontainers/dotnet:0-6.0-bullseye-slim
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Configure apt and install packages
 RUN apt-get update \
-  && apt-get -y install --no-install-recommends apt-utils dialog libicu63 libssl1.1 2>&1 \
+  #
+  # Configure apt and install common packages
+  && apt-get -y install --no-install-recommends apt-utils dialog iproute2 procps sudo \
   #
   # Verify wget, jq, unzip, git and process tools installed
-  && apt-get -y install git iproute2 procps wget zip unzip jq sudo \
+  && apt-get -y install git wget zip unzip jq \
   #
   # Upgrade existing packages
   && apt-get -y upgrade \
