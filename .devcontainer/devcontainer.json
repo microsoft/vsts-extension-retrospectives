@@ -28,6 +28,5 @@
     "vscode-icons-team.vscode-icons",
     "editorconfig.editorconfig",
     "davidanson.vscode-markdownlint"
-  ],
-  "postCreateCommand": "pre-commit install"
+  ]
 }
