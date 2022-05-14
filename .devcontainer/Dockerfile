@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM mcr.microsoft.com/vscode/devcontainers/dotnet:0-6.0-bullseye-slim
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
