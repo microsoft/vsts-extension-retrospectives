@@ -24,12 +24,9 @@
   "extensions": [
     "ms-dotnettools.csharp",
     "ms-azuretools.vscode-docker",
-    "eg2.vscode-npm-script",
     "ms-vsliveshare.vsliveshare",
     "vscode-icons-team.vscode-icons",
     "editorconfig.editorconfig",
-    "donjayamanne.githistory",
-    "eamodio.gitlens",
     "davidanson.vscode-markdownlint"
   ],
   "postCreateCommand": "pre-commit install"
