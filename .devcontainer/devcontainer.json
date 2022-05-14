@@ -15,6 +15,7 @@
     },
     "workbench.iconTheme": "vscode-icons"
   },
+	"remoteUser": "vscode",
   "extensions": [
     "ms-dotnettools.csharp",
     "ms-azuretools.vscode-docker",
