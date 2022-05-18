@@ -42,7 +42,7 @@ implemented in C#. The project follows a single branch source control strategy.
    development extension on Pull Request creation or update to successfully execute.
 
 2. Once your feature addition or bug fix is ready for review, create a pull
-   request against the `master` branch of the repository.
+   request against the `main` branch of the repository.
 
 3. Include a link to the GitHub issue you are addressing to the description of
    your pull request. Reviewers will be added to the pull request automatically.
@@ -360,7 +360,7 @@ re-publish the extension in the marketplace.
 The Retrospectives extension uses the
 [Azure SignalR service](https://azure.microsoft.com/en-us/services/signalr-service/)
 to add real time support. The backend codebase can be found
-[here](https://github.com/microsoft/vsts-extension-retrospectives/tree/master/RetrospectiveExtension.Backend).
+[here](https://github.com/microsoft/vsts-extension-retrospectives/tree/main/RetrospectiveExtension.Backend).
 
 To enable real time updates from your test extension you will need to deploy
 the backend to Azure specifying your publisher id and the unique key of your
