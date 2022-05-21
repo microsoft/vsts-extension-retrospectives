@@ -45,7 +45,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         <td>
           <TooltipHost
             hostClassName="toggle-carousel-button-tooltip-wrapper"
-            content={ this.props.tooltip }
+            content={<div dangerouslySetInnerHTML={{ __html: this.props.tooltip}} />}
             calloutProps={{ gapSpace: 0 }}>
             <DefaultButton
               className="contextual-menu-button hide-mobile"
