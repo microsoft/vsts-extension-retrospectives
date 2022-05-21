@@ -9,7 +9,7 @@ import { ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedb
 
 export interface EffectivenessMeasurementRowProps {
   title: string;
-  tooltip: JSX.Element;
+  tooltip: string;
   questionId?: number;
   votes?: ITeamEffectivenessMeasurementVoteCollection[];
   selected?: number;
