@@ -2,6 +2,7 @@ import Enzyme from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import { mockCore } from '../__mocks__/azure-devops-extension-api/Core/Core';
 import { mockCommon } from '../__mocks__/azure-devops-extension-api/Common/Common';
+import { mockUuid } from '../__mocks__/uuid/v4';
 import { MockSDK } from '../__mocks__/azure-devops-extension-sdk/sdk';
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -32,3 +33,6 @@ jest.mock('azure-devops-extension-api/WorkItemTracking/WorkItemTrackingClient', 
 jest.mock('azure-devops-extension-api/Common', () => {
   return mockCommon;
 });
+
+jest.mock('uuid', () => { return mockUuid });
+

@@ -1,11 +1,10 @@
 
 import { mocked } from 'jest-mock';
 import { WorkflowPhase } from '../../../interfaces/workItem';
-import { v4 as uuid } from 'uuid';
 import { TooltipOverflowMode } from 'office-ui-fabric-react';
 
-export const testTeamId = uuid();
-export const testBoardId = uuid();
+export const testTeamId = "mocked-team-uuid";
+export const testBoardId = "mocked-board-uuid";
 export const testWorkItemType = mocked({
   _links: [],
   color: '#cc293d',
@@ -13,7 +12,7 @@ export const testWorkItemType = mocked({
   fieldInstances: [],
   fields: [],
   icon: {
-    id: uuid(),
+    id: "mocked-column-uuid",
     url: ''
   },
   isDisabled: true,
@@ -24,8 +23,8 @@ export const testWorkItemType = mocked({
   url: '',
   xmlForm: '',
 });
-export const testColumnUuidOne = uuid();
-export const testColumnUuidTwo = uuid();
+export const testColumnUuidOne = "mocked-column-uuid-one";
+export const testColumnUuidTwo = "mocked-column-uuid-two";
 export const testColumnTwoTitle = 'Test Feedback Column Two';
 export const testUpvotes = Math.floor(Math.random() * 10);
 export const testGroupedItemProps = mocked({
@@ -38,7 +37,7 @@ export const testGroupedItemProps = mocked({
   updateGroupCardStackHeight: jest.fn(() => { }),
 });
 export const testFeedbackItem = mocked({
-  id: uuid(),
+  id: "mocked-feedback-item-uuid",
   element: mocked({
     innerText: 'Test Inner Text',
     innerHtml: '<div>Test Inner HTML</div>'
@@ -49,14 +48,14 @@ export const testFeedbackItem = mocked({
   columnId: testColumnUuidOne,
   originalColumnId: testColumnUuidOne,
   upvotes: testUpvotes,
-  voteCollection: { [uuid()]: testUpvotes },
+  voteCollection: { ["vote-collection-uuid"]: testUpvotes },
   createdDate: new Date(),
   createdByProfileImage: 'testProfileImageSource',
   groupedItemProps: testGroupedItemProps,
-  userIdRef: uuid(),
+  userIdRef: "user-ref-uuid",
   timerSecs: Math.floor(Math.random() * 60),
   timerstate: false,
-  timerId: uuid(),
+  timerId: "timer-uuid",
   groupTitles: ['example one', 'example two'],
   isGroupedCarouselItem: false,
 });
@@ -112,17 +111,17 @@ export const testColumnProps = mocked({
   isDataLoaded: false,
   columnItems: testColumns[testColumnUuidOne].columnItems,
   team: {
-    id: uuid(),
+    id: "team-uuid",
     identity: {
       customDisplayName: 'Test Web API Identity Custom Display Name',
       descriptor: {
         identifier: 'Test Identifier',
         identityType: 'Test Identity Type'
       },
-      id: uuid(),
+      id: "team-identity-uuid",
       isActive: true,
       isContainer: false,
-      masterId: uuid(),
+      masterId: "team-identity-master-uuid",
       memberIds: [],
       memberOf: [],
       members: [],
@@ -137,7 +136,7 @@ export const testColumnProps = mocked({
     name: 'Test Web API Team Name',
     description: 'Test Web API Team Description',
     identityUrl: '',
-    projectId: uuid(),
+    projectId: "project-uuid",
     projectName: 'Test Azure DevOps Retrospectives Extension',
     url: ''
   },
