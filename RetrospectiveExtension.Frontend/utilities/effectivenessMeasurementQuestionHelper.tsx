@@ -27,7 +27,7 @@ export const questions = [
     id: 5,
     shortTitle: "Outcomes",
     title: "I'm confident our team will be successful",
-    tooltip: "Research shows that the strongest predictor of a team efficacy is their collective confidence in their ability to be successful",
+    tooltip: "<a target=\"_blank\" rel=\"noreferrer\" href=\"https://content.apa.org/record/2009-06703-020\">Research</a> shows the strongest predictor of team efficacy is the collective confidence of the team to be successful",
   }
 ];
 

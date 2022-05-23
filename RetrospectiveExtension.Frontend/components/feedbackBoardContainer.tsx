@@ -1229,7 +1229,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                         votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection}
                                         onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)}
                                         title={`${getQuestionShortName(question.id)} - ${getQuestionName(question.id)}`}
-                                        tooltip={<>{getQuestionTooltip(question.id)}</>}
+                                        tooltip={getQuestionTooltip(question.id)}
                                       />
                                     )
                                   })}

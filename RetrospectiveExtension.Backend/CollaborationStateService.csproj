@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>589795ca-1eb9-454e-814e-758d93771646</UserSecretsId>
     <ApplicationInsightsResourceId>/subscriptions/73e87577-b178-4859-8827-0ff1633ed16c/resourcegroups/reflect-int/providers/microsoft.insights/components/reflect-appinsights-int</ApplicationInsightsResourceId>
     <ApplicationInsightsAnnotationResourceId>/subscriptions/73e87577-b178-4859-8827-0ff1633ed16c/resourcegroups/reflect-int/providers/microsoft.insights/components/reflect-appinsights-int</ApplicationInsightsAnnotationResourceId>
