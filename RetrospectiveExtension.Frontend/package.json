@@ -37,6 +37,7 @@
     "dotenv-webpack": "7.1.0",
     "enzyme-to-json": "3.6.2",
     "file-saver": "2.0.5",
+    "jest-environment-jsdom": "^28.1.0",
     "jest-junit-reporter": "1.1.0",
     "moment": "2.29.3",
     "office-ui-fabric-react": "7.185.5",
