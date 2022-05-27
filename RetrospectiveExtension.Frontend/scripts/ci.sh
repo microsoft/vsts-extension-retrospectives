@@ -12,7 +12,7 @@
     npm run lint
     echo "eslint passed"
 
-    # npm run build:p
+    npm run build:p
     echo "build passed"
 
     npm run test
