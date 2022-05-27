@@ -81,9 +81,9 @@ export interface FeedbackBoardContainerState {
   isDropIssueInEdgeMessageBarVisible: boolean;
   isDesktop: boolean;
   isAutoResizeEnabled: boolean;
-  allowCrossColumnGroups: boolean;
+  preventCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
-  contributors: {id: string, name: string, imageUrl: string}[];
+  contributors: { id: string, name: string, imageUrl: string }[];
   effectivenessMeasurementSummary: { questionId: number, question: string, average: number }[];
   effectivenessMeasurementChartData: { questionId: number, red: number, yellow: number, green: number }[];
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
@@ -97,7 +97,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     super(props);
     this.state = {
       allWorkItemTypes: [],
-      allowCrossColumnGroups: false,
+      preventCrossColumnGroups: false,
       boards: [],
       currentUserId: getUserIdentity().id,
       currentBoard: undefined,
@@ -731,7 +731,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     isIncludeTeamEffectivenessMeasurement: boolean,
     isBoardAnonymous: boolean,
     shouldShowFeedbackAfterCollect: boolean,
-    displayPrimeDirective: boolean) => {
+    displayPrimeDirective: boolean,
+    preventCrossColumnGroups: boolean) => {
     const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
       title,
       maxvotesPerUser,
@@ -739,7 +740,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isIncludeTeamEffectivenessMeasurement,
       isBoardAnonymous,
       shouldShowFeedbackAfterCollect,
-      displayPrimeDirective);
+      displayPrimeDirective,
+      preventCrossColumnGroups);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
@@ -776,13 +778,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const chartData: { questionId: number, red: number, yellow: number, green: number }[] = [];
 
     [...Array(5).keys()].forEach(e => {
-      chartData.push({ questionId: (e+1), red: 0, yellow: 0, green: 0 });
+      chartData.push({ questionId: (e + 1), red: 0, yellow: 0, green: 0 });
     });
 
     this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.forEach(vote => {
       [...Array(5).keys()].forEach(e => {
-        const selection = vote.responses.find(response => response.questionId === (e+1))?.selection;
-        const data = chartData.find(d => d.questionId === (e+1));
+        const selection = vote.responses.find(response => response.questionId === (e + 1))?.selection;
+        const data = chartData.find(d => d.questionId === (e + 1));
         if (selection <= 6) {
           data.red++;
         } else if (selection <= 8) {
@@ -897,7 +899,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isIncludeTeamEffectivenessMeasurement: boolean,
       isBoardAnonymous: boolean,
       shouldShowFeedbackAfterCollect: boolean,
-      displayPrimeDirective: boolean
+      displayPrimeDirective: boolean,
+      preventCrossColumnGroups: boolean
     ) => void,
     onCancel: () => void) => {
     return (
@@ -1254,46 +1257,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           </TooltipHost>
                         </>
                       }
-                      {this.state.currentBoard.displayPrimeDirective &&
-                        <>
-                          <Dialog
-                            hidden={this.state.isPrimeDirectiveDialogHidden}
-                            onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
-                            dialogContentProps={{
-                              type: DialogType.close,
-                              title: 'The Prime Directive',
-                            }}
-                            minWidth={600}
-                            modalProps={{
-                              isBlocking: true,
-                              containerClassName: 'prime-directive-dialog',
-                              className: 'retrospectives-dialog-modal',
-                            }}>
-                            <DialogContent>
-                              The purpose of the Prime Directive is to assure that a retrospective has the right culture to make it a positive and result oriented event. It makes a retrospective become an effective team gathering to learn and find solutions to improve the way of working.
-                              <br /><br />
-                              <strong>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</strong>
-                              <br /><br />
-                              <em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
-                            </DialogContent>
-                            <DialogFooter>
-                              <DefaultButton onClick={() => { window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank'); }} text="Open Retrospective Wiki Page" />
-                              <PrimaryButton onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }} text="Close" />
-                            </DialogFooter>
-                          </Dialog>
-                          <TooltipHost
-                            hostClassName="toggle-carousel-button-tooltip-wrapper"
-                            content="Prime Directive"
-                            calloutProps={{ gapSpace: 0 }}>
-                            <ActionButton
-                              className="toggle-carousel-button"
-                              text="Prime Directive"
-                              iconProps={{ iconName: 'BookAnswers' }}
-                              onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: false }); }}>
-                            </ActionButton>
-                          </TooltipHost>
-                        </>
-                      }
                       <WorkflowStage
                         display="Collect"
                         value={WorkflowPhase.Collect}
@@ -1328,6 +1291,46 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           onClick={this.showCarouselDialog}>
                         </ActionButton>
                       </TooltipHost>
+                    }
+                    {this.state.currentBoard.displayPrimeDirective &&
+                      <>
+                        <Dialog
+                          hidden={this.state.isPrimeDirectiveDialogHidden}
+                          onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
+                          dialogContentProps={{
+                            type: DialogType.close,
+                            title: 'The Prime Directive',
+                          }}
+                          minWidth={600}
+                          modalProps={{
+                            isBlocking: true,
+                            containerClassName: 'prime-directive-dialog',
+                            className: 'retrospectives-dialog-modal',
+                          }}>
+                          <DialogContent>
+                            The purpose of the Prime Directive is to assure that a retrospective has the right culture to make it a positive and result oriented event. It makes a retrospective become an effective team gathering to learn and find solutions to improve the way of working.
+                            <br /><br />
+                            <strong>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</strong>
+                            <br /><br />
+                            <em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
+                          </DialogContent>
+                          <DialogFooter>
+                            <DefaultButton onClick={() => { window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank'); }} text="Open Retrospective Wiki Page" />
+                            <PrimaryButton onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }} text="Close" />
+                          </DialogFooter>
+                        </Dialog>
+                        <TooltipHost //TODO: hakenned - move this out of the main flow ... next to focus mode?
+                          hostClassName="toggle-carousel-button-tooltip-wrapper"
+                          content="Prime Directive"
+                          calloutProps={{ gapSpace: 0 }}>
+                          <ActionButton
+                            className="toggle-carousel-button"
+                            text="Prime Directive"
+                            iconProps={{ iconName: 'BookAnswers' }}
+                            onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: false }); }}>
+                          </ActionButton>
+                        </TooltipHost>
+                      </>
                     }
                   </div>
                   {
@@ -1501,32 +1504,34 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <div>{this.state.actionItemIds.length} action items created</div>
               <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
               <div>
-              Assessment Scores ({ this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.length } people responded)<br />
+                Assessment Scores ({this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.length} people responded)<br />
                 <div className="retro-summary-effectiveness-scores">
                   <ul className="chart">
-                  { this.state.effectivenessMeasurementChartData.map((data, index) => { return (
-                      <li key={index}>
-                        <div style={{ width: "200px", color: "#000", textAlign: "end" }}>
-                          { getQuestionShortName(data.questionId) }
-                        </div>
-                        { data.red > 0 &&
-                        <div style={{ backgroundColor: "#d6201f", width: `${((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
-                          {((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
-                        </div>
-                        }
-                        { data.yellow > 0 &&
-                        <div style={{ backgroundColor: "#ffd302", width: `${((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
-                          {((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
-                        </div>
-                        }
-                        { data.green > 0 &&
-                        <div style={{ backgroundColor: "#006b3d", width: `${((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
-                          {((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
-                        </div>
-                        }
-                      </li>
-                    )})
-                  }
+                    {this.state.effectivenessMeasurementChartData.map((data, index) => {
+                      return (
+                        <li key={index}>
+                          <div style={{ width: "200px", color: "#000", textAlign: "end" }}>
+                            {getQuestionShortName(data.questionId)}
+                          </div>
+                          {data.red > 0 &&
+                            <div style={{ backgroundColor: "#d6201f", width: `${((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                              {((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                            </div>
+                          }
+                          {data.yellow > 0 &&
+                            <div style={{ backgroundColor: "#ffd302", width: `${((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                              {((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                            </div>
+                          }
+                          {data.green > 0 &&
+                            <div style={{ backgroundColor: "#006b3d", width: `${((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                              {((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
+                            </div>
+                          }
+                        </li>
+                      )
+                    })
+                    }
                   </ul>
                   <div className="legend">
                     <span>Favorability</span>
@@ -1548,10 +1553,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 </div>
                 <a href="#" onClick={(e) => { e.preventDefault(); this.setState({ teamEffectivenessMeasurementAverageVisibilityClassName: this.state.teamEffectivenessMeasurementAverageVisibilityClassName === "visible" ? "hidden" : "visible" }) }}>Show average points for each question:</a>
                 <div className={this.state.teamEffectivenessMeasurementAverageVisibilityClassName}>
-                { this.state.effectivenessMeasurementSummary.map((measurement, index) => {
+                  {this.state.effectivenessMeasurementSummary.map((measurement, index) => {
                     return <div key={index}><strong>{getQuestionShortName(measurement.questionId)}</strong> - {measurement.question}: {measurement.average}</div>
                   })
-                }
+                  }
                 </div>
               </div>
               {!this.state.currentBoard.isAnonymous ?

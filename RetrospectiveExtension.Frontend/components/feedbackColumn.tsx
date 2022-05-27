@@ -121,8 +121,15 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
     // const draggedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
+    //TODO: hakenned here!
+    const boardItem = await itemDataService.getBoardItem(this.props.team.id,
+      this.props.boardId);
 
-    await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
+    // only drop into another column if that's allowed
+    // It's allowed unless explicitly set up otherwise
+    if (!boardItem.preventCrossColumnGroups) {
+      await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
+    }
   }
 
   public static moveFeedbackItem = async (

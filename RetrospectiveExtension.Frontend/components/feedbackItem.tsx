@@ -9,7 +9,7 @@ import { DocumentCard, DocumentCardActivity } from 'office-ui-fabric-react/lib/D
 import { WorkflowPhase } from '../interfaces/workItem';
 import ActionItemDisplay from './actionItemDisplay';
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
-import { IFeedbackItemDocument } from '../interfaces/feedback';
+import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
 import { itemDataService } from '../dal/itemDataService';
 import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import localStorageHelper from '../utilities/localStorageHelper';
@@ -223,9 +223,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     // const droppedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
     const droppedItemProps = await itemDataService.getFeedbackItem(this.props.boardId, droppedItemId);
+    //TODO: hakenned here!
+    const boardItem: IFeedbackBoardDocument = await itemDataService.getBoardItem(
+      this.props.team.id, this.props.boardId
+    );
+    const preventCrossColumnGroups = boardItem.preventCrossColumnGroups;
 
     if (this.props.id !== droppedItemId) {
-      if (this.props.columnId === droppedItemProps.originalColumnId) {
+      if (!preventCrossColumnGroups || this.props.columnId === droppedItemProps.originalColumnId) {
         FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(this.props, droppedItemId, this.props.id);
       }
     }

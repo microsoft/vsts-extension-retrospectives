@@ -25,8 +25,19 @@
     "quotes": "off",
     "react/jsx-key": "off",
     "react/no-direct-mutation-state": "off",
-    "no-multiple-empty-lines": ["error", { "max": 1 }],
-    "no-trailing-spaces": [2, { "skipBlankLines": true }],
+    "react/prop-types": "off",
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1
+      }
+    ],
+    "no-trailing-spaces": [
+      2,
+      {
+        "skipBlankLines": true
+      }
+    ],
     "@typescript-eslint/ban-types": "off",
     "jsx-quotes": [
       "error",
@@ -39,6 +50,8 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/comma-spacing": ["error"]
+    "@typescript-eslint/comma-spacing": [
+      "error"
+    ]
   }
 }

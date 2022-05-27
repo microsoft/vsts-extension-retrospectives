@@ -23,7 +23,7 @@ $team_selector_list_item_width: 450px;
   right: 0;
   top: 0;
   bottom: 0;
-  position: absolute;
+  // position: absolute;
 }
 
 .feedback-board-container-header-spacer {
@@ -83,7 +83,7 @@ $team_selector_list_item_width: 450px;
   margin-right: 10px;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend > span {
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend>span {
   width: 150px;
   font-size: large;
   justify-content: flex-end;
@@ -97,7 +97,7 @@ $team_selector_list_item_width: 450px;
   margin-right: 4px;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores > * > * {
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores>*>* {
   display: flex;
 }
 
@@ -172,7 +172,7 @@ $team_selector_list_item_width: 450px;
   justify-content: flex-start;
   padding: 10px 15px;
 
-  .extension-title-text{
+  .extension-title-text {
     font-size: 26px;
     line-height: 40px;
     letter-spacing: -.04em;
@@ -225,11 +225,11 @@ $team_selector_list_item_width: 450px;
 }
 
 .pivot-container button[role=tab] {
-  color: rgba(var(--palette-neutral-80,51, 51, 51),1);
+  color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
 }
 
 .pivot-container button[role=tab]:hover {
-  color: rgba(var(--palette-neutral-80,51, 51, 51),1);
+  color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
   background-color: transparent;
 }
 
@@ -283,7 +283,7 @@ $team_selector_list_item_width: 450px;
     align-items: center;
     margin-left: 35px;
     margin-top: 8px;
-    background-color: rgba(0,0,0,0.04);
+    background-color: rgba(0, 0, 0, 0.04);
 
     .retrospective-workflowState {
       width: 72px;
@@ -356,7 +356,9 @@ $team_selector_list_item_width: 450px;
     text-align: center;
   }
 
-  tbody tr:hover {background-color: #ddd;}
+  tbody tr:hover {
+    background-color: #ddd;
+  }
 
   tr td button {
     color: darkslategray !important;
@@ -372,6 +374,7 @@ $team_selector_list_item_width: 450px;
     .ms-Dialog-header {
       display: none;
     }
+
     .ms-Dialog-inner {
       padding: 0 3px 5px;
     }

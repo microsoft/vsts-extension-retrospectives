@@ -1,4 +1,5 @@
-﻿import React from 'react';
+﻿/* eslint-disable react/prop-types */
+import React from 'react';
 import { getService } from 'azure-devops-extension-sdk';
 import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { DocumentCard, DocumentCardTitle, DocumentCardType } from 'office-ui-fabric-react/lib/DocumentCard';
@@ -45,7 +46,7 @@ interface IActionItemsTableProps {
 
 class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryState> {
   constructor(props: IBoardSummaryProps) {
-    super (props);
+    super(props);
 
     const actionItemsTableColumns: IColumn[] = [
       {
@@ -57,7 +58,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         maxWidth: 16,
         minWidth: 16,
         name: 'Work Item Icon',
-        onRender: (props) => {
+        onRender: (props: IActionItemsTableProps) => {
           return <Image src={props.icon.url} className="work-item-type-icon" alt={`${props.type} icon`} />;
         }
       },
