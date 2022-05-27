@@ -1319,7 +1319,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             <PrimaryButton onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }} text="Close" />
                           </DialogFooter>
                         </Dialog>
-                        <TooltipHost //TODO: hakenned - move this out of the main flow ... next to focus mode?
+                        <TooltipHost
                           hostClassName="toggle-carousel-button-tooltip-wrapper"
                           content="Prime Directive"
                           calloutProps={{ gapSpace: 0 }}>

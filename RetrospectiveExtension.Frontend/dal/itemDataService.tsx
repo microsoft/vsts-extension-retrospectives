@@ -97,7 +97,7 @@ class ItemDataService {
       return undefined;
     }
 
-    if(feedbackItem && feedbackItem.upvotes > 0) {
+    if (feedbackItem && feedbackItem.upvotes > 0) {
       console.log(`Cannot delete a feedback item which has upvotes. Board: ${boardId} Item: ${feedbackItemId}`);
       return undefined;
     }
@@ -158,6 +158,7 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
+      console.log(`Cannot increment upvote for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
 

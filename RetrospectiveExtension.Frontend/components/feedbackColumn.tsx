@@ -121,7 +121,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
     // const draggedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
-    //TODO: hakenned here!
     const boardItem = await itemDataService.getBoardItem(this.props.team.id,
       this.props.boardId);
 

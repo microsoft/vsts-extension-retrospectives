@@ -223,7 +223,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     // const droppedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
     const droppedItemProps = await itemDataService.getFeedbackItem(this.props.boardId, droppedItemId);
-    //TODO: hakenned here!
     const boardItem: IFeedbackBoardDocument = await itemDataService.getBoardItem(
       this.props.team.id, this.props.boardId
     );
