@@ -1090,13 +1090,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     return (
-      <div className={this.state.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}>
-        <div id="extension-header">
-          <div className="extension-title-text" aria-label="Retrospectives">
+      <>
+        <div className="flex items-center px-2 py-2">
+          <div className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
             Retrospectives
           </div>
           <SelectorCombo<WebApiTeam>
-            className="team-selector"
+            className="flex items-center mx-6"
             currentValue={this.state.currentTeam}
             iconName="users"
             nameGetter={(team) => team.name}
@@ -1107,7 +1107,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <div style={{ flexGrow: 1 }}></div>
           <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.toggleAndFixResolution} />
         </div>
-        <div className="pivot-container">
+        <div className="flex w-full items-center justify-start">
           <Pivot>
             <PivotItem headerText="Board">
               {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible &&
