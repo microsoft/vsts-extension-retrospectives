@@ -6,7 +6,7 @@ import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 
-import { ViewMode, MobileWidthBreakpoint } from '../config/constants';
+import { MobileWidthBreakpoint } from '../config/constants';
 import { WorkflowPhase } from '../interfaces/workItem';
 import WorkflowStage from './workflowStage';
 import BoardDataService from '../dal/boardDataService';
@@ -1431,7 +1431,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </PivotItem>
           </Pivot>
         </div>
-        <div className="feedback-board-container-header-spacer hide-mobile" />
         {this.state.isTeamDataLoaded &&
           !this.state.boards.length &&
           !this.state.isSummaryDashboardVisible &&
@@ -1583,7 +1582,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           toastClassName="retrospective-notification-toast"
           bodyClassName="retrospective-notification-toast-body"
           progressClassName="retrospective-notification-toast-progress-bar" />
-      </div>
+      </>
     );
   }
 }
