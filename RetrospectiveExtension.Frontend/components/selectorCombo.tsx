@@ -55,35 +55,8 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
   public render(): JSX.Element {
     const selectorButtonText: string = this.props.nameGetter(this.props.currentValue);
 
-    return (<>
-      <div className={classNames('hide-desktop', this.props.className)}>
-        <div
-          className="selector-button"
-          tabIndex={0}
-          onClick={this.openMobileSelectorDialog}
-          onKeyDown={this.handleKeyPressTeamListMobile}
-          aria-expanded={!this.state.isSelectorDialogHidden}>
-          <i className={"selector-button-icon fas fa-" + this.props.iconName}></i>
-          <span className="selector-button-text-wrapper">
-            <div className="selector-button-text">
-              {selectorButtonText}
-            </div>
-          </span>
-          <i className={"selector-button-chevron fas fa-chevron-down"}></i>
-        </div>
-        <Dialog
-          hidden={this.state.isSelectorDialogHidden}
-          onDismiss={this.closeMobileSelectorDialog}
-          modalProps={{
-            className: classNames('retrospectives-dialog-modal', 'selector', this.props.className),
-            containerClassName: 'ms-dialogMainOverride',
-            isBlocking: false,
-          }}
-        >
-          {this.renderSelectorCombo(this.getFilteredValues(), false)}
-        </Dialog>
-      </div>
-      <div className={classNames('hide-mobile', this.props.className)}>
+    return (
+      <div className={this.props.className}>
         <div
           className="selector-button"
           aria-label={'Click to search and select ' + this.props.title + '. Current selection is ' + selectorButtonText}
@@ -115,7 +88,7 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
           {this.renderSelectorCombo(this.getFilteredValues(), true)}
         </FocusTrapCallout>
       </div>
-    </>);
+    );
   }
 
   private handleKeyPressSelectorButton = (event: React.KeyboardEvent<HTMLDivElement>) => {
