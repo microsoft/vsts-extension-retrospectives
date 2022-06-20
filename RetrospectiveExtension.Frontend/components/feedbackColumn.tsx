@@ -249,36 +249,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         onDoubleClick={this.createEmptyFeedbackItem}
         onDrop={this.handleDropFeedbackItemOnColumnSpace}
         onDragOver={this.dragFeedbackItemOverColumn}>
-        <div className="hide-mobile feedback-column-header">
+        <div className="feedback-column-header">
           <div className="feedback-column-title"
             aria-label={this.props.columnName}>
             <i className={classNames(this.props.iconClass, 'feedback-column-icon')} />
             <div className="feedback-column-name">
               {this.props.columnName}
-            </div>
-          </div>
-        </div>
-        <div className="hide-desktop collapse"
-          aria-label="Toggle Hide/Show"
-          tabIndex={0}
-          onClick={this.toggleCollapse}
-          onKeyUp={(e) => {
-            if (e.keyCode === 13) {
-              e.stopPropagation();
-              this.toggleCollapse();
-            }
-          }}>
-          <div className="feedback-column-title"
-            aria-label={this.props.columnName}>
-            <div className="feedback-column-icon">
-              {this.state.isCollapsed ?
-                <i className="fa fa-caret-right" /> :
-                <i className="fa fa-caret-down" />}
-            </div>
-            <div className="feedback-column-name">
-              {this.props.columnName}&nbsp;
-              <i className={this.props.iconClass}
-                style={{ color: this.props.accentColor }}></i>
             </div>
           </div>
         </div>
@@ -297,7 +273,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           {this.props.isDataLoaded &&
             <div
               className={classNames('feedback-items-container',
-                { 'feedback-items-actions': this.props.workflowPhase === WorkflowPhase.Act, })
+                { 'feedback-items-actions': this.props.workflowPhase === WorkflowPhase.Act })
               }
             >
               {this.renderFeedbackItems()}
