@@ -120,18 +120,6 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
     });
   }
 
-  private openMobileSelectorDialog = () => {
-    this.setState({
-      isSelectorDialogHidden: false,
-    });
-  }
-
-  private handleKeyPressTeamListMobile = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.keyCode === 13) {
-      this.openMobileSelectorDialog();
-    }
-  }
-
   private hideSelectorCallout = () => {
     this.setState({
       isSelectorCalloutVisible: false,
