@@ -1054,6 +1054,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     };
 
     const saveTeamEffectivenessMeasurement = () => {
+      const teamEffectivenessMeasurementVoteCollection = this.state.currentBoard.teamEffectivenessMeasurementVoteCollection;
+      const currentUserVote = teamEffectivenessMeasurementVoteCollection.find((vote) => vote.userId === this.state.currentUserId);
+      const responseCount = currentUserVote.responses.length;
+
+      if (responseCount < questions.length) {
+        toast("Please answer all questions before saving");
+        return;
+      }
+
       itemDataService.updateTeamEffectivenessMeasurement(this.state.currentBoard.id, this.state.currentTeam.id, this.state.currentUserId, this.state.currentBoard.teamEffectivenessMeasurementVoteCollection);
 
       this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
