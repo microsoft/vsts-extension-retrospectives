@@ -5,7 +5,8 @@
   break-inside: avoid-column;
   display: inline-block;
   vertical-align: top;
-  flex-basis: $main_item_card_max_width;
+  width: 100%;
+  min-width: 310px;
 
   &.newFeedbackItem {
     .ms-DocumentCard {
@@ -29,7 +30,7 @@
   }
 
   .mainItemCard {
-    width: $main_item_card_max_width;
+    width: 100%;
     background-color: var(--background-color);
     border-top: 1px solid rgb(96, 94, 92);
     border-right: 1px solid rgb(96, 94, 92);
