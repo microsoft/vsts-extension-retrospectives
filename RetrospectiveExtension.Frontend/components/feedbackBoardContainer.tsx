@@ -483,9 +483,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const queryParamTeamAndDefaultBoardState = {
       ...baseTeamState,
-      currentBoard: boardsForMatchedTeam.length
-        ? boardsForMatchedTeam[0]
-        : null,
+      currentBoard: boardsForMatchedTeam.length ? boardsForMatchedTeam[0] : null,
       currentTeam: matchedTeam,
       boards: boardsForMatchedTeam,
     };
@@ -582,9 +580,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return {
       boards: boardsForMatchedTeam,
-      currentBoard: (boardsForMatchedTeam && boardsForMatchedTeam.length)
-        ? boardsForMatchedTeam[0]
-        : null,
+      currentBoard: (boardsForMatchedTeam && boardsForMatchedTeam.length) ? boardsForMatchedTeam[0] : null,
       currentTeam: defaultTeam,
     };
   }
@@ -613,12 +609,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         if (!prevState.currentTeam || prevState.currentTeam.id !== matchedTeam.id) {
 
           return {
-            boards: (boardsForTeam && boardsForTeam.length)
-              ? boardsForTeam
-              : [],
-            currentBoard: (boardsForTeam && boardsForTeam.length)
-              ? boardsForTeam[0]
-              : null,
+            boards: (boardsForTeam && boardsForTeam.length) ? boardsForTeam : [],
+            currentBoard: (boardsForTeam && boardsForTeam.length) ? boardsForTeam[0] : null,
             currentTeam: matchedTeam,
             isTeamDataLoaded: true,
           }
