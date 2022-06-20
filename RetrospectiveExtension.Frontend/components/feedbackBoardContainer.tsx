@@ -1488,6 +1488,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <div>Retrospective session date is {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
               <div>{this.state.feedbackItems.length} feedback items created</div>
               <div>{this.state.members.length} people in the team, {this.state.contributors.length} participants contributed</div>
+              {!this.state.currentBoard.isAnonymous && this.state.contributors.length > 0 &&
+                <>
+                  <div>Contributors:</div>
+                  {this.state.contributors.map((contributor, index) =>
+                    <div key={index}>
+                      <img className="avatar" src={contributor.imageUrl} /> {contributor.name}
+                    </div>
+                  )}
+                </>
+              }
               <div>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted {this.state.castedVoteCount} votes</div>
               <div>{this.state.actionItemIds.length} action items created</div>
               <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
@@ -1545,16 +1555,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 }
                 </div>
               </div>
-              {!this.state.currentBoard.isAnonymous ?
-                <>
-                  <div>Contributors:</div>
-                  {this.state.contributors.map((contributor, index) =>
-                    <div key={index}>
-                      <img className="avatar" src={contributor.imageUrl} /> {contributor.name}
-                    </div>
-                  )}
-                </>
-                : <div>User information for team assessment answers always stored anonymously</div>}
             </>
           }
         </Dialog>
