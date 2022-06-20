@@ -16,3 +16,11 @@
 .ms-Button--default {
   background-color: #fff;
 }
+
+div.ms-Tooltip-content p.ms-Tooltip-subtext a {
+  @apply text-blue-500 underline;
+}
+
+.ms-Pivot .ms-Button {
+  color: var(--text-primary-color);
+}
