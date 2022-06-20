@@ -12,19 +12,18 @@ import FeedbackBoardContainer, { FeedbackBoardContainerProps } from './component
 
 initializeIcons();
 
-sdkInit()
-  .then(() => {
-    Promise.all([isHostedAzureDevOps(), getProjectId()]).then(res => {
-      const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
-        isHostedAzureDevOps: res[0],
-        projectId: res[1]
-      };
+sdkInit({ applyTheme: true }).then(() => {
+  Promise.all([isHostedAzureDevOps(), getProjectId()]).then(res => {
+    const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
+      isHostedAzureDevOps: res[0],
+      projectId: res[1]
+    };
 
-      ReactDOM.render(
-        <AppInsightsErrorBoundary onError={() => <h1>We detected an error in the application</h1>} appInsights={reactPlugin}>
-          <FeedbackBoardContainer {...feedbackBoardContainerProps} />
-        </AppInsightsErrorBoundary>,
-        document.getElementById('root') as HTMLElement,
-      );
-    });
+    ReactDOM.render(
+      <AppInsightsErrorBoundary onError={() => <h1>We detected an error in the application</h1>} appInsights={reactPlugin}>
+        <FeedbackBoardContainer {...feedbackBoardContainerProps} />
+      </AppInsightsErrorBoundary>,
+      document.getElementById('root') as HTMLElement,
+    );
   });
+});
