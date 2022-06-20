@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
 import { ActionButton, PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
@@ -603,13 +602,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     if (!this.props.createdBy) {
       return (
         <div className="anonymous-created-date">
-          {moment(this.props.createdDate).format('MMM Do, YYYY h:mm a')}
+          {new Intl.DateTimeFormat("default", {year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"}).format(new Date(this.props.createdDate))}
         </div>
       );
     }
 
     return (<DocumentCardActivity
-      activity={moment(this.props.createdDate).format('MMM Do, YYYY h:mm a')}
+      activity={new Intl.DateTimeFormat("default", {year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"}).format(new Date(this.props.createdDate))}
       people={[{
         name: this.props.createdBy,
         profileImageSrc: this.props.createdByProfileImage,
