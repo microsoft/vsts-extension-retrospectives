@@ -39,6 +39,7 @@ import { getQuestionName, getQuestionShortName, getQuestionTooltip, questions } 
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
+import boardDataService from '../dal/boardDataService';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -160,19 +161,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       this.setSupportedWorkItemTypesForProject();
 
-      const feedbackItems = await itemDataService.getFeedbackItemsForBoard(this.state.currentBoard.id);
-
-      this.setState({ feedbackItems: feedbackItems });
-
-      feedbackItems.forEach(async item => {
-        const actionItems = await itemDataService.getAssociatedActionItemIds(this.state.currentBoard.id, item.id);
-
-        this.setState({ actionItemIds: [...this.state.actionItemIds].concat(actionItems) });
-      });
-
-      const contributors = feedbackItems.map(e => { return { id: e?.createdBy?.id, name: e?.createdBy?.displayName, imageUrl: e?.createdBy?.imageUrl } }).filter((v, i, a) => a.indexOf(v) === i);
-
-      this.setState({ contributors: [...new Set(contributors.map(e => e.imageUrl))].map(e => contributors.find(i => i.imageUrl === e)) });
+      await this.updateFeedbackItemsAndContributors();
 
       const members = await azureDevOpsCoreService.getMembers(this.state.currentTeam.projectId, this.state.currentTeam.id);
 
@@ -200,6 +189,28 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     this.setState({ isAppInitialized: true });
+  }
+
+  private async updateFeedbackItemsAndContributors() {
+    const board = await itemDataService.getBoardItem(this.state.currentTeam.id, this.state.currentBoard.id);
+
+    const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board.id);
+
+    let actionItemIds: number[] = [];
+    feedbackItems.forEach(item => {
+      actionItemIds = actionItemIds.concat(item.associatedActionItemIds);
+    });
+
+    const contributors = feedbackItems.map(e => { return { id: e.userIdRef, name: e?.createdBy?.displayName, imageUrl: e?.createdBy?.imageUrl }; }).filter((v, i, a) => a.indexOf(v) === i);
+
+    const votes = Object.values(board.boardVoteCollection || []);
+
+    this.setState({
+      actionItemIds: actionItemIds.filter(item => item !== undefined),
+      feedbackItems,
+      contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
+      castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0
+    });
   }
 
   public componentDidUpdate(prevProps: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
@@ -750,10 +761,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isPreviewEmailDialogHidden: false });
   }
 
-  private showRetroSummaryDialog = (): void => {
-    // TODO (enpolat) : go and fetch the current data from the custom data store for all of the users team effectiveness measurement answers
+  private showRetroSummaryDialog = async () => {
     const measurements: { id: number, selected: number }[] = [];
-    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.forEach(vote => {
+
+    const board = await boardDataService.getBoardForTeamById(this.state.currentTeam.id, this.state.currentBoard.id);
+    const voteCollection =  board.teamEffectivenessMeasurementVoteCollection || [];
+
+    voteCollection.forEach(vote => {
       vote?.responses?.forEach(response => {
         measurements.push({ id: response.questionId, selected: response.selection });
       });
@@ -771,7 +785,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       chartData.push({ questionId: (e+1), red: 0, yellow: 0, green: 0 });
     });
 
-    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.forEach(vote => {
+    voteCollection?.forEach(vote => {
       [...Array(5).keys()].forEach(e => {
         const selection = vote.responses.find(response => response.questionId === (e+1))?.selection;
         const data = chartData.find(d => d.questionId === (e+1));
@@ -785,7 +799,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     });
 
+    await this.updateFeedbackItemsAndContributors();
+
     this.setState({
+      currentBoard: board,
       isRetroSummaryDialogHidden: false,
       effectivenessMeasurementChartData: chartData,
       effectivenessMeasurementSummary: average,
