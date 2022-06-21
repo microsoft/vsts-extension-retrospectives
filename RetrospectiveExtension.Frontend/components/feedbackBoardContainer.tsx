@@ -255,6 +255,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
+  private percentageFormatter = (value: number) => {
+    const option = { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 };
+
+    const formatter = new Intl.NumberFormat("en-US", option);
+
+    return formatter.format(value / 100);
+  }
+
   // private handleErrorEvent = async (errorEvent: ErrorEvent) => {
   // TODO (enpolat) : appInsightsClient.trackException(errorEvent.error);
   // }
@@ -1531,29 +1539,31 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 Assessment Scores ({this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.length} people responded)<br />
                 <div className="retro-summary-effectiveness-scores">
                   <ul className="chart">
-                  { this.state.effectivenessMeasurementChartData.map((data, index) => { return (
-                      <li key={index}>
-                        <div style={{ width: "200px", color: "#000", textAlign: "end" }}>
-                          { getQuestionShortName(data.questionId) }
-                        </div>
-                        { data.red > 0 &&
-                        <div style={{ backgroundColor: "#d6201f", width: `${((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
-                          {((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
-                        </div>
-                        }
-                        { data.yellow > 0 &&
-                        <div style={{ backgroundColor: "#ffd302", width: `${((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
-                          {((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
-                        </div>
-                        }
-                        { data.green > 0 &&
-                        <div style={{ backgroundColor: "#006b3d", width: `${((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
-                          {((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%
-                        </div>
-                        }
-                      </li>
-                    )})
-                  }
+                    {this.state.effectivenessMeasurementChartData.map((data, index) => {
+                      return (
+                        <li key={index}>
+                          <div style={{ width: "200px", color: "#000", textAlign: "end" }}>
+                            {getQuestionShortName(data.questionId)}
+                          </div>
+                          {data.red > 0 &&
+                            <div style={{ backgroundColor: "#d6201f", width: `${((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                              {this.percentageFormatter((data.red * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}
+                            </div>
+                          }
+                          {data.yellow > 0 &&
+                            <div style={{ backgroundColor: "#ffd302", width: `${((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                              {this.percentageFormatter((data.yellow * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}
+                            </div>
+                          }
+                          {data.green > 0 &&
+                            <div style={{ backgroundColor: "#006b3d", width: `${((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}%` }} title={getQuestionName(data.questionId)}>
+                              {this.percentageFormatter((data.green * 100) / this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.length)}
+                            </div>
+                          }
+                        </li>
+                      )
+                    })
+                    }
                   </ul>
                   <div className="legend">
                     <span>Favorability</span>
