@@ -84,7 +84,7 @@ export interface FeedbackBoardContainerState {
   isAutoResizeEnabled: boolean;
   allowCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
-  contributors: {id: string, name: string, imageUrl: string}[];
+  contributors: { id: string, name: string, imageUrl: string }[];
   effectivenessMeasurementSummary: { questionId: number, question: string, average: number }[];
   effectivenessMeasurementChartData: { questionId: number, red: number, yellow: number, green: number }[];
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
@@ -765,7 +765,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const measurements: { id: number, selected: number }[] = [];
 
     const board = await boardDataService.getBoardForTeamById(this.state.currentTeam.id, this.state.currentBoard.id);
-    const voteCollection =  board.teamEffectivenessMeasurementVoteCollection || [];
+    const voteCollection = board.teamEffectivenessMeasurementVoteCollection || [];
 
     voteCollection.forEach(vote => {
       vote?.responses?.forEach(response => {
@@ -782,13 +782,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const chartData: { questionId: number, red: number, yellow: number, green: number }[] = [];
 
     [...Array(5).keys()].forEach(e => {
-      chartData.push({ questionId: (e+1), red: 0, yellow: 0, green: 0 });
+      chartData.push({ questionId: (e + 1), red: 0, yellow: 0, green: 0 });
     });
 
     voteCollection?.forEach(vote => {
       [...Array(5).keys()].forEach(e => {
-        const selection = vote.responses.find(response => response.questionId === (e+1))?.selection;
-        const data = chartData.find(d => d.questionId === (e+1));
+        const selection = vote.responses.find(response => response.questionId === (e + 1))?.selection;
+        const data = chartData.find(d => d.questionId === (e + 1));
         if (selection <= 6) {
           data.red++;
         } else if (selection <= 8) {
@@ -1528,7 +1528,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <div>{this.state.actionItemIds.length} action items created</div>
               <div>Board created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName}</div>
               <div>
-              Assessment Scores ({ this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.length } people responded)<br />
+                Assessment Scores ({this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.length} people responded)<br />
                 <div className="retro-summary-effectiveness-scores">
                   <ul className="chart">
                   { this.state.effectivenessMeasurementChartData.map((data, index) => { return (
