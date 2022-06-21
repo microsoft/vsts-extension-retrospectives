@@ -164,7 +164,7 @@ class ItemDataService {
     if (feedbackItem.upvotes <= 0) {
       return "0";
     } else {
-      if (feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
+      if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
         return "0";
       }
       else {
