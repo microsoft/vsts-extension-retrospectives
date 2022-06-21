@@ -255,6 +255,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
+  private numberFormatter = (value: number) => {
+    const option = { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 };
+
+    const formatter = new Intl.NumberFormat("en-US", option);
+
+    return formatter.format(value);
+  }
+
   private percentageFormatter = (value: number) => {
     const option = { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 };
 
@@ -1585,10 +1593,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 </div>
                 <a href="#" onClick={(e) => { e.preventDefault(); this.setState({ teamEffectivenessMeasurementAverageVisibilityClassName: this.state.teamEffectivenessMeasurementAverageVisibilityClassName === "visible" ? "hidden" : "visible" }) }}>Show average points for each question:</a>
                 <div className={this.state.teamEffectivenessMeasurementAverageVisibilityClassName}>
-                { this.state.effectivenessMeasurementSummary.map((measurement, index) => {
-                    return <div key={index}><strong>{getQuestionShortName(measurement.questionId)}</strong> - {measurement.question}: {measurement.average}</div>
+                  {this.state.effectivenessMeasurementSummary.map((measurement, index) => {
+                    return <div key={index}><strong>{getQuestionShortName(measurement.questionId)}</strong> - {measurement.question}: {this.numberFormatter(measurement.average)}</div>
                   })
-                }
+                  }
                 </div>
               </div>
             </>
