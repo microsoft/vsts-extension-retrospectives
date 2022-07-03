@@ -812,7 +812,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           </div>
           <hr></hr>
           <div className="board-metadata-form-section-subheader">
-          <div className="flex flex-col">
+            <div className="flex flex-col">
               <Checkbox
                 label="Include Team Assessment"
                 ariaLabel="Include Team Assessment. This selection cannot be modified after board creation."
