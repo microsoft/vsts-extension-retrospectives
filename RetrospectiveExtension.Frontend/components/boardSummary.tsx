@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { getService } from 'azure-devops-extension-sdk';
 import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { DocumentCard, DocumentCardTitle, DocumentCardType } from 'office-ui-fabric-react/lib/DocumentCard';
@@ -45,7 +45,7 @@ interface IActionItemsTableProps {
 
 class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryState> {
   constructor(props: IBoardSummaryProps) {
-    super (props);
+    super(props);
 
     const actionItemsTableColumns: IColumn[] = [
       {
