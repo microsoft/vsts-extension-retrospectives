@@ -1589,8 +1589,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 <div className={this.state.teamEffectivenessMeasurementAverageVisibilityClassName}>
                   {this.state.effectivenessMeasurementSummary.map((measurement, index) => {
                     return <div key={index}><strong>{getQuestionShortName(measurement.questionId)}</strong> - {measurement.question}: {this.numberFormatter(measurement.average)}</div>
-                  })
-                  }
+                  })}
                 </div>
               </div>
             </>
