@@ -1022,12 +1022,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     },
   ];
 
-  private showMobileBoardActionsDialog = () => {
-    this.setState({
-      isMobileBoardActionsDialogHidden: false,
-    });
-  }
-
   private hideMobileBoardActionsDialog = () => {
     this.setState({
       isMobileBoardActionsDialogHidden: true,
