@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { getService } from 'azure-devops-extension-sdk';
 import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { DocumentCard, DocumentCardTitle, DocumentCardType } from 'office-ui-fabric-react/lib/DocumentCard';
