@@ -57,7 +57,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         maxWidth: 16,
         minWidth: 16,
         name: 'Work Item Icon',
-        onRender: (props) => {
+        onRender: (props: IActionItemsTableProps) => {
           return <Image src={props.icon.url} className="work-item-type-icon" alt={`${props.type} icon`} />;
         }
       },
