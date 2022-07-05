@@ -263,11 +263,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
             </div>
           }
           {this.props.isDataLoaded &&
-            <div
-              className={classNames('feedback-items-container',
-                { 'feedback-items-actions': this.props.workflowPhase === WorkflowPhase.Act })
-              }
-            >
+            <div className={classNames('feedback-items-container', { 'feedback-items-actions': this.props.workflowPhase === WorkflowPhase.Act })}>
               {this.renderFeedbackItems()}
             </div>
           }
