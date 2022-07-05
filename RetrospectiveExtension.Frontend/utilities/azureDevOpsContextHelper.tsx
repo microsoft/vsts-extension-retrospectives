@@ -26,8 +26,5 @@ export const isInternalOrg = () => {
  */
 export const isHostedAzureDevOps = async () => {
   const hostAuthority = await getHostAuthority();
-  const isHosted = hostAuthority === 'dev.azure.com'
-    || hostAuthority.endsWith('.visualstudio.com');
-
-  return isHosted;
+  return hostAuthority === 'dev.azure.com' || hostAuthority.endsWith('.visualstudio.com');
 };
