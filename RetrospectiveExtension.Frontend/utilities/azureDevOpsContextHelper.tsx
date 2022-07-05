@@ -16,9 +16,7 @@ const internalOrgNames = [
  */
 export const isInternalOrg = () => {
   const host = getHost();
-  const isInternal = internalOrgNames.indexOf(host.name.toLowerCase().trim()) !== -1;
-
-  return isInternal;
+  return internalOrgNames.indexOf(host.name.toLowerCase().trim()) !== -1;
 };
 
 /**
