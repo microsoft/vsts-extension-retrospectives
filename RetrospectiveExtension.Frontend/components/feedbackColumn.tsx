@@ -235,12 +235,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       });
   }
 
-  private toggleCollapse = () => {
-    this.setState((prevState) => ({
-      isCollapsed: !prevState.isCollapsed,
-    }));
-  }
-
   private renderFeedbackColumn = () => {
     return (
       <div className="feedback-column"
