@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import classNames from 'classnames';
 
 import { WorkflowPhase } from '../interfaces/workItem';
@@ -198,12 +198,10 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   }
 
   private renderFeedbackItems = () => {
-    const sortItems = this.props.workflowPhase === WorkflowPhase.Act;
-
     // Build components to display the retrospective items, as individuals or groups.
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
-    if (sortItems) {
+    if (this.props.workflowPhase === WorkflowPhase.Act) {
       columnItems = columnItems.sort((item1, item2) => item2.feedbackItem.upvotes - item1.feedbackItem.upvotes);
     }
 
