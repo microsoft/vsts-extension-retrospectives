@@ -1,5 +1,4 @@
 import React from 'react';
-import classNames from 'classnames';
 
 import { WorkflowPhase } from '../interfaces/workItem';
 import FeedbackItem, { FeedbackItemHelper, IFeedbackItemProps } from './feedbackItem';
@@ -66,9 +65,7 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
   public render(): JSX.Element {
     return (
       <div
-        className={classNames('feedback-item-group', {
-          'feedback-item-group-expanded': this.state.isGroupExpanded
-        })}
+        className={`feedback-item-group ${this.state.isGroupExpanded ? "feedback-item-group-expanded" : ""}`}
         onDragOver={this.dragFeedbackItemOverFeedbackItemGroup}
         onDrop={this.dropFeedbackItemOnFeedbackItemGroup}>
         <div className="item-cards"
