@@ -129,7 +129,10 @@ class ReflectBackendService {
       return;
     }
 
-    this.leaveBoardGroup(this._currentBoardId);
+    if (this._currentBoardId !== undefined && this._currentBoardId !== null) {
+      this._signalRConnection.send(ReflectBackendSignals.LeaveReflectBoardGroup, this._currentBoardId);
+    }
+
     if (newBoardId) {
       this.joinBoardGroup(newBoardId);
     }
