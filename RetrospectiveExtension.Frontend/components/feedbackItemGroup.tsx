@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { WorkflowPhase } from '../interfaces/workItem';
-import FeedbackItem, { FeedbackItemHelper, IFeedbackItemProps } from './feedbackItem';
-import localStorageHelper from '../utilities/localStorageHelper';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { WorkflowPhase } from '../interfaces/workItem';
+import localStorageHelper from '../utilities/localStorageHelper';
 import { reactPlugin } from '../utilities/telemetryClient';
+import FeedbackItem, { FeedbackItemHelper, IFeedbackItemProps } from './feedbackItem';
 
 export interface IFeedbackItemGroupProps {
   groupedWorkItems: IFeedbackItemProps[];
