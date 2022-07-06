@@ -177,8 +177,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     }
 
     const columnItemPromises: Promise<IColumnItem>[] = feedbackItems.map(async (feedbackItem) => {
-      const actionItems = feedbackItem.associatedActionItemIds && feedbackItem.associatedActionItemIds.length ?
-        await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
+      const actionItems = feedbackItem.associatedActionItemIds && feedbackItem.associatedActionItemIds.length ? await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
 
       return {
         actionItems,
