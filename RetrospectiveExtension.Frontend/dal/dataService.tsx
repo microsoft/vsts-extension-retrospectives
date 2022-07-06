@@ -44,6 +44,9 @@ export async function readDocuments<T>(
  * Read a specific user/account scoped document.
  */
 export async function readDocument<T>(collectionName: string, id: string, isPrivate?: boolean): Promise<T> {
+  if (id === "emptyFeedbackItem") {
+    return undefined;
+  }
   const dataService: IExtensionDataManager = await getDataService();
   let data: T;
   try {
