@@ -55,7 +55,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
       workItemSearchTextboxHasErrors: false,
       initialRender: true,
     };
-}
+  }
 
   componentDidMount() {
     if(this.state.initialRender) {
