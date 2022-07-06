@@ -494,8 +494,7 @@ class ItemDataService {
       updatedFeedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
     }
     catch (e) {
-      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
-      console.log(`Failed to read Feedback item with id: ${feedbackItemId}.`);
+      appInsights.trackException(e);
       updatedFeedbackItem = undefined;
     }
 
@@ -527,8 +526,7 @@ class ItemDataService {
       updatedFeedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
     }
     catch (e) {
-      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
-      console.log(`Failed to read Feedback item with id: ${feedbackItemId}.`);
+      appInsights.trackException(e);
       updatedFeedbackItem = undefined;
     }
 
