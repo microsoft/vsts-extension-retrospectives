@@ -37,7 +37,7 @@ import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { getQuestionName, getQuestionShortName, getQuestionTooltip, questions } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
 import boardDataService from '../dal/boardDataService';
 
@@ -184,8 +184,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
     }
     catch (e) {
-      // TODO: Better error handling.
-      // TODO (enpolat) : appInsightsClient.trackException(e);
+      appInsights.trackException(e);
     }
 
     this.setState({ isAppInitialized: true });
