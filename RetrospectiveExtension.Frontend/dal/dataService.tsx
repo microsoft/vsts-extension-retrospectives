@@ -1,5 +1,6 @@
 import { getAccessToken, getExtensionContext, getService } from 'azure-devops-extension-sdk';
 import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from 'azure-devops-extension-api';
+import { appInsights } from '../utilities/telemetryClient';
 
 let extensionDataManager: IExtensionDataManager;
 
@@ -31,8 +32,7 @@ export async function readDocuments<T>(
       }
     }
 
-    // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
-    console.error('An exception occurred while trying to read the documents: ', e);
+    appInsights.trackException(e);
 
     data = [];
   }
