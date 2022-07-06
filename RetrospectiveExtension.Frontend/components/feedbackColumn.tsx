@@ -105,7 +105,8 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       /*newlyCreated*/ true,
       /*showAddedAnimation*/ false,
       /*shouldHaveFocus*/ false,
-      /*hideFeedbackItems*/ false);
+      /*hideFeedbackItems*/ false
+    );
   }
 
   public dragFeedbackItemOverColumn = (e: React.DragEvent<HTMLDivElement>) => {
