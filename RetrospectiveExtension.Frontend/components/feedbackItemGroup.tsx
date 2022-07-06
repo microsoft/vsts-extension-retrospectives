@@ -28,14 +28,6 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
     };
   }
 
-  private updateItemCardsStackHeight = (newHeight: number) => {
-    if (this.state.itemCardsStackHeight !== newHeight) {
-      this.setState({
-        itemCardsStackHeight: newHeight,
-      });
-    }
-  }
-
   private dragFeedbackItemOverFeedbackItemGroup = (e: React.DragEvent<HTMLDivElement>) => {
     // Allow if the item being dragged is not from this group.
     if (!this.state.isBeingDragged) {
