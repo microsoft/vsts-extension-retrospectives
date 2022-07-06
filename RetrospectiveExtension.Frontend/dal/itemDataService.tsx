@@ -436,10 +436,6 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
-      console.log(`Cannot move a non-existent feedback item.
-              Board: ${boardId},
-              Parent Item: ${feedbackItem.parentFeedbackItemId},
-              Child Item: ${feedbackItemId}`);
       return undefined;
     }
 
@@ -448,10 +444,6 @@ class ItemDataService {
     if (feedbackItem.parentFeedbackItemId) {
       const parentFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItem.parentFeedbackItemId);
       if (!parentFeedbackItem) {
-        console.log(`The given feedback item has a non-existent parent.
-                Board: ${boardId},
-                Parent Item: ${feedbackItem.parentFeedbackItemId},
-                Child Item: ${feedbackItemId}`);
         return undefined;
       }
 
