@@ -110,26 +110,12 @@ class ReflectBackendService {
     );
   }
 
-  private leaveBoardGroup = (boardId: string) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
-    this._signalRConnection.send(
-      ReflectBackendSignals.LeaveReflectBoardGroup,
-      boardId
-    );
-  }
-
   private removeSignalCallback = (signal: string, callback: (columnId: string, feedbackItemId: string) => void) => {
     if (!this._connectionAvailable) {
       return;
     }
 
-    this._signalRConnection.off(
-      signal,
-      callback
-    );
+    this._signalRConnection.off(signal, callback);
   }
 
   /**
