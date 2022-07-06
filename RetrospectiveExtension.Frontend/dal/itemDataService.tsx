@@ -1,9 +1,10 @@
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
-import { IFeedbackItemDocument, IFeedbackBoardDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { workItemService } from './azureDevOpsWorkItemService';
 import { v4 as uuid } from 'uuid';
+import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
+import { appInsights } from '../utilities/telemetryClient';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { workItemService } from './azureDevOpsWorkItemService';
+import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 
 class ItemDataService {
   /**
