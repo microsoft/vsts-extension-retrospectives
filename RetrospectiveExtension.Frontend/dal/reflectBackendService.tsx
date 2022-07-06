@@ -39,9 +39,7 @@ class ReflectBackendService {
 
     if (!this._signalRConnection) {
       this._signalRConnection = new HubConnectionBuilder()
-        .withUrl(ReflectBackendService.signalRHubUrl.href, {
-          accessTokenFactory: this.retrieveValidToken,
-        })
+        .withUrl(ReflectBackendService.signalRHubUrl.href, { accessTokenFactory: this.retrieveValidToken })
         .configureLogging(LogLevel.Error)
         .build();
       this._connectionAvailable = false;
