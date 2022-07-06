@@ -70,8 +70,7 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
               isMainItem: true,
               parentItemId: undefined,
               setIsGroupBeingDragged: this.setIsGroupBeingDragged,
-              toggleGroupExpand: this.toggleGroupExpand,
-              updateGroupCardStackHeight: this.updateItemCardsStackHeight,
+              toggleGroupExpand: this.toggleGroupExpand
             }}
           />
           {this.state.isGroupExpanded &&
@@ -85,8 +84,7 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
                   isMainItem: false,
                   parentItemId: this.props.mainFeedbackItem.id,
                   setIsGroupBeingDragged: this.setIsGroupBeingDragged,
-                  toggleGroupExpand: undefined,
-                  updateGroupCardStackHeight: undefined,
+                  toggleGroupExpand: undefined
                 }}
               />
             )
