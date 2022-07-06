@@ -1,22 +1,22 @@
-import { DefaultButton, IButtonProps, ActionButton, Button, BaseButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
+import { IWorkItemFormNavigationService, WorkItemTrackingServiceIds } from 'azure-devops-extension-api/WorkItemTracking';
+import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { getService, getUser } from 'azure-devops-extension-sdk';
+import { ActionButton, BaseButton, Button, DefaultButton, IButtonProps, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { Image } from 'office-ui-fabric-react/lib/Image';
 import React from 'react';
-import { getService, getUser } from 'azure-devops-extension-sdk';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
-import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
 
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { DirectionalHint, FocusTrapCallout } from 'office-ui-fabric-react/lib/Callout';
+import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
+import { List } from 'office-ui-fabric-react/lib/List';
+import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
-import { FocusTrapCallout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
-import { List } from 'office-ui-fabric-react/lib/List';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
-import Dialog, { DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
-import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
-import ActionItem from './actionItem';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
+import ActionItem from './actionItem';
 
 export interface ActionItemDisplayProps extends IButtonProps {
   feedbackItemId: string;
