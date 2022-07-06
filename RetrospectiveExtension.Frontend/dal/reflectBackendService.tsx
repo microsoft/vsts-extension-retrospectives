@@ -5,6 +5,8 @@ import { getAppToken } from 'azure-devops-extension-sdk';
 import { config } from '../config/config';
 import { decodeJwt } from '../utilities/tokenHelper';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
+import { appInsights } from '../utilities/telemetryClient';
+import { IExceptionTelemetry } from '@microsoft/applicationinsights-web';
 
 const enum ReflectBackendSignals {
   JoinReflectBoardGroup = 'joinReflectBoardGroup',
