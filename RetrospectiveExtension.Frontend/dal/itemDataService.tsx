@@ -456,24 +456,20 @@ class ItemDataService {
     if (feedbackItem.columnId !== newColumnId && feedbackItem.childFeedbackItemIds) {
       let getChildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = [];
 
-      getChildFeedbackItemPromises = feedbackItem.childFeedbackItemIds.map((childFeedbackItem) =>
-        this.getFeedbackItem(boardId, childFeedbackItem));
+      getChildFeedbackItemPromises = feedbackItem.childFeedbackItemIds.map((childFeedbackItem) => this.getFeedbackItem(boardId, childFeedbackItem));
 
-      const childFeedbackItems =
-        await Promise.all(getChildFeedbackItemPromises).then((promiseResults) => {
-          return promiseResults.map((childFeedbackItem) => {
-            childFeedbackItem.columnId = newColumnId;
-            return childFeedbackItem;
-          })
-        });
+      const childFeedbackItems = await Promise.all(getChildFeedbackItemPromises).then((promiseResults) => {
+        return promiseResults.map((childFeedbackItem) => {
+          childFeedbackItem.columnId = newColumnId;
+          return childFeedbackItem;
+        })
+      });
 
-      const updatedChildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = childFeedbackItems.map((childFeedbackItem) =>
-        this.updateFeedbackItem(boardId, childFeedbackItem));
+      const updatedChildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = childFeedbackItems.map((childFeedbackItem) => this.updateFeedbackItem(boardId, childFeedbackItem));
 
-      updatedChildFeedbackItems =
-        await Promise.all(updatedChildFeedbackItemPromises).then((promiseResults) => {
-          return promiseResults.map((updatedChildFeedbackItem) => updatedChildFeedbackItem)
-        });
+      updatedChildFeedbackItems = await Promise.all(updatedChildFeedbackItemPromises).then((promiseResults) => {
+        return promiseResults.map((updatedChildFeedbackItem) => updatedChildFeedbackItem)
+      });
     }
 
     feedbackItem.parentFeedbackItemId = null;
