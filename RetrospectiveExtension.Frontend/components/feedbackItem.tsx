@@ -91,7 +91,6 @@ export interface IGroupedFeedbackItemProps {
 
   setIsGroupBeingDragged: (isBeingDragged: boolean) => void;
   toggleGroupExpand: () => void;
-  updateGroupCardStackHeight: (newHeight: number) => void;
 }
 
 export interface IFeedbackItemState {
@@ -152,9 +151,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   public async componentDidMount() {
     await this.isVoted(this.props.id);
     await this.setDisabledFeedbackItemDeletion(this.props.boardId, this.props.id);
-    if (this.props.groupedItemProps && this.props.groupedItemProps.isMainItem) {
-      this.updateFeedbackItemGroupShadowCardHeight();
-    }
 
     reflectBackendService.onReceiveDeletedItem(this.receiveDeletedItemHandler);
     this.props.shouldHaveFocus && this.itemElement && this.itemElement.focus();
@@ -171,17 +167,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   public componentDidUpdate() {
-    if (this.props.groupedItemProps && this.props.groupedItemProps.isMainItem) {
-      this.updateFeedbackItemGroupShadowCardHeight();
-    }
-
     this.props.shouldHaveFocus && this.itemElement && this.itemElement.focus();
-  }
-
-  // TODO consider when we actually need this to fire.
-  // Possibly only after updating title and adding a work item?
-  private updateFeedbackItemGroupShadowCardHeight() {
-    this.props.groupedItemProps.updateGroupCardStackHeight(this.itemElement.clientHeight);
   }
 
   private deleteFeedbackItem = () => {
