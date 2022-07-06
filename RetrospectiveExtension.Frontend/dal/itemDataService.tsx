@@ -225,13 +225,11 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
-      console.log(`Cannot increment upvote for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
     const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
 
     if (boardItem == undefined) {
-      console.log(`Cannot retrieve board for the feedback. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
 
@@ -239,16 +237,13 @@ class ItemDataService {
       if (!boardItem.boardVoteCollection ||
         !boardItem.boardVoteCollection[userId] ||
         boardItem.boardVoteCollection[userId] <= 0) {
-        console.log(`Cannot decrement item with zero or less votes. Board ${boardId}, Item: ${feedbackItemId}`);
         return undefined;
       }
 
       if (feedbackItem.upvotes <= 0) {
-        console.log(`Cannot decrement upvote as votes must be > 0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
         return undefined;
       } else {
         if (feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
-          console.log(`Cannot decrement upvote as your votes must be > 0 to decrement. Board: ${boardId}, Item: ${feedbackItemId}`);
           return undefined;
         }
         else {
