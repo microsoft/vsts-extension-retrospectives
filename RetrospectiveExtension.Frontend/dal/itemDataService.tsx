@@ -268,8 +268,6 @@ class ItemDataService {
       }
 
       if (boardItem.boardVoteCollection[userId] >= boardItem.maxVotesPerUser) {
-        console.log(`User has reached max votes for the board. Board: ${boardId}, Max Votes: ${boardItem.maxVotesPerUser}`);
-
         return undefined;
       }
 
@@ -282,24 +280,18 @@ class ItemDataService {
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
 
     if (!updatedFeedbackItem) {
-      console.log(`The feedback item was not incremented or decremented. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
 
     const updatedBoardItem = await this.updateBoardItem(teamId, boardItem);
     if (!updatedBoardItem) {
-      console.log(`Could not update board, votes will be removed from or added to the feedback item.
-        Board: ${boardId}, Item: ${feedbackItemId}`);
-
-      updatedFeedbackItem.voteCollection[userId] = decrement ?
-        updatedFeedbackItem.voteCollection[userId]++ : updatedFeedbackItem.voteCollection[userId]--;
+      updatedFeedbackItem.voteCollection[userId] = decrement ? updatedFeedbackItem.voteCollection[userId]++ : updatedFeedbackItem.voteCollection[userId]--;
       updatedFeedbackItem.upvotes = decrement ? updatedFeedbackItem.upvotes++ : updatedFeedbackItem.upvotes--;
 
       const feedbackItemWithOriginalVotes = await this.updateFeedbackItem(boardId, updatedFeedbackItem);
       if (feedbackItemWithOriginalVotes) {
         return feedbackItemWithOriginalVotes;
       }
-      console.log(`Cannot remove or add votes from feedback item. Board ${boardId}, Item: ${updatedFeedbackItem.id}`);
     }
 
     return updatedFeedbackItem;
