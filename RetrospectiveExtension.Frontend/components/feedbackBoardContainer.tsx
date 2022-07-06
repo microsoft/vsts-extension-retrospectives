@@ -214,10 +214,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   public componentDidUpdate(prevProps: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
-    if (prevState.currentTeam !== this.state.currentTeam) {
+    // TODO (enpolat) : if (prevState.currentTeam !== this.state.currentTeam) {
       // TODO (enpolat) : appInsightsClient.updateTeamInfo(this.state.currentTeam);
-    }
-
+    // TODO (enpolat) : }
     if (prevState.currentBoard !== this.state.currentBoard) {
       reflectBackendService.switchToBoard(this.state.currentBoard ? this.state.currentBoard.id : undefined);
       // TODO (enpolat) : appInsightsClient.updateBoardInfo(this.state.currentBoard);
