@@ -304,7 +304,6 @@ class ItemDataService {
     const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
 
     if (boardItem === undefined) {
-      console.log(`Cannot retrieve board for the feedback. Board: ${boardId}`);
       return undefined;
     }
 
@@ -330,7 +329,6 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
-      console.log(`Cannot update title for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
 
@@ -360,18 +358,11 @@ class ItemDataService {
     const childFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, childFeedbackItemId);
 
     if (!parentFeedbackItem || !childFeedbackItem) {
-      console.log(`Cannot add child for a non-existent feedback item.
-                Board: ${boardId},
-                Parent Item: ${parentFeedbackItemId},
-                Child Item: ${childFeedbackItemId}`);
       return undefined;
     }
 
     // The parent feedback item must not be a child of another group.
     if (parentFeedbackItem.parentFeedbackItemId) {
-      console.log(`Cannot add child if parent is already a child in another group.
-                Board: ${boardId},
-                Parent Item: ${parentFeedbackItemId}`);
       return undefined;
     }
 
