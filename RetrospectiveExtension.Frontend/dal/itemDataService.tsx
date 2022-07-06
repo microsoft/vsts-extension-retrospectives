@@ -205,7 +205,6 @@ class ItemDataService {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
-      console.log(`Cannot increment the timer seconds for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
       return undefined;
     }
 
