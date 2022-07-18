@@ -11,10 +11,11 @@ class ShareBoardHelper {
     const feedbackItems: IFeedbackItemDocument[] = await itemDataService.getFeedbackItemsForBoard(board.id);
     const boardUrl = await getBoardUrl(board.teamId, board.id);
 
-    let content: string = `Retrospectives Summary for "${board.title}" (${boardUrl})\n`;
+    /* eslint-disable  no-useless-escape */
+    let content: string = `\"Retrospectives Summary for '${board.title}' (${boardUrl})\"\n`;
     content += "\n\nFeedback Items\nType,Description,Votes,CreatedDate,CreatedBy\n"
 
-    const contentList: {type: string, description: string, votes: number, createdDate: Date, createdBy: string}[] = [];
+    const contentList: { type: string, description: string, votes: number, createdDate: Date, createdBy: string }[] = [];
 
     for (const feedbackItem of feedbackItems) {
       if (feedbackItem.parentFeedbackItemId) {
@@ -53,7 +54,7 @@ class ShareBoardHelper {
     }
 
     contentList.forEach(item => {
-      content += `${item.type},${item.description},${item.votes},${item.createdDate},${item.createdBy}\n`;
+      content += `\"${item.type}\",\"${item.description}\",${item.votes},${item.createdDate},\"${item.createdBy}\"\n`;
     });
 
     content += `\n\nWork Items\nFeedback Description,Work Item Title,Work Item Type,Work Item Id,Url\n`;
@@ -63,12 +64,13 @@ class ShareBoardHelper {
         const workItems = await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds);
 
         for (const item of workItems) {
-          content += `${feedbackItem.title},${item.fields["System.Title"]},${item.fields["System.WorkItemType"]},${item.id},${item._links["html"]["href"]}\n`;
+          content += `\"${feedbackItem.title}\",\"${item.fields["System.Title"]}\",${item.fields["System.WorkItemType"]},${item.id},${item._links["html"]["href"]}\n`;
         }
+        /* eslint-enable  no-useless-escape */
       }
     }
 
-    const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     saveAs(blob, "retro.csv");
   }
 
