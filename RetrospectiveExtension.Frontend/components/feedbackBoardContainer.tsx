@@ -149,27 +149,49 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.handleResolutionChange();
 
     try {
-      const backendConnectionResult = await reflectBackendService.startConnection();
-      this.setState({ isBackendServiceConnected: backendConnectionResult });
-      // TODO (enpolat) : window.addEventListener('error', this.handleErrorEvent);
+      const isBackendServiceConnected = await reflectBackendService.startConnection();
+      this.setState({ isBackendServiceConnected });
+    } catch (error) {
+      console.error({m: "isBackendServiceConnected", error});
+    }
 
+    try {
       const initalizedTeamAndBoardState = await this.initializeFeedbackBoard();
-      this.setState({
-        ...initalizedTeamAndBoardState,
-        isTeamDataLoaded: true,
-      }, this.initializeProjectTeams);
 
+      this.setState({ ...initalizedTeamAndBoardState, isTeamDataLoaded: true, }, this.initializeProjectTeams);
+    } catch (error) {
+      console.error({m: "initalizedTeamAndBoardState", error});
+    }
+
+    try {
       this.setSupportedWorkItemTypesForProject();
+    } catch (error) {
+      console.error({m: "setSupportedWorkItemTypesForProject", error});
+    }
 
+    try {
       await this.updateFeedbackItemsAndContributors();
+    } catch (error) {
+      console.error({m: "updateFeedbackItemsAndContributors", error});
+    }
 
+    try {
       const members = await azureDevOpsCoreService.getMembers(this.state.currentTeam.projectId, this.state.currentTeam.id);
 
-      this.setState({ members: members });
+      this.setState({ members });
+    } catch (error) {
+      console.error({m: "members", error});
+    }
 
+    try {
       const votes = Object.values(this.state.currentBoard?.boardVoteCollection || []);
-      this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0 });
 
+      this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0 });
+    } catch (error) {
+      console.error({m: "votes", error});
+    }
+
+    try {
       reflectBackendService.onConnectionClose(() => {
         this.setState({
           isBackendServiceConnected: false,
@@ -184,6 +206,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
     }
     catch (e) {
+      console.error(e);
       appInsights.trackException(e);
     }
 
@@ -417,8 +440,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     }
 
+    console.log({userTeams});
     // Default to select first user team or the project's default team.
     const defaultTeam = (userTeams && userTeams.length) ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
+    console.log({defaultTeam});
 
     const baseTeamState = {
       userTeams,
