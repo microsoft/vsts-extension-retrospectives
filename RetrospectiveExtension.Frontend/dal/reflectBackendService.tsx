@@ -35,9 +35,11 @@ class ReflectBackendService {
   private _connectionAvailable: boolean;
 
   constructor() {
-    if (!isHostedAzureDevOps()) {
-      return;
-    }
+    isHostedAzureDevOps().then(isHosted => {
+      if(!isHosted) {
+        return;
+      }
+    });
 
     if (!this._signalRConnection) {
       this._signalRConnection = new HubConnectionBuilder()
