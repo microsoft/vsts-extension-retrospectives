@@ -209,10 +209,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const droppedItemId = localStorageHelper.getIdValue();
     const droppedItemProps = await itemDataService.getFeedbackItem(this.props.boardId, droppedItemId);
 
+    console.log('Why is grouping behaving weird?');
+    console.log('The card', this.props.id, this.props.title, 'is moving');
+
     if (this.props.id !== droppedItemId) {
-      if (this.props.columnId === droppedItemProps.originalColumnId) {
-        FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(this.props, droppedItemId, this.props.id);
-      }
+      FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(this.props, droppedItemId, this.props.id);
     }
 
     e.stopPropagation();
@@ -588,13 +589,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     if (!this.props.createdBy) {
       return (
         <div className="anonymous-created-date">
-          {new Intl.DateTimeFormat("default", {year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"}).format(new Date(this.props.createdDate))}
+          {new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" }).format(new Date(this.props.createdDate))}
         </div>
       );
     }
 
     return (<DocumentCardActivity
-      activity={new Intl.DateTimeFormat("default", {year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric"}).format(new Date(this.props.createdDate))}
+      activity={new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" }).format(new Date(this.props.createdDate))}
       people={[{
         name: this.props.createdBy,
         profileImageSrc: this.props.createdByProfileImage,
