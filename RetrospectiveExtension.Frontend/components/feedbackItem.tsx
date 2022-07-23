@@ -207,10 +207,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
     // const droppedItemId = e.dataTransfer.getData('id');
     const droppedItemId = localStorageHelper.getIdValue();
-    const droppedItemProps = await itemDataService.getFeedbackItem(this.props.boardId, droppedItemId);
-
-    console.log('Why is grouping behaving weird?');
-    console.log('The card', this.props.id, this.props.title, 'is moving');
 
     if (this.props.id !== droppedItemId) {
       FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(this.props, droppedItemId, this.props.id);
