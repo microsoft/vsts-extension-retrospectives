@@ -6,6 +6,7 @@
   display: table-cell;
   height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
 }
+
 .feedback-column:last-child {
   border-right: none;
 }
@@ -43,9 +44,10 @@
 
 .feedback-items-container {
   padding-top: 10px;
-  display: block;
+  display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  gap: 20px 30px;
 }
 
 .create-container {
@@ -53,12 +55,13 @@
 
   .create-button {
     margin-left: 0px;
+
     i {
       margin-left: -4px;
     }
 
     .ms-Button-textContainer {
-      color: rgba(var(--palette-neutral-80,51, 51, 51),1);
+      color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
     }
   }
 }
