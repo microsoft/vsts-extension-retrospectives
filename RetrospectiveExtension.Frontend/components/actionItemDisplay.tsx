@@ -69,6 +69,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     const boardUrl = await getBoardUrl(this.props.team.id, this.props.boardId);
     const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
 
+    // Account for any users who are no longer a part of the org
     const assignedUser: string | undefined = getUser().name === undefined ? "Former User" : getUser().name;
 
     const workItem = await workItemNavSvc.openNewWorkItem(workItemTypeName, {
