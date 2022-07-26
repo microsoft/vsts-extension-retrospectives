@@ -58,7 +58,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
   }
 
   componentDidMount() {
-    if(this.state.initialRender) {
+    if (this.state.initialRender) {
       this.setState({ initialRender: false });
     }
   }
@@ -68,8 +68,12 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
   private createAndLinkActionItem = async (workItemTypeName: string) => {
     const boardUrl = await getBoardUrl(this.props.team.id, this.props.boardId);
     const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+
+    // Account for any users who are no longer a part of the org
+    const assignedUser: string | undefined = getUser().name === undefined ? "Former User" : getUser().name;
+
     const workItem = await workItemNavSvc.openNewWorkItem(workItemTypeName, {
-      'System.AssignedTo': getUser().name,
+      'System.AssignedTo': assignedUser,
       'Tags': 'feedback;reflect-hub',
       'Title': '',
       'Description': `${this.props.feedbackItemTitle}`,
