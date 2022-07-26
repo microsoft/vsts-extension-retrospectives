@@ -52,6 +52,7 @@
       .groupedItemCard {
         @extend .mainItemCard;
         margin-top: 0px;
+        background-color: #eee;
 
         .card-integral-part {
           border-left-width: 3px;

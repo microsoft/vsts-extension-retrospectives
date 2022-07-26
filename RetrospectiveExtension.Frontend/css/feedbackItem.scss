@@ -6,6 +6,7 @@
   display: inline-block;
   vertical-align: top;
   width: 100%;
+  min-width: 260px;
 
   &.newFeedbackItem {
     .ms-DocumentCard {
@@ -113,7 +114,7 @@
             animation: push .3s linear 1;
 
             i {
-              color: $main_blue !important;
+              color: $main_blue  !important;
             }
           }
 
@@ -146,7 +147,7 @@
           font-style: italic;
           font-size: 0.75em;
         }
-        
+
         .feedback-yourvote-count {
           font-size: 1em;
         }
@@ -188,6 +189,7 @@
       ul {
         list-style: none;
       }
+
       .fa-ul {
         margin-top: 0;
         margin-left: 45px;
@@ -197,6 +199,7 @@
           border: 1px darkgrey solid;
           height: 30px;
         }
+
         li {
           word-wrap: break-word;
           padding: 2px;
@@ -233,7 +236,8 @@
     .feedback-item-search-result-item {
       cursor: pointer;
 
-      &:focus, &:hover {
+      &:focus,
+      &:hover {
         .feedbackItem {
           .mainItemCard {
             border-width: 1px;
