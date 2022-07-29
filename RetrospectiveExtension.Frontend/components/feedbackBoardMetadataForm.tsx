@@ -851,8 +851,8 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
           <div className="board-metadata-form-section-subheader">
             <Checkbox
-              label="Make all feedback anonymous"
-              ariaLabel="Make all feedback anonymous. This selection cannot be modified after board creation."
+              label="Do not display names in feedback"
+              ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation."
               boxSide="start"
               defaultChecked={this.state.isBoardAnonymous}
               disabled={!this.props.isNewBoardCreation}
