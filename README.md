@@ -67,7 +67,7 @@ button and then clicking on 'Create new board'.
     Please enter the appropriate information:
 
     - **Retrospective Title**: Enter appropriate text
-    - **Make all feedback anonymous**: When you select this checkbox, user identities for the item
+    - **Do not display names in feedback**: When you select this checkbox, user names for the item
         reators will not be displayed.
     - **Only show feedback after Collect phase**: When selected, users cannot see other users input
         until they have moved to another phase. Other users' feedback will be blurred.
