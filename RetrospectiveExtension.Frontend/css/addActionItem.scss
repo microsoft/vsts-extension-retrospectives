@@ -53,14 +53,17 @@
 .add-action-item-wrapper {
   display: flex;
   max-width: 100%;
-  background-color: $azure_devops_navigator_light_grey;
+  background-color: var(--nav-vertical-background-color);
 
   .feedback-spacer {
     flex: 1;
   }
 
-  .add-action-item-button {
-    height: 32px;
+  .add-action-item-section {
+    .add-action-item-button {
+      height: 32px;
+      color: var(--text-primary-color);
+    }
   }
 }
 
@@ -84,7 +87,7 @@
           &:hover:not(:disabled) {
             i {
               color: #666666; // Office UI dark grey
-               font-size: 13px;
+              font-size: 13px;
             }
           }
         }
