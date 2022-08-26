@@ -93,13 +93,8 @@ class ItemDataService {
     let updatedChildFeedbackItems: IFeedbackItemDocument[] = [];
 
     const feedbackItem: IFeedbackItemDocument = await readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
-    if (feedbackItem && feedbackItem.upvotes > 0) {
-      console.log(`Cannot delete a feedback item which has upvotes. Board: ${boardId} Item: ${feedbackItemId}`);
-      return undefined;
-    }
-
-    if(feedbackItem && feedbackItem.upvotes > 0) {
-      console.log(`Cannot delete a feedback item which has upvotes. Board: ${boardId} Item: ${feedbackItemId}`);
+    if (feedbackItem && feedbackItem.voteCollection.keys > 0) {
+      console.log(`Cannot delete a feedback item which has any votes. Board: ${boardId} Item: ${feedbackItemId}`);
       return undefined;
     }
 
