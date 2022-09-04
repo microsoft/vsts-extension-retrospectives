@@ -6,7 +6,7 @@ $feedback_column_card_height: 60px;
   text-align: center;
 
   hr {
-    border: 0.5px solid #0078d4; // AzDO blue
+    border: 0.5px solid $azdo_blue;
   }
 
   .board-metadata-form-section-information {
@@ -36,6 +36,7 @@ $feedback_column_card_height: 60px;
     margin: 0px;
     background-color: #0078d483;
     text-align: right;
+    color: var(--text-primary-color);
 
     &.bottom-padding-zero {
       padding-bottom: 0;
@@ -61,13 +62,62 @@ $feedback_column_card_height: 60px;
     display: flex;
     align-items: center;
     margin: 3px;
+    color: var(--text-primary-color);
 
     label {
       margin-right: 10px;
     }
   }
 
+  .ms-Checkbox {
+    &.is-checked {
+      .ms-Checkbox-checkbox {
+        background-color: var(--background-color);
+
+        &:hover {
+          background-color: $azdo_blue;
+          color: white;
+        }
+      }
+
+      .ms-Checkbox-checkmark {
+        color: var(--text-primary-color);
+
+        &:hover {
+          color: white;
+        }
+      }
+    }
+
+    .ms-Checkbox-text {
+      color: var(--text-primary-color);
+
+      &:hover {
+        color: $azdo_blue;
+      }
+    }
+
+    .ms-Checkbox-checkbox {
+      background-color: var(--background-color);
+      border-color: #aaa;
+
+      &:hover {
+        background-color: $azdo_blue;
+      }
+    }
+
+    .ms-Checkbox-checkmark {
+      color: var(--text-primary-color);
+
+      &:hover {
+        color: white;
+      }
+    }
+  }
+
   .feedback-column-card {
+    background-color: var(---nav-vertical-background-color);
+    color: var(--text-primary-color);
     height: $feedback_column_card_height;
     margin-top: 10px;
     align-items: center;
@@ -81,9 +131,11 @@ $feedback_column_card_height: 60px;
       margin-left: 5px;
       margin-right: 5px;
       border: none;
+      color: var(--text-primary-color);
 
       &:hover {
         background: #f4f4f4;
+        color: var(--background-color);
       }
     }
 
@@ -115,22 +167,26 @@ $feedback_column_card_height: 60px;
     .feedback-column-card-move-up-button,
     .feedback-column-card-move-down-button,
     .feedback-column-card-delete-button {
-      background-color: rgba(0, 0, 0, 0);
+      background-color: var(--background-color);
       border: none;
+      margin: 0 3px;
 
       &:hover {
         background: #f4f4f4;
       }
 
       &.is-disabled {
+        background-color: var(--text-disabled-color);
+
         i {
-          color: rgba(0, 0, 0, 0.25);
+          color: var(--text-disabled-color);
         }
       }
     }
 
     &.marked-for-deletion {
-      background: rgba(0, 0, 0, 0.2);
+      background-color: var(--text-disabled-color);
+      margin-left: 2px;
 
       .feedback-column-card-icon {
         color: rgba(0, 0, 0, 0.3);
@@ -147,12 +203,12 @@ $feedback_column_card_height: 60px;
       }
 
       .feedback-column-card-undelete-button {
-        height: $feedback_column_card_height - 2px;
         background: white;
         border: none;
 
         &:hover {
           background: #f4f4f4;
+          color: var(--status-info-foreground);
         }
 
         &.is-disabled {
@@ -175,6 +231,14 @@ $feedback_column_card_height: 60px;
   .create-feedback-column-card-button-wrapper {
     .create-feedback-column-card-button {
       border: none;
+      color: var(--text-primary-color);
+    }
+
+    .ms-Button-icon {
+      color: var(--status-info-foreground);
+      background-color: var(--nav-vertical-background-color);
+      padding: 4px;
+      height: 22px;
     }
   }
 
@@ -196,7 +260,7 @@ $feedback_column_card_height: 60px;
 
     &.column-template-dropdown {
       display: inline-flex;
-      background-color: #fff;
+      background-color: var(--background-color);
       font-weight: normal;
       margin-left: 10px;
       width: 66%;
@@ -242,5 +306,24 @@ $feedback_column_card_height: 60px;
     font-size: 30px;
     height: 50px;
     margin: 5px 5px 5px 5px;
+  }
+}
+
+.metadata-form-save-button {
+  background-color: $azdo_blue;
+  color: white;
+}
+
+.retrospectives-board-metadata-dialog {
+  width: 500px;
+  max-width: 500px;
+  max-height: 100%;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--background-color);
+
+  .ms-Dialog-title {
+    color: var(--text-primary-color);
   }
 }

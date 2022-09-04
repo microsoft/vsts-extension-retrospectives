@@ -20,15 +20,17 @@
   overflow: auto;
 
   .selector-list-item {
-    background-color: white;
+    background-color: var(--background-color);
     height: $team_selector_list_item_height;
     width: $team_selector_list_item_width;
     display: flex;
     cursor: pointer;
     padding-left: 8px;
-    
+    color: var(--text-primary-color);
+
     &:hover {
-      background-color: $azure_devops_navigator_light_grey;
+      background-color: var(--border-subtle-color);
+      color: var(--background-color);
     }
 
     .selector-list-item-text {
@@ -41,7 +43,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-  
+
     i {
       vertical-align: middle;
       text-align: center;
@@ -65,7 +67,7 @@
     color: var(--text-primary-color);
   }
 
-  i.selector-button-icon{
+  i.selector-button-icon {
     font-size: 18px;
     line-height: 30px;
     margin-right: 4px;
@@ -85,7 +87,7 @@
     white-space: nowrap;
   }
 
-  i.selector-button-chevron{
+  i.selector-button-chevron {
     font-size: 12px;
     line-height: 30px;
   }

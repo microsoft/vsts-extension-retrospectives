@@ -4,9 +4,25 @@
   height: 35px;
   margin: 0;
   max-width: 100%;
-  border-bottom: 0;
+  border: none;
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
 
   @include vsts-workitem-colors;
+
+  .ms-Image-image {
+    width: 16px;
+  }
+
+  .ms-Button--icon {
+    background-color: var(--background-color);
+
+    .ms-Button-icon {
+      &:hover {
+        color: $azdo_blue;
+      }
+    }
+  }
 
   .ms-DocumentCard-details {
     padding-right: 16px;
@@ -25,6 +41,7 @@
     white-space: nowrap;
     overflow: hidden;
     font-size: 14px;
+    color: var(--text-primary-color);
   }
 
   &.resolved-border-right {
@@ -38,12 +55,6 @@
 
 .work-item-icon {
   width: 16px;
-}
-
-.related-task-sub-card {
-  .ms-Image-image {
-    width: 16px;
-  }
 }
 
 .action-item-selector {
@@ -68,6 +79,10 @@
 }
 
 .action-items {
+  .work-item-type-icon-container {
+    background-color: var(--background-color);
+  }
+
   .ms-DocumentCard {
     .ms-DocumentCardActions {
       padding: 0 4px 0 0;
@@ -79,15 +94,14 @@
         .ms-Button {
           .ms-Button-flexContainer {
             i {
-              color: grey;
+              color: $azdo_blue;
               font-size: 12px;
             }
           }
 
           &:hover:not(:disabled) {
             i {
-              color: #666666; // Office UI dark grey
-              font-size: 13px;
+              font-weight: bolder;
             }
           }
         }
@@ -159,7 +173,6 @@
 
   .related-task-sub-card {
     width: 100%;
-    border: 1px solid #eaeaea;
   }
 
   .work-item-not-found {

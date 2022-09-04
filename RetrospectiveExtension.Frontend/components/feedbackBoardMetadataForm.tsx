@@ -793,9 +793,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       <div className="board-metadata-form">
         <section className="board-metadata-form-board-settings hide-mobile">
           <h3 className="board-metadata-form-section-header">Board Settings</h3>
-          <div className="board-metadata-form-section-information">
-            <i className="fas fa-exclamation-circle"></i>&nbsp;Some of these settings cannot be modified after board creation.
-          </div>
           <div className="board-metadata-form-section-subheader">
             <label htmlFor="title-input-container">Title:</label>
             <TextField
@@ -811,6 +808,24 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
             }
           </div>
           <hr></hr>
+          <div className="board-metadata-form-section-subheader">
+            <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
+              Max Votes per User (Current: {this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser}):
+            </label>
+            <TextField
+              className="title-input-container max-vote-counter"
+              id="max-vote-counter"
+              type="number"
+              min="3"
+              max="12"
+              value={this.state.maxVotesPerUser?.toString()}
+              onChange={this.handleMaxVotePerUserChange}
+            />
+          </div>
+          <hr></hr>
+          <div className="board-metadata-form-section-information">
+            <i className="fas fa-exclamation-circle"></i>&nbsp;These settings cannot be modified after board creation.
+          </div>
           <div className="board-metadata-form-section-subheader">
             <div className="flex flex-col">
               <Checkbox
@@ -857,21 +872,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               defaultChecked={this.state.isBoardAnonymous}
               disabled={!this.props.isNewBoardCreation}
               onChange={this.handleIsAnonymousCheckboxChange}
-            />
-          </div>
-          <hr></hr>
-          <div className="board-metadata-form-section-subheader">
-            <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-              Max Votes per User (Current: {this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser}):
-            </label>
-            <TextField
-              className="title-input-container max-vote-counter"
-              id="max-vote-counter"
-              type="number"
-              min="3"
-              max="12"
-              value={this.state.maxVotesPerUser?.toString()}
-              onChange={this.handleMaxVotePerUserChange}
             />
           </div>
         </section>
@@ -1053,7 +1053,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 // Ask for confirmation if user is deleting existing column(s).
                 this.showDeleteColumnConfirmationDialog();
               }
-            }} text="Save" />
+            }}
+            text="Save"
+            className="metadata-form-save-button" />
           <DefaultButton onClick={this.props.onFormCancel} text="Cancel" />
         </DialogFooter>
         {this.props.currentBoard && <Dialog

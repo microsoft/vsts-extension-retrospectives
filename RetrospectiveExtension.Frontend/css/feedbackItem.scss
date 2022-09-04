@@ -94,6 +94,7 @@
           line-height: $feedback_item_header_height;
           font-size: 12px;
           font-weight: 600;
+          color: var(--text-primary-color);
 
           i {
             width: 36px;
@@ -179,11 +180,17 @@
 
     .card-action-timer {
       margin-bottom: 10px;
+      color: var(--text-primary-color);
     }
 
     .group-child-feedback-stack {
+      width: 100%;
+
       .related-feedback-header {
-        font-variant: small-caps;
+        font-weight: bolder;
+        color: var(--text-primary-color);
+        padding: 8px;
+        background-color: var(--nav-vertical-background-color);
       }
 
       ul {
@@ -192,22 +199,31 @@
 
       .fa-ul {
         margin-top: 0;
-        margin-left: 45px;
+        margin-left: 37px;
 
         .fa-li {
-          background-color: lightgrey;
-          border: 1px darkgrey solid;
+          border-style: solid;
           height: 30px;
+          border-width: 0 1px 0 0;
+          border-color: var(--text-secondary-color);
+          color: var(--text-disabled-color);
         }
 
         li {
           word-wrap: break-word;
-          padding: 2px;
+          padding: 5px;
           line-height: 30px;
-          border-bottom: lightgrey 1px solid;
+          border-bottom-style: solid;
+          border-bottom-color: var(--text-disabled-color);
+          border-bottom-width: 1px;
+
+          &:last-child {
+            border: 0;
+          }
 
           .related-feedback-title {
             margin-left: 10px;
+            color: var(--text-primary-color);
           }
         }
       }
@@ -268,5 +284,46 @@
 
   .ms-DocumentCardActivity-avatar::after {
     border: 1px solid var(--text-primary-color);
+  }
+}
+
+.feedback-action-menu {
+  border: 1px solid var(--border-subtle-color);
+
+
+  .ms-ContextualMenu-list {
+    background-color: var(--background-color);
+
+    .ms-ContextualMenu-itemText {
+      color: var(--text-primary-color);
+    }
+
+    .ms-ContextualMenu-link {
+      &:hover {
+        color: var(--text-primary-color);
+        background-color: var(--border-subtle-color);
+      }
+
+      &.is-disabled {
+        .ms-ContextualMenu-itemText {
+          color: var(--text-disabled-color);
+        }
+      }
+    }
+  }
+}
+
+.retrospectives-delete-board-confirmation-dialog,
+.retrospectives-delete-feedback-item-dialog {
+  background-color: var(--background-color);
+
+  .ms-Dialog-title,
+  .ms-Dialog-subText {
+    color: var(--text-primary-color);
+  }
+
+  .ms-Button--primary {
+    background-color: $azdo_blue;
+    color: white;
   }
 }

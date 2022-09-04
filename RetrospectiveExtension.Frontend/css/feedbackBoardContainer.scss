@@ -2,6 +2,19 @@ $stage_block_width: 90px;
 $team_selector_list_item_height: 32px;
 $team_selector_list_item_width: 450px;
 
+// Make the exit buttons more visible
+.ms-Dialog-button {
+  &.ms-Dialog-button--close {
+    .ms-Button-icon {
+      color: var(--text-primary-color);
+    }
+
+    &:hover {
+      background-color: var(--border-subtle-color);
+    }
+  }
+}
+
 .feedback-board-container {
   display: flex;
   height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
@@ -16,16 +29,6 @@ $team_selector_list_item_width: 450px;
   margin-left: -50px;
 }
 
-.retrospectives-board-metadata-dialog {
-  width: 500px;
-  max-width: 500px;
-  max-height: 100%;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  position: absolute;
-}
-
 .feedback-board-container-header-spacer {
   background: $azure_devops_navigator_dark_grey;
   height: 1px;
@@ -33,72 +36,6 @@ $team_selector_list_item_width: 450px;
   width: 100%;
   position: fixed;
   margin-top: 40px;
-}
-
-.retrospectives-retro-summary-dialog {
-  max-width: none;
-  width: 50%;
-}
-
-.retrospectives-retro-summary-dialog img.avatar {
-  height: 1.8em;
-  border-radius: 50%;
-  vertical-align: middle;
-  margin-top: -5px;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores {
-  clear: both;
-  position: relative;
-  min-width: 100px;
-  min-height: 100px;
-  padding: 0;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart {
-  flex-direction: row;
-  padding: 0;
-  margin: 10px 0;
-  width: 100%;
-  list-style: none;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li div {
-  display: inline-block;
-  min-height: 0.655em;
-  padding: 8px;
-
-  color: #ffffff;
-  box-sizing: border-box;
-  border: 1px solid #ffffff;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend {
-  display: flex;
-  align-items: center;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend section {
-  display: flex;
-  margin-right: 10px;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend > span {
-  width: 150px;
-  font-size: large;
-  justify-content: flex-end;
-  padding-right: 10px;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .legend section div {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  margin-right: 4px;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores > * > * {
-  display: flex;
 }
 
 .extension-header-spacer {
@@ -111,36 +48,12 @@ $team_selector_list_item_width: 450px;
   }
 }
 
-.retrospective-notification-toast-container {
-  top: 50px;
-
-  .retrospective-notification-toast {
-    .retrospective-notification-toast-body {
-      font-family: $default_vsts_font;
-      color: black;
-      word-break: break-word;
-    }
-
-    .retrospective-notification-toast-progress-bar {
-      background: $main_blue;
-    }
-  }
-}
-
 .toggle-carousel-button-tooltip-wrapper {
   position: relative;
 
-  .toggle-carousel-button .ms-Button-icon {
-    color: var(--text-primary-color) !important;
-  }
-
   .toggle-carousel-button {
-    margin-top: 8px;
-    margin-left: 8px;
-    margin-right: 8px;
-
+    margin: 8px;
     font-size: 13px;
-
     color: var(--text-primary-color);
 
     &:hover {
@@ -152,8 +65,7 @@ $team_selector_list_item_width: 450px;
     }
 
     .ms-Button-icon {
-      color: black;
-      margin-top: 2px;
+      color: var(--text-primary-color) !important;
     }
 
     .ms-Button-textContainer {
@@ -172,7 +84,7 @@ $team_selector_list_item_width: 450px;
   justify-content: flex-start;
   padding: 10px 15px;
 
-  .extension-title-text{
+  .extension-title-text {
     font-size: 26px;
     line-height: 40px;
     letter-spacing: -.04em;
@@ -222,15 +134,15 @@ $team_selector_list_item_width: 450px;
     position: absolute;
     width: 100%;
   }
-}
 
-.pivot-container button[role=tab] {
-  color: rgba(var(--palette-neutral-80,51, 51, 51),1);
-}
+  button[role=tab] {
+    color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
 
-.pivot-container button[role=tab]:hover {
-  color: rgba(var(--palette-neutral-80,51, 51, 51),1);
-  background-color: transparent;
+    &:hover {
+      color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
+      background-color: transparent;
+    }
+  }
 }
 
 .vertical-tab-separator {
@@ -282,8 +194,7 @@ $team_selector_list_item_width: 450px;
     display: flex;
     align-items: center;
     margin-left: 35px;
-    margin-top: 8px;
-    background-color: rgba(0,0,0,0.04);
+    background-color: var(--border-subtle-color);
 
     .retrospective-workflowState {
       width: 72px;
@@ -346,32 +257,77 @@ $team_selector_list_item_width: 450px;
   }
 }
 
+.team-effectiveness-section-information {
+  border-radius: 5px;
+  background-color: #dedede;
+  margin: 5px auto 10px auto;
+  padding: 3px;
+  text-align: center;
+  color: var(--toastify-text-color-light);
+  width: 350px;
+}
+
 .team-effectiveness-measurement-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 0.5em;
 
-  tr th {
-    font-weight: 400;
+  thead {
     text-align: center;
+
+    .team-effectiveness-favorability-label {
+      border-bottom: solid 4px var(--text-primary-color);
+      outline: var(--background-color) 4px solid;
+    }
+
+    .voting-measurement-index {
+      color: var(--background-color);
+    }
+
   }
 
-  tbody tr:hover {background-color: #ddd;}
+  tbody {
+    .effectiveness-measurement-row {
+      &:nth-child(odd) {
+        background-color: var(--border-subtle-color);
+      }
 
-  tr td button {
-    color: darkslategray !important;
-  }
+      th {
+        font-weight: 400;
+        text-align: center;
+      }
 
-  tr td button:hover {
-    color: darkslategray !important;
+      .effectiveness-measurement-question-cell {
+        padding: 10px 0 10px 10px;
+      }
+
+      .effectivemess-measurement-voting-button {
+        color: $azdo_blue  !important;
+      }
+
+      .effectiveness-measurement-tooltip-cell {
+        border-right: $azdo_blue 2px solid;
+      }
+    }
   }
 }
 
+.team-effectiveness-dialog,
 .prime-directive-dialog {
+  background-color: var(--background-color);
+  border: 3px solid var(--border-subtle-color);
+  max-width: 700px;
+  color: var(--text-primary-color);
+
+  .ms-Dialog-title {
+    color: var(--text-primary-color);
+  }
+
   .ms-Dialog-content {
     .ms-Dialog-header {
       display: none;
     }
+
     .ms-Dialog-inner {
       padding: 0 3px 5px;
     }
@@ -380,13 +336,13 @@ $team_selector_list_item_width: 450px;
 
 .board-actions-menu {
   background-color: var(--background-color);
-}
 
-.board-actions-menu button.ms-ContextualMenu-link {
-  color: var(--text-primary-color);
-}
+  button.ms-ContextualMenu-link {
+    color: var(--text-primary-color);
 
-.board-actions-menu button.ms-ContextualMenu-link:hover {
-  background-color: rgba(var(--palette-neutral-0), 0.05);
-  color: var(--text-primary-color);
+    &:hover {
+      background-color: rgba(var(--palette-neutral-0), 0.05);
+      color: var(--text-primary-color);
+    }
+  }
 }

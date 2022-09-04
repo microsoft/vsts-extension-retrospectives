@@ -18,29 +18,31 @@
 
 .user-settings-menu {
   background-color: var(--callout-background-color);
-}
 
-.user-settings-menu button.ms-ContextualMenu-link {
-  color: var(--text-primary-color);
-}
+  button.ms-ContextualMenu-link {
+    color: var(--text-primary-color);
 
-.user-settings-menu button.ms-ContextualMenu-link:hover {
-  background-color: rgba(var(--palette-neutral-0), 0.05);
-  color: var(--text-primary-color);
+    &:hover {
+      background-color: rgba(var(--palette-neutral-0), 0.05);
+      color: var(--text-primary-color);
+    }
+  }
 }
 
 .whatsnew-dialog {
   background-color: var(--background-color);
-}
 
-.whatsnew-dialog div[role=heading] {
-  color: var(--text-primary-color);
-}
+  div[role=heading] {
+    color: var(--text-primary-color);
+  }
 
-.whatsnew-dialog p.ms-Dialog-subText {
-  color: var(--text-primary-color);
-}
+  p.ms-Dialog-subText {
+    color: var(--text-primary-color);
+  }
 
-.whatsnew-dialog .ms-Dialog-header button.ms-Dialog-button {
-  color: var(--text-primary-color);
+  .ms-Dialog-header {
+    button.ms-Dialog-button {
+      color: var(--text-primary-color);
+    }
+  }
 }

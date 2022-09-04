@@ -12,7 +12,7 @@
     "pack:p": "npm run build:p && tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
     "publish:d": "npm run pack:d && tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
     "publish:p": "npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
-    "start:dev": "webpack-dev-server --mode development",
+    "start:dev": "npm run compile && webpack-dev-server --mode development",
     "test": "jest --env=jsdom --silent -ci --testResultsProcessor=jest-junit",
     "pack:test": "tfx extension create --manifests vss-extension-prod.json --output-path ./dist/",
     "test:watch": "jest --env=jsdom --watch",
