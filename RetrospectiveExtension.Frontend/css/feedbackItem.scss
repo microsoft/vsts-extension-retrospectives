@@ -232,6 +232,13 @@
 }
 
 .retrospectives-move-feedback-item-dialog {
+  background-color: var(--background-color);
+
+  .ms-Dialog-title,
+  .ms-Dialog-subText {
+    color: var(--text-primary-color);
+  }
+
   .move-feedback-item-column-button {
     i {
       margin-right: 10px;
@@ -240,6 +247,13 @@
 }
 
 .retrospectives-group-feedback-item-dialog {
+  background-color: var(--background-color);
+
+  .ms-Dialog-title,
+  .ms-Dialog-subText {
+    color: var(--text-primary-color);
+  }
+
   .output-container {
     overflow-y: auto;
     height: 300px;
