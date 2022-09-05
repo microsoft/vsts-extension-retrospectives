@@ -121,6 +121,8 @@
     }
 
     .add-action-item-list-container {
+      background-color: var(--background-color);
+
       .add-action-item-list-item {
         display: flex;
         cursor: pointer;
@@ -131,12 +133,8 @@
         border: 0px hidden;
         overflow: hidden;
 
-        &:hover {
-          background-color: $azure_devops_navigator_light_grey;
-        }
-
-        &:focus {
-          background-color: $azure_devops_navigator_light_grey;
+        .work-item-icon.fas.fa-link {
+          color: var(--border-subtle-color);
         }
 
         .work-item-icon {
@@ -152,6 +150,7 @@
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
+          color: var(--text-primary-color);
         }
       }
     }

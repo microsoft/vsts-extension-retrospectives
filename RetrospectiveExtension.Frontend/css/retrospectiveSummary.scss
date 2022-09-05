@@ -22,7 +22,7 @@
     }
 
     .retro-summary-section-header {
-      font-size: 1em;
+      font-size: 16px;
       text-align: right;
       background-color: #0078d483;
       margin-bottom: 5px;
@@ -43,6 +43,7 @@
       margin-top: 10px;
       border-top: 1px solid var(--border-subtle-color);
       padding-top: 10px;
+      width: 100%;
 
       .horizontal-group-item {
         margin: 0 auto;
@@ -50,6 +51,8 @@
     }
 
     .retro-summary-contributors-section {
+      display: flex;
+      flex-wrap: wrap;
       padding: 5px;
 
       .retro-summary-contributor {
@@ -58,6 +61,7 @@
         width: fit-content;
         background-color: var(--border-subtle-color);
         margin-right: 10px;
+        margin-bottom: 10px;
 
         &:last-child {
           margin-right: 0;

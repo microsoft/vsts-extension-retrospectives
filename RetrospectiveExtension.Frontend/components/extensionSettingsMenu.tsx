@@ -139,7 +139,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}>
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
-            <PrimaryButton onClick={this.hideWhatsNewDialog} text="Close" />
+            <PrimaryButton className="whats-new-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
           </DialogFooter>
         </Dialog>
         <Dialog
@@ -183,8 +183,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             type: DialogType.close,
             title: 'Clear Visit History',
             subText: 'This extension maintains records of the teams and boards you visited. ' +
-            'Clearing visit history means that the next time you use the extension, ' +
-            'you will not be automatically directed to the your last visited board.',
+              'Clearing visit history means that the next time you use the extension, ' +
+              'you will not be automatically directed to the your last visited board.',
           }}
           minWidth={450}
           modalProps={{

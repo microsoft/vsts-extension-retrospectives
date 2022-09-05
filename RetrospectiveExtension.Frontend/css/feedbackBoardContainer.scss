@@ -346,3 +346,10 @@ $team_selector_list_item_width: 450px;
     }
   }
 }
+
+.prime-directive-close-button,
+.whats-new-close-button,
+.team-effectiveness-submit-button {
+  background-color: $azdo_blue;
+  color: white;
+}

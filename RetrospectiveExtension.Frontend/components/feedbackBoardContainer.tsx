@@ -1292,7 +1292,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               </table>
                             </DialogContent>
                             <DialogFooter>
-                              <PrimaryButton onClick={() => { saveTeamEffectivenessMeasurement(); }} text="Submit" />
+                              <PrimaryButton className="team-effectiveness-submit-button" onClick={() => { saveTeamEffectivenessMeasurement(); }} text="Submit" />
                               <DefaultButton onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true }); }} text="Cancel" />
                             </DialogFooter>
                           </Dialog>
@@ -1332,8 +1332,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               <em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
                             </DialogContent>
                             <DialogFooter>
-                              <DefaultButton onClick={() => { window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank'); }} text="Open Retrospective Wiki Page" />
-                              <PrimaryButton onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }} text="Close" />
+                              <DefaultButton onClick={() => {
+                                window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank');
+                              }}
+                                text="Open Retrospective Wiki Page" />
+                              <PrimaryButton onClick={() => {
+                                this.setState({ isPrimeDirectiveDialogHidden: true });
+                              }}
+                                text="Close"
+                                className="prime-directive-close-button" />
                             </DialogFooter>
                           </Dialog>
                           <TooltipHost
@@ -1568,90 +1575,92 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   </div>
                 }
                 <div className='retro-summary-item-horizontal-group'>
-                  <div className='retro-summary-section-item horizontal-group-item'>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participants casted {this.state.castedVoteCount} votes</div>
-                  <div className='retro-summary-section-item horizontal-group-item'>{this.state.feedbackItems.length} feedback items created</div>
-                  <div className='retro-summary-section-item horizontal-group-item'>{this.state.actionItemIds.length} action items created</div>
+                  <div className='retro-summary-section-item horizontal-group-item'>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {this.state.castedVoteCount} vote(s)</div>
+                  <div className='retro-summary-section-item horizontal-group-item'>{this.state.feedbackItems.length} feedback item(s) created</div>
+                  <div className='retro-summary-section-item horizontal-group-item'>{this.state.actionItemIds.length} action item(s) created</div>
                 </div>
               </section>
-              <section className='retro-summary-section'>
-                <div className='retro-summary-section-header'>Team Effectiveness Assessment</div>
-                <div>
-                  Effectiveness with favorability percentages and average score <br />
-                  ({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? 'person' : 'people'} responded)
-                  <div className="retro-summary-effectiveness-scores">
-                    <ul className="chart">
-                      {this.state.effectivenessMeasurementChartData.map((data, index) => {
-                        const averageScore = this.state.effectivenessMeasurementSummary[index]?.average;
-                        const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
-                        const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
-                        const redScore = ((data.red * 100) / teamEffectivenessResponseCount);
-                        return (
-                          <li className='chart-question-block' key={index}>
-                            <div className='chart-question'>
-                              <i className={getQuestionFontAwesomeClass(data.questionId)} /> &nbsp;
-                              {getQuestionShortName(data.questionId)}
-                            </div>
-                            {data.red > 0 &&
-                              <div
-                                className='red-chart-response chart-response'
-                                style={{ width: `${redScore}%` }}
-                                title={getQuestionName(data.questionId)}
-                                aria-label={`Unfavorable percentage is ${redScore}%`}
-                              >
-                                {this.percentageFormatter(redScore)}
+              {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement &&
+                <section className='retro-summary-section'>
+                  <div className='retro-summary-section-header'>Team Effectiveness Assessment</div>
+                  <div>
+                    Effectiveness with favorability percentages and average score <br />
+                    ({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? 'person' : 'people'} responded)
+                    <div className="retro-summary-effectiveness-scores">
+                      <ul className="chart">
+                        {this.state.effectivenessMeasurementChartData.map((data, index) => {
+                          const averageScore = this.state.effectivenessMeasurementSummary[index]?.average;
+                          const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
+                          const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
+                          const redScore = ((data.red * 100) / teamEffectivenessResponseCount);
+                          return (
+                            <li className='chart-question-block' key={index}>
+                              <div className='chart-question'>
+                                <i className={getQuestionFontAwesomeClass(data.questionId)} /> &nbsp;
+                                {getQuestionShortName(data.questionId)}
                               </div>
-                            }
-                            {data.yellow > 0 &&
-                              <div
-                                className='yellow-chart-response chart-response'
-                                style={{ width: `${yellowScore}%` }}
-                                title={getQuestionName(data.questionId)}
-                                aria-label={`Neutral percentage is ${yellowScore}%`}
-                              >
-                                {this.percentageFormatter(yellowScore)}
-                              </div>
-                            }
-                            {data.green > 0 &&
-                              <div
-                                className='green-chart-response chart-response'
-                                style={{ width: `${greenScore}%` }}
-                                title={getQuestionName(data.questionId)}
-                                aria-label={`Favorable percentage is ${greenScore}%`}
-                              >
-                                {this.percentageFormatter(greenScore)}
-                              </div>
-                            }
-                            {averageScore > 0 &&
-                              <div className="team-effectiveness-average-number"
-                                aria-label={`The average score for this question is ${this.numberFormatter(averageScore)}`}>
-                                {this.numberFormatter(averageScore)}
-                              </div>
-                            }
-                          </li>
-                        )
-                      })
-                      }
-                    </ul>
-                    <div className="chart-legend-section">
-                      <div className='chart-legend-group'>
-                        <section >
-                          <div style={{ backgroundColor: "#d6201f" }}></div>
-                          <span>Unfavorable</span>
-                        </section>
-                        <section>
-                          <div style={{ backgroundColor: "#ffd302" }}></div>
-                          <span>Neutral</span>
-                        </section>
-                        <section>
-                          <div style={{ backgroundColor: "#006b3d" }}></div>
-                          <span>Favorable</span>
-                        </section>
+                              {data.red > 0 &&
+                                <div
+                                  className='red-chart-response chart-response'
+                                  style={{ width: `${redScore}%` }}
+                                  title={getQuestionName(data.questionId)}
+                                  aria-label={`Unfavorable percentage is ${redScore}%`}
+                                >
+                                  {this.percentageFormatter(redScore)}
+                                </div>
+                              }
+                              {data.yellow > 0 &&
+                                <div
+                                  className='yellow-chart-response chart-response'
+                                  style={{ width: `${yellowScore}%` }}
+                                  title={getQuestionName(data.questionId)}
+                                  aria-label={`Neutral percentage is ${yellowScore}%`}
+                                >
+                                  {this.percentageFormatter(yellowScore)}
+                                </div>
+                              }
+                              {data.green > 0 &&
+                                <div
+                                  className='green-chart-response chart-response'
+                                  style={{ width: `${greenScore}%` }}
+                                  title={getQuestionName(data.questionId)}
+                                  aria-label={`Favorable percentage is ${greenScore}%`}
+                                >
+                                  {this.percentageFormatter(greenScore)}
+                                </div>
+                              }
+                              {averageScore > 0 &&
+                                <div className="team-effectiveness-average-number"
+                                  aria-label={`The average score for this question is ${this.numberFormatter(averageScore)}`}>
+                                  {this.numberFormatter(averageScore)}
+                                </div>
+                              }
+                            </li>
+                          )
+                        })
+                        }
+                      </ul>
+                      <div className="chart-legend-section">
+                        <div className='chart-legend-group'>
+                          <section >
+                            <div style={{ backgroundColor: "#d6201f" }}></div>
+                            <span>Unfavorable</span>
+                          </section>
+                          <section>
+                            <div style={{ backgroundColor: "#ffd302" }}></div>
+                            <span>Neutral</span>
+                          </section>
+                          <section>
+                            <div style={{ backgroundColor: "#006b3d" }}></div>
+                            <span>Favorable</span>
+                          </section>
+                        </div>
+                        <span className='favorability-header'>Favorability</span>
                       </div>
-                      <span className='favorability-header'>Favorability</span>
                     </div>
                   </div>
-                </div>
-              </section>
+                </section>
+              }
             </>
           }
         </Dialog>
