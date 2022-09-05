@@ -38,7 +38,9 @@ export const questions = [
 
 /**
  * Helpers for Effectiveness Measurement Questions.
- *
+ */
+
+/**
  * @param questionId Id of the question
  *
  * @returns name of the question
@@ -51,6 +53,11 @@ export const getQuestionName = (questionId: number): string => {
   return "";
 }
 
+/**
+ * @param questionId Id of the question
+ *
+ * @returns short name of the question
+ */
 export const getQuestionShortName = (questionId: number): string => {
   const question = questions.find(q => q.id === questionId);
   if (question) {
@@ -59,6 +66,11 @@ export const getQuestionShortName = (questionId: number): string => {
   return "";
 }
 
+/**
+ * @param questionId Id of the question
+ *
+ * @returns tooltip of the question
+ */
 export const getQuestionTooltip = (questionId: number): string => {
   const question = questions.find(q => q.id === questionId);
   if (question) {
@@ -67,6 +79,11 @@ export const getQuestionTooltip = (questionId: number): string => {
   return "";
 }
 
+/**
+ * @param questionId Id of the question
+ *
+ * @returns associated fontaswesome icon of the question
+ */
 export const getQuestionFontAwesomeClass = (questionId: number): string => {
   const question = questions.find(q => q.id === questionId);
   if (question) {
