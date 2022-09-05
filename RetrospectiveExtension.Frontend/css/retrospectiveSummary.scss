@@ -104,35 +104,52 @@
         margin: 2px 0;
 
         .chart-question {
-          width: 200px;
+          width: 225px;
           text-align: end;
           border-right: $azdo_blue 2px solid;
+          margin: 2px;
         }
 
         .team-effectiveness-average-number {
           padding: 3px;
           font-weight: bolder;
           margin: auto 2px;
-          border-left: 3px $azdo_blue solid;
+          border-left: 2px $azdo_blue solid;
           width: 30px;
           text-align: center;
         }
       }
 
       .chart-response {
-        margin-left: 2px;
 
         &.red-chart-response {
           background-color: #d6201f;
+          // For accessibility, make the backgrounds slightly different from one another
+          background-image: repeating-linear-gradient(45deg,
+              transparent,
+              transparent 9px,
+              #bd1c1a 9px,
+              #bd1c1a 10px);
         }
 
         &.yellow-chart-response {
           background-color: #ffd302;
           color: #000; // For contrast
+          // For accessibility, make the backgrounds slightly different from one another
+          background-image: repeating-linear-gradient(90deg,
+              transparent,
+              transparent 15px,
+              #ceab02 15px,
+              #ceab02 16px);
         }
 
         &.green-chart-response {
           background-color: #006b3d;
+          // For accessibility, make the backgrounds slightly different from one another
+          background-image: radial-gradient(#006238 20%, transparent 20%),
+            radial-gradient(#006238 20%, transparent 20%);
+          background-size: 12px 12px;
+          background-position: top left, 6px 6px;
         }
       }
 

@@ -1603,7 +1603,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                 <div
                                   className='red-chart-response chart-response'
                                   style={{ width: `${redScore}%` }}
-                                  title={getQuestionName(data.questionId)}
+                                  title={`Unfavorable percentage is ${redScore}%`}
                                   aria-label={`Unfavorable percentage is ${redScore}%`}
                                 >
                                   {this.percentageFormatter(redScore)}
@@ -1613,7 +1613,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                 <div
                                   className='yellow-chart-response chart-response'
                                   style={{ width: `${yellowScore}%` }}
-                                  title={getQuestionName(data.questionId)}
+                                  title={`Neutral percentage is ${yellowScore}%`}
                                   aria-label={`Neutral percentage is ${yellowScore}%`}
                                 >
                                   {this.percentageFormatter(yellowScore)}
@@ -1623,7 +1623,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                 <div
                                   className='green-chart-response chart-response'
                                   style={{ width: `${greenScore}%` }}
-                                  title={getQuestionName(data.questionId)}
+                                  title={`Favorable percentage is ${greenScore}%`}
                                   aria-label={`Favorable percentage is ${greenScore}%`}
                                 >
                                   {this.percentageFormatter(greenScore)}
