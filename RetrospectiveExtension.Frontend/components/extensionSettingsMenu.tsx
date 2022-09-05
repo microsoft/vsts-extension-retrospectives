@@ -130,7 +130,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           dialogContentProps={{
             type: DialogType.close,
             title: 'What\'s New',
-            subText: "Lot's of fixes , new Measure Team Assessment feature added 🥳",
+            subText: "Some visual fixes for the dark theme, and formatting dialog modals",
           }}
           minWidth={450}
           modalProps={{
