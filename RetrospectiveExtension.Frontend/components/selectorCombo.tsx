@@ -67,7 +67,7 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
           onClick={this.toggleSelectorCallout}
           tabIndex={0}
           onKeyDown={this.handleKeyPressSelectorButton}>
-          <i className={"selector-button-icon fas fa-" + this.props.iconName}></i>
+          <i className={"selector-button-icon fa-solid fa-" + this.props.iconName}></i>
           <span className="selector-button-text-wrapper">
             <div className="selector-button-text">
               {selectorButtonText}
@@ -80,7 +80,7 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
           target={this.selectorButton}
           directionalHint={DirectionalHint.bottomLeftEdge}
           gapSpace={0}
-          focusTrapProps={{isClickableOutsideFocusTrap: true}}
+          focusTrapProps={{ isClickableOutsideFocusTrap: true }}
           isBeakVisible={false}
           onDismiss={this.hideSelectorCallout}
           hidden={!this.state.isSelectorCalloutVisible}
@@ -155,7 +155,7 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.handleKeyPressTeamList(e, item)}
               tabIndex={0}
               aria-label={ariaLabel}>
-              <i className={"fas fa-" + this.props.iconName}></i>
+              <i className={"fa-solid fa-" + this.props.iconName}></i>
               <div title={itemName} className="selector-list-item-text">
                 {itemName}
               </div>
@@ -222,7 +222,7 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
 
       searchResultsAriaLabel = itemCount === 1
         ? 'Found 1 result.'
-        :'Found ' + itemCount + ' results.';
+        : 'Found ' + itemCount + ' results.';
     }
 
     return (

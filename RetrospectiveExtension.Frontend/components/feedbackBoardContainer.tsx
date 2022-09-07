@@ -1149,7 +1149,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       this.setState({ currentBoard });
     }
 
-    const teamEffectivenessResponseCount = this.state.currentBoard.teamEffectivenessMeasurementVoteCollection?.length;
+    const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
       <>
@@ -1181,7 +1181,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         <SelectorCombo<IFeedbackBoardDocument>
                           className="board-selector"
                           currentValue={this.state.currentBoard}
-                          iconName="sitemap"
+                          iconName="table-columns"
                           nameGetter={(feedbackBoard) => feedbackBoard.title}
                           selectorList={boardSelectorList}
                           selectorListItemOnClick={this.changeSelectedBoard}
@@ -1197,7 +1197,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             items: this.boardActionContexualMenuItems,
                           }}
                         >
-                          <span className="ms-Button-icon"><i className="fas fa-ellipsis-h"></i></span>&nbsp;
+                          <span className="ms-Button-icon"><i className="fa-solid fa-grip"></i></span>&nbsp;
                         </DefaultButton>
                         <Dialog
                           hidden={this.state.isMobileBoardActionsDialogHidden}

@@ -78,6 +78,14 @@
   }
 }
 
+.add-action-item-list-items {
+  .ms-List-cell {
+    &:hover {
+      background-color: var(--border-subtle-color);
+    }
+  }
+}
+
 .action-items {
   .work-item-type-icon-container {
     background-color: var(--background-color);

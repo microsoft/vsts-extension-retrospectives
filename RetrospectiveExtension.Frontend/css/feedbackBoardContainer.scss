@@ -342,12 +342,13 @@ $team_selector_list_item_width: 450px;
     color: var(--text-primary-color);
 
     &:hover {
-      background-color: rgba(var(--palette-neutral-0), 0.05);
+      background-color: var(--border-subtle-color);
       color: var(--text-primary-color);
     }
   }
 }
 
+.create-new-board-button,
 .metadata-form-save-button,
 .prime-directive-close-button,
 .whats-new-close-button,

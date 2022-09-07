@@ -166,7 +166,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
                   text={extensionSettingsMenuItem.text}
                   title={extensionSettingsMenuItem.title}
                 >
-                  <span className="ms-Button-icon"><i className={"fas fa-" + extensionSettingsMenuItem.iconProps}></i></span>&nbsp;
+                  <span className="ms-Button-icon"><i className={"fa-solid fa-" + extensionSettingsMenuItem.iconProps}></i></span>&nbsp;
                   <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span>
                 </ActionButton>
               )
