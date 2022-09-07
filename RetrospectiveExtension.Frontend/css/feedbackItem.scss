@@ -30,7 +30,7 @@
   }
 
   .mainItemCard {
-    width: 100%;
+    width: 250px; // For a uniform size
     background-color: var(--background-color);
     border-top: 1px solid rgb(96, 94, 92);
     border-right: 1px solid rgb(96, 94, 92);
@@ -168,8 +168,8 @@
       .anonymous-created-date {
         padding: 8px 16px;
         display: block;
-        font-size: 12px;
-        font-weight: 400;
+        font-size: 14px;
+        font-weight: lighter;
         color: var(--text-secondary-color);
         line-height: 18px;
         overflow: hidden;
@@ -261,6 +261,7 @@
     .no-matching-feedback-message {
       font-size: 15px;
       font-style: italic;
+      color: var(--text-primary-color);
     }
 
     .feedback-item-search-result-item {
@@ -290,6 +291,12 @@
           .non-editable-text-container {
             width: 100%;
             word-wrap: break-word;
+          }
+
+          .anonymous-created-date .card-id,
+          .non-editable-text-container,
+          .card-id {
+            color: var(--text-primary-color);
           }
         }
       }
