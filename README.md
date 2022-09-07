@@ -40,18 +40,18 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
  Navigate to the Azure 'Boards' tab in your account on the left hand navigation.
 Select the 'Retrospectives' tab under 'Boards'.
 
-    ![A screenshot of the Azure DevOps left-hand navigation. Under the Boards
-    heading, the extension for the retrospective is darkened as though hovered by
-    a mouse.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/azdo-side-bar.png)
+![A screenshot of the Azure DevOps left-hand navigation. Under the Boards
+heading, the extension for the retrospective is darkened as though hovered by
+a mouse.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/azdo-side-bar.png)
 
 ### 2. Pick The Team
 
 You are now on the Retrospectives page. Select your Azure DevOps team from the
 selector in the header.
 
-    ![A screenshot of the Retrospective tool's Team dropdown. The selected team
-    is "Backend Team" and the selection is darkened as though the mouse is hovering
-    over.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/team-dropdown.png)
+![A screenshot of the Retrospective tool's Team dropdown. The selected team
+is "Backend Team" and the selection is darkened as though the mouse is hovering
+over.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/team-dropdown.png)
 
 ### 3. Create New Retrospective
 
@@ -59,29 +59,29 @@ Create a new retrospective using the 'Create Board' button. If this is your
 first retrospective for your selected team, then press the "Create Board" button
 in the center of the screen.
 
-  ![A screenshot of the Retrospective main page. The screen is mostly empty
-  except for the top navigation of the tool. In the center there is a blue button
-  to 'Create Board.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/create-first-retrospective.png)
+![A screenshot of the Retrospective main page. The screen is mostly empty
+except for the top navigation of the tool. In the center there is a blue button
+to 'Create Board.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/create-first-retrospective.png)
 
 If you have created a retrospective before for your selected team, then you
 can select "Create a new retrospective" from the navigation drop down.
 
-  ![A screenshot of the top navigation in the Retrospective tool, where the
-  'Board Actions' menu has been opened. The first option in the dropdown is
-  the 'Create New Retrospective.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/create-new-retrospective-dropdown.png)
+![A screenshot of the top navigation in the Retrospective tool, where the
+'Board Actions' menu has been opened. The first option in the dropdown is
+the 'Create New Retrospective.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/create-new-retrospective-dropdown.png)
 
 ### 4. Choose Your Retrospective Settings
 
 When you select **New Board** or **Create new board** as above, you will see
 the following dialog:
 
-    ![A screenshot showing the modal box that controls the initial settings for
-    creating a retrospective board. The settings include: a text field for title
-    of the retrospective; a number input box for maximum votes per person; a
-    checkbox to include a Team Assessment; a checkbox to obscure the feedback of
-    others during the Collect Phase; a checkbox to include Retrospective Prime
-    Directive; and a section to pick the different columns to include in the
-    retrospective, either customized or loaded from predefined templates.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/create-new-retro-lightmode.png)
+![A screenshot showing the modal box that controls the initial settings for
+creating a retrospective board. The settings include: a text field for title
+of the retrospective; a number input box for maximum votes per person; a
+checkbox to include a Team Assessment; a checkbox to obscure the feedback of
+others during the Collect Phase; a checkbox to include Retrospective Prime
+Directive; and a section to pick the different columns to include in the
+retrospective, either customized or loaded from predefined templates.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/create-new-retro-lightmode.png)
 
 Please enter the appropriate information:
 
@@ -100,12 +100,12 @@ individual feedback items.
 - **Columns**: You can either Apply from a preselected templates or individually
 select and configure columns.
 
-  ![A screenshot showing the dropdown of available templates for the retrospective
-  board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/pick-retrospective-template-lightmode.png)
+![A screenshot showing the dropdown of available templates for the retrospective
+board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/pick-retrospective-template-lightmode.png)
 
 **Note:** Retrospective Title is the minimum 'required' information (other
-  fields can stay at default as needed). Ones the title is provided, the `Save`
-  button is enabled. Save the retrospective using the `Save` button.
+fields can stay at default as needed). Ones the title is provided, the `Save`
+button is enabled. Save the retrospective using the `Save` button.
 
 ### ... Or Select Another Board
 
@@ -114,10 +114,10 @@ different from the currently displayed board, click on the board name and select
 the desired board. You can use the search box to find the appropriate boards if
 you have a large number of boards.
 
-  ![A screenshot showing the dropdown for searching available retrospective
-  boards after they've been created. The current Retrospective Board is
-  "Retrospective for Sprint 8" and the selection for "Retrospective for
-  Sprint 7" is darkened as though hovered.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/retro-board-dropdown.png)
+![A screenshot showing the dropdown for searching available retrospective
+boards after they've been created. The current Retrospective Board is
+"Retrospective for Sprint 8" and the selection for "Retrospective for
+Sprint 7" is darkened as though hovered.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/retro-board-dropdown.png)
 
 ### 5. Share the Link to the Retrospective
 
@@ -126,9 +126,9 @@ Users can then access that link even from their mobile browsers to participate i
 the retrospective. The extension offers real time synchronisation, so all users
 will see the most upto date information without having to refresh the page.
 
-  ![A screenshot of the dropdown from the Board Actions Menu. The option for
-  'Copy Retrsopectivelink Link' is darkened as though the mouse is hovering
-  over it.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/copy-retro-link.png)
+![A screenshot of the dropdown from the Board Actions Menu. The option for
+'Copy Retrsopectivelink Link' is darkened as though the mouse is hovering
+over it.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/copy-retro-link.png)
 
 ### 6. The Four Phases of the Retrospective
 
@@ -200,7 +200,7 @@ real time as the user clicks on 'Upvote' and 'Downvote' icons.
 
 ![A screenshot that shows a user has used two votes out of five, which is
 indicated next to "Votes Used." The two items that have been voted on by the
-user show a "Your Votes: 1" in the feedback card.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/grouped-feedback-expanded.png)
+user show a "Your Votes: 1" in the feedback card.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/vote-feedback-in-progress.png)
 
 Once everyone is done voting, move on to the next phase.
 
