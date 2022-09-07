@@ -105,7 +105,7 @@ export interface IFeedbackItemState {
   isDeletionDisabled: boolean;
   showVotedAnimation: boolean;
   itemElementHeight: number;
-  searchedFeedbackItems: IColumnItem[];
+  searchedFeedbackItems: IFeedbackItemDocument[];
   searchTerm: string;
   hideFeedbackItems: boolean;
   userVotes: string;
@@ -539,11 +539,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
     const trimmedSearchTerm = searchTerm.trim();
 
-    const searchedFeedbackItems = this.props.columns[this.props.columnId].columnItems
-      .filter((columnItem) => columnItem.feedbackItem.title.toLocaleLowerCase().includes(
-        trimmedSearchTerm.toLocaleLowerCase()))
-      .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId &&
-        columnItem.feedbackItem.id !== this.props.id);
+    const boardItems = await itemDataService.getFeedbackItemsForBoard(this.props.boardId);
+    const searchedFeedbackItems = boardItems.filter(findItem => {
+      return findItem.title.toLocaleLowerCase().includes(trimmedSearchTerm.toLocaleLowerCase())
+    }).filter(boardItem => {
+      return boardItem.id !== this.props.id && !boardItem.parentFeedbackItemId
+    })
 
     this.setState({
       searchTerm: searchTerm,
@@ -969,23 +970,62 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             {!this.state.searchedFeedbackItems.length && this.state.searchTerm &&
               <p className="no-matching-feedback-message">No feedback with title containing your input.</p>
             }
-            {this.state.searchedFeedbackItems
-              .map((columnItem) => {
-                const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(
-                  this.props.columnProps,
-                  columnItem,
-                  false)
-                return <div
-                  key={feedbackItemProps.id}
-                  className="feedback-item-search-result-item"
-                  onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
-                  onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
-                  tabIndex={0}
-                >
-                  <FeedbackItem {...feedbackItemProps}>
-                  </FeedbackItem>
-                </div>
-              })}
+            {this.state.searchedFeedbackItems.map((searchItem) => {
+              // Making feedbackItemsProps by hand since we are looking across
+              //   all columns
+              const feedbackItemProps: IFeedbackItemProps = {
+                id: searchItem.id,
+                title: searchItem.title,
+                columnProps: this.props.columnProps,
+                columns: this.props.columns,
+                columnIds: this.props.columnIds,
+                lastEditedDate: searchItem.modifedDate ? searchItem.modifedDate.toString() : '',
+                createdDate: searchItem.createdDate.toString(),
+                upvotes: searchItem.upvotes,
+                accentColor: this.props.accentColor,
+                iconClass: this.props.iconClass,
+                workflowPhase: this.props.workflowPhase,
+                originalColumnId: searchItem.originalColumnId,
+                team: this.props.team,
+                columnId: searchItem.columnId,
+                boardId: searchItem.boardId,
+                boardTitle: this.props.boardTitle,
+                defaultActionItemAreaPath: this.props.defaultActionItemAreaPath,
+                defaultActionItemIteration: this.props.defaultActionItemIteration,
+                actionItems: [], // Since this is just for grouping, we don't _need_ these
+                showAddedAnimation: this.props.showAddedAnimation,
+                newlyCreated: this.props.newlyCreated,
+                nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
+                allWorkItemTypes: this.props.allWorkItemTypes,
+                isInteractable: false,
+                shouldHaveFocus: this.props.shouldHaveFocus,
+                hideFeedbackItems: this.props.hideFeedbackItems,
+                userIdRef: searchItem.userIdRef,
+                timerSecs: searchItem.timerSecs,
+                timerState: searchItem.timerstate,
+                timerId: searchItem.timerId,
+                groupCount: searchItem.groupTitles?.length,
+                isGroupedCarouselItem: searchItem.isGroupedCarouselItem,
+                groupTitles: searchItem.groupTitles,
+                isShowingGroupedChildrenTitles: false,
+                isFocusModalHidden: true,
+                onVoteCasted: this.props.onVoteCasted,
+                addFeedbackItems: this.props.addFeedbackItems,
+                removeFeedbackItemFromColumn: this.props.removeFeedbackItemFromColumn,
+                refreshFeedbackItems: this.props.refreshFeedbackItems,
+                moveFeedbackItem: this.props.moveFeedbackItem
+              };
+              return <div
+                key={searchItem.id}
+                className="feedback-item-search-result-item"
+                onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
+                onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
+                tabIndex={0}
+              >
+                <FeedbackItem {...feedbackItemProps}>
+                </FeedbackItem>
+              </div>
+            })}
           </div>
         </Dialog>
         <Dialog
