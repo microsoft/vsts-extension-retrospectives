@@ -35,6 +35,9 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
 
 ## Use
 
+Please note: the screenshot examples use light mode and dark mode interchangeably
+because both are supported!
+
 ### 1. Open Retrospectives Extension
 
  Navigate to the Azure 'Boards' tab in your account on the left hand navigation.
@@ -268,6 +271,19 @@ If there is a team assessment, then a charted summary will show the vote breakdo
 by favorability, along with an average score.
 
 ![A screenshot that shows an example retrospective summary with a team assessment.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/retro-summary-with-assessment-darkmode.png)
+
+### 10. Board History
+
+There may be times that a team may want to reflect on past retrospectives they have
+run. There is a History tab in the top navigation of the tool, next to "Board" header.
+
+![A screenshot that shows the history view tab. There is a table that shows four
+columns: Retrospective Name, Created Date, Pending Work Items, and Total Work Items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/history-view-darkmode.png)
+
+From here, one can look at past retrospectives and see a few high level stats and
+the action items created after each by clicking the individual retrospective.
+
+![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/history-expanded-summary-lightmode.png)
 
 ## Contribute
 
