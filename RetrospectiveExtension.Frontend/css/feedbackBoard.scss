@@ -1,4 +1,21 @@
-﻿.feedback-board {
+﻿.ms-FocusZone {
+  padding-top: 11px;
+  height: 40px;
+
+  .ms-Pivot-link {
+    &.is-selected {
+      background-color: var(--border-subtle-color);
+      border-radius: 5px 5px 0 0;
+    }
+
+    border-radius: 5px 5px 0 0;
+    border-top: 1px solid var(--border-subtle-color);
+    border-left: 1px solid var(--border-subtle-color);
+    border-right: 1px solid var(--border-subtle-color);
+  }
+}
+
+.feedback-board {
   width: 100%;
   display: table;
   table-layout: fixed;

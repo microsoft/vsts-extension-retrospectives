@@ -1152,7 +1152,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <>
+      <div className="retrospective-feedback-board-container">
         <div className="flex items-center px-2 py-2">
           <div className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
             Retrospectives
@@ -1167,7 +1167,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             title={"Team"}
           />
           <div style={{ flexGrow: 1 }}></div>
-          <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.toggleAndFixResolution} />
+          <ExtensionSettingsMenu
+            isDesktop={this.state.isDesktop}
+            onScreenViewModeChanged={this.toggleAndFixResolution}
+          />
         </div>
         <div className="flex w-full items-center justify-start">
           <Pivot>
@@ -1234,7 +1237,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     </div>
                     <div className="feedback-workflow-wrapper">
                       {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement &&
-                        <>
+                        <div className="team-effectiveness-dialog-section">
                           <Dialog
                             hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
                             onDismiss={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true }); }}
@@ -1307,10 +1310,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               <span className="ms-Button-label">Team Assessment</span>
                             </ActionButton>
                           </TooltipHost>
-                        </>
+                        </div>
                       }
                       {this.state.currentBoard.displayPrimeDirective &&
-                        <>
+                        <div className="prime-directive-dialog-section">
                           <Dialog
                             hidden={this.state.isPrimeDirectiveDialogHidden}
                             onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
@@ -1354,28 +1357,30 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: false }); }}>
                             </ActionButton>
                           </TooltipHost>
-                        </>
+                        </div>
                       }
-                      <WorkflowStage
-                        display="Collect"
-                        value={WorkflowPhase.Collect}
-                        isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect}
-                        clickEventCallback={this.clickWorkflowStateCallback} />
-                      <WorkflowStage
-                        display="Group"
-                        value={WorkflowPhase.Group}
-                        isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group}
-                        clickEventCallback={this.clickWorkflowStateCallback} />
-                      <WorkflowStage
-                        display="Vote"
-                        value={WorkflowPhase.Vote}
-                        isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote}
-                        clickEventCallback={this.clickWorkflowStateCallback} />
-                      <WorkflowStage
-                        display="Act"
-                        value={WorkflowPhase.Act}
-                        isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act}
-                        clickEventCallback={this.clickWorkflowStateCallback} />
+                      <div className="workflow-stage-tab-container">
+                        <WorkflowStage
+                          display="Collect"
+                          value={WorkflowPhase.Collect}
+                          isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect}
+                          clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage
+                          display="Group"
+                          value={WorkflowPhase.Group}
+                          isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group}
+                          clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage
+                          display="Vote"
+                          value={WorkflowPhase.Vote}
+                          isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote}
+                          clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage
+                          display="Act"
+                          value={WorkflowPhase.Act}
+                          isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act}
+                          clickEventCallback={this.clickWorkflowStateCallback} />
+                      </div>
                     </div>
                     {
                       this.getCurrentBoardPhase() === WorkflowPhase.Act &&
@@ -1497,7 +1502,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               }
             </PivotItem>
             <PivotItem headerText="History">
-              <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} />
+              <div className="pivot-content-wrapper">
+                <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} />
+              </div>
             </PivotItem>
           </Pivot>
         </div>
@@ -1688,7 +1695,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           toastClassName="retrospective-notification-toast"
           bodyClassName="retrospective-notification-toast-body"
           progressClassName="retrospective-notification-toast-progress-bar" />
-      </>
+      </div>
     );
   }
 }

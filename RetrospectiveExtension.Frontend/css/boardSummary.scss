@@ -30,12 +30,14 @@
 
   .ReactTable {
     height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
+    width: 70vw;
 
     .rt-table {
       flex: 0 1 auto;
 
       .rt-thead {
         background-color: $azdo_blue;
+        color: #fff;
 
         .rt-resizable-header-content {
           height: 30px;

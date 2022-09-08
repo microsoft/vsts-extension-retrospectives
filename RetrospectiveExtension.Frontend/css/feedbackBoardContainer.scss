@@ -50,9 +50,10 @@ $team_selector_list_item_width: 450px;
 
 .toggle-carousel-button-tooltip-wrapper {
   position: relative;
+  margin-bottom: -6px;
 
   .toggle-carousel-button {
-    margin: 8px;
+    margin: 8px 8px 0 8px;
     font-size: 13px;
     color: var(--text-primary-color);
 
@@ -74,6 +75,12 @@ $team_selector_list_item_width: 450px;
       }
     }
   }
+}
+
+.pivot-content-wrapper {
+  margin-top: 15px;
+  border-top: var(--nav-header-active-item-background) 4px solid;
+  width: 98.5vw;
 }
 
 #extension-header {
@@ -162,7 +169,7 @@ $team_selector_list_item_width: 450px;
   justify-content: flex-start;
   margin-left: 200px;
   padding-right: $header_horizontal_spacing;
-  margin-top: -56px;
+  margin-top: -60px;
 
   .menu-button {
     margin-left: 5px;
@@ -195,42 +202,56 @@ $team_selector_list_item_width: 450px;
     display: flex;
     align-items: center;
     margin-left: 35px;
-    background-color: var(--border-subtle-color);
+    margin-top: 8px;
+    background-color: var(--background-color);
 
-    .retrospective-workflowState {
-      width: 72px;
-      height: 40px;
-      cursor: pointer;
+    .workflow-stage-tab-container {
+      flex-direction: row;
       display: flex;
-      text-align: center;
-      align-items: center;
+      padding-top: 8px;
 
-      .stage-text {
-        font-size: 12px;
-        width: 100%;
-      }
+      .retrospective-workflowState {
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        text-align: center;
+        align-items: center;
+        width: 75px;
+        margin-right: 10px;
+        border-radius: 5px 5px 0 0;
+        border-left: 1px var(--nav-header-active-item-background) solid;
+        border-right: 1px var(--nav-header-active-item-background) solid;
+        border-top: 1px var(--nav-header-active-item-background) solid;
 
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-        color: var(--text-primary-color);
-      }
+        .stage-text {
+          font-size: 12px;
+          width: 100%;
+        }
 
-      &.active {
-        color: var(--status-info-foreground);
-        font-weight: bold;
+        &:hover {
+          background-color: $azdo_blue;
+          color: #fff;
+        }
 
-        &::before {
-          background-color: transparent;
-          bottom: 0px;
-          content: '';
-          position: absolute;
-          width: 44px;
-          margin-left: 14px;
-          box-sizing: border-box;
-          border-bottom: 2px solid var(--status-info-foreground);
+        &.active {
+          color: var(--status-info-foreground);
+          font-weight: bold;
+          background-color: var(--nav-header-active-item-background);
+
+          &::before {
+            background-color: transparent;
+            bottom: 0px;
+            content: '';
+            position: absolute;
+            width: 44px;
+            margin-left: 14px;
+            box-sizing: border-box;
+            border-bottom: 2px solid var(--status-info-foreground);
+          }
         }
       }
     }
+
   }
 
   .feedback-workflow-wrapper-background {

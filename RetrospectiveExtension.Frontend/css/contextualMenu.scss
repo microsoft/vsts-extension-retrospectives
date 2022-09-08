@@ -16,8 +16,17 @@
   }
 }
 
+.ms-ContextualMenu-Callout {
+  .ms-Callout-main {
+    background-color: var(--callout-background-color);
+  }
+}
+
 .user-settings-menu {
   background-color: var(--callout-background-color);
+  height: 155px;
+  margin-top: -10px;
+
 
   button.ms-ContextualMenu-link {
     color: var(--text-primary-color);
