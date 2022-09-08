@@ -45,7 +45,7 @@ Select the 'Retrospectives' tab under 'Boards'.
 
 ![A screenshot of the Azure DevOps left-hand navigation. Under the Boards
 heading, the extension for the retrospective is darkened as though hovered by
-a mouse.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/azdo-side-bar.png)
+a mouse.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/azdo-side-bar.png)
 
 ### 2. Pick The Team
 
@@ -54,7 +54,7 @@ selector in the header.
 
 ![A screenshot of the Retrospective tool's Team dropdown. The selected team
 is "Backend Team" and the selection is darkened as though the mouse is hovering
-over.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/team-dropdown.png)
+over.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/team-dropdown.png)
 
 ### 3. Create New Retrospective
 
@@ -64,14 +64,14 @@ in the center of the screen.
 
 ![A screenshot of the Retrospective main page. The screen is mostly empty
 except for the top navigation of the tool. In the center there is a blue button
-to 'Create Board.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/create-first-retrospective.png)
+to 'Create Board.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-first-retrospective.png)
 
 If you have created a retrospective before for your selected team, then you
 can select "Create a new retrospective" from the navigation drop down.
 
 ![A screenshot of the top navigation in the Retrospective tool, where the
 'Board Actions' menu has been opened. The first option in the dropdown is
-the 'Create New Retrospective.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/create-new-retrospective-dropdown.png)
+the 'Create New Retrospective.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retrospective-dropdown.png)
 
 ### 4. Choose Your Retrospective Settings
 
@@ -84,7 +84,7 @@ of the retrospective; a number input box for maximum votes per person; a
 checkbox to include a Team Assessment; a checkbox to obscure the feedback of
 others during the Collect Phase; a checkbox to include Retrospective Prime
 Directive; and a section to pick the different columns to include in the
-retrospective, either customized or loaded from predefined templates.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/create-new-retro-lightmode.png)
+retrospective, either customized or loaded from predefined templates.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retro-lightmode.png)
 
 Please enter the appropriate information:
 
@@ -104,7 +104,7 @@ individual feedback items.
 select and configure columns.
 
 ![A screenshot showing the dropdown of available templates for the retrospective
-board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/pick-retrospective-template-lightmode.png)
+board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/pick-retrospective-template-lightmode.png)
 
 **Note:** Retrospective Title is the minimum 'required' information (other
 fields can stay at default as needed). Ones the title is provided, the `Save`
@@ -120,7 +120,7 @@ you have a large number of boards.
 ![A screenshot showing the dropdown for searching available retrospective
 boards after they've been created. The current Retrospective Board is
 "Retrospective for Sprint 8" and the selection for "Retrospective for
-Sprint 7" is darkened as though hovered.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/retro-board-dropdown.png)
+Sprint 7" is darkened as though hovered.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-board-dropdown.png)
 
 ### 5. Share the Link to the Retrospective
 
@@ -131,7 +131,7 @@ will see the most upto date information without having to refresh the page.
 
 ![A screenshot of the dropdown from the Board Actions Menu. The option for
 'Copy Retrsopectivelink Link' is darkened as though the mouse is hovering
-over it.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/copy-retro-link.png)
+over it.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/copy-retro-link.png)
 
 ### 6. The Four Phases of the Retrospective
 
@@ -148,7 +148,7 @@ all users is collected, move onto the next phase.
 
 ![A screenshot of an example retrospective board column, showing the example
 user Avery Axolotl writing in a feedback item that says 'Accidentally deleted
-my branch on remote. Dang!'](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/write-new-feedback-item.png)
+my branch on remote. Dang!'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/write-new-feedback-item.png)
 
 If when creating a retrospective, the checkbox for "Do not display names on
 feedback" is checked, then the cards will show no names, appearing anonymous.
@@ -160,7 +160,7 @@ you have created in this mode.
 
 ![A screenshot of a board that shows two columnds for "Mad" and "Sad." The each
 column has two feedback items: one which has text visible and another where
-there is a blur that obscures the text from another user.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/obscured-anonymous-feedback.png)
+there is a blur that obscures the text from another user.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/obscured-anonymous-feedback.png)
 
 #### Group
 
@@ -170,7 +170,7 @@ onto another to group them together. Dragging any item onto a group, will add it
 to that group.
 
 ![A screenshot that shows a piece of feedback being dragged on top of another
-due to their similarity. The item being dragged is semi-transparent.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/group-feedback-by-dragging.png)
+due to their similarity. The item being dragged is semi-transparent.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-by-dragging.png)
 
 If you would rather not drag you can use the feedback item's action menu
 (the ellipsis '...') to "Group Feedback". This will bring up a search box and
@@ -178,15 +178,15 @@ you can type in the feedback item you would like to group your selected item
 under.
 
 ![A screenshot that shows the selected feedback item's action menu. The
-"Group Feedback" is darked as though a mouse is hovering.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/group-feedback-by-feedback-menu.png)
+"Group Feedback" is darked as though a mouse is hovering.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-by-feedback-menu.png)
 
 ![A screenshot that shows a search bar. The word "team" has been typed in
-and shows a feedback item has been found with that word.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/group-feedback-search-dialog.png)
+and shows a feedback item has been found with that word.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-search-dialog.png)
 
 Both methods of grouping will result in the item being grouped beneath the other.
 
 ![A screenshot that shows that one feedback from Fernando Flamingo is grouped
-beneath Avery Axolotl's feedback because both discussed team bonding.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/grouped-feedback-expanded.png)
+beneath Avery Axolotl's feedback because both discussed team bonding.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/grouped-feedback-expanded.png)
 
 Once all similar items are grouped together, move on to the next phase.
 
@@ -203,7 +203,7 @@ real time as the user clicks on 'Upvote' and 'Downvote' icons.
 
 ![A screenshot that shows a user has used two votes out of five, which is
 indicated next to "Votes Used." The two items that have been voted on by the
-user show a "Your Votes: 1" in the feedback card.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/vote-feedback-in-progress.png)
+user show a "Your Votes: 1" in the feedback card.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/vote-feedback-in-progress.png)
 
 Once everyone is done voting, move on to the next phase.
 
@@ -221,10 +221,10 @@ feedback items, the button for 'Add Action Item,' an ellipsis, has been pressed
 to reveal a selection of options. The user has the option to create a number of
 different Azure Dev Ops items, like adding a bug, a user story, and others. In
 this case, the item that is darkened as though hovered by a mouse is the 'User
-Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/add-action-item-dropdown.png)
+Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
 ![A screenshot of a different example board that shows the action items made
-for a variety of feedback items. All are labelled as tasks.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/add-action-item-in-act-phase-darkmode.png)
+for a variety of feedback items. All are labelled as tasks.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-in-act-phase-darkmode.png)
 
 ### 7. Team Assessment
 
@@ -243,7 +243,7 @@ The users can rank on a scale of 1 to 10; scores of 1-6 are categorized as
 
 ![A screenshot of an example user filling out the team assessment. Each question
 has alternating background for visual distinction. Each question/category has
-a short description and a tooltip icon that provides more context.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/retro-team-assessment-darkmode.png)
+a short description and a tooltip icon that provides more context.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-team-assessment-darkmode.png)
 
 Once the team assessment has been completed, the summary of answers can be viewed
 in the Retrospective Summary Dialog.
@@ -254,7 +254,7 @@ in the Retrospective Summary Dialog.
 in the top navigation.
 
 ![A screenshot that shows the Board Actions menu, where the "Show Retrospective
-Summary" is highlighted as though the mouse is hovering.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/show-retro-summary.png)
+Summary" is highlighted as though the mouse is hovering.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/show-retro-summary.png)
 
 Once there, there is a summary of the Retrospective. This includes:
 
@@ -265,12 +265,12 @@ Once there, there is a summary of the Retrospective. This includes:
 - Number of votes cast
 - Number of action items created
 
-![A screenshot that shows an example retrospective summary without a team assessment.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/retro-summary-no-assessment-darkmode.png)
+![A screenshot that shows an example retrospective summary without a team assessment.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-summary-no-assessment-darkmode.png)
 
 If there is a team assessment, then a charted summary will show the vote breakdown
 by favorability, along with an average score.
 
-![A screenshot that shows an example retrospective summary with a team assessment.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/retro-summary-with-assessment-darkmode.png)
+![A screenshot that shows an example retrospective summary with a team assessment.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-summary-with-assessment-darkmode.png)
 
 ### 10. Board History
 
@@ -278,12 +278,12 @@ There may be times that a team may want to reflect on past retrospectives they h
 run. There is a History tab in the top navigation of the tool, next to "Board" header.
 
 ![A screenshot that shows the history view tab. There is a table that shows four
-columns: Retrospective Name, Created Date, Pending Work Items, and Total Work Items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/history-view-darkmode.png)
+columns: Retrospective Name, Created Date, Pending Work Items, and Total Work Items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-darkmode.png)
 
 From here, one can look at past retrospectives and see a few high level stats and
 the action items created after each by clicking the individual retrospective.
 
-![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/mindlessroman/fix-dark-mode/documentation/images/desktop/history-expanded-summary-lightmode.png)
+![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-expanded-summary-lightmode.png)
 
 ## Contribute
 
