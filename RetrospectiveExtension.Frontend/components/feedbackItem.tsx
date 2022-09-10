@@ -759,6 +759,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       iconProps={{ iconName: 'MoreVertical' }}
                       title="Feedback actions"
                       menuProps={{
+                        className: "feedback-action-menu",
                         items: this.feedbackItemEllipsisMenuItems
                           .filter((menuItem) => !(isMainItem && menuItem.hideMainItem))
                           .map((menuItem) => {
@@ -874,19 +875,16 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 />}
             </div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles &&
-              <div className="group-child-feedback-stack"
-                style={{
-                  width: "300px"
-                }}><span className="related-feedback-header">Related Feedback</span>
-                <ul className="fa-ul">
+              <div className="group-child-feedback-stack">
+                <div className="related-feedback-header"> <i className="far fa-comments" />&nbsp;Related Feedback</div>
+                <ul className="fa-ul" aria-label="List of Related Feedback">
                   {childrenTitlesShort.map((title: String, index: React.Key) =>
-                    <li key={index}><span className="fa-li"><i className="far fa-comment-dots" /></span>
+                    <li key={index}><span className="fa-li"><i className="fa-solid fa-quote-left" /></span>
                       <span className="related-feedback-title"
                         aria-label={'Title of the feedback is ' + title}>
                         {title}
                       </span></li>
-                  )
-                  }
+                  )}
                 </ul>
               </div>
             }

@@ -36,6 +36,7 @@ $bug_red: rgb(204, 41, 61);
 $task_yellow: rgb(242, 203, 29);
 $resolved_green: rgb(51, 153, 51);
 $hover_grey: rgba(0, 0, 0, .04);
+$azdo_blue: #0078d4;
 
 // high contrast color substitutes. bow = black on white theme. wob = white on black theme
 $hc_bow_hover_grey: rgb(55, 0, 110);
@@ -44,4 +45,4 @@ $hc_wob_main_blue: rgb(26, 235, 255);
 $hc_bow_main_blue: rgb(0, 0, 0);
 
 // fonts
-$default_vsts_font: "Segoe UI VSS (Regular)","-apple-system",BlinkMacSystemFont,"Segoe UI",sans-serif;
+$default_vsts_font: "Segoe UI VSS (Regular)", "-apple-system", BlinkMacSystemFont, "Segoe UI", sans-serif;

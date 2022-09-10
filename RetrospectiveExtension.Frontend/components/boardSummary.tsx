@@ -66,7 +66,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         fieldName: 'title',
         isResizable: true,
         key: 'title',
-        maxWidth: 700,
+        maxWidth: 350,
         minWidth: 100,
         name: 'Title',
         onColumnClick: this.onColumnClick,
@@ -98,7 +98,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         key: 'changedDate',
         name: 'Last Updated',
         fieldName: 'changedDate',
-        minWidth: 50,
+        minWidth: 100,
         maxWidth: 150,
         isResizable: true,
         ariaLabel: 'Work item changed date.',
@@ -247,14 +247,14 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
             </div>
           </div>
           <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon fas fa-clipboard"></i>
+            <i className="stats-icon fa-regular fa-square-plus"></i>
             <div className="count-and-text" aria-label="count and text container">
               <div className="count" aria-label="total work items count">{this.props.actionItems.length}</div>
               <div className="text">Work items created.</div>
             </div>
           </div>
           <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon pending-action-item-color fas fa-bug"></i>
+            <i className="stats-icon pending-action-item-color fa-solid fa-hourglass-half"></i>
             <div className="count-and-text" aria-label="count and text container">
               <div className={`count ${this.props.pendingWorkItemsCount > 0 ? 'pending-action-item-color' : ''}`} aria-label="pending work items count">
                 {this.props.pendingWorkItemsCount}</div>
@@ -262,7 +262,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
             </div>
           </div>
           <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon resolved-green fas fa-file"></i>
+            <i className="stats-icon resolved-green fa-solid fa-clipboard-check"></i>
             <div className="count-and-text" aria-label="count and text container">
               <div className={`count ${this.props.resolvedActionItemsCount > 0 ? 'resolved-green' : ''}`} aria-label="resolved work items count">
                 {this.props.resolvedActionItemsCount}</div>

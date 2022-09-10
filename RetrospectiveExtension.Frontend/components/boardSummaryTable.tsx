@@ -259,11 +259,28 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
       (rowInfo && rowInfo.original && rowInfo.original.pendingWorkItemsCount && rowInfo.original.pendingWorkItemsCount > 0) ?
         true : false;
 
+    const isTotalWorkItemsCount = col && col.id === 'totalWorkItemsCount';
     const isPendingCountColumn = col && col.id === 'pendingWorkItemsCount';
     const ariaLabel = col && col.Header && col.id && rowInfo && rowInfo.original && rowInfo.original[col.id] ? col.Header + ' ' + rowInfo.original[col.id] : '';
 
+    let workItemsClass;
+    switch (col.id) {
+      case 'totalWorkItemsCount':
+        workItemsClass = 'workItemsCount total-work-item-count';
+        break;
+      case 'pendingWorkItemsCount':
+        workItemsClass = 'workItemsCount';
+        if (hasPendingItems) {
+          workItemsClass += " pending-action-item-count";
+        }
+        break;
+      default:
+        workItemsClass = '';
+        break;
+    }
+
     return {
-      className: (hasPendingItems && isPendingCountColumn) ? 'pending-action-item-count' : '',
+      className: `${workItemsClass}`,
       'aria-label': ariaLabel,
       'aria-readonly': true
     };
@@ -284,7 +301,7 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
 
   public render() {
     return (
-        <div className="board-summary-table-container">
+      <div className="board-summary-table-container">
         {/*
          // @ts-ignore TS2786 */}
         <ReactTable

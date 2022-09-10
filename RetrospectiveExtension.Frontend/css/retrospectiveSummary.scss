@@ -1,0 +1,200 @@
+//
+// Retro Spectives Summary Dialog
+//
+.retrospectives-retro-summary-dialog {
+  max-width: none;
+  width: 50%;
+  display: flex;
+  align-items: center;
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
+
+  .ms-Dialog-title {
+    text-align: left;
+    color: var(--text-primary-color);
+  }
+
+  .retro-summary-section {
+    padding: 10px;
+
+    #retro-summary-created-by {
+      margin: 3px 0;
+    }
+
+    .retro-summary-section-header {
+      font-size: 16px;
+      text-align: right;
+      background-color: #0078d483;
+      margin-bottom: 5px;
+      padding: 5px 10px;
+      font-weight: 500;
+    }
+
+    .retro-summary-section-item {
+      .retro-summary-section-item-header {
+        font-weight: bolder;
+      }
+    }
+
+    .retro-summary-item-horizontal-group {
+      flex-direction: row;
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+      border-top: 1px solid var(--border-subtle-color);
+      padding-top: 10px;
+      width: 100%;
+
+      .horizontal-group-item {
+        margin: 0 auto;
+      }
+    }
+
+    .retro-summary-contributors-section {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 5px;
+
+      .retro-summary-contributor {
+        border-radius: 10px;
+        padding: 12px;
+        width: fit-content;
+        background-color: var(--border-subtle-color);
+        margin-right: 10px;
+        margin-bottom: 10px;
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  img.avatar {
+    height: 1.8em;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-top: -5px;
+    display: inline;
+  }
+
+  //
+  // Retro Summary, Team Effectivenss Section
+  //
+  .retro-summary-effectiveness-scores {
+    clear: both;
+    position: relative;
+    min-width: 100px;
+    min-height: 100px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    ul.chart {
+      flex-direction: row;
+      padding: 0;
+      margin: 10px 0;
+      width: 100%;
+      list-style: none;
+
+      .chart-question-block {
+        display: flex;
+        flex-direction: row;
+        margin: 2px 0;
+
+        .chart-question {
+          width: 225px;
+          text-align: end;
+          border-right: $azdo_blue 2px solid;
+          margin: 2px;
+        }
+
+        .team-effectiveness-average-number {
+          padding: 3px;
+          font-weight: bolder;
+          margin: auto 2px;
+          border-left: 2px $azdo_blue solid;
+          width: 30px;
+          text-align: center;
+        }
+      }
+
+      .chart-response {
+
+        &.red-chart-response {
+          background-color: #d6201f;
+          // For accessibility, make the backgrounds slightly different from one another
+          background-image: repeating-linear-gradient(45deg,
+              transparent,
+              transparent 9px,
+              #bd1c1a 9px,
+              #bd1c1a 10px);
+        }
+
+        &.yellow-chart-response {
+          background-color: #ffd302;
+          color: #000; // For contrast
+          // For accessibility, make the backgrounds slightly different from one another
+          background-image: repeating-linear-gradient(90deg,
+              transparent,
+              transparent 15px,
+              #ceab02 15px,
+              #ceab02 16px);
+        }
+
+        &.green-chart-response {
+          background-color: #006b3d;
+          // For accessibility, make the backgrounds slightly different from one another
+          background-image: radial-gradient(#006238 20%, transparent 20%),
+            radial-gradient(#006238 20%, transparent 20%);
+          background-size: 12px 12px;
+          background-position: top left, 6px 6px;
+        }
+      }
+
+      li div {
+        display: inline-block;
+        min-height: 0.655em;
+        padding: 8px;
+        box-sizing: border-box;
+      }
+    }
+
+    .chart-legend-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border-radius: 3px;
+      border: 2px solid var(--border-subtle-color);
+      padding: 10px;
+      width: fit-content;
+      margin-bottom: 10px;
+
+      .favorability-header {
+        font-weight: bolder;
+      }
+
+      .chart-legend-group {
+        display: flex;
+      }
+
+      section {
+        display: flex;
+        margin-right: 10px;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        div {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+}

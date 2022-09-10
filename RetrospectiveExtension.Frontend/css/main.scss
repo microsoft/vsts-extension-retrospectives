@@ -18,10 +18,13 @@
 @import "./selectorCombo.scss";
 @import "./_mobile.scss";
 @import "./_highContrast.scss";
+@import "./retrospectiveSummary.scss";
 
 @import "../node_modules/react-toastify/dist/ReactToastify.css";
 
-:focus { outline: none; }
+:focus {
+  outline: none;
+}
 
 body {
   overflow-y: auto;
@@ -34,7 +37,8 @@ body {
 }
 
 // VSS automatically adds border and boldfaces button text. This doesn't look good with Office Fabric, so we will remove the styling.
-button:hover:not(.ms-Button), button:focus:not(.ms-Button){
+button:hover:not(.ms-Button),
+button:focus:not(.ms-Button) {
   border: none;
 
   // !important required to override the "bold !important" style in VSS bundle.

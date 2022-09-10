@@ -91,12 +91,13 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
               // to show in 'Related Feedback' section
               const columnItemChildrenIds = columnItem.feedbackItem.childFeedbackItemIds;
               const childrenTitlesShort: String[] = [];
+
               columnItemChildrenIds.forEach(childId => {
                 // For every child item in the group, limit to 2 lines (~200 characters)
-                const childFeedbackItem = columnProps.columnItems.find(childItem => childItem.feedbackItem.id == childId)
-                const origTitle = childFeedbackItem.feedbackItem.title
+                const childFeedbackItem = columnProps.columnItems.find(childItem => childItem.feedbackItem.id == childId);
+                const origTitle = childFeedbackItem.feedbackItem.title;
                 const shortTitle = origTitle.length > childTitleLengthMax ? origTitle.substring(0, childTitleLengthMax) + '...' : origTitle;
-                childrenTitlesShort.push(shortTitle)
+                childrenTitlesShort.push(shortTitle);
               });
 
               columnItem.feedbackItem.groupTitles = childrenTitlesShort;
