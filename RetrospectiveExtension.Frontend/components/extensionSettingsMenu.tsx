@@ -1,6 +1,6 @@
 import React from 'react';
 import { PrimaryButton, DefaultButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
-import { Dialog, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
+import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { ViewMode } from '../config/constants';
@@ -56,24 +56,12 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isWhatsNewDialogHidden: true });
   }
 
-  private showGetHelpDialog = () => {
-    this.setState({ isGetHelpDialogHidden: false });
-  }
-
-  private hideGetHelpDialog = () => {
-    this.setState({ isGetHelpDialogHidden: true });
-  }
-
   private hideMobileExtensionSettingsMenuDialog = () => {
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
   private onChangeLogClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md', '_blank');
-  }
-
-  private onGetHelpButtonClicked = () => {
-    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank');
   }
 
   private onContactUsClicked = () => {
@@ -142,7 +130,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           className="contextual-menu-button"
           aria-label="Get Help"
           title="Get Help"
-          onClick={this.showGetHelpDialog}
+          onClick={() => this.setState({ isGetHelpDialogHidden: false })}
         >
           <span className="ms-Button-icon"><i className="fa fa-question-circle"></i></span>&nbsp;
           <span className="ms-Button-label">Get Help</span>
@@ -167,20 +155,34 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         </Dialog>
         <Dialog
           hidden={this.state.isGetHelpDialogHidden}
-          onDismiss={this.hideGetHelpDialog}
+          onDismiss={() => { this.setState({ isGetHelpDialogHidden: true }); }}
           dialogContentProps={{
             type: DialogType.close,
-            title: 'Get Help',
-            subText: "The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.\n\nThe Team Assessment addition to the retrospective guides teams through a set of questions that highlight strengths and opportunities. Teams can then utilize specific retrospective templates to identify the top opportunities for improvement.\n\nResearch from the 2018 State of Dev Ops report indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a 2013 meta-analysis on teams indicates that teams that effectively debrief are 20-25% more effective.",
+            title: 'Retrospectives',
           }}
-          minWidth={450}
+          minWidth={600}
           modalProps={{
             isBlocking: true,
-            containerClassName: 'gethelp-dialog',
+            containerClassName: 'prime-directive-dialog',
+            className: 'gethelp-dialog',
           }}>
+          <DialogContent>
+            The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.
+            <br /><br />
+            The Team Assessment addition to the retrospective guides teams through a set of questions that highlight strengths and opportunities. Teams can then utilize specific retrospective templates to identify the top opportunities for improvement.
+            <br /><br />
+            Research from the <a href="https://services.google.com/fh/files/misc/state-of-devops-2018.pdf" target="_blank">2018 State of DevOps</a> report indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a <a href="https://journals.sagepub.com/doi/full/10.1177/0018720812448394" target="_blank">2013 meta-analysis on teams</a> indicates that teams that effectively debrief are 20-25% more effective.
+          </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={this.onGetHelpButtonClicked} text="Go to gelp page page" />
-            <PrimaryButton onClick={this.hideGetHelpDialog} text="Close" />
+            <DefaultButton onClick={() => {
+              window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank');
+            }}
+              text="Get more information" />
+            <PrimaryButton onClick={() => {
+              this.setState({ isGetHelpDialogHidden: true });
+            }}
+              text="Close"
+              className="prime-directive-close-button" />
           </DialogFooter>
         </Dialog>
         <Dialog
