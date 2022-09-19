@@ -11,6 +11,7 @@ interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
   isMobileExtensionSettingsDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
+  isGetHelpDialogHidden: boolean;
 }
 
 interface IExtensionSettingsMenuProps {
@@ -25,7 +26,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.state = {
       isClearVisitHistoryDialogHidden: true,
       isMobileExtensionSettingsDialogHidden: true,
-      isWhatsNewDialogHidden: true
+      isWhatsNewDialogHidden: true,
+      isGetHelpDialogHidden: true
     };
   }
 
@@ -54,12 +56,24 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isWhatsNewDialogHidden: true });
   }
 
+  private showGetHelpDialog = () => {
+    this.setState({ isGetHelpDialogHidden: false });
+  }
+
+  private hideGetHelpDialog = () => {
+    this.setState({ isGetHelpDialogHidden: true });
+  }
+
   private hideMobileExtensionSettingsMenuDialog = () => {
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
   private onChangeLogClicked = () => {
-    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/master/CHANGELOG.md', '_blank');
+    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md', '_blank');
+  }
+
+  private onGetHelpButtonClicked = () => {
+    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank');
   }
 
   private onContactUsClicked = () => {
@@ -124,6 +138,15 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
           <span className="ms-Button-label">What&apos;s New</span>
         </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button"
+          aria-label="Get Help"
+          title="Get Help"
+          onClick={this.showGetHelpDialog}
+        >
+          <span className="ms-Button-icon"><i className="fa fa-question-circle"></i></span>&nbsp;
+          <span className="ms-Button-label">Get Help</span>
+        </DefaultButton>
         <Dialog
           hidden={this.state.isWhatsNewDialogHidden}
           onDismiss={this.hideWhatsNewDialog}
@@ -140,6 +163,24 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
             <PrimaryButton onClick={this.hideWhatsNewDialog} text="Close" />
+          </DialogFooter>
+        </Dialog>
+        <Dialog
+          hidden={this.state.isGetHelpDialogHidden}
+          onDismiss={this.hideGetHelpDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Get Help',
+            subText: "",
+          }}
+          minWidth={450}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'gethelp-dialog',
+          }}>
+          <DialogFooter>
+            <DefaultButton onClick={this.onGetHelpButtonClicked} text="Go to gelp page page" />
+            <PrimaryButton onClick={this.hideGetHelpDialog} text="Close" />
           </DialogFooter>
         </Dialog>
         <Dialog
