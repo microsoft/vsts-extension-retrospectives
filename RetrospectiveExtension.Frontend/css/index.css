@@ -9,7 +9,7 @@
 }
 
 .ms-Button--primary:hover {
-  background-color: rgb(0, 120, 212);;
+  background-color: rgb(0, 120, 212);
   color: #fff;
 }
 
@@ -23,4 +23,9 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .ms-Pivot .ms-Button {
   color: var(--text-primary-color);
+}
+
+.ms-Pivot-link:hover {
+  color: var(--status-info-foreground);
+  background-color: inherit;
 }

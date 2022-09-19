@@ -52,10 +52,11 @@
       .groupedItemCard {
         @extend .mainItemCard;
         margin-top: 0px;
-        background-color: #eee;
+        background-color: rgba(var(--palette-neutral-10), 1);
 
         .card-integral-part {
           border-left-width: 3px;
+          background-color: var(--background-color);
         }
       }
     }

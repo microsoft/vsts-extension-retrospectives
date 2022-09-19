@@ -207,8 +207,9 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
       <div className="action-items">
         {this.props.allowAddNewActionItem &&
           <div className="add-action-item-wrapper">
-            <div className="feedback-spacer" />
-            <div
+            <div className="feedback-spacer"
+              aria-hidden />
+            <div className="add-action-item-section"
               ref={(div) => this.addActionItemButtonWrapper = div}>
               <ActionButton
                 // @ts-ignore TS2769

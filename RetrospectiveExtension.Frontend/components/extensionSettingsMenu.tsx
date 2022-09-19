@@ -153,7 +153,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           dialogContentProps={{
             type: DialogType.close,
             title: 'What\'s New',
-            subText: "Lot's of fixes , new Measure Team Assessment feature added 🥳",
+            subText: "Some visual fixes for the dark theme, and formatting dialog modals.",
           }}
           minWidth={450}
           modalProps={{
@@ -162,7 +162,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}>
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
-            <PrimaryButton onClick={this.hideWhatsNewDialog} text="Close" />
+            <PrimaryButton className="whats-new-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
           </DialogFooter>
         </Dialog>
         <Dialog
@@ -207,7 +207,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
                   text={extensionSettingsMenuItem.text}
                   title={extensionSettingsMenuItem.title}
                 >
-                  <span className="ms-Button-icon"><i className={"fas fa-" + extensionSettingsMenuItem.iconProps}></i></span>&nbsp;
+                  <span className="ms-Button-icon"><i className={"fa-solid fa-" + extensionSettingsMenuItem.iconProps}></i></span>&nbsp;
                   <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span>
                 </ActionButton>
               )
@@ -224,8 +224,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             type: DialogType.close,
             title: 'Clear Visit History',
             subText: 'This extension maintains records of the teams and boards you visited. ' +
-            'Clearing visit history means that the next time you use the extension, ' +
-            'you will not be automatically directed to the your last visited board.',
+              'Clearing visit history means that the next time you use the extension, ' +
+              'you will not be automatically directed to the your last visited board.',
           }}
           minWidth={450}
           modalProps={{

@@ -23,42 +23,192 @@
   }
 }
 
-.ReactTable .rt-expander:after {
-  border-top: 7px solid rgba(var(--palette-neutral-100, 0, 0, 0), 1);
-}
 
-.ReactTable .rt-thead .rt-th.-sort-desc,
-.ReactTable .rt-thead .rt-td.-sort-desc {
-  box-shadow: inset 0 -2px 0 0 rgba(var(--palette-neutral-100, 0, 0, 0), 1);
-}
-
-.action-items-summary-card div[role=row] {
-  background-color: var(--background-color);
-  color: var(--text-primary-color);
-  padding-top: 0;
-}
-
-.action-items-summary-card .ms-DetailsHeader-cell[role=columnheader] {
-  background-color: var(--background-color);
-  color: var(--text-primary-color);
-  border-bottom: 1px solid #fff;
-}
-
-.action-items-summary-card .ms-DetailsHeader-cell[role=columnheader]:hover {
-  color: var(--text-primary-color);
-}
 
 .board-summary-table-container {
+  min-width: 1000px;
+
   .ReactTable {
     height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
+    width: 70vw;
 
     .rt-table {
       flex: 0 1 auto;
 
       .rt-thead {
+        background-color: $azdo_blue;
+        color: #fff;
+
         .rt-resizable-header-content {
           height: 30px;
           line-height: 30px;
+        }
+
+        .rt-th.-sort-desc,
+        .rt-td.-sort-desc {
+          box-shadow: inset 0 -2px 0 0 rgba(var(--palette-neutral-100, 0, 0, 0), 1);
+        }
+      }
+
+      .rt-tbody {
+        .rt-tr-group {
+          &:nth-child(even) {
+            background-color: var(--border-subtle-color);
+          }
+
+          .board-summary-container {
+            display: flex;
+            justify-content: center;
+
+            .rt-tr.-odd,
+            .rt-tr.-even {
+              height: 35px;
+            }
+
+            .board-summary-card,
+            .action-items-summary-card {
+              margin: 8px 6px;
+              background-color: var(--background-color);
+              min-height: 285px;
+
+              .items-stats-container {
+                display: flex;
+                margin: 10px 0;
+
+                .pending-action-item-color {
+                  color: var(--status-warning-text);
+                }
+
+                .count-and-text {
+                  margin: 0 32px 0 16px;
+
+                  .count {
+                    font-weight: 600;
+                    font-size: 15px;
+                  }
+
+                  .text {
+                    font-size: 12px;
+                    color: var(--text-primary-color);
+                  }
+                }
+
+                .stats-icon {
+                  height: 32px;
+                  width: 32px;
+                  font-size: 16px;
+                  padding: 8px;
+                }
+              }
+            }
+
+            .action-items-summary-card {
+              width: 80%;
+              max-width: 800px;
+              overflow-y: auto;
+
+              div[role=row] {
+                background-color: var(--background-color);
+                color: var(--text-primary-color);
+                padding-top: 0;
+                border: none;
+
+                &:nth-child(even) {
+                  background-color: var(--border-subtle-color);
+                }
+              }
+
+              .ms-DetailsList-headerWrapper {
+                border-bottom: 3px var(--border-subtle-color) solid;
+              }
+
+              .ms-DetailsHeader-cell[role=columnheader] {
+                background-color: var(--background-color);
+                color: var(--text-primary-color);
+                border-bottom: 1px solid #fff;
+
+                &:hover {
+                  color: var(--text-primary-color);
+                }
+              }
+
+              .overflow-ellipsis {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                display: block;
+                width: 100%;
+              }
+
+              .ms-Viewport {
+                height: 100%;
+
+                .ms-DetailsList {
+                  height: 100%;
+                }
+
+                .ms-DetailsRow {
+                  border: none;
+                }
+              }
+
+              .ms-List-cell {
+                font-size: 14px;
+              }
+
+              @include vsts-workitem-colors;
+
+              .work-item-title {
+                cursor: pointer;
+              }
+
+              .no-action-items {
+                font-size: 15px;
+                position: relative;
+                top: 50%;
+                transform: translateY(-50%);
+                text-align: center;
+              }
+            }
+
+            .board-summary-card {
+              padding: 20px;
+              width: 20%;
+              min-width: 270px;
+              border: 1px solid var(--text-primary-color);
+              border-radius: 4px;
+
+
+              .resolved-green {
+                color: var(--status-success-text);
+              }
+
+              .board-summary-card-title {
+                font-size: 18px;
+                border-bottom: 3px solid $azdo_blue;
+
+                .ms-DocumentCardTitle {
+                  font-weight: 600;
+                  padding: 0;
+                  margin-bottom: 20px;
+                  height: auto;
+                  color: var(--text-primary-color);
+                }
+              }
+            }
+          }
+        }
+
+        .rt-tr {
+          align-items: center;
+          font-size: 14px;
+          font-weight: 400;
+          cursor: pointer;
+        }
+
+        .rt-tr.-odd,
+        .rt-tr.-even {
+          height: 45px;
         }
       }
 
@@ -79,135 +229,18 @@
         }
       }
     }
+
+    .rt-expander:after {
+      border-top: 7px solid rgba(var(--palette-neutral-100, 0, 0, 0), 1);
+    }
+  }
+
+  .workItemsCount {
+    text-align: center;
   }
 
   .pending-action-item-count {
     color: var(--status-warning-text);
     font-weight: 600;
-  }
-
-  .rt-tr {
-    align-items: center;
-    font-size: 14px;
-    font-weight: 400;
-    cursor: pointer;
-  }
-
-  .rt-tr.-odd,
-  .rt-tr.-even {
-    height: 45px;
-  }
-
-  .board-summary-container {
-
-    .rt-tr.-odd,
-    .rt-tr.-even {
-      height: 35px;
-    }
-
-    display: flex;
-    justify-content: center;
-  }
-
-  .board-summary-card {
-    padding: 24px;
-    width: 20%;
-    min-width: 270px;
-
-    .resolved-green {
-      color: var(--status-success-text);
-    }
-
-    .board-summary-card-title {
-      font-size: 18px;
-
-      .ms-DocumentCardTitle {
-        font-weight: 600;
-        padding: 0;
-        margin-bottom: 20px;
-        height: auto;
-        color: var(--text-primary-color);
-      }
-    }
-  }
-
-  .action-items-summary-card {
-    width: 80%;
-    max-width: 1000px;
-    overflow-y: auto;
-
-    .overflow-ellipsis {
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      display: block;
-      width: 100%;
-    }
-
-    .ms-Viewport {
-      height: 100%;
-
-      .ms-DetailsList {
-        height: 100%;
-      }
-    }
-
-    .ms-List-cell {
-      font-size: 14px;
-    }
-
-    @include vsts-workitem-colors;
-
-    .work-item-title {
-      cursor: pointer;
-    }
-
-    .no-action-items {
-      font-size: 15px;
-      position: relative;
-      top: 50%;
-      transform: translateY(-50%);
-      text-align: center;
-    }
-  }
-
-  .board-summary-card,
-  .action-items-summary-card {
-    margin: 8px;
-    border: 0px solid #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, .08);
-    border-radius: 4px;
-    background-color: var(--background-color);
-    min-height: 285px;
-
-    .items-stats-container {
-      display: flex;
-      margin-bottom: 12px;
-
-      .pending-action-item-color {
-        color: var(--status-warning-text);
-      }
-
-      .count-and-text {
-        margin: 0 32px 0 16px;
-
-        .count {
-          font-weight: 600;
-          font-size: 15px;
-        }
-
-        .text {
-          font-size: 12px;
-          color: var(--text-primary-color);
-        }
-      }
-
-      .stats-icon {
-        height: 32px;
-        width: 32px;
-        font-size: 16px;
-        padding: 8px;
-      }
-    }
   }
 }

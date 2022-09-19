@@ -9,6 +9,8 @@ import { ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedb
 
 export interface EffectivenessMeasurementRowProps {
   title: string;
+  subtitle: string;
+  iconClass: string;
   tooltip: string;
   questionId?: number;
   votes?: ITeamEffectivenessMeasurementVoteCollection[];
@@ -40,12 +42,17 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
 
   public render() {
     return (
-      <tr>
-        <td>{this.props.title}</td>
-        <td>
+      <tr className="effectiveness-measurement-row">
+        <td className="effectiveness-measurement-question-cell">
+          <i className={this.props.iconClass} />&nbsp;&nbsp;
+          <span style={{ fontWeight: 'bolder' }}>{this.props.title}</span>
+          <br />
+          {this.props.subtitle}
+        </td>
+        <td className="effectiveness-measurement-tooltip-cell">
           <TooltipHost
             hostClassName="toggle-carousel-button-tooltip-wrapper"
-            content={<div dangerouslySetInnerHTML={{ __html: this.props.tooltip}} />}
+            content={<div dangerouslySetInnerHTML={{ __html: this.props.tooltip }} />}
             calloutProps={{ gapSpace: 0 }}>
             <DefaultButton
               className="contextual-menu-button hide-mobile"
@@ -55,7 +62,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="1"
             onClick={() => this.updateSelected(1)}
             iconProps={{ iconName: this.state.selected === 1 ? 'CircleFill' : 'CircleRing' }}
@@ -63,7 +70,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="2"
             onClick={() => this.updateSelected(2)}
             iconProps={{ iconName: this.state.selected === 2 ? 'CircleFill' : 'CircleRing' }}
@@ -71,7 +78,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="3"
             onClick={() => this.updateSelected(3)}
             iconProps={{ iconName: this.state.selected === 3 ? 'CircleFill' : 'CircleRing' }}
@@ -79,7 +86,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="4"
             onClick={() => this.updateSelected(4)}
             iconProps={{ iconName: this.state.selected === 4 ? 'CircleFill' : 'CircleRing' }}
@@ -87,7 +94,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="5"
             onClick={() => this.updateSelected(5)}
             iconProps={{ iconName: this.state.selected === 5 ? 'CircleFill' : 'CircleRing' }}
@@ -95,7 +102,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="6"
             onClick={() => this.updateSelected(6)}
             iconProps={{ iconName: this.state.selected === 6 ? 'CircleFill' : 'CircleRing' }}
@@ -103,7 +110,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="7"
             onClick={() => this.updateSelected(7)}
             iconProps={{ iconName: this.state.selected === 7 ? 'CircleFill' : 'CircleRing' }}
@@ -111,7 +118,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="8"
             onClick={() => this.updateSelected(8)}
             iconProps={{ iconName: this.state.selected === 8 ? 'CircleFill' : 'CircleRing' }}
@@ -119,7 +126,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="9"
             onClick={() => this.updateSelected(9)}
             iconProps={{ iconName: this.state.selected === 9 ? 'CircleFill' : 'CircleRing' }}
@@ -127,7 +134,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
         </td>
         <td>
           <DefaultButton
-            className="contextual-menu-button hide-mobile"
+            className="contextual-menu-button hide-mobile effectivemess-measurement-voting-button"
             aria-label="10"
             onClick={() => this.updateSelected(10)}
             iconProps={{ iconName: this.state.selected === 10 ? 'CircleFill' : 'CircleRing' }}

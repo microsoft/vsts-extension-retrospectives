@@ -4,9 +4,25 @@
   height: 35px;
   margin: 0;
   max-width: 100%;
-  border-bottom: 0;
+  border: none;
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
 
   @include vsts-workitem-colors;
+
+  .ms-Image-image {
+    width: 16px;
+  }
+
+  .ms-Button--icon {
+    background-color: var(--background-color);
+
+    .ms-Button-icon {
+      &:hover {
+        color: $azdo_blue;
+      }
+    }
+  }
 
   .ms-DocumentCard-details {
     padding-right: 16px;
@@ -25,6 +41,7 @@
     white-space: nowrap;
     overflow: hidden;
     font-size: 14px;
+    color: var(--text-primary-color);
   }
 
   &.resolved-border-right {
@@ -40,12 +57,6 @@
   width: 16px;
 }
 
-.related-task-sub-card {
-  .ms-Image-image {
-    width: 16px;
-  }
-}
-
 .action-item-selector {
   @include vsts-workitem-colors;
 }
@@ -53,18 +64,33 @@
 .add-action-item-wrapper {
   display: flex;
   max-width: 100%;
-  background-color: $azure_devops_navigator_light_grey;
+  background-color: var(--nav-vertical-background-color);
 
   .feedback-spacer {
     flex: 1;
   }
 
-  .add-action-item-button {
-    height: 32px;
+  .add-action-item-section {
+    .add-action-item-button {
+      height: 32px;
+      color: var(--text-primary-color);
+    }
+  }
+}
+
+.add-action-item-list-items {
+  .ms-List-cell {
+    &:hover {
+      background-color: var(--border-subtle-color);
+    }
   }
 }
 
 .action-items {
+  .work-item-type-icon-container {
+    background-color: var(--background-color);
+  }
+
   .ms-DocumentCard {
     .ms-DocumentCardActions {
       padding: 0 4px 0 0;
@@ -76,15 +102,14 @@
         .ms-Button {
           .ms-Button-flexContainer {
             i {
-              color: grey;
+              color: $azdo_blue;
               font-size: 12px;
             }
           }
 
           &:hover:not(:disabled) {
             i {
-              color: #666666; // Office UI dark grey
-               font-size: 13px;
+              font-weight: bolder;
             }
           }
         }
@@ -104,6 +129,8 @@
     }
 
     .add-action-item-list-container {
+      background-color: var(--background-color);
+
       .add-action-item-list-item {
         display: flex;
         cursor: pointer;
@@ -114,12 +141,8 @@
         border: 0px hidden;
         overflow: hidden;
 
-        &:hover {
-          background-color: $azure_devops_navigator_light_grey;
-        }
-
-        &:focus {
-          background-color: $azure_devops_navigator_light_grey;
+        .work-item-icon.fas.fa-link {
+          color: var(--border-subtle-color);
         }
 
         .work-item-icon {
@@ -135,6 +158,7 @@
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
+          color: var(--text-primary-color);
         }
       }
     }
@@ -156,7 +180,6 @@
 
   .related-task-sub-card {
     width: 100%;
-    border: 1px solid #eaeaea;
   }
 
   .work-item-not-found {
