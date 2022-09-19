@@ -171,7 +171,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           dialogContentProps={{
             type: DialogType.close,
             title: 'Get Help',
-            subText: "The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.<br /><br />The Team Assessment addition to the retrospective guides teams through a set of questions that highlight strengths and opportunities. Teams can then utilize specific retrospective templates to identify the top opportunities for improvement.<br /><br />Research from the 2018 State of Dev Ops report indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a 2013 meta-analysis on teams indicates that teams that effectively debrief are 20-25% more effective.",
+            subText: "The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.\n\nThe Team Assessment addition to the retrospective guides teams through a set of questions that highlight strengths and opportunities. Teams can then utilize specific retrospective templates to identify the top opportunities for improvement.\n\nResearch from the 2018 State of Dev Ops report indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a 2013 meta-analysis on teams indicates that teams that effectively debrief are 20-25% more effective.",
           }}
           minWidth={450}
           modalProps={{
