@@ -1589,9 +1589,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </section>
               {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement &&
                 <section className='retro-summary-section'>
-                  <div className='retro-summary-section-header'>Team Effectiveness Assessment</div>
+                  <div className='retro-summary-section-header'>Team Assessment</div>
                   <div>
-                    Effectiveness with favorability percentages and average score <br />
+                    Assessment with favorability percentages and average score <br />
                     ({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? 'person' : 'people'} responded)
                     <div className="retro-summary-effectiveness-scores">
                       <ul className="chart">
