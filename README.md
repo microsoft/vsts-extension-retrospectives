@@ -224,7 +224,7 @@ this case, the item that is darkened as though hovered by a mouse is the 'User
 Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
 ![A screenshot of a different example board that shows the action items made
-for a variety of feedback items. All are labelled as tasks.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-in-act-phase-darkmode.png)
+for a variety of feedback items. All are labelled as tasks.](https://github.com/microsoft/vsts-extension-retrospectives/raw//main/documentation/images/desktop/action-items-in-act-phase-darkmode.png)
 
 ### 7. Team Assessment
 
@@ -283,7 +283,7 @@ columns: Retrospective Name, Created Date, Pending Work Items, and Total Work It
 From here, one can look at past retrospectives and see a few high level stats and
 the action items created after each by clicking the individual retrospective.
 
-![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-expanded-summary-lightmode.png)
+![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-expanded-summary-lightmode.png)
 
 ## Contribute
 
