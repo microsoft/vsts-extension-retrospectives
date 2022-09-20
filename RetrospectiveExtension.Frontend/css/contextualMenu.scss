@@ -54,4 +54,9 @@
       color: var(--text-primary-color);
     }
   }
+
+  .ms-Dialog-inner a {
+    color: var(--palette-primary-darken-6);
+    text-decoration: underline;
+  }
 }
