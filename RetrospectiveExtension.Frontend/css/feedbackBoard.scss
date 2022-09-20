@@ -1,6 +1,9 @@
-﻿.ms-FocusZone {
-  padding-top: 11px;
+﻿div[role=toolbar] .ms-FocusZone {
   height: 40px;
+}
+
+.ms-FocusZone {
+  padding-top: 11px;
 
   .ms-Pivot-link {
     &.is-selected {
