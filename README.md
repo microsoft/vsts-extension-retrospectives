@@ -296,7 +296,7 @@ Re-open the retrospective summary and when the majority of the team has responde
 
 --Add screenshot here
 
-##### Refine Template and Collect Feedback
+##### Collect: Refine Template and Collect Feedback
 
 In this phase the facilitator modifies the template to the template that is specific to the dimension the team has chosen to improve upon. For example, if the team has decided to improve on psychological safety, then the facilitator will edit the retrospective and choose the "Psychological Safety" template.
 
@@ -304,7 +304,7 @@ In this phase the facilitator modifies the template to the template that is spec
 
 Once the template is modified, ask team members to input feedback cards on the left 2 columns. After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, proceed to the next step.
 
-#### Identify and Prioritize Action
+#### Group and Vote: Identify and Prioritize Action
 
 In this phase the facilitator asks the team the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be? Capture this in a feedback card in the third column (One action in the next sprint)"
 
