@@ -230,7 +230,7 @@ different Azure Dev Ops items, like adding a bug, a user story, and others. In
 this case, the item that is darkened as though hovered by a mouse is the 'User
 Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
-### 7. The Team Assessment
+### 7. Optional: The Team Assessment
 
 You can optionally include a "Team Assessment" that anonymously collects
 feedback from participants. To get the feedback form, you can click on the "Team
@@ -240,7 +240,7 @@ Assessment" link at the top of the board. The assessment tracks 5 categories:
 - Energy
 - Psychological Safety
 - Work-life Balance
-- Outcomes
+- Confidence
 
 The users can rank on a scale of 1 to 10; scores of 1-6 are categorized as
 "Unfavorable", 7 and 8 are "Neutral," and 9 and 10 are "Favorable."
@@ -250,9 +250,28 @@ has alternating background for visual distinction. Each question/category has
 a short description and a tooltip icon that provides more context.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-team-assessment-darkmode.png)
 
 Once the team assessment has been completed, the summary of answers can be viewed
-in the Retrospective Summary Dialog.
+in the Retrospective Summary Dialog (see below)
 
-Teams may choose to address the issues found in the team assessment in multiple ways. If a team wants to use the retrospective to assess themselves and identify actions to take to improve on one of the dimensions of the team assessment the following 6 step approach is recommended:
+#### Improving Based on Team Assessment Scores
+
+Teams may choose to address the issues found in the team assessment in multiple ways:
+-Through open conversations during the standard retrospective process to identify opportunities for improvement.
+  -While this approach works, it may not be effective if the team isn't psychologically safe, and our research indicates that only 10% of the teams that do team assessments are psychologically safe
+ -Through a Team Assessment Retrospective
+  -A Team Assessment Retrospective is a new approach to retrospectives allowing teams to identify the largest opportunities for improvement based on each team members' responses to the team assessment. Section 7.1 below outlines the Six Steps in a Team Assessment Retrospective
+  
+ ### 7.1 The Six Steps To a Team Assessment Retrospective
+
+#### Setup
+
+Create a new retrospective using the steps above with the following exceptions:
+-Include Team Assessment is checked
+-Do not display names in feedback is checked
+-Display 'Retrospective Prime Directive' is checked
+-Note: You do not need to select a template. The template will be modified after the assessment is complete
+-Share the link to the retrospective with the team
+
+---Add screenshot here---
 
 #### Set the Stage
 
@@ -262,12 +281,42 @@ In this phase the facilitator sets the stage for the retrospective. It is recomm
 
 #### Conduct Team Assessment
 
-In this phase each team member clicks on the Team Assessment and anonymously answers all questions and hits "submit".
+In this phase each team member clicks on the Team Assessment and anonymously answers all questions and hits "submit". It is critical that you remind everyone that all feedback is anonymous and confidential.
 
-![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
+---Add screenshot here---
 
+#### View Team Assessment Results and Choose Dimension to Improve On
 
+In this phase you will open the retrospective summary (see below) and view the Team Assessment results. If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
 
+Re-open the retrospective summary and when the majority of the team has responded, discuss which dimension the team would like to improve upon. Note: If more than 20% of the responses are unfavorable for psychological safety, we recommend focusing on psychological safety first. This is because without psychological safety the more difficult conversations that need to happen to make improvements in the other dimensions will not happen.
+
+--Add screenshot here
+
+##### Refine Template and Collect Feedback
+
+In this phase the facilitator modifies the template to the template that is specific to the dimension the team has chosen to improve upon. For example, if the team has decided to improve on psychological safety, then the facilitator will edit the retrospective and choose the "Psychological Safety" template.
+
+---Add screenshot here
+
+Once the template is modified, ask team members to input feedback cards on the left 2 columns. After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, proceed to the next step.
+
+#### Identify and Prioritize Action
+
+In this phase the facilitator asks the team the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be? Capture this in a feedback card in the third column (One action in the next sprint)"
+
+---Insert screenshot here---
+After the majority of the team has added feedback cards to the third column, facilitator switches to the "group" tab and collectively groups like ideas together with the teeam (see above).
+
+After the cards in the third column are grouped, the facilitator then asks the team to vote ONLY ON THE THIRD column by allocating their votes across the cards in the third column only by saying "Each member has [number of votes]. You may place these votes on the cards in the third column that you'd like our team to focus our efforts on in the next sprint. You may place multiple votes on a card, and you can see how many votes you've used by looking in the upper left hand corner of the board."
+
+---Insert screenshot here---
+
+The facilitator then waits for votes to compile and after the majority of the team has voted the facilitator clicks on the "Act" tab which automatically sorts the cards from the most to the least voted upon.
+
+#### Act
+
+Follow the steps above to assign actions as work items in Azure Dev Ops. Note: We recommend only selecting 1-2 actions per sprint to ensure completion prior to the next sprint.
 
 ### 8. Retrospective Summary
 
