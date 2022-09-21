@@ -133,11 +133,18 @@ will see the most upto date information without having to refresh the page.
 'Copy Retrsopectivelink Link' is darkened as though the mouse is hovering
 over it.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/copy-retro-link.png)
 
-### 6. The Four Phases of the Retrospective
+### 6. The Five Phases of the Standard Retrospective
 
 The number of columns in each retrospective is determined by the selection made
 when making the new board. Regardless of the template, they still follow the same
-sequence of four stages.
+sequence of five stages.
+
+#### Set the Stage
+
+In this phase the facilitator sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues that discovered will be assumed to be process problems, not people problems.
+
+![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
+
 
 #### Collect
 
@@ -223,10 +230,7 @@ different Azure Dev Ops items, like adding a bug, a user story, and others. In
 this case, the item that is darkened as though hovered by a mouse is the 'User
 Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
-![A screenshot of a different example board that shows the action items made
-for a variety of feedback items. All are labelled as tasks.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-in-act-phase-darkmode.png)
-
-### 7. Team Assessment
+### 7. The Team Assessment
 
 You can optionally include a "Team Assessment" that anonymously collects
 feedback from participants. To get the feedback form, you can click on the "Team
@@ -247,6 +251,23 @@ a short description and a tooltip icon that provides more context.](https://gith
 
 Once the team assessment has been completed, the summary of answers can be viewed
 in the Retrospective Summary Dialog.
+
+Teams may choose to address the issues found in the team assessment in multiple ways. If a team wants to use the retrospective to assess themselves and identify actions to take to improve on one of the dimensions of the team assessment the following 6 step approach is recommended:
+
+#### Set the Stage
+
+In this phase the facilitator sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues that discovered will be assumed to be process problems, not people problems.
+
+![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
+
+#### Conduct Team Assessment
+
+In this phase each team member clicks on the Team Assessment and anonymously answers all questions and hits "submit".
+
+![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
+
+
+
 
 ### 8. Retrospective Summary
 
@@ -283,7 +304,7 @@ columns: Retrospective Name, Created Date, Pending Work Items, and Total Work It
 From here, one can look at past retrospectives and see a few high level stats and
 the action items created after each by clicking the individual retrospective.
 
-![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-expanded-summary-lightmode.png)
+![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-expanded-summary-lightmode.png)
 
 ## Contribute
 
