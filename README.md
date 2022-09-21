@@ -142,7 +142,7 @@ The number of columns in each retrospective is determined by the selection made
 when making the new board. Regardless of the template, they still follow the same
 sequence of five stages.
 
-#### Set the Stage
+#### The Prime Directive
 
 In this phase the facilitator sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues that discovered will be assumed to be process problems, not people problems.
 
@@ -258,64 +258,75 @@ in the Retrospective Summary Dialog (see below)
 #### Improving Based on Team Assessment Scores
 
 Teams may choose to address the issues found in the team assessment in multiple ways:
--Through open conversations during the standard retrospective process to identify opportunities for improvement.
-  -While this approach works, it may not be effective if the team isn't psychologically safe, and our research indicates that only 10% of the teams that do team assessments are psychologically safe
- -Through a Team Assessment Retrospective
-  -A Team Assessment Retrospective is a new approach to retrospectives allowing teams to identify the largest opportunities for improvement based on each team members' responses to the team assessment. Section 7.1 below outlines the Six Steps in a Team Assessment Retrospective
+
+- Through open conversations during the standard retrospective process to identify opportunities for improvement.
+  - While this approach works, it may not be effective if the team isn't psychologically safe, and our research indicates that only 10% of the teams that do team assessments are psychologically safe
+- Through a Team Assessment Retrospective
+  - A Team Assessment Retrospective is a new approach to retrospectives allowing teams to identify the largest opportunities for improvement based on each team members' responses to the team assessment. 
+  -  Section 7.1 below outlines the Six Steps in a Team Assessment Retrospective
   
  ### 7.1 The Six Steps To a Team Assessment Retrospective
 
 #### Setup
 
 Create a new retrospective using the steps above with the following exceptions:
--Include Team Assessment is checked
--Do not display names in feedback is checked
--Display 'Retrospective Prime Directive' is checked
--Note: You do not need to select a template. The template will be modified after the assessment is complete
--Share the link to the retrospective with the team
+- Include Team Assessment is checked
+- Do not display names in feedback is checked
+- Display 'Retrospective Prime Directive' is checked
+- Note: You do not need to select a template. The template will be modified after the assessment is complete
+- Share the link to the retrospective with the team
 
 ---Add screenshot here---
 
-#### Set the Stage
+#### The Prime Directive
 
 In this phase the facilitator sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues that discovered will be assumed to be process problems, not people problems.
 
 ![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
 
-#### Conduct Team Assessment
+#### Team Assessment
 
-In this phase each team member clicks on the Team Assessment and anonymously answers all questions and hits "submit". It is critical that you remind everyone that all feedback is anonymous and confidential.
+In this phase each team member clicks on the Team Assessment and anonymously answers all questions and hits "submit". It is critical that you remind everyone that all feedback is anonymous and confidential. 
 
----Add screenshot here---
+Throughout this phase you will periodically check the retrospective summary. If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
 
-#### View Team Assessment Results and Choose Dimension to Improve On
-
-In this phase you will open the retrospective summary (see below) and view the Team Assessment results. If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
+--Add screenshot here
 
 Re-open the retrospective summary and when the majority of the team has responded, discuss which dimension the team would like to improve upon. Note: If more than 20% of the responses are unfavorable for psychological safety, we recommend focusing on psychological safety first. This is because without psychological safety the more difficult conversations that need to happen to make improvements in the other dimensions will not happen.
 
 --Add screenshot here
 
-##### Collect: Refine Template and Collect Feedback
+Once the team has decided which dimension to focus on the facilitator edits the template by selecting the template aligned to the dimension the team wants to focus on. For example, if the team has decided to improve on psychological safety, then the facilitator will edit the retrospective and choose the "Psychological Safety" template.
 
-In this phase the facilitator modifies the template to the template that is specific to the dimension the team has chosen to improve upon. For example, if the team has decided to improve on psychological safety, then the facilitator will edit the retrospective and choose the "Psychological Safety" template.
+---Add screenshot here---
 
----Add screenshot here
+##### Collect
 
-Once the template is modified, ask team members to input feedback cards on the left 2 columns. After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, proceed to the next step.
+In this phase team members will provide feedback to help improve the dimension they've chosen to focus on 
 
-#### Group and Vote: Identify and Prioritize Action
+Ask team members to input feedback cards on the left 2 columns. 
 
-In this phase the facilitator asks the team the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be? Capture this in a feedback card in the third column (One action in the next sprint)"
+---insert screenshot here
 
----Insert screenshot here---
-After the majority of the team has added feedback cards to the third column, facilitator switches to the "group" tab and collectively groups like ideas together with the teeam (see above).
+After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, the facilitator asks the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be? Capture this in a feedback card in the third column (One action in the next sprint)"
 
-After the cards in the third column are grouped, the facilitator then asks the team to vote ONLY ON THE THIRD column by allocating their votes across the cards in the third column only by saying "Each member has [number of votes]. You may place these votes on the cards in the third column that you'd like our team to focus our efforts on in the next sprint. You may place multiple votes on a card, and you can see how many votes you've used by looking in the upper left hand corner of the board."
+---insert screenshot here
 
----Insert screenshot here---
+#### Group
 
-The facilitator then waits for votes to compile and after the majority of the team has voted the facilitator clicks on the "Act" tab which automatically sorts the cards from the most to the least voted upon.
+In this phase the team will group similar items together. To expedite the process we recommend only grouping the action items together.
+
+After the majority of the team has added feedback cards to the third column, the facilitator switches to the "group" tab and collectively groups like ideas together with the teeam (see above).
+
+---insert screenshot here
+
+#### Vote
+
+In this step the facilitator asks participants to vote only on the third column and the top items for improvement are identified.
+
+---insert screenshot here.
+
+The facilitator then waits for votes to compile and after the majority of the team has voted (the facilitator can view the retrospective summary to quickly determine how many votes have beeen cast), the facilitator clicks on the "Act" tab which automatically sorts the cards from the most to the least voted upon.
 
 #### Act
 
