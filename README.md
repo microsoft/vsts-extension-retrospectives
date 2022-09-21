@@ -5,10 +5,12 @@
 Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform
 _smart and efficient retrospectives from within the Azure DevOps pipeline._
 
-Retrospectives are an important part of the software engineering cycle. Teams often
-use external retrospective tools, white board with Post-its, OneNote, etc to
-conduct retrospectives. The data then needs to be collated, and any actionable
-items need to be created in your Azure DevOps pipeline.
+Retrospectives are an important practice in becoming an effective team, allowing the team to gather feedback and continuously improve based on the feedback.
+
+Research from the [2018 State of DevOps report](https://services.google.com/fh/files/misc/state-of-devops-2018.pdf) indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a [2013 meta-analysis on teams](https://journals.sagepub.com/doi/full/10.1177/0018720812448394) indicates that teams that effectively debrief/conduct retrospectives are 20-25% more effective.
+
+Teams often use external retrospective tools, white boards with Post-its, OneNote, etc. to conduct retrospectives. The data then needs to be collated, and any actionable items need to be created in your Azure DevOps pipeline.
+
 The [Retrospectives extension](https://marketplace.visualstudio.com/items?itemName=ms-devlabs.team-retrospectives)
 allows you to do all this and more from within Azure DevOps.
 
@@ -19,6 +21,7 @@ allows you to do all this and more from within Azure DevOps.
   - [Features](#features)
   - [Install](#install)
   - [Use](#use)
+  - [Best Practices](#best-practices)
   - [Contribute](#contribute)
   - [License](#license)
 
@@ -75,7 +78,7 @@ the 'Create New Retrospective.'](https://github.com/microsoft/vsts-extension-ret
 
 ### 4. Choose Your Retrospective Settings
 
-When you select **New Board** or **Create new board** as above, you will see
+When you select **New Board** or **Create new retrospective** as above, you will see
 the following dialog:
 
 ![A screenshot showing the modal box that controls the initial settings for
@@ -96,7 +99,7 @@ the board.
 - **Only show feedback after Collect phase**: When selected, users cannot
 see other users input until they have moved to another phase. Other users'
 feedback will be blurred.
-- **Display 'Retrospective Prime Directive'**: Include a link to the 'Prime
+- **Display 'Retrospective Prime Directive**: Include a link to the 'Prime
 Directive' at the top of the board.
 - **Do not display names in feedback**: When checked, anonymize who creates
 individual feedback items.
@@ -354,6 +357,8 @@ From here, one can look at past retrospectives and see a few high level stats an
 the action items created after each by clicking the individual retrospective.
 
 ![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-expanded-summary-lightmode.png)
+
+## Best Practices
 
 ## Contribute
 
