@@ -60,7 +60,7 @@ describe('Feedback Item', () => {
     // Expect basic values of the Feedback Item to be propagated in multiple areas of the rendered component.
     expect(component.findWhere((child) =>
       child.prop("className") === "anonymous-created-date").text()).
-      toEqual(moment(testFeedbackItem.createdDate).format('MMM Do, YYYY h:mm a'));
+      toEqual(moment(testFeedbackItem.createdDate).format('MMMM D, YYYY, h:mm A'));
 
     expect(component.findWhere((child) =>
       child.prop("className") === "card-id").text()).

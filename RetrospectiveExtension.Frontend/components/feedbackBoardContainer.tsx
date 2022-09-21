@@ -165,7 +165,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      this.setSupportedWorkItemTypesForProject();
+      await this.setSupportedWorkItemTypesForProject();
     } catch (error) {
       console.error({ m: "setSupportedWorkItemTypesForProject", error });
     }
