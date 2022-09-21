@@ -3,11 +3,11 @@ name: 'CD - Frontend'
 on:
   push:
     branches:
-      - master
+      - main
       - dev
   pull_request:
     branches:
-      - master
+      - main
       - dev
 
 jobs:
@@ -39,12 +39,12 @@ jobs:
         rc_test_organization=retroextcd-rc
         pr_test_organization=retroextcd-prval
 
-        if [[ "$branch" == master ]] || [[ "$branch" == dev ]]; then
+        if [[ "$branch" == main ]] || [[ "$branch" == dev ]]; then
           echo "Setting config for Release Candidate (RC) environment"
           echo "##[set-output name=publisher;]$rc_publisher"
           echo "##[set-output name=ext_prefix;]$rc_ext_prefix"
           echo "##[set-output name=test_organization;]$rc_test_organization"
-        elif [[ "$target_branch" == master ]] || [[ "$target_branch" == dev ]]; then
+        elif [[ "$target_branch" == main ]] || [[ "$target_branch" == dev ]]; then
           echo "Setting config for PR validation"
           echo "##[set-output name=publisher;]$pr_publisher"
           echo "##[set-output name=ext_prefix;]$pr_ext_prefix"
