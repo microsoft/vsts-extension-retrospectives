@@ -1604,7 +1604,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <div className="retro-summary-effectiveness-scores">
                       <ul className="chart">
                         {this.state.effectivenessMeasurementChartData.map((data, index) => {
-                          const averageScore = this.state.effectivenessMeasurementSummary[index]?.average;
+                          const averageScore = this.state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0].average;
                           const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
                           const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
                           const redScore = ((data.red * 100) / teamEffectivenessResponseCount);
