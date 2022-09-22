@@ -143,7 +143,7 @@ sequence of stages.
 
 #### The Prime Directive
 
-If you had selected the 'Display 'Retrospective Prime Directive', you will see the option to view that directiive which sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues discovered will be assumed to be process problems, not people problems.
+If you had selected the 'Display 'Retrospective Prime Directive', you will see the option to view that directive which sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues discovered will be assumed to be process problems, not people problems.
 
 ![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
 
