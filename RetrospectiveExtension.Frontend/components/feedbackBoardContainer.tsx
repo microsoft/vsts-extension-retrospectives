@@ -441,10 +441,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     }
 
-    console.log({ userTeams });
     // Default to select first user team or the project's default team.
     const defaultTeam = (userTeams && userTeams.length) ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
-    console.log({ defaultTeam });
 
     const baseTeamState = {
       userTeams,
@@ -821,12 +819,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const chartData: { questionId: number, red: number, yellow: number, green: number }[] = [];
 
-    [...Array(5).keys()].forEach(e => {
+    [...Array(questions.length).keys()].forEach(e => {
       chartData.push({ questionId: (e + 1), red: 0, yellow: 0, green: 0 });
     });
 
     voteCollection?.forEach(vote => {
-      [...Array(5).keys()].forEach(e => {
+      [...Array(questions.length).keys()].forEach(e => {
         const selection = vote.responses.find(response => response.questionId === (e + 1))?.selection;
         const data = chartData.find(d => d.questionId === (e + 1));
         if (selection <= 6) {
@@ -837,6 +835,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           data.green++;
         }
       });
+    });
+
+    chartData.sort((a, b) => {
+      if (a.red > b.red) {
+        return 1;
+      }
+      if (a.red < b.red) {
+        return -1;
+      }
+      return 0;
     });
 
     await this.updateFeedbackItemsAndContributors();
@@ -1596,7 +1604,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <div className="retro-summary-effectiveness-scores">
                       <ul className="chart">
                         {this.state.effectivenessMeasurementChartData.map((data, index) => {
-                          const averageScore = this.state.effectivenessMeasurementSummary[index]?.average;
+                          const averageScore = this.state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0].average;
                           const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
                           const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
                           const redScore = ((data.red * 100) / teamEffectivenessResponseCount);
@@ -1662,7 +1670,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             <span>Favorable</span>
                           </section>
                         </div>
-                        <span className='favorability-header'>Favorability</span>
                       </div>
                     </div>
                   </div>
