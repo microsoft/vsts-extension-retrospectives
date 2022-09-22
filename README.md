@@ -17,14 +17,14 @@ allows you to do all this and more from within Azure DevOps.
 ## Table of Contents
 
 - [Retrospectives](#retrospectives)
-  - [Features](#features)
+  - [Retrospective Features](#retrospective-features)
   - [Install](#install)
   - [Use](#use)
   - [Best Practices](#best-practices)
   - [Contribute](#contribute)
   - [License](#license)
 
-## Features
+## Retrospective Features
 
 - Retrospectives in Azure DevOps
 - Real time support for distributed retrospectives
@@ -90,7 +90,7 @@ retrospective, either customized or loaded from predefined templates.](https://g
 
 Please enter the appropriate information:
 
-- **Retrospective Title**: Enter a title for the Retrospective.
+- **Retrospective Title**: Title for the Retrospective.
 - **Max Votes per User**: The maximum number of votes a participant has to
 use in the "Vote" Phase.
 - **Include Team Assessment**: Include a Team Assessment link at the top of
@@ -102,21 +102,21 @@ feedback will be blurred.
 Directive' at the top of the board.
 - **Do not display names in feedback**: When checked, anonymize who creates
 individual feedback items.
-- **Columns**: You can either Apply from a preselected templates or individually
-select and configure columns.
+- **Columns Settings**: You can either Apply from a pre-populated template or individually
+select and configure columns yourself.
 
 ![A screenshot showing the dropdown of available templates for the retrospective
 board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/pick-retrospective-template-lightmode.png)
 
 **Note:** Retrospective Title is the minimum 'required' information (other
-fields can stay at default as needed). Ones the title is provided, the `Save`
+fields can stay at default as needed). Once the title is provided, the `Save`
 button is enabled. Save the retrospective using the `Save` button.
 
-### ... Or Select Another Board
+### ... Or Select Another Retrospective Board
 
-Once you have created the retrospective board and you want to select a board
-different from the currently displayed board, click on the board name and select
-the desired board. You can use the search box to find the appropriate boards if
+Once you have created the retrospective board and you want to select a retrospective board
+different from the currently displayed board, click on the retrospective board name and select
+the desired one. You can use the search box to find the appropriate retrospective boards if
 you have a large number of boards.
 
 ![A screenshot showing the dropdown for searching available retrospective
@@ -129,21 +129,21 @@ Sprint 7" is darkened as though hovered.](https://github.com/microsoft/vsts-exte
 Once you create a new retrospective, you can share a link to it to all participants.
 Users can then access that link even from their mobile browsers to participate in
 the retrospective. The extension offers real time synchronisation, so all users
-will see the most upto date information without having to refresh the page.
+will see the most up-to-date information without having to refresh the page.
 
 ![A screenshot of the dropdown from the Board Actions Menu. The option for
 'Copy Retrsopectivelink Link' is darkened as though the mouse is hovering
 over it.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/copy-retro-link.png)
 
-### 6. The Five Phases of the Standard Retrospective
+### 6. Phases of the Standard Retrospective
 
 The number of columns in each retrospective is determined by the selection made
 when making the new board. Regardless of the template, they still follow the same
-sequence of five stages.
+sequence of stages.
 
 #### The Prime Directive
 
-In this phase the facilitator sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues that discovered will be assumed to be process problems, not people problems.
+If you had selected the 'Display 'Retrospective Prime Directive', you will see the option to view that directive which sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues discovered will be assumed to be process problems, not people problems.
 
 ![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
 
@@ -152,8 +152,7 @@ In this phase the facilitator sets the stage for the retrospective. It is recomm
 
 In this phase feedback is collected from all participants. Users
 can add feedback under any of the columns using the 'Add new card' button or by
-double clicking the empty space of the column's background. Once feedback from
-all users is collected, move onto the next phase.
+double clicking the empty space of the column's background. 
 
 ![A screenshot of an example retrospective board column, showing the example
 user Avery Axolotl writing in a feedback item that says 'Accidentally deleted
@@ -163,13 +162,15 @@ If when creating a retrospective, the checkbox for "Do not display names on
 feedback" is checked, then the cards will show no names, appearing anonymous.
 
 If when creating a retrospective, the checkbox for 'Obscure the feedback of
-others during the Collect Phase' was checked, then while typing the feedback
+others during the Collect Phase' was checked, then while typing, the feedback
 of others will not be shown, even if anonymous. You can only edit items that
 you have created in this mode.
 
 ![A screenshot of a board that shows two columnds for "Mad" and "Sad." The each
 column has two feedback items: one which has text visible and another where
 there is a blur that obscures the text from another user.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/obscured-anonymous-feedback.png)
+
+Once feedback from all users is collected, move on to the next phase of **Group**.
 
 #### Group
 
@@ -197,7 +198,7 @@ Both methods of grouping will result in the item being grouped beneath the other
 ![A screenshot that shows that one feedback from Fernando Flamingo is grouped
 beneath Avery Axolotl's feedback because both discussed team bonding.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/grouped-feedback-expanded.png)
 
-Once all similar items are grouped together, move on to the next phase.
+Once all similar items are grouped together, move on to the next phase of **Vote**.
 
 #### Vote
 
@@ -214,29 +215,17 @@ real time as the user clicks on 'Upvote' and 'Downvote' icons.
 indicated next to "Votes Used." The two items that have been voted on by the
 user show a "Your Votes: 1" in the feedback card.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/vote-feedback-in-progress.png)
 
-Once everyone is done voting, move on to the next phase.
+Once everyone is done voting, move on to the next phase of **Act**.
 
 #### Act
 
-In this phase, the team will go through each feedback item and create
-work items in Azure DevOps if needed. Click on the 'Add action item' button on a
-feedback card, and select the type of work item that needs to be created. This
-will open up the standard Azure DevOps work item creation form. Enter the work
-item details and save. This will create the work item in your Azure DevOps
-account and also associate it to the feedback item.
+In this phase, the team will go through each feedback item.  You will notice that the items with the most votes will appear at the top of the column. It is recommended that each time you do this exercise, you only select one or two of the feedback items to take action against. Click on the 'Add action item' button on a feedback card, and select the type of work item that needs to be created in Azure DevOps. This will open up the standard Azure DevOps work item creation form. Enter the work item details and save. This will create the work item in your Azure DevOps account and also associate it to the feedback item.
 
-![A screenshot that shows a feedback item in the 'Act Phase'. On the example
-feedback items, the button for 'Add Action Item,' an ellipsis, has been pressed
-to reveal a selection of options. The user has the option to create a number of
-different Azure Dev Ops items, like adding a bug, a user story, and others. In
-this case, the item that is darkened as though hovered by a mouse is the 'User
-Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
+![A screenshot that shows a feedback item in the 'Act Phase'. On the example feedback items, the button for 'Add Action Item,' an ellipsis, has been pressed to reveal a selection of options. The user has the option to create a number of different Azure Dev Ops items, like adding a bug, a user story, and others. In this case, the item that is darkened as though hovered by a mouse is the 'User Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
 ### 7. Optional: The Team Assessment
 
-You can optionally include a "Team Assessment" that anonymously collects
-feedback from participants. To get the feedback form, you can click on the "Team
-Assessment" link at the top of the board. The assessment tracks 5 categories:
+You can optionally include a "Team Assessment" that anonymously collects feedback from participants. To get the feedback form, you can click on the "Team Assessment" link at the top of the board. The assessment tracks 5 categories:
 
 - Clarity
 - Energy
@@ -244,15 +233,11 @@ Assessment" link at the top of the board. The assessment tracks 5 categories:
 - Work-life Balance
 - Confidence
 
-The users can rank on a scale of 1 to 10; scores of 1-6 are categorized as
-"Unfavorable", 7 and 8 are "Neutral," and 9 and 10 are "Favorable."
+The users will rank on a scale of 1 to 10; scores of 1-6 are categorized as "Unfavorable", 7 and 8 are "Neutral," and 9 and 10 are "Favorable".
 
-![A screenshot of an example user filling out the team assessment. Each question
-has alternating background for visual distinction. Each question/category has
-a short description and a tooltip icon that provides more context.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-team-assessment-darkmode.png)
+![A screenshot of an example user filling out the team assessment. Each question has alternating background for visual distinction. Each question/category has a short description and a tooltip icon that provides more context.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-team-assessment-darkmode.png)
 
-Once the team assessment has been completed, the summary of answers can be viewed
-in the Retrospective Summary Dialog (see below)
+Once the team assessment has been completed, the summary of answers can be viewed in the Retrospective Summary Dialog (see below).
 
 #### Improving Based on Team Assessment Scores
 
@@ -269,19 +254,19 @@ Teams may choose to address the issues found in the team assessment in multiple 
 #### Setup
 
 Create a new retrospective using the steps above with the following exceptions:
-- Include Team Assessment is checked
-- Do not display names in feedback is checked
-- Display 'Retrospective Prime Directive' is checked
+- 'Include Team Assessment' is checked
+- 'Display 'Retrospective Prime Directive'' is checked
+- 'Do not display names in feedback' is checked
 - Note: You do not need to select a template. The template will be modified after the assessment is complete
 - Share the link to the retrospective with the team
 
----Add screenshot here---
+![A screenshot of the new retrospective box](https://user-images.githubusercontent.com/114175122/191842014-77ca660d-2a9f-4004-9678-04cb91aa7429.png)
 
 #### The Prime Directive
 
 In this phase the facilitator sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues that discovered will be assumed to be process problems, not people problems.
 
-![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
+![A screenshot of the prime directive](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
 
 #### Team Assessment
 
@@ -289,15 +274,12 @@ In this phase each team member clicks on the Team Assessment and anonymously ans
 
 Throughout this phase you will periodically check the retrospective summary. If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
 
---Add screenshot here
+![A screenshot of a Team Assessment](https://user-images.githubusercontent.com/114175122/191842510-877c3e60-6d70-4048-b371-8eb3a6593f4e.png)
 
 Re-open the retrospective summary and when the majority of the team has responded, discuss which dimension the team would like to improve upon. Note: If more than 20% of the responses are unfavorable for psychological safety, we recommend focusing on psychological safety first. This is because without psychological safety the more difficult conversations that need to happen to make improvements in the other dimensions will not happen.
 
---Add screenshot here
-
 Once the team has decided which dimension to focus on the facilitator edits the template by selecting the template aligned to the dimension the team wants to focus on. For example, if the team has decided to improve on psychological safety, then the facilitator will edit the retrospective and choose the "Psychological Safety" template.
 
----Add screenshot here---
 
 ##### Collect
 
@@ -329,7 +311,7 @@ The facilitator then waits for votes to compile and after the majority of the te
 
 #### Act
 
-Follow the steps above to assign actions as work items in Azure Dev Ops. Note: We recommend only selecting 1-2 actions per sprint to ensure completion prior to the next sprint.
+Follow the steps above to assign actions as work items in Azure DevOps. Note: We recommend only selecting 1-2 actions per sprint to ensure completion prior to the next sprint.
 
 ### 8. Retrospective Summary
 
