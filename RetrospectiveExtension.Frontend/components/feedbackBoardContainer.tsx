@@ -441,10 +441,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     }
 
-    console.log({ userTeams });
     // Default to select first user team or the project's default team.
     const defaultTeam = (userTeams && userTeams.length) ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
-    console.log({ defaultTeam });
 
     const baseTeamState = {
       userTeams,
