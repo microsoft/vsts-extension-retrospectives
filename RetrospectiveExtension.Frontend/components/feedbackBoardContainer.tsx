@@ -837,6 +837,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     });
 
+    chartData.sort((a, b) => {
+      if (a.red > b.red) {
+        return 1;
+      }
+      if (a.red < b.red) {
+        return -1;
+      }
+      return 0;
+    });
+
     await this.updateFeedbackItemsAndContributors();
 
     this.setState({
