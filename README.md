@@ -219,27 +219,13 @@ Once everyone is done voting, move on to the next phase of **Act**.
 
 #### Act
 
-In this phase, the team will go through each feedback item.  You will notice 
-that the items with the most votes will appear at the top of the column. It is 
-recommended that each time you do this exercise, you only select one or two
-of the feedback items to take action against. Click on the 'Add action item' button on a
-feedback card, and select the type of work item that needs to be created in Azure DevOps. This
-will open up the standard Azure DevOps work item creation form. Enter the work
-item details and save. This will create the work item in your Azure DevOps
-account and also associate it to the feedback item. 
+In this phase, the team will go through each feedback item.  You will notice that the items with the most votes will appear at the top of the column. It is recommended that each time you do this exercise, you only select one or two of the feedback items to take action against. Click on the 'Add action item' button on a feedback card, and select the type of work item that needs to be created in Azure DevOps. This will open up the standard Azure DevOps work item creation form. Enter the work item details and save. This will create the work item in your Azure DevOps account and also associate it to the feedback item.
 
-![A screenshot that shows a feedback item in the 'Act Phase'. On the example
-feedback items, the button for 'Add Action Item,' an ellipsis, has been pressed
-to reveal a selection of options. The user has the option to create a number of
-different Azure Dev Ops items, like adding a bug, a user story, and others. In
-this case, the item that is darkened as though hovered by a mouse is the 'User
-Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
+![A screenshot that shows a feedback item in the 'Act Phase'. On the example feedback items, the button for 'Add Action Item,' an ellipsis, has been pressed to reveal a selection of options. The user has the option to create a number of different Azure Dev Ops items, like adding a bug, a user story, and others. In this case, the item that is darkened as though hovered by a mouse is the 'User Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
 ### 7. Optional: The Team Assessment
 
-You can optionally include a "Team Assessment" that anonymously collects
-feedback from participants. To get the feedback form, you can click on the "Team
-Assessment" link at the top of the board. The assessment tracks 5 categories:
+You can optionally include a "Team Assessment" that anonymously collects feedback from participants. To get the feedback form, you can click on the "Team Assessment" link at the top of the board. The assessment tracks 5 categories:
 
 - Clarity
 - Energy
@@ -247,15 +233,11 @@ Assessment" link at the top of the board. The assessment tracks 5 categories:
 - Work-life Balance
 - Confidence
 
-The users will rank on a scale of 1 to 10; scores of 1-6 are categorized as
-"Unfavorable", 7 and 8 are "Neutral," and 9 and 10 are "Favorable."
+The users will rank on a scale of 1 to 10; scores of 1-6 are categorized as "Unfavorable", 7 and 8 are "Neutral," and 9 and 10 are "Favorable".
 
-![A screenshot of an example user filling out the team assessment. Each question
-has alternating background for visual distinction. Each question/category has
-a short description and a tooltip icon that provides more context.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-team-assessment-darkmode.png)
+![A screenshot of an example user filling out the team assessment. Each question has alternating background for visual distinction. Each question/category has a short description and a tooltip icon that provides more context.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-team-assessment-darkmode.png)
 
-Once the team assessment has been completed, the summary of answers can be viewed
-in the Retrospective Summary Dialog (see below).
+Once the team assessment has been completed, the summary of answers can be viewed in the Retrospective Summary Dialog (see below).
 
 #### Improving Based on Team Assessment Scores
 
