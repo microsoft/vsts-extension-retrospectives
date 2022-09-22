@@ -17,7 +17,6 @@ allows you to do all this and more from within Azure DevOps.
 ## Table of Contents
 
 - [Retrospectives](#retrospectives)
-  - [Table of Contents](#table-of-contents)
   - [Features](#features)
   - [Install](#install)
   - [Use](#use)
