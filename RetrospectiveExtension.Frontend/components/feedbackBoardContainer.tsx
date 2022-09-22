@@ -1670,7 +1670,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             <span>Favorable</span>
                           </section>
                         </div>
-                        <span className='favorability-header'>Favorability</span>
                       </div>
                     </div>
                   </div>
