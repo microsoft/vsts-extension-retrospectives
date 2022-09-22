@@ -819,12 +819,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const chartData: { questionId: number, red: number, yellow: number, green: number }[] = [];
 
-    [...Array(5).keys()].forEach(e => {
+    [...Array(questions.length).keys()].forEach(e => {
       chartData.push({ questionId: (e + 1), red: 0, yellow: 0, green: 0 });
     });
 
     voteCollection?.forEach(vote => {
-      [...Array(5).keys()].forEach(e => {
+      [...Array(questions.length).keys()].forEach(e => {
         const selection = vote.responses.find(response => response.questionId === (e + 1))?.selection;
         const data = chartData.find(d => d.questionId === (e + 1));
         if (selection <= 6) {
