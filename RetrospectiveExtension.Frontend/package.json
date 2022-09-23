@@ -9,7 +9,7 @@
     "build:p": "npm run clean && npm run compile && webpack --mode=production",
     "lint": "eslint . --ext .ts,.tsx",
     "pack:d": "npm run build:p && tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
-    "pack:test": "npm run build:p && tfx extension create --manifests vss-extension-prod.json --output-path ./dist/testing",
+    "pack:test": "npm run compile && webpack --mode=production && tfx extension create --manifests vss-extension-prod.json --output-path ./dist/testing",
     "pack:p": "npm run build:p && tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
     "publish:d": "npm run pack:d && tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
     "publish:p": "npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
