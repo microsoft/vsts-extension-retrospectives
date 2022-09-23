@@ -139,7 +139,7 @@ over it.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/do
 
 The number of columns in each retrospective is determined by the selection made
 when making the new board. Regardless of the template, they still follow the same
-sequence of stages.
+sequence of phases.
 
 #### The Prime Directive
 
@@ -283,30 +283,23 @@ Once the team has decided which dimension to focus on the facilitator edits the 
 
 ##### Collect
 
-In this phase team members will provide feedback to help improve the dimension they've chosen to focus on 
-
+In this phase team members will provide feedback to help improve the dimension they've chosen to focus on.
 Ask team members to input feedback cards on the left 2 columns. 
 
----insert screenshot here
+![A screenshot of the Clarity Retrospective Board Template](https://user-images.githubusercontent.com/114175122/192053065-b05e5144-a663-46fd-b0cb-42c5edc39dad.png)
 
-After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, the facilitator asks the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be? Capture this in a feedback card in the third column (One action in the next sprint)"
+After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, the facilitator asks the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be? 
+Capture this in a feedback card in the third column (One action in the next sprint)"
 
----insert screenshot here
 
 #### Group
 
-In this phase the team will group similar items together. To expedite the process we recommend only grouping the action items together.
-
-After the majority of the team has added feedback cards to the third column, the facilitator switches to the "group" tab and collectively groups like ideas together with the teeam (see above).
-
----insert screenshot here
+In this phase the team will group similar items together. To expedite the process we recommend only grouping the action items together in the last column.
+After the majority of the team has added feedback cards to the third column, the facilitator switches to the "group" tab and collectively groups like ideas together with the team (see above).
 
 #### Vote
 
-In this step the facilitator asks participants to vote only on the third column and the top items for improvement are identified.
-
----insert screenshot here.
-
+In this phase the facilitator asks participants to vote only on the third column and the top items for improvement are identified.
 The facilitator then waits for votes to compile and after the majority of the team has voted (the facilitator can view the retrospective summary to quickly determine how many votes have beeen cast), the facilitator clicks on the "Act" tab which automatically sorts the cards from the most to the least voted upon.
 
 #### Act
@@ -315,8 +308,7 @@ Follow the steps above to assign actions as work items in Azure DevOps. Note: We
 
 ### 8. Retrospective Summary
 
- The Retrospective Summary dialog is accessable from the "Board Actions" menu
-in the top navigation.
+ The Retrospective Summary dialog is accessable from the "Board Actions" menu in the top navigation.
 
 ![A screenshot that shows the Board Actions menu, where the "Show Retrospective
 Summary" is highlighted as though the mouse is hovering.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/show-retro-summary.png)
@@ -332,8 +324,7 @@ Once there, there is a summary of the Retrospective. This includes:
 
 ![A screenshot that shows an example retrospective summary without a team assessment.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-summary-no-assessment-darkmode.png)
 
-If there is a team assessment, then a charted summary will show the vote breakdown
-by favorability, along with an average score.
+If there is a team assessment, then a charted summary will show the vote breakdown by favorability, along with an average score.
 
 ![A screenshot that shows an example retrospective summary with a team assessment.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-summary-with-assessment-darkmode.png)
 
@@ -351,6 +342,28 @@ the action items created after each by clicking the individual retrospective.
 ![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-expanded-summary-lightmode.png)
 
 ## Best Practices
+
+### Use Retrospectives to give Kudos
+Giving kudos, or recognizing others for their achievements, is one of the highest drivers of employee satisfaction and retention. When people feel appreciated and supported, they will be more engaged and motivated. Who doesn’t want that?  You have an opportunity to provide a space for kudos in every team retrospective.  Make sure to add a column for “Kudos” in your retrospective board. It is that simple and it just takes a moment for people to add a few pieces of feedback to acknowledge the great work of others.  When you finish your retrospective, make sure to read through each kudos feedback item and take a moment to celebrate!
+
+### Use Retrospectives to create a Team Working Agreement
+Team Working Agreements are shared commitments to ways of working together. They establish team members' work preferences. A shared agreement will balance individual and team needs, and set clear expectations for how the team will work together.
+A good team working agreement must include everyone's background, needs and voices so a retrospective is a great way for a team to collect that information and then bring it together.  The agreement should be relatively short, 5-7 items.  
+Bring your team together and create a restrospective board with 1 column:
+- Good Working Preferences
+
+Follow the phases through from Collect, Group and Vote. Make sure every team member contributes feedback items to the Board before you Group and Vote. Read every card outloud before Grouping like items together. After voting, you will see those working preferences that got the most votes come to the top.  Select the top 5-7 items and talk through them together as a team to ensure that they are clear and that everyone agrees. Put those items in a document that you can keep in front of your team (at the top of a Microsoft Team Channel, or in your Azure DevOps Dashboard). Review the Working Agreement at the beginning of Team ceremonies or events.  Whenever there is a change in the team composition, the Working Agreement should be reviewed again to ensure that all team members agree to each item.
+
+### Team Assessment Best Practices
+Below are a number of best practices for driving team effectiveness and using the “Team Assessment” measurement within the Retrospective Board.
+- The ‘Team Assessment’ measurement questions were selected based on significant research indicating improvements in these areas will result in significant improvements in overall team effectiveness.  It is recommended that teams conduct a ‘Team Assessment’ measurement as a part of their standard retrospective process once a month at a minimum.  Deep dive discussions to debrief on the area of the biggest opportunity with actions identified should be a part of that process. 
+
+![Screenshot of the Team Assessment Questions](https://user-images.githubusercontent.com/114175122/192054246-4dda3cdc-7732-449e-b4eb-8ceb9c316261.png)
+
+- Best practices for improving **clarity** include creation of and alignment to OKRs. Regular review of OKRs with stakeholders combined with the implementation of agile development methodologies to continually prioritize the work that will have the biggest impact on achieving the OKRs. A well groomed backlog that is visible to the entire team and reviewed regularly will ensure clarity. The backlog should be stack ranked in order of priority with minimum work in process will ensure team clarity on the work that matters the most. Drive continuous improvement in clarity by using the “Clarity” Retrospective Boad template, following the standard retrospective process.
+- Best practices for improving **energy** include ensuring that all team members are spending at least 20% of their time on the team doing work that they love. Each team member should embark on a journey of self-discovery to identify what they love by keeping a record of the work that they loved doing on a daily and weekly basis until their strengths are clearly identified. Managers should endeavor to understand the work that their employees love by conducting a simple weekly check-in and asking 4 simple questions: "What did you do last week that energized you (you loved)?”, “What did you do last week that drained your energy?”, "What are your priorities this week?", and "How can I (your manager) help?". Drive continuous improvement in energy by using the “Energy” Retrospective Boad template, following the standard retrospective process.
+- Best practices for improving **psychological safety** include conducting a baseline retrospective using the "Psychological Safety" template in Azure DevOps Retrospectives (anonymously). Identify top actions that the team will implement to improve psychological safety. Repeat the psychological safety retrospective every 4-6 weeks until there are no scores below a 7. We've learned that every team is different and, in most cases, simple changes can make a profound impact, but it requires asking anonymously and taking action to improve.  Drive continuous improvement in psychological safety by using the “Psychological Safety” Retrospective Boad template, following the standard retrospective process.
+- Best practices for improving **work-life balance** include the implementation of fundamental agile practices including backlog grooming and prioritization, limiting Work In Process by establishing WIP limits and adhering to them, and only committing to deliver at the same velocity as the data indicates the team has predictably delivered in the past. Finally, simply asking the question in the Team Effectiveness survey and conducting deep dive discussions to identify drivers combined with follow-through on the associated actions should result in increased sustainability for the team. Drive continuous improvement in work-life balance by using the “Work-Life Balance” Retrospective Boad template, following the standard retrospective process.
 
 ## Contribute
 
