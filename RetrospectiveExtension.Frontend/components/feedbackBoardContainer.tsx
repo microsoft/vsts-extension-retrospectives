@@ -165,7 +165,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      this.setSupportedWorkItemTypesForProject();
+      await this.setSupportedWorkItemTypesForProject();
     } catch (error) {
       console.error({ m: "setSupportedWorkItemTypesForProject", error });
     }
@@ -1570,34 +1570,34 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           }}>
           {this.state.currentBoard &&
             <>
-              <section className='retro-summary-section'>
-                <div className='retro-summary-section-header'>Basic Settings</div>
+              <section className="retro-summary-section">
+                <div className="retro-summary-section-header">Basic Settings</div>
                 <div id="retro-summary-session-date">Session date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
-                <div id='retro-summary-created-by'>Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName} </div>
+                <div id="retro-summary-created-by">Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName} </div>
               </section>
-              <section className='retro-summary-section'>
-                <div className='retro-summary-section-header'>Participant Summary</div>
-                <div className='retro-summary-section-item'>Team Size: {this.state.members.length} member(s)</div>
-                <div className='retro-summary-section-item'>Contributors: {this.state.contributors.length} participant(s)</div>
+              <section className="retro-summary-section">
+                <div className="retro-summary-section-header">Participant Summary</div>
+                <div className="retro-summary-section-item">Team Size: {this.state.members.length} member(s)</div>
+                <div className="retro-summary-section-item">Contributors: {this.state.contributors.length} participant(s)</div>
 
                 {!this.state.currentBoard.isAnonymous && this.state.contributors.length > 0 &&
-                  <div className='retro-summary-contributors-section'>
+                  <div className="retro-summary-contributors-section">
                     {this.state.contributors.map((contributor, index) =>
-                      <div key={index} className='retro-summary-contributor'>
+                      <div key={index} className="retro-summary-contributor">
                         <img className="avatar" src={contributor.imageUrl} /> {contributor.name}
                       </div>
                     )}
                   </div>
                 }
-                <div className='retro-summary-item-horizontal-group'>
-                  <div className='retro-summary-section-item horizontal-group-item'>{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {this.state.castedVoteCount} vote(s)</div>
-                  <div className='retro-summary-section-item horizontal-group-item'>{this.state.feedbackItems.length} feedback item(s) created</div>
-                  <div className='retro-summary-section-item horizontal-group-item'>{this.state.actionItemIds.length} action item(s) created</div>
+                <div className="retro-summary-item-horizontal-group">
+                  <div className="retro-summary-section-item horizontal-group-item">{Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {this.state.castedVoteCount} vote(s)</div>
+                  <div className="retro-summary-section-item horizontal-group-item">{this.state.feedbackItems.length} feedback item(s) created</div>
+                  <div className="retro-summary-section-item horizontal-group-item">{this.state.actionItemIds.length} action item(s) created</div>
                 </div>
               </section>
               {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement &&
-                <section className='retro-summary-section'>
-                  <div className='retro-summary-section-header'>Team Assessment</div>
+                <section className="retro-summary-section">
+                  <div className="retro-summary-section-header">Team Assessment</div>
                   <div>
                     Assessment with favorability percentages and average score <br />
                     ({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? 'person' : 'people'} responded)
@@ -1609,14 +1609,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
                           const redScore = ((data.red * 100) / teamEffectivenessResponseCount);
                           return (
-                            <li className='chart-question-block' key={index}>
-                              <div className='chart-question'>
+                            <li className="chart-question-block" key={index}>
+                              <div className="chart-question">
                                 <i className={getQuestionFontAwesomeClass(data.questionId)} /> &nbsp;
                                 {getQuestionShortName(data.questionId)}
                               </div>
                               {data.red > 0 &&
                                 <div
-                                  className='red-chart-response chart-response'
+                                  className="red-chart-response chart-response"
                                   style={{ width: `${redScore}%` }}
                                   title={`Unfavorable percentage is ${redScore}%`}
                                   aria-label={`Unfavorable percentage is ${redScore}%`}
@@ -1626,7 +1626,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               }
                               {data.yellow > 0 &&
                                 <div
-                                  className='yellow-chart-response chart-response'
+                                  className="yellow-chart-response chart-response"
                                   style={{ width: `${yellowScore}%` }}
                                   title={`Neutral percentage is ${yellowScore}%`}
                                   aria-label={`Neutral percentage is ${yellowScore}%`}
@@ -1636,7 +1636,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               }
                               {data.green > 0 &&
                                 <div
-                                  className='green-chart-response chart-response'
+                                  className="green-chart-response chart-response"
                                   style={{ width: `${greenScore}%` }}
                                   title={`Favorable percentage is ${greenScore}%`}
                                   aria-label={`Favorable percentage is ${greenScore}%`}
@@ -1656,7 +1656,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         }
                       </ul>
                       <div className="chart-legend-section">
-                        <div className='chart-legend-group'>
+                        <div className="chart-legend-group">
                           <section >
                             <div style={{ backgroundColor: "#d6201f" }}></div>
                             <span>Unfavorable</span>

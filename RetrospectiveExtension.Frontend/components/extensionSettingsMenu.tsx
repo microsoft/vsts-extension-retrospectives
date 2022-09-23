@@ -171,11 +171,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <br /><br />
             The Team Assessment addition to the retrospective guides teams through a set of questions that highlight strengths and opportunities. Teams can then utilize specific retrospective templates to identify the top opportunities for improvement.
             <br /><br />
-            Research from the <a href="https://services.google.com/fh/files/misc/state-of-devops-2018.pdf" target="_blank">2018 State of DevOps</a> report indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a <a href="https://journals.sagepub.com/doi/full/10.1177/0018720812448394" target="_blank">2013 meta-analysis on teams</a> indicates that teams that effectively debrief are 20-25% more effective.
+            Research from the <a href="https://services.google.com/fh/files/misc/state-of-devops-2018.pdf" target="_blank" rel="noreferrer">2018 State of DevOps</a> report indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a <a href="https://journals.sagepub.com/doi/full/10.1177/0018720812448394" target="_blank" rel="noreferrer">2013 meta-analysis on teams</a> indicates that teams that effectively debrief are 20-25% more effective.
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={() => {
-              window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank');
+              window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank', 'noreferrer');
             }}
               text="Get more information" />
             <PrimaryButton onClick={() => {

@@ -57,8 +57,12 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         maxWidth: 16,
         minWidth: 16,
         name: 'Work Item Icon',
-        onRender: (props: IActionItemsTableProps) => {
-          return <Image src={props.icon.url} className="work-item-type-icon" alt={`${props.type} icon`} />;
+        onRender: ({ icon, type }: IActionItemsTableProps) => {
+          return <Image
+            src={icon.url}
+            className="work-item-type-icon"
+            alt={`${type} icon`}
+          />;
         }
       },
       {
@@ -70,8 +74,14 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         minWidth: 100,
         name: 'Title',
         onColumnClick: this.onColumnClick,
-        onRender: (props: IActionItemsTableProps) => {
-          return <div onClick={async () => { await props.onActionItemClick(props.id); }} className="work-item-title overflow-ellipsis">{props.title}</div>;
+        onRender: ({ id, title, onActionItemClick }: IActionItemsTableProps) => {
+          return <div
+            onClick={async () => {
+              await onActionItemClick(id);
+            }}
+            className="work-item-title overflow-ellipsis">
+            {title}
+          </div>;
         }
       },
       {
@@ -102,9 +112,14 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         maxWidth: 150,
         isResizable: true,
         ariaLabel: 'Work item changed date.',
-        onRender: (props: IActionItemsTableProps) => {
-          const changedDate = new Date(props.changedDate);
-          return <div className="overflow-ellipsis">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(changedDate)}</div>;
+        onRender: ({ changedDate }: IActionItemsTableProps) => {
+          const changedDateAsDate = new Date(changedDate);
+          return <div
+            className="overflow-ellipsis">
+            {new Intl.DateTimeFormat('en-US',
+              { year: 'numeric', month: 'short', day: 'numeric' }
+            ).format(changedDateAsDate)}
+          </div>;
         },
         onColumnClick: this.onColumnClick,
       },
