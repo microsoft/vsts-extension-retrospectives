@@ -1208,7 +1208,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             items: this.boardActionContexualMenuItems,
                           }}
                         >
-                          <span className="ms-Button-icon"><i className="fa-solid fa-grip"></i></span>&nbsp;
+                          <span className="ms-Button-icon"><i className="fa-solid fa-ellipsis-h"></i></span>&nbsp;
                         </DefaultButton>
                         <Dialog
                           hidden={this.state.isMobileBoardActionsDialogHidden}
