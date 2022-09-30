@@ -274,11 +274,11 @@ In this phase each team member clicks on the Team Assessment and anonymously ans
 
 Throughout this phase you will periodically check the retrospective summary. If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
 
-![A screenshot of a Team Assessment](https://user-images.githubusercontent.com/114175122/191842510-877c3e60-6d70-4048-b371-8eb3a6593f4e.png)
+![A screenshot of a Team Assessment](https://user-images.githubusercontent.com/114175122/192640966-250255a1-4497-47d5-ab8f-8a634103b972.png)
 
-Re-open the retrospective summary and when the majority of the team has responded, discuss which dimension the team would like to improve upon. Note: If more than 20% of the responses are unfavorable for psychological safety, we recommend focusing on psychological safety first. This is because without psychological safety the more difficult conversations that need to happen to make improvements in the other dimensions will not happen.
+Re-open the retrospective summary and when the majority of the team has responded, discuss which dimension the team would like to improve upon. Note: If more than 20% of the responses are unfavorable for a dimension, we recommend focusing on that area first. Otherwise, it is beneficial to focus on psychological safety first. This is because without psychological safety the more difficult conversations that need to happen to make improvements in the other dimensions will not happen.
 
-Once the team has decided which dimension to focus on the facilitator edits the template by selecting the template aligned to the dimension the team wants to focus on. For example, if the team has decided to improve on psychological safety, then the facilitator will edit the retrospective and choose the "Psychological Safety" template.
+Once the team has decided which dimension to focus on the facilitator edits the template by selecting the template aligned to the dimension the team wants to focus on. For example, based on this team with 16.7% unfavorable for energy, the team may decide to focus first on energy. The facilitator will edit the retrospective and choose the "Energy" template.
 
 
 ##### Collect
@@ -286,7 +286,7 @@ Once the team has decided which dimension to focus on the facilitator edits the 
 In this phase team members will provide feedback to help improve the dimension they've chosen to focus on.
 Ask team members to input feedback cards on the left 2 columns. 
 
-![A screenshot of the Clarity Retrospective Board Template](https://user-images.githubusercontent.com/114175122/192053065-b05e5144-a663-46fd-b0cb-42c5edc39dad.png)
+![A screenshot of the Energy Retrospective Board Templage](https://user-images.githubusercontent.com/114175122/192641620-e53c15bb-6060-4a4b-bd65-0c89a66b0c5f.png)
 
 After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, the facilitator asks the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be? 
 Capture this in a feedback card in the third column (One action in the next sprint)"
