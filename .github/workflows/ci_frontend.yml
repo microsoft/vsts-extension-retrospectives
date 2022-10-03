@@ -51,7 +51,7 @@ jobs:
           reporter: jest-junit
           working-directory: 'RetrospectiveExtension.Frontend'
 
-      - if: steps.changes.ourputs.src == 'true'
+      - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
         uses: codecov/codecov-action@v3.1.1
         with:
