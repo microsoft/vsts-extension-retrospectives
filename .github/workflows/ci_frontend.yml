@@ -56,7 +56,7 @@ jobs:
         uses: codecov/codecov-action@v3.1.1
         with:
           name: Codecov Run
-          directory: coverage
+          files: coverage/coverage-final.json
 
 
 
