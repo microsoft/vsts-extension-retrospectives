@@ -116,6 +116,12 @@
           width: 30px;
           text-align: center;
         }
+
+        .assessment-chart-action {
+          white-space: nowrap;
+          padding: 0px 5px;
+          background-color: $azdo_blue;
+        }
       }
 
       .chart-response {
