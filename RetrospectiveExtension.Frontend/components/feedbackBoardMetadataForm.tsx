@@ -90,7 +90,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
             markedForDeletion: false,
           };
         }),
-      isIncludeTeamEffectivenessMeasurement: !this.props.isNewBoardCreation && this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
+      isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? true : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
       isBoardAnonymous: !this.props.isNewBoardCreation && this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,
       isBoardNameTaken: false,
