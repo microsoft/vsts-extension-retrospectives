@@ -92,7 +92,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           };
         }),
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? true : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
-      isBoardAnonymous: !this.props.isNewBoardCreation && this.props.currentBoard.isAnonymous,
+      isBoardAnonymous: this.props.isNewBoardCreation ? true : this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,
       isBoardNameTaken: false,
       isChooseColumnAccentColorDialogHidden: true,
@@ -102,7 +102,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       selectedAccentColorKey: undefined,
       selectedIconKey: undefined,
       displayPrimeDirective: this.props.isNewBoardCreation ? true : this.props.currentBoard.displayPrimeDirective,
-      shouldShowFeedbackAfterCollect: !this.props.isNewBoardCreation && this.props.currentBoard.shouldShowFeedbackAfterCollect,
+      shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? false : this.props.currentBoard.shouldShowFeedbackAfterCollect,
       title: this.props.initialValue
     };
   }
