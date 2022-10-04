@@ -40,7 +40,7 @@ import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
 import boardDataService from '../dal/boardDataService';
-import classNames from 'classnames';
+import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -92,6 +92,8 @@ export interface FeedbackBoardContainerState {
   actionItemIds: number[];
   members: TeamMember[];
   castedVoteCount: number;
+  boardColumns: IFeedbackColumn[];
+  questionIdForDiscussAndActBoardUpdate: number;
 }
 
 class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
@@ -142,6 +144,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       actionItemIds: [],
       members: [],
       castedVoteCount: 0,
+      boardColumns: [],
+      questionIdForDiscussAndActBoardUpdate: -1
     };
   }
 
@@ -1162,6 +1166,44 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return (
       <div className="retrospective-feedback-board-container">
         <div className="flex items-center px-2 py-2">
+          <Dialog
+            hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
+            onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
+            dialogContentProps={{
+              type: DialogType.close,
+              title: 'Discuss and Act',
+              subText: `Are you sure you want to change the template of this board?`,
+            }}
+            modalProps={{
+              isBlocking: true,
+              containerClassName: 'retrospectives-delete-feedback-item-dialog',
+              className: 'retrospectives-dialog-modal',
+            }}>
+            <DialogFooter>
+              <PrimaryButton onClick={async () => {
+                    const question = questions.filter((question) => question.id === this.state.questionIdForDiscussAndActBoardUpdate)[0];
+                    const templateName = question.discussActTemplate;
+                    const columns = getColumnsByTemplateId(templateName);
+
+                    const board = this.state.currentBoard;
+                    const columnId = columns[0].id;
+
+                    await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns);
+
+                    /*
+                    TODO (enpolat) : in the future we may need to create feedback items based on the answers of the questions
+                    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.flatMap(e => e.responses).filter(e => e.questionId === question.id).forEach(async vote => {
+                      const item = await itemDataService.createItemForBoard(board.id, vote.selection.toString(), columnId, true);
+                      reflectBackendService.broadcastNewItem(columnId, item.id);
+                    });
+                    */
+
+                    this.setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
+              }} text="Proceed" />
+              <DefaultButton onClick={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
+            </DialogFooter>
+          </Dialog>
+
           <div className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
             Retrospectives
           </div>
@@ -1604,7 +1646,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <div className="retro-summary-effectiveness-scores">
                       <ul className="chart">
                         {this.state.effectivenessMeasurementChartData.map((data, index) => {
-                          const averageScore = this.state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0].average;
+                          const averageScore = this.state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
                           const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
                           const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
                           const redScore = ((data.red * 100) / teamEffectivenessResponseCount);
@@ -1650,6 +1692,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                   {this.numberFormatter(averageScore)}
                                 </div>
                               }
+                              <button
+                                className="assessment-chart-action"
+                                title={`${this.state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`}
+                                disabled={this.state.feedbackItems.length > 0}
+                                onClick={() => this.setState({ questionIdForDiscussAndActBoardUpdate: data.questionId })}
+                              >Discuss and Act</button>
                             </li>
                           )
                         })
