@@ -57,14 +57,3 @@ jobs:
         with:
           name: Codecov Run
           files: coverage/coverage-final.json
-
-
-
-      # # We do not leave a PR Comment when merging since there is no PR,
-      # # opened means that the PR is still open and the comment will only be left then
-      # - if: (steps.changes.outputs.src == 'true' &&  github.event.action=='opened' )
-      #   name: Test Coverage PR comment
-      #   uses: thollander/actions-comment-pull-request@v1
-      #   with:
-      #     message: 'Test Coverage! ![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mhassaninmsft/b414faf6b91eaaa6ec7d82882be36935/raw/retrotool__${{ env.BRANCH }}.json)'
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
