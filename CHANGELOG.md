@@ -4,6 +4,22 @@ You can find the changelog of the Retrospective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.90.1 ([GitHub PR #462](https://github.com/microsoft/vsts-extension-retrospectives/pull/462))
+
+* Modified default to Include team assessment, display 'Retrospective Prime Directive', do not display names in feedback.
+
+* Added "Discuss and Act" button to the Team Assessment allowing teams to discuss and take action on specific areas in the Team Assessment
+
+* Sorted Team Assessment results in order of opportunity
+
+## v1.80.1
+
+* Board Templates made available to all structures programmatically, so, they'll be available globally
+
+## v1.70.1
+
+* Team Assessment Chart added to Retrospective Summary Dialog
+
 ## v1.60.*
 
 **Fixes**
