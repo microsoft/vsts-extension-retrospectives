@@ -848,6 +848,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       if (a.red < b.red) {
         return 1;
       }
+      const avgA = average.find(e => e.questionId === a.questionId)?.average;
+      const avgB = average.find(e => e.questionId === b.questionId)?.average;
+      if (avgA > avgB) {
+        return 1;
+      }
+      if (avgA < avgB) {
+        return -1;
+      }
       return 0;
     });
 
