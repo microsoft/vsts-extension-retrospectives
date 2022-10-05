@@ -4,6 +4,10 @@ You can find the changelog of the Retrospective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.90.2 ([GitHub PR #463](https://github.com/microsoft/vsts-extension-retrospectives/pull/463))
+
+* Unifying board template column helper structures.
+
 ## v1.90.1 ([GitHub PR #462](https://github.com/microsoft/vsts-extension-retrospectives/pull/462))
 
 * Modified default to Include team assessment, display 'Retrospective Prime Directive', do not display names in feedback.
