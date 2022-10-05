@@ -61,36 +61,11 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
-    const defaultColumnCards: IFeedbackColumnCard[] = [{
-      column: {
-        accentColor: '#008000',
-        iconClass: 'far fa-smile',
-        id: uuid(),
-        title: 'What went well',
-      },
-      markedForDeletion: false,
-    }, {
-      column: {
-        accentColor: '#cc293d',
-        iconClass: 'far fa-frown',
-        id: uuid(),
-        title: "What didn't go well",
-      },
-      markedForDeletion: false,
-    }];
-
     this.state = {
       columnCardBeingEdited: undefined,
       columnCards: this.props.isNewBoardCreation ?
-        defaultColumnCards :
-        this.props.currentBoard.columns.map((column) => {
-          return {
-            // Need a deep copy of the column object here to avoid making changes to the original column.
-            // This ensures no changes are made when the user hits Cancel.
-            column: { ...column },
-            markedForDeletion: false,
-          };
-        }),
+        getColumnsByTemplateId("").map(column => { return { column, markedForDeletion: false } }) :
+        this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } }),
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? true : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
       isBoardAnonymous: this.props.isNewBoardCreation ? true : this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,

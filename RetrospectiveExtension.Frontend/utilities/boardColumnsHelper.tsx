@@ -307,7 +307,17 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
       ];
     default: {
-      return []
+      return [{
+        accentColor: '#008000',
+        iconClass: 'far fa-smile',
+        id: uuid(),
+        title: 'What went well',
+      }, {
+        accentColor: '#cc293d',
+        iconClass: 'far fa-frown',
+        id: uuid(),
+        title: "What didn't go well",
+      }]
     }
   };
 };
