@@ -319,5 +319,5 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         title: "What didn't go well",
       }]
     }
-  };
+  }
 };
