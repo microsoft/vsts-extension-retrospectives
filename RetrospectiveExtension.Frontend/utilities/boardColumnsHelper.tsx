@@ -279,6 +279,27 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           title: 'One action in next sprint',
         },
       ];
+    case 'team-efficiency':
+      return [
+        {
+          accentColor: '#008000',
+          iconClass: 'far fa-smile',
+          id: uuid(),
+          title: 'What helps efficiency',
+        },
+        {
+          accentColor: '#cc293d',
+          iconClass: 'far fa-frown',
+          id: uuid(),
+          title: 'What hinders efficiency',
+        },
+        {
+          accentColor: '#0078d4',
+          iconClass: 'fas fa-exclamation',
+          id: uuid(),
+          title: 'One action in next sprint',
+        },
+      ];
     case 'wlai': // Went Well, Learned, Impediments, Accelerators
       return [
         {
