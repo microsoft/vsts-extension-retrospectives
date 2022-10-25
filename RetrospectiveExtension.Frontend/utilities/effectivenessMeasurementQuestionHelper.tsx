@@ -38,6 +38,14 @@ export const questions = [
     title: "I'm confident our team will be successful",
     fontAwesomeClass: "fa-solid fa-square-poll-vertical",
     tooltip: "<a target=\"_blank\" rel=\"noreferrer\" href=\"https://content.apa.org/record/2009-06703-020\">Research</a> shows the strongest predictor of team efficacy is the collective confidence of the team to be successful.",
+  },
+  {
+    id: 6,
+    shortTitle: "Efficiency",
+    discussActTemplate: "team-efficiency",
+    title: "Tools/resources/processes/procedures allow me to effectively meet my customers' needs",
+    fontAwesomeClass: "fa-solid fa-bolt",
+    tooltip: "This question is an experimental question enabling teams to quickly identify and improve areas of inefficiency. Please provide any feedback using this link: <a target=\"_blank\" rel=\"noreferrer\" href=\"https://github.com/microsoft/vsts-extension-retrospectives/discussions/470\">New Experimental Question on Efficiency</a>",
   }
 ];
 
