@@ -4,6 +4,12 @@ You can find the changelog of the Retrospective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.90.X
+
+* Github Experience: Updating README to include the code coverage and status badges.
+Github PRs now get code coverage comments from CodeCov.
+From [Github PR #461](https://github.com/microsoft/vsts-extension-retrospectives/pull/461).
+
 ## v1.90.2 ([GitHub PR #463](https://github.com/microsoft/vsts-extension-retrospectives/pull/463))
 
 * Unifying board template column helper structures.

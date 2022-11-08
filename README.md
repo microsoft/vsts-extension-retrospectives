@@ -1,6 +1,9 @@
 # Retrospectives
 
-![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mhassaninmsft/b414faf6b91eaaa6ec7d82882be36935/raw/retrotool__heads_dev.json)
+[![codecov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
+[![CI - FrontEnd](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml)
+[![CI - Backend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml)
+[![CD - Frontend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/cd_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/cd_frontend.yml)
 
 Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform
 _smart and efficient retrospectives from within the Azure DevOps pipeline._
@@ -147,12 +150,11 @@ If you had selected the 'Display 'Retrospective Prime Directive', you will see t
 
 ![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
 
-
 #### Collect
 
 In this phase feedback is collected from all participants. Users
 can add feedback under any of the columns using the 'Add new card' button or by
-double clicking the empty space of the column's background. 
+double clicking the empty space of the column's background.
 
 ![A screenshot of an example retrospective board column, showing the example
 user Avery Axolotl writing in a feedback item that says 'Accidentally deleted
@@ -246,14 +248,15 @@ Teams may choose to address the issues found in the team assessment in multiple 
 - Through open conversations during the standard retrospective process to identify opportunities for improvement.
   - While this approach works, it may not be effective if the team isn't psychologically safe, and our research indicates that only 10% of the teams that do team assessments are psychologically safe
 - Through a Team Assessment Retrospective
-  - A Team Assessment Retrospective is a new approach to retrospectives allowing teams to identify the largest opportunities for improvement based on each team members' responses to the team assessment. 
-  -  Section 7.1 below outlines the Six Steps in a Team Assessment Retrospective
-  
- ### 7.1 The Six Steps To a Team Assessment Retrospective
+  - A Team Assessment Retrospective is a new approach to retrospectives allowing teams to identify the largest opportunities for improvement based on each team members' responses to the team assessment.
+  - Section 7.1 below outlines the Six Steps in a Team Assessment Retrospective
+
+### 7.1 The Six Steps To a Team Assessment Retrospective
 
 #### Setup
 
 Create a new retrospective using the steps above with the following exceptions:
+
 - 'Include Team Assessment' is checked
 - 'Display 'Retrospective Prime Directive'' is checked
 - 'Do not display names in feedback' is checked
@@ -270,7 +273,7 @@ In this phase the facilitator sets the stage for the retrospective. It is recomm
 
 #### Team Assessment
 
-In this phase each team member clicks on the Team Assessment and anonymously answers all questions and hits "submit". It is critical that you remind everyone that all feedback is anonymous and confidential. 
+In this phase each team member clicks on the Team Assessment and anonymously answers all questions and hits "submit". It is critical that you remind everyone that all feedback is anonymous and confidential.
 
 Throughout this phase you will periodically check the retrospective summary. If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
 
@@ -280,17 +283,15 @@ Re-open the retrospective summary and when the majority of the team has responde
 
 Once the team has decided which dimension to focus on the facilitator edits the template by selecting the template aligned to the dimension the team wants to focus on. For example, based on this team with 16.7% unfavorable for energy, the team may decide to focus first on energy. The facilitator will edit the retrospective and choose the "Energy" template.
 
-
 ##### Collect
 
 In this phase team members will provide feedback to help improve the dimension they've chosen to focus on.
-Ask team members to input feedback cards on the left 2 columns. 
+Ask team members to input feedback cards on the left 2 columns.
 
 ![A screenshot of the Energy Retrospective Board Templage](https://user-images.githubusercontent.com/114175122/192641620-e53c15bb-6060-4a4b-bd65-0c89a66b0c5f.png)
 
-After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, the facilitator asks the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be? 
+After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, the facilitator asks the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be?
 Capture this in a feedback card in the third column (One action in the next sprint)"
-
 
 #### Group
 
@@ -344,19 +345,24 @@ the action items created after each by clicking the individual retrospective.
 ## Best Practices
 
 ### Use Retrospectives to give Kudos
+
 Giving kudos, or recognizing others for their achievements, is one of the highest drivers of employee satisfaction and retention. When people feel appreciated and supported, they will be more engaged and motivated. Who doesn’t want that?  You have an opportunity to provide a space for kudos in every team retrospective.  Make sure to add a column for “Kudos” in your retrospective board. It is that simple and it just takes a moment for people to add a few pieces of feedback to acknowledge the great work of others.  When you finish your retrospective, make sure to read through each kudos feedback item and take a moment to celebrate!
 
 ### Use Retrospectives to create a Team Working Agreement
+
 Team Working Agreements are shared commitments to ways of working together. They establish team members' work preferences. A shared agreement will balance individual and team needs, and set clear expectations for how the team will work together.
-A good team working agreement must include everyone's background, needs and voices so a retrospective is a great way for a team to collect that information and then bring it together.  The agreement should be relatively short, 5-7 items.  
+A good team working agreement must include everyone's background, needs and voices so a retrospective is a great way for a team to collect that information and then bring it together.  The agreement should be relatively short, 5-7 items.
 Bring your team together and create a restrospective board with 1 column:
+
 - Good Working Preferences
 
 Follow the phases through from Collect, Group and Vote. Make sure every team member contributes feedback items to the Board before you Group and Vote. Read every card outloud before Grouping like items together. After voting, you will see those working preferences that got the most votes come to the top.  Select the top 5-7 items and talk through them together as a team to ensure that they are clear and that everyone agrees. Put those items in a document that you can keep in front of your team (at the top of a Microsoft Team Channel, or in your Azure DevOps Dashboard). Review the Working Agreement at the beginning of Team ceremonies or events.  Whenever there is a change in the team composition, the Working Agreement should be reviewed again to ensure that all team members agree to each item.
 
 ### Team Assessment Best Practices
+
 Below are a number of best practices for driving team effectiveness and using the “Team Assessment” measurement within the Retrospective Board.
-- The ‘Team Assessment’ measurement questions were selected based on significant research indicating improvements in these areas will result in significant improvements in overall team effectiveness.  It is recommended that teams conduct a ‘Team Assessment’ measurement as a part of their standard retrospective process once a month at a minimum.  Deep dive discussions to debrief on the area of the biggest opportunity with actions identified should be a part of that process. 
+
+- The ‘Team Assessment’ measurement questions were selected based on significant research indicating improvements in these areas will result in significant improvements in overall team effectiveness.  It is recommended that teams conduct a ‘Team Assessment’ measurement as a part of their standard retrospective process once a month at a minimum.  Deep dive discussions to debrief on the area of the biggest opportunity with actions identified should be a part of that process.
 
 ![Screenshot of the Team Assessment Questions](https://user-images.githubusercontent.com/114175122/192054246-4dda3cdc-7732-449e-b4eb-8ceb9c316261.png)
 
