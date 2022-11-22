@@ -98,7 +98,7 @@ Please enter the appropriate information:
 use in the "Vote" Phase.
 - **Include Team Assessment**: Include a Team Assessment link at the top of
 the board.
-- **Only show feedback after Collect phase**: When selected, users cannot
+- **Obscure the feedback of others until after Collect phase**: When selected, users cannot
 see other users input until they have moved to another phase. Other users'
 feedback will be blurred.
 - **Display 'Retrospective Prime Directive**: Include a link to the 'Prime
@@ -227,17 +227,18 @@ In this phase, the team will go through each feedback item.  You will notice tha
 
 ### 7. Optional: The Team Assessment
 
-You can optionally include a "Team Assessment" that anonymously collects feedback from participants. To get the feedback form, you can click on the "Team Assessment" link at the top of the board. The assessment tracks 5 categories:
+You can optionally include a "Team Assessment" that anonymously collects feedback from participants. To get the feedback form, you can click on the "Team Assessment" link at the top of the board. The assessment tracks 6 categories:
 
 - Clarity
 - Energy
 - Psychological Safety
 - Work-life Balance
 - Confidence
+- Efficiency
 
 The users will rank on a scale of 1 to 10; scores of 1-6 are categorized as "Unfavorable", 7 and 8 are "Neutral," and 9 and 10 are "Favorable".
 
-![A screenshot of an example user filling out the team assessment. Each question has alternating background for visual distinction. Each question/category has a short description and a tooltip icon that provides more context.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-team-assessment-darkmode.png)
+![A screenshot of an example user filling out the team assessment. Each question has alternating background for visual distinction. Each question/category has a short description and a tooltip icon that provides more context.](https://user-images.githubusercontent.com/114175122/203422503-e87ea9ba-9fac-4e5d-a938-dc5b07768f9c.png)
 
 Once the team assessment has been completed, the summary of answers can be viewed in the Retrospective Summary Dialog (see below).
 
@@ -277,18 +278,18 @@ In this phase each team member clicks on the Team Assessment and anonymously ans
 
 Throughout this phase you will periodically check the retrospective summary. If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
 
-![A screenshot of a Team Assessment](https://user-images.githubusercontent.com/114175122/192640966-250255a1-4497-47d5-ab8f-8a634103b972.png)
+![A screenshot of a Team Assessment](https://user-images.githubusercontent.com/114175122/203423975-b8cc6fc1-3e80-438a-87e6-db2869e8714b.png)
 
 Re-open the retrospective summary and when the majority of the team has responded, discuss which dimension the team would like to improve upon. Note: If more than 20% of the responses are unfavorable for a dimension, we recommend focusing on that area first. Otherwise, it is beneficial to focus on psychological safety first. This is because without psychological safety the more difficult conversations that need to happen to make improvements in the other dimensions will not happen.
 
-Once the team has decided which dimension to focus on the facilitator edits the template by selecting the template aligned to the dimension the team wants to focus on. For example, based on this team with 16.7% unfavorable for energy, the team may decide to focus first on energy. The facilitator will edit the retrospective and choose the "Energy" template.
+Once the team has decided which dimension to focus on, the facilitator will click the button "Discuss and Act" which aligns to the dimension the team wants to focus on. This will create retrospective with a template that aligns to the dimension.
 
 ##### Collect
 
 In this phase team members will provide feedback to help improve the dimension they've chosen to focus on.
 Ask team members to input feedback cards on the left 2 columns.
 
-![A screenshot of the Energy Retrospective Board Templage](https://user-images.githubusercontent.com/114175122/192641620-e53c15bb-6060-4a4b-bd65-0c89a66b0c5f.png)
+![A screenshot of the Efficiency Retrospective Board Templage](https://user-images.githubusercontent.com/114175122/203426762-9fc09511-377d-4368-9a9a-a547e22bbdf5.png)
 
 After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional feedback cards are being added, the facilitator asks the following question: "Reflecting on the feedback we've collected, if you could take only one action in the next sprint that would yield the biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be?
 Capture this in a feedback card in the third column (One action in the next sprint)"
@@ -327,8 +328,6 @@ Once there, there is a summary of the Retrospective. This includes:
 
 If there is a team assessment, then a charted summary will show the vote breakdown by favorability, along with an average score.
 
-![A screenshot that shows an example retrospective summary with a team assessment.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-summary-with-assessment-darkmode.png)
-
 ### 10. Board History
 
 There may be times that a team may want to reflect on past retrospectives they have
@@ -364,12 +363,14 @@ Below are a number of best practices for driving team effectiveness and using th
 
 - The ‘Team Assessment’ measurement questions were selected based on significant research indicating improvements in these areas will result in significant improvements in overall team effectiveness.  It is recommended that teams conduct a ‘Team Assessment’ measurement as a part of their standard retrospective process once a month at a minimum.  Deep dive discussions to debrief on the area of the biggest opportunity with actions identified should be a part of that process.
 
-![Screenshot of the Team Assessment Questions](https://user-images.githubusercontent.com/114175122/192054246-4dda3cdc-7732-449e-b4eb-8ceb9c316261.png)
+![Screenshot of the Team Assessment Questions](https://user-images.githubusercontent.com/114175122/203427827-f8e1e562-daf9-448b-9636-ec5f9beae120.png)
 
 - Best practices for improving **clarity** include creation of and alignment to OKRs. Regular review of OKRs with stakeholders combined with the implementation of agile development methodologies to continually prioritize the work that will have the biggest impact on achieving the OKRs. A well groomed backlog that is visible to the entire team and reviewed regularly will ensure clarity. The backlog should be stack ranked in order of priority with minimum work in process will ensure team clarity on the work that matters the most. Drive continuous improvement in clarity by using the “Clarity” Retrospective Boad template, following the standard retrospective process.
 - Best practices for improving **energy** include ensuring that all team members are spending at least 20% of their time on the team doing work that they love. Each team member should embark on a journey of self-discovery to identify what they love by keeping a record of the work that they loved doing on a daily and weekly basis until their strengths are clearly identified. Managers should endeavor to understand the work that their employees love by conducting a simple weekly check-in and asking 4 simple questions: "What did you do last week that energized you (you loved)?”, “What did you do last week that drained your energy?”, "What are your priorities this week?", and "How can I (your manager) help?". Drive continuous improvement in energy by using the “Energy” Retrospective Boad template, following the standard retrospective process.
 - Best practices for improving **psychological safety** include conducting a baseline retrospective using the "Psychological Safety" template in Azure DevOps Retrospectives (anonymously). Identify top actions that the team will implement to improve psychological safety. Repeat the psychological safety retrospective every 4-6 weeks until there are no scores below a 7. We've learned that every team is different and, in most cases, simple changes can make a profound impact, but it requires asking anonymously and taking action to improve.  Drive continuous improvement in psychological safety by using the “Psychological Safety” Retrospective Boad template, following the standard retrospective process.
 - Best practices for improving **work-life balance** include the implementation of fundamental agile practices including backlog grooming and prioritization, limiting Work In Process by establishing WIP limits and adhering to them, and only committing to deliver at the same velocity as the data indicates the team has predictably delivered in the past. Finally, simply asking the question in the Team Effectiveness survey and conducting deep dive discussions to identify drivers combined with follow-through on the associated actions should result in increased sustainability for the team. Drive continuous improvement in work-life balance by using the “Work-Life Balance” Retrospective Boad template, following the standard retrospective process.
+- Best practices for improving **Confidence** include sharing Objectives and Key Results (OKRs) from different levels across your organization. Bringing transparency into the OKRs can help teams and individuals better understand how their work aligns to the organizations' priorities and can build confidence in doing the right work to deliver against those OKRs.
+- Best practices for improving **Efficiency** can also include the implementation of agile practices including backlog grooming and prioritization. Limiting Work In Process by establishing WIP limits and adhering to them enables teams to be more efficient so they can "stop starting and start finishing"!
 
 ## Contribute
 
