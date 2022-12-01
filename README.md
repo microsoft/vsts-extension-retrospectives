@@ -263,7 +263,7 @@ Create a new retrospective using the steps above with the following exceptions:
 - Note: You do not need to select a template. The template will be modified after the assessment is complete
 - Share the link to the retrospective with the team
 
-![A screenshot of the new retrospective box](https://user-images.githubusercontent.com/114175122/191842014-77ca660d-2a9f-4004-9678-04cb91aa7429.png)
+![A screenshot of the new retrospective box](https://user-images.githubusercontent.com/114175122/205136944-da434ca9-f4cd-4b7d-b5ff-9f58ce4fe7f3.png)
 
 #### The Prime Directive
 
@@ -275,9 +275,12 @@ In this phase the facilitator sets the stage for the retrospective. It is recomm
 
 In this phase each team member clicks on the Team Assessment and anonymously answers all questions and hits "submit". It is critical that you remind everyone that all feedback is anonymous and confidential.
 
-Throughout this phase you will periodically check the retrospective summary. If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
+Throughout this phase you will periodically check the retrospective summary. 
+![A screenshot of how you get to the Retrospective Summary](https://user-images.githubusercontent.com/114175122/205138487-9b62c7f5-e4a0-4b80-bb54-f4bb7d43a90c.png)
 
-![A screenshot of a Team Assessment](https://user-images.githubusercontent.com/114175122/192640966-250255a1-4497-47d5-ab8f-8a634103b972.png)
+If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
+
+![A screenshot of a Team Assessment](https://user-images.githubusercontent.com/114175122/205138067-18adcb82-ade0-464e-bcd8-e449655158a5.png)
 
 Re-open the retrospective summary and when the majority of the team has responded, discuss which dimension the team would like to improve upon. Note: If more than 20% of the responses are unfavorable for a dimension, we recommend focusing on that area first. Otherwise, it is beneficial to focus on psychological safety first. This is because without psychological safety the more difficult conversations that need to happen to make improvements in the other dimensions will not happen.
 
