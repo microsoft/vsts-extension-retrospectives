@@ -101,7 +101,7 @@ the board.
 - **Obscure the feedback of others until after Collect phase**: When selected, users cannot
 see other users input until they have moved to another phase. Other users'
 feedback will be blurred.
-- **Display 'Retrospective Prime Directive**: Include a link to the 'Prime
+- **Display 'Retrospective Prime Directive'**: Include a link to the 'Prime
 Directive' at the top of the board.
 - **Do not display names in feedback**: When checked, anonymize who creates
 individual feedback items.
@@ -264,7 +264,7 @@ Create a new retrospective using the steps above with the following exceptions:
 - Note: You do not need to select a template. The template will be modified after the assessment is complete
 - Share the link to the retrospective with the team
 
-![A screenshot of the new retrospective box](https://user-images.githubusercontent.com/114175122/191842014-77ca660d-2a9f-4004-9678-04cb91aa7429.png)
+![A screenshot of the new retrospective box](https://user-images.githubusercontent.com/114175122/205405481-2f02f772-7d5a-4be5-bc9d-f9a712062565.png)
 
 #### The Prime Directive
 
@@ -276,7 +276,10 @@ In this phase the facilitator sets the stage for the retrospective. It is recomm
 
 In this phase each team member clicks on the Team Assessment and anonymously answers all questions and hits "submit". It is critical that you remind everyone that all feedback is anonymous and confidential.
 
-Throughout this phase you will periodically check the retrospective summary. If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
+Throughout this phase you will periodically check the retrospective summary. 
+![Image of how to check the retrospective summary](https://user-images.githubusercontent.com/114175122/205405705-105ec68b-412e-465a-b192-6b3231688383.png)
+
+If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't be acted upon.
 
 ![A screenshot of a Team Assessment](https://user-images.githubusercontent.com/114175122/203423975-b8cc6fc1-3e80-438a-87e6-db2869e8714b.png)
 
@@ -310,7 +313,7 @@ Follow the steps above to assign actions as work items in Azure DevOps. Note: We
 
 ### 8. Retrospective Summary
 
- The Retrospective Summary dialog is accessable from the "Board Actions" menu in the top navigation.
+ The Retrospective Summary dialog is accessible from the "Board Actions" menu in the top navigation.
 
 ![A screenshot that shows the Board Actions menu, where the "Show Retrospective
 Summary" is highlighted as though the mouse is hovering.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/show-retro-summary.png)
