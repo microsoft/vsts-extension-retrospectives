@@ -11,7 +11,7 @@ import ReactTable from 'react-table-6';
 
 import 'react-table-6/react-table.css'
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -64,7 +64,7 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
     }
     catch (e) {
       // TODO: Better error handling.
-      // TODO (enpolat) : appInsightsClient.trackException(e);
+      appInsights.trackException(e);
     }
   }
 
