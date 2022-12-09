@@ -103,7 +103,7 @@
         --name "app-${resource_name_suffix}" \
         --resource-group "$resource_group" \
         --plan "plan-${resource_name_suffix}"\
-        --runtime "DOTNET|5.0"
+        --runtime "DOTNET|6.0"
 
     signalr_connection_string=$( \
         az signalr key list \
@@ -144,7 +144,7 @@
     # Publish the Dotnet project
     dotnet publish -c Release
 
-    cd  bin/Release/net5/publish/
+    cd  bin/Release/net6.0/publish/
     # Zip the deployed artifact
     zip -r "../../../website.zip" .
 
