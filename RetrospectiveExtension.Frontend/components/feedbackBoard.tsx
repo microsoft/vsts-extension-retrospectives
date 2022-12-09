@@ -69,7 +69,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       defaultActionItemIteration: '',
       hasItems: false,
       isDataLoaded: false,
-      currentVoteCount: (props.board.boardVoteCollection === undefined || props.board.boardVoteCollection === null) ? "0" : (props.board.boardVoteCollection[this.props.userId] === undefined || props.board.boardVoteCollection[this.props.userId] === null) ? "0" : props.board.boardVoteCollection[this.props.userId]?.toString()
+      currentVoteCount: props.board.boardVoteCollection?.[this.props.userId]?.toString() ?? "0",
     };
   }
 
@@ -421,19 +421,28 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         onVoteCasted: () => {
           itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
             const voteCollection = boardItem.boardVoteCollection;
-
-            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[this.props.userId] === undefined ? "0" : voteCollection[this.props.userId].toString() });
+            this.setState({ currentVoteCount: voteCollection?.[this.props.userId]?.toString() ?? "0"});
           });
         },
         groupTitles: []
       };
     });
 
+    const columnItems = this.state.columnIds
+      .flatMap((columnId) => this.state.columns[columnId].columnItems);
+    const participants = new Set(columnItems.flatMap((columnItem) => Object.keys(columnItem.feedbackItem.voteCollection))).size;
+
+    const teamVotes = columnItems
+      .flatMap((columnItem) => Object.values(columnItem.feedbackItem.voteCollection))
+      .reduce((a, b) => a + b, 0)
+      .toString();
+    const maxTeamVotes = (participants * this.props.board?.maxVotesPerUser).toString();
+
     return (
       <div className="feedback-board">
         {this.props.workflowPhase === WorkflowPhase.Vote &&
           <div className="feedback-maxvotes-per-user">
-            <label>Votes Used: {this.state.currentVoteCount} / {this.props.board?.maxVotesPerUser?.toString()}</label>
+            <label>Votes Used: {this.state.currentVoteCount} / {this.props.board?.maxVotesPerUser?.toString()} (me), {teamVotes} / {maxTeamVotes} (team)</label>
           </div>
         }
         <div className="feedback-columns-container">
