@@ -40,80 +40,51 @@ The extension can be installed from [Azure DevOps Marketplace](https://marketpla
 
 ## Use
 
-Please note: the screenshot examples use light mode and dark mode interchangeably
-because both are supported!
+Please note: the screenshot examples use light mode and dark mode interchangeably because both are supported!
 
 ### 1. Open Retrospectives Extension
 
- Navigate to the Azure 'Boards' tab in your account on the left hand navigation.
-Select the 'Retrospectives' tab under 'Boards'.
+Navigate to the Azure 'Boards' tab in your account on the left hand navigation. Select the 'Retrospectives' tab under 'Boards'.
 
-![A screenshot of the Azure DevOps left-hand navigation. Under the Boards
-heading, the extension for the retrospective is darkened as though hovered by
-a mouse.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/azdo-side-bar.png)
+![A screenshot of the Azure DevOps left-hand navigation. Under the Boards heading, the extension for the retrospective is darkened as though hovered by a mouse.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/azdo-side-bar.png)
 
 ### 2. Pick The Team
 
-You are now on the Retrospectives page. Select your Azure DevOps team from the
-selector in the header.
+You are now on the Retrospectives page. Select your Azure DevOps team from the selector in the header.
 
-![A screenshot of the Retrospective tool's Team dropdown. The selected team
-is "Backend Team" and the selection is darkened as though the mouse is hovering
-over.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/team-dropdown.png)
+![A screenshot of the Retrospective tool's Team dropdown. The selected team is "Backend Team" and the selection is darkened as though the mouse is hovering over.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/team-dropdown.png)
 
 ### 3. Create New Retrospective
 
-Create a new retrospective using the 'Create Board' button. If this is your
-first retrospective for your selected team, then press the "Create Board" button
-in the center of the screen.
+Create a new retrospective using the 'Create Board' button. If this is your first retrospective for your selected team, then press the "Create Board" button in the center of the screen.
 
-![A screenshot of the Retrospective main page. The screen is mostly empty
-except for the top navigation of the tool. In the center there is a blue button
-to 'Create Board.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-first-retrospective.png)
+https://user-images.githubusercontent.com/118744/208821363-cde5b0e1-e747-4158-8d8b-99017b4c3cc4.mp4
 
-If you have created a retrospective before for your selected team, then you
-can select "Create a new retrospective" from the navigation drop down.
+![A screenshot of the Retrospective main page. The screen is mostly empty except for the top navigation of the tool. In the center there is a blue button to 'Create Board.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-first-retrospective.png)
 
-![A screenshot of the top navigation in the Retrospective tool, where the
-'Board Actions' menu has been opened. The first option in the dropdown is
-the 'Create New Retrospective.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retrospective-dropdown.png)
+If you have created a retrospective before for your selected team, then you can select "Create a new retrospective" from the navigation drop down.
+
+![A screenshot of the top navigation in the Retrospective tool, where the 'Board Actions' menu has been opened. The first option in the dropdown is the 'Create New Retrospective.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retrospective-dropdown.png)
 
 ### 4. Choose Your Retrospective Settings
 
-When you select **New Board** or **Create new retrospective** as above, you will see
-the following dialog:
+When you select **New Board** or **Create new retrospective** as above, you will see the following dialog:
 
-![A screenshot showing the modal box that controls the initial settings for
-creating a retrospective board. The settings include: a text field for title
-of the retrospective; a number input box for maximum votes per person; a
-checkbox to include a Team Assessment; a checkbox to obscure the feedback of
-others during the Collect Phase; a checkbox to include Retrospective Prime
-Directive; and a section to pick the different columns to include in the
-retrospective, either customized or loaded from predefined templates.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retro-lightmode.png)
+![A screenshot showing the modal box that controls the initial settings for creating a retrospective board. The settings include: a text field for title of the retrospective; a number input box for maximum votes per person; a checkbox to include a Team Assessment; a checkbox to obscure the feedback of others during the Collect Phase; a checkbox to include Retrospective Prime Directive; and a section to pick the different columns to include in the retrospective, either customized or loaded from predefined templates.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retro-lightmode.png)
 
 Please enter the appropriate information:
 
 - **Retrospective Title**: Title for the Retrospective.
-- **Max Votes per User**: The maximum number of votes a participant has to
-use in the "Vote" Phase.
-- **Include Team Assessment**: Include a Team Assessment link at the top of
-the board.
-- **Obscure the feedback of others until after Collect phase**: When selected, users cannot
-see other users input until they have moved to another phase. Other users'
-feedback will be blurred.
-- **Display 'Retrospective Prime Directive'**: Include a link to the 'Prime
-Directive' at the top of the board.
-- **Do not display names in feedback**: When checked, anonymize who creates
-individual feedback items.
-- **Columns Settings**: You can either Apply from a pre-populated template or individually
-select and configure columns yourself.
+- **Max Votes per User**: The maximum number of votes a participant has to use in the "Vote" Phase.
+- **Include Team Assessment**: Include a Team Assessment link at the top of the board.
+- **Obscure the feedback of others until after Collect phase**: When selected, users cannot see other users input until they have moved to another phase. Other users' feedback will be blurred.
+- **Display 'Retrospective Prime Directive'**: Include a link to the 'Prime Directive' at the top of the board.
+- **Do not display names in feedback**: When checked, anonymize who creates individual feedback items.
+- **Columns Settings**: You can either Apply from a pre-populated template or individually select and configure columns yourself.
 
-![A screenshot showing the dropdown of available templates for the retrospective
-board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/pick-retrospective-template-lightmode.png)
+![A screenshot showing the dropdown of available templates for the retrospective board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/pick-retrospective-template-lightmode.png)
 
-**Note:** Retrospective Title is the minimum 'required' information (other
-fields can stay at default as needed). Once the title is provided, the `Save`
-button is enabled. Save the retrospective using the `Save` button.
+**Note:** Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Once the title is provided, the `Save` button is enabled. Save the retrospective using the `Save` button.
 
 ### ... Or Select Another Retrospective Board
 
