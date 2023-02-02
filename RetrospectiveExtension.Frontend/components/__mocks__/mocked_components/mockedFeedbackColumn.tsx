@@ -70,7 +70,7 @@ export const testColumnItem = mocked({
 
 export const testColumnIds: string[] = [testColumnUuidOne, testColumnUuidTwo];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const testColumnsObj: any = {};
+export const testColumnsObj: any = [];
 testColumnsObj[testColumnUuidOne] = {
   columnProperties:
   {
