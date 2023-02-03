@@ -198,8 +198,11 @@ In this phase, the team will go through each feedback item.  You will notice tha
 
 ### 7. Optional: The Team Assessment
 
-You can optionally include a "Team Assessment" that anonymously collects feedback from participants. To get the feedback form, you can click on the "Team Assessment" link at the top of the board. The assessment tracks 6 categories:
+You can optionally include a "Team Assessment" that anonymously collects feedback from participants. To get the feedback form, you can click on the "Team Assessment" link at the top of the board. 
 
+![A screenshot of where you see the link to "Team Assessment"](https://user-images.githubusercontent.com/114175122/216712371-7fd79231-99a2-43cf-90f8-145c4c71bb81.png)
+
+The assessment tracks 6 categories:
 - Clarity
 - Energy
 - Psychological Safety
@@ -316,6 +319,27 @@ the action items created after each by clicking the individual retrospective.
 ![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-expanded-summary-lightmode.png)
 
 ## Best Practices
+
+### Plan for a Team Assessment Retrospective
+
+Planning in advance will help you make the best use of the team's time in completing a Team Assessment Retrospective.
+
+**In Advance of the Event**
+| **When** | **Action** |
+| :--- | :--- |
+| Week in advance (more or less depending on your team’s rhythm of business) | Create and send a calendar invite for 50 minutes for the Team Assessment.  Make sure that all team members can be present. |
+| 3-5 days prior | **(1)** [Create the Retrospective in ADO](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#71-the-six-steps-to-a-team-assessment-retrospective); **(2)** Create the schedule and timebox each section; **(3)** Update the meeting invite with the schedule; **(4)** Review action items from previous retro to familiarize yourself and be prepared to share |
+
+**At the Event**
+| **Activity** | **Time** | **Guidance** |
+| :--- | :--- | :--- |
+| Welcome & Kickoff | 10 min | **(1)** Welcome the team; **(2)** Review Agenda; **(3)** Review actions from last retro and make any updates or clarify next steps; **(4)** Kick-off with the retro |
+| Conduct Team Assessment | 5 min | [Share link and give team members 2 minutes to complete team assessment](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#71-the-six-steps-to-a-team-assessment-retrospective) |
+| Identify area for deep dive | 10 min | [Discuss results and agree on area for deep dive](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#team-assessment) |
+| Conduct the deep dive retro | 15 min | [Collect, Review & Group Columns 1 & 2](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#collect-1) |
+| Determine action plan(s) | 10 min | [Collect, Review, Group and Vote on Column 3](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#act) |
+| Close the meeting | 2 min | Thank attendees for participation and summarize |
+
 
 ### Use Retrospectives to give Kudos
 
