@@ -82,7 +82,7 @@ const mockedBoard: IFeedbackBoardDocument = {
   teamId: testColumnProps.team.id,
   createdBy: mockedIdentity,
   createdDate: new Date(),
-  columns: testColumnProps.columns,
+  columns: testColumnProps.columnIds.map((columnId) => testColumnProps.columns[columnId].columnProperties),
   activePhase: 'Vote',
   maxVotesPerUser: 5,
   boardVoteCollection: {},
@@ -93,7 +93,7 @@ const mockedProps: FeedbackBoardProps = {
   displayBoard: true,
   board: mockedBoard,
   team: testColumnProps.team,
-  workflowPhase: testColumnProps.workflowPhase,
+  workflowPhase: 'Vote',
   nonHiddenWorkItemTypes: testColumnProps.nonHiddenWorkItemTypes,
   allWorkItemTypes: testColumnProps.allWorkItemTypes,
   isAnonymous: testColumnProps.isBoardAnonymous,
@@ -108,5 +108,12 @@ describe(`The Feedback Board Component`, () => {
     const wrapper = shallow(<FeedbackBoard {...mockedProps} />);
     const component = wrapper.children().dive();
     expect(component.prop('className')).toBe('feedback-board');
+  });
+
+  it(`shows correct vote counts`, () => {
+    const wrapper = shallow(<FeedbackBoard {...mockedProps} />);
+    const component = wrapper.children().dive();
+    expect(component.findWhere((child) => child.prop("className") === "feedback-maxvotes-per-user").text())
+      .toBe('Votes Used: 0 / 5 (me), 0 / 0 (team)');
   });
 });
