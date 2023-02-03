@@ -52,10 +52,6 @@ jest.mock('azure-devops-extension-api/Work/WorkClient', () => {
   return { WorkRestClient: workRestClientMock };
 });
 
-jest.mock('azure-devops-extension-api/WorkItemTracking/WorkItemTrackingClient', () => ({
-  WorkItemTrackingRestClient: jest.fn().mockImplementation(() => ({}))
-}));
-
 jest.mock('azure-devops-extension-api/Common', () => ({
   getClient: (clientClass: typeof Object) => new clientClass(),
 }));
