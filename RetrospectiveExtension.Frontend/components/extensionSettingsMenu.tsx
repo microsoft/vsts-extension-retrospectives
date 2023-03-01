@@ -31,6 +31,12 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     };
   }
 
+  private exportData = async () => {
+  }
+
+  private importData = async () => {
+  }
+
   private clearVisitHistory = async () => {
     await userDataService.clearVisits()
     this.hideClearVisitHistoryDialog();
@@ -71,6 +77,20 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   // If an action needs to be hidden on desktop or mobile view, use the item's className property
   // with .hide-mobile or .hide-desktop
   private readonly extensionSettingsMenuItem: IContextualMenuItem[] = [
+    {
+      key: 'exportData',
+      iconProps: { iconName: 'CloudDownload' },
+      onClick: this.exportData,
+      text: 'Export Data',
+      title: 'Export Data',
+    },
+    {
+      key: 'importData',
+      iconProps: { iconName: 'CloudImport' },
+      onClick: this.importData,
+      text: 'Import Data',
+      title: 'Import Data',
+    },
     {
       key: 'clearVisitHistory',
       iconProps: { iconName: 'RemoveEvent' },
