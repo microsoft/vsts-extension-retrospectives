@@ -82,7 +82,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private processImportedData = async (importedData: {board: IFeedbackBoardDocument, items: IFeedbackItemDocument[]}[]) => {
     const projectId = await getProjectId();
-    const team = await azureDevOpsCoreService.getDefaultTeam(projectId)
+    const team = await azureDevOpsCoreService.getDefaultTeam(projectId);
+    const toastId = toast('Importing data...');
     for (let iLoop = 0; iLoop < importedData.length; iLoop++) {
       const oldBoard = importedData[iLoop].board;
       const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.isAnonymous, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.displayPrimeDirective, oldBoard.startDate, oldBoard.endDate);
@@ -90,12 +91,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         const oldItem = importedData[iLoop].items[yLoop];
         oldItem.boardId = newBoard.id;
         await itemDataService.appendItemToBoard(oldItem);
+        toast.update(toastId, { render: `Importing data... (${newBoard.title} is done)` })
       }
     }
   };
 
   private clearVisitHistory = async () => {
-    await userDataService.clearVisits()
+    await userDataService.clearVisits();
     this.hideClearVisitHistoryDialog();
   }
 
