@@ -11,6 +11,7 @@ import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { getProjectId } from '../utilities/servicesHelper';
 import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
+import { Slide, toast, ToastContainer } from 'react-toastify';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
@@ -316,6 +317,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={this.hideClearVisitHistoryDialog} text="Cancel" />
           </DialogFooter>
         </Dialog>
+        <ToastContainer
+          transition={Slide}
+          closeButton={false}
+          className="retrospective-notification-toast-container"
+          toastClassName="retrospective-notification-toast"
+          bodyClassName="retrospective-notification-toast-body"
+          progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }
