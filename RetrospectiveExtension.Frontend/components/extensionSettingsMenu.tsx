@@ -38,6 +38,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   }
 
   private exportData = async () => {
+    const toastId = toast('Processing boards...');
     const exportedData: {board: IFeedbackBoardDocument, items: IFeedbackItemDocument[]}[] = [];
     const projectId = await getProjectId();
     const teams = await azureDevOpsCoreService.getAllTeams(projectId, false);
@@ -47,11 +48,10 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         const board = boards[yLoop];
         const items = await itemDataService.getFeedbackItemsForBoard(board.id);
         exportedData.push({board, items});
+        toast.update(toastId, { render: `Processing boards... (${board.title} is done)` })
       }
     }
-
     const content = [JSON.stringify(exportedData)];
-    console.log(content);
 
     const blob = new Blob(content, { type: "text/plain;charset=utf-8" });
 
