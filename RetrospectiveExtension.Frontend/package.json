@@ -17,7 +17,7 @@
     "test": "jest --env=jsdom --silent -ci --testResultsProcessor=jest-junit --coverage",
     "test:watch": "jest --env=jsdom --watch",
     "ncu": "npx npm-check-updates",
-    "ncu:u": "npx npx npm-check-updates --update-dependencies"
+    "ncu:u": "npx npm-check-updates --update-dependencies"
   },
   "repository": {
     "type": "git",
