@@ -10,6 +10,13 @@ class ItemDataService {
   /**
    * Create an item with given title and column id in the board.
    */
+  public appendItemToBoard = async (item: IFeedbackItemDocument): Promise<IFeedbackItemDocument> => {
+    return await createDocument<IFeedbackItemDocument>(item.boardId, item);
+  }
+
+  /**
+   * Create an item with given title and column id in the board.
+   */
   public createItemForBoard = async (
     boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
     const itemId: string = uuid();
