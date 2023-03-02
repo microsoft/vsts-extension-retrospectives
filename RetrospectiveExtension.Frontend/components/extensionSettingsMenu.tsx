@@ -6,6 +6,11 @@ import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { ViewMode } from '../config/constants';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
+import boardDataService from '../dal/boardDataService';
+import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
+import { getProjectId } from '../utilities/servicesHelper';
+import { itemDataService } from '../dal/itemDataService';
+import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
@@ -32,10 +37,61 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   }
 
   private exportData = async () => {
+    const exportedData: {board: IFeedbackBoardDocument, items: IFeedbackItemDocument[]}[] = [];
+    const projectId = await getProjectId();
+    const teams = await azureDevOpsCoreService.getAllTeams(projectId, false);
+    for (let iLoop = 0; iLoop < teams.length; iLoop++) {
+      const boards = await boardDataService.getBoardsForTeam(teams[iLoop].id);
+      for (let yLoop = 0; yLoop < boards.length; yLoop++) {
+        const board = boards[yLoop];
+        const items = await itemDataService.getFeedbackItemsForBoard(board.id);
+        exportedData.push({board, items});
+      }
+    }
+
+    const content = [JSON.stringify(exportedData)];
+    console.log(content);
+
+    const blob = new Blob(content, { type: "text/plain;charset=utf-8" });
+
+    const a = document.createElement("a");
+    a.download = "Retrospective_Export.json";
+    a.href = window.URL.createObjectURL(blob);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   private importData = async () => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.addEventListener('change', () => {
+      const reader = new FileReader()
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const importedData: {board: IFeedbackBoardDocument, items: IFeedbackItemDocument[]}[] = JSON.parse(event.target.result.toString());
+        this.processImportedData(importedData);
+      };
+      reader.readAsText(input.files[0])
+    }, false);
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+    return false;
   }
+
+  private processImportedData = async (importedData: {board: IFeedbackBoardDocument, items: IFeedbackItemDocument[]}[]) => {
+    const projectId = await getProjectId();
+    const team = await azureDevOpsCoreService.getDefaultTeam(projectId)
+    for (let iLoop = 0; iLoop < importedData.length; iLoop++) {
+      const oldBoard = importedData[iLoop].board;
+      const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.isAnonymous, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.displayPrimeDirective, oldBoard.startDate, oldBoard.endDate);
+      for (let yLoop = 0; yLoop < importedData[iLoop].items.length; yLoop++) {
+        const oldItem = importedData[iLoop].items[yLoop];
+        oldItem.boardId = newBoard.id;
+        await itemDataService.appendItemToBoard(oldItem);
+      }
+    }
+  };
 
   private clearVisitHistory = async () => {
     await userDataService.clearVisits()
@@ -86,7 +142,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     },
     {
       key: 'importData',
-      iconProps: { iconName: 'CloudImport' },
+      iconProps: { iconName: 'CloudUpload' },
       onClick: this.importData,
       text: 'Import Data',
       title: 'Import Data',
