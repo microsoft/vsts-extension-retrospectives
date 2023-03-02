@@ -7,8 +7,13 @@ const CommonServiceIds = {
   ProjectPageService: "ms.vss-tfs-web.tfs-page-data-service"
 };
 
+const mockExtensionDataManager = {
+  getDocuments: () => {},
+  getDocument: () => {}
+};
+
 const mockExtensionDataService = {
-  getExtensionDataManager: () => {},
+  getExtensionDataManager: () => mockExtensionDataManager,
 };
 
 const mockLocationService = {

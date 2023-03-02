@@ -1,7 +1,6 @@
 
 import { mocked } from 'jest-mock';
 import { WorkflowPhase } from '../../../interfaces/workItem';
-import { TooltipOverflowMode } from 'office-ui-fabric-react';
 
 export const testTeamId = "mocked-team-uuid";
 export const testBoardId = "mocked-board-uuid";
@@ -90,7 +89,7 @@ testColumnsObj[testColumnUuidOne] = {
 testColumnsObj[testColumnUuidTwo] = {
   columnProperties:
   {
-    id: TooltipOverflowMode,
+    id: testColumnUuidTwo,
     title: testColumnTwoTitle,
     iconClass: 'far fa-smile',
     accentColor: '#008100',

@@ -33,7 +33,7 @@ class WorkService {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (e: any) {
-      if (e.serverError.typeKey === 'CurrentIterationDoesNotExistException') {
+      if (e.serverError?.typeKey === 'CurrentIterationDoesNotExistException') {
         // TODO: Enable once trackTrace is supported
         // appInsightsClient.trackTrace(TelemetryExceptions.CurrentTeamIterationNotFound, e);
       }

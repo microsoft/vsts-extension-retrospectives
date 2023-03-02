@@ -24,7 +24,7 @@ jest.mock('azure-devops-extension-api/WorkItemTracking', () => { });
 jest.mock('azure-devops-extension-api/WorkItemTracking/WorkItemTracking', () => { });
 jest.mock('azure-devops-extension-api/WorkItemTracking/WorkItemTrackingClient', () => {
   const mockWorkItemTrackingClient = {
-    WorkItemTrackingRestClient: {},
+    WorkItemTrackingRestClient: jest.fn().mockImplementation(() => ({})),
   };
 
   return mockWorkItemTrackingClient;
