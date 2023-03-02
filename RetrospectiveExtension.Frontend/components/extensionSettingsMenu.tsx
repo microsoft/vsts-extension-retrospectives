@@ -220,7 +220,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           dialogContentProps={{
             type: DialogType.close,
             title: 'What\'s New',
-            subText: "Added 'Discuss and Act' button to the Team Assessment allowing teams to discuss and take action on specific areas in the Team Assessment",
+            subText: "Added 'import data' and 'export data' features",
           }}
           minWidth={450}
           modalProps={{
