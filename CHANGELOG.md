@@ -4,6 +4,10 @@ You can find the changelog of the Retrospective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.91.1
+
+* Adding `import data` and `export data` functions
+
 ## v1.90.3
 
 * Github Experience: Updating README to include the code coverage and status badges. Github PRs now get code coverage comments from CodeCov. From [Github PR #461](https://github.com/microsoft/vsts-extension-retrospectives/pull/461).
