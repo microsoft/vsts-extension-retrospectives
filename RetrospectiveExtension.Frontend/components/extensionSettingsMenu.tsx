@@ -12,6 +12,7 @@ import { getProjectId } from '../utilities/servicesHelper';
 import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
 import { Slide, toast, ToastContainer } from 'react-toastify';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
@@ -23,6 +24,12 @@ interface IExtensionSettingsMenuState {
 interface IExtensionSettingsMenuProps {
   onScreenViewModeChanged: () => void;
   isDesktop: boolean;
+}
+
+interface IExportImportDataSchema {
+  team: WebApiTeam
+  board: IFeedbackBoardDocument
+  items: IFeedbackItemDocument[]
 }
 
 class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
@@ -39,15 +46,16 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private exportData = async () => {
     const toastId = toast('Processing boards...');
-    const exportedData: {board: IFeedbackBoardDocument, items: IFeedbackItemDocument[]}[] = [];
+    const exportedData: IExportImportDataSchema[] = [];
     const projectId = await getProjectId();
     const teams = await azureDevOpsCoreService.getAllTeams(projectId, false);
     for (let iLoop = 0; iLoop < teams.length; iLoop++) {
-      const boards = await boardDataService.getBoardsForTeam(teams[iLoop].id);
+      const team = teams[iLoop];
+      const boards = await boardDataService.getBoardsForTeam(team.id);
       for (let yLoop = 0; yLoop < boards.length; yLoop++) {
         const board = boards[yLoop];
         const items = await itemDataService.getFeedbackItemsForBoard(board.id);
-        exportedData.push({board, items});
+        exportedData.push({team, board, items});
         toast.update(toastId, { render: `Processing boards... (${board.title} is done)` })
       }
     }
@@ -69,7 +77,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     input.addEventListener('change', () => {
       const reader = new FileReader()
       reader.onload = (event: ProgressEvent<FileReader>) => {
-        const importedData: {board: IFeedbackBoardDocument, items: IFeedbackItemDocument[]}[] = JSON.parse(event.target.result.toString());
+        const importedData: IExportImportDataSchema[] = JSON.parse(event.target.result.toString());
         this.processImportedData(importedData);
       };
       reader.readAsText(input.files[0])
@@ -80,18 +88,30 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     return false;
   }
 
-  private processImportedData = async (importedData: {board: IFeedbackBoardDocument, items: IFeedbackItemDocument[]}[]) => {
+  private processImportedData = async (importedData: IExportImportDataSchema[]) => {
     const projectId = await getProjectId();
-    const team = await azureDevOpsCoreService.getDefaultTeam(projectId);
+
+    const teams = await azureDevOpsCoreService.getAllTeams(projectId, false);
+    const defaultTeam = await azureDevOpsCoreService.getDefaultTeam(projectId);
+
     const toastId = toast('Importing data...');
+
     for (let iLoop = 0; iLoop < importedData.length; iLoop++) {
-      const oldBoard = importedData[iLoop].board;
+      const dataToProcess = importedData[iLoop];
+
+      const team = teams.find(e => e.name === dataToProcess.team.name) ?? defaultTeam;
+
+      const oldBoard = dataToProcess.board;
+
       const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.isAnonymous, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.displayPrimeDirective, oldBoard.startDate, oldBoard.endDate);
-      for (let yLoop = 0; yLoop < importedData[iLoop].items.length; yLoop++) {
-        const oldItem = importedData[iLoop].items[yLoop];
+
+      for (let yLoop = 0; yLoop < dataToProcess.items.length; yLoop++) {
+        const oldItem = dataToProcess.items[yLoop];
         oldItem.boardId = newBoard.id;
+
         await itemDataService.appendItemToBoard(oldItem);
-        toast.update(toastId, { render: `Importing data... (${newBoard.title} is done)` })
+
+        toast.update(toastId, { render: `Importing data... (${newBoard.title} to ${team.name} is done)` });
       }
     }
   };
