@@ -322,3 +322,7 @@ $feedback_column_card_height: 60px;
     color: var(--text-primary-color);
   }
 }
+
+.ms-Checkbox:not(.is-checked):hover .ms-Checkbox-checkmark{
+  display:none;
+}
