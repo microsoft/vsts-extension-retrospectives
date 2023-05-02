@@ -6,6 +6,13 @@ import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { ViewMode } from '../config/constants';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
+import boardDataService from '../dal/boardDataService';
+import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
+import { getProjectId } from '../utilities/servicesHelper';
+import { itemDataService } from '../dal/itemDataService';
+import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
+import { Slide, toast, ToastContainer } from 'react-toastify';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
@@ -17,6 +24,12 @@ interface IExtensionSettingsMenuState {
 interface IExtensionSettingsMenuProps {
   onScreenViewModeChanged: () => void;
   isDesktop: boolean;
+}
+
+interface IExportImportDataSchema {
+  team: WebApiTeam
+  board: IFeedbackBoardDocument
+  items: IFeedbackItemDocument[]
 }
 
 class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
@@ -31,8 +44,80 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     };
   }
 
+  private exportData = async () => {
+    const toastId = toast('Processing boards...');
+    const exportedData: IExportImportDataSchema[] = [];
+    const projectId = await getProjectId();
+    const teams = await azureDevOpsCoreService.getAllTeams(projectId, false);
+    for (let iLoop = 0; iLoop < teams.length; iLoop++) {
+      const team = teams[iLoop];
+      const boards = await boardDataService.getBoardsForTeam(team.id);
+      for (let yLoop = 0; yLoop < boards.length; yLoop++) {
+        const board = boards[yLoop];
+        const items = await itemDataService.getFeedbackItemsForBoard(board.id);
+        exportedData.push({team, board, items});
+        toast.update(toastId, { render: `Processing boards... (${board.title} is done)` })
+      }
+    }
+    const content = [JSON.stringify(exportedData)];
+
+    const blob = new Blob(content, { type: "text/plain;charset=utf-8" });
+
+    const a = document.createElement("a");
+    a.download = "Retrospective_Export.json";
+    a.href = window.URL.createObjectURL(blob);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  private importData = async () => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.addEventListener('change', () => {
+      const reader = new FileReader()
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const importedData: IExportImportDataSchema[] = JSON.parse(event.target.result.toString());
+        this.processImportedData(importedData);
+      };
+      reader.readAsText(input.files[0])
+    }, false);
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+    return false;
+  }
+
+  private processImportedData = async (importedData: IExportImportDataSchema[]) => {
+    const projectId = await getProjectId();
+
+    const teams = await azureDevOpsCoreService.getAllTeams(projectId, false);
+    const defaultTeam = await azureDevOpsCoreService.getDefaultTeam(projectId);
+
+    const toastId = toast('Importing data...');
+
+    for (let iLoop = 0; iLoop < importedData.length; iLoop++) {
+      const dataToProcess = importedData[iLoop];
+
+      const team = teams.find(e => e.name === dataToProcess.team.name) ?? defaultTeam;
+
+      const oldBoard = dataToProcess.board;
+
+      const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.isAnonymous, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.displayPrimeDirective, oldBoard.startDate, oldBoard.endDate);
+
+      for (let yLoop = 0; yLoop < dataToProcess.items.length; yLoop++) {
+        const oldItem = dataToProcess.items[yLoop];
+        oldItem.boardId = newBoard.id;
+
+        await itemDataService.appendItemToBoard(oldItem);
+
+        toast.update(toastId, { render: `Importing data... (${newBoard.title} to ${team.name} is done)` });
+      }
+    }
+  };
+
   private clearVisitHistory = async () => {
-    await userDataService.clearVisits()
+    await userDataService.clearVisits();
     this.hideClearVisitHistoryDialog();
   }
 
@@ -71,6 +156,20 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   // If an action needs to be hidden on desktop or mobile view, use the item's className property
   // with .hide-mobile or .hide-desktop
   private readonly extensionSettingsMenuItem: IContextualMenuItem[] = [
+    {
+      key: 'exportData',
+      iconProps: { iconName: 'CloudDownload' },
+      onClick: this.exportData,
+      text: 'Export Data',
+      title: 'Export Data',
+    },
+    {
+      key: 'importData',
+      iconProps: { iconName: 'CloudUpload' },
+      onClick: this.importData,
+      text: 'Import Data',
+      title: 'Import Data',
+    },
     {
       key: 'clearVisitHistory',
       iconProps: { iconName: 'RemoveEvent' },
@@ -141,7 +240,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           dialogContentProps={{
             type: DialogType.close,
             title: 'What\'s New',
-            subText: "Added 'Discuss and Act' button to the Team Assessment allowing teams to discuss and take action on specific areas in the Team Assessment",
+            subText: "Added 'import data' and 'export data' features",
           }}
           minWidth={450}
           modalProps={{
@@ -240,6 +339,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={this.hideClearVisitHistoryDialog} text="Cancel" />
           </DialogFooter>
         </Dialog>
+        <ToastContainer
+          transition={Slide}
+          closeButton={false}
+          className="retrospective-notification-toast-container"
+          toastClassName="retrospective-notification-toast"
+          bodyClassName="retrospective-notification-toast-body"
+          progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }
