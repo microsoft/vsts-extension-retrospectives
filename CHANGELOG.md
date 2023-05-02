@@ -4,6 +4,13 @@ You can find the changelog of the Retrospective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.XX.XX
+
+* Team Assessment form: Background colors for each number on the spectrum now more
+closely resemble the Retrospective summary's color separation for the three categories:
+Reds and Oranges for Unfavorable (1-6), Yellows for Neutral (7-8), Greens for
+Favorable (9-10). From [Github PR #531](https://github.com/microsoft/vsts-extension-retrospectives/pull/531).
+
 ## v1.90.3
 
 * Github Experience: Updating README to include the code coverage and status badges. Github PRs now get code coverage comments from CodeCov. From [Github PR #461](https://github.com/microsoft/vsts-extension-retrospectives/pull/461).
