@@ -1189,24 +1189,24 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             }}>
             <DialogFooter>
               <PrimaryButton onClick={async () => {
-                    const question = questions.filter((question) => question.id === this.state.questionIdForDiscussAndActBoardUpdate)[0];
-                    const templateName = question.discussActTemplate;
-                    const columns = getColumnsByTemplateId(templateName);
+                const question = questions.filter((question) => question.id === this.state.questionIdForDiscussAndActBoardUpdate)[0];
+                const templateName = question.discussActTemplate;
+                const columns = getColumnsByTemplateId(templateName);
 
-                    const board = this.state.currentBoard;
-                    const columnId = columns[0].id;
+                const board = this.state.currentBoard;
+                const columnId = columns[0].id;
 
-                    await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns);
+                await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns);
 
-                    /*
-                    TODO (enpolat) : in the future we may need to create feedback items based on the answers of the questions
-                    this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.flatMap(e => e.responses).filter(e => e.questionId === question.id).forEach(async vote => {
-                      const item = await itemDataService.createItemForBoard(board.id, vote.selection.toString(), columnId, true);
-                      reflectBackendService.broadcastNewItem(columnId, item.id);
-                    });
-                    */
+                /*
+                TODO (enpolat) : in the future we may need to create feedback items based on the answers of the questions
+                this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.flatMap(e => e.responses).filter(e => e.questionId === question.id).forEach(async vote => {
+                  const item = await itemDataService.createItemForBoard(board.id, vote.selection.toString(), columnId, true);
+                  reflectBackendService.broadcastNewItem(columnId, item.id);
+                });
+                */
 
-                    this.setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
+                this.setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
               }} text="Proceed" />
               <DefaultButton onClick={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
             </DialogFooter>
@@ -1294,7 +1294,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </div>
                     </div>
                     <div className="feedback-workflow-wrapper">
-                    {this.state.currentBoard.displayPrimeDirective &&
+                      {this.state.currentBoard.displayPrimeDirective &&
                         <div className="prime-directive-dialog-section">
                           <Dialog
                             hidden={this.state.isPrimeDirectiveDialogHidden}
@@ -1369,16 +1369,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                   <tr>
                                     <th></th>
                                     <th></th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#F8696B" }}>1</th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#F98570" }}>2</th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#FBA276" }}>3</th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#FCBF7B" }}>4</th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#FEDC81" }}>5</th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#EEE683" }}>6</th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#CCDD82" }}>7</th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#A9D27F" }}>8</th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#86C97E" }}>9</th>
-                                    <th className="voting-measurement-index" style={{ backgroundColor: "#63BE7B" }}>10</th>
+                                    <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
+                                    <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
+                                    <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
+                                    <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
+                                    <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
+                                    <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
+                                    <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
+                                    <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
+                                    <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
+                                    <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1410,9 +1410,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             calloutProps={{ gapSpace: 0 }}>
                             <ActionButton
                               className="toggle-carousel-button"
+                              iconProps={{ iconName: 'Chart' }}
+                              text="Team Assessment"
                               onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false }); }}>
-                              <span className="ms-Button-icon"><i className="fas fa-chart-line"></i></span>&nbsp;
-                              <span className="ms-Button-label">Team Assessment</span>
                             </ActionButton>
                           </TooltipHost>
                         </div>
