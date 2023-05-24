@@ -3,6 +3,33 @@ import { IFeedbackColumn } from '../interfaces/feedback';
 
 export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] => {
   switch (templateId) {
+    case 'speedboat': // Speedboat retrospective - Propellors, Life Preserver, Anchors, Rocks
+    return [
+      {
+        accentColor: '#008000',
+        iconClass: 'fas fa-rocket',
+        id: uuid(),
+        title: 'Propellors'
+      },
+      {
+        accentColor: '#f6af03',
+        iconClass: 'fas fa-life-ring',
+        id: uuid(),
+        title: 'Life preserver',
+      },
+      {
+        accentColor: '#F78A53',
+        iconClass: 'fas fa-anchor',
+        id: uuid(),
+        title: 'Anchors',
+      },
+      {
+        accentColor: '#cc293d',
+        iconClass: 'far fa-exclamation',
+        id: uuid(),
+        title: 'Rocks',
+      },
+    ];
     case '4ls': // The 4 Ls - Like, Learned, Lacked, Longed For
       return [
         {
