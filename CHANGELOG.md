@@ -11,7 +11,7 @@ closely resemble the Retrospective summary's color separation for the three cate
 Reds and Oranges for Unfavorable (1-6), Yellows for Neutral (7-8), Greens for
 Favorable (9-10). From [Github PR #531](https://github.com/microsoft/vsts-extension-retrospectives/pull/531).
 * New tab in "Focus Mode", called "All", which contains every card on the current retrospective board so that
-your team can prioritize the highest voted cards first.
+your team can prioritize the highest voted cards first. From [Github PR #531](https://github.com/microsoft/vsts-extension-retrospectives/pull/543).
 
 ## v1.91.1
 
