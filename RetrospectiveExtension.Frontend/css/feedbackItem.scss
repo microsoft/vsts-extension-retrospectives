@@ -204,7 +204,7 @@
         .fa-li {
           border-style: solid;
           height: 30px;
-          border-width: 0 1px 0 0;
+          border-width: 0 3px 0 0;
           border-color: var(--text-secondary-color);
           color: var(--text-disabled-color);
         }
@@ -212,13 +212,23 @@
         li {
           word-wrap: break-word;
           padding: 5px;
-          line-height: 30px;
           border-bottom-style: solid;
           border-bottom-color: var(--text-disabled-color);
           border-bottom-width: 1px;
 
+          span {
+            line-height: 30px; // Height set for icon and feedback title and not any additional text ('Original Column: X')
+          }
+
           &:last-child {
             border: 0;
+          }
+
+          .original-column-info {
+            text-align: right;
+            font-weight: 300;
+            font-style: italic;
+            font-size: 0.75em;
           }
 
           .related-feedback-title {

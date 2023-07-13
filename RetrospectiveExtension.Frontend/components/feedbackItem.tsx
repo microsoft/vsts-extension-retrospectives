@@ -14,7 +14,7 @@ import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTrack
 import localStorageHelper from '../utilities/localStorageHelper';
 import { reflectBackendService } from '../dal/reflectBackendService';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
-import { IColumn } from './feedbackBoard';
+import { IColumn, IColumnItem } from './feedbackBoard';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { FeedbackColumnProps } from './feedbackColumn';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
@@ -58,7 +58,7 @@ export interface IFeedbackItemProps {
   timerId: any;
   groupCount: number;
   isGroupedCarouselItem: boolean;
-  groupTitles: String[];
+  groupIds: string[];
   isShowingGroupedChildrenTitles: boolean;
   isFocusModalHidden: boolean;
   onVoteCasted: () => void;
@@ -624,7 +624,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const originalColumnId = this.props.originalColumnId;
     const originalColumnTitle = originalColumnId ? this.props.columns[originalColumnId].columnProperties.title : 'n/a';
     // showing `n/a` will be for older boards who don't have this property
-    const childrenTitlesShort = this.props.groupTitles;
+    const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
 
     return (
@@ -878,13 +878,22 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               <div className="group-child-feedback-stack">
                 <div className="related-feedback-header"> <i className="far fa-comments" />&nbsp;Related Feedback</div>
                 <ul className="fa-ul" aria-label="List of Related Feedback">
-                  {childrenTitlesShort.map((title: String, index: React.Key) =>
-                    <li key={index}><span className="fa-li"><i className="fa-solid fa-quote-left" /></span>
-                      <span className="related-feedback-title"
-                        aria-label={'Title of the feedback is ' + title}>
-                        {title}
-                      </span></li>
-                  )}
+                  {childrenIds.map((id: string, index: React.Key) => {
+                    const childCard: IColumnItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
+                    const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
+
+                    return childCard &&
+                      <li key={index}>
+                        <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}><i className="fa-solid fa-quote-left" /></span>
+                        <span className="related-feedback-title"
+                          aria-label={'Title of the feedback is ' + childCard.feedbackItem.title}>
+                          {childCard.feedbackItem.title}
+                        </span>
+                        {(this.props.columnId !== originalColumn?.columnProperties?.id) &&
+                          <div className="original-column-info">Original Column: <br />{originalColumn.columnProperties.title}</div>
+                        }
+                    </li>
+                  })}
                 </ul>
               </div>
             }
@@ -1005,8 +1014,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 timerState: searchItem.timerstate,
                 timerId: searchItem.timerId,
                 groupCount: searchItem.groupTitles?.length,
+                groupIds: searchItem.childFeedbackItemIds ?? [],
                 isGroupedCarouselItem: searchItem.isGroupedCarouselItem,
-                groupTitles: searchItem.groupTitles,
                 isShowingGroupedChildrenTitles: false,
                 isFocusModalHidden: true,
                 onVoteCasted: this.props.onVoteCasted,
