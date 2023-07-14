@@ -44,6 +44,8 @@ describe('Feedback Carousel ', () => {
 
     expect(feedbackItem.prop('groupIds')).toEqual([testGroupFeedbackItemTwo.id]);
 
+  })
+
   describe("'All' column", () => {
     it("should be set by default in the first position", () => {
       const wrapper = shallow(<FeedbackCarousel {...mockedProps} />);
