@@ -425,7 +425,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[this.props.userId] === undefined ? "0" : voteCollection[this.props.userId].toString() });
           });
         },
-        groupTitles: []
+        groupIds: []
       };
     });
 

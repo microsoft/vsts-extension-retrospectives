@@ -127,20 +127,9 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
             columnItem.feedbackItem.isGroupedCarouselItem = columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length > 0 : false;
 
             if (isGroupedCarouselItem) {
-              // If an item in the column is a parent, get the title of the children
-              // to show in 'Related Feedback' section
-              const columnItemChildrenIds = columnItem.feedbackItem.childFeedbackItemIds;
-              const childrenTitlesShort: String[] = [];
-
-              columnItemChildrenIds.forEach(childId => {
-                // For every child item in the group, limit to 2 lines (~200 characters)
-                const childFeedbackItem = columnProps.columnItems.find(childItem => childItem.feedbackItem.id == childId);
-                const origTitle = childFeedbackItem.feedbackItem.title;
-                const shortTitle = origTitle.length > childTitleLengthMax ? origTitle.substring(0, childTitleLengthMax) + '...' : origTitle;
-                childrenTitlesShort.push(shortTitle);
-              });
-
-              columnItem.feedbackItem.groupTitles = childrenTitlesShort;
+              // If an item in the column is a parent, set the children ids so we can show data
+              // in the 'Related Feedback' section
+              columnItem.feedbackItem.groupIds  = columnItem.feedbackItem.childFeedbackItemIds;
             }
           });
 

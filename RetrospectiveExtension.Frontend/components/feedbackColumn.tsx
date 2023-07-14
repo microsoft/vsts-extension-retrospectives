@@ -34,7 +34,7 @@ export interface FeedbackColumnProps {
   isBoardAnonymous: boolean;
   shouldFocusOnCreateFeedback: boolean;
   hideFeedbackItems: boolean;
-  groupTitles: String[];
+  groupIds: string[];
   onVoteCasted: () => void;
 
   addFeedbackItems: (
@@ -94,7 +94,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       timerSecs: 0,
       timerstate: false,
       timerId: null,
-      groupTitles: [],
+      groupIds: [],
       isGroupedCarouselItem: false
     };
 
@@ -198,8 +198,8 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       userIdRef: columnItem.feedbackItem.userIdRef,
       onVoteCasted: columnProps.onVoteCasted,
       groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
+      groupIds: columnItem.feedbackItem.childFeedbackItemIds ?? [],
       isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
-      groupTitles: columnItem.feedbackItem.groupTitles,
       isShowingGroupedChildrenTitles: false,
       isFocusModalHidden: true
     }
