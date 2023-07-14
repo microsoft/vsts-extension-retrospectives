@@ -231,6 +231,18 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       iconClass: 'fas fa-exclamation',
     },
     {
+      friendlyName: 'rocket',
+      iconClass: 'fas fa-rocket',
+    },
+    {
+      friendlyName: 'life-ring',
+      iconClass: 'fas fa-life-ring',
+    },
+    {
+      friendlyName: 'anchor',
+      iconClass: 'fas fa-anchor',
+    },
+    {
       friendlyName: 'celebrate',
       iconClass: 'fas fa-birthday-cake',
     },
@@ -385,6 +397,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               className="title-input-container column-template-dropdown"
             >
               <option value="">Select a template</option>
+              <option value="speedboat">Speedboat</option>
               <option value="4ls">4Ls</option>
               <option value="1to1">1-to-1</option>
               <option value="daki">Drop-Add-Keep-Improve</option>

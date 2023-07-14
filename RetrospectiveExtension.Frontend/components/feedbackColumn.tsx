@@ -152,6 +152,13 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     columnProps: FeedbackColumnProps,
     columnItem: IColumnItem,
     isInteractable: boolean): IFeedbackItemProps => {
+
+    let accentColor: string = columnProps.accentColor;
+    if(columnItem.feedbackItem.originalColumnId !== columnProps.columnId) {
+      // Ensure that the item's accent color matches the original column's accent color.
+      accentColor = columnProps.columns[columnItem.feedbackItem.originalColumnId]?.columnProperties?.accentColor ?? columnProps.accentColor;
+    }
+
     return {
       id: columnItem.feedbackItem.id,
       title: columnItem.feedbackItem.title,
@@ -163,7 +170,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       timerState: columnItem.feedbackItem.timerstate,
       timerId: columnItem.feedbackItem.timerId,
       workflowPhase: columnProps.workflowPhase,
-      accentColor: columnProps.accentColor,
+      accentColor: accentColor,
       iconClass: columnProps.iconClass,
       createdDate: columnItem.feedbackItem.createdDate.toString(),
       team: columnProps.team,

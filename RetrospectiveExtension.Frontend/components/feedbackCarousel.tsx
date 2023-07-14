@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 import Slider, { Settings } from "react-slick";
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -8,6 +9,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
+import { IColumnItem } from './feedbackBoard';
 
 export interface IFeedbackCarouselProps {
   feedbackColumnPropsList: FeedbackColumnProps[];
@@ -68,6 +70,47 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       variableWidth: true,
       accessibility: true,
     };
+
+    // Change this value to adjust what "two lines" is considered
+    const childTitleLengthMax = 200;
+
+    // Added an "All" column by default which is a clone of an existing
+    // column configuration, but will contain static "All" column data and
+    // every feedback card. "All" column gets applied in the carousel so
+    // that is does not impact any UI outside of "Focus Mode".
+    if(this.props.feedbackColumnPropsList.length > 0) {
+      const existingColumn: FeedbackColumnProps = this.props.feedbackColumnPropsList[0];
+
+      const allColumnItems: IColumnItem[] = [...this.props.feedbackColumnPropsList.flatMap(c => c.columnItems)];
+      const allColumnId: string = uuid();
+      const allColumnName: string = 'All';
+      const allFeedbackColumn: FeedbackColumnProps = {
+        ...existingColumn,
+        columnId: allColumnId,
+        columnIds: [
+          ...existingColumn.columnIds,
+          allColumnId
+        ],
+        columns: {
+          ...existingColumn.columns,
+          [allColumnId]: {
+            columnItems: allColumnItems,
+            columnProperties: {
+              id: allColumnId,
+              title: allColumnName,
+              iconClass: '',
+              accentColor: ''
+            },
+            shouldFocusOnCreateFeedback: false
+          }
+        },
+        columnItems: allColumnItems,
+        columnName: allColumnName
+      }
+
+      // Always set the "All" column as the first option
+      this.props.feedbackColumnPropsList.unshift(allFeedbackColumn);
+    }
 
     return (
       <Pivot
