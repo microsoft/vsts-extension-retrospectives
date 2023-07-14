@@ -234,6 +234,8 @@
           .related-feedback-title {
             margin-left: 10px;
             color: var(--text-primary-color);
+
+            @include max-line-render(2);
           }
         }
       }

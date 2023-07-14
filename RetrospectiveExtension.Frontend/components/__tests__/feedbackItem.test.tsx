@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { shallow } from 'enzyme';
-import FeedbackItem from '../feedbackItem';
+import FeedbackItem, { IFeedbackItemProps } from '../feedbackItem';
 import FeedbackColumn from '../feedbackColumn';
 import EditableDocumentCardTitle from '../editableDocumentCardTitle';
 import Dialog from 'office-ui-fabric-react/lib/Dialog';
@@ -15,7 +15,12 @@ import {
   testFeedbackItem,
   testColumns,
   testBoardId,
-  testColumnUuidOne
+  testColumnUuidOne,
+  testGroupColumnProps,
+  testGroupFeedbackItemOne,
+  testGroupColumnItemOne,
+  testGroupColumnsObj,
+  testGroupColumnUuidTwo
 } from '../__mocks__/mocked_components/mockedFeedbackColumn';
 
 // Base render constants, these may change if the FeedbackItem component is changed.
@@ -79,7 +84,7 @@ describe('Feedback Item', () => {
     expect(actionItemDisplay.prop("boardId")).toEqual(testBoardId);
     expect(actionItemDisplay.prop("boardTitle")).toEqual(testColumnProps.boardTitle);
 
-    // Same formating function
+    // Same formatting function
     const timerMinutes = Math.floor(testFeedbackItem.timerSecs / 60);
     const timerSeconds = testFeedbackItem.timerSecs % 60;
     const showLeadingZeroInSeconds = timerSeconds < 10;
@@ -87,5 +92,52 @@ describe('Feedback Item', () => {
 
     expect(component.findWhere((child) =>
       child.prop("title") === "Timer").html()).toContain(`${formatTimer} elapsed`);
+  });
+
+  describe('Group feedback items', () => {
+    const testProps: IFeedbackItemProps = FeedbackColumn.createFeedbackItemProps(testGroupColumnProps, testGroupColumnItemOne, true);
+
+    beforeEach(() => {
+      testProps.isGroupedCarouselItem = true;
+      testProps.isFocusModalHidden = false;
+      testProps.groupedItemProps = {
+        groupedCount: 1,
+        isGroupExpanded: true,
+        isMainItem: true,
+        parentItemId: null,
+        setIsGroupBeingDragged: () => false,
+        toggleGroupExpand: () => null
+      }
+    });
+
+    it('should show the related feedback header', () => {
+      const wrapper = shallow(<FeedbackItem {...testProps} />);
+      const component = wrapper.children().dive();
+
+      component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
+
+      const feedbackHeader = component.findWhere(c => c.prop('className') === 'related-feedback-header');
+      expect(feedbackHeader).toHaveLength(1);
+    })
+
+    it('should show the related feedback item title', () => {
+      const wrapper = shallow(<FeedbackItem {...testProps} />);
+      const component = wrapper.children().dive();
+
+      component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
+
+      const feedbackTitle = component.findWhere(c => c.prop('className') === 'related-feedback-title').first();
+      expect(feedbackTitle.text()).toEqual(testGroupFeedbackItemOne.title);
+    })
+
+    it('should show the original column information', () => {
+      const wrapper = shallow(<FeedbackItem {...testProps} />);
+      const component = wrapper.children().dive();
+
+      component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
+
+      const originalColumn = component.findWhere(c => c.prop('className') === 'original-column-info').first();
+      expect(originalColumn.text()).toEqual(`Original Column: ${testGroupColumnsObj[testGroupColumnUuidTwo].columnProperties.title}`);
+    })
   });
 });

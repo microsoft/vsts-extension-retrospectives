@@ -36,7 +36,7 @@ class ItemDataService {
       timerSecs: 0,
       timerstate: false,
       timerId: null,
-      groupTitles: [],
+      groupIds: [],
       isGroupedCarouselItem: false
     };
 

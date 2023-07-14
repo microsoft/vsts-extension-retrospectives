@@ -886,7 +886,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       <li key={index}>
                         <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}><i className="fa-solid fa-quote-left" /></span>
                         <span className="related-feedback-title"
-                          aria-label={'Title of the feedback is ' + childCard.feedbackItem.title}>
+                          aria-label={'Title of the feedback is ' + childCard.feedbackItem.title}
+                          title={childCard.feedbackItem.title}>
                           {childCard.feedbackItem.title}
                         </span>
                         {(this.props.columnId !== originalColumn?.columnProperties?.id) &&
@@ -1013,7 +1014,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 timerSecs: searchItem.timerSecs,
                 timerState: searchItem.timerstate,
                 timerId: searchItem.timerId,
-                groupCount: searchItem.groupTitles?.length,
+                groupCount: searchItem.childFeedbackItemIds?.length,
                 groupIds: searchItem.childFeedbackItemIds ?? [],
                 isGroupedCarouselItem: searchItem.isGroupedCarouselItem,
                 isShowingGroupedChildrenTitles: false,

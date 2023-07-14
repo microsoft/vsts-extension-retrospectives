@@ -11,3 +11,14 @@
         color: $bug_red;
     }
 }
+
+// Set the max amount of lines to render for a given textual
+// element. Text that exceed the line count will ellipse out.
+@mixin max-line-render($line-count) {
+    display: -webkit-box;
+    line-clamp: $line-count;
+    overflow: hidden;
+
+    -webkit-line-clamp: $line-count;
+    -webkit-box-orient: vertical;
+}
