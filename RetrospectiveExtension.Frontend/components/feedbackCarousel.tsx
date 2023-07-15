@@ -71,9 +71,6 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       accessibility: true,
     };
 
-    // Change this value to adjust what "two lines" is considered
-    const childTitleLengthMax = 200;
-
     // Added an "All" column by default which is a clone of an existing
     // column configuration, but will contain static "All" column data and
     // every feedback card. "All" column gets applied in the carousel so

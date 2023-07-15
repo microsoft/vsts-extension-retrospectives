@@ -31,7 +31,7 @@ describe('Feedback Carousel ', () => {
     const wrapper = shallow(<FeedbackCarousel {...mockedProps} />);
     const component = wrapper.children().dive();
 
-    const feedbackItem = component.findWhere(c => c.prop('className') === 'feedback-carousel-item').find(FeedbackItem);
+    const feedbackItem = component.findWhere(c => c.prop('className') === 'feedback-carousel-item').find(FeedbackItem).first();
 
     expect(feedbackItem.prop('groupIds')).toEqual([]);
   })
@@ -40,7 +40,7 @@ describe('Feedback Carousel ', () => {
     const wrapper = shallow(<FeedbackCarousel {...mockedGroupProps} />);
     const component = wrapper.children().dive();
 
-    const feedbackItem = component.findWhere(c => c.prop('className') === 'feedback-carousel-item').find(FeedbackItem);
+    const feedbackItem = component.findWhere(c => c.prop('className') === 'feedback-carousel-item').find(FeedbackItem).first();
 
     expect(feedbackItem.prop('groupIds')).toEqual([testGroupFeedbackItemTwo.id]);
 
