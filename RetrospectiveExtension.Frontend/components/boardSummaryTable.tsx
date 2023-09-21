@@ -1,17 +1,14 @@
-import React from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
-import classNames from 'classnames';
-
-import ReactTable from 'react-table-6';
-
-import 'react-table-6/react-table.css'
+import { Cell, CellContext, ColumnDef, Header, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin } from '../utilities/telemetryClient';
+import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -44,50 +41,104 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardSummaryTableState> {
-  constructor(props: IBoardSummaryTableProps) {
-    super(props);
+/**
+ * Obtain a configured TanStack Table specifically for the board history tab.
+ */
+function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
+  const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
+  const columns: ColumnDef<IBoardSummaryTableItem, any>[] = [
+    columnHelper.accessor('id', {
+      header: null,
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
+        return cellContext.row.getCanExpand() ? (
+          <DefaultButton
+            className="contextual-menu-button"
+            aria-label="Expand Row"
+            title="Expand Row"
+          >
+            <span className="ms-Button-icon"><i className={`fas ${cellContext.row.getIsExpanded() ? 'fa-caret-down' : 'fa-caret-right'}`}></i></span>
+          </DefaultButton>
+        ) : (
+          ''
+        )
+      },
+      enableResizing: false,
+      enableSorting: false
+    }),
+    columnHelper.accessor('boardName', {
+      header: 'Retrospective Name',
+      footer: info => info.column.id
+    }),
+    columnHelper.accessor('createdDate', {
+      header: 'Created Date',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
+        return (
+          new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
+        )
+      },
+      size: 175,
+      sortDescFirst: true
+    }),
+    columnHelper.accessor('pendingWorkItemsCount', {
+      header: 'Pending Work Items',
+      footer: info => info.column.id,
+      size: 170,
+    }),
+    columnHelper.accessor('totalWorkItemsCount', {
+      header: 'Total Work Items',
+      footer: info => info.column.id,
+      size: 170,
+    })
+  ]
 
-    this.state = {
-      boardsTableItems: new Array<IBoardSummaryTableItem>(),
-      isDataLoaded: false,
-      feedbackBoards: new Array<IFeedbackBoardDocument>(),
-      actionItemsByBoard: {},
-      allDataLoaded: false,
-    };
+  const tableOptions: TableOptions<IBoardSummaryTableItem> = {
+    data,
+    columns,
+    columnResizeMode: 'onChange',
+    onSortingChange: onSortingChange,
+    getSortedRowModel: getSortedRowModel(),
+    getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getRowCanExpand: () => true,
+    state: {
+      pagination: {
+        pageSize: data.length,
+        pageIndex: 0
+      },
+      sorting: sortingState
+    }
   }
 
-  public async componentDidMount() {
-    try {
-      await this.setBoardsTable();
-      await this.setActionItems();
-    }
-    catch (e) {
-      // TODO: Better error handling.
-      appInsights.trackException(e);
-    }
-  }
+  const table = useReactTable(tableOptions);
+  return table;
+}
 
-  public async componentDidUpdate(prevProps: IBoardSummaryTableProps) {
-    if (prevProps.teamId !== this.props.teamId) {
-      await this.setBoardsTable();
-      await this.setActionItems();
-    }
-  }
+function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
+  const [teamId, setTeamId] = useState<string>();
+  const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
+    boardsTableItems: new Array<IBoardSummaryTableItem>(),
+    isDataLoaded: false,
+    feedbackBoards: new Array<IFeedbackBoardDocument>(),
+    actionItemsByBoard: {},
+    allDataLoaded: false
+  })
+  const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  // TODO: Add live update support.
-  private setBoardsTable = async () => {
-    const boardsForTeam = await BoardDataService.getBoardsForTeam(this.props.teamId);
-    if (!boardsForTeam || boardsForTeam.length === 0) {
-      this.setState({ isDataLoaded: true, boardsTableItems: [] });
-      return;
-    }
+  const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting);
 
-    this.setState(() => {
+  const updatedState: IBoardSummaryTableState = boardSummaryState;
+
+  const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
+    if((boardDocuments ?? []).length === 0) {
+      updatedState.boardsTableItems = [];
+      updatedState.isDataLoaded = true;
+    } else {
       const boardsTableItems = new Array<IBoardSummaryTableItem>();
       const actionItems: IActionItemsTableItems = {};
 
-      boardsForTeam.forEach(board => {
+      boardDocuments.forEach(board => {
         const boardSummaryItem: IBoardSummaryTableItem = {
           boardName: board.title,
           createdDate: new Date(board.createdDate),
@@ -110,53 +161,42 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
         return (new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime());
       });
 
-      return {
-        boardsTableItems: boardsTableItems,
-        isDataLoaded: true,
-        feedbackBoards: boardsForTeam,
-        actionItemsByBoard: actionItems,
-      };
-    });
-  }
-
-  private setActionItems = async () => {
-    const feedbackBoards = this.state.feedbackBoards;
-
-    await Promise.all(feedbackBoards.map(async (feedbackBoard) => {
-      await this.setBoardStats(feedbackBoard.id);
-    }));
-
-    this.setState({
-      allDataLoaded: true,
-    });
-  };
-
-  private setBoardStats = async (feedbackBoardId: string) => {
-    const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
-
-    if (!feedbackItems || !feedbackItems.length) {
-      return;
+      updatedState.boardsTableItems = boardsTableItems;
+      updatedState.isDataLoaded = true;
+      updatedState.feedbackBoards = boardDocuments;
+      updatedState.actionItemsByBoard = actionItems;
     }
 
-    const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
+    handleActionItems().then();
+  }
 
-    await Promise.all(this.props.supportedWorkItemTypes.map(async (workItemType) => {
-      const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
-      workItemTypeToStatesMap[workItemType.name] = workItemTypeStates;
-    }));
+  const handleActionItems = async () => {
+    await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
+      const feedbackBoardId: string = feedbackBoard.id;
+      const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
 
-    await Promise.all(feedbackItems.map(async (feedbackItem) => {
-      if (!feedbackItem.associatedActionItemIds || !feedbackItem.associatedActionItemIds.length) {
+      if (!feedbackItems || !feedbackItems.length) {
         return;
       }
 
-      const workItems = await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds);
-      if (!workItems || !workItems.length) {
-        return
-      }
+      const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
 
-      this.setState(prevState => {
-        const updatedActionItemsForBoard = prevState.actionItemsByBoard[feedbackBoardId];
+      await Promise.all(props.supportedWorkItemTypes.map(async (workItemType) => {
+        const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
+        workItemTypeToStatesMap[workItemType.name] = workItemTypeStates;
+      }));
+
+      await Promise.all(feedbackItems.map(async (feedbackItem) => {
+        if (!feedbackItem.associatedActionItemIds || !feedbackItem.associatedActionItemIds.length) {
+          return;
+        }
+
+        const workItems = await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds);
+        if (!workItems || !workItems.length) {
+          return
+        }
+
+        const updatedActionItemsForBoard = updatedState.actionItemsByBoard[feedbackBoardId];
         const updatedItems = updatedActionItemsForBoard.actionItems.concat(workItems);
         updatedActionItemsForBoard.actionItems = updatedItems;
         updatedActionItemsForBoard.isDataLoaded = true;
@@ -176,7 +216,7 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
         const totalWorkItemsCount = updatedItems.length;
 
         const currentTableItemsToUpdate =
-          prevState.boardsTableItems.map(
+        updatedState.boardsTableItems.map(
             item => item.id === feedbackBoardId ?
               {
                 ...item,
@@ -186,85 +226,77 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
               } :
               item);
 
-        return {
-          actionItemsByBoard: prevState.actionItemsByBoard,
-          boardsTableItems: currentTableItemsToUpdate,
-        };
-      })
+        updatedState.boardsTableItems = currentTableItemsToUpdate;
+      }));
+
+      updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ?
+        {
+          ...item,
+          feedbackItemsCount: feedbackItems.length
+        } : item)
+      
+      setBoardSummaryState({
+        ...updatedState,
+        allDataLoaded: true
+      });
     }));
-
-    this.setState(prevState => {
-      return {
-        boardsTableItems: prevState.boardsTableItems.map(item => item.id === feedbackBoardId ?
-          {
-            ...item,
-            feedbackItemsCount: feedbackItems.length
-          } : item),
-      };
-    });
-  };
-
-  renderActionItemsSummary = (
-    isCurrentDataLoaded: boolean,
-    isAllDataLoaded: boolean,
-    actionItems: WorkItem[],
-    pendingWorkItemsCount: number,
-    resolvedActionItemsCount: number,
-    boardName: string,
-    feedbackItemsCount: number) => {
-    return (<BoardSummary
-      actionItems={actionItems}
-      isDataLoaded={isCurrentDataLoaded || isAllDataLoaded}
-      pendingWorkItemsCount={pendingWorkItemsCount}
-      resolvedActionItemsCount={resolvedActionItemsCount}
-      boardName={boardName}
-      feedbackItemsCount={feedbackItemsCount}
-      supportedWorkItemTypes={this.props.supportedWorkItemTypes}
-    />);
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private expandSummaryRow = (state: any, rowInfo: any, instance: any) => {
-    const { expanded } = state;
-    const path = rowInfo.nestingPath[0];
-    const diff = { [path]: expanded[path] ? false : true };
-
-    instance.setState({
-      expanded: {
-        ...expanded,
-        ...diff
-      }
-    });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getTrProps = (state: any, rowInfo: any, col: any, instance: any) => {
+  const boardRowSummary = (row: Row<IBoardSummaryTableItem>) => {
+    const currentBoard = boardSummaryState.boardsTableItems.find(board => board.id === row.original.id);
+    const actionItems = boardSummaryState.actionItemsByBoard[currentBoard.id];
+    return <BoardSummary
+      actionItems={actionItems?.actionItems}
+      isDataLoaded={true}
+      pendingWorkItemsCount={currentBoard?.pendingWorkItemsCount}
+      resolvedActionItemsCount={currentBoard?.totalWorkItemsCount - currentBoard?.pendingWorkItemsCount}
+      boardName={currentBoard?.boardName}
+      feedbackItemsCount={currentBoard?.feedbackItemsCount}
+      supportedWorkItemTypes={props.supportedWorkItemTypes}
+    />
+  }
+
+  const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
+
+    const sortDirection: false | SortDirection = header.column.getIsSorted()
+    let sortClassName: string = '';
+    if(sortDirection) {
+      sortClassName = sortDirection;
+    }
+
     return {
-      onClick: () => {
-        this.expandSummaryRow(state, rowInfo, instance);
+      key: header.id,
+      style: {
+        minWidth: header.getSize(),
+        width: header.getSize()
       },
+      className: sortClassName,
+      onClick: header.column.getToggleSortingHandler()
+    }
+  }
+
+  const getTrProps = (row: Row<IBoardSummaryTableItem>) => {
+    return {
+      onClick: () => row.toggleExpanded(),
       tabIndex: 0,
       'aria-label': 'Board summary row. Click row to expand and view more statistics for this board.',
-      onKeyPress: (e: KeyboardEvent) => {
+      onKeyPress: (e: any) => {
         if (e.key === 'Enter') {
-          this.expandSummaryRow(state, rowInfo, instance);
+          row.toggleExpanded();
         }
       },
     };
-  };
+  }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getTdProps = (state: any, rowInfo: any, col: any) => {
-    const hasPendingItems: boolean =
-      (rowInfo && rowInfo.original && rowInfo.original.pendingWorkItemsCount && rowInfo.original.pendingWorkItemsCount > 0) ?
-        true : false;
+  const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
+    const hasPendingItems: boolean = cell?.row?.original?.pendingWorkItemsCount > 0;
+    const columnId: keyof IBoardSummaryTableItem | undefined = cell?.column?.id as keyof IBoardSummaryTableItem | undefined;
+    const cellValue: unknown | null = (cell?.row?.original && columnId && cell.row.original[columnId]) ? cell.row.original[columnId] : null;
 
-    const isTotalWorkItemsCount = col && col.id === 'totalWorkItemsCount';
-    const isPendingCountColumn = col && col.id === 'pendingWorkItemsCount';
-    const ariaLabel = col && col.Header && col.id && rowInfo && rowInfo.original && rowInfo.original[col.id] ? col.Header + ' ' + rowInfo.original[col.id] : '';
+    const ariaLabel = (columnId && cellValue) ? columnId + ' ' + cellValue : '';
 
     let workItemsClass;
-    switch (col.id) {
+    switch (columnId) {
       case 'totalWorkItemsCount':
         workItemsClass = 'workItemsCount total-work-item-count';
         break;
@@ -284,88 +316,88 @@ class BoardSummaryTable extends React.Component<IBoardSummaryTableProps, IBoardS
       'aria-label': ariaLabel,
       'aria-readonly': true
     };
-  };
+  }
 
-  private getTableProps = () => {
-    return {
-      tabIndex: 0
-    };
-  };
+  useEffect(() => {
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getCustomTbodyComponent = (props: any) => (
-    <div {...props} className={classNames("rt-tbody", props.className || [])}>
-      {props.children}
+    if(teamId !== props.teamId) {
+      try {
+        BoardDataService.getBoardsForTeam(props.teamId)
+        .then((boardDocuments: IFeedbackBoardDocument[]) => {
+          setTeamId(props.teamId);
+          handleBoardsDocuments(boardDocuments);
+        })
+        .catch(e => {
+          // TODO: Better error handling.
+          appInsights.trackException(e);
+        })
+      } catch (e) {
+        // TODO: Better error handling.
+        appInsights.trackException(e);
+      }
+    }
+    
+  }, [props.teamId])
+
+  if(boardSummaryState.allDataLoaded !== true) {
+    return <Spinner className="board-summary-initialization-spinner"
+      size={SpinnerSize.large}
+      label="Loading..."
+      ariaLive="assertive"
+    />
+  }
+
+  return (
+    <div className="board-summary-table-container">
+      <table tabIndex={0}>
+          <thead>
+            {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => (
+                    <th {...getThProps(header)} onClick={header.column.getToggleSortingHandler()}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      <div
+                      {...{
+                        onMouseDown: header.getResizeHandler(),
+                        onTouchStart: header.getResizeHandler(),
+                        className: `
+                          ${header.column.getCanResize() ? 'resizer' : ''} 
+                          ${header.column.getIsResizing() ? 'isResizing' : ''}
+                        `
+                      }}
+                    />
+                    </th>
+                  ))}
+                </tr>
+              ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map(row => (
+              <Fragment key={row.id}>
+              <tr {...getTrProps(row)}>
+                {row.getVisibleCells().map(cell => (
+                  <td key={cell.id} {...getTdProps(cell)}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+              {row.getIsExpanded() &&
+              <tr>
+                <td colSpan={row.getVisibleCells().length}>
+                  { boardRowSummary(row) }
+                </td>
+              </tr>}
+              </Fragment>
+            ))}
+          </tbody>
+      </table>
     </div>
   );
-
-  public render() {
-    return (
-      <div className="board-summary-table-container">
-        {/*
-         // @ts-ignore TS2786 */}
-        <ReactTable
-          data={this.state.boardsTableItems}
-          TbodyComponent={this.getCustomTbodyComponent}
-          columns={[
-            {
-              Header: 'Retrospective Name',
-              accessor: 'boardName',
-            },
-            {
-              Header: 'Created Date',
-              accessor: 'createdDate',
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              Cell: (row: any) => {
-                return (
-                  new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(row.original.createdDate)
-                )
-              },
-              width: 175,
-            },
-            {
-              Header: 'Pending Work Items',
-              accessor: 'pendingWorkItemsCount',
-              width: 170,
-            },
-            {
-              Header: 'Total Work Items',
-              accessor: 'totalWorkItemsCount',
-              width: 170,
-            },
-          ]}
-          defaultSorted={[
-            {
-              id: "createdDate",
-              desc: true
-            }
-          ]}
-          pageSize={this.state.boardsTableItems.length}
-          showPagination={false}
-          loading={!this.state.allDataLoaded}
-          className="-striped -highlight"
-          getTrProps={this.getTrProps}
-          getTdProps={this.getTdProps}
-          getTableProps={this.getTableProps}
-          // @ts-ignore TS7006
-          SubComponent={row => {
-            const currentBoard = this.state.boardsTableItems.find(board => board.id === row.original.id);
-            const actionItems = this.state.actionItemsByBoard[currentBoard.id];
-            return (
-              this.renderActionItemsSummary(
-                actionItems.isDataLoaded,
-                this.state.allDataLoaded,
-                actionItems.actionItems,
-                currentBoard.pendingWorkItemsCount,
-                currentBoard.totalWorkItemsCount - currentBoard.pendingWorkItemsCount,
-                currentBoard.boardName,
-                currentBoard.feedbackItemsCount)
-            );
-          }}
-        />
-      </div>
-    );
-  }
 }
 
 export default withAITracking(reactPlugin, BoardSummaryTable);
