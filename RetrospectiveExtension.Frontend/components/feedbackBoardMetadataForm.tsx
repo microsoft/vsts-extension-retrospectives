@@ -16,12 +16,12 @@ import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 
-interface IFeedbackBoardMetadataFormProps {
+export interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
+  isDuplicatingBoard: boolean;
   currentBoard: IFeedbackBoardDocument;
   teamId: string;
   placeholderText: string;
-  initialValue: string;
   maxvotesPerUser: number;
   onFormSubmit: (
     title: string,
@@ -35,6 +35,7 @@ interface IFeedbackBoardMetadataFormProps {
 }
 
 interface IFeedbackBoardMetadataFormState {
+  initialTitle: string;
   title: string;
   isBoardNameTaken: boolean;
   placeholderText: string;
@@ -52,7 +53,7 @@ interface IFeedbackBoardMetadataFormState {
   selectedAccentColorKey: string;
 }
 
-interface IFeedbackColumnCard {
+export interface IFeedbackColumnCard {
   column: IFeedbackColumn;
   markedForDeletion: boolean;
 }
@@ -61,14 +62,32 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
+    let defaultTitle: string = '';
+    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => { return { column, markedForDeletion: false } });
+    let defaultMaxVotes: number = 5;
+    let defaultIsAnonymous: boolean = true;
+    let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
+    let defaultDisplayPrimeDirective: boolean = true;
+    let defaultShowFeedbackAfterCollect: boolean = false;
+
+    if(props.isDuplicatingBoard) {
+      defaultTitle = `${this.props.currentBoard.title} - copy`;
+      defaultColumns = this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } });
+      defaultMaxVotes = this.props.currentBoard.maxVotesPerUser;
+      defaultIsAnonymous = this.props.currentBoard.isAnonymous;
+      defaultIncludeTeamEffectivenessMeasurement = this.props.currentBoard.isIncludeTeamEffectivenessMeasurement;
+      defaultDisplayPrimeDirective = this.props.currentBoard.displayPrimeDirective;
+      defaultShowFeedbackAfterCollect = this.props.currentBoard.shouldShowFeedbackAfterCollect;
+    }
+
     this.state = {
       columnCardBeingEdited: undefined,
-      columnCards: this.props.isNewBoardCreation ?
-        getColumnsByTemplateId("").map(column => { return { column, markedForDeletion: false } }) :
-        this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } }),
-      isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? true : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
-      isBoardAnonymous: this.props.isNewBoardCreation ? true : this.props.currentBoard.isAnonymous,
-      maxVotesPerUser: this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser,
+      columnCards: this.props.isNewBoardCreation
+        ? defaultColumns
+        : this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } }),
+      isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? defaultIncludeTeamEffectivenessMeasurement : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
+      isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
+      maxVotesPerUser: this.props.isNewBoardCreation ? defaultMaxVotes : this.props.currentBoard.maxVotesPerUser,
       isBoardNameTaken: false,
       isChooseColumnAccentColorDialogHidden: true,
       isChooseColumnIconDialogHidden: true,
@@ -76,9 +95,10 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       placeholderText: this.props.placeholderText,
       selectedAccentColorKey: undefined,
       selectedIconKey: undefined,
-      displayPrimeDirective: this.props.isNewBoardCreation ? true : this.props.currentBoard.displayPrimeDirective,
-      shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? false : this.props.currentBoard.shouldShowFeedbackAfterCollect,
-      title: this.props.initialValue
+      displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
+      shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
+      initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
+      title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title
     };
   }
 
@@ -104,7 +124,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
     const isBoardNameTaken = await BoardDataService.checkIfBoardNameIsTaken(this.props.teamId, this.state.title);
 
-    if (isBoardNameTaken && this.props.initialValue !== this.state.title) {
+    if (isBoardNameTaken && this.state.initialTitle !== this.state.title) {
       this.setState({
         isBoardNameTaken: true,
       });
@@ -122,33 +142,33 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     );
   }
 
-  private handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+  private handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({
       isIncludeTeamEffectivenessMeasurement: checked,
     });
   }
 
-  private handleIsAnonymousCheckboxChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+  private handleIsAnonymousCheckboxChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({
       isBoardAnonymous: checked,
     });
   }
 
-  private handleShouldShowFeedbackAfterCollectChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+  private handleShouldShowFeedbackAfterCollectChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({
       shouldShowFeedbackAfterCollect: checked,
     });
   }
 
-  private handleDisplayPrimeDirectiveChange = (ev: React.MouseEvent<HTMLElement>, checked: boolean) => {
+  private handleDisplayPrimeDirectiveChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({
       displayPrimeDirective: checked,
     });
   }
 
-  private handleMaxVotePerUserChange = (ev: ChangeEvent<HTMLInputElement>) => {
+  private handleMaxVotePerUserChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
     this.setState({
-      maxVotesPerUser: Number(ev.target.value),
+      maxVotesPerUser: Number((event.target as HTMLInputElement | HTMLTextAreaElement)?.value),
     });
   }
 
@@ -313,7 +333,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           <hr></hr>
           <div className="board-metadata-form-section-subheader">
             <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-              Max Votes per User (Current: {this.props.isNewBoardCreation ? 5 : this.props.currentBoard.maxVotesPerUser}):
+              Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxvotesPerUser : this.props.currentBoard.maxVotesPerUser}):
             </label>
             <TextField
               className="title-input-container max-vote-counter"
@@ -332,6 +352,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           <div className="board-metadata-form-section-subheader">
             <div className="flex flex-col">
               <Checkbox
+                id="include-team-assessment-checkbox"
                 label="Include Team Assessment"
                 ariaLabel="Include Team Assessment. This selection cannot be modified after board creation."
                 boxSide="start"
@@ -347,6 +368,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
           <div className="board-metadata-form-section-subheader">
             <Checkbox
+              id="obscure-feedback-checkbox"
               label="Obscure the feedback of others until after Collect phase"
               ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
               boxSide="start"
@@ -358,6 +380,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
           <div className="board-metadata-form-section-subheader">
             <Checkbox
+              id="display-prime-directive"
               label="Display 'Retrospective Prime Directive'"
               ariaLabel="Display 'Retrospective Prime Directive.' This selection cannot be modified after board creation."
               boxSide="start"
@@ -369,6 +392,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
           <div className="board-metadata-form-section-subheader">
             <Checkbox
+              id="feedback-display-names-checkbox"
               label="Do not display names in feedback"
               ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation."
               boxSide="start"
