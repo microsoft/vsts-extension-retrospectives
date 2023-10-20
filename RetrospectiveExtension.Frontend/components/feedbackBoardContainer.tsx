@@ -68,6 +68,7 @@ export interface FeedbackBoardContainerState {
   isPreviewEmailDialogHidden: boolean;
   isRetroSummaryDialogHidden: boolean;
   isBoardCreationDialogHidden: boolean;
+  isBoardDuplicateDialogHidden: boolean;
   isBoardUpdateDialogHidden: boolean;
   isDeleteBoardConfirmationDialogHidden: boolean;
   isMobileBoardActionsDialogHidden: boolean;
@@ -113,6 +114,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isAutoResizeEnabled: true,
       isBackendServiceConnected: false,
       isBoardCreationDialogHidden: true,
+      isBoardDuplicateDialogHidden: true,
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
@@ -787,6 +789,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       displayPrimeDirective);
     await this.reloadBoardsForCurrentTeam();
     this.hideBoardCreationDialog();
+    this.hideBoardDuplicateDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
     // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardCreated);
   }
@@ -892,6 +895,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isBoardUpdateDialogHidden: true });
   }
 
+  private showBoardDuplicateDialog = (): void => {
+    this.setState({ isBoardDuplicateDialogHidden: false });
+  }
+
+  private hideBoardDuplicateDialog = (): void => {
+    this.setState({ isBoardDuplicateDialogHidden: true });
+  }
+
   // Note: This is temporary, to support older boards that do not have an active phase.
   private getCurrentBoardPhase = () => {
     if (!this.state.currentBoard || !this.state.currentBoard.activePhase) {
@@ -954,11 +965,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private renderBoardUpdateMetadataFormDialog = (
     isNewBoardCreation: boolean,
+    isDuplicatingBoard: boolean,
     hidden: boolean,
     onDismiss: () => void,
     dialogTitle: string,
     placeholderText: string,
-    initialValue: string,
     onSubmit: (
       title: string,
       maxVotesPerUser: number,
@@ -983,11 +994,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         }}>
         <FeedbackBoardMetadataForm
           isNewBoardCreation={isNewBoardCreation}
+          isDuplicatingBoard={isDuplicatingBoard}
           currentBoard={this.state.currentBoard}
           teamId={this.state.currentTeam.id}
           maxvotesPerUser={this.state.maxvotesPerUser}
           placeholderText={placeholderText}
-          initialValue={initialValue}
           onFormSubmit={onSubmit}
           onFormCancel={onCancel} />
       </Dialog>);
@@ -1015,6 +1026,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       onClick: this.showBoardCreationDialog,
       text: 'Create new retrospective',
       title: 'Create new retrospective',
+    },
+    {
+      key: 'duplicateBoard',
+      className: 'hide-mobile',
+      iconProps: { iconName: 'Copy' },
+      onClick: this.showBoardDuplicateDialog,
+      text: 'Create a copy of retrospective',
+      title: 'Create a copy of retrospective',
     },
     {
       key: 'editBoard',
@@ -1578,20 +1597,29 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         }
         {this.renderBoardUpdateMetadataFormDialog(
           true,
+          false,
           this.state.isBoardCreationDialogHidden,
           this.hideBoardCreationDialog,
           'Create new retrospective',
           `Example: Retrospective ${new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date())}`,
-          '',
           this.createBoard,
           this.hideBoardCreationDialog)}
+        {this.renderBoardUpdateMetadataFormDialog(
+          true,
+          true,
+          this.state.isBoardDuplicateDialogHidden,
+          this.hideBoardDuplicateDialog,
+          'Create a copy of retrospective',
+          '',
+          this.createBoard,
+          this.hideBoardDuplicateDialog)}
         {this.state.currentBoard && this.renderBoardUpdateMetadataFormDialog(
+          false,
           false,
           this.state.isBoardUpdateDialogHidden,
           this.hideBoardUpdateDialog,
           'Edit retrospective',
           '',
-          this.state.currentBoard.title,
           this.updateBoardMetadata,
           this.hideBoardUpdateDialog)}
         <Dialog
