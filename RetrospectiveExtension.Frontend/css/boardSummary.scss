@@ -27,211 +27,230 @@
 
 .board-summary-table-container {
   min-width: 1000px;
+  overflow: auto;
+  height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
 
-  .ReactTable {
-    height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
-    width: 70vw;
 
-    .rt-table {
-      flex: 0 1 auto;
+  th, td {
+    border: 1px solid rgba(0,0,0,0.02);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
 
-      .rt-thead {
-        background-color: $azdo_blue;
-        color: #fff;
+  table {
+    border: 1px solid rgba(0,0,0,0.1);
+    border-collapse: collapse;
+    overflow: auto;
+    width: 100%;
+    
 
-        .rt-resizable-header-content {
+    thead {
+      background-color: $azdo_blue;
+      color: #fff;
+      
+      tr {
+        th {
+          background-color: $azdo_blue;
+          font-weight: 400;
           height: 30px;
           line-height: 30px;
-        }
+          position: sticky;
+          padding: 5px 5px;
+          top: 0px;
+          z-index: 1;
 
-        .rt-th.-sort-desc,
-        .rt-td.-sort-desc {
-          box-shadow: inset 0 -2px 0 0 rgba(var(--palette-neutral-100, 0, 0, 0), 1);
-        }
-      }
-
-      .rt-tbody {
-        .rt-tr-group {
-          &:nth-child(even) {
-            background-color: var(--border-subtle-color);
+          .resizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            cursor: col-resize;
+            user-select: none;
+            touch-action: none;
           }
 
-          .board-summary-container {
-            display: flex;
-            justify-content: center;
-
-            .rt-tr.-odd,
-            .rt-tr.-even {
-              height: 35px;
-            }
-
-            .board-summary-card,
-            .action-items-summary-card {
-              margin: 8px 6px;
-              background-color: var(--background-color);
-              min-height: 285px;
-
-              .items-stats-container {
-                display: flex;
-                margin: 10px 0;
-
-                .pending-action-item-color {
-                  color: var(--status-warning-text);
-                }
-
-                .count-and-text {
-                  margin: 0 32px 0 16px;
-
-                  .count {
-                    font-weight: 600;
-                    font-size: 15px;
-                  }
-
-                  .text {
-                    font-size: 12px;
-                    color: var(--text-primary-color);
-                  }
-                }
-
-                .stats-icon {
-                  height: 32px;
-                  width: 32px;
-                  font-size: 16px;
-                  padding: 8px;
-                }
-              }
-            }
-
-            .action-items-summary-card {
-              width: 80%;
-              max-width: 800px;
-              overflow-y: auto;
-
-              div[role=row] {
-                background-color: var(--background-color);
-                color: var(--text-primary-color);
-                padding-top: 0;
-                border: none;
-
-                &:nth-child(even) {
-                  background-color: var(--border-subtle-color);
-                }
-              }
-
-              .ms-DetailsList-headerWrapper {
-                border-bottom: 3px var(--border-subtle-color) solid;
-              }
-
-              .ms-DetailsHeader-cell[role=columnheader] {
-                background-color: var(--background-color);
-                color: var(--text-primary-color);
-                border-bottom: 1px solid #fff;
-
-                &:hover {
-                  color: var(--text-primary-color);
-                }
-              }
-
-              .overflow-ellipsis {
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-                display: block;
-                width: 100%;
-              }
-
-              .ms-Viewport {
-                height: 100%;
-
-                .ms-DetailsList {
-                  height: 100%;
-                }
-
-                .ms-DetailsRow {
-                  border: none;
-                }
-              }
-
-              .ms-List-cell {
-                font-size: 14px;
-              }
-
-              @include vsts-workitem-colors;
-
-              .work-item-title {
-                cursor: pointer;
-              }
-
-              .no-action-items {
-                font-size: 15px;
-                position: relative;
-                top: 50%;
-                transform: translateY(-50%);
-                text-align: center;
-              }
-            }
-
-            .board-summary-card {
-              padding: 20px;
-              width: 20%;
-              min-width: 270px;
-              border: 1px solid var(--text-primary-color);
-              border-radius: 4px;
-
-
-              .resolved-green {
-                color: var(--status-success-text);
-              }
-
-              .board-summary-card-title {
-                font-size: 18px;
-                border-bottom: 3px solid $azdo_blue;
-
-                .ms-DocumentCardTitle {
-                  font-weight: 600;
-                  padding: 0;
-                  margin-bottom: 20px;
-                  height: auto;
-                  color: var(--text-primary-color);
-                }
-              }
-            }
+          &:first-of-type {
+            // Expander width setting
+            width: 35px !important;
+            max-width: 35px !important;
+            min-width: 35px !important;
           }
-        }
 
-        .rt-tr {
-          align-items: center;
-          font-size: 14px;
-          font-weight: 400;
-          cursor: pointer;
-        }
+          &.asc {
+            box-shadow: inset 0 3px 0 0 rgba(0,0,0,0.6);
+          }
 
-        .rt-tr.-odd,
-        .rt-tr.-even {
-          height: 45px;
-        }
-      }
-
-      .-pagination {
-        .-btn {
-          border-radius: 0;
-          -webkit-font-smoothing: antialiased;
-          font-size: 14px;
-
-          &:not([disabled]) {
-            background: rgb(0, 120, 212);
-            color: rgb(255, 255, 255);
-
-            &:hover {
-              background-color: rgb(16, 110, 190);
-            }
+          &.desc {
+            box-shadow: inset 0 -2px 0 0 rgba(var(--palette-neutral-100, 0, 0, 0), 1);
           }
         }
       }
     }
 
-    .rt-expander:after {
-      border-top: 7px solid rgba(var(--palette-neutral-100, 0, 0, 0), 1);
+    tbody {
+      tr {
+
+        td {
+          align-items: center;
+          font-size: 14px;
+          font-weight: 400;
+          height: 45px;
+          padding: 7px 5px;
+
+          &:first-of-type {
+            padding: 0px;
+          }
+        }
+
+        &:nth-child(even) {
+          background-color: var(--border-subtle-color);
+        }
+
+        .board-summary-container {
+          display: flex;
+          justify-content: center;
+
+          .rt-tr.-odd,
+          .rt-tr.-even {
+            height: 35px;
+          }
+
+          .board-summary-card,
+          .action-items-summary-card {
+            margin: 8px 6px;
+            background-color: var(--background-color);
+            min-height: 285px;
+
+            .items-stats-container {
+              display: flex;
+              margin: 10px 0;
+
+              .pending-action-item-color {
+                color: var(--status-warning-text);
+              }
+
+              .count-and-text {
+                margin: 0 32px 0 16px;
+
+                .count {
+                  font-weight: 600;
+                  font-size: 15px;
+                }
+
+                .text {
+                  font-size: 12px;
+                  color: var(--text-primary-color);
+                }
+              }
+
+              .stats-icon {
+                height: 32px;
+                width: 32px;
+                font-size: 16px;
+                padding: 8px;
+              }
+            }
+          }
+
+          .action-items-summary-card {
+            width: 80%;
+            max-width: 800px;
+            overflow-y: auto;
+
+            div[role=row] {
+              background-color: var(--background-color);
+              color: var(--text-primary-color);
+              padding-top: 0;
+              border: none;
+
+              &:nth-child(even) {
+                background-color: var(--border-subtle-color);
+              }
+            }
+
+            .ms-DetailsList-headerWrapper {
+              border-bottom: 3px var(--border-subtle-color) solid;
+            }
+
+            .ms-DetailsHeader-cell[role=columnheader] {
+              background-color: var(--background-color);
+              color: var(--text-primary-color);
+              border-bottom: 1px solid #fff;
+
+              &:hover {
+                color: var(--text-primary-color);
+              }
+            }
+
+            .overflow-ellipsis {
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+              display: block;
+              width: 100%;
+            }
+
+            .ms-Viewport {
+              height: 100%;
+
+              .ms-DetailsList {
+                height: 100%;
+              }
+
+              .ms-DetailsRow {
+                border: none;
+              }
+            }
+
+            .ms-List-cell {
+              font-size: 14px;
+            }
+
+            @include vsts-workitem-colors;
+
+            .work-item-title {
+              cursor: pointer;
+            }
+
+            .no-action-items {
+              font-size: 15px;
+              position: relative;
+              top: 50%;
+              transform: translateY(-50%);
+              text-align: center;
+            }
+          }
+
+          .board-summary-card {
+            padding: 20px;
+            width: 20%;
+            min-width: 270px;
+            border: 1px solid var(--text-primary-color);
+            border-radius: 4px;
+
+
+            .resolved-green {
+              color: var(--status-success-text);
+            }
+
+            .board-summary-card-title {
+              font-size: 18px;
+              border-bottom: 3px solid $azdo_blue;
+
+              .ms-DocumentCardTitle {
+                font-weight: 600;
+                padding: 0;
+                margin-bottom: 20px;
+                height: auto;
+                color: var(--text-primary-color);
+              }
+            }
+          }
+        }
+      }
     }
   }
 
@@ -243,4 +262,12 @@
     color: var(--status-warning-text);
     font-weight: 600;
   }
+}
+
+.board-summary-initialization-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -50px;
 }

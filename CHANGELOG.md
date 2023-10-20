@@ -16,6 +16,8 @@ Favorable (9-10). From [Github PR #531](https://github.com/microsoft/vsts-extens
 * New tab in "Focus Mode", called "All", which contains every card on the current retrospective board so that
 your team can prioritize the highest voted cards first. From [Github PR #531](https://github.com/microsoft/vsts-extension-retrospectives/pull/543).
 
+* Package updates for SASS and ReactTable that enhances the developer experience to run `npm i` without the need of `--force` or `--legacy-peer-deps`. From [Github PR #553](https://github.com/microsoft/vsts-extension-retrospectives/pull/553)
+
 ## v1.91.1
 
 * Adding `import data` and `export data` functions
