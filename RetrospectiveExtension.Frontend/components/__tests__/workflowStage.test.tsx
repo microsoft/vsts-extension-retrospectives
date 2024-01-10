@@ -6,6 +6,7 @@ import { WorkflowPhase } from '../../interfaces/workItem';
 
 const mockedProps = mocked({
   display: "Sample Workflow Stage Text",
+  ariaPosInSet: 1,
   value: WorkflowPhase.Collect,
   isActive: true,
   clickEventCallback: jest.fn(() => {})
