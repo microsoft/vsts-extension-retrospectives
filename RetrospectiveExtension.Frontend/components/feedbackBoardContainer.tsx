@@ -1439,21 +1439,25 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <div className="workflow-stage-tab-container">
                         <WorkflowStage
                           display="Collect"
+                          ariaPosInSet={1}
                           value={WorkflowPhase.Collect}
                           isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect}
                           clickEventCallback={this.clickWorkflowStateCallback} />
                         <WorkflowStage
                           display="Group"
+                          ariaPosInSet={2}
                           value={WorkflowPhase.Group}
                           isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group}
                           clickEventCallback={this.clickWorkflowStateCallback} />
                         <WorkflowStage
                           display="Vote"
+                          ariaPosInSet={3}
                           value={WorkflowPhase.Vote}
                           isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote}
                           clickEventCallback={this.clickWorkflowStateCallback} />
                         <WorkflowStage
                           display="Act"
+                          ariaPosInSet={4}
                           value={WorkflowPhase.Act}
                           isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act}
                           clickEventCallback={this.clickWorkflowStateCallback} />
