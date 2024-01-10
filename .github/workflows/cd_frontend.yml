@@ -1,10 +1,7 @@
 name: 'CD - Frontend'
 
 on:
-  push:
-    branches:
-      - main
-      - dev
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -15,64 +12,40 @@ jobs:
     name: Frontend - Deploy package
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      name: Check out repository
+    - name: Check out repository
+      uses: actions/checkout@v2
 
-    - run: |
-        # Current/target branches' names
+    - name: Install tools used for deployment
+      run: |
+        npm install -g tfx-cli node-jq
+
+    - name: Prepare vss-extension-dev.json
+      working-directory: 'RetrospectiveExtension.Frontend'
+      run: |
+        # Create vss-extension-dev.json from template
+        cp vss-extension-dev.json.template vss-extension-dev.json
+
         branch=${GITHUB_REF#refs/heads/}
         target_branch="${{ github.event.pull_request.base.ref }}"
 
-        # Extension Publishers
-        rc_publisher=retroextcd-rc
-        pr_publisher=retroextcd-prval
-
-        # Extension Prefix
-        # Remove all forward slashes to use for Extension Id
-        rc_ext_prefix=${branch//\//}
-        pr_branch=${{ github.event.pull_request.head.ref }}
-        if [[ "$pr_branch" ]]; then
-          pr_ext_prefix=${pr_branch//\//}
-        fi
-
-        # Test Organizations
-        rc_test_organization=retroextcd-rc
-        pr_test_organization=retroextcd-prval
-
-        if [[ "$branch" == main ]] || [[ "$branch" == dev ]]; then
-          echo "Setting config for Release Candidate (RC) environment"
-          echo "##[set-output name=publisher;]$rc_publisher"
-          echo "##[set-output name=ext_prefix;]$rc_ext_prefix"
-          echo "##[set-output name=test_organization;]$rc_test_organization"
-        elif [[ "$target_branch" == main ]] || [[ "$target_branch" == dev ]]; then
+        if [[ "$branch" == main ]]; then
+          echo "Setting config for production environment"
+          PUBLISHER="enpolat"
+          EXTENSION_NAME="retrospective-vsts-extension"
+        elif [[ "$target_branch" == main ]]; then
           echo "Setting config for PR validation"
-          echo "##[set-output name=publisher;]$pr_publisher"
-          echo "##[set-output name=ext_prefix;]$pr_ext_prefix"
-          echo "##[set-output name=test_organization;]$pr_test_organization"
+          PUBLISHER="enginpolat"
+          EXTENSION_NAME="retrospective-vsts-extension-dev"
         fi
-      name: Set up default variables
-      id: config
-
-    - run: |
-        npm install -g \
-          tfx-cli \
-          node-jq
-      name: Install tools used for deployment
-
-    - run: |
-        # Create vss-extension-dev.json from template
-        cp vss-extension-dev.json.template vss-extension-dev.json
 
         # Update vss-extension-dev.json
         scripts/update_ext_manifest.sh \
           vss-extension-dev.json \
-          ${{ steps.config.outputs.publisher }} \
-          ${{ steps.config.outputs.ext_prefix }} \
+          "${PUBLISHER}" \
+          ${EXTENSION_NAME} \
           ${{ secrets.AZURE_DEVOPS_TOKEN }}
 
         cat vss-extension-dev.json
-      name: Prepare vss-extension-dev.json
-      working-directory: 'RetrospectiveExtension.Frontend'
 
     - run: |
         npm install
