@@ -8,6 +8,7 @@ export interface IWorkflowStageProps {
   display: string;
   value: WorkflowPhase;
   isActive: boolean;
+  ariaPosInSet: number;
   clickEventCallback: (clickedElement: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => void;
 }
 
@@ -30,6 +31,8 @@ export interface IWorkflowStageState {
 
     return (
       <div className={classes}
+        aria-setsize={4}
+        aria-posinset={this.props.ariaPosInSet}
         aria-label={ariaLabel}
         role="tab"
         onClick={ (e) => this.clickWorkflowState(e, this.props.value) }
