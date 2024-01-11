@@ -31,77 +31,34 @@ jobs:
         if [[ "$branch" == main ]]; then
           echo "Setting config for production environment"
           PUBLISHER="enpolat"
-          EXTENSION_NAME="retrospective-vsts-extension"
         elif [[ "$target_branch" == main ]]; then
           echo "Setting config for PR validation"
           PUBLISHER="enginpolat"
-          EXTENSION_NAME="retrospective-vsts-extension-dev"
         fi
 
         # Update vss-extension-dev.json
         scripts/update_ext_manifest.sh \
           vss-extension-dev.json \
-          "${PUBLISHER}" \
-          ${EXTENSION_NAME} \
+          "enginpolat" \
+          "retrospective-vsts-extension-dev" \
           ${{ secrets.AZURE_DEVOPS_TOKEN }}
 
         cat vss-extension-dev.json
 
-    - run: |
-        npm install
-        npm run build:p
-        npm run pack:d
-      name: Prepare extension package
+    - name: Prepare extension package
       working-directory: 'RetrospectiveExtension.Frontend'
       env:
         REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
         REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
+      run: |
+        npm install
+        npm run build:p
+        npm run pack:d
 
-    - run: >
+    - name: Publish extension
+      working-directory: 'RetrospectiveExtension.Frontend'
+      run: >
         tfx extension publish
         --manifests vss-extension-dev.json
         --vsix ./dist/*.vsix
         --token ${{ secrets.AZURE_DEVOPS_TOKEN }}
-      name: Publish extension
-      working-directory: 'RetrospectiveExtension.Frontend'
-
-    - run: >
-        tfx extension share
-        --no-prompt
-        --publisher ${{ steps.config.outputs.publisher }}
-        --extensionId ${{ steps.config.outputs.ext_prefix }}-retrospective-vsts-extension-dev
-        --shareWith ${{ steps.config.outputs.test_organization }}
-        --token ${{ secrets.AZURE_DEVOPS_TOKEN }}
-      name: Share extension
-      working-directory: 'RetrospectiveExtension.Frontend'
-
-    - run: >
-        tfx extension install
-        --no-prompt
-        --publisher ${{ steps.config.outputs.publisher }}
-        --extensionId ${{ steps.config.outputs.ext_prefix }}-retrospective-vsts-extension-dev
-        --serviceUrl https://dev.azure.com/${{ steps.config.outputs.test_organization }}
-        --token ${{ secrets.AZURE_DEVOPS_TOKEN }}
-      name: Install extension
-      working-directory: 'RetrospectiveExtension.Frontend'
-
-    - run: |
-        # Download developer certificate
-        cert_file=cert.txt
-        scripts/download_dev_cert.sh \
-          ${{ secrets.AZURE_DEVOPS_TOKEN }} \
-          ${{ steps.config.outputs.publisher }} \
-          ${{ steps.config.outputs.ext_prefix }}-retrospective-vsts-extension-dev \
-          $cert_file
-
-        # Update app settings
-        cert=$(cat $cert_file)
-        scripts/update_app_conf.sh \
-          ${{ secrets.TENANT_ID }} \
-          ${{ secrets.SERVICE_PRINCIPAL_ID }} \
-          ${{ secrets.SERVICE_PRINCIPAL_SECRET }} \
-          ${{ secrets.BACKEND_RESOURCE_GROUP }} \
-          ${{ secrets.BACKEND_WEBAPPNAME }} \
-          $cert
-      name: Update backend configuration
-      working-directory: 'RetrospectiveExtension.Frontend'
