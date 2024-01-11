@@ -19,7 +19,7 @@
     cat <<< $(jq ".publisher = \"$publisher\"" $ext_file) > $ext_file
 
     # Inject Extension Id and Name
-    cat <<< $(jq ".id = \"$ext_prefix-retrospective-vsts-extension-dev\"" $ext_file) > $ext_file
+    cat <<< $(jq ".id = \"$ext_prefix\"" $ext_file) > $ext_file
     cat <<< $(jq ".name = \"$ext_prefix - Retrospectives (Dev)\"" $ext_file) > $ext_file
 
     # Inject version
@@ -27,7 +27,7 @@
         --no-prompt \
         --json \
         --publisher $publisher \
-        --extensionId $ext_prefix-retrospective-vsts-extension-dev \
+        --extensionId $ext_prefix \
         --token $pat)
 
     if [[ "$ext_info" != "null" ]]; then
