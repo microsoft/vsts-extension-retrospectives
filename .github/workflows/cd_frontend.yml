@@ -22,28 +22,13 @@ jobs:
     - name: Prepare vss-extension-dev.json
       working-directory: 'RetrospectiveExtension.Frontend'
       run: |
-        # Create vss-extension-dev.json from template
         cp vss-extension-dev.json.template vss-extension-dev.json
 
-        branch=${GITHUB_REF#refs/heads/}
-        target_branch="${{ github.event.pull_request.base.ref }}"
-
-        if [[ "$branch" == main ]]; then
-          echo "Setting config for production environment"
-          PUBLISHER="enpolat"
-        elif [[ "$target_branch" == main ]]; then
-          echo "Setting config for PR validation"
-          PUBLISHER="enginpolat"
-        fi
-
-        # Update vss-extension-dev.json
         scripts/update_ext_manifest.sh \
-          vss-extension-dev.json \
+          "vss-extension-dev.json" \
           "enginpolat" \
           "retrospective-vsts-extension-dev" \
-          ${{ secrets.AZURE_DEVOPS_TOKEN }}
-
-        cat vss-extension-dev.json
+          "${{ secrets.AZURE_DEVOPS_TOKEN }}"
 
     - name: Prepare extension package
       working-directory: 'RetrospectiveExtension.Frontend'
@@ -61,4 +46,4 @@ jobs:
         tfx extension publish
         --manifests vss-extension-dev.json
         --vsix ./dist/*.vsix
-        --token ${{ secrets.AZURE_DEVOPS_TOKEN }}
+        --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
