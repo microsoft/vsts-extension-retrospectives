@@ -193,7 +193,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       nonHiddenWorkItemTypes: columnProps.nonHiddenWorkItemTypes,
       allWorkItemTypes: columnProps.allWorkItemTypes,
       isInteractable: isInteractable,
-      shouldHaveFocus: columnItem.shouldHaveFocus ? true : false,
+      shouldHaveFocus: columnItem.shouldHaveFocus,
       hideFeedbackItems: columnProps.hideFeedbackItems,
       userIdRef: columnItem.feedbackItem.userIdRef,
       onVoteCasted: columnProps.onVoteCasted,
@@ -218,7 +218,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       .map((columnItem) => {
         const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem, true);
 
-        if (columnItem.feedbackItem.childFeedbackItemIds && columnItem.feedbackItem.childFeedbackItemIds.length) {
+        if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
           const childItemsToGroup = this.props.columnItems
             .filter((childColumnItem) => columnItem.feedbackItem.childFeedbackItemIds.some((childId) => childId === childColumnItem.feedbackItem.id))
             .map((childColumnItem) => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem, true));
@@ -253,9 +253,9 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           <div className="feedback-column-title"
             aria-label={this.props.columnName}>
             <i className={classNames(this.props.iconClass, 'feedback-column-icon')} />
-            <div className="feedback-column-name">
+            <h2 className="feedback-column-name">
               {this.props.columnName}
-            </div>
+            </h2>
           </div>
         </div>
         <div className={classNames('feedback-column-content', { 'hide-collapse': this.state.isCollapsed })}>
