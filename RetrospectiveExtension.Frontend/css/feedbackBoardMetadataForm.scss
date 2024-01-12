@@ -65,7 +65,8 @@ $feedback_column_card_height: 60px;
     color: var(--text-primary-color);
 
     label {
-      margin-right: 10px;
+      flex-grow: 1;
+      text-align: start;
     }
   }
 
@@ -257,6 +258,7 @@ $feedback_column_card_height: 60px;
     flex-direction: column;
     align-items: center;
     padding-bottom: 2px;
+    flex-grow: 1;
 
     &.column-template-dropdown {
       display: inline-flex;
@@ -277,13 +279,19 @@ $feedback_column_card_height: 60px;
     .ms-TextField-wrapper {
       display: flex;
       align-items: center;
+      width: 100%;
 
       .ms-Label {
         width: 50px;
       }
 
       .ms-TextField-fieldGroup {
-        width: 300px;
+        width: 100%;
+        max-width: 100%;
+
+        #retrospective-title-input {
+          width: 100%;
+        }
       }
     }
 
