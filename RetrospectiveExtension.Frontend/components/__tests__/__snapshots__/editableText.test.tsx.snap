@@ -29,7 +29,9 @@ exports[`Editable Text Component updates text appropriately. 1`] = `
     className="editable-text"
     onClick={[Function]}
     onKeyDown={[Function]}
+    role="textbox"
     tabIndex={0}
+    title="Click to edit"
   >
     Test Text
   </p>
