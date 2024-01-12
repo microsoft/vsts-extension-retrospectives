@@ -1231,9 +1231,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </DialogFooter>
           </Dialog>
 
-          <div className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
+          <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
             Retrospectives
-          </div>
+          </h1>
           <SelectorCombo<WebApiTeam>
             className="flex items-center mx-6"
             currentValue={this.state.currentTeam}
