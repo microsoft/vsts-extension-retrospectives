@@ -188,8 +188,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
           tabIndex={0}
           onKeyDown={this.props.isDisabled ? () => { } : this.handleEditKeyDown}
           onClick={this.props.isDisabled ? () => { } : this.handleEdit}
-          aria-label={'Feedback title is ' + (this.props.isDisabled ? 'obscured during collection.' : this.props.text + '. Click to edit.')}
-          aria-required={true}>
+          aria-label={'Feedback title is ' + (this.props.isDisabled ? 'obscured during collection.' : this.props.text + '. Click to edit.')}>
           {this.props.text}
         </p>
       </div>
