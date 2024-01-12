@@ -26,7 +26,6 @@ exports[`Editable Text Component updates text appropriately. 1`] = `
 >
   <p
     aria-label="Feedback title is Test Text. Click to edit."
-    aria-required={true}
     className="editable-text"
     onClick={[Function]}
     onKeyDown={[Function]}
