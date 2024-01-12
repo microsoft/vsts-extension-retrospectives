@@ -320,6 +320,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
             <label htmlFor="title-input-container">Title:</label>
             <TextField
               ariaLabel="Please enter new retrospective name"
+              aria-required={true}
               placeholder={this.props.placeholderText}
               className="title-input-container"
               id="retrospective-title-input"
