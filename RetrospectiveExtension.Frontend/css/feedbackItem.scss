@@ -246,10 +246,6 @@
 .retrospectives-move-feedback-item-dialog {
   background-color: var(--background-color);
 
-  .ms-SearchBox {
-    margin-top: 1em;
-  }
-
   .ms-Dialog-title,
   .ms-Dialog-subText {
     color: var(--text-primary-color);
@@ -264,6 +260,10 @@
 
 .retrospectives-group-feedback-item-dialog {
   background-color: var(--background-color);
+
+  .ms-SearchBox {
+    margin-top: 1em;
+  }
 
   .ms-Dialog-title,
   .ms-Dialog-subText {
