@@ -618,7 +618,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isMainItem = isNotGroupedItem || this.props.groupedItemProps.isMainItem;
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const groupItemsCount = this.props && this.props.groupedItemProps && this.props.groupedItemProps.groupedCount + 1;
-    const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : 'Feedback group main item. Group has ' + groupItemsCount + ' items.');
+    const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : `Feedback group main item. Group has ${groupItemsCount} items.`);
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
     const originalColumnId = this.props.originalColumnId;
@@ -961,15 +961,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           onDismiss={this.hideGroupFeedbackItemDialog}
           dialogContentProps={{
             type: DialogType.close,
-            title: 'Group Feedback',
-            subText: 'Search and select the feedback under which to group the current feedback.'
+            title: 'Group Feedback'
           }}
           modalProps={{
             isBlocking: false,
             containerClassName: 'retrospectives-group-feedback-item-dialog',
             className: 'retrospectives-dialog-modal',
           }}>
-          <label className="ms-Dialog-subText subText-140" htmlFor="feedback-item-search-input">Search and select the feedback under which to group the current feedback.</label>
+          <label className="ms-Dialog-subText" htmlFor="feedback-item-search-input" style={{ marginBottom: "1em" }}>Search and select the feedback under which to group the current feedback.</label>
           <SearchBox
             id="feedback-item-search-input"
             autoFocus={true}
