@@ -968,14 +968,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             containerClassName: 'retrospectives-group-feedback-item-dialog',
             className: 'retrospectives-dialog-modal',
           }}>
-          <label className="ms-Dialog-subText" htmlFor="feedback-item-search-input" style={{ marginBottom: "1em" }}>Search and select the feedback under which to group the current feedback.</label>
+          <label className="ms-Dialog-subText" htmlFor="feedback-item-search-input">Search and select the feedback under which to group the current feedback.</label>
           <SearchBox
             id="feedback-item-search-input"
             autoFocus={true}
             placeholder="Enter the feedback title"
             aria-label="Enter the feedback title"
             onChange={this.handleFeedbackItemSearchInputChange}
-            className="feedback-item-name-input"
+            style={{ marginTop: "1em" }}
           />
           <div className="output-container">
             {!this.state.searchedFeedbackItems.length && this.state.searchTerm &&
