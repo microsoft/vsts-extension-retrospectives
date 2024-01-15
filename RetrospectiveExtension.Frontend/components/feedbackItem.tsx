@@ -878,12 +878,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               <div className="group-child-feedback-stack">
                 <div className="related-feedback-header"> <i className="far fa-comments" />&nbsp;Related Feedback</div>
                 <ul className="fa-ul" aria-label="List of Related Feedback">
-                  {childrenIds.map((id: string, index: React.Key) => {
+                  {childrenIds.map((id: string) => {
                     const childCard: IColumnItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
                     const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
 
                     return childCard &&
-                      <li key={index}>
+                      <li key={id}>
                         <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}><i className="fa-solid fa-quote-left" /></span>
                         <span className="related-feedback-title"
                           aria-label={'Title of the feedback is ' + childCard.feedbackItem.title}
@@ -942,8 +942,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               return <DefaultButton
                 key={columnId}
                 className="move-feedback-item-column-button"
-                onClick={async () => {
-                  await this.props.moveFeedbackItem(
+                onClick={() => {
+                  this.props.moveFeedbackItem(
                     this.props.refreshFeedbackItems,
                     this.props.boardId,
                     this.props.id,
