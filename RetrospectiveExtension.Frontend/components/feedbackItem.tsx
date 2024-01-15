@@ -975,7 +975,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             placeholder="Enter the feedback title"
             aria-label="Enter the feedback title"
             onChange={this.handleFeedbackItemSearchInputChange}
-            style={{ marginTop: "1em" }}
           />
           <div className="output-container">
             {!this.state.searchedFeedbackItems.length && this.state.searchTerm &&
