@@ -257,15 +257,18 @@ function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
   }
 
   const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
-
     const sortDirection: false | SortDirection = header.column.getIsSorted()
-    let sortClassName: string = '';
+    let sortClassName: string = "";
+    let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
     if(sortDirection) {
       sortClassName = sortDirection;
+      ariaSort = `${sortDirection}ending`;
     }
 
     return {
       key: header.id,
+      role: "button",
+      'aria-sort': ariaSort,
       style: {
         minWidth: header.getSize(),
         width: header.getSize()
@@ -319,7 +322,6 @@ function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
   }
 
   useEffect(() => {
-
     if(teamId !== props.teamId) {
       try {
         BoardDataService.getBoardsForTeam(props.teamId)
@@ -328,15 +330,12 @@ function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
           handleBoardsDocuments(boardDocuments);
         })
         .catch(e => {
-          // TODO: Better error handling.
           appInsights.trackException(e);
         })
       } catch (e) {
-        // TODO: Better error handling.
         appInsights.trackException(e);
       }
     }
-    
   }, [props.teamId])
 
   if(boardSummaryState.allDataLoaded !== true) {
