@@ -160,7 +160,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     reflectBackendService.removeOnReceiveDeletedItem(this.receiveDeletedItemHandler);
   }
 
-  private receiveDeletedItemHandler = async (columnId: string, feedbackItemId: string) => {
+  private receiveDeletedItemHandler = (columnId: string, feedbackItemId: string) => {
     if (feedbackItemId === this.props.id && !this.state.isMarkedForDeletion) {
       this.markFeedbackItemForDelete();
     }
@@ -247,8 +247,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     });
   }
 
-  private onConfirmRemoveFeedbackItemFromGroup = async () => {
-    await this.props.moveFeedbackItem(
+  private onConfirmRemoveFeedbackItemFromGroup = () => {
+    this.props.moveFeedbackItem(
       this.props.refreshFeedbackItems,
       this.props.boardId,
       this.props.id,
@@ -271,7 +271,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   private markFeedbackItemForDelete = (isLocalDelete: boolean = false) => {
-    if (this.props.groupedItemProps && this.props.groupedItemProps.isMainItem && this.props.groupedItemProps.isGroupExpanded) {
+    if (this.props.groupedItemProps?.isMainItem && this.props.groupedItemProps?.isGroupExpanded) {
       this.props.groupedItemProps.toggleGroupExpand();
     }
 
@@ -315,12 +315,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         this.props.refreshFeedbackItems([updatedItem], true);
       }
     }
-  }
-
-  private showMobileFeedbackItemActionsDialog = () => {
-    this.setState({
-      isMobileFeedbackItemActionsDialogHidden: false,
-    });
   }
 
   private hideMobileFeedbackItemActionsDialog = () => {
@@ -566,8 +560,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   private pressSearchedFeedbackItem = (event: React.KeyboardEvent<HTMLDivElement>, feedbackItemProps: IFeedbackItemProps) => {
     event.stopPropagation();
 
-    // Enter
-    if (event.keyCode === 13) {
+    if (event.key === "Enter") {
       FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(
         feedbackItemProps,
         this.props.id,
@@ -576,8 +569,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       this.hideGroupFeedbackItemDialog();
     }
 
-    // ESC
-    if (event.keyCode === 27) {
+    if (event.key === "Escape") {
       this.hideGroupFeedbackItemDialog();
     }
   }
@@ -617,7 +609,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isNotGroupedItem = !this.props.groupedItemProps;
     const isMainItem = isNotGroupedItem || this.props.groupedItemProps.isMainItem;
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
-    const groupItemsCount = this.props && this.props.groupedItemProps && this.props.groupedItemProps.groupedCount + 1;
+    const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
     const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : `Feedback group main item. Group has ${groupItemsCount} items.`);
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
@@ -1040,8 +1032,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         </Dialog>
         <Dialog
           hidden={this.state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden}
-          maxWidth={700}
-          minWidth={700}
           onDismiss={this.hideRemoveFeedbackItemFromGroupConfirmationDialog}
           dialogContentProps={{
             type: DialogType.close,
