@@ -1436,7 +1436,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           </TooltipHost>
                         </div>
                       }
-                      <div className="workflow-stage-tab-container">
+                      <div className="workflow-stage-tab-container" role="tablist">
                         <WorkflowStage
                           display="Collect"
                           ariaPosInSet={1}
