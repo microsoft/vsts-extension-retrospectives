@@ -258,15 +258,17 @@ function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
 
   const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
     const sortDirection: false | SortDirection = header.column.getIsSorted()
-    let sortClassName: string = '';
+    let sortClassName: string = "";
+    let ariaSort = "ascending";
     if(sortDirection) {
       sortClassName = sortDirection;
+      ariaSort = "descending";
     }
 
     return {
       key: header.id,
       role: "button",
-      ariaSort: `ascending_${sortDirection}_${sortClassName}`,
+      ariaSort,
       style: {
         minWidth: header.getSize(),
         width: header.getSize()
