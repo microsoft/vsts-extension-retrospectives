@@ -614,7 +614,3 @@ these tests, perform the following steps:
 ## License Information
 
 Copyright (c) Microsoft Corporation. All rights reserved.
-
----
-
-[Return to Table of Contents](#table-of-contents)
