@@ -1,7 +1,7 @@
 # Retrospectives
 
 [![codecov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
-[![CI - FrontEnd](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml)
+[![CI - Frontend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml)
 [![CI - Backend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml)
 [![CD - Frontend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/cd_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/cd_frontend.yml)
 
