@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { PrimaryButton, DefaultButton, IconButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
@@ -11,7 +11,6 @@ import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/Docum
 import classNames from 'classnames'
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
 import { v4 as uuid } from 'uuid';
-import { ChangeEvent } from 'react';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
@@ -166,7 +165,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     });
   }
 
-  private handleMaxVotePerUserChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+  private handleMaxVotePerUserChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     this.setState({
       maxVotesPerUser: Number((event.target as HTMLInputElement | HTMLTextAreaElement)?.value),
     });
