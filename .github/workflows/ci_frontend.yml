@@ -18,10 +18,10 @@ jobs:
     name: Frontend - Build and Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         name: Check out repository
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         name: Setup node
         with:
           node-version: '16'
@@ -44,7 +44,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: Upload test report
-        uses: dorny/test-reporter@v1.5.0
+        uses: dorny/test-reporter@v1.7.0
         with:
           name: JEST Tests
           path: reports/jest-*.xml
@@ -53,7 +53,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.4
         with:
           name: Codecov Run
           files: coverage/coverage-final.json
