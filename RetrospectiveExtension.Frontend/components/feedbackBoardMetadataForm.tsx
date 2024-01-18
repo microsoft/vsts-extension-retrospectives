@@ -450,6 +450,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   <DefaultButton
                     className="feedback-column-card-icon-button"
                     ariaLabel="Change column icon"
+                    title="Change column icon"
                     disabled={columnCard.markedForDeletion}
                     onClick={
                       () => {
@@ -463,6 +464,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   <DefaultButton
                     className="feedback-column-card-accent-color-button"
                     ariaLabel="Change column color"
+                    title="Change column color"
                     disabled={columnCard.markedForDeletion}
                     onClick={
                       () => {
