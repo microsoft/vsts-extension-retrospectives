@@ -1,6 +1,6 @@
 import React from 'react';
 import { PrimaryButton, DefaultButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
-import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
+import { Dialog, DialogBase, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { ViewMode } from '../config/constants';
@@ -42,6 +42,15 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       isWhatsNewDialogHidden: true,
       isGetHelpDialogHidden: true
     };
+  }
+
+  private getChangelog = (): string[] => {
+    return [
+      'Team Assessment form: Background colors for each number on the spectrum now more closely resemble the Retrospective summary\'s color separation for the three categories: Reds and Oranges for Unfavorable (1-6), Yellows for Neutral (7-8), Greens for Favorable (9-10).',
+      'Related feedback items, in "Focus Mode", now show the original column textual as well as visually.',
+      'New tab in "Focus Mode", called "All", which contains every card on the current retrospective board so that your team can prioritize the highest voted cards first. ',
+      'Duplicate an existing board with the new menu option "Create a copy of retrospective".'
+    ];
   }
 
   private exportData = async () => {
@@ -239,14 +248,23 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           onDismiss={this.hideWhatsNewDialog}
           dialogContentProps={{
             type: DialogType.close,
-            title: 'What\'s New',
-            subText: "Added 'import data' and 'export data' features",
+            title: 'What\'s New'
           }}
           minWidth={450}
           modalProps={{
             isBlocking: true,
             containerClassName: 'whatsnew-dialog',
           }}>
+          <DialogBase>
+            
+          </DialogBase>
+          <DialogContent>
+            <ul style={{listStyle: 'initial'}}>
+              {this.getChangelog().map((change, index) => {
+                return <li key={`changelog-item${index}`} style={{marginBottom: '1rem'}}>{change}</li>;
+              })}
+            </ul>
+          </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
             <PrimaryButton className="whats-new-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
