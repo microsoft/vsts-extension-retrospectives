@@ -314,7 +314,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     return (
       <div className="board-metadata-form">
         <section className="board-metadata-form-board-settings hide-mobile">
-          <h3 className="board-metadata-form-section-header">Board Settings</h3>
+          <h2 className="board-metadata-form-section-header">Board Settings</h2>
           <div className="board-metadata-form-section-subheader">
             <label htmlFor="title-input-container">Title<span style={{color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px"}}>(*)</span>:</label>
             <TextField
@@ -403,7 +403,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           </div>
         </section>
         <section className="board-metadata-edit-column-settings hide-mobile">
-          <h3 className="board-metadata-form-section-header">Column Settings</h3>
+          <h2 className="board-metadata-form-section-header">Column Settings</h2>
           <div className="board-metadata-form-section-information">
             <i className="fas fa-exclamation-circle"></i>&nbsp;You can create a maximum of {this.maxColumnCount} columns in a retrospective.
           </div>
