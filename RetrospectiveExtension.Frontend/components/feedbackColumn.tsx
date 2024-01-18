@@ -260,11 +260,11 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         </div>
         <div className={classNames('feedback-column-content', { 'hide-collapse': this.state.isCollapsed })}>
           {this.props.workflowPhase === WorkflowPhase.Collect &&
-            <div className="create-container" aria-label="Create Feedback Item">
+            <div className="create-container">
               <ActionButton iconProps={{ iconName: 'Add' }}
                 componentRef={(element: IButton) => { this.createFeedbackButton = element; }}
                 onClick={this.createEmptyFeedbackItem}
-                aria-label="Create Feedback Item"
+                aria-label="Add new feedback"
                 className="create-button">
                 Add new feedback
               </ActionButton>
