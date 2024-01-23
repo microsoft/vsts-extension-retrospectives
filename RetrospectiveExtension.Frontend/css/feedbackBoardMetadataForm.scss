@@ -4,6 +4,7 @@ $feedback_column_card_height: 60px;
 
 .board-metadata-form {
   text-align: center;
+  margin-top: 15px;
 
   hr {
     border: 0.5px solid $azdo_blue;
@@ -48,6 +49,10 @@ $feedback_column_card_height: 60px;
     border: $border_grey 1px solid;
     padding: 10px;
     margin-bottom: 5px;
+
+    &--no-padding {
+      padding: 0;
+    }
   }
 
   .board-metadata-edit-column-settings {
@@ -67,6 +72,17 @@ $feedback_column_card_height: 60px;
     label {
       flex-grow: 1;
       text-align: start;
+    }
+  }
+
+  .board-metadata-table {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    border-collapse: collapse;
+    overflow: auto;
+    width: 100%;
+
+    td, th {
+      color: var(--text-primary-color);
     }
   }
 

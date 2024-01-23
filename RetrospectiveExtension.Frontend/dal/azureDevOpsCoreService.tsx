@@ -1,5 +1,5 @@
 import { CoreRestClient } from 'azure-devops-extension-api/Core/CoreClient';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
+import { WebApiTeam, } from 'azure-devops-extension-api/Core';
 import { TeamMember } from 'azure-devops-extension-api/WebApi';
 import { getClient } from 'azure-devops-extension-api/Common';
 
@@ -55,7 +55,7 @@ class AzureDevOpsCoreService {
 
     const getTeamBatch = async (skip: number) => {
       const teamBatch: WebApiTeam[] =
-        await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, this.maxTeamsPerRequest, skip);
+        await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, this.maxTeamsPerRequest, skip, true);
 
       if (teamBatch.length > 0) {
         allTeams.push(...teamBatch);

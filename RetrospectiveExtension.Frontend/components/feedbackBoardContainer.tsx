@@ -41,6 +41,7 @@ import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
 import boardDataService from '../dal/boardDataService';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
+import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -92,6 +93,7 @@ export interface FeedbackBoardContainerState {
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   members: TeamMember[];
+  allMembers: TeamMember[];
   castedVoteCount: number;
   boardColumns: IFeedbackColumn[];
   questionIdForDiscussAndActBoardUpdate: number;
@@ -113,7 +115,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isAppInitialized: false,
       isAutoResizeEnabled: true,
       isBackendServiceConnected: false,
-      isBoardCreationDialogHidden: true,
+      isBoardCreationDialogHidden: false,
       isBoardDuplicateDialogHidden: true,
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
@@ -145,6 +147,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamEffectivenessMeasurementAverageVisibilityClassName: "hidden",
       actionItemIds: [],
       members: [],
+      allMembers: [],
       castedVoteCount: 0,
       boardColumns: [],
       questionIdForDiscussAndActBoardUpdate: -1
@@ -163,9 +166,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      const initalizedTeamAndBoardState = await this.initializeFeedbackBoard();
+      const initializedTeamAndBoardState = await this.initializeFeedbackBoard();
 
-      this.setState({ ...initalizedTeamAndBoardState, isTeamDataLoaded: true, }, this.initializeProjectTeams);
+      this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true, }, this.initializeProjectTeams);
     } catch (error) {
       console.error({ m: "initalizedTeamAndBoardState", error });
     }
@@ -220,28 +223,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isAppInitialized: true });
   }
 
-  private async updateFeedbackItemsAndContributors() {
-    const board = await itemDataService.getBoardItem(this.state.currentTeam.id, this.state.currentBoard.id);
-
-    const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board.id);
-
-    let actionItemIds: number[] = [];
-    feedbackItems.forEach(item => {
-      actionItemIds = actionItemIds.concat(item.associatedActionItemIds);
-    });
-
-    const contributors = feedbackItems.map(e => { return { id: e.userIdRef, name: e?.createdBy?.displayName, imageUrl: e?.createdBy?.imageUrl }; }).filter((v, i, a) => a.indexOf(v) === i);
-
-    const votes = Object.values(board.boardVoteCollection || []);
-
-    this.setState({
-      actionItemIds: actionItemIds.filter(item => item !== undefined),
-      feedbackItems,
-      contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
-      castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0
-    });
-  }
-
   public componentDidUpdate(prevProps: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
     // TODO (enpolat) : if (prevState.currentTeam !== this.state.currentTeam) {
     // TODO (enpolat) : appInsightsClient.updateTeamInfo(this.state.currentTeam);
@@ -262,6 +243,28 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveNewBoard(this.handleNewBoardAvailable);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
+  }
+
+  private async updateFeedbackItemsAndContributors() {
+    const board = await itemDataService.getBoardItem(this.state.currentTeam.id, this.state.currentBoard.id);
+
+    const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board.id);
+
+    let actionItemIds: number[] = [];
+    feedbackItems.forEach(item => {
+      actionItemIds = actionItemIds.concat(item.associatedActionItemIds);
+    });
+
+    const contributors = feedbackItems.map(e => { return { id: e.userIdRef, name: e?.createdBy?.displayName, imageUrl: e?.createdBy?.imageUrl }; }).filter((v, i, a) => a.indexOf(v) === i);
+
+    const votes = Object.values(board.boardVoteCollection || []);
+
+    this.setState({
+      actionItemIds: actionItemIds.filter(item => item !== undefined),
+      feedbackItems,
+      contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
+      castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0
+    });
   }
 
   private toggleAndFixResolution = () => {
@@ -447,11 +450,19 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     }
 
+    const allTeamMembers: TeamMember[] = []
+    for(const userTeam of userTeams) {
+      let members = await azureDevOpsCoreService.getMembers(userTeam.projectId, userTeam.id);
+      members = members.filter(m => allTeamMembers.findIndex(existingMember => existingMember.identity.id !== m.identity.id) === -1);
+      allTeamMembers.push(...members);
+    }
+
     // Default to select first user team or the project's default team.
     const defaultTeam = (userTeams && userTeams.length) ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
 
     const baseTeamState = {
       userTeams,
+      allMembers: allTeamMembers,
       filteredUserTeams: userTeams,
       projectTeams: (userTeams && userTeams.length) ? [] : [defaultTeam],
       filteredProjectTeams: (userTeams && userTeams.length) ? [] : [defaultTeam],
@@ -980,6 +991,28 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       displayPrimeDirective: boolean
     ) => void,
     onCancel: () => void) => {
+
+    const permissionOptions: FeedbackBoardPermissionOption[] = []
+    
+    for(const team of this.state.projectTeams) {
+      permissionOptions.push({
+        id: team.id,
+        name: team.name,
+        uniqueName: team.projectName,
+        type: 'team',
+      })
+    }
+
+    for(const member of this.state.allMembers) {
+      permissionOptions.push({
+        id: member.identity.id,
+        name: member.identity.displayName,
+        uniqueName: member.identity.uniqueName,
+        thumbnailUrl: member.identity.imageUrl,
+        type: 'member',
+      })
+    }
+
     return (
       <Dialog
         hidden={hidden}
@@ -999,6 +1032,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           teamId={this.state.currentTeam.id}
           maxvotesPerUser={this.state.maxvotesPerUser}
           placeholderText={placeholderText}
+          availablePermissionOptions={permissionOptions}
           onFormSubmit={onSubmit}
           onFormCancel={onCancel} />
       </Dialog>);

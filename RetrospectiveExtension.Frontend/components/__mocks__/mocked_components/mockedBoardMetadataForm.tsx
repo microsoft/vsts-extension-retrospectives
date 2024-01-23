@@ -32,5 +32,7 @@ export const testExistingBoard: IFeedbackBoardDocument = {
     isIncludeTeamEffectivenessMeasurement: true,
     shouldShowFeedbackAfterCollect: false,
     displayPrimeDirective: true,
-    isAnonymous: false
+    isAnonymous: false,
+    isPublic: false,
+    permissions: null
 }

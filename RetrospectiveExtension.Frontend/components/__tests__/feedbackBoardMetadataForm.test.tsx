@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { mockUuid } from '../__mocks__/uuid/v4';
 import FeedbackBoardMetadataForm, { IFeedbackBoardMetadataFormProps, IFeedbackColumnCard } from '../feedbackBoardMetadataForm';
-import { testColumns, testExistingBoard, testTeamId, testTitle } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
+import { testColumns, testExistingBoard, testTeamId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
 import { Checkbox, List, TextField } from 'office-ui-fabric-react';
 
 const mockedProps: IFeedbackBoardMetadataFormProps = {
@@ -12,6 +12,7 @@ const mockedProps: IFeedbackBoardMetadataFormProps = {
   teamId: testTeamId,
   placeholderText: '',
   maxvotesPerUser: 5,
+  availablePermissionOptions: [],
   onFormSubmit: () => null,
   onFormCancel: () => null
 };

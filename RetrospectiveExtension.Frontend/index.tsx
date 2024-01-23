@@ -21,7 +21,7 @@ sdkInit({ applyTheme: true }).then(() => {
 
     ReactDOM.render(
       <AppInsightsErrorBoundary onError={() => <h1>We detected an error in the application</h1>} appInsights={reactPlugin}>
-        <FeedbackBoardContainer {...feedbackBoardContainerProps} />
+          <FeedbackBoardContainer {...feedbackBoardContainerProps} />
       </AppInsightsErrorBoundary>,
       document.getElementById('root') as HTMLElement,
     );

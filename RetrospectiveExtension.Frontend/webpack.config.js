@@ -11,11 +11,18 @@ const APP_DIR = path.resolve(__dirname, '');
 module.exports = (env, argv) => {
   const mode = argv.mode || 'production';
   return {
-    devtool: 'source-map',
+    devtool: 'inline-source-map',
     entry: `${APP_DIR}/index.tsx`,
+    devServer: {
+      https: true,
+      port: 3000,
+      static: {
+        directory: path.join(__dirname),
+      }
+    },
     output: {
       path: BUILD_DIR,
-      publicPath: './',
+      publicPath: '/dist/',
       filename: './reflect-bundle.js',
     },
     resolve: {

@@ -1,5 +1,6 @@
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 import { WorkflowPhase } from './workItem';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
 
 export interface IUserVisit {
   teamId: string;
@@ -29,6 +30,13 @@ export interface IFeedbackBoardDocument {
   maxVotesPerUser: number;
   boardVoteCollection: { [voter: string]: number };
   teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[];
+  permissions?: IFeedbackBoardDocumentPermissions;
+  isPublic?: boolean;
+}
+
+export interface IFeedbackBoardDocumentPermissions {
+  Teams: Record<string, WebApiTeam>;
+  Members: Record<string, unknown>;
 }
 
 export interface ITeamEffectivenessMeasurementVoteCollection {

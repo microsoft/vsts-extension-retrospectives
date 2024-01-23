@@ -5,7 +5,7 @@ import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dia
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 
 import BoardDataService from '../dal/boardDataService';
-import { IFeedbackBoardDocument, IFeedbackColumn } from '../interfaces/feedback';
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn } from '../interfaces/feedback';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
 import classNames from 'classnames'
@@ -14,6 +14,8 @@ import { v4 as uuid } from 'uuid';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
+import { Pivot, PivotItem } from 'office-ui-fabric-react';
+import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from './feedbackBoardMetadataFormPermissions';
 
 export interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -22,6 +24,7 @@ export interface IFeedbackBoardMetadataFormProps {
   teamId: string;
   placeholderText: string;
   maxvotesPerUser: number;
+  availablePermissionOptions: FeedbackBoardPermissionOption[]
   onFormSubmit: (
     title: string,
     maxvotesPerUser: number,
@@ -50,6 +53,8 @@ interface IFeedbackBoardMetadataFormState {
   columnCardBeingEdited: IFeedbackColumnCard;
   selectedIconKey: string;
   selectedAccentColorKey: string;
+  isPublic: boolean;
+  permissions: IFeedbackBoardDocumentPermissions
 }
 
 export interface IFeedbackColumnCard {
@@ -69,7 +74,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultDisplayPrimeDirective: boolean = true;
     let defaultShowFeedbackAfterCollect: boolean = false;
 
-    if(props.isDuplicatingBoard) {
+    if (props.isDuplicatingBoard) {
       defaultTitle = `${this.props.currentBoard.title} - copy`;
       defaultColumns = this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } });
       defaultMaxVotes = this.props.currentBoard.maxVotesPerUser;
@@ -97,7 +102,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
       initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
-      title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title
+      title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
+      isPublic: this.props.currentBoard.permissions === undefined || (Object.values(this.props.currentBoard.permissions.Teams).length === 0 && Object.values(this.props.currentBoard.permissions.Members).length === 0),
+      permissions: this.props.currentBoard.permissions ?? { Teams: {}, Members: {}}
     };
   }
 
@@ -205,7 +212,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
   private handleColumnsTemplateChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const columns = getColumnsByTemplateId(event.target.value);
-    this.setState({columnCards: columns.map((column) => { return {column, markedForDeletion: false}; })});
+    this.setState({ columnCards: columns.map((column) => { return { column, markedForDeletion: false }; }) });
   };
 
   private allIconClassNames: { friendlyName: string, iconClass: string }[] = [
@@ -312,267 +319,373 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
   public render() {
     return (
-      <div className="board-metadata-form">
-        <section className="board-metadata-form-board-settings hide-mobile">
-          <h2 className="board-metadata-form-section-header">Board Settings</h2>
-          <div className="board-metadata-form-section-subheader">
-            <label htmlFor="title-input-container">Title<span style={{color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px"}}>(*)</span>:</label>
-            <TextField
-              ariaLabel="Please enter new retrospective name"
-              aria-required={true}
-              placeholder={this.props.placeholderText}
-              className="title-input-container"
-              id="retrospective-title-input"
-              value={this.state.title}
-              maxLength={100}
-              onChange={this.handleInputChange} />
-            {this.state.isBoardNameTaken &&
-              <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>
-            }
-          </div>
-          <hr></hr>
-          <div className="board-metadata-form-section-subheader">
-            <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-              Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxvotesPerUser : this.props.currentBoard.maxVotesPerUser}):
-            </label>
-            <TextField
-              className="title-input-container max-vote-counter"
-              id="max-vote-counter"
-              type="number"
-              min="3"
-              max="12"
-              value={this.state.maxVotesPerUser?.toString()}
-              onChange={this.handleMaxVotePerUserChange}
-            />
-          </div>
-          <hr></hr>
-          <div className="board-metadata-form-section-information">
-            <i className="fas fa-exclamation-circle"></i>&nbsp;These settings cannot be modified after board creation.
-          </div>
-          <div className="board-metadata-form-section-subheader">
-            <div className="flex flex-col">
-              <Checkbox
-                id="include-team-assessment-checkbox"
-                label="Include Team Assessment"
-                ariaLabel="Include Team Assessment. This selection cannot be modified after board creation."
-                boxSide="start"
-                defaultChecked={this.state.isIncludeTeamEffectivenessMeasurement}
-                disabled={!this.props.isNewBoardCreation}
-                onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
-              />
-              <div className="italic text-sm font-thin text-left">
-                Note: All user information for assessment answers is always stored anonymously.
-              </div>
-            </div>
-          </div>
-
-          <div className="board-metadata-form-section-subheader">
-            <Checkbox
-              id="obscure-feedback-checkbox"
-              label="Obscure the feedback of others until after Collect phase"
-              ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
-              boxSide="start"
-              defaultChecked={this.state.shouldShowFeedbackAfterCollect}
-              disabled={!this.props.isNewBoardCreation}
-              onChange={this.handleShouldShowFeedbackAfterCollectChange}
-            />
-          </div>
-
-          <div className="board-metadata-form-section-subheader">
-            <Checkbox
-              id="display-prime-directive"
-              label="Display 'Retrospective Prime Directive'"
-              ariaLabel="Display 'Retrospective Prime Directive.' This selection cannot be modified after board creation."
-              boxSide="start"
-              defaultChecked={this.state.displayPrimeDirective}
-              disabled={!this.props.isNewBoardCreation}
-              onChange={this.handleDisplayPrimeDirectiveChange}
-            />
-          </div>
-
-          <div className="board-metadata-form-section-subheader">
-            <Checkbox
-              id="feedback-display-names-checkbox"
-              label="Do not display names in feedback"
-              ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation."
-              boxSide="start"
-              defaultChecked={this.state.isBoardAnonymous}
-              disabled={!this.props.isNewBoardCreation}
-              onChange={this.handleIsAnonymousCheckboxChange}
-            />
-          </div>
-        </section>
-        <section className="board-metadata-edit-column-settings hide-mobile">
-          <h2 className="board-metadata-form-section-header">Column Settings</h2>
-          <div className="board-metadata-form-section-information">
-            <i className="fas fa-exclamation-circle"></i>&nbsp;You can create a maximum of {this.maxColumnCount} columns in a retrospective.
-          </div>
-          {!this.props.isNewBoardCreation &&
-            <div className="board-metadata-form-section-information warning-information">
-              <i className="fas fa-exclamation-triangle"></i>&nbsp;Warning:
-              <br />Existing feedback items may not be available after changing the board template!
-            </div>
-          }
-          <div className="board-metadata-form-section-subheader">
-            <label htmlFor="column-template-dropdown">Apply template:</label>
-            <select
-              onChange={this.handleColumnsTemplateChange}
-              id="column-template-dropdown"
-              className="title-input-container column-template-dropdown"
-            >
-              <option value="">Select a template</option>
-              <option value="speedboat">Speedboat</option>
-              <option value="4ls">4Ls</option>
-              <option value="1to1">1-to-1</option>
-              <option value="daki">Drop-Add-Keep-Improve</option>
-              <option value="mad-sad-glad">Mad-Sad-Glad</option>
-              <option value="good-bad-ideas">Good-Bad-Ideas</option>
-              <option value="kalm">Keep-Add-Less-More</option>
-              <option value="start-stop-continue">Start-Stop-Continue</option>
-              <option value="psy-safety">Psychological Safety</option>
-              <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
-              <option value="clarity">Clarity</option>
-              <option value="energy">Energy</option>
-              <option value="wlb">Work-life Balance</option>
-              <option value="team-confidence">Team Confidence</option>
-            </select>
-          </div>
-          <List
-            items={this.state.columnCards}
-            onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
-              return (<DocumentCard
-                className={classNames({
-                  'feedback-column-card': true,
-                  'marked-for-deletion': columnCard.markedForDeletion,
-                })}
-                type={DocumentCardType.compact}>
-                <div className="flex grow items-center">
-                  <DefaultButton
-                    className="feedback-column-card-icon-button"
-                    ariaLabel="Change column icon"
-                    title="Change column icon"
-                    disabled={columnCard.markedForDeletion}
-                    onClick={
-                      () => {
-                        this.setState({
-                          columnCardBeingEdited: columnCard,
-                          isChooseColumnIconDialogHidden: false,
-                        });
-                      }}>
-                    <i className={classNames('feedback-column-card-icon', columnCard.column.iconClass)} />
-                  </DefaultButton>
-                  <DefaultButton
-                    className="feedback-column-card-accent-color-button"
-                    ariaLabel="Change column color"
-                    title="Change column color"
-                    disabled={columnCard.markedForDeletion}
-                    onClick={
-                      () => {
-                        this.setState({
-                          columnCardBeingEdited: columnCard,
-                          isChooseColumnAccentColorDialogHidden: false,
-                        });
-                      }}>
-                    <i className={classNames('feedback-column-card-accent-color', 'fas fa-square')}
-                      style={{ color: columnCard.column.accentColor }}
+      <div className="flex flex-col flex-nowrap">
+        <Pivot>
+          <PivotItem headerText={'General'}>
+            <div className="board-metadata-form">
+              <section className="board-metadata-form-board-settings hide-mobile">
+                <h2 className="board-metadata-form-section-header">Board Settings</h2>
+                <div className="board-metadata-form-section-subheader">
+                  <label htmlFor="title-input-container">Title<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:</label>
+                  <TextField
+                    ariaLabel="Please enter new retrospective name"
+                    aria-required={true}
+                    placeholder={this.props.placeholderText}
+                    className="title-input-container"
+                    id="retrospective-title-input"
+                    value={this.state.title}
+                    maxLength={100}
+                    onChange={this.handleInputChange} />
+                  {this.state.isBoardNameTaken &&
+                    <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>
+                  }
+                </div>
+                <hr></hr>
+                <div className="board-metadata-form-section-subheader">
+                  <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
+                    Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxvotesPerUser : this.props.currentBoard.maxVotesPerUser}):
+                  </label>
+                  <TextField
+                    className="title-input-container max-vote-counter"
+                    id="max-vote-counter"
+                    type="number"
+                    min="3"
+                    max="12"
+                    value={this.state.maxVotesPerUser?.toString()}
+                    onChange={this.handleMaxVotePerUserChange}
+                  />
+                </div>
+                <hr></hr>
+                <div className="board-metadata-form-section-information">
+                  <i className="fas fa-exclamation-circle"></i>&nbsp;These settings cannot be modified after board creation.
+                </div>
+                <div className="board-metadata-form-section-subheader">
+                  <div className="flex flex-col">
+                    <Checkbox
+                      id="include-team-assessment-checkbox"
+                      label="Include Team Assessment"
+                      ariaLabel="Include Team Assessment. This selection cannot be modified after board creation."
+                      boxSide="start"
+                      defaultChecked={this.state.isIncludeTeamEffectivenessMeasurement}
+                      disabled={!this.props.isNewBoardCreation}
+                      onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
                     />
-                  </DefaultButton>
-                  <EditableDocumentCardTitle
-                    isDisabled={columnCard.markedForDeletion}
-                    isMultiline={false}
-                    maxLength={25}
-                    title={columnCard.column.title}
-                    isChangeEventRequired={true}
-                    onSave={(newText: string) => {
-                      columnCard.column.title = newText
+                    <div className="italic text-sm font-thin text-left">
+                      Note: All user information for assessment answers is always stored anonymously.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="board-metadata-form-section-subheader">
+                  <Checkbox
+                    id="obscure-feedback-checkbox"
+                    label="Obscure the feedback of others until after Collect phase"
+                    ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
+                    boxSide="start"
+                    defaultChecked={this.state.shouldShowFeedbackAfterCollect}
+                    disabled={!this.props.isNewBoardCreation}
+                    onChange={this.handleShouldShowFeedbackAfterCollectChange}
+                  />
+                </div>
+
+                <div className="board-metadata-form-section-subheader">
+                  <Checkbox
+                    id="display-prime-directive"
+                    label="Display 'Retrospective Prime Directive'"
+                    ariaLabel="Display 'Retrospective Prime Directive.' This selection cannot be modified after board creation."
+                    boxSide="start"
+                    defaultChecked={this.state.displayPrimeDirective}
+                    disabled={!this.props.isNewBoardCreation}
+                    onChange={this.handleDisplayPrimeDirectiveChange}
+                  />
+                </div>
+
+                <div className="board-metadata-form-section-subheader">
+                  <Checkbox
+                    id="feedback-display-names-checkbox"
+                    label="Do not display names in feedback"
+                    ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation."
+                    boxSide="start"
+                    defaultChecked={this.state.isBoardAnonymous}
+                    disabled={!this.props.isNewBoardCreation}
+                    onChange={this.handleIsAnonymousCheckboxChange}
+                  />
+                </div>
+              </section>
+              <section className="board-metadata-edit-column-settings hide-mobile">
+                <h2 className="board-metadata-form-section-header">Column Settings</h2>
+                <div className="board-metadata-form-section-information">
+                  <i className="fas fa-exclamation-circle"></i>&nbsp;You can create a maximum of {this.maxColumnCount} columns in a retrospective.
+                </div>
+                {!this.props.isNewBoardCreation &&
+                  <div className="board-metadata-form-section-information warning-information">
+                    <i className="fas fa-exclamation-triangle"></i>&nbsp;Warning:
+                    <br />Existing feedback items may not be available after changing the board template!
+                  </div>
+                }
+                <div className="board-metadata-form-section-subheader">
+                  <label htmlFor="column-template-dropdown">Apply template:</label>
+                  <select
+                    onChange={this.handleColumnsTemplateChange}
+                    id="column-template-dropdown"
+                    className="title-input-container column-template-dropdown"
+                  >
+                    <option value="">Select a template</option>
+                    <option value="speedboat">Speedboat</option>
+                    <option value="4ls">4Ls</option>
+                    <option value="1to1">1-to-1</option>
+                    <option value="daki">Drop-Add-Keep-Improve</option>
+                    <option value="mad-sad-glad">Mad-Sad-Glad</option>
+                    <option value="good-bad-ideas">Good-Bad-Ideas</option>
+                    <option value="kalm">Keep-Add-Less-More</option>
+                    <option value="start-stop-continue">Start-Stop-Continue</option>
+                    <option value="psy-safety">Psychological Safety</option>
+                    <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
+                    <option value="clarity">Clarity</option>
+                    <option value="energy">Energy</option>
+                    <option value="wlb">Work-life Balance</option>
+                    <option value="team-confidence">Team Confidence</option>
+                  </select>
+                </div>
+                <List
+                  items={this.state.columnCards}
+                  onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
+                    return (<DocumentCard
+                      className={classNames({
+                        'feedback-column-card': true,
+                        'marked-for-deletion': columnCard.markedForDeletion,
+                      })}
+                      type={DocumentCardType.compact}>
+                      <div className="flex grow items-center">
+                        <DefaultButton
+                          className="feedback-column-card-icon-button"
+                          ariaLabel="Change column icon"
+                          title="Change column icon"
+                          disabled={columnCard.markedForDeletion}
+                          onClick={
+                            () => {
+                              this.setState({
+                                columnCardBeingEdited: columnCard,
+                                isChooseColumnIconDialogHidden: false,
+                              });
+                            }}>
+                          <i className={classNames('feedback-column-card-icon', columnCard.column.iconClass)} />
+                        </DefaultButton>
+                        <DefaultButton
+                          className="feedback-column-card-accent-color-button"
+                          ariaLabel="Change column color"
+                          title="Change column color"
+                          disabled={columnCard.markedForDeletion}
+                          onClick={
+                            () => {
+                              this.setState({
+                                columnCardBeingEdited: columnCard,
+                                isChooseColumnAccentColorDialogHidden: false,
+                              });
+                            }}>
+                          <i className={classNames('feedback-column-card-accent-color', 'fas fa-square')}
+                            style={{ color: columnCard.column.accentColor }}
+                          />
+                        </DefaultButton>
+                        <EditableDocumentCardTitle
+                          isDisabled={columnCard.markedForDeletion}
+                          isMultiline={false}
+                          maxLength={25}
+                          title={columnCard.column.title}
+                          isChangeEventRequired={true}
+                          onSave={(newText: string) => {
+                            columnCard.column.title = newText
+                            this.setState({
+                              columnCards: [].concat(this.state.columnCards),
+                            });
+                          }} />
+                      </div>
+                      <div className="flex flex-none items-center">
+                        <IconButton
+                          className="feedback-column-card-move-up-button"
+                          iconProps={{ iconName: 'Up' }}
+                          title="Move Up"
+                          ariaLabel="Move Up"
+                          disabled={columnCard.markedForDeletion || index === 0}
+                          onClick={() => {
+                            const newColumns = [].concat(this.state.columnCards);
+                            [newColumns[index], newColumns[index - 1]] = [newColumns[index - 1], newColumns[index]];
+                            this.setState({
+                              columnCards: newColumns,
+                            });
+                          }} />
+                        <IconButton
+                          className="feedback-column-card-move-down-button"
+                          iconProps={{ iconName: 'Down' }}
+                          title="Move Down"
+                          ariaLabel="Move Down"
+                          disabled={columnCard.markedForDeletion || index === this.state.columnCards.length - 1}
+                          onClick={() => {
+                            const newColumns = [].concat(this.state.columnCards);
+                            [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
+                            this.setState({
+                              columnCards: newColumns,
+                            });
+                          }} />
+                        {!columnCard.markedForDeletion &&
+                          <IconButton
+                            className="feedback-column-card-delete-button"
+                            iconProps={{ iconName: 'Delete' }} title="Delete" ariaLabel="Delete"
+                            disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length <= 1}
+                            onClick={() => {
+                              const newColumns = [].concat(this.state.columnCards);
+                              newColumns[index].markedForDeletion = true;
+                              this.setState({
+                                columnCards: newColumns,
+                              });
+                            }}
+                          />}
+                        {columnCard.markedForDeletion &&
+                          <IconButton
+                            className="feedback-column-card-undelete-button"
+                            iconProps={{ iconName: 'Undo' }} title="Undo Delete" ariaLabel="Undo Delete"
+                            disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length >= this.maxColumnCount}
+                            onClick={() => {
+                              const newColumns = [].concat(this.state.columnCards);
+                              newColumns[index].markedForDeletion = false;
+                              this.setState({
+                                columnCards: newColumns,
+                              });
+                            }}
+                          />}
+                      </div>
+                    </DocumentCard>);
+                  }} />
+                <div className="create-feedback-column-card-button-wrapper">
+                  <ActionButton
+                    className="create-feedback-column-card-button"
+                    aria-label="Add new column"
+                    iconProps={{ iconName: 'Add' }}
+                    disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length >= this.maxColumnCount}
+                    onClick={() => {
+                      const newColumns: IFeedbackColumnCard[] = [].concat(this.state.columnCards);
+                      const newColumnId = uuid();
+                      newColumns.push(
+                        {
+                          column: {
+                            id: newColumnId,
+                            title: "New Column",
+                            iconClass: this.getRandomArrayElement(this.allIconClassNames).iconClass,
+                            accentColor: this.getRandomArrayElement(this.allAccentColors).colorCode,
+                          },
+                          markedForDeletion: false,
+                        });
                       this.setState({
+                        columnCards: newColumns,
+                      });
+                    }}>
+                    Add new column
+                  </ActionButton>
+                </div>
+              </section>
+              {this.props.currentBoard && <Dialog
+                hidden={this.state.isDeleteColumnConfirmationDialogHidden}
+                onDismiss={this.hideDeleteColumnConfirmationDialog}
+                dialogContentProps={{
+                  type: DialogType.close,
+                  title: 'Confirm Changes',
+                  subText: `Are you sure you want to remove columns from '${this.props.currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`,
+                }}
+                modalProps={{
+                  isBlocking: true,
+                  containerClassName: 'retrospectives-confirm-changes-dialog',
+                  className: 'retrospectives-dialog-modal',
+                }}>
+                <DialogFooter>
+                  <PrimaryButton onClick={this.handleFormSubmit} text="Confirm" />
+                  <DefaultButton onClick={this.hideDeleteColumnConfirmationDialog} text="Cancel" />
+                </DialogFooter>
+              </Dialog>}
+              {this.state.columnCardBeingEdited && <Dialog
+                hidden={this.state.isChooseColumnIconDialogHidden}
+                dialogContentProps={{
+                  type: DialogType.normal,
+                  title: 'Choose Column Icon',
+                  subText: `Choose the column icon for column '${this.state.columnCardBeingEdited.column.title}'`,
+                }}
+                modalProps={{
+                  isBlocking: false,
+                  containerClassName: 'retrospectives-choose-column-icon-dialog',
+                  className: 'retrospectives-dialog-modal',
+                }}
+                onDismiss={() => {
+                  this.setState({
+                    isChooseColumnIconDialogHidden: true,
+                    columnCardBeingEdited: null,
+                  });
+                }}
+              >
+                {this.allIconClassNames.map((iconClassName) => {
+                  return <DefaultButton
+                    ariaLabel={'Choose the icon ' + iconClassName.friendlyName}
+                    className="choose-feedback-column-icon-button"
+                    key={iconClassName.friendlyName}
+                    onClick={() => {
+                      this.state.columnCardBeingEdited.column.iconClass = iconClassName.iconClass;
+                      this.setState({
+                        isChooseColumnIconDialogHidden: true,
+                        columnCardBeingEdited: null,
                         columnCards: [].concat(this.state.columnCards),
                       });
-                    }} />
-                </div>
-                <div className="flex flex-none items-center">
-                  <IconButton
-                    className="feedback-column-card-move-up-button"
-                    iconProps={{ iconName: 'Up' }}
-                    title="Move Up"
-                    ariaLabel="Move Up"
-                    disabled={columnCard.markedForDeletion || index === 0}
-                    onClick={() => {
-                      const newColumns = [].concat(this.state.columnCards);
-                      [newColumns[index], newColumns[index - 1]] = [newColumns[index - 1], newColumns[index]];
-                      this.setState({
-                        columnCards: newColumns,
-                      });
-                    }} />
-                  <IconButton
-                    className="feedback-column-card-move-down-button"
-                    iconProps={{ iconName: 'Down' }}
-                    title="Move Down"
-                    ariaLabel="Move Down"
-                    disabled={columnCard.markedForDeletion || index === this.state.columnCards.length - 1}
-                    onClick={() => {
-                      const newColumns = [].concat(this.state.columnCards);
-                      [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
-                      this.setState({
-                        columnCards: newColumns,
-                      });
-                    }} />
-                  {!columnCard.markedForDeletion &&
-                    <IconButton
-                      className="feedback-column-card-delete-button"
-                      iconProps={{ iconName: 'Delete' }} title="Delete" ariaLabel="Delete"
-                      disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length <= 1}
-                      onClick={() => {
-                        const newColumns = [].concat(this.state.columnCards);
-                        newColumns[index].markedForDeletion = true;
-                        this.setState({
-                          columnCards: newColumns,
-                        });
-                      }}
-                    />}
-                  {columnCard.markedForDeletion &&
-                    <IconButton
-                      className="feedback-column-card-undelete-button"
-                      iconProps={{ iconName: 'Undo' }} title="Undo Delete" ariaLabel="Undo Delete"
-                      disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length >= this.maxColumnCount}
-                      onClick={() => {
-                        const newColumns = [].concat(this.state.columnCards);
-                        newColumns[index].markedForDeletion = false;
-                        this.setState({
-                          columnCards: newColumns,
-                        });
-                      }}
-                    />}
-                </div>
-              </DocumentCard>);
-            }} />
-          <div className="create-feedback-column-card-button-wrapper">
-            <ActionButton
-              className="create-feedback-column-card-button"
-              aria-label="Add new column"
-              iconProps={{ iconName: 'Add' }}
-              disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length >= this.maxColumnCount}
-              onClick={() => {
-                const newColumns: IFeedbackColumnCard[] = [].concat(this.state.columnCards);
-                const newColumnId = uuid();
-                newColumns.push(
-                  {
-                    column: {
-                      id: newColumnId,
-                      title: "New Column",
-                      iconClass: this.getRandomArrayElement(this.allIconClassNames).iconClass,
-                      accentColor: this.getRandomArrayElement(this.allAccentColors).colorCode,
-                    },
-                    markedForDeletion: false,
+                    }}>
+                    <i className={iconClassName.iconClass} />
+                  </DefaultButton>
+                })}
+              </Dialog>}
+              {this.state.columnCardBeingEdited && <Dialog
+                hidden={this.state.isChooseColumnAccentColorDialogHidden}
+                dialogContentProps={{
+                  type: DialogType.normal,
+                  title: 'Choose Column Color',
+                  subText: `Choose the column color for column '${this.state.columnCardBeingEdited.column.title}'`,
+                }}
+                modalProps={{
+                  isBlocking: false,
+                  containerClassName: 'retrospectives-choose-column-accent-color-dialog',
+                  className: 'retrospectives-dialog-modal',
+                }}
+                onDismiss={() => {
+                  this.setState({
+                    isChooseColumnAccentColorDialogHidden: true,
+                    columnCardBeingEdited: null,
                   });
-                this.setState({
-                  columnCards: newColumns,
-                });
-              }}>
-              Add new column
-            </ActionButton>
-          </div>
-        </section>
+                }}>
+                {this.allAccentColors.map((accentColor) => {
+                  return <DefaultButton
+                    key={accentColor.friendlyName}
+                    ariaLabel={'Choose the color ' + accentColor.friendlyName}
+                    className="choose-feedback-column-accent-color-button"
+                    onClick={() => {
+                      this.state.columnCardBeingEdited.column.accentColor = accentColor.colorCode;
+                      this.setState({
+                        isChooseColumnAccentColorDialogHidden: true,
+                        columnCardBeingEdited: undefined,
+                        columnCards: [].concat(this.state.columnCards),
+                      });
+                    }}>
+                    <i className={'fas fa-square'}
+                      style={{
+                        color: accentColor.colorCode,
+                      }} />
+                  </DefaultButton>
+                })}
+              </Dialog>}
+            </div>
+          </PivotItem>
+          <PivotItem headerText={'Permissions'}>
+            <FeedbackBoardMetadataFormPermissions
+              isPublic={this.state.isPublic}
+              permissions={this.state.permissions}
+              permissionOptions={this.props.availablePermissionOptions}
+              onPermissionChanged={(s: FeedbackBoardPermissionState) => this.setState({ isPublic: s.isPublic, permissions: s.permissions })}
+            />
+          </PivotItem>
+        </Pivot>
         <DialogFooter>
           <PrimaryButton
             disabled={!this.isSaveButtonEnabled()}
@@ -588,98 +701,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
             className="metadata-form-save-button" />
           <DefaultButton onClick={this.props.onFormCancel} text="Cancel" />
         </DialogFooter>
-        {this.props.currentBoard && <Dialog
-          hidden={this.state.isDeleteColumnConfirmationDialogHidden}
-          onDismiss={this.hideDeleteColumnConfirmationDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: 'Confirm Changes',
-            subText: `Are you sure you want to remove columns from '${this.props.currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`,
-          }}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: 'retrospectives-confirm-changes-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}>
-          <DialogFooter>
-            <PrimaryButton onClick={this.handleFormSubmit} text="Confirm" />
-            <DefaultButton onClick={this.hideDeleteColumnConfirmationDialog} text="Cancel" />
-          </DialogFooter>
-        </Dialog>}
-        {this.state.columnCardBeingEdited && <Dialog
-          hidden={this.state.isChooseColumnIconDialogHidden}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: 'Choose Column Icon',
-            subText: `Choose the column icon for column '${this.state.columnCardBeingEdited.column.title}'`,
-          }}
-          modalProps={{
-            isBlocking: false,
-            containerClassName: 'retrospectives-choose-column-icon-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}
-          onDismiss={() => {
-            this.setState({
-              isChooseColumnIconDialogHidden: true,
-              columnCardBeingEdited: null,
-            });
-          }}
-        >
-          {this.allIconClassNames.map((iconClassName) => {
-            return <DefaultButton
-              ariaLabel={'Choose the icon ' + iconClassName.friendlyName}
-              className="choose-feedback-column-icon-button"
-              key={iconClassName.friendlyName}
-              onClick={() => {
-                this.state.columnCardBeingEdited.column.iconClass = iconClassName.iconClass;
-                this.setState({
-                  isChooseColumnIconDialogHidden: true,
-                  columnCardBeingEdited: null,
-                  columnCards: [].concat(this.state.columnCards),
-                });
-              }}>
-              <i className={iconClassName.iconClass} />
-            </DefaultButton>
-          })}
-        </Dialog>}
-        {this.state.columnCardBeingEdited && <Dialog
-          hidden={this.state.isChooseColumnAccentColorDialogHidden}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: 'Choose Column Color',
-            subText: `Choose the column color for column '${this.state.columnCardBeingEdited.column.title}'`,
-          }}
-          modalProps={{
-            isBlocking: false,
-            containerClassName: 'retrospectives-choose-column-accent-color-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}
-          onDismiss={() => {
-            this.setState({
-              isChooseColumnAccentColorDialogHidden: true,
-              columnCardBeingEdited: null,
-            });
-          }}>
-          {this.allAccentColors.map((accentColor) => {
-            return <DefaultButton
-              key={accentColor.friendlyName}
-              ariaLabel={'Choose the color ' + accentColor.friendlyName}
-              className="choose-feedback-column-accent-color-button"
-              onClick={() => {
-                this.state.columnCardBeingEdited.column.accentColor = accentColor.colorCode;
-                this.setState({
-                  isChooseColumnAccentColorDialogHidden: true,
-                  columnCardBeingEdited: undefined,
-                  columnCards: [].concat(this.state.columnCards),
-                });
-              }}>
-              <i className={'fas fa-square'}
-                style={{
-                  color: accentColor.colorCode,
-                }} />
-            </DefaultButton>
-          })}
-        </Dialog>}
       </div>
     );
   }

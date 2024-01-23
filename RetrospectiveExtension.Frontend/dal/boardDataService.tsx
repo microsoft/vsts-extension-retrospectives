@@ -1,5 +1,5 @@
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
-import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { v4 as uuid } from 'uuid';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
@@ -18,7 +18,8 @@ class BoardDataService {
     shouldShowFeedbackAfterCollect?: boolean,
     displayPrimeDirective?: boolean,
     startDate?: Date,
-    endDate?: Date) => {
+    endDate?: Date,
+    permissions?: IFeedbackBoardDocumentPermissions) => {
     const boardId: string = uuid();
     const userIdentity = getUserIdentity();
 
@@ -40,6 +41,8 @@ class BoardDataService {
       title,
       boardVoteCollection: {},
       teamEffectivenessMeasurementVoteCollection: [],
+      isPublic: permissions === undefined || (Object.values(permissions.Teams).length === 0 && Object.values(permissions.Members).length === 0),
+      permissions: permissions
     }
 
     return await createDocument<IFeedbackBoardDocument>(teamId, board);
