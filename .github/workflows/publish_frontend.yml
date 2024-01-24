@@ -31,24 +31,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: "echo 'latest release: ${{ steps.get_latest_release.outputs.data }}'"
 
-      - name: test step
-        run: |
-          query='query {
-            repository(owner: "microsoft", name: "vsts-extension-retrospectives") {
-              issues(last: 5) {
-                nodes {
-                  title
-                  url
+      - uses: octokit/graphql-action@v2.x
+        id: get_total_count
+        with:
+          query: |
+            query {
+              organization(login: "microsoft") {
+                team(slug: "retrospective-extension-admin") {
+                  members(userLogins: ["'${{ github.actor }}'"]) {
+                    totalCount
+                  }
                 }
               }
             }
-          }'
-
-          curl -sSL -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github.v4+json" -d "{\"query\":\"$query\"}" https://api.github.com/graphql
-
-          result=$(curl -sSL -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github.v4+json" -d "{\"query\":\"$query\"}" https://api.github.com/graphql)
-
-          echo "$result" > graphql_response.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: "echo ${{ github.actor }} totalCount: ${{ steps.get_total_count.outputs.data }}'"
 
       - name: Check if the user is in the specified team
         id: check-team
