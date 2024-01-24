@@ -11,16 +11,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Stop execution if not the specified team
-        run: |
-          echo "This workflow can only be executed by the specified team."
-
       - uses: octokit/graphql-action@v2.x
         id: get_latest_release
         with:
           query: |
-            query release() {
-              repository(owner:"polatengin",name:"microsoft/vsts-extension-retrospectives") {
+            query {
+              repository(owner:"polatengin", name:"microsoft/vsts-extension-retrospectives") {
                 releases(first:1) {
                   nodes {
                     name
