@@ -1,0 +1,28 @@
+name: Publish to Azure DevOps Marketplace
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Stop execution if not the specified team
+        run: |
+          echo "This workflow can only be executed by the specified team."
+
+      - name: Stop execution if not the specified team
+        if: github.actor != 'retrospective-extension-admin'
+        run: |
+          echo "You shall not pass!"
+          exit 1  # Exit with an error to stop the workflow
+
+      - name: Continue execution if the specified team
+        run: |
+          echo "Congratulations! You are part of the specified team."
