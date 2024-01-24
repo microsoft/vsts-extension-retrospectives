@@ -19,8 +19,8 @@ jobs:
         id: get_latest_release
         with:
           query: |
-            query release($owner:String!,$repo:String!) {
-              repository(owner:$owner,name:$repo) {
+            query release() {
+              repository(owner:"polatengin",name:"microsoft/vsts-extension-retrospectives") {
                 releases(first:1) {
                   nodes {
                     name
@@ -31,9 +31,6 @@ jobs:
                 }
               }
             }
-          variables: |
-            owner: ${{ github.event.repository.owner.name }}
-            repo: ${{ github.event.repository.name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: "echo 'latest release: ${{ steps.get_latest_release.outputs.data }}'"
