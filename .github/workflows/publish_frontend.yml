@@ -12,59 +12,28 @@ jobs:
         uses: actions/checkout@v2
 
       - uses: octokit/graphql-action@v2.x
-        id: get_latest_release
-        with:
-          query: |
-            query {
-              repository(owner:"microsoft", name:"vsts-extension-retrospectives") {
-                releases(first:1) {
-                  nodes {
-                    name
-                    createdAt
-                    tagName
-                    description
-                  }
-                }
-              }
-            }
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: "echo 'latest release: ${{ steps.get_latest_release.outputs.data }}'"
-
-      - uses: octokit/graphql-action@v2.x
         id: get_total_count
         with:
           query: |
-            organization(login: "microsoft") {
-              teams(
-                first: 10,
-                userLogins: ["${{ github.actor }}"]
-                query: "Retrospective-Extension-Admin"
-              ) {
-                totalCount
+            query {
+              organization(login: "microsoft") {
+                teams(
+                  first: 10,
+                  userLogins: ["${{ github.actor }}"]
+                  query: "Retrospective-Extension-Admin"
+                ) {
+                  totalCount
+                }
               }
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: "echo ${{ github.actor }} totalCount: ${{ steps.get_total_count.outputs.data }}'"
 
-      - name: Check if the user is in the specified team
-        id: check-team
+      - name: Check if the specified team exists
         run: |
-          TEAM_SLUG='retrospective-extension-admin'
-          USERNAME=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/users/$GITHUB_ACTOR/teams" | jq -r --arg team_slug "$TEAM_SLUG" '.[] | select(.slug == $team_slug) | .slug')
-          TEAM_FOUND=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" \
-            "https://api.github.com/user/teams" \
-            | jq --arg team_slug "$TEAM_SLUG" '.[] | select(.slug == $team_slug) | .id // empty')
-
-          if [ -z "$TEAM_FOUND" ]; then
-            echo "This workflow can only be executed by the specified team."
-            exit 1
-          fi
-
-          echo "Team Slug: $USERNAME"
-          if [ "$USERNAME" != "$TEAM_SLUG" ]; then
-            echo "This workflow can only be executed by the specified team."
+          if [ ${{ steps.get_total_count.outputs.data }} -eq 0 ]; then
+            echo "You are not part of the specified team."
             exit 1
           fi
 
