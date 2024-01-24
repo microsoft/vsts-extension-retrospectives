@@ -15,14 +15,41 @@ jobs:
         run: |
           echo "This workflow can only be executed by the specified team."
 
+      - name: test step
+        run: |
+          query='query {
+            repository(owner: "polatengin", name: "microsoft/vsts-extension-retrospectives") {
+              issues(last: 5) {
+                nodes {
+                  title
+                  url
+                }
+              }
+            }
+          }'
+
+          curl -sSL -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github.v4+json" -d "{\"query\":\"$query\"}" https://api.github.com/graphql
+
+          result=$(curl -sSL -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github.v4+json" -d "{\"query\":\"$query\"}" https://api.github.com/graphql)
+
+          echo "$result" > graphql_response.json
+
       - name: Check if the user is in the specified team
         id: check-team
         run: |
           TEAM_SLUG='retrospective-extension-admin'
-          curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/user/teams" | jq
-          TEAM_FOUND=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/user/teams" | jq)
+          USERNAME=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/users/$GITHUB_ACTOR/teams" | jq -r --arg team_slug "$TEAM_SLUG" '.[] | select(.slug == $team_slug) | .slug')
+          TEAM_FOUND=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/user/teams" \
+            | jq --arg team_slug "$TEAM_SLUG" '.[] | select(.slug == $team_slug) | .id // empty')
 
           if [ -z "$TEAM_FOUND" ]; then
+            echo "This workflow can only be executed by the specified team."
+            exit 1
+          fi
+
+          echo "Team Slug: $USERNAME"
+          if [ "$USERNAME" != "$TEAM_SLUG" ]; then
             echo "This workflow can only be executed by the specified team."
             exit 1
           fi
