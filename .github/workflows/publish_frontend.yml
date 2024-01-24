@@ -35,13 +35,13 @@ jobs:
         id: get_total_count
         with:
           query: |
-            query {
-              organization(login: "microsoft") {
-                team(slug: "retrospective-extension-admin") {
-                  members(userLogins: ["'${{ github.actor }}'"]) {
-                    totalCount
-                  }
-                }
+            organization(login: "microsoft") {
+              teams(
+                first: 10,
+                userLogins: ["${{ github.actor }}"]
+                query: "Retrospective-Extension-Admin"
+              ) {
+                totalCount
               }
             }
         env:
