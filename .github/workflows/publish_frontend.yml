@@ -1,9 +1,7 @@
 name: Publish to Azure DevOps Marketplace
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,11 +15,17 @@ jobs:
         run: |
           echo "This workflow can only be executed by the specified team."
 
-      - name: Stop execution if not the specified team
-        if: github.actor != 'retrospective-extension-admin'
+      - name: Check if the user is in the specified team
+        id: check-team
         run: |
-          echo "You shall not pass!"
-          exit 1  # Exit with an error to stop the workflow
+          TEAM_SLUG='retrospective-extension-admin'
+          USERNAME=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/users/$GITHUB_ACTOR/teams" | jq -r --arg team_slug "$TEAM_SLUG" '.[] | select(.slug == $team_slug) | .slug')
+
+          echo "Team Slug: $USERNAME"
+          if [ "$USERNAME" != "$TEAM_SLUG" ]; then
+            echo "This workflow can only be executed by the specified team."
+            exit 1
+          fi
 
       - name: Continue execution if the specified team
         run: |
