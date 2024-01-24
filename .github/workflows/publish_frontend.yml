@@ -16,7 +16,7 @@ jobs:
         with:
           query: |
             query {
-              repository(owner:"polatengin", name:"microsoft/vsts-extension-retrospectives") {
+              repository(owner:"microsoft", name:"vsts-extension-retrospectives") {
                 releases(first:1) {
                   nodes {
                     name
@@ -34,7 +34,7 @@ jobs:
       - name: test step
         run: |
           query='query {
-            repository(owner: "polatengin", name: "microsoft/vsts-extension-retrospectives") {
+            repository(owner: "microsoft", name: "vsts-extension-retrospectives") {
               issues(last: 5) {
                 nodes {
                   title
