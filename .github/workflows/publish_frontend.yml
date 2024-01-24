@@ -1,9 +1,7 @@
 name: Publish to Azure DevOps Marketplace
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   build:
