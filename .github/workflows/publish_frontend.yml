@@ -27,8 +27,7 @@ jobs:
               }
             }
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: "echo ${{ github.actor }} totalCount: ${{ steps.get_total_count.outputs.data }}'"
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN_READ_ORG }}
 
       - name: Check if the specified team exists
         run: |
