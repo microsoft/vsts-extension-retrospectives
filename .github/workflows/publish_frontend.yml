@@ -43,7 +43,11 @@ jobs:
       - name: Publish extension
         working-directory: 'RetrospectiveExtension.Frontend'
         run: >
-          tfx extension publish
-          --manifests vss-extension-prod.json
-          --vsix ./dist/*.vsix
-          --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+          ext_info=$(tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
+
+          if [[ "$ext_info" != "null" ]]; then
+              version=$(jq -r '.versions[0].version' <<< "$ext_info")
+              cat <<< $(jq ".version = \"$version\"" vss-extension-prod.json) > vss-extension-prod.json
+          fi
+
+          tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
