@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -45,11 +45,12 @@ jobs:
         run: >
           ext_info=$(tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
 
-          echo "$ext_info"
-
           if [[ "$ext_info" != "null" ]]; then
             version=$(jq -r '.versions[0].version' <<< "$ext_info")
+            echo "Updating extension version to $version"
             cat <<< $(jq ".version = \"$version\"" vss-extension-prod.json) > vss-extension-prod.json
+            echo "content of the manifest file:"
+            cat vss-extension-prod.json
           fi
 
           tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
