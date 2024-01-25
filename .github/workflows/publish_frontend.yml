@@ -14,9 +14,4 @@ jobs:
       - name: Login GitHub CLI
         run: |
           echo ${{ secrets.GH_CLI_LOGIN_TOKEN }} | gh auth login --with-token
-          gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/organizations/6154722/team/9355952/members
-
-      - name: Continue execution if the specified team
-        run: |
-          echo "Congratulations! You are part of the specified team."
-          https://api.github.com/repos/microsoft/vsts-extension-retrospectives/collaborators/polatengin
+          gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/organizations/microsoft/team/Retrospective-Extension-Admin/members
