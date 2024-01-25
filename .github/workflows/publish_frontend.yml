@@ -36,6 +36,13 @@ jobs:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
         run: |
+          ext_info=$(tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
+
+          if [[ "$ext_info" != "null" ]]; then
+            version=$(jq -r '.versions[0].version' <<< "$ext_info")
+            cat <<< $(jq ".version = \"$version\"" vss-extension-prod.json) > vss-extension-prod.json
+          fi
+
           npm install
           npm run build:p
           npm run pack:p
@@ -43,14 +50,4 @@ jobs:
       - name: Publish extension
         working-directory: 'RetrospectiveExtension.Frontend'
         run: >
-          ext_info=$(tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
-
-          if [[ "$ext_info" != "null" ]]; then
-            version=$(jq -r '.versions[0].version' <<< "$ext_info")
-            echo "Updating extension version to $version"
-            cat <<< $(jq ".version = \"$version\"" vss-extension-prod.json) > vss-extension-prod.json
-            echo "content of the manifest file:"
-            cat vss-extension-prod.json
-          fi
-
           tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
