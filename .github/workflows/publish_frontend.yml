@@ -16,6 +16,7 @@ jobs:
           echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
           gh auth status
           echo "Status above should be 'Logged in to github.com as <username>'"
+          gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /orgs/microsoft/teams/Retrospective-Extension-Admin/members
 
       - name: Continue execution if the specified team
         run: |
