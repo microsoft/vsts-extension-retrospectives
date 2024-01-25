@@ -1,32 +1,59 @@
-name: Publish to Azure DevOps Marketplace
+name: Publish - Production
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "The version to use"
+        required: false
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Stop execution if not the specified team
+      - name: Check if the invoker is a member of the admin team
         run: |
-          echo "This workflow can only be executed by the specified team."
+          echo ${{ secrets.GH_CLI_LOGIN_TOKEN }} | gh auth login --with-token
 
-      - name: Check if the user is in the specified team
-        id: check-team
-        run: |
-          TEAM_SLUG='retrospective-extension-admin'
-          USERNAME=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/users/$GITHUB_ACTOR/teams" | jq -r --arg team_slug "$TEAM_SLUG" '.[] | select(.slug == $team_slug) | .slug')
+          team_members=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/organizations/6154722/team/9355952/members)
 
-          echo "Team Slug: $USERNAME"
-          if [ "$USERNAME" != "$TEAM_SLUG" ]; then
-            echo "This workflow can only be executed by the specified team."
+          # Extract usernames from the API response
+          usernames=$(echo "$team_members" | jq -r '.[].login')
+
+          # Check if github.actor is in the list
+          if [[ "$usernames" != *"${{ github.actor }}"* ]]; then
+            echo "${{ github.actor }} you shall not pass!"
             exit 1
           fi
 
-      - name: Continue execution if the specified team
+      - name: Install tools used for deployment
         run: |
-          echo "Congratulations! You are part of the specified team."
+          npm install -g tfx-cli node-jq
+
+      - name: Prepare extension package
+        working-directory: 'RetrospectiveExtension.Frontend'
+        env:
+          REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
+          REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
+        run: |
+          if [ -z "${INPUT_VERSION}" ]; then
+            ext_info=$(tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
+            VERSION=$(jq -r '.versions[0].version' <<< "$ext_info")
+          else
+            VERSION="${INPUT_VERSION}"
+          fi
+
+          cat <<< $(jq ".version = \"${VERSION}\"" vss-extension-prod.json) > vss-extension-prod.json
+
+          npm install
+          npm run build:p
+          npm run pack:p
+
+      - name: Publish extension
+        working-directory: 'RetrospectiveExtension.Frontend'
+        run: >
+          tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
