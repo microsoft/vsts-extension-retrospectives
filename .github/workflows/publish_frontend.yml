@@ -1,4 +1,4 @@
-name: Publish to Azure DevOps Marketplace
+name: Publish - Production
 
 on:
   workflow_dispatch:
