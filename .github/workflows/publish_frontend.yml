@@ -11,30 +11,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - uses: octokit/graphql-action@v2.x
-        id: get_total_count
-        with:
-          query: |
-            query {
-              organization(login: "microsoft") {
-                teams(
-                  first: 10,
-                  userLogins: ["${{ github.actor }}"]
-                  query: "Retrospective-Extension-Admin"
-                ) {
-                  totalCount
-                }
-              }
-            }
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN_READ_ORG }}
-
-      - name: Check if the specified team exists
+      - name: Login GitHub CLI
         run: |
-          if [ ${{ steps.get_total_count.outputs.data }} -eq 0 ]; then
-            echo "You are not part of the specified team."
-            exit 1
-          fi
+          gh auth status
+          echo "Status above should be 'Logged in to github.com as <username>'"
+          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+          gh auth status
+          echo "Status above should be 'Logged in to github.com as <username>'"
 
       - name: Continue execution if the specified team
         run: |
