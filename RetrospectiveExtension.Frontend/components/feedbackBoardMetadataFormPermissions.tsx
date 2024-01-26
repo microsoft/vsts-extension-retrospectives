@@ -52,6 +52,14 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
     props.onPermissionChanged({ isPublic: state.isPublic, permissions: state.permissions })
   }
 
+  const PermissionImage = (props: {option: FeedbackBoardPermissionOption}) => {
+    if (props.option.type === 'team') {
+      return <i className="permission-image fa-solid fa-users h-11 w-11"></i>
+    }
+
+    return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission image for ${props.option.name}`} />
+  }
+
   return <div className="board-metadata-form">
     <section className="board-metadata-form-board-settings">
       <Checkbox
@@ -65,8 +73,8 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
       />
     </section>
 
-    <section className="board-metadata-form-board-settings">
-      <div>
+    <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
+      <div className="search-bar">
         <TextField
           ariaLabel="Search for a team or a member to add permissions"
           aria-required={true}
@@ -74,40 +82,54 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
           id="retrospective-permission-search-input"
         />
       </div>
-      <table className="board-metadata-table">
-        <thead>
-          <tr>
-            <th><Checkbox
-              className="my-2"
-              id="visible-to-every-team-member-checkbox"
-              ariaLabel="Visible to every Team Member. The board will be public."
-              boxSide="start"
-              defaultChecked={state.isPublic}
-              onChange={(_, checked) => handlePublicState(checked)}
-            /></th>
-            <th>Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredPermissionOptions.map((option, index) => {
-            return (
-              <tr key={'table-row-' + index}>
-                <td>
-                  <Checkbox
-                    className="my-2"
-                    id="visible-to-every-team-member-checkbox"
-                    ariaLabel="Visible to every Team Member. The board will be public."
-                    boxSide="start"
-                    defaultChecked={state.isPublic}
-                    onChange={(_, checked) => handlePublicState(checked)}
-                  />
-                </td>
-                <td>{option.name}</td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+      <div className="board-metadata-table-container">
+        {/* TODO: Replace with Fluent grid once we migration components over */}
+        <table className="board-metadata-table">
+          <thead>
+            <tr>
+              <th className="cell-checkbox">
+                <Checkbox
+                  className="my-2"
+                  id="visible-to-every-team-member-checkbox"
+                  ariaLabel="Visible to every Team Member. The board will be public."
+                  boxSide="start"
+                  defaultChecked={false}
+                  onChange={(_, checked) => handlePublicState(checked)}
+                />
+              </th>
+              <th className={"text-left"}>
+                <span>{"Name"}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPermissionOptions.map((option, index) => {
+              return (
+                <tr key={'table-row-' + index} className="option-row" onClick={() => handlePublicState(!state.isPublic)}>
+                  <td>
+                    <Checkbox
+                      className="my-2"
+                      id="visible-to-every-team-member-checkbox"
+                      ariaLabel="Visible to every Team Member. The board will be public."
+                      boxSide="start"
+                      defaultChecked={false}
+                    />
+                  </td>
+                  <td className="cell-content flex flex-row flex-nowrap">
+                    <div className="content-image">
+                      <PermissionImage option={option} />
+                    </div>
+                    <div className="content-text flex flex-col flex-nowrap text-left">
+                      <span>{option.name}</span>
+                      <span>{option.uniqueName}</span>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
     </section>
   </div>;
 }
