@@ -1,0 +1,59 @@
+name: Publish - Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The version to use"
+        required: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check if the invoker is a member of the admin team
+        run: |
+          echo ${{ secrets.GH_CLI_LOGIN_TOKEN }} | gh auth login --with-token
+
+          team_members=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/organizations/6154722/team/9355952/members)
+
+          # Extract usernames from the API response
+          usernames=$(echo "$team_members" | jq -r '.[].login')
+
+          # Check if github.actor is in the list
+          if [[ "$usernames" != *"${{ github.actor }}"* ]]; then
+            echo "${{ github.actor }} you shall not pass!"
+            exit 1
+          fi
+
+      - name: Install tools used for deployment
+        run: |
+          npm install -g tfx-cli node-jq
+
+      - name: Prepare extension package
+        working-directory: 'RetrospectiveExtension.Frontend'
+        env:
+          REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
+          REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
+        run: |
+          if [ -z "${INPUT_VERSION}" ]; then
+            ext_info=$(tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
+            VERSION=$(jq -r '.versions[0].version' <<< "$ext_info")
+          else
+            VERSION="${INPUT_VERSION}"
+          fi
+
+          cat <<< $(jq ".version = \"${VERSION}\"" vss-extension-prod.json) > vss-extension-prod.json
+
+          npm install
+          npm run build:p
+          npm run pack:p
+
+      - name: Publish extension
+        working-directory: 'RetrospectiveExtension.Frontend'
+        run: >
+          tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
