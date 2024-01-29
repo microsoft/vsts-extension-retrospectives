@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
         name: Check out repository
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
