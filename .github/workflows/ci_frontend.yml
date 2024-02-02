@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: '16'
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
@@ -44,7 +44,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: Upload test report
-        uses: dorny/test-reporter@v1.7.0
+        uses: dorny/test-reporter@v1.8.0
         with:
           name: JEST Tests
           path: reports/jest-*.xml
@@ -53,7 +53,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v3.1.5
         with:
           name: Codecov Run
           files: coverage/coverage-final.json

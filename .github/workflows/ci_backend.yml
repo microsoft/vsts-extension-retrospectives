@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
         name: Check out repository
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
@@ -50,7 +50,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: Upload backend test report
-        uses: dorny/test-reporter@v1.7.0
+        uses: dorny/test-reporter@v1.8.0
         with:
           name: Dotnet Tests
           path: TestResults/test-results.trx
