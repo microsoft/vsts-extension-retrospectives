@@ -116,7 +116,7 @@ class BoardDataService {
   }
 
   private isBoardPublic = (permissions: IFeedbackBoardDocumentPermissions): boolean => {
-    return permissions === undefined || (Object.values(permissions.Teams).length === 0 && Object.values(permissions.Members).length === 0);
+    return permissions === undefined || (permissions.Teams.length === 0 && permissions.Members.length === 0);
   }
 }
 
