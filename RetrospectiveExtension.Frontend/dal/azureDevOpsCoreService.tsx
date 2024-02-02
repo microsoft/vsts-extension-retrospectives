@@ -1,5 +1,5 @@
 import { CoreRestClient } from 'azure-devops-extension-api/Core/CoreClient';
-import { WebApiTeam, } from 'azure-devops-extension-api/Core';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { TeamMember } from 'azure-devops-extension-api/WebApi';
 import { getClient } from 'azure-devops-extension-api/Common';
 
