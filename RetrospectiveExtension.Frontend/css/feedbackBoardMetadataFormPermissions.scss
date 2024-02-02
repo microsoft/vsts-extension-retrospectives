@@ -2,7 +2,7 @@
 
 $content-padding: 10px;
 
-.board-metadata-form {
+.board-metadata-form-permissions {
 
   .board-metadata-form-board-settings {
     padding-top: 20px;
@@ -12,6 +12,10 @@ $content-padding: 10px;
 
     &--no-padding {
       padding: 0;
+    }
+
+    .board-metadata-form-section-information {
+      margin: $content-padding
     }
 
     .search-bar {
@@ -48,16 +52,6 @@ $content-padding: 10px;
 
       .option-row {
 
-        &:hover {
-          cursor: pointer;
-
-          .cell-content {
-            .content-text {
-              color: $azdo_blue;
-            }
-          }
-        }
-
         td {
           &.cell-content {
             background-color: var(--background-color);
@@ -80,7 +74,7 @@ $content-padding: 10px;
             .content-text {
               color: var(--text-primary-color);
     
-              &:nth-child(1) {
+              .content-sub-text {
                 color: var(--text-secondary-color);
               }
             }

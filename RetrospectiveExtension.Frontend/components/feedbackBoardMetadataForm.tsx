@@ -32,7 +32,8 @@ export interface IFeedbackBoardMetadataFormProps {
     isIncludeTeamEffectivenessMeasurement: boolean,
     isBoardAnonymous: boolean,
     shouldShowFeedbackAfterCollect: boolean,
-    displayPrimeDirective: boolean) => void;
+    displayPrimeDirective: boolean,
+    permissions: IFeedbackBoardDocumentPermissions) => void;
   onFormCancel: () => void;
 }
 
@@ -53,7 +54,6 @@ interface IFeedbackBoardMetadataFormState {
   columnCardBeingEdited: IFeedbackColumnCard;
   selectedIconKey: string;
   selectedAccentColorKey: string;
-  isPublic: boolean;
   permissions: IFeedbackBoardDocumentPermissions
 }
 
@@ -73,6 +73,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
     let defaultDisplayPrimeDirective: boolean = true;
     let defaultShowFeedbackAfterCollect: boolean = false;
+    let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: []};
 
     if (props.isDuplicatingBoard) {
       defaultTitle = `${this.props.currentBoard.title} - copy`;
@@ -82,6 +83,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       defaultIncludeTeamEffectivenessMeasurement = this.props.currentBoard.isIncludeTeamEffectivenessMeasurement;
       defaultDisplayPrimeDirective = this.props.currentBoard.displayPrimeDirective;
       defaultShowFeedbackAfterCollect = this.props.currentBoard.shouldShowFeedbackAfterCollect;
+      defaultPermissions = this.props.currentBoard.permissions;
     }
 
     this.state = {
@@ -103,8 +105,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
       initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
-      isPublic: this.props.currentBoard.permissions === undefined || (Object.values(this.props.currentBoard.permissions.Teams).length === 0 && Object.values(this.props.currentBoard.permissions.Members).length === 0),
-      permissions: this.props.currentBoard.permissions ?? { Teams: {}, Members: {}}
+      permissions: this.props.isNewBoardCreation ? defaultPermissions : this.props.currentBoard.permissions
     };
   }
 
@@ -144,7 +145,8 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       this.state.isIncludeTeamEffectivenessMeasurement,
       this.state.isBoardAnonymous,
       this.state.shouldShowFeedbackAfterCollect,
-      this.state.displayPrimeDirective
+      this.state.displayPrimeDirective,
+      this.state.permissions
     );
   }
 
@@ -323,7 +325,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         <Pivot>
           <PivotItem headerText={'General'}>
             <div className="board-metadata-form">
-              <section className="board-metadata-form-board-settings hide-mobile">
+              <section className="board-metadata-edit-column-settings hide-mobile">
                 <h2 className="board-metadata-form-section-header">Board Settings</h2>
                 <div className="board-metadata-form-section-subheader">
                   <label htmlFor="title-input-container">Title<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:</label>
@@ -679,10 +681,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           </PivotItem>
           <PivotItem headerText={'Permissions'}>
             <FeedbackBoardMetadataFormPermissions
-              isPublic={this.state.isPublic}
               permissions={this.state.permissions}
               permissionOptions={this.props.availablePermissionOptions}
-              onPermissionChanged={(s: FeedbackBoardPermissionState) => this.setState({ isPublic: s.isPublic, permissions: s.permissions })}
+              onPermissionChanged={(s: FeedbackBoardPermissionState) => this.setState({ permissions: s.permissions })}
             />
           </PivotItem>
         </Pivot>
