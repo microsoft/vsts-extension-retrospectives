@@ -1,6 +1,5 @@
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 import { WorkflowPhase } from './workItem';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
 
 export interface IUserVisit {
   teamId: string;
