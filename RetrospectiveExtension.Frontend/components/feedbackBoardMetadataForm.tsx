@@ -323,7 +323,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     return (
       <div className="flex flex-col flex-nowrap">
         <Pivot>
-          <PivotItem headerText={'General'}>
+          <PivotItem headerText={'General'} aria-label="Board General Settings">
             <div className="board-metadata-form">
               <section className="board-metadata-edit-column-settings hide-mobile">
                 <h2 className="board-metadata-form-section-header">Board Settings</h2>
@@ -679,7 +679,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               </Dialog>}
             </div>
           </PivotItem>
-          <PivotItem headerText={'Permissions'}>
+          <PivotItem headerText={'Permissions'} aria-label="Board Permission Settings">
             <FeedbackBoardMetadataFormPermissions
               permissions={this.state.permissions}
               permissionOptions={this.props.availablePermissionOptions}

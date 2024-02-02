@@ -123,7 +123,7 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
   const PublicWarningBanner = () => {
     if(teamPermissions.length === 0 && memberPermissions.length === 0) {
       return <div className="board-metadata-form-section-information">
-        <i className="fas fa-exclamation-circle"></i>&nbsp;This board is visible to every member in the organization.
+        <i className="fas fa-exclamation-circle" aria-label="Board is visible to every member in the organization"></i>&nbsp;This board is visible to every member in the organization.
       </div>
     }
 
@@ -167,7 +167,7 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
                 />
               </th>
               <th className={"text-left"}>
-                <span>{"Name"}</span>
+                <span aria-label="Permission option name table header">{"Name"}</span>
               </th>
             </tr>
           </thead>
@@ -179,7 +179,7 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
                     <Checkbox
                       className="my-2"
                       id={"permission-option-" + index}
-                      ariaLabel="Visible to every Team Member. The board will be public."
+                      ariaLabel="Add permission to every team or member in the table"
                       boxSide="start"
                       checked={teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
                       onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
@@ -190,8 +190,8 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
                       {PermissionImage({ option })}
                     </div>
                     <div className="content-text flex flex-col flex-nowrap text-left">
-                      <span>{option.name}</span>
-                      <span className="content-sub-text">{option.uniqueName}</span>
+                      <span aria-label="Team or member name">{option.name}</span>
+                      <span aria-label="Team or member unique name" className="content-sub-text">{option.uniqueName}</span>
                     </div>
                   </td>
                 </tr>
