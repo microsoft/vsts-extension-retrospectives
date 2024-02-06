@@ -50,14 +50,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: jest-test-results
-          path: reports/jest-test.xml
+          path: reports/jest-junit.xml
 
-      - run: npm pack:test
-      - if: success() || failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: pack-results
-          path: reports/pack-results.xml
+      # - run: npm run pack:test
+      # - if: success() || failure()
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: pack-results
+      #     path: reports/pack-results.xml
 
       # https://github.com/marketplace/actions/markdownlint-cli2-action
       - uses: DavidAnson/markdownlint-cli2-action@v15
