@@ -39,7 +39,7 @@ jobs:
         working-directory: 'RetrospectiveExtension.Frontend'
 
       - name: "Lint node files"
-        run: npm lint
+        run: npm run lint
         working-directory: 'RetrospectiveExtension.Frontend'
 
       - name: "Run tests"
