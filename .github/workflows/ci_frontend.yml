@@ -42,14 +42,20 @@ jobs:
         shell: bash
         working-directory: 'RetrospectiveExtension.Frontend'
 
-      - if: steps.changes.outputs.src == 'true'
-        name: Upload test report
-        uses: dorny/test-reporter@v1.8.0
+      - if: success() || failure()
+        uses: actions/upload-artifact@v3
         with:
-          name: JEST Tests
+          name: jest-test-results
           path: reports/jest-*.xml
-          reporter: jest-junit
-          working-directory: 'RetrospectiveExtension.Frontend'
+
+      # - if: steps.changes.outputs.src == 'true'
+      #   name: Upload test report
+      #   uses: dorny/test-reporter@v1.8.0
+      #   with:
+      #     name: JEST Tests
+      #     path: reports/jest-*.xml
+      #     reporter: jest-junit
+      #     working-directory: 'RetrospectiveExtension.Frontend'
 
       - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
