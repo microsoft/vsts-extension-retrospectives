@@ -33,9 +33,19 @@ jobs:
             src:
               - '.github/**'
               - 'RetrospectiveExtension.Frontend/**'
-      - run: npm ci # confirm
 
-      - run: npm test
+      - name: "Install node packages"
+        run: npm ci # confirm
+        working-directory: 'RetrospectiveExtension.Frontend'
+
+      - name: "Lint node files"
+        run: npm lint
+        working-directory: 'RetrospectiveExtension.Frontend'
+
+      - name: "Run tests"
+        run: npm test
+        working-directory: 'RetrospectiveExtension.Frontend'
+
       - if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
