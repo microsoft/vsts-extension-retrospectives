@@ -33,20 +33,43 @@ jobs:
             src:
               - '.github/**'
               - 'RetrospectiveExtension.Frontend/**'
+      - run: npm ci # confirm
 
-      - if: steps.changes.outputs.src == 'true'
-        run: |
-          scripts/setup_ci.sh
-          scripts/ci.sh
-        name: Build and Test (CI script)
-        shell: bash
-        working-directory: 'RetrospectiveExtension.Frontend'
-
+      - run: npm test
       - if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: jest-test-results
-          path: reports/jest-*.xml
+          path: reports/jest-test.xml
+
+      - run: npm pack:test
+      - if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: pack-results
+          path: reports/pack-results.xml
+
+      # https://github.com/marketplace/actions/markdownlint-cli2-action
+      - uses: DavidAnson/markdownlint-cli2-action@v15
+        with:
+          config: #TODO have a config file
+
+      # https://github.com/marketplace/actions/spellchecker-cli
+      - uses: tbroadley/spellchecker-cli-action@v1
+
+      # - if: steps.changes.outputs.src == 'true'
+      #   run: |
+      #     scripts/setup_ci.sh
+      #     scripts/ci.sh
+      #   name: Build and Test (CI script)
+      #   shell: bash
+      #   working-directory: 'RetrospectiveExtension.Frontend'
+
+      # - if: success() || failure()
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: jest-test-results
+      #     path: reports/jest-.xml
 
       # - if: steps.changes.outputs.src == 'true'
       #   name: Upload test report
