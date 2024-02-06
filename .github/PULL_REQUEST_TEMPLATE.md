@@ -13,7 +13,8 @@ Relevant Issue(s): <!-- What issue(s) is this PR fixing  -->
 
 ## Fundamentals
 
-- [ ] I have read the [**CONTRIBUTING**](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md) document.
+- [ ] I have read the [**CONTRIBUTING**](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md)
+document.
 - [ ] My code follows the code style of this project.
 - [ ] I have updated any relevant documentation accordingly.
 - [ ] I have included an update blurb (50 words or less) at the top of `CHANGELOG.md`,

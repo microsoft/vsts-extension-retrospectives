@@ -66,8 +66,8 @@
     "code_block_line_length": 100,
     // Include code blocks
     "code_blocks": true,
-    // Include tables
-    "tables": true,
+    // Exclude tables
+    "tables": false,
     // Include headings
     "headings": true,
     // Include headings
