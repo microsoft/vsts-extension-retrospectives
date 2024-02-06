@@ -1,48 +1,48 @@
-name: 'CD - Frontend'
+# name: 'CD - Frontend'
 
-on:
-  workflow_dispatch:
-  pull_request:
-    branches:
-      - main
+# on:
+#   workflow_dispatch:
+#   pull_request:
+#     branches:
+#       - main
 
-jobs:
-  deploy:
-    name: Frontend - Deploy package
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out repository
-      uses: actions/checkout@v4
+# jobs:
+#   deploy:
+#     name: Frontend - Deploy package
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Check out repository
+#       uses: actions/checkout@v4
 
-    - name: Install tools used for deployment
-      run: |
-        npm install -g tfx-cli node-jq
+#     - name: Install tools used for deployment
+#       run: |
+#         npm install -g tfx-cli node-jq
 
-    - name: Prepare vss-extension-dev.json
-      working-directory: 'RetrospectiveExtension.Frontend'
-      run: |
-        cp vss-extension-dev.json.template vss-extension-dev.json
+#     - name: Prepare vss-extension-dev.json
+#       working-directory: 'RetrospectiveExtension.Frontend'
+#       run: |
+#         cp vss-extension-dev.json.template vss-extension-dev.json
 
-        scripts/update_ext_manifest.sh \
-          "vss-extension-dev.json" \
-          "enginpolat" \
-          "retrospective-vsts-extension-dev" \
-          "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+#         scripts/update_ext_manifest.sh \
+#           "vss-extension-dev.json" \
+#           "enginpolat" \
+#           "retrospective-vsts-extension-dev" \
+#           "${{ secrets.AZURE_DEVOPS_TOKEN }}"
 
-    - name: Prepare extension package
-      working-directory: 'RetrospectiveExtension.Frontend'
-      env:
-        REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
-        REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
-      run: |
-        npm install
-        npm run build:p
-        npm run pack:d
+#     - name: Prepare extension package
+#       working-directory: 'RetrospectiveExtension.Frontend'
+#       env:
+#         REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
+#         REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
+#       run: |
+#         npm install
+#         npm run build:p
+#         npm run pack:d
 
-    - name: Publish extension
-      working-directory: 'RetrospectiveExtension.Frontend'
-      run: >
-        tfx extension publish
-        --manifests vss-extension-dev.json
-        --vsix ./dist/*.vsix
-        --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+#     - name: Publish extension
+#       working-directory: 'RetrospectiveExtension.Frontend'
+#       run: >
+#         tfx extension publish
+#         --manifests vss-extension-dev.json
+#         --vsix ./dist/*.vsix
+#         --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"

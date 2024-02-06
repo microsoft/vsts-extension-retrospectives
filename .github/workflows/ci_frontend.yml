@@ -35,7 +35,7 @@ jobs:
               - 'RetrospectiveExtension.Frontend/**'
 
       - name: "Install node packages"
-        run: npm ci # confirm
+        run: npm ci
         working-directory: 'RetrospectiveExtension.Frontend'
 
       - name: "Lint node files"
@@ -62,7 +62,12 @@ jobs:
       # https://github.com/marketplace/actions/markdownlint-cli2-action
       - uses: DavidAnson/markdownlint-cli2-action@v15
         with:
-          config: #TODO have a config file
+          config: .markdownlint.json
+          globs: |
+            #CODE_OF_CONDUCT.md
+            #LICENSE
+            #SECURITY.md
+
 
       # https://github.com/marketplace/actions/spellchecker-cli
       - uses: tbroadley/spellchecker-cli-action@v1
