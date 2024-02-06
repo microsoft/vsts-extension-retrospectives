@@ -43,14 +43,14 @@ jobs:
         working-directory: 'RetrospectiveExtension.Frontend'
 
       - name: "Run tests"
-        run: npm run test
+        run: npm test
         working-directory: 'RetrospectiveExtension.Frontend'
 
       - if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: jest-test-results
-          path: reports/jest-junit.xml
+          path: RetrospectiveExtension.Frontend/reports/jest-junit.xml
 
       # - run: npm run pack:test
       # - if: success() || failure()
