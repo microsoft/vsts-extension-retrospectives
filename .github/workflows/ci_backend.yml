@@ -1,58 +1,58 @@
-# name: 'CI - Backend'
+name: 'CI_Backend'
 
-# on:
-#   push:
-#     branches:
-#       - main
-#       - dev
-#       - 'releases/**'
-#   pull_request:
-#     branches:
-#       - main
-#       - dev
-#       - 'releases/**'
-#   workflow_dispatch:
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - 'releases/**'
+  pull_request:
+    branches:
+      - main
+      - dev
+      - 'releases/**'
+  workflow_dispatch:
 
-# jobs:
-#   build:
-#     name: Backend - Build and Test
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
-#         name: Check out repository
+jobs:
+  build:
+    name: Backend - Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Check out repository
 
-#       - uses: dorny/paths-filter@v3
-#         id: changes
-#         with:
-#           filters: |
-#             src:
-#               - '.github/**'
-#               - 'RetrospectiveExtension.Backend/**'
-#               - 'RetrospectiveExtension.Backend.Tests/**'
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - '.github/**'
+              - 'RetrospectiveExtension.Backend/**'
+              - 'RetrospectiveExtension.Backend.Tests/**'
 
-#       - if: steps.changes.outputs.src == 'true'
-#         uses: actions/setup-dotnet@v4
-#         with:
-#           dotnet-version: '6.0.x'
+      - if: steps.changes.outputs.src == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
 
-#       - if: steps.changes.outputs.src == 'true'
-#         run: |
-#           dotnet restore
-#           dotnet build
-#         name: Build
-#         working-directory: 'RetrospectiveExtension.Backend'
+      - if: steps.changes.outputs.src == 'true'
+        run: |
+          dotnet restore
+          dotnet build
+        name: Build
+        working-directory: 'RetrospectiveExtension.Backend'
 
-#       - if: steps.changes.outputs.src == 'true'
-#         run: |
-#           dotnet test --logger "trx;LogFileName=test-results.trx"
-#         name: Test
-#         working-directory: 'RetrospectiveExtension.Backend.Tests'
+      - if: steps.changes.outputs.src == 'true'
+        run: |
+          dotnet test --logger "trx;LogFileName=test-results.trx"
+        name: Test
+        working-directory: 'RetrospectiveExtension.Backend.Tests'
 
-#       - if: steps.changes.outputs.src == 'true'
-#         name: Upload backend test report
-#         uses: dorny/test-reporter@v1.8.0
-#         with:
-#           name: Dotnet Tests
-#           path: TestResults/test-results.trx
-#           reporter: dotnet-trx
-#           working-directory: 'RetrospectiveExtension.Backend.Tests'
+      - if: steps.changes.outputs.src == 'true'
+        name: Upload backend test report
+        uses: dorny/test-reporter@v1.8.0
+        with:
+          name: Dotnet Tests
+          path: TestResults/test-results.trx
+          reporter: dotnet-trx
+          working-directory: 'RetrospectiveExtension.Backend.Tests'

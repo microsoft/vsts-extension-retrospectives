@@ -1,4 +1,4 @@
-name: 'CI - Frontend'
+name: 'CI_Frontend'
 
 on:
   push:
@@ -34,15 +34,18 @@ jobs:
               - '.github/**'
               - 'RetrospectiveExtension.Frontend/**'
 
-      - name: "Install node packages"
+      - if: steps.changes.outputs.src == 'true'
+        name: "Install dependencies"
         run: npm ci
         working-directory: 'RetrospectiveExtension.Frontend'
 
-      - name: "Lint node files"
+      - if: steps.changes.outputs.src == 'true'
+        name: "Lint node files"
         run: npm run lint
         working-directory: 'RetrospectiveExtension.Frontend'
 
-      - name: "Run tests"
+      - if: steps.changes.outputs.src == 'true'
+        name: "Run tests"
         run: npm test
         working-directory: 'RetrospectiveExtension.Frontend'
 
@@ -51,13 +54,6 @@ jobs:
         with:
           name: jest-test-results
           path: RetrospectiveExtension.Frontend/reports/jest-junit.xml
-
-      # - run: npm run pack:test
-      # - if: success() || failure()
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: pack-results
-      #     path: reports/pack-results.xml
 
       # https://github.com/marketplace/actions/markdownlint-cli2-action
       - uses: DavidAnson/markdownlint-cli2-action@v15
@@ -68,32 +64,8 @@ jobs:
             #LICENSE
             #SECURITY.md
 
-
       # https://github.com/marketplace/actions/spellchecker-cli
       - uses: tbroadley/spellchecker-cli-action@v1
-
-      # - if: steps.changes.outputs.src == 'true'
-      #   run: |
-      #     scripts/setup_ci.sh
-      #     scripts/ci.sh
-      #   name: Build and Test (CI script)
-      #   shell: bash
-      #   working-directory: 'RetrospectiveExtension.Frontend'
-
-      # - if: success() || failure()
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: jest-test-results
-      #     path: reports/jest-.xml
-
-      # - if: steps.changes.outputs.src == 'true'
-      #   name: Upload test report
-      #   uses: dorny/test-reporter@v1.8.0
-      #   with:
-      #     name: JEST Tests
-      #     path: reports/jest-*.xml
-      #     reporter: jest-junit
-      #     working-directory: 'RetrospectiveExtension.Frontend'
 
       - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
