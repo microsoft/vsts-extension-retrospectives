@@ -43,7 +43,7 @@ jobs:
         working-directory: 'RetrospectiveExtension.Frontend'
 
       - name: "Run tests"
-        run: npm test
+        run: npm run test
         working-directory: 'RetrospectiveExtension.Frontend'
 
       - if: success() || failure()

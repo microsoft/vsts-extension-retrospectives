@@ -14,7 +14,7 @@
     "publish:d": "npm run pack:d && tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
     "publish:p": "npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
     "start:dev": "npm run compile && webpack-dev-server --mode development",
-    "test": "jest --env=jsdom --silent -ci --testResultsProcessor=jest-junit --coverage",
+    "test": "jest --env=jsdom --silent -ci --reporters=default --reporters=jest-junit --coverage",
     "test:watch": "jest --env=jsdom --watch",
     "ncu": "npx npm-check-updates",
     "ncu:u": "npx npm-check-updates --update-dependencies"
