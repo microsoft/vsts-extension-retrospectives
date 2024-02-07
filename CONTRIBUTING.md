@@ -5,7 +5,7 @@
 - [Background](#background)
 - [Contributing Guidelines](#contributing-guidelines)
   - [Branching and Pull Requests](#branching-and-pull-requests)
-  - [Continuous Integration and Pre-commit Hook](#continuous-integration-ci-script-and-pre-commit-hook)
+  - [Continuous Integration (CI) and Pre-commit Hook](#continuous-integration-ci-and-pre-commit-hook)
 - [Development Environments](#development-environments)
   - [Visual Studio Code - Dev Containers](#dev-containers)
   - [Windows Subsystem for Linux (WSL)](#windows-subsystem-for-linux)
@@ -56,24 +56,31 @@ implemented in C#. The project follows a single branch source control strategy.
    developer from the [Retrospectives team](retrospectives@microsoft.com), or if
    you do not have permission to do that, you may request the reviewer to merge it for you.
 
-### Continuous Integration (CI) Script and Pre-commit Hook
+### Continuous Integration (CI) and Pre-commit Hook
 
-The `RetrospectiveExtension.Frontend/scripts` folder includes a ci script,
-[`ci.sh`](RetrospectiveExtension.Frontend/scripts/ci.sh).
-The script runs all CI steps locally. If you are using the
-projects dev container all script dependencies are already installed.
-If you are not using the [dev container](#dev-containers) you can run the
-[`setup_ci.sh`](RetrospectiveExtension.Frontend/scripts/setup_ci.sh) script
-to install all dependencies.
+Our CI pipeline can be invoked on Github, or if you want to get ahead of the potential failures, you
+can use the [`pre-commit` configuration](./.pre-commit-config.yaml). It will run
+linting on markdown files and python files, and run a spellcheck. The same rules will be caught locally
+that will be caught in Github actions.
 
-In addition to running the CI script manually the dev container is
-configured to install a
-[pre-commit hook](https://git-scm.com/docs/githooks#_pre_commit) using the
-[Python pre-commit framework](https://pre-commit.com/). The pre-commit
-hook will run the [`ci.sh`](RetrospectiveExtension.Frontend/scripts/ci.sh)
-script before each commit and abort the commit on error. To
-disable the pre-commit hook run `pre-commit uninstall` from the
-root folder.
+To use `pre-commit`, it's recommended to have a [python virtual environment (venv)](https://docs.python.org/3/library/venv.html#creating-virtual-environments).
+If the venv ends with `-env`, such as `retro-env`, then the `.gitignore` is configured to not watch
+this environment during development!
+
+Either in the [dev container](#dev-containers) or locally:
+
+1. Run: `pip install -r requirements.txt`
+2. Run: `pre-commit install`
+3. To run the checks ahead of commiting:
+    - `pre-commit run` will run the pre-commit hooks against staged files
+    - `pre-commit run --all-files` will run against *everything*
+    - `pre-commit run markdownlint` to run the markdown linting
+    - `pre-commit run spellcheck-cli` to run the spellchecking
+4. To run linting for the typescript/javascript (must be done within the `RetrospectiveExtension.Frontend`
+directory): `npm run lint`
+
+Read more about the [python pre-commit framework](https://pre-commit.com/). To disable the pre-commit
+hook run `pre-commit uninstall` from the root folder.
 
 ## Development Environments
 
@@ -385,7 +392,7 @@ extension.
 
 #### Notes
 
-- This setup is **_not_** required for contributing to this extension, but can
+- This setup is **not** required for contributing to this extension, but can
   be helpful if you want certain debugging options available to you.
 - If you are part of a team working on the Retrospectives extension you can
   deploy a single backend to support multiple developer test extensions.

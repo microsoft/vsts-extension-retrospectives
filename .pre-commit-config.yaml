@@ -21,11 +21,11 @@ repos:
     - id: markdownlint
       stages:
         - "pre-commit"
--   repo: https://github.com/tbroadley/spellchecker-cli
-    rev: e4879b5 # COMING SOON: Release tag
-    hooks:
-      - id: spellchecker-cli
-        name: spellcheck
-        types: [markdown]
-        stages:
-          - "pre-commit"
+# -   repo: https://github.com/tbroadley/spellchecker-cli
+#     rev: v6.1.1 # COMING SOON: Release tag
+#     hooks:
+#       - id: spellchecker-cli
+#         name: spellcheck
+#         types: [markdown]
+#         stages:
+#           - "pre-commit"
