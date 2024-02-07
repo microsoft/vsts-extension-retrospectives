@@ -14,14 +14,19 @@ closely resemble the Retrospective summary's color separation for the three cate
 Reds and Oranges for Unfavorable (1-6), Yellows for Neutral (7-8), Greens for
 Favorable (9-10). From [Github PR #531](https://github.com/microsoft/vsts-extension-retrospectives/pull/531).
 
-* Related feedback items, in "Focus Mode", now show the original column textual as well as visually. From [Github PR #544](https://github.com/microsoft/vsts-extension-retrospectives/pull/544)
+* Related feedback items, in "Focus Mode", now show the original column textual as well as visually.
+From [Github PR #544](https://github.com/microsoft/vsts-extension-retrospectives/pull/544)
 
-* New tab in "Focus Mode", called "All", which contains every card on the current retrospective board so that
-your team can prioritize the highest voted cards first. From [Github PR #531](https://github.com/microsoft/vsts-extension-retrospectives/pull/543).
+* New tab in "Focus Mode", called "All", which contains every card on the current retrospective board
+so that your team can prioritize the highest voted cards first.
+From [Github PR #531](https://github.com/microsoft/vsts-extension-retrospectives/pull/543).
 
-* Duplicate an existing board with the new menu option "Create a copy of retrospective". [Github PR #561](https://github.com/microsoft/vsts-extension-retrospectives/pull/561)
+* Duplicate an existing board with the new menu option "Create a copy of retrospective".
+[Github PR #561](https://github.com/microsoft/vsts-extension-retrospectives/pull/561)
 
-* Package updates for SASS and ReactTable that enhances the developer experience to run `npm i` without the need of `--force` or `--legacy-peer-deps`. From [Github PR #553](https://github.com/microsoft/vsts-extension-retrospectives/pull/553)
+* Package updates for SASS and ReactTable that enhances the developer experience to run `npm i`
+without the need of `--force` or `--legacy-peer-deps`.
+From [Github PR #553](https://github.com/microsoft/vsts-extension-retrospectives/pull/553)
 
 ## v1.91.1
 
@@ -29,7 +34,9 @@ your team can prioritize the highest voted cards first. From [Github PR #531](ht
 
 ## v1.90.3
 
-* Github Experience: Updating README to include the code coverage and status badges. Github PRs now get code coverage comments from CodeCov. From [Github PR #461](https://github.com/microsoft/vsts-extension-retrospectives/pull/461).
+* Github Experience: Updating README to include the code coverage and status badges. Github PRs now
+get code coverage comments from CodeCov.
+From [Github PR #461](https://github.com/microsoft/vsts-extension-retrospectives/pull/461).
 
 * Adding a new board template to Efficiency
 
@@ -39,9 +46,11 @@ your team can prioritize the highest voted cards first. From [Github PR #531](ht
 
 ## v1.90.1 ([GitHub PR #462](https://github.com/microsoft/vsts-extension-retrospectives/pull/462))
 
-* Modified default to Include team assessment, display 'Retrospective Prime Directive', do not display names in feedback.
+* Modified default to Include team assessment, display 'Retrospective Prime Directive', do not display
+names in feedback.
 
-* Added "Discuss and Act" button to the Team Assessment allowing teams to discuss and take action on specific areas in the Team Assessment
+* Added "Discuss and Act" button to the Team Assessment allowing teams to discuss and take action on
+specific areas in the Team Assessment
 
 * Sorted Team Assessment results in order of opportunity
 
@@ -104,7 +113,8 @@ your team can prioritize the highest voted cards first. From [Github PR #531](ht
 
 ## v1.0.48
 
-* Templates added to _Create new retrospective_ dialog, so it's now possible to create a board from one of those templates, such as, _Mad-Sad-Glad_, _Start-Stop-Continue_, etc.
+* Templates added to _Create new retrospective_ dialog, so it's now possible to create a board from
+one of those templates, such as, _Mad-Sad-Glad_, _Start-Stop-Continue_, etc.
 * New icon and color options added for columns
 
 ## v1.0.47

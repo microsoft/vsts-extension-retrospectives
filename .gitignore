@@ -279,3 +279,6 @@ ai-dashboard.json
 
 # Alerts template
 ai-alerts.json
+
+# Python Virtual envs
+*-env/

@@ -1,0 +1,31 @@
+exclude: '^$'
+fail_fast: false
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: trailing-whitespace
+        stages:
+          - "pre-commit"
+      - id: no-commit-to-branch
+        stages:
+          - "pre-commit"
+-   repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+    - id: detect-secrets
+      args: ['--baseline', '.secrets.baseline']
+-   repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.35.0
+    hooks:
+    - id: markdownlint
+      stages:
+        - "pre-commit"
+# -   repo: https://github.com/tbroadley/spellchecker-cli
+#     rev: v6.1.1 # COMING SOON: Release tag
+#     hooks:
+#       - id: spellchecker-cli
+#         name: spellcheck
+#         types: [markdown]
+#         stages:
+#           - "pre-commit"

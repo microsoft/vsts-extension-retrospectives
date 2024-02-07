@@ -19,7 +19,7 @@ RUN apt-get update \
   && apt install -y nodejs \
   #
   # Install jest-cli testing framework globally
-  && npm install -g jest-cli markdown-spellcheck markdownlint-cli \
+  && npm install -g jest-cli spellchecker-cli markdownlint-cli \
   #
   # Clean up
   && apt-get autoremove -y \
