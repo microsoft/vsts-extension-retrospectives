@@ -1,0 +1,7 @@
+files:
+  - "**/*.md"
+  - "!LICENSE"
+  - "!CODE_OF_CONDUCT.md"
+  - "!SECURITY.md"
+dictionaries:
+  - dictionary.txt

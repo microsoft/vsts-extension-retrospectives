@@ -1,0 +1,28 @@
+name: 'Report_Tests'
+on:
+  workflow_run:
+    workflows: ['CI_Frontend', 'CI_Backend']                     # runs after CI workflow
+    types:
+      - completed
+permissions:
+  contents: read
+  actions: read
+  checks: write
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: dorny/test-reporter@v1
+      with:
+        artifact: jest-test-results       # artifact name
+        name: JEST Tests                  # Name of the check run which will be created
+        path: '*.xml'                     # Path to test results (inside artifact .zip)
+        reporter: jest-junit              # Format of test results
+        working-directory: 'RetrospectiveExtension.Frontend'
+    - uses: dorny/test-reporter@v1
+      with:
+        artifact: dotnet-test-results     # artifact name
+        name: dotnet Tests                # Name of the check run which will be created
+        path: '*.trx'                     # Path to test results (inside artifact .zip)
+        reporter: dotnet-trx              # Format of test results
+        working-directory: 'RetrospectiveExtension.Backend.Tests'

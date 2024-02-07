@@ -1,4 +1,4 @@
-name: 'CD - Frontend'
+name: 'CD_Frontend'
 
 on:
   workflow_dispatch:
@@ -14,11 +14,20 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v4
 
-    - name: Install tools used for deployment
+    - uses: dorny/paths-filter@v3
+      id: changes
+      with:
+        filters: |
+          src:
+            - 'RetrospectiveExtension.Frontend/**'
+
+    - if: steps.changes.outputs.src == 'true'
+      name: Install tools used for deployment
       run: |
         npm install -g tfx-cli node-jq
 
-    - name: Prepare vss-extension-dev.json
+    - if: steps.changes.outputs.src == 'true'
+      name: Prepare vss-extension-dev.json
       working-directory: 'RetrospectiveExtension.Frontend'
       run: |
         cp vss-extension-dev.json.template vss-extension-dev.json
@@ -29,7 +38,8 @@ jobs:
           "retrospective-vsts-extension-dev" \
           "${{ secrets.AZURE_DEVOPS_TOKEN }}"
 
-    - name: Prepare extension package
+    - if: steps.changes.outputs.src == 'true'
+      name: Prepare extension package
       working-directory: 'RetrospectiveExtension.Frontend'
       env:
         REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
@@ -39,7 +49,8 @@ jobs:
         npm run build:p
         npm run pack:d
 
-    - name: Publish extension
+    - if: steps.changes.outputs.src == 'true'
+      name: Publish extension
       working-directory: 'RetrospectiveExtension.Frontend'
       run: >
         tfx extension publish

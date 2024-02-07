@@ -10,7 +10,7 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
-** Are you using the Retrospectives Tool on-prem?**
+**Are you using the Retrospectives Tool on-prem?**
 [ ] Yes
 [ ] No
 
@@ -18,6 +18,7 @@ If Yes, what version of the extension?
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -27,7 +28,8 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem. If you have any developer console information that feels relevant, that is also helpful!
+If applicable, add screenshots to help explain your problem. If you have any developer console information
+that feels relevant, that is also helpful!
 
 **What screen type are you seeing this on ?**
 [ ] Desktop

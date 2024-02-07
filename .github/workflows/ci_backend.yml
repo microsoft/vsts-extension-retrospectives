@@ -1,4 +1,4 @@
-name: 'CI - Backend'
+name: 'CI_Backend'
 
 on:
   push:
@@ -48,11 +48,9 @@ jobs:
         name: Test
         working-directory: 'RetrospectiveExtension.Backend.Tests'
 
-      - if: steps.changes.outputs.src == 'true'
+      - if: success() || failure()
         name: Upload backend test report
-        uses: dorny/test-reporter@v1.8.0
+        uses: actions/upload-artifact@v3
         with:
-          name: Dotnet Tests
-          path: TestResults/test-results.trx
-          reporter: dotnet-trx
-          working-directory: 'RetrospectiveExtension.Backend.Tests'
+          name: dotnet-test-results
+          path: RetrospectiveExtension.Backend.Tests/TestResults/test-results.trx
