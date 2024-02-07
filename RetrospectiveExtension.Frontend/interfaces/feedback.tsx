@@ -51,7 +51,7 @@ export class FeedbackBoardDocumentHelper {
     const hasAccessByMember = board.permissions?.Members === undefined || board.permissions.Members.includes(userId);
     const hasAccessByTeam = board.permissions?.Teams === undefined || teamIds.some(t => board.permissions.Teams.includes(t));
 
-    const hasAccess = isBoardOwner||
+    const hasAccess = isBoardOwner ||
       isBoardPublic ||
       hasAccessByMember ||
       hasAccessByTeam;
