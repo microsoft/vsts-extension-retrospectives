@@ -847,7 +847,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
               </div>
               {this.feedbackCreationInformationContent()}
-              <div className="card-id">#{this.props.columns[this.props.columnId].columnItems.findIndex((columnItem) => columnItem.feedbackItem.id === this.props.id)+ 1}</div>
+              <div className="card-id">#{(this.props.columns[this.props.columnId].columnItems.findIndex((columnItem) => columnItem.feedbackItem.id === this.props.id)+1)}</div>
             </div>
             <div className="card-action-item-part">
               {showAddActionItem &&
