@@ -1,6 +1,7 @@
 import { IFeedbackBoardDocument, IFeedbackColumn } from "../../../interfaces/feedback";
 
 export const testTeamId: string = 'mocked-team-uuid';
+export const testUserId: string = 'mocked-user-uuid';
 export const testTitle: string = 'Test Title';
 
 export const testColumns: IFeedbackColumn[] = [
@@ -32,5 +33,7 @@ export const testExistingBoard: IFeedbackBoardDocument = {
     isIncludeTeamEffectivenessMeasurement: true,
     shouldShowFeedbackAfterCollect: false,
     displayPrimeDirective: true,
-    isAnonymous: false
+    isAnonymous: false,
+    isPublic: false,
+    permissions: null
 }

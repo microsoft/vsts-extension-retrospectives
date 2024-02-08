@@ -4,6 +4,7 @@ $feedback_column_card_height: 60px;
 
 .board-metadata-form {
   text-align: center;
+  margin-top: 15px;
 
   hr {
     border: 0.5px solid $azdo_blue;
@@ -43,13 +44,6 @@ $feedback_column_card_height: 60px;
     }
   }
 
-  .board-metadata-form-board-settings {
-    padding-top: 20px;
-    border: $border_grey 1px solid;
-    padding: 10px;
-    margin-bottom: 5px;
-  }
-
   .board-metadata-edit-column-settings {
     border: $border_grey 1px solid;
     padding: 10px;
@@ -86,6 +80,14 @@ $feedback_column_card_height: 60px;
 
         &:hover {
           color: white;
+        }
+      }
+    }
+
+    &.is-disabled {
+      .ms-Checkbox-checkbox {  
+        &:hover {
+          background-color: var(--background-color);
         }
       }
     }

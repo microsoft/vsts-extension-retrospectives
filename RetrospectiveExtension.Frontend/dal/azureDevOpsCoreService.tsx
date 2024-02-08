@@ -55,7 +55,7 @@ class AzureDevOpsCoreService {
 
     const getTeamBatch = async (skip: number) => {
       const teamBatch: WebApiTeam[] =
-        await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, this.maxTeamsPerRequest, skip);
+        await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, this.maxTeamsPerRequest, skip, true);
 
       if (teamBatch.length > 0) {
         allTeams.push(...teamBatch);

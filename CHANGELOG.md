@@ -4,6 +4,9 @@ You can find the changelog of the Retrospective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.XX.X
+* Boards can now restrict access down to specific teams or individuals. From [Github PR #650](https://github.com/microsoft/vsts-extension-retrospectives/pull/650)
+
 ## v1.92.1
 
 * Team Assessment form: Background colors for each number on the spectrum now more

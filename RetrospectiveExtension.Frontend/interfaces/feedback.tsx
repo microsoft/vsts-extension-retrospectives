@@ -29,6 +29,40 @@ export interface IFeedbackBoardDocument {
   maxVotesPerUser: number;
   boardVoteCollection: { [voter: string]: number };
   teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[];
+  permissions?: IFeedbackBoardDocumentPermissions;
+  isPublic?: boolean;
+}
+
+export class FeedbackBoardDocumentHelper {
+  static sort(board1: IFeedbackBoardDocument, board2: IFeedbackBoardDocument): number {
+    return (new Date(board2.createdDate).getTime() - new Date(board1.createdDate).getTime())
+  }
+
+  /**
+   * Filter out boards that the user does not have access to
+   * @param board - Current board being evaluated
+   * @param teamIds - List of team ids the user has access to
+   * @param userId - Id of the current user
+   * @returns
+   */
+  static filter(board: IFeedbackBoardDocument, teamIds: string[], userId: string): boolean {
+    const isBoardOwner = board.createdBy?.id === userId;
+    const isBoardPublic = board.isPublic === undefined || board.isPublic === true;
+    const hasAccessByMember = board.permissions?.Members === undefined || board.permissions.Members.includes(userId);
+    const hasAccessByTeam = board.permissions?.Teams === undefined || teamIds.some(t => board.permissions.Teams.includes(t));
+
+    const hasAccess = isBoardOwner ||
+      isBoardPublic ||
+      hasAccessByMember ||
+      hasAccessByTeam;
+      
+    return hasAccess;
+  }
+}
+
+export interface IFeedbackBoardDocumentPermissions {
+  Teams: string[];
+  Members: string[];
 }
 
 export interface ITeamEffectivenessMeasurementVoteCollection {

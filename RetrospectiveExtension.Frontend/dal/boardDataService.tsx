@@ -1,5 +1,5 @@
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
-import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { v4 as uuid } from 'uuid';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
@@ -18,7 +18,8 @@ class BoardDataService {
     shouldShowFeedbackAfterCollect?: boolean,
     displayPrimeDirective?: boolean,
     startDate?: Date,
-    endDate?: Date) => {
+    endDate?: Date,
+    permissions?: IFeedbackBoardDocumentPermissions) => {
     const boardId: string = uuid();
     const userIdentity = getUserIdentity();
 
@@ -40,6 +41,8 @@ class BoardDataService {
       title,
       boardVoteCollection: {},
       teamEffectivenessMeasurementVoteCollection: [],
+      isPublic: this.isBoardPublic(permissions),
+      permissions: permissions
     }
 
     return await createDocument<IFeedbackBoardDocument>(teamId, board);
@@ -88,7 +91,7 @@ class BoardDataService {
     await deleteDocument(teamId, boardId);
   }
 
-  public updateBoardMetadata = async (teamId: string, boardId: string, maxvotesPerUser: number, title: string, newColumns: IFeedbackColumn[]): Promise<IFeedbackBoardDocument> => {
+  public updateBoardMetadata = async (teamId: string, boardId: string, maxvotesPerUser: number, title: string, newColumns: IFeedbackColumn[], permissions: IFeedbackBoardDocumentPermissions): Promise<IFeedbackBoardDocument> => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
 
     // Check in case board was deleted by other user after option to update was selected by current user
@@ -101,6 +104,8 @@ class BoardDataService {
     board.maxVotesPerUser = maxvotesPerUser;
     board.columns = newColumns;
     board.modifiedDate = new Date(Date.now());
+    board.isPublic = this.isBoardPublic(permissions),
+    board.permissions = permissions;
 
     return await this.updateBoard(teamId, board);
   }
@@ -108,6 +113,10 @@ class BoardDataService {
   // Update the board document.
   private updateBoard = async (teamId: string, board: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
     return await updateDocument<IFeedbackBoardDocument>(teamId, board);
+  }
+
+  private isBoardPublic = (permissions: IFeedbackBoardDocumentPermissions): boolean => {
+    return permissions === undefined || (permissions.Teams.length === 0 && permissions.Members.length === 0);
   }
 }
 
