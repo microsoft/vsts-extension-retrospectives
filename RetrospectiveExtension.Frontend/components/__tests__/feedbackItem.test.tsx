@@ -69,9 +69,9 @@ describe('Feedback Item', () => {
 
     expect(component.findWhere((child) =>
       child.prop("className") === "card-id").text()).
-      toEqual(`#${testColumns[testColumnUuidOne].columnItems.findIndex(
+      toEqual(`#${(testColumns[testColumnUuidOne].columnItems.findIndex(
         (columnItem: { feedbackItem: { id: string; }; }) =>
-          columnItem.feedbackItem.id === testFeedbackItem.id)}`);
+          columnItem.feedbackItem.id === testFeedbackItem.id)+1)}`); // +1 because humans start at 1
 
     expect(component.findWhere((child) =>
       child.type() === EditableDocumentCardTitle).prop("title")).
