@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Action Item component renders correctly when there are no action items. 1`] = `
+<StyledDocumentCardBase
+  className="related-task-sub-card "
+  key="1card"
+  type={1}
+>
+  <StyledDocumentCardPreviewBase
+    key="1preview"
+    previewImages={
+      Array [
+        Object {
+          "previewIconContainerClass": "work-item-type-icon-container",
+          "previewIconProps": Object {
+            "ariaLabel": "icon for work item type Test Work Item Type",
+            "iconType": 1,
+            "imageProps": Object {
+              "alt": "icon for work item type Test Work Item Type",
+              "src": "testUrl",
+            },
+          },
+          "width": 36,
+        },
+      ]
+    }
+  />
+  <div
+    aria-label="Test Work Item Type Test Title, click to open work item"
+    className="ms-DocumentCard-details"
+    key="1details"
+    onClick={[Function]}
+    onKeyPress={[Function]}
+    role="button"
+    tabIndex={0}
+  >
+    <StyledDocumentCardTitleBase
+      key="1title"
+      shouldTruncate={true}
+      title="Test Title"
+    />
+  </div>
+  <StyledDocumentCardActionsBase
+    actions={
+      Array [
+        Object {
+          "ariaLabel": "Remove link to work item button",
+          "iconProps": Object {
+            "iconName": "RemoveLink",
+          },
+          "onClick": [Function],
+          "onKeyPress": [Function],
+          "title": "Remove link to work item",
+        },
+      ]
+    }
+  />
+</StyledDocumentCardBase>
+`;
