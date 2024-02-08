@@ -282,3 +282,5 @@ ai-alerts.json
 
 # Python Virtual envs
 *-env/
+
+test-report.xml
