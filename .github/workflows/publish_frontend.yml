@@ -70,9 +70,5 @@ jobs:
               tag: "v${{steps.publish_extension_package.outputs.EXTENSION_VERSION}}",
               message: "",
               object: context.sha,
-              type: "commit",
-              tagger: {
-                name: "${{ secrets.GIT_USER_NAME }}",
-                email: "${{ secrets.GIT_USER_EMAIL }}"
-              }
+              type: "commit"
             })
