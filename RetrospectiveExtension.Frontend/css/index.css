@@ -31,10 +31,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .ms-Checkbox.is-disabled {
-  color: var(--text-disabled-color) !important;
+  background-color: transparent !important;
 }
 
-.ms-Checkbox.is-disabled:hover {
+.is-disabled .ms-Checkbox-text {
   color: var(--text-disabled-color) !important;
 }
 
