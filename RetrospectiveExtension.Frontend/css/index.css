@@ -29,3 +29,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   color: var(--status-info-foreground);
   background-color: inherit;
 }
+
+.ms-Checkbox.is-disabled {
+  color: var(--text-disabled-color);
+}
+
+.is-disabled {
+  background-color: var(--text-disabled-color);
+  border-color: var(--text-disabled-color);
+  color: var(--text-disabled-color);
+}
