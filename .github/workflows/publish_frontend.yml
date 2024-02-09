@@ -64,7 +64,7 @@ jobs:
         with:
           github-token: ${{ secrets.GH_CLI_LOGIN_TOKEN }}
           script: |
-            const r = github.rest.git.createTag({
+            const r = await github.rest.git.createTag({
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag: "v${{steps.publish_extension_package.outputs.EXTENSION_VERSION}}",
