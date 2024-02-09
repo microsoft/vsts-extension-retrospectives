@@ -35,6 +35,7 @@ jobs:
           npm install -g tfx-cli node-jq
 
       - name: Publish extension package
+        id: publish_extension_package
         working-directory: 'RetrospectiveExtension.Frontend'
         env:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
@@ -50,14 +51,22 @@ jobs:
 
           cat <<< $(jq ".version = \"${VERSION}\"" vss-extension-prod.json) > vss-extension-prod.json
 
+          echo "EXTENSION_VERSION=${VERSION}" >> $GITHUB_OUTPUT
+
           npm install
           npm run build:p
           npm run pack:p
 
           tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
 
-          git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
-          git config --global user.name "${{ secrets.GIT_USER_NAME }}"
-
-          git tag -a "v${VERSION}" -m ""
-          git push --tags
+      - name: Create the tag for the extension release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_CLI_LOGIN_TOKEN }}
+          script: |
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/v${{steps.publish_extension_package.outputs.EXTENSION_VERSION}}`,
+              sha: context.sha
+            });
