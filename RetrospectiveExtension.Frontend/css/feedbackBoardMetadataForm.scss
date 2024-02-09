@@ -4,7 +4,7 @@ $feedback_column_card_height: 60px;
 
 .board-metadata-form {
   text-align: center;
-  margin-top: 15px;
+  margin-top: 1em;
 
   hr {
     border: 0.5px solid $azdo_blue;
@@ -14,7 +14,7 @@ $feedback_column_card_height: 60px;
     border: 3px #dedede solid;
     background-color: #dedede;
     margin: 5px 0 10px 0;
-    padding: 3px;
+    padding: 0.2em;
 
     &.warning-information {
       background-color: #f6a608;
@@ -32,9 +32,9 @@ $feedback_column_card_height: 60px;
 
   .board-metadata-form-section-header {
     padding: 5px 10px;
-    font-size: 16px;
+    font-size: 1.1em;
     font-weight: 500;
-    margin: 0px;
+    margin: 0;
     background-color: #0078d483;
     text-align: right;
     color: var(--text-primary-color);
@@ -50,12 +50,12 @@ $feedback_column_card_height: 60px;
   }
 
   .board-metadata-form-section-subheader {
-    font-size: 14px;
+    font-size: 1em;
     font-weight: 600;
     width: 100%;
     display: flex;
     align-items: center;
-    margin: 3px;
+    margin: 0.2em;
     color: var(--text-primary-color);
 
     label {
@@ -155,10 +155,10 @@ $feedback_column_card_height: 60px;
 
       .editable-text {
         display: inherit;
-        margin-left: 20px;
-        margin-right: 20px;
-        font-size: 16px;
-        line-height: 16px;
+        margin-left: 10px;
+        font-size: 1.1em;
+        line-height: 1.1em;
+        text-align: start;
       }
 
       .editable-text-input-container {
