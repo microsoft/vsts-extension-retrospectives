@@ -31,11 +31,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .ms-Checkbox.is-disabled {
-  color: var(--text-disabled-color);
+  color: var(--text-disabled-color) !important;
+}
+
+.ms-Checkbox.is-disabled:hover {
+  color: var(--text-disabled-color) !important;
 }
 
 .is-disabled {
-  background-color: var(--text-disabled-color);
-  border-color: var(--text-disabled-color);
-  color: var(--text-disabled-color);
+  background-color: var(--text-disabled-color) !important;
+  border-color: var(--text-disabled-color) !important;
+  color: var(--text-disabled-color) !important;
 }
