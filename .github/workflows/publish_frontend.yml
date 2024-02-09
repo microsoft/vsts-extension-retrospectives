@@ -53,11 +53,11 @@ jobs:
 
           echo "EXTENSION_VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
-          npm install
-          npm run build:p
-          npm run pack:p
+          # npm install
+          # npm run build:p
+          # npm run pack:p
 
-          tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+          # tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
 
       - name: Create the tag for the extension release
         uses: actions/github-script@v7
@@ -68,9 +68,9 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag: "v${{steps.publish_extension_package.outputs.EXTENSION_VERSION}}",
-              message: ""
-              object: context.sha
-              type: "commit"
+              message: "",
+              object: context.sha,
+              type: "commit",
               tagger: {
                 name: "${{ secrets.GIT_USER_NAME }}",
                 email: "${{ secrets.GIT_USER_EMAIL }}"
