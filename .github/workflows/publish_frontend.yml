@@ -64,19 +64,9 @@ jobs:
         with:
           github-token: ${{ secrets.GH_CLI_LOGIN_TOKEN }}
           script: |
-            const t = await github.rest.git.createTag({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag: "v${{steps.publish_extension_package.outputs.EXTENSION_VERSION}}",
-              message: "",
-              object: context.sha,
-              type: "commit"
-            });
-            const r = await github.rest.git.createRef({
+            await github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: `refs/tags/v${{steps.publish_extension_package.outputs.EXTENSION_VERSION}}`,
               sha: context.sha
             });
-            console.log(r);
-            console.log(t);
