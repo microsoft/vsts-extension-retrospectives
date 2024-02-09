@@ -64,11 +64,12 @@ jobs:
         with:
           github-token: ${{ secrets.GH_CLI_LOGIN_TOKEN }}
           script: |
-            github.rest.git.createTag({
+            const r = github.rest.git.createTag({
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag: "v${{steps.publish_extension_package.outputs.EXTENSION_VERSION}}",
               message: "",
               object: context.sha,
               type: "commit"
-            })
+            });
+            console.log(r);
