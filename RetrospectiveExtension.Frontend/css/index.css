@@ -38,6 +38,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   color: var(--text-disabled-color) !important;
 }
 
+.is-disabled .ms-Checkbox-checkbox {
+  color: var(--text-disabled-color) !important;
+}
+
+.is-disabled .ms-Checkbox-checkmark {
+  color: var(--text-disabled-color) !important;
+}
+
 .is-disabled {
   background-color: var(--text-disabled-color) !important;
   border-color: var(--text-disabled-color) !important;
