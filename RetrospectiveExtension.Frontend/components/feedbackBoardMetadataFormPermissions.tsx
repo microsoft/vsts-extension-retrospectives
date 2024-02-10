@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../interfaces/feedback';
-
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 
@@ -197,7 +196,7 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
                       <span aria-label="Team or member unique name" className="content-sub-text">{option.uniqueName}</span>
                     </div>
                     <div className="content-badge">
-                      {isBoardOwner && <span className="badge badge--owner" aria-label="Board owner badge">{'Owner'}</span>}
+                      {isBoardOwner && <span aria-label="Board owner badge">{'Owner'}</span>}
                     </div>
                   </td>
                 </tr>
