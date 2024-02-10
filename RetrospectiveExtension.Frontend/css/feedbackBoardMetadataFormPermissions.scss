@@ -78,6 +78,21 @@ $content-padding: 10px;
                 color: var(--text-secondary-color);
               }
             }
+
+            .content-badge {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              margin-left: auto;
+
+              span {
+                background-color: var(--palette-black-alpha-6);
+                padding: 0.125rem 0.5rem;
+                border-radius: 120px;
+                color: var(--text-primary-color);
+                white-space: nowrap;
+              }
+            }
           }
         }
       }
