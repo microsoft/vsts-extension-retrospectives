@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
-import { IFeedbackBoardDocumentPermissions } from '../interfaces/feedback';
-
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../interfaces/feedback';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
+  board: IFeedbackBoardDocument;
   permissions: IFeedbackBoardDocumentPermissions;
   permissionOptions: FeedbackBoardPermissionOption[];
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
@@ -173,6 +173,7 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
           </thead>
           <tbody>
             {filteredPermissionOptions.map((option, index) => {
+              const isBoardOwner: boolean = option.id === props.board.createdBy?.id;
               return (
                 <tr key={'table-row-' + index} className="option-row">
                   <td>
@@ -181,7 +182,8 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
                       id={"permission-option-" + index}
                       ariaLabel="Add permission to every team or member in the table"
                       boxSide="start"
-                      checked={teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
+                      disabled={isBoardOwner}
+                      checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
                       onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
                     />
                   </td>
@@ -192,6 +194,9 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
                     <div className="content-text flex flex-col flex-nowrap text-left">
                       <span aria-label="Team or member name">{option.name}</span>
                       <span aria-label="Team or member unique name" className="content-sub-text">{option.uniqueName}</span>
+                    </div>
+                    <div className="content-badge">
+                      {isBoardOwner && <span aria-label="Board owner badge">{'Owner'}</span>}
                     </div>
                   </td>
                 </tr>

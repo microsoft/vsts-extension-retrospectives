@@ -1,12 +1,12 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { mockUuid } from '../__mocks__/uuid/v4';
-import FeedbackBoardMetadataForm, { IFeedbackBoardMetadataFormProps, IFeedbackColumnCard } from '../feedbackBoardMetadataForm';
-import { testColumns, testExistingBoard, testTeamId, testUserId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
-import { Checkbox, List, TextField } from 'office-ui-fabric-react';
+import { testExistingBoard, testTeamId, testUserId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
+import { TextField } from 'office-ui-fabric-react';
 import FeedbackBoardMetadataFormPermissions, { IFeedbackBoardMetadataFormPermissionsProps } from '../feedbackBoardMetadataFormPermissions';
 
 const mockedProps: IFeedbackBoardMetadataFormPermissionsProps = {
+  board: testExistingBoard,
   permissions: {
     Teams: [],
     Members: []
@@ -227,6 +227,66 @@ describe('Board Metadata Form Permissions', () => {
 
       const last = tableRows.last().find('span').first();
       expect(last.text()).toEqual('Charlie');
+    })
+
+    it('should set an Owner label if the board is created by the user', () => {
+      const props: IFeedbackBoardMetadataFormPermissionsProps = {
+        ...mockedProps,
+        board: {
+          ...mockedProps.board,
+          createdBy: {
+            ...mockedProps.board.createdBy,
+            id: '1'
+          }
+        },
+        permissions: {
+          Teams: [],
+          Members: []
+        },
+        permissionOptions: [
+          {
+            id: '1',
+            name: 'Alpha',
+            uniqueName: 'User 1',
+            type: 'member',
+            thumbnailUrl: ''
+          },
+          {
+            id: '2',
+            name: 'Charlie',
+            uniqueName: 'User 2',
+            type: 'member',
+            thumbnailUrl: ''
+          },
+          {
+            id: '3',
+            name: 'Bravo',
+            uniqueName: 'Team 3',
+            type: 'team',
+            thumbnailUrl: ''
+          },
+          {
+            id: '4',
+            name: 'Zebra',
+            uniqueName: 'Team Z',
+            type: 'team',
+            thumbnailUrl: ''
+          },
+        ]
+      };
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const tableBody = wrapper.find('tbody');
+      const tableRows = tableBody.find('tr');
+
+      expect(tableRows).toHaveLength(4);
+
+      const first = tableRows.first();
+      const hasOwnerLabel1 = first.find('span').last().text() === 'Owner';
+      expect(hasOwnerLabel1).toBeTruthy();
+
+      const last = tableRows.last();
+      const hasOwnerLabel2 = last.find('span').last().text() === 'Owner';
+      expect(hasOwnerLabel2).toBeFalsy();
     })
   });
 });

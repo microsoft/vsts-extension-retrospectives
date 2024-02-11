@@ -681,6 +681,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           </PivotItem>
           <PivotItem headerText={'Permissions'} aria-label="Board Permission Settings">
             <FeedbackBoardMetadataFormPermissions
+              board={this.props.currentBoard}
               permissions={this.state.permissions}
               permissionOptions={this.props.availablePermissionOptions}
               onPermissionChanged={(s: FeedbackBoardPermissionState) => this.setState({ permissions: s.permissions })}
