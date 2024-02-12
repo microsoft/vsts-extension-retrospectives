@@ -50,7 +50,7 @@ jobs:
 
       - if: success() || failure()
         name: Upload backend test report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dotnet-test-results
           path: RetrospectiveExtension.Backend.Tests/TestResults/test-results.trx

@@ -50,7 +50,7 @@ jobs:
         working-directory: 'RetrospectiveExtension.Frontend'
 
       - if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jest-test-results
           path: RetrospectiveExtension.Frontend/reports/jest-junit.xml
