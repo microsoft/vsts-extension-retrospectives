@@ -57,10 +57,13 @@ $content-padding: 10px;
             background-color: var(--background-color);
   
             .content-image {
+              display: flex;
               padding-right: $content-padding;
     
               .permission-image {
                 width: 44px;
+                min-width: 44px;
+                max-width: 44px;
                 height: 44px;
                 border-radius: 99999px; // rounded-full
                 display: flex;
