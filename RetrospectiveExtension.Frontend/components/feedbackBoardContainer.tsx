@@ -171,6 +171,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     window.addEventListener('resize', this.handleResolutionChange);
     this.handleResolutionChange();
 
+    let initialCurrentTeam: WebApiTeam | undefined;
+    let initialCurrentBoard: IFeedbackBoardDocument | undefined;
+
     try {
       const isBackendServiceConnected = await reflectBackendService.startConnection();
       this.setState({ isBackendServiceConnected });
@@ -181,11 +184,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     try {
       const initializedTeamAndBoardState = await this.initializeFeedbackBoard();
 
-      await this.initializeProjectTeams(initializedTeamAndBoardState.currentTeam);
+      initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
+      initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
+
+      await this.initializeProjectTeams(initialCurrentTeam);
 
       this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true, });
     } catch (error) {
-      console.error({ m: "initalizedTeamAndBoardState", error });
+      console.error({ m: "initializedTeamAndBoardState", error });
     }
 
     try {
@@ -195,13 +201,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      await this.updateFeedbackItemsAndContributors();
+      await this.updateFeedbackItemsAndContributors(initialCurrentTeam, initialCurrentBoard);
     } catch (error) {
       console.error({ m: "updateFeedbackItemsAndContributors", error });
     }
 
     try {
-      const members = await azureDevOpsCoreService.getMembers(this.state.currentTeam.projectId, this.state.currentTeam.id);
+      const members = await azureDevOpsCoreService.getMembers(initialCurrentTeam?.projectId, initialCurrentTeam?.id);
 
       this.setState({ members });
     } catch (error) {
@@ -209,7 +215,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      const votes = Object.values(this.state.currentBoard?.boardVoteCollection || []);
+      const votes = Object.values(initialCurrentBoard?.boardVoteCollection || []);
 
       this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0 });
     } catch (error) {
@@ -260,10 +266,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
   }
 
-  private async updateFeedbackItemsAndContributors() {
-    const board = await itemDataService.getBoardItem(this.state.currentTeam.id, this.state.currentBoard.id);
+  private async updateFeedbackItemsAndContributors(currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) {
+    if (!currentTeam || !currentBoard) {
+      return;
+    }
 
-    const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board.id);
+    const board: IFeedbackBoardDocument = await itemDataService.getBoardItem(currentTeam.id, currentBoard.id);
+
+    const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board?.id) ?? [];
 
     let actionItemIds: number[] = [];
     feedbackItems.forEach(item => {
@@ -464,7 +474,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const allTeamMembers: TeamMember[] = []
     for(const userTeam of userTeams) {
-      let members = await azureDevOpsCoreService.getMembers(userTeam.projectId, userTeam.id);
+      let members: TeamMember[] = await azureDevOpsCoreService.getMembers(userTeam.projectId, userTeam.id) ?? [];
       members = members.filter(m => allTeamMembers.findIndex(existingMember => existingMember.identity.id !== m.identity.id) === -1);
       allTeamMembers.push(...members);
     }
@@ -604,7 +614,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const allTeamMembers: TeamMember[] = []
     for(const team of allTeams) {
-      let members = await azureDevOpsCoreService.getMembers(team.projectId, team.id);
+      let members: TeamMember[] = await azureDevOpsCoreService.getMembers(team.projectId, team.id) ?? [];
       members = members.filter(m => allTeamMembers.findIndex(existingMember => existingMember.identity.id !== m.identity.id) === -1);
       allTeamMembers.push(...members);
     }
@@ -894,7 +904,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       return 0;
     });
 
-    await this.updateFeedbackItemsAndContributors();
+    await this.updateFeedbackItemsAndContributors(this.state.currentTeam, board);
 
     this.setState({
       currentBoard: board,
