@@ -472,13 +472,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     }
 
-    const allTeamMembers: TeamMember[] = []
-    for(const userTeam of userTeams) {
-      let members: TeamMember[] = await azureDevOpsCoreService.getMembers(userTeam.projectId, userTeam.id) ?? [];
-      members = members.filter(m => allTeamMembers.findIndex(existingMember => existingMember.identity.id !== m.identity.id) === -1);
-      allTeamMembers.push(...members);
-    }
-
     // Default to select first user team or the project's default team.
     const defaultTeam = (userTeams && userTeams.length) ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
 
