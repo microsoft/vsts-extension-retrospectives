@@ -39,7 +39,6 @@ import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionF
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
-import boardDataService from '../dal/boardDataService';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
 
@@ -445,7 +444,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         boards: boardsForTeam,
       };
     }, async () => {
-      await userDataService.addVisit(this.state.currentTeam.id, this.state.currentBoard && this.state.currentBoard.id);
+      await userDataService.addVisit(this.state.currentTeam?.id, this.state.currentBoard?.id);
     });
   }
 
@@ -466,14 +465,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     teamBoardDeletedDialogMessage: string,
   }> => {
     const userTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
-    if (userTeams && userTeams.length) {
-      userTeams.sort((t1, t2) => {
-        return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
-      });
-    }
+    userTeams?.sort((t1, t2) => {
+      return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
+    });
 
     // Default to select first user team or the project's default team.
-    const defaultTeam = (userTeams && userTeams.length) ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
+    const defaultTeam = (userTeams?.length) ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
 
     const baseTeamState = {
       userTeams,
@@ -844,7 +841,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private showRetroSummaryDialog = async () => {
     const measurements: { id: number, selected: number }[] = [];
 
-    const board = await boardDataService.getBoardForTeamById(this.state.currentTeam.id, this.state.currentBoard.id);
+    const board = await BoardDataService.getBoardForTeamById(this.state.currentTeam.id, this.state.currentBoard.id);
     const voteCollection = board.teamEffectivenessMeasurementVoteCollection || [];
 
     voteCollection.forEach(vote => {
@@ -1713,7 +1710,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <section className="retro-summary-section">
                 <div className="retro-summary-section-header">Basic Settings</div>
                 <div id="retro-summary-session-date">Session date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
-                <div id="retro-summary-created-by">Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} /> {this.state.currentBoard?.createdBy.displayName} </div>
+                <div id="retro-summary-created-by">Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} alt={this.state.currentBoard?.createdBy.displayName} /> {this.state.currentBoard?.createdBy.displayName} </div>
               </section>
               <section className="retro-summary-section">
                 <div className="retro-summary-section-header">Participant Summary</div>
@@ -1722,9 +1719,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 {!this.state.currentBoard.isAnonymous && this.state.contributors.length > 0 &&
                   <div className="retro-summary-contributors-section">
-                    {this.state.contributors.map((contributor, index) =>
-                      <div key={index} className="retro-summary-contributor">
-                        <img className="avatar" src={contributor.imageUrl} /> {contributor.name}
+                    {this.state.contributors.map((contributor) =>
+                      <div key={contributor.id} className="retro-summary-contributor">
+                        <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
                       </div>
                     )}
                   </div>
@@ -1743,13 +1740,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     ({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? 'person' : 'people'} responded)
                     <div className="retro-summary-effectiveness-scores">
                       <ul className="chart">
-                        {this.state.effectivenessMeasurementChartData.map((data, index) => {
+                        {this.state.effectivenessMeasurementChartData.map((data) => {
                           const averageScore = this.state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
                           const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
                           const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
                           const redScore = ((data.red * 100) / teamEffectivenessResponseCount);
                           return (
-                            <li className="chart-question-block" key={index}>
+                            <li className="chart-question-block" key={data.questionId}>
                               <div className="chart-question">
                                 <i className={getQuestionFontAwesomeClass(data.questionId)} /> &nbsp;
                                 {getQuestionShortName(data.questionId)}
