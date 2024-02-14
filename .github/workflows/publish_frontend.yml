@@ -51,13 +51,16 @@ jobs:
 
           cat <<< $(jq ".version = \"${VERSION}\"" vss-extension-prod.json) > vss-extension-prod.json
 
-          echo "EXTENSION_VERSION=${VERSION}" >> $GITHUB_OUTPUT
-
           npm install
           npm run build:p
           npm run pack:p
 
           tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+
+          ext_info=$(tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
+          VERSION=$(jq -r '.versions[0].version' <<< "$ext_info")
+
+          echo "EXTENSION_VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Create the tag for the extension release
         uses: actions/github-script@v7
