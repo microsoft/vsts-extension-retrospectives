@@ -5,7 +5,6 @@ import { getClient } from 'azure-devops-extension-api/Common';
 
 class AzureDevOpsCoreService {
   private _httpCoreClient: CoreRestClient;
-  private readonly maxTeamsPerRequest = 100;
 
   constructor() {
     if (!this._httpCoreClient) {
@@ -51,24 +50,7 @@ class AzureDevOpsCoreService {
    * @param forCurrentUserOnly If true, return teams the requesting user is a member of. If false, return teams the user can see in this project.
    */
   public async getAllTeams(projectId: string, forCurrentUserOnly: boolean): Promise<WebApiTeam[]> {
-    const allTeams: WebApiTeam[] = [];
-
-    const getTeamBatch = async (skip: number) => {
-      const teamBatch: WebApiTeam[] =
-        await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, this.maxTeamsPerRequest, skip, true);
-
-      if (teamBatch.length > 0) {
-        allTeams.push(...teamBatch);
-      }
-
-      if (teamBatch.length === this.maxTeamsPerRequest) {
-          await getTeamBatch(skip + this.maxTeamsPerRequest);
-      }
-      return;
-    };
-
-    await getTeamBatch(0);
-    return allTeams;
+    return await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, 255, 0, true);
   }
 }
 
