@@ -98,10 +98,6 @@ export interface FeedbackBoardContainerState {
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   /**
-   * Members related to the current team.
-   */
-  members: TeamMember[];
-  /**
    * Members of the all teams that the current user access to. This may not be all the team
    * members within the organization.
    */
@@ -158,7 +154,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       effectivenessMeasurementChartData: [],
       teamEffectivenessMeasurementAverageVisibilityClassName: "hidden",
       actionItemIds: [],
-      members: [],
       allMembers: [],
       castedVoteCount: 0,
       boardColumns: [],
@@ -203,14 +198,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       await this.updateFeedbackItemsAndContributors(initialCurrentTeam, initialCurrentBoard);
     } catch (error) {
       console.error({ m: "updateFeedbackItemsAndContributors", error });
-    }
-
-    try {
-      const members = await azureDevOpsCoreService.getMembers(initialCurrentTeam?.projectId, initialCurrentTeam?.id);
-
-      this.setState({ members });
-    } catch (error) {
-      console.error({ m: "members", error });
     }
 
     try {
@@ -602,18 +589,21 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
 
-    const allTeamMembers: TeamMember[] = []
+    const promises = []
     for(const team of allTeams) {
-      let members: TeamMember[] = await azureDevOpsCoreService.getMembers(team.projectId, team.id) ?? [];
-      members = members.filter(m => allTeamMembers.findIndex(existingMember => existingMember.identity.id !== m.identity.id) === -1);
-      allTeamMembers.push(...members);
+      promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
     }
-
-    this.setState({
-      allMembers: allTeamMembers,
-      projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-      filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-      isAllTeamsLoaded: true,
+    Promise.all(promises).then((values) => {
+      const allTeamMembers: TeamMember[] = [];
+      for(const members of values) {
+        allTeamMembers.push(...members);
+      }
+      this.setState({
+        allMembers: allTeamMembers,
+        projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
+        filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
+        isAllTeamsLoaded: true,
+      });
     });
   }
 
@@ -633,7 +623,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       if (mostRecentTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
-        if (boardsForTeam && boardsForTeam.length) {
+        if (boardsForTeam?.length) {
           boardsForTeam = boardsForTeam
             .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
@@ -641,11 +631,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
         const recentVisitState = {
           boards: boardsForTeam,
-          currentBoard: (boardsForTeam && boardsForTeam.length) ? boardsForTeam[0] : null,
+          currentBoard: (boardsForTeam?.length) ? boardsForTeam[0] : null,
           currentTeam: mostRecentTeam,
         };
 
-        if (boardsForTeam && boardsForTeam.length && mostRecentUserVisit.boardId) {
+        if (boardsForTeam?.length && mostRecentUserVisit.boardId) {
           const mostRecentBoard = boardsForTeam.find((board) => board.id === mostRecentUserVisit.boardId);
           recentVisitState.currentBoard = mostRecentBoard;
         }
@@ -655,7 +645,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(defaultTeam.id);
-    if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
+    if (boardsForMatchedTeam?.length) {
       boardsForMatchedTeam = boardsForMatchedTeam
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
@@ -663,7 +653,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return {
       boards: boardsForMatchedTeam,
-      currentBoard: (boardsForMatchedTeam && boardsForMatchedTeam.length) ? boardsForMatchedTeam[0] : null,
+      currentBoard: (boardsForMatchedTeam?.length) ? boardsForMatchedTeam[0] : null,
       currentTeam: defaultTeam,
     };
   }
@@ -680,7 +670,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     if (matchedTeam) {
       let boardsForTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
-      if (boardsForTeam && boardsForTeam.length) {
+      if (boardsForTeam?.length) {
         boardsForTeam = boardsForTeam
           .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
           .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
@@ -692,8 +682,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         if (!prevState.currentTeam || prevState.currentTeam.id !== matchedTeam.id) {
 
           return {
-            boards: (boardsForTeam && boardsForTeam.length) ? boardsForTeam : [],
-            currentBoard: (boardsForTeam && boardsForTeam.length) ? boardsForTeam[0] : null,
+            boards: (boardsForTeam?.length) ? boardsForTeam : [],
+            currentBoard: (boardsForTeam?.length) ? boardsForTeam[0] : null,
             currentTeam: matchedTeam,
             isTeamDataLoaded: true,
           }
@@ -702,10 +692,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         return {};
       });
     }
-
-    // TODO:
-    // Show error message in case there's an unexpected case of a chosen team not found
-    // instead of showing the loading indefinitely.
   }
 
   /**
@@ -937,7 +923,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   // Note: This is temporary, to support older boards that do not have an active phase.
   private getCurrentBoardPhase = () => {
-    if (!this.state.currentBoard || !this.state.currentBoard.activePhase) {
+    if (!this.state.currentBoard?.activePhase) {
       return WorkflowPhase.Collect;
     }
 
@@ -1714,7 +1700,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </section>
               <section className="retro-summary-section">
                 <div className="retro-summary-section-header">Participant Summary</div>
-                <div className="retro-summary-section-item">Team Size: {this.state.members.length} member(s)</div>
                 <div className="retro-summary-section-item">Contributors: {this.state.contributors.length} participant(s)</div>
 
                 {!this.state.currentBoard.isAnonymous && this.state.contributors.length > 0 &&
