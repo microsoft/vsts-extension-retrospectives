@@ -614,7 +614,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
     const originalColumnId = this.props.originalColumnId;
-    const originalColumnTitle = originalColumnId ? this.props.columns[originalColumnId].columnProperties.title : 'n/a';
+    const originalColumnTitle = originalColumnId ? this.props.columns[originalColumnId]?.columnProperties.title : 'n/a';
     // showing `n/a` will be for older boards who don't have this property
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
