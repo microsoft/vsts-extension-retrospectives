@@ -408,8 +408,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       await this.isVoted(this.props.id);
       this.props.refreshFeedbackItems([updatedFeedbackItem], true);
       await this.setDisabledFeedbackItemDeletion(this.props.boardId, this.props.id);
-    } else {
-      // TODO: Show pop-up indicating voting failed. This can be a common scenario due to race condition.
     }
   }
 
@@ -422,10 +420,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       if (this.props.timerState === true) {
         updatedFeedbackItem = await itemDataService.updateTimer(boardId, feedbackItemId);
         if (updatedFeedbackItem) {
-
           this.props.refreshFeedbackItems([updatedFeedbackItem], true);
-        } else {
-          // TODO: Show pop-up indicating timer count update failed.
         }
       }
     }
@@ -435,23 +430,17 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       updatedFeedbackItem = await itemDataService.updateTimer(boardId, feedbackItemId, true);
       if (updatedFeedbackItem) {
         this.props.refreshFeedbackItems([updatedFeedbackItem], true);
-      } else {
-        // TODO: Show pop-up indicating timer count update failed.
       }
       if (this.props.timerId == null) {
         const tid = setInterval(incTimer, 1000);
         updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, tid);
         if (updatedFeedbackItem) {
           this.props.refreshFeedbackItems([updatedFeedbackItem], true);
-        } else {
-          // TODO: Show pop-up indicating timer could not be flipped.
         }
       } else {
         updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, this.props.timerId);
         if (updatedFeedbackItem) {
           this.props.refreshFeedbackItems([updatedFeedbackItem], true);
-        } else {
-          // TODO: Show pop-up indicating timer could not be flipped.
         }
       }
     } else {
@@ -459,8 +448,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, null);
       if (updatedFeedbackItem) {
         this.props.refreshFeedbackItems([updatedFeedbackItem], true);
-      } else {
-        // TODO: Show pop-up indicating timer could not be flipped.
       }
     }
   }
@@ -512,16 +499,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
     if (updatedFeedbackItem) {
       this.props.refreshFeedbackItems([updatedFeedbackItem], true);
-    } else {
-      // TODO: Show pop-up indicating title update failed. This can be a common scenario due to race condition.
     }
   }
 
   private onUpdateActionItem = async (updatedFeedbackItem: IFeedbackItemDocument) => {
     if (updatedFeedbackItem) {
       this.props.refreshFeedbackItems([updatedFeedbackItem], true);
-    } else {
-      // TODO: Show pop-up indicating that a change related to work item(s) failed. This can be a common scenario due to race condition.
     }
   }
 
@@ -655,10 +638,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
                   <button className="feedback-expand-group-focus"
                     aria-live="polite"
-                    aria-label={this.props.groupedItemProps
-                      && !this.props.groupedItemProps.isGroupExpanded
-                      ? 'Expand Feedback Group button. Group has ' + groupItemsCount + ' items.'
-                      : 'Collapse Feedback Group button. Group has ' + groupItemsCount + ' items.'}
+                    aria-label={this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded ? 'Expand Feedback Group button. Group has ' + groupItemsCount + ' items.' : 'Collapse Feedback Group button. Group has ' + groupItemsCount + ' items.'}
                     onClick={(e) => {
                       e.stopPropagation();
                       this.toggleShowGroupedChildrenTitles();
@@ -671,15 +651,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </button>
                 }
                 {
-                  // This controls the top level feedback item in a group in the vote phase
-                  // and outside the focus mode
+                  // This controls the top level feedback item in a group in the vote phase and outside the focus mode
                   !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
                   <button className="feedback-expand-group"
                     aria-live="polite"
-                    aria-label={this.props.groupedItemProps
-                      && !this.props.groupedItemProps.isGroupExpanded
-                      ? 'Expand Feedback Group button. Group has ' + groupItemsCount + ' items.'
-                      : 'Collapse Feedback Group button. Group has ' + groupItemsCount + ' items.'}
+                    aria-label={this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded ? 'Expand Feedback Group button. Group has ' + groupItemsCount + ' items.' : 'Collapse Feedback Group button. Group has ' + groupItemsCount + ' items.'}
                     style={{ color: this.props.accentColor }}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -741,7 +717,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       this.setState({ showVotedAnimation: false });
                     }}>
                     <i className="fas fa-arrow-circle-down" />
-
                   </button>
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
@@ -791,9 +766,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                               }}
                               text={menuItem.menuItem.text}
                               title={menuItem.menuItem.title} />
-                          }
-                          )
-                      }
+                          })
+                        }
                       </div>
                       <DialogFooter>
                         <DefaultButton onClick={this.hideMobileFeedbackItemActionsDialog} text="Close" />
@@ -973,8 +947,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               <p className="no-matching-feedback-message">No feedback with title containing your input.</p>
             }
             {this.state.searchedFeedbackItems.map((searchItem) => {
-              // Making feedbackItemsProps by hand since we are looking across
-              //   all columns
+              // Making feedbackItemsProps by hand since we are looking across all columns
               const feedbackItemProps: IFeedbackItemProps = {
                 id: searchItem.id,
                 title: searchItem.title,
@@ -1055,7 +1028,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
 export class FeedbackItemHelper {
   // Handle linking/grouping workitems and reload any updated items.
-  public static handleDropFeedbackItemOnFeedbackItem = async (feedbackItemProps: IFeedbackItemProps, droppedItemId: string, targetItemId: string) => {
+  public readonly static handleDropFeedbackItemOnFeedbackItem = async (feedbackItemProps: IFeedbackItemProps, droppedItemId: string, targetItemId: string) => {
     const updatedFeedbackItems = await itemDataService.addFeedbackItemAsChild(feedbackItemProps.boardId, targetItemId, droppedItemId);
 
     feedbackItemProps.refreshFeedbackItems(
