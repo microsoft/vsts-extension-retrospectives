@@ -25,7 +25,7 @@ export interface FeedbackBoardPermissionOption {
   thumbnailUrl?: string;
 }
 
-function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormPermissionsProps): JSX.Element {
+function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
@@ -117,7 +117,7 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
       return <i className="permission-image fa-solid fa-users h-11 w-11"></i>
     }
 
-    return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission image for ${props.option.name}`} />
+    return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission for ${props.option.name}`} />
   }
 
   const PublicWarningBanner = () => {
@@ -152,7 +152,6 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
       </div>
 
       <div className="board-metadata-table-container">
-        {/* TODO: Replace with Fluent grid once we migration components over */}
         <table className="board-metadata-table">
           <thead>
             <tr>
@@ -172,14 +171,14 @@ function FeedbackBoardMetadataFormPermissions(props: IFeedbackBoardMetadataFormP
             </tr>
           </thead>
           <tbody>
-            {filteredPermissionOptions.map((option, index) => {
-              const isBoardOwner: boolean = option.id === props.board.createdBy?.id;
+            {filteredPermissionOptions.map((option) => {
+              const isBoardOwner: boolean = option.id === props.board?.createdBy?.id;
               return (
-                <tr key={'table-row-' + index} className="option-row">
+                <tr key={option.id} className="option-row">
                   <td>
                     <Checkbox
                       className="my-2"
-                      id={"permission-option-" + index}
+                      id={`permission-option-${option.id}`}
                       ariaLabel="Add permission to every team or member in the table"
                       boxSide="start"
                       disabled={isBoardOwner}
