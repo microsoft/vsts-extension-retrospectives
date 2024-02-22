@@ -26,7 +26,7 @@ export const testWorkItemType = mocked({
 export const testColumnUuidOne = "mocked-column-uuid-one";
 export const testColumnUuidTwo = "mocked-column-uuid-two";
 export const testColumnTwoTitle = 'Test Feedback Column Two';
-export const testUpvotes = Math.floor(Math.random() * 10);
+export const testUpvotes = Math.floor((window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1)) * 10);
 export const testFeedbackItem = mocked({
   id: "mocked-feedback-item-uuid",
   element: mocked({
@@ -43,7 +43,7 @@ export const testFeedbackItem = mocked({
   createdDate: new Date(),
   createdByProfileImage: 'testProfileImageSource',
   userIdRef: "user-ref-uuid",
-  timerSecs: Math.floor(Math.random() * 60),
+  timerSecs: Math.floor((window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1)) * 60),
   timerstate: false,
   timerId: "timer-uuid",
   groupIds: [],
@@ -193,7 +193,7 @@ export const testGroupFeedbackItemTwo = mocked({
     isMainItem: false
   },
   userIdRef: "user-ref-uuid",
-  timerSecs: Math.floor(Math.random() * 60),
+  timerSecs: Math.floor((window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1)) * 60),
   timerstate: false,
   timerId: "timer-uuid",
   groupIds: [],
@@ -219,7 +219,7 @@ export const testGroupFeedbackItemOne = mocked({
   createdByProfileImage: 'testProfileImageSource',
   groupedItemProps: testGroupedItemPropsTwo,
   userIdRef: "user-ref-uuid",
-  timerSecs: Math.floor(Math.random() * 60),
+  timerSecs: Math.floor((window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1)) * 60),
   timerstate: false,
   timerId: "timer-uuid",
   groupIds: [],
