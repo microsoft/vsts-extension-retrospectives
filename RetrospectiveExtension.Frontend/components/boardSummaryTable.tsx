@@ -50,7 +50,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
     columnHelper.accessor('id', {
       header: null,
       footer: info => info.column.id,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, string | number | Date>) => {
         return cellContext.row.getCanExpand() ? (
           <DefaultButton
             className="contextual-menu-button"
