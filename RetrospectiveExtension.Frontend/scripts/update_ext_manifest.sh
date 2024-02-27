@@ -18,10 +18,6 @@
     # Inject Publisher Id
     cat <<< $(jq ".publisher = \"$publisher\"" $ext_file) > $ext_file
 
-    # Inject Extension Id and Name
-    cat <<< $(jq ".id = \"$ext_prefix\"" $ext_file) > $ext_file
-    cat <<< $(jq ".name = \"$ext_prefix - Retrospectives (Dev)\"" $ext_file) > $ext_file
-
     # Inject version
     ext_info=$(tfx extension show \
         --no-prompt \
