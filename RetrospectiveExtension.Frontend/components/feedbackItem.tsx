@@ -529,7 +529,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     });
   }
 
-  private clickSearchedFeedbackItem = (event: React.MouseEvent<HTMLDivElement>, feedbackItemProps: IFeedbackItemProps) => {
+  private clickSearchedFeedbackItem = (event: React.MouseEvent<HTMLButtonElement>, feedbackItemProps: IFeedbackItemProps) => {
     event.stopPropagation();
     FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(
       feedbackItemProps,
@@ -540,7 +540,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     this.hideGroupFeedbackItemDialog();
   }
 
-  private pressSearchedFeedbackItem = (event: React.KeyboardEvent<HTMLDivElement>, feedbackItemProps: IFeedbackItemProps) => {
+  private pressSearchedFeedbackItem = (event: React.KeyboardEvent<HTMLButtonElement>, feedbackItemProps: IFeedbackItemProps) => {
     event.stopPropagation();
 
     if (event.key === "Enter") {
@@ -946,7 +946,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             {!this.state.searchedFeedbackItems.length && this.state.searchTerm &&
               <p className="no-matching-feedback-message">No feedback with title containing your input.</p>
             }
-            {this.state.searchedFeedbackItems.map((searchItem) => {
+            {this.state.searchedFeedbackItems.map((searchItem, index) => {
               // Making feedbackItemsProps by hand since we are looking across all columns
               const feedbackItemProps: IFeedbackItemProps = {
                 id: searchItem.id,
@@ -990,16 +990,16 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 refreshFeedbackItems: this.props.refreshFeedbackItems,
                 moveFeedbackItem: this.props.moveFeedbackItem
               };
-              return <div
+              return <button
                 key={searchItem.id}
                 className="feedback-item-search-result-item"
-                onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
-                onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
-                tabIndex={0}
+                onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
+                onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
+                tabIndex={index}
               >
                 <FeedbackItem {...feedbackItemProps}>
                 </FeedbackItem>
-              </div>
+              </button>
             })}
           </div>
         </Dialog>

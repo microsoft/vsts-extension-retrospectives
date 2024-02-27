@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, KeyboardEvent, useEffect, useState } from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
@@ -46,7 +46,7 @@ export interface IActionItemsTableItems {
  */
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
-  const columns: ColumnDef<IBoardSummaryTableItem, any>[] = [
+  const columns: ColumnDef<IBoardSummaryTableItem, string | Date | number>[] = [
     columnHelper.accessor('id', {
       header: null,
       footer: info => info.column.id,
@@ -111,11 +111,10 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
     }
   }
 
-  const table = useReactTable(tableOptions);
-  return table;
+  return useReactTable(tableOptions);
 }
 
-function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
+function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
     boardsTableItems: new Array<IBoardSummaryTableItem>(),
@@ -175,7 +174,7 @@ function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
       const feedbackBoardId: string = feedbackBoard.id;
       const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
 
-      if (!feedbackItems || !feedbackItems.length) {
+      if (!feedbackItems.length) {
         return;
       }
 
@@ -187,12 +186,12 @@ function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
       }));
 
       await Promise.all(feedbackItems.map(async (feedbackItem) => {
-        if (!feedbackItem.associatedActionItemIds || !feedbackItem.associatedActionItemIds.length) {
+        if (!feedbackItem.associatedActionItemIds.length) {
           return;
         }
 
         const workItems = await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds);
-        if (!workItems || !workItems.length) {
+        if (!workItems.length) {
           return
         }
 
@@ -283,7 +282,7 @@ function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
       onClick: () => row.toggleExpanded(),
       tabIndex: 0,
       'aria-label': 'Board summary row. Click row to expand and view more statistics for this board.',
-      onKeyPress: (e: any) => {
+      onKeyPress: (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
           row.toggleExpanded();
         }
@@ -294,7 +293,7 @@ function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
   const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
     const hasPendingItems: boolean = cell?.row?.original?.pendingWorkItemsCount > 0;
     const columnId: keyof IBoardSummaryTableItem | undefined = cell?.column?.id as keyof IBoardSummaryTableItem | undefined;
-    const cellValue: unknown | null = (cell?.row?.original && columnId && cell.row.original[columnId]) ? cell.row.original[columnId] : null;
+    const cellValue = (cell?.row?.original && columnId && cell.row.original[columnId]) ? cell.row.original[columnId] : null;
 
     const ariaLabel = (columnId && cellValue) ? columnId + ' ' + cellValue : '';
 
