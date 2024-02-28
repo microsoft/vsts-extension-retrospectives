@@ -234,8 +234,7 @@ $team_selector_list_item_width: 450px;
         }
 
         &.active {
-          color: var(--palette-primary-darken-6);
-          font-weight: bold;
+          font-weight: 700;
           background-color: var(--nav-header-active-item-background);
 
           &::before {
