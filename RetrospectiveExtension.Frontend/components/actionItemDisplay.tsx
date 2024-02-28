@@ -15,7 +15,7 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
-import { reactPlugin } from '../utilities/telemetryClient';
+import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import ActionItem from './actionItem';
 
 export interface ActionItemDisplayProps extends IButtonProps {
@@ -87,7 +87,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
 
     if (workItem) {
       const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(this.props.boardId, this.props.feedbackItemId, workItem.id);
-      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.WorkItemCreated, { [TelemetryEventProperties.WorkItemType]: workItemTypeName });
+      appInsights.trackEvent({name: TelemetryEvents.WorkItemCreated, properties: { workItemTypeName }});
       this.props.onUpdateActionItem(updatedFeedbackItem);
     }
   }

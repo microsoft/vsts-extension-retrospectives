@@ -282,13 +282,16 @@
 
     .feedback-item-search-result-item {
       cursor: pointer;
+      text-align: start;
+      display: block;
+      width: 100%;
 
       &:focus,
+      &:active,
       &:hover {
         .feedbackItem {
           .mainItemCard {
-            border-width: 1px;
-            border-color: $main_blue;
+            border: 2px soliid $main_blue;
           }
         }
       }
