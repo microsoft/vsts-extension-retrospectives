@@ -19,7 +19,7 @@ import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { FeedbackColumnProps } from './feedbackColumn';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 
 export interface IFeedbackItemProps {
   id: string;
@@ -1027,7 +1027,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 }
 
 export class FeedbackItemHelper {
-  // Handle linking/grouping workitems and reload any updated items.
   public static readonly handleDropFeedbackItemOnFeedbackItem = async (feedbackItemProps: IFeedbackItemProps, droppedItemId: string, targetItemId: string) => {
     const updatedFeedbackItems = await itemDataService.addFeedbackItemAsChild(feedbackItemProps.boardId, targetItemId, droppedItemId);
 
@@ -1040,9 +1039,7 @@ export class FeedbackItemHelper {
       ].filter((item) => item),
       true
     );
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemGrouped);
-
-    // TODO: Inform user when not all updates are successful due to race conditions.
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemGrouped, properties: feedbackItemProps});
   }
 }
 

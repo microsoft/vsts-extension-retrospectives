@@ -8,7 +8,6 @@ import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azur
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
-import { IconType } from 'office-ui-fabric-react/lib/Icon';
 import Dialog, { DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
@@ -60,7 +59,6 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
           width: 36,
           previewIconProps: {
             ariaLabel: `icon for work item type ${workItemType.name}`,
-            iconType: IconType.image,
             imageProps: {
               src: workItemType.icon.url,
               alt: `icon for work item type ${workItemType.name}`,

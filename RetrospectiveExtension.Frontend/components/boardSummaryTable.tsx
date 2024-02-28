@@ -41,16 +41,13 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-/**
- * Obtain a configured TanStack Table specifically for the board history tab.
- */
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
-  const columns: ColumnDef<IBoardSummaryTableItem, string | Date | number>[] = [
+  const columns = [
     columnHelper.accessor('id', {
       header: null,
       footer: info => info.column.id,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, string | number | Date>) => {
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
         return cellContext.row.getCanExpand() ? (
           <DefaultButton
             className="contextual-menu-button"
