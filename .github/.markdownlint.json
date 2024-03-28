@@ -50,26 +50,7 @@
     "maximum": 1
   },
   // MD013/line-length - Line length
-  "MD013": {
-    // Number of characters
-    "line_length": 100,
-    // Number of characters for headings
-    "heading_line_length": 80,
-    // Number of characters for code blocks
-    "code_block_line_length": 100,
-    // Include code blocks
-    "code_blocks": true,
-    // Exclude tables
-    "tables": false,
-    // Include headings
-    "headings": true,
-    // Include headings
-    "headers": true,
-    // Strict length checking
-    "strict": false,
-    // Stern length checking
-    "stern": false
-  },
+  "MD013": false,
   // MD014/commands-show-output - Dollar signs used before commands without showing output
   "MD014": true,
   // MD022/blanks-around-headings/blanks-around-headers - Headings should be surrounded by blank lines
