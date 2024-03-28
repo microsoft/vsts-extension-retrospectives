@@ -1,27 +1,19 @@
 # Retrospectives
 
-[![codecov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
+[![CodeCov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
 [![CI - Frontend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml)
 [![CI - Backend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml)
 [![CD - Frontend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/cd_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/cd_frontend.yml)
 
-Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform
-_smart and efficient retrospectives from within the Azure DevOps pipeline._
+Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform _smart and efficient retrospectives from within the Azure DevOps pipeline._
 
-Retrospectives are an important practice in becoming an effective team, allowing the team to gather
-feedback and continuously improve based on the feedback.
+Retrospectives are an important practice in becoming an effective team, allowing the team to gather feedback and continuously improve based on the feedback.
 
-Research from the [2018 State of DevOps report](https://services.google.com/fh/files/misc/state-of-devops-2018.pdf)
-indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them
-to improve their work. Furthermore, a [2013 meta-analysis on teams](https://journals.sagepub.com/doi/full/10.1177/0018720812448394)
-indicates that teams that effectively debrief/conduct retrospectives are 20-25% more effective.
+Research from the [2018 State of DevOps report](https://services.google.com/fh/files/misc/state-of-devops-2018.pdf) indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a [2013 meta-analysis on teams](https://journals.sagepub.com/doi/full/10.1177/0018720812448394) indicates that teams that effectively debrief/conduct retrospectives are 20-25% more effective.
 
-Teams often use external retrospective tools, white boards with Post-its, OneNote, etc. to conduct
-retrospectives. The data then needs to be collated, and any actionable items need to be created in
-your Azure DevOps pipeline.
+Teams often use external retrospective tools, white boards with Post-its, OneNote, etc. to conduct retrospectives. The data then needs to be collated, and any actionable items need to be created in your Azure DevOps pipeline.
 
-The [Retrospectives extension](https://marketplace.visualstudio.com/items?itemName=ms-devlabs.team-retrospectives)
-allows you to do all this and more from within Azure DevOps.
+The [Retrospectives extension](https://marketplace.visualstudio.com/items?itemName=ms-devlabs.team-retrospectives) allows you to do all this and more from within Azure DevOps.
 
 ## Table of Contents
 
@@ -50,8 +42,7 @@ Please note: the screenshot examples use light mode and dark mode interchangeabl
 
 ### 1. Open Retrospectives Extension
 
-Navigate to the Azure 'Boards' tab in your account on the left hand navigation. Select the 'Retrospectives'
-tab under 'Boards'.
+Navigate to the Azure 'Boards' tab in your account on the left hand navigation. Select the 'Retrospectives' tab under 'Boards'.
 
 ![A screenshot of the Azure DevOps left-hand navigation. Under the Boards heading, the extension for the retrospective is darkened as though hovered by a mouse.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/azdo-side-bar.png)
 
@@ -63,15 +54,13 @@ You are now on the Retrospectives page. Select your Azure DevOps team from the s
 
 ### 3. Create New Retrospective
 
-Create a new retrospective using the 'Create Board' button. If this is your first retrospective for
-your selected team, then press the "Create Board" button in the center of the screen.
+Create a new retrospective using the 'Create Board' button. If this is your first retrospective for your selected team, then press the "Create Board" button in the center of the screen.
 
 ![Video](https://user-images.githubusercontent.com/118744/208821363-cde5b0e1-e747-4158-8d8b-99017b4c3cc4.mp4)
 
 ![A screenshot of the Retrospective main page. The screen is mostly empty except for the top navigation of the tool. In the center there is a blue button to 'Create Board.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-first-retrospective.png)
 
-If you have created a retrospective before for your selected team, then you can select "Create a new
-retrospective" from the navigation drop down.
+If you have created a retrospective before for your selected team, then you can select "Create a new retrospective" from the navigation drop down.
 
 ![A screenshot of the top navigation in the Retrospective tool, where the 'Board Actions' menu has been opened. The first option in the dropdown is the 'Create New Retrospective.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retrospective-dropdown.png)
 
@@ -86,136 +75,84 @@ Please enter the appropriate information:
 - **Retrospective Title**: Title for the Retrospective.
 - **Max Votes per User**: The maximum number of votes a participant has to use in the "Vote" Phase.
 - **Include Team Assessment**: Include a Team Assessment link at the top of the board.
-- **Obscure the feedback of others until after Collect phase**: When selected, users cannot see other
-users input until they have moved to another phase. Other users' feedback will be blurred.
-- **Display 'Retrospective Prime Directive'**: Include a link to the 'Prime Directive' at the top of
-the board.
+- **Obscure the feedback of others until after Collect phase**: When selected, users cannot see other users input until they have moved to another phase. Other users' feedback will be blurred.
+- **Display 'Retrospective Prime Directive'**: Include a link to the 'Prime Directive' at the top of the board.
 - **Do not display names in feedback**: When checked, anonymize who creates individual feedback items.
-- **Columns Settings**: You can either Apply from a pre-populated template or individually select and
-configure columns yourself.
+- **Columns Settings**: You can either Apply from a pre-populated template or individually select and configure columns yourself.
 
 ![A screenshot showing the dropdown of available templates for the retrospective board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/pick-retrospective-template-lightmode.png)
 
-**Note:** Retrospective Title is the minimum 'required' information (other fields can stay at default
-as needed). Once the title is provided, the `Save` button is enabled. Save the retrospective using
-the `Save` button.
+**Note:** Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Once the title is provided, the `Save` button is enabled. Save the retrospective using the `Save` button.
 
 ### ... Or Select Another Retrospective Board
 
-Once you have created the retrospective board and you want to select a retrospective board
-different from the currently displayed board, click on the retrospective board name and select
-the desired one. You can use the search box to find the appropriate retrospective boards if
-you have a large number of boards.
+Once you have created the retrospective board and you want to select a retrospective board different from the currently displayed board, click on the retrospective board name and select the desired one. You can use the search box to find the appropriate retrospective boards if you have a large number of boards.
 
-![A screenshot showing the dropdown for searching available retrospective
-boards after they've been created. The current Retrospective Board is
-"Retrospective for Sprint 8" and the selection for "Retrospective for
-Sprint 7" is darkened as though hovered.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-board-dropdown.png)
+![A screenshot showing the dropdown for searching available retrospective boards after they've been created. The current Retrospective Board is "Retrospective for Sprint 8" and the selection for "Retrospective for Sprint 7" is darkened as though hovered.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-board-dropdown.png)
 
 ### 5. Share the Link to the Retrospective
 
-Once you create a new retrospective, you can share a link to it to all participants.
-Users can then access that link even from their mobile browsers to participate in
-the retrospective. The extension offers real time synchronisation, so all users
-will see the most up-to-date information without having to refresh the page.
+Once you create a new retrospective, you can share a link to it to all participants. Users can then access that link even from their mobile browsers to participate in the retrospective. The extension offers real time synchronization, so all users will see the most up-to-date information without having to refresh the page.
 
-![A screenshot of the dropdown from the Board Actions Menu. The option for
-'Copy Retrsopectivelink Link' is darkened as though the mouse is hovering
-over it.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/copy-retro-link.png)
+![A screenshot of the dropdown from the Board Actions Menu. The option for 'Copy Retrospective Link' is darkened as though the mouse is hovering over it](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/copy-retro-link.png)
 
 ### 6. Phases of the Standard Retrospective
 
-The number of columns in each retrospective is determined by the selection made
-when making the new board. Regardless of the template, they still follow the same
-sequence of phases.
+The number of columns in each retrospective is determined by the selection made when making the new board. Regardless of the template, they still follow the same sequence of phases.
 
 #### The Prime Directive
 
-If you had selected the 'Display 'Retrospective Prime Directive', you will see the option to view
-that directive which sets the stage for the retrospective. It is recommended that you click on the
-Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues discovered
-will be assumed to be process problems, not people problems.
+If you had selected the 'Display 'Retrospective Prime Directive', you will see the option to view that directive which sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues discovered will be assumed to be process problems, not people problems.
 
-![A screenshot of the prime directive'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
+![A screenshot of the prime directive](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
 
 #### Collect
 
-In this phase feedback is collected from all participants. Users
-can add feedback under any of the columns using the 'Add new card' button or by
-double clicking the empty space of the column's background.
+In this phase feedback is collected from all participants. Users can add feedback under any of the columns using the 'Add new card' button or by double clicking the empty space of the column's background.
 
-![A screenshot of an example retrospective board column, showing the example
-user Avery Axolotl writing in a feedback item that says 'Accidentally deleted
-my branch on remote. Dang!'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/write-new-feedback-item.png)
+![A screenshot of an example retrospective board column, showing the example user Avery Axolotl writing in a feedback item that says 'Accidentally deleted my branch on remote. Dang!'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/write-new-feedback-item.png)
 
-If when creating a retrospective, the checkbox for "Do not display names on
-feedback" is checked, then the cards will show no names, appearing anonymous.
+If when creating a retrospective, the checkbox for "Do not display names on feedback" is checked, then the cards will show no names, appearing anonymous.
 
-If when creating a retrospective, the checkbox for 'Obscure the feedback of
-others during the Collect Phase' was checked, then while typing, the feedback
-of others will not be shown, even if anonymous. You can only edit items that
-you have created in this mode.
+If when creating a retrospective, the checkbox for 'Obscure the feedback of others during the Collect Phase' was checked, then while typing, the feedback of others will not be shown, even if anonymous. You can only edit items that you have created in this mode.
 
-![A screenshot of a board that shows two columnds for "Mad" and "Sad." The each
-column has two feedback items: one which has text visible and another where
-there is a blur that obscures the text from another user.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/obscured-anonymous-feedback.png)
+![A screenshot of a board that shows two columns for "Mad" and "Sad." The each column has two feedback items: one which has text visible and another where there is a blur that obscures the text from another user](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/obscured-anonymous-feedback.png)
 
 Once feedback from all users is collected, move on to the next phase of **Group**.
 
 #### Group
 
-In this phase, any similar feedback can be grouped together beneath
-a "header" or champion item. If you feel 2 feedback items are similar, drag one
-onto another to group them together. Dragging any item onto a group, will add items
-to that group.
+In this phase, any similar feedback can be grouped together beneath a "header" or champion item. If you feel 2 feedback items are similar, drag one onto another to group them together. Dragging any item onto a group, will add items to that group.
 
-![A screenshot that shows a piece of feedback being dragged on top of another
-due to their similarity. The item being dragged is semi-transparent.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-by-dragging.png)
+![A screenshot that shows a piece of feedback being dragged on top of another due to their similarity. The item being dragged is semi-transparent.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-by-dragging.png)
 
-If you would rather not drag you can use the feedback item's action menu
-(the ellipsis '...') to "Group Feedback". This will bring up a search box and
-you can type in the feedback item you would like to group your selected item
-under.
+If you would rather not drag you can use the feedback item's action menu (the ellipsis '...') to "Group Feedback". This will bring up a search box and you can type in the feedback item you would like to group your selected item under.
 
-![A screenshot that shows the selected feedback item's action menu. The
-"Group Feedback" is darked as though a mouse is hovering.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-by-feedback-menu.png)
+![A screenshot that shows the selected feedback item's action menu. The "Group Feedback" is made darker as though a mouse is hovering.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-by-feedback-menu.png)
 
-![A screenshot that shows a search bar. The word "team" has been typed in
-and shows a feedback item has been found with that word.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-search-dialog.png)
+![A screenshot that shows a search bar. The word "team" has been typed in and shows a feedback item has been found with that word.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-search-dialog.png)
 
 Both methods of grouping will result in the item being grouped beneath the other.
 
-![A screenshot that shows that one feedback from Fernando Flamingo is grouped
-beneath Avery Axolotl's feedback because both discussed team bonding.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/grouped-feedback-expanded.png)
+![A screenshot that shows that one feedback from Fernando Flamingo is grouped beneath Avery Axolotl's feedback because both discussed team bonding.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/grouped-feedback-expanded.png)
 
 Once all similar items are grouped together, move on to the next phase of **Vote**.
 
 #### Vote
 
-In this phase, participants will individually go through all the feedback
-items and vote on the ones they feel are important, by clicking on the 'Upvote'
-icon. Users can reduce their number of votes on a specific item by clicking on the
-'Downvote' icon.
+In this phase, participants will individually go through all the feedback items and vote on the ones they feel are important, by clicking on the 'Upvote' icon. Users can reduce their number of votes on a specific item by clicking on the 'Downvote' icon.
 
-Note the _Max Votes per User_ set by the board creator are displayed as the
-denominator in a ratio of "Votes Used". Votes used by the user are updated in
-real time as the user clicks on 'Upvote' and 'Downvote' icons.
+Note the _Max Votes per User_ set by the board creator are displayed as the denominator in a ratio of "Votes Used". Votes used by the user are updated in real time as the user clicks on 'Upvote' and 'Downvote' icons.
 
-![A screenshot that shows a user has used two votes out of five, which is
-indicated next to "Votes Used." The two items that have been voted on by the
-user show a "Your Votes: 1" in the feedback card.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/vote-feedback-in-progress.png)
+![A screenshot that shows a user has used two votes out of five, which is indicated next to "Votes Used." The two items that have been voted on by the user show a "Your Votes: 1" in the feedback card.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/vote-feedback-in-progress.png)
 
 Once everyone is done voting, move on to the next phase of **Act**.
 
 #### Act
 
-In this phase, the team will go through each feedback item.  You will notice that the items with the
-most votes will appear at the top of the column. It is recommended that each time you do this exercise,
-you only select one or two of the feedback items to take action against. Click on the 'Add action item'
-button on a feedback card, and select the type of work item that needs to be created in Azure DevOps.
-This will open up the standard Azure DevOps work item creation form. Enter the work item details and
-save. This will create the work item in your Azure DevOps account and also associate it to the feedback
-item.
+In this phase, the team will go through each feedback item.  You will notice that the items with the most votes will appear at the top of the column. It is recommended that each time you do this exercise, you only select one or two of the feedback items to take action against. Click on the 'Add action item' button on a feedback card, and select the type of work item that needs to be created in Azure DevOps.
+
+This will open up the standard Azure DevOps work item creation form. Enter the work item details and save. This will create the work item in your Azure DevOps account and also associate it to the feedback item.
 
 ![A screenshot that shows a feedback item in the 'Act Phase'. On the example feedback items, the button for 'Add Action Item,' an ellipsis, has been pressed to reveal a selection of options. The user has the option to create a number of different Azure Dev Ops items, like adding a bug, a user story, and others. In this case, the item that is darkened as though hovered by a mouse is the 'User Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
@@ -307,7 +244,7 @@ with a template that aligns to the dimension.
 In this phase team members will provide feedback to help improve the dimension they've chosen to focus
 on. Ask team members to input feedback cards on the left 2 columns.
 
-![A screenshot of the Efficiency Retrospective Board Templage](https://user-images.githubusercontent.com/114175122/203426762-9fc09511-377d-4368-9a9a-a547e22bbdf5.png)
+![A screenshot of the Efficiency Retrospective Board Template](https://user-images.githubusercontent.com/114175122/203426762-9fc09511-377d-4368-9a9a-a547e22bbdf5.png)
 
 After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional
 feedback cards are being added, the facilitator asks the following question: "Reflecting on the
@@ -327,7 +264,7 @@ to the "group" tab and collectively groups like ideas together with the team (se
 In this phase the facilitator asks participants to vote only on the third column and the top items
 for improvement are identified.
 The facilitator then waits for votes to compile and after the majority of the team has voted (the
-facilitator can view the retrospective summary to quickly determine how many votes have beeen cast),
+facilitator can view the retrospective summary to quickly determine how many votes have been cast),
 the facilitator clicks on the "Act" tab which automatically sorts the cards from the most to the
 least voted upon.
 
@@ -415,7 +352,7 @@ A good team working agreement must include everyone's background, needs and voic
 is a great way for a team to collect that information and then bring it together.  The agreement should
 be relatively short, 5-7 items.
 
-Bring your team together and create a restrospective board with 1 column:
+Bring your team together and create a retrospective board with 1 column:
 
 - Good Working Preferences
 

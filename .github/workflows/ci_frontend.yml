@@ -58,11 +58,33 @@ jobs:
       - name: Markdown lint
         run: |
           npm install markdownlint-cli2 --global
-          markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json"
+          markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#RetrospectiveExtension.Frontend/node_modules"
 
       - name: Spell check
         run: |
-          npx -y spellchecker-cli@^6 --files "**/*.md"
+          wget --backups 0 https://raw.githubusercontent.com/tbroadley/spellchecker-cli/master/dictionaries/base.txt
+          echo "" >> base.txt
+          echo "Dev" >> base.txt
+          echo "tooltip" >> base.txt
+          echo "outloud" >> base.txt
+          echo "timebox" >> base.txt
+          echo "uncast" >> base.txt
+          echo "PRs" >> base.txt
+          echo "CodeCov" >> base.txt
+          echo "Backend" >> base.txt
+          echo "WIP" >> base.txt
+          echo "OKR" >> base.txt
+          echo "OKRs" >> base.txt
+          echo "CSV" >> base.txt
+          echo "GitHub" >> base.txt
+          echo "DevOps" >> base.txt
+          echo "Frontend" >> base.txt
+          echo "ERD" >> base.txt
+          echo "Changelog" >> base.txt
+          echo "changelog" >> base.txt
+          echo "ReactTable" >> base.txt
+          echo "README" >> base.txt
+          npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
