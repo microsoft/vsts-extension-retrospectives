@@ -64,6 +64,10 @@ jobs:
         run: |
           wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/master/dictionaries/base.txt
           echo "" >> base.txt
+          echo "emailable" >> base.txt
+          echo "anonymize" >> base.txt
+          echo "pre-populated" >> base.txt
+          echo "favorability" >> base.txt
           echo "Dev" >> base.txt
           echo "tooltip" >> base.txt
           echo "outloud" >> base.txt
