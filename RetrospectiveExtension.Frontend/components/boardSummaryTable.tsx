@@ -5,7 +5,7 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extensi
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
-import { Cell, CellContext, ColumnDef, Header, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { Cell, CellContext, Header, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
@@ -175,6 +175,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         return;
       }
 
+      const feedbackItemsCount = feedbackItems.length;
+
       const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
 
       await Promise.all(props.supportedWorkItemTypes.map(async (workItemType) => {
@@ -211,25 +213,10 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         const pendingWorkItemsCount = pendingWorkItems.length;
         const totalWorkItemsCount = updatedItems.length;
 
-        const currentTableItemsToUpdate =
-        updatedState.boardsTableItems.map(
-            item => item.id === feedbackBoardId ?
-              {
-                ...item,
-                feedbackItemsCount: feedbackItems.length,
-                pendingWorkItemsCount: pendingWorkItemsCount,
-                totalWorkItemsCount: totalWorkItemsCount
-              } :
-              item);
-
-        updatedState.boardsTableItems = currentTableItemsToUpdate;
+        updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ? { ...item, feedbackItemsCount, pendingWorkItemsCount, totalWorkItemsCount } : item);
       }));
 
-      updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ?
-        {
-          ...item,
-          feedbackItemsCount: feedbackItems.length
-        } : item)
+      updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ? { ...item, feedbackItemsCount } : item);
       
       setBoardSummaryState({
         ...updatedState,
@@ -319,18 +306,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   useEffect(() => {
     if(teamId !== props.teamId) {
-      try {
-        BoardDataService.getBoardsForTeam(props.teamId)
-        .then((boardDocuments: IFeedbackBoardDocument[]) => {
-          setTeamId(props.teamId);
-          handleBoardsDocuments(boardDocuments);
-        })
-        .catch(e => {
-          appInsights.trackException(e);
-        })
-      } catch (e) {
+      BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
+        setTeamId(props.teamId);
+        handleBoardsDocuments(boardDocuments);
+      }).catch(e => {
         appInsights.trackException(e);
-      }
+      })
     }
   }, [props.teamId])
 
@@ -344,7 +325,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   return (
     <div className="board-summary-table-container">
-      <table tabIndex={0}>
+      <table>
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
                 <tr key={headerGroup.id}>

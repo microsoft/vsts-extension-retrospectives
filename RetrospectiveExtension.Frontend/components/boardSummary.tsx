@@ -75,13 +75,13 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         name: 'Title',
         onColumnClick: this.onColumnClick,
         onRender: ({ id, title, onActionItemClick }: IActionItemsTableProps) => {
-          return <div
-            onClick={async () => {
-              await onActionItemClick(id);
+          return <button
+            onClick={() => {
+              onActionItemClick(id);
             }}
             className="work-item-title overflow-ellipsis">
             {title}
-          </div>;
+          </button>;
         }
       },
       {
@@ -181,7 +181,6 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         priority: workItem.fields['Microsoft.VSTS.Common.Priority'],
         id: workItem.id,
         onActionItemClick: async (id: number) => {
-          // TODO: Update specific table summary after work item is updated.
           const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
           await workItemNavSvc.openWorkItem(id);
         }
