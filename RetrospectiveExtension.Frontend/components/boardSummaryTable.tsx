@@ -185,7 +185,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       }));
 
       await Promise.all(feedbackItems.map(async (feedbackItem) => {
-        if (!feedbackItem.associatedActionItemIds.length) {
+        if (!feedbackItem.associatedActionItemIds?.length) {
           return;
         }
 
