@@ -62,7 +62,7 @@ jobs:
 
       - name: Spell check
         run: |
-          wget --backups 0 https://raw.githubusercontent.com/tbroadley/spellchecker-cli/master/dictionaries/base.txt
+          wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/master/dictionaries/base.txt
           echo "" >> base.txt
           echo "Dev" >> base.txt
           echo "tooltip" >> base.txt
