@@ -57,6 +57,7 @@ jobs:
 
       - name: Markdown lint
         run: |
+          cat .github/.markdownlint.json
           npm install markdownlint-cli2 --global
           markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json"
 
