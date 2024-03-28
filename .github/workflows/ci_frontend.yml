@@ -1,16 +1,16 @@
-name: 'CI_Frontend'
+name: "CI_Frontend"
 
 on:
   push:
     branches:
       - main
       - dev
-      - 'releases/**'
+      - "releases/**"
   pull_request:
     branches:
       - main
       - dev
-      - 'releases/**'
+      - "releases/**"
   workflow_dispatch:
 
 jobs:
@@ -24,30 +24,30 @@ jobs:
       - uses: actions/setup-node@v4
         name: Setup node
         with:
-          node-version: '16'
+          node-version: "18"
 
       - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
             src:
-              - '.github/**'
-              - 'RetrospectiveExtension.Frontend/**'
+              - ".github/**"
+              - "RetrospectiveExtension.Frontend/**"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Install dependencies"
         run: npm ci
-        working-directory: 'RetrospectiveExtension.Frontend'
+        working-directory: "RetrospectiveExtension.Frontend"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Lint node files"
         run: npm run lint
-        working-directory: 'RetrospectiveExtension.Frontend'
+        working-directory: "RetrospectiveExtension.Frontend"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Run tests"
         run: npm test
-        working-directory: 'RetrospectiveExtension.Frontend'
+        working-directory: "RetrospectiveExtension.Frontend"
 
       - if: success() || failure()
         uses: actions/upload-artifact@v4
@@ -55,17 +55,14 @@ jobs:
           name: jest-test-results
           path: RetrospectiveExtension.Frontend/reports/jest-junit.xml
 
-      # https://github.com/marketplace/actions/markdownlint-cli2-action
-      - uses: DavidAnson/markdownlint-cli2-action@v15
-        with:
-          config: .markdownlint.json
-          globs: |
-            #CODE_OF_CONDUCT.md
-            #LICENSE
-            #SECURITY.md
+      - name: Markdown lint
+        run: |
+          npm install markdownlint-cli2 --global
+          markdownlint-cli2 "**/*.md"
 
-      # https://github.com/marketplace/actions/spellchecker-cli
-      - uses: tbroadley/spellchecker-cli-action@v1
+      - name: Spell check
+        run: |
+          npx -y spellchecker-cli@^6 --files "**/*.md"
 
       - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
