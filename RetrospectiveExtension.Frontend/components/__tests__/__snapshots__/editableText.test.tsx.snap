@@ -6,6 +6,7 @@ exports[`Editable Text Component renders correctly. 1`] = `
   className="editable-text-container"
 >
   <StyledTextFieldBase
+    aria-required={true}
     ariaLabel="Please enter feedback title"
     autoAdjustHeight={true}
     autoFocus={true}
