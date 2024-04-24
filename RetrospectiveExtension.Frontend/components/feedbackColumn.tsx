@@ -153,7 +153,11 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     isInteractable: boolean): IFeedbackItemProps => {
 
     let accentColor: string = columnProps.accentColor;
-    if(columnItem.feedbackItem.originalColumnId !== columnProps.columnId) {
+
+    // Only show original color on column 'All'
+    // see: "New 'Focus Mode' tab called 'All'" https://github.com/microsoft/vsts-extension-retrospectives/pull/543
+    if(columnProps.columnName === 'All'
+       && columnItem.feedbackItem.originalColumnId !== columnProps.columnId) {
       accentColor = columnProps.columns[columnItem.feedbackItem.originalColumnId]?.columnProperties?.accentColor ?? columnProps.accentColor;
     }
 
