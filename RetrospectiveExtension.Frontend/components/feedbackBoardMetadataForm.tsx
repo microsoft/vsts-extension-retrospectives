@@ -328,7 +328,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               <section className="board-metadata-edit-column-settings hide-mobile">
                 <h2 className="board-metadata-form-section-header">Board Settings</h2>
                 <div className="board-metadata-form-section-subheader">
-                  <label htmlFor="title-input-container">Title<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:</label>
+                  <label htmlFor="title-input-container">Retrospective Name<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:</label>
                   <TextField
                     ariaLabel="Please enter new retrospective title"
                     aria-required={true}
