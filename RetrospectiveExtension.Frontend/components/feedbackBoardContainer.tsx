@@ -774,7 +774,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       this.setCurrentBoard(board);
       const newurl = await getBoardUrl(_teamId, _boardId);
       const service = await SDK.getService<IHostNavigationService>("ms.vss-features.host-navigation-service");
-      service.navigate(newurl);
+      service.setHash(newurl);
       console.log({a: window.location, b: newurl, c: _teamId, d: _boardId});
       // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardSelectionChanged);
     }
