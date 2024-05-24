@@ -18,6 +18,7 @@ import FeedbackBoard from '../components/feedbackBoard';
 
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
+import * as SDK from 'azure-devops-extension-sdk';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import NoFeedbackBoardsView from './noFeedbackBoardsView';
@@ -41,6 +42,7 @@ import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
+import { IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -771,8 +773,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       const _boardId = board.id;
       this.setCurrentBoard(board);
       const newurl = await getBoardUrl(_teamId, _boardId);
-      console.log({a: window.location, b: newurl, c: window.history, d: _teamId, e: _boardId});
-      window.history.pushState({path:newurl}, "", newurl);
+      const service = await SDK.getService<IHostNavigationService>("ms.vss-features.host-navigation-service");
+      service.navigate(newurl);
+      console.log({a: window.location, b: newurl, c: _teamId, d: _boardId});
       // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardSelectionChanged);
     }
   }
