@@ -250,7 +250,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
     return {
       key: header.id,
-      role: "button",
+      role: "columnheader",
       'aria-sort': ariaSort,
       style: {
         minWidth: header.getSize(),
@@ -259,19 +259,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       className: sortClassName,
       onClick: header.column.getToggleSortingHandler()
     }
-  }
-
-  const getTrProps = (row: Row<IBoardSummaryTableItem>) => {
-    return {
-      onClick: () => row.toggleExpanded(),
-      tabIndex: 0,
-      'aria-label': 'Board summary row. Click row to expand and view more statistics for this board.',
-      onKeyPress: (e: KeyboardEvent) => {
-        if (e.key === 'Enter') {
-          row.toggleExpanded();
-        }
-      },
-    };
   }
 
   const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
@@ -326,9 +313,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   return (
     <div className="board-summary-table-container">
       <table>
-          <thead>
+          <thead role="rowgroup">
             {table.getHeaderGroups().map(headerGroup => (
-                <tr key={headerGroup.id}>
+                <tr key={headerGroup.id} role="row">
                   {headerGroup.headers.map(header => (
                     <th {...getThProps(header)} onClick={header.column.getToggleSortingHandler()}>
                       {header.isPlaceholder
@@ -355,7 +342,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
           <tbody>
             {table.getRowModel().rows.map(row => (
               <Fragment key={row.id}>
-              <tr {...getTrProps(row)}>
+              <tr
+                tabIndex={0}
+                aria-label="Board summary row. Click row to expand and view more statistics for this board."
+                onKeyPress={(e: KeyboardEvent) => { if (e.key === 'Enter') row.toggleExpanded(); }}
+                onClick={() => row.toggleExpanded()}
+              >
                 {row.getVisibleCells().map(cell => (
                   <td key={cell.id} {...getTdProps(cell)}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
