@@ -261,6 +261,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
+  private async parseUrlForBoardAndTeamInformation(): Promise<{ teamId: string, boardId: string }> {
+    const service = await getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
+    const hash = await service.getHash();
+    const hashParams = new URLSearchParams(hash);
+    const teamId = hashParams.get("teamId");
+    const boardId = hashParams.get("boardId");
+
+    return { teamId, boardId };
+  }
+
   private async updateFeedbackItemsAndContributors(currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) {
     if (!currentTeam || !currentBoard) {
       return;
@@ -479,13 +489,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamBoardDeletedDialogMessage: '',
     };
 
-    // Attempt to use query params to pre-select a specific team and board.
-    let queryParams: URLSearchParams;
-
+    const x = await this.parseUrlForBoardAndTeamInformation();
     try {
-      queryParams = (new URL(document.location.href)).searchParams;
+      console.log(x);
 
-      if (!queryParams) {
+      if (!x) {
         if (!this.props.isHostedAzureDevOps) {
           throw new Error("URL-related issue occurred with on-premise Azure DevOps");
         }
@@ -515,7 +523,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       // TODO (enpolat) : appInsightsClient.trackException(e);
     }
 
-    if (!queryParams || !queryParams.has('teamId')) {
+    if (!x || !x.teamId) {
       // If the teamId query param doesn't exist, attempt to pre-select a team and board by last
       // visited user records.
       const recentVisitState = await this.loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
@@ -527,7 +535,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     // Attempt to pre-select the team based on the teamId query param.
-    const teamIdQueryParam = queryParams.get('teamId');
+    const teamIdQueryParam = x.teamId;
     const matchedTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, teamIdQueryParam);
 
     if (!matchedTeam) {
@@ -561,7 +569,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       boards: boardsForMatchedTeam,
     };
 
-    if (!queryParams.has('boardId')) {
+    if (!x.boardId) {
       // If the boardId query param doesn't exist, we fall back to using the most recently
       // created board. We don't use the last visited records in this case since it may be for
       // a different team.
@@ -569,7 +577,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     // Attempt to pre-select the board based on the boardId query param.
-    const boardIdQueryParam = queryParams.get('boardId');
+    const boardIdQueryParam = x.boardId;
     const matchedBoard = boardsForMatchedTeam.find((board) => board.id === boardIdQueryParam);
 
     if (matchedBoard) {
