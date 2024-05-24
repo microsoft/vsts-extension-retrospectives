@@ -572,11 +572,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const boardIdQueryParam = queryParams.get('boardId');
     const matchedBoard = boardsForMatchedTeam.find((board) => board.id === boardIdQueryParam);
 
-    if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
-      matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
-    }
-
     if (matchedBoard) {
+      if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
+        matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
+      }
       return {
         ...queryParamTeamAndDefaultBoardState,
         currentBoard: matchedBoard,
@@ -589,7 +588,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         ...queryParamTeamAndDefaultBoardState,
         isTeamBoardDeletedInfoDialogHidden: false,
         teamBoardDeletedDialogTitle: 'Board not found',
-        teamBoardDeletedDialogMessage: 'Could not find the board specified in the url.',
+        teamBoardDeletedDialogMessage: 'Could not find the board specified in the url.'
       };
     }
   }
@@ -601,12 +600,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
 
     const promises = []
-    for(const team of allTeams) {
+    for (const team of allTeams) {
       promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
     }
     Promise.all(promises).then((values) => {
       const allTeamMembers: TeamMember[] = [];
-      for(const members of values) {
+      for (const members of values) {
         allTeamMembers.push(...members);
       }
       this.setState({
@@ -1013,8 +1012,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     onCancel: () => void) => {
 
     const permissionOptions: FeedbackBoardPermissionOption[] = []
-    
-    for(const team of this.state.projectTeams) {
+
+    for (const team of this.state.projectTeams) {
       permissionOptions.push({
         id: team.id,
         name: team.name,
@@ -1023,7 +1022,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       })
     }
 
-    for(const member of this.state.allMembers) {
+    for (const member of this.state.allMembers) {
       permissionOptions.push({
         id: member.identity.id,
         name: member.identity.displayName,
