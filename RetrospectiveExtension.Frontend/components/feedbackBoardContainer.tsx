@@ -765,9 +765,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
-  private changeSelectedBoard = (board: IFeedbackBoardDocument) => {
+  private changeSelectedBoard = async (board: IFeedbackBoardDocument) => {
     if (board) {
+      const _teamId = this.state.currentTeam.id;
+      const _boardId = board.id;
       this.setCurrentBoard(board);
+      const newurl = await getBoardUrl(_teamId, _boardId);
+      console.log({a: window.location, b: newurl, c: window.history, d: _teamId, e: _boardId});
+      window.history.pushState({path:newurl}, "", newurl);
       // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardSelectionChanged);
     }
   }
