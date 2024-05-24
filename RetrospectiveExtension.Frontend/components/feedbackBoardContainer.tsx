@@ -42,7 +42,8 @@ import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
-import { IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
+import { CommonServiceIds, IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
+import { getService } from 'azure-devops-extension-sdk';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -262,6 +263,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const board: IFeedbackBoardDocument = await itemDataService.getBoardItem(currentTeam.id, currentBoard.id);
 
     const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board?.id) ?? [];
+
+    getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
+      const _teamId = this.state.currentTeam.id;
+      const _boardId = board.id;
+      service.setHash(`teamId=${_teamId}&boardId=${_boardId}`);
+    })
 
     let actionItemIds: number[] = [];
     feedbackItems.forEach(item => {
@@ -769,13 +776,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private changeSelectedBoard = async (board: IFeedbackBoardDocument) => {
     if (board) {
-      const _teamId = this.state.currentTeam.id;
-      const _boardId = board.id;
       this.setCurrentBoard(board);
-      const newurl = await getBoardUrl(_teamId, _boardId);
-      const service = await SDK.getService<IHostNavigationService>("ms.vss-features.host-navigation-service");
-      service.setHash(newurl);
-      console.log({a: window.location, b: newurl, c: _teamId, d: _boardId});
       // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardSelectionChanged);
     }
   }
