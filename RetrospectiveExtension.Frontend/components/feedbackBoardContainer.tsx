@@ -255,6 +255,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
   }
 
+  private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
+    getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
+      service.setHash(`teamId=${teamId}&boardId=${boardId}`);
+    });
+  }
+
   private async updateFeedbackItemsAndContributors(currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) {
     if (!currentTeam || !currentBoard) {
       return;
@@ -264,11 +270,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board?.id) ?? [];
 
-    getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
-      const _teamId = this.state.currentTeam.id;
-      const _boardId = board.id;
-      service.setHash(`teamId=${_teamId}&boardId=${_boardId}`);
-    })
+    await this.updateUrlWithBoardAndTeamInformation(currentTeam.id, board.id);
 
     let actionItemIds: number[] = [];
     feedbackItems.forEach(item => {
@@ -777,6 +779,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private changeSelectedBoard = async (board: IFeedbackBoardDocument) => {
     if (board) {
       this.setCurrentBoard(board);
+      this.updateUrlWithBoardAndTeamInformation(this.state.currentTeam.id, board.id);
       // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardSelectionChanged);
     }
   }
