@@ -92,7 +92,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
-        uses: codecov/codecov-action@v4.4.0
+        uses: codecov/codecov-action@v4.4.1
         with:
           name: Codecov Run
           files: coverage/coverage-final.json
