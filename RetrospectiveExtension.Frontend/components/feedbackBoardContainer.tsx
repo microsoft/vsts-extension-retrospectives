@@ -263,8 +263,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private async parseUrlForBoardAndTeamInformation(): Promise<{ teamId: string, boardId: string }> {
     const service = await getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
-    const hash = await service.getHash();
-    console.log(hash);
+    let hash = await service.getHash();
+    if (hash.startsWith('#')) {
+      hash = hash.substring(1);
+    }
     const hashParams = new URLSearchParams(hash);
     const teamId = hashParams.get("teamId");
     const boardId = hashParams.get("boardId");
