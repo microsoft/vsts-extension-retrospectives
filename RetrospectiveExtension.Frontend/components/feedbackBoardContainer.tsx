@@ -18,7 +18,6 @@ import FeedbackBoard from '../components/feedbackBoard';
 
 import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
-import * as SDK from 'azure-devops-extension-sdk';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import NoFeedbackBoardsView from './noFeedbackBoardsView';
@@ -494,8 +493,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const info = await this.parseUrlForBoardAndTeamInformation();
     try {
-      console.log(info);
-
       if (!info) {
         if (!this.props.isHostedAzureDevOps) {
           throw new Error("URL-related issue occurred with on-premise Azure DevOps");
