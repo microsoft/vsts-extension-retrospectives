@@ -41,6 +41,8 @@ import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
+import { CommonServiceIds, IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
+import { getService } from 'azure-devops-extension-sdk';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -252,6 +254,25 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
   }
 
+  private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
+    getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
+      service.setHash(`teamId=${teamId}&boardId=${boardId}`);
+    });
+  }
+
+  private async parseUrlForBoardAndTeamInformation(): Promise<{ teamId: string, boardId: string }> {
+    const service = await getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
+    let hash = await service.getHash();
+    if (hash.startsWith('#')) {
+      hash = hash.substring(1);
+    }
+    const hashParams = new URLSearchParams(hash);
+    const teamId = hashParams.get("teamId");
+    const boardId = hashParams.get("boardId");
+
+    return { teamId, boardId };
+  }
+
   private async updateFeedbackItemsAndContributors(currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) {
     if (!currentTeam || !currentBoard) {
       return;
@@ -260,6 +281,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const board: IFeedbackBoardDocument = await itemDataService.getBoardItem(currentTeam.id, currentBoard.id);
 
     const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board?.id) ?? [];
+
+    await this.updateUrlWithBoardAndTeamInformation(currentTeam.id, board.id);
 
     let actionItemIds: number[] = [];
     feedbackItems.forEach(item => {
@@ -468,13 +491,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamBoardDeletedDialogMessage: '',
     };
 
-    // Attempt to use query params to pre-select a specific team and board.
-    let queryParams: URLSearchParams;
-
+    const info = await this.parseUrlForBoardAndTeamInformation();
     try {
-      queryParams = (new URL(document.location.href)).searchParams;
-
-      if (!queryParams) {
+      if (!info) {
         if (!this.props.isHostedAzureDevOps) {
           throw new Error("URL-related issue occurred with on-premise Azure DevOps");
         }
@@ -504,7 +523,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       // TODO (enpolat) : appInsightsClient.trackException(e);
     }
 
-    if (!queryParams || !queryParams.has('teamId')) {
+    if (!info || !info.teamId) {
       // If the teamId query param doesn't exist, attempt to pre-select a team and board by last
       // visited user records.
       const recentVisitState = await this.loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
@@ -516,7 +535,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     // Attempt to pre-select the team based on the teamId query param.
-    const teamIdQueryParam = queryParams.get('teamId');
+    const teamIdQueryParam = info.teamId;
     const matchedTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, teamIdQueryParam);
 
     if (!matchedTeam) {
@@ -550,7 +569,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       boards: boardsForMatchedTeam,
     };
 
-    if (!queryParams.has('boardId')) {
+    if (!info.boardId) {
       // If the boardId query param doesn't exist, we fall back to using the most recently
       // created board. We don't use the last visited records in this case since it may be for
       // a different team.
@@ -558,7 +577,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     // Attempt to pre-select the board based on the boardId query param.
-    const boardIdQueryParam = queryParams.get('boardId');
+    const boardIdQueryParam = info.boardId;
     const matchedBoard = boardsForMatchedTeam.find((board) => board.id === boardIdQueryParam);
 
     if (matchedBoard) {
@@ -764,9 +783,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
-  private changeSelectedBoard = (board: IFeedbackBoardDocument) => {
+  private changeSelectedBoard = async (board: IFeedbackBoardDocument) => {
     if (board) {
       this.setCurrentBoard(board);
+      this.updateUrlWithBoardAndTeamInformation(this.state.currentTeam.id, board.id);
       // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardSelectionChanged);
     }
   }

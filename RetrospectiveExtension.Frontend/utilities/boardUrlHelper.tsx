@@ -12,12 +12,7 @@ export const getBoardUrl = async (teamId: string, boardId: string): Promise<stri
   const hostBase = await getHostBaseUrl();
   const projectName = await getProjectName();
 
-  const queryParams = new URLSearchParams();
-
-  queryParams.append('teamId', teamId);
-  queryParams.append('boardId', boardId);
-
-  const boardDeepLinkUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home?${queryParams.toString()}`;
+  const boardDeepLinkUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
 
   return encodeURI(boardDeepLinkUrl);
 }
