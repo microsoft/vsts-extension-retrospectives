@@ -492,11 +492,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamBoardDeletedDialogMessage: '',
     };
 
-    const x = await this.parseUrlForBoardAndTeamInformation();
+    const info = await this.parseUrlForBoardAndTeamInformation();
     try {
-      console.log(x);
+      console.log(info);
 
-      if (!x) {
+      if (!info) {
         if (!this.props.isHostedAzureDevOps) {
           throw new Error("URL-related issue occurred with on-premise Azure DevOps");
         }
@@ -526,7 +526,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       // TODO (enpolat) : appInsightsClient.trackException(e);
     }
 
-    if (!x || !x.teamId) {
+    if (!info || !info.teamId) {
       // If the teamId query param doesn't exist, attempt to pre-select a team and board by last
       // visited user records.
       const recentVisitState = await this.loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
@@ -538,7 +538,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     // Attempt to pre-select the team based on the teamId query param.
-    const teamIdQueryParam = x.teamId;
+    const teamIdQueryParam = info.teamId;
     const matchedTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, teamIdQueryParam);
 
     if (!matchedTeam) {
@@ -572,7 +572,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       boards: boardsForMatchedTeam,
     };
 
-    if (!x.boardId) {
+    if (!info.boardId) {
       // If the boardId query param doesn't exist, we fall back to using the most recently
       // created board. We don't use the last visited records in this case since it may be for
       // a different team.
@@ -580,7 +580,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     // Attempt to pre-select the board based on the boardId query param.
-    const boardIdQueryParam = x.boardId;
+    const boardIdQueryParam = info.boardId;
     const matchedBoard = boardsForMatchedTeam.find((board) => board.id === boardIdQueryParam);
 
     if (matchedBoard) {
