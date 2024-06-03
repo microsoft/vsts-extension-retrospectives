@@ -7,6 +7,10 @@ import { MockSDK } from '../__mocks__/azure-devops-extension-sdk/sdk';
 
 Enzyme.configure({ adapter: new Adapter() });
 
+Object.defineProperty(window, 'crypto', {
+  value: { getRandomValues: () => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
+});
+
 window.matchMedia = jest.fn().mockImplementation(query => {
   return {
     matches: false,
