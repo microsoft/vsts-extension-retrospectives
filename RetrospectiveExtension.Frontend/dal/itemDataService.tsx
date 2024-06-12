@@ -1,5 +1,4 @@
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { v4 as uuid } from 'uuid';
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { appInsights } from '../utilities/telemetryClient';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
@@ -19,7 +18,7 @@ class ItemDataService {
    */
   public createItemForBoard = async (
     boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
-    const itemId: string = uuid();
+    const itemId: string = crypto.randomUUID();
     const userIdentity = getUserIdentity();
 
     const feedbackItem: IFeedbackItemDocument = {
