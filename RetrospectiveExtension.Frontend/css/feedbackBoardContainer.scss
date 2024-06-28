@@ -236,6 +236,7 @@ $team_selector_list_item_width: 450px;
         &.active {
           font-weight: 700;
           background-color: var(--nav-header-active-item-background);
+          color: var(--status-info-foreground);
 
           &::before {
             background-color: transparent;
