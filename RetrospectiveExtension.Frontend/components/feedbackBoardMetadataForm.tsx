@@ -10,7 +10,6 @@ import { List } from 'office-ui-fabric-react/lib/List';
 import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
 import classNames from 'classnames'
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
-import { v4 as uuid } from 'uuid';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
@@ -566,7 +565,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length >= this.maxColumnCount}
                     onClick={() => {
                       const newColumns: IFeedbackColumnCard[] = [].concat(this.state.columnCards);
-                      const newColumnId = uuid();
+                      const newColumnId = crypto.randomUUID();
                       newColumns.push(
                         {
                           column: {

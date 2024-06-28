@@ -1,6 +1,5 @@
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
-import { v4 as uuid } from 'uuid';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 
@@ -20,7 +19,7 @@ class BoardDataService {
     startDate?: Date,
     endDate?: Date,
     permissions?: IFeedbackBoardDocumentPermissions) => {
-    const boardId: string = uuid();
+    const boardId: string = crypto.randomUUID();
     const userIdentity = getUserIdentity();
 
     const board: IFeedbackBoardDocument = {
