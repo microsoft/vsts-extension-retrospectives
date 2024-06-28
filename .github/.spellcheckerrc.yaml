@@ -1,7 +1,9 @@
 files:
   - "**/*.md"
   - "!LICENSE"
+  - "!CONTRIBUTING.md"
+  - "!**/LICENSE.md"
   - "!CODE_OF_CONDUCT.md"
   - "!SECURITY.md"
 dictionaries:
-  - dictionary.txt
+  - base.txt

@@ -1,5 +1,4 @@
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { v4 as uuid } from 'uuid';
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { appInsights } from '../utilities/telemetryClient';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
@@ -19,7 +18,7 @@ class ItemDataService {
    */
   public createItemForBoard = async (
     boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
-    const itemId: string = uuid();
+    const itemId: string = crypto.randomUUID();
     const userIdentity = getUserIdentity();
 
     const feedbackItem: IFeedbackItemDocument = {
@@ -75,6 +74,7 @@ class ItemDataService {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
+        // TODO (enpolat) : add a notification to the user that the board does not exist.
         // TODO (enpolat) : appInsightsClient.trackTrace(TelemetryExceptions.ItemsNotFoundForBoard, e, AI.SeverityLevel.Warning);
       }
     }

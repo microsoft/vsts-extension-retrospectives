@@ -598,7 +598,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const curTimerState = this.props.timerState;
     const originalColumnId = this.props.originalColumnId;
     const originalColumnTitle = originalColumnId ? this.props.columns[originalColumnId]?.columnProperties.title : 'n/a';
-    // showing `n/a` will be for older boards who don't have this property
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
 
@@ -634,7 +633,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               }}>
               <div className="card-header">
                 {
-                  // This controls the top-level feedback item in the action phase on the carousel
                   isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
                   <button className="feedback-expand-group-focus"
                     aria-live="polite"

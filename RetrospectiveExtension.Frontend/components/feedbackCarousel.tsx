@@ -1,5 +1,4 @@
 import React from 'react';
-import { v4 as uuid } from 'uuid';
 import Slider, { Settings } from "react-slick";
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -79,7 +78,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       const existingColumn: FeedbackColumnProps = this.props.feedbackColumnPropsList[0];
 
       const allColumnItems: IColumnItem[] = [...this.props.feedbackColumnPropsList.flatMap(c => c.columnItems)];
-      const allColumnId: string = uuid();
+      const allColumnId: string = crypto.randomUUID();
       const allColumnName: string = 'All';
       const allFeedbackColumn: FeedbackColumnProps = {
         ...existingColumn,

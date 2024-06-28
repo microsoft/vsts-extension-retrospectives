@@ -1,7 +1,7 @@
-﻿import React from 'react';
-import { TextField } from 'office-ui-fabric-react/lib/TextField';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+﻿import React from "react";
+import { TextField } from "office-ui-fabric-react/lib/TextField";
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { reactPlugin } from "../utilities/telemetryClient";
 
 export interface EditableTextProps {
   isDisabled?: boolean;
@@ -79,11 +79,11 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
   }
 
   componentDidMount() {
-    document.addEventListener('mousedown', this.handleClickOutside);
+    document.addEventListener("mousedown", this.handleClickOutside);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('mousedown', this.handleClickOutside);
+    document.removeEventListener("mousedown", this.handleClickOutside);
   }
 
   private handleClickOutside = (event: Event) => {
@@ -93,7 +93,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
           newText: "",
           hasErrors: true
         }, () => {
-          this.props.onSave('')
+          this.props.onSave("")
         });
         return;
       }
@@ -163,7 +163,8 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
           aria-live="assertive">
           <TextField autoFocus
             ariaLabel="Please enter feedback title"
-            inputClassName={'editable-text-input' + (this.state.hasErrors ? ' error-border' : '')}
+            aria-required={true}
+            inputClassName={`editable-text-input${this.state.hasErrors ? " error-border" : ""}`}
             value={this.state.newText}
             onChange={this.handleTextChange}
             className="editable-text-input-container"
@@ -190,7 +191,8 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
           onClick={this.props.isDisabled ? () => { } : this.handleEdit}
           role="textbox"
           title="Click to edit"
-          aria-label={'Feedback title is ' + (this.props.isDisabled ? 'obscured during collection.' : this.props.text + '. Click to edit.')}>
+          aria-required={true}
+          aria-label={`Feedback title is ${this.props.isDisabled ? "obscured during collection." : this.props.text + ". Click to edit."}`}>
           {this.props.text}
         </p>
       </div>

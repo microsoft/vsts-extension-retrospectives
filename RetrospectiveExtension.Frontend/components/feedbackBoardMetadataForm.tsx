@@ -10,7 +10,6 @@ import { List } from 'office-ui-fabric-react/lib/List';
 import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
 import classNames from 'classnames'
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
-import { v4 as uuid } from 'uuid';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
@@ -328,7 +327,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               <section className="board-metadata-edit-column-settings hide-mobile">
                 <h2 className="board-metadata-form-section-header">Board Settings</h2>
                 <div className="board-metadata-form-section-subheader">
-                  <label htmlFor="title-input-container">Title<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:</label>
+                  <label htmlFor="title-input-container">Retrospective Name<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:</label>
                   <TextField
                     ariaLabel="Please enter new retrospective title"
                     aria-required={true}
@@ -566,7 +565,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length >= this.maxColumnCount}
                     onClick={() => {
                       const newColumns: IFeedbackColumnCard[] = [].concat(this.state.columnCards);
-                      const newColumnId = uuid();
+                      const newColumnId = crypto.randomUUID();
                       newColumns.push(
                         {
                           column: {
