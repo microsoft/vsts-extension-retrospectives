@@ -228,15 +228,9 @@ $team_selector_list_item_width: 450px;
           width: 100%;
         }
 
-        // &:hover {
-        //   background-color: $azdo_blue;
-        //   color: #fff;
-        // }
-
         &.active {
           font-weight: 700;
           background-color: var(--nav-header-active-item-background);
-          // color: var(--status-info-foreground);
 
           &::before {
             background-color: transparent;
@@ -246,7 +240,7 @@ $team_selector_list_item_width: 450px;
             width: 44px;
             margin-left: 14px;
             box-sizing: border-box;
-            border-bottom: 2px solid var(--status-info-foreground);
+            border-bottom: 2px solid var(--text-primary-color);
           }
         }
       }
