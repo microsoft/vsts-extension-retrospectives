@@ -228,15 +228,9 @@ $team_selector_list_item_width: 450px;
           width: 100%;
         }
 
-        &:hover {
-          background-color: $azdo_blue;
-          color: #fff;
-        }
-
         &.active {
           font-weight: 700;
           background-color: var(--nav-header-active-item-background);
-          color: var(--status-info-foreground);
 
           &::before {
             background-color: transparent;
@@ -246,7 +240,7 @@ $team_selector_list_item_width: 450px;
             width: 44px;
             margin-left: 14px;
             box-sizing: border-box;
-            border-bottom: 2px solid var(--status-info-foreground);
+            border-bottom: 2px solid var(--text-primary-color);
           }
         }
       }
@@ -281,11 +275,11 @@ $team_selector_list_item_width: 450px;
 
 .team-effectiveness-section-information {
   border-radius: 5px;
-  background-color: #dedede;
+  background-color: var(--border-subtle-color);
+  font-weight: 700;
   margin: 5px auto 10px auto;
   padding: 3px;
   text-align: center;
-  color: var(--toastify-text-color-light);
   width: 350px;
 }
 
@@ -306,7 +300,7 @@ $team_selector_list_item_width: 450px;
       color: #ffffff;
 
       &.voting-measurement-index-unfavorable {
-        text-shadow: -1px 0 #a61919, 0 1px #a61919, 1px 0 #a61919, 0 -1px #a61919;
+        text-shadow: -2px 0 black,0 2px black,2px 0 black,0 -2px black;
 
         &.voting-index-1 {
           background-color: rgb(219, 77, 79);
@@ -340,7 +334,7 @@ $team_selector_list_item_width: 450px;
       }
 
       &.voting-measurement-index-neutral {
-        text-shadow: -1px 0 #b19500, 0 1px #b19500, 1px 0 #b19500, 0 -1px #b19500;
+        text-shadow: -2px 0 black,0 2px black,2px 0 black,0 -2px black;
 
         &.voting-index-7 {
           background-color: rgb(255, 211, 92);
@@ -354,7 +348,7 @@ $team_selector_list_item_width: 450px;
       }
 
       &.voting-measurement-index-favorable {
-        text-shadow: -1px 0 #157b00, 0 1px #157b00, 1px 0 #157b00, 0 -1px #157b00;
+        text-shadow: -2px 0 black,0 2px black,2px 0 black,0 -2px black;
 
         &.voting-index-9 {
           background-color: rgb(141, 223, 126);
