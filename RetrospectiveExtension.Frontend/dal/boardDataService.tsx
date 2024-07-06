@@ -2,6 +2,7 @@ import { createDocument, deleteDocument, readDocument, readDocuments, updateDocu
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { generateUUID } from '../utilities/random';
 
 class BoardDataService {
   public readonly legacyPositiveColumnId: string = 'whatwentwell';
@@ -19,7 +20,7 @@ class BoardDataService {
     startDate?: Date,
     endDate?: Date,
     permissions?: IFeedbackBoardDocumentPermissions) => {
-    const boardId: string = crypto.randomUUID();
+    const boardId: string = generateUUID();
     const userIdentity = getUserIdentity();
 
     const board: IFeedbackBoardDocument = {
