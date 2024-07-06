@@ -15,6 +15,7 @@ import { reactPlugin } from '../utilities/telemetryClient';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { Pivot, PivotItem } from 'office-ui-fabric-react';
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from './feedbackBoardMetadataFormPermissions';
+import { generateUUID } from '../utilities/random';
 
 export interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -565,7 +566,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     disabled={this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).length >= this.maxColumnCount}
                     onClick={() => {
                       const newColumns: IFeedbackColumnCard[] = [].concat(this.state.columnCards);
-                      const newColumnId = crypto.randomUUID();
+                      const newColumnId = generateUUID();
                       newColumns.push(
                         {
                           column: {

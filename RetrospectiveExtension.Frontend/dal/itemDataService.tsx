@@ -4,6 +4,7 @@ import { appInsights } from '../utilities/telemetryClient';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
+import { generateUUID } from '../utilities/random';
 
 class ItemDataService {
   /**
@@ -18,7 +19,7 @@ class ItemDataService {
    */
   public createItemForBoard = async (
     boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
-    const itemId: string = crypto.randomUUID();
+    const itemId: string = generateUUID();
     const userIdentity = getUserIdentity();
 
     const feedbackItem: IFeedbackItemDocument = {
