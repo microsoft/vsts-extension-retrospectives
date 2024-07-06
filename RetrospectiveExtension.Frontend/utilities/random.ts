@@ -1,5 +1,3 @@
-import crypto from 'node:crypto';
-
 export const generateUUID = () => {
   if (crypto.randomUUID) {
     return crypto.randomUUID();
