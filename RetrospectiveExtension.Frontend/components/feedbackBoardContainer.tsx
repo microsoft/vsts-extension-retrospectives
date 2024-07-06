@@ -164,9 +164,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   public async componentDidMount() {
-    window.addEventListener('resize', this.handleResolutionChange);
-    this.handleResolutionChange();
-
     let initialCurrentTeam: WebApiTeam | undefined;
     let initialCurrentBoard: IFeedbackBoardDocument | undefined;
 
@@ -321,17 +318,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private numberFormatter = (value: number) => {
-    const option = { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 };
-
-    const formatter = new Intl.NumberFormat("en-US", option);
+    const formatter = new Intl.NumberFormat("en-US", { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     return formatter.format(value);
   }
 
   private percentageFormatter = (value: number) => {
-    const option = { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 };
-
-    const formatter = new Intl.NumberFormat("en-US", option);
+    const formatter = new Intl.NumberFormat("en-US", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     return formatter.format(value / 100);
   }
