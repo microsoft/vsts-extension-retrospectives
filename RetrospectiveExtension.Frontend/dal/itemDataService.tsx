@@ -32,7 +32,7 @@ class ItemDataService {
       title,
       voteCollection: {},
       upvotes: 0,
-      userIdRef: isAnonymous ? null : userIdentity.id,
+      userIdRef: userIdentity.id,
       timerSecs: 0,
       timerstate: false,
       timerId: null,
