@@ -50,7 +50,13 @@ class AzureDevOpsCoreService {
    * @param forCurrentUserOnly If true, return teams the requesting user is a member of. If false, return teams the user can see in this project.
    */
   public async getAllTeams(projectId: string, forCurrentUserOnly: boolean): Promise<WebApiTeam[]> {
-    return await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, 255, 0, true);
+    const worker = new Worker('worker.ts');
+    worker.postMessage({ projectId, forCurrentUserOnly });
+    return new Promise((resolve) => {
+      worker.onmessage = (e) => {
+        resolve(e.data);
+      };
+    });
   }
 }
 
