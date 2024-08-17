@@ -78,7 +78,7 @@
       "addressable": true
     },
     {
-      "path": "src/dal/worker.ts",
+      "path": "dal/worker.ts",
       "addressable": true
     },
     {
