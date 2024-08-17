@@ -81,10 +81,6 @@
       "addressable": true
     },
     {
-      "path": "src/dal/worker.ts",
-      "addressable": true
-    },
-    {
       "path": "dist/reflect-bundle.js.map",
       "addressable": true
     },
