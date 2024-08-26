@@ -1,6 +1,6 @@
 # Retrospectives
 
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/{owner}/{repo}/badge)](https://scorecard.dev/viewer/?uri=github.com/{owner}/{repo})
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/microsoft/vsts-extension-retrospectives/badge)](https://scorecard.dev/viewer/?uri=github.com/microsoft/vsts-extension-retrospectives)
 [![CodeCov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
 [![CI - Frontend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_frontend.yml)
 [![CI - Backend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml)
