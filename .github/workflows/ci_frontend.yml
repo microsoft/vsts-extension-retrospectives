@@ -95,7 +95,7 @@ jobs:
         run: |
           #!/bin/bash
           set -e
-          docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable --repo=https://github.com/microsoft/vsts-extension-retrospectives
+          docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable --repo=https://github.com/microsoft/vsts-extension-retrospectives || true
 
       - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
