@@ -27,7 +27,7 @@ export const testColumnUuidOne = "mocked-column-uuid-one";
 export const testColumnUuidTwo = "mocked-column-uuid-two";
 export const testColumnTwoTitle = 'Test Feedback Column Two';
 export const testUpvotes = window.crypto.getRandomValues(new Uint32Array(1))[0] % 10;
-;
+
 export const testFeedbackItem = mocked({
   id: "mocked-feedback-item-uuid",
   element: mocked({
