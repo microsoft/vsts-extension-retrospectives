@@ -28,7 +28,7 @@
   "dependencies": {
     "@microsoft/applicationinsights-react-js": "3.3.5",
     "@microsoft/applicationinsights-web": "2.8.5",
-    "@microsoft/signalr": "6.0.7",
+    "@microsoft/signalr": "8.0.7",
     "@tanstack/react-table": "8.13.0",
     "azure-devops-extension-api": "1.152.0",
     "azure-devops-extension-sdk": "2.0.11",
