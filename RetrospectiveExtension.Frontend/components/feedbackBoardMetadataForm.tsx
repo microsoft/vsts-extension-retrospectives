@@ -209,7 +209,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   }
 
   private getRandomArrayElement = <T extends {}>(array: T[]) => {
-    return array[Math.floor((window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1)) * array.length)];
+    return array[Math.floor(Math.random() * array.length)];
   }
 
   private handleColumnsTemplateChange = (event: ChangeEvent<HTMLSelectElement>) => {
