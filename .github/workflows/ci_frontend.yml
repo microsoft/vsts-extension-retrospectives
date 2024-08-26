@@ -91,6 +91,11 @@ jobs:
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'
+        name: OpenSSF Score Card
+        run: |
+          docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable --repo=https://github.com/microsoft/vsts-extension-retrospectives
+
+      - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
         uses: codecov/codecov-action@v4.5.0
         with:
