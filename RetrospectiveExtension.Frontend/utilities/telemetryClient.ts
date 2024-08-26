@@ -16,8 +16,28 @@ const appInsights = new ApplicationInsights({
 });
 appInsights.loadAppInsights();
 
-// The new log error function logs the data to console as usual,
-// but also sends error messages to Application insights as well.
+export const TelemetryEvents = {
+  WorkItemCreated: 'Work item created',
+  ExistingWorkItemLinked: 'Existing work item linked',
+  FeedbackBoardCreated: 'Feedback board created',
+  FeedbackBoardMetadataUpdated: 'Feedback board metadata updated',
+  TeamSelectionChanged: 'Team changed',
+  FeedbackBoardSelectionChanged: 'Feedback board changed',
+  WorkflowPhaseChanged: 'Workflow phase changed',
+  FeedbackBoardDeleted: 'Feedback board deleted',
+  SummaryDashboardOpened: 'Summary dashboard opened',
+  SummaryDashboardClosed: 'Summary dashboard closed',
+  FeedbackBoardShared: 'Feedback board shared',
+  FeedbackItemCreated: 'Feedback item created',
+  FeedbackItemGrouped: 'Feedback items grouped',
+  FeedbackItemUngrouped: 'Feedback items ungrouped',
+  FeedbackItemDeleted: 'Feedback item deleted',
+  FeedbackItemTitleEdited: 'Feedback item title edited',
+  FeedbackItemUpvoted: 'Feedback item upvoted',
+  ExtensionLaunched: 'Extension launched',
+  FeedbackItemCarouselLaunched: 'Feedback item carousel launched',
+};
+
 const updatedConsoleError = ((oldErrorFunction) => {
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,7 +47,7 @@ const updatedConsoleError = ((oldErrorFunction) => {
     },
   };
 })(window.console.error);
-//Then redefine the old console
+
 window.console.error = updatedConsoleError.error;
 
 export { reactPlugin, appInsights };

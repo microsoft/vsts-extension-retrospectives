@@ -1,5 +1,4 @@
 import React from 'react';
-import { v4 as uuid } from 'uuid';
 import Slider, { Settings } from "react-slick";
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -10,6 +9,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { IColumnItem } from './feedbackBoard';
+import { generateUUID } from '../utilities/random';
 
 export interface IFeedbackCarouselProps {
   feedbackColumnPropsList: FeedbackColumnProps[];
@@ -79,7 +79,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       const existingColumn: FeedbackColumnProps = this.props.feedbackColumnPropsList[0];
 
       const allColumnItems: IColumnItem[] = [...this.props.feedbackColumnPropsList.flatMap(c => c.columnItems)];
-      const allColumnId: string = uuid();
+      const allColumnId: string = generateUUID();
       const allColumnName: string = 'All';
       const allFeedbackColumn: FeedbackColumnProps = {
         ...existingColumn,

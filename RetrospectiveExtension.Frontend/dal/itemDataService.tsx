@@ -1,10 +1,10 @@
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { v4 as uuid } from 'uuid';
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { appInsights } from '../utilities/telemetryClient';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
+import { generateUUID } from '../utilities/random';
 
 class ItemDataService {
   /**
@@ -19,7 +19,7 @@ class ItemDataService {
    */
   public createItemForBoard = async (
     boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
-    const itemId: string = uuid();
+    const itemId: string = generateUUID();
     const userIdentity = getUserIdentity();
 
     const feedbackItem: IFeedbackItemDocument = {
@@ -75,6 +75,7 @@ class ItemDataService {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
+        // TODO (enpolat) : add a notification to the user that the board does not exist.
         // TODO (enpolat) : appInsightsClient.trackTrace(TelemetryExceptions.ItemsNotFoundForBoard, e, AI.SeverityLevel.Warning);
       }
     }
@@ -354,13 +355,7 @@ class ItemDataService {
    *   3) that the child feedback item and the existing children of the child feedback item (if any) are
    *   assigned the same columnId as the parent feedback item.
    */
-  public addFeedbackItemAsChild = async (boardId: string, parentFeedbackItemId: string, childFeedbackItemId: string):
-    Promise<{
-      updatedParentFeedbackItem: IFeedbackItemDocument,
-      updatedChildFeedbackItem: IFeedbackItemDocument,
-      updatedOldParentFeedbackItem: IFeedbackItemDocument,
-      updatedGrandchildFeedbackItems: IFeedbackItemDocument[]
-    }> => {
+  public addFeedbackItemAsChild = async (boardId: string, parentFeedbackItemId: string, childFeedbackItemId: string): Promise<{ updatedParentFeedbackItem: IFeedbackItemDocument, updatedChildFeedbackItem: IFeedbackItemDocument, updatedOldParentFeedbackItem: IFeedbackItemDocument, updatedGrandchildFeedbackItems: IFeedbackItemDocument[] }> => {
     const parentFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, parentFeedbackItemId);
     const childFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, childFeedbackItemId);
 
@@ -433,13 +428,7 @@ class ItemDataService {
    * If the feedback item has a parent, the parent-child relationship is removed.
    * If the feedback item is being moved to a different column, its children are also updated.
    */
-  public addFeedbackItemAsMainItemToColumn = async (boardId: string, feedbackItemId: string, newColumnId: string):
-    Promise<{
-      updatedOldParentFeedbackItem: IFeedbackItemDocument,
-      updatedFeedbackItem: IFeedbackItemDocument,
-      updatedChildFeedbackItems: IFeedbackItemDocument[]
-    }> => {
-
+  public addFeedbackItemAsMainItemToColumn = async (boardId: string, feedbackItemId: string, newColumnId: string): Promise<{ updatedOldParentFeedbackItem: IFeedbackItemDocument, updatedFeedbackItem: IFeedbackItemDocument, updatedChildFeedbackItems: IFeedbackItemDocument[] }> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {

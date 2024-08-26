@@ -38,7 +38,7 @@ Prioritize feedback by having the team vote on the items that are most important
 
 Create follow-up work items in your team’s Azure DevOps project.
 
-![A feedback item with an work item attached](https://github.com/microsoft/vsts-extension-retrospectives/raw/main//RetrospectiveExtension.Frontend/images/screenshots/act.jpg)
+![A feedback item with a work item attached](https://github.com/microsoft/vsts-extension-retrospectives/raw/main//RetrospectiveExtension.Frontend/images/screenshots/act.jpg)
 
 Use Focus Mode to help the team walk through one feedback item at a time.
 

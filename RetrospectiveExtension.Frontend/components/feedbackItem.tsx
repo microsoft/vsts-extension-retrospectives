@@ -19,7 +19,7 @@ import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { FeedbackColumnProps } from './feedbackColumn';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 
 export interface IFeedbackItemProps {
   id: string;
@@ -529,7 +529,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     });
   }
 
-  private clickSearchedFeedbackItem = (event: React.MouseEvent<HTMLDivElement>, feedbackItemProps: IFeedbackItemProps) => {
+  private clickSearchedFeedbackItem = (event: React.MouseEvent<HTMLButtonElement>, feedbackItemProps: IFeedbackItemProps) => {
     event.stopPropagation();
     FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(
       feedbackItemProps,
@@ -540,7 +540,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     this.hideGroupFeedbackItemDialog();
   }
 
-  private pressSearchedFeedbackItem = (event: React.KeyboardEvent<HTMLDivElement>, feedbackItemProps: IFeedbackItemProps) => {
+  private pressSearchedFeedbackItem = (event: React.KeyboardEvent<HTMLButtonElement>, feedbackItemProps: IFeedbackItemProps) => {
     event.stopPropagation();
 
     if (event.key === "Enter") {
@@ -598,7 +598,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const curTimerState = this.props.timerState;
     const originalColumnId = this.props.originalColumnId;
     const originalColumnTitle = originalColumnId ? this.props.columns[originalColumnId]?.columnProperties.title : 'n/a';
-    // showing `n/a` will be for older boards who don't have this property
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
 
@@ -634,7 +633,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               }}>
               <div className="card-header">
                 {
-                  // This controls the top-level feedback item in the action phase on the carousel
                   isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
                   <button className="feedback-expand-group-focus"
                     aria-live="polite"
@@ -946,7 +944,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             {!this.state.searchedFeedbackItems.length && this.state.searchTerm &&
               <p className="no-matching-feedback-message">No feedback with title containing your input.</p>
             }
-            {this.state.searchedFeedbackItems.map((searchItem) => {
+            {this.state.searchedFeedbackItems.map((searchItem, index) => {
               // Making feedbackItemsProps by hand since we are looking across all columns
               const feedbackItemProps: IFeedbackItemProps = {
                 id: searchItem.id,
@@ -990,16 +988,16 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 refreshFeedbackItems: this.props.refreshFeedbackItems,
                 moveFeedbackItem: this.props.moveFeedbackItem
               };
-              return <div
+              return <button
                 key={searchItem.id}
                 className="feedback-item-search-result-item"
-                onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
-                onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
-                tabIndex={0}
+                onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => this.clickSearchedFeedbackItem(e, feedbackItemProps)}
+                onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => this.pressSearchedFeedbackItem(e, feedbackItemProps)}
+                tabIndex={index}
               >
                 <FeedbackItem {...feedbackItemProps}>
                 </FeedbackItem>
-              </div>
+              </button>
             })}
           </div>
         </Dialog>
@@ -1027,7 +1025,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 }
 
 export class FeedbackItemHelper {
-  // Handle linking/grouping workitems and reload any updated items.
   public static readonly handleDropFeedbackItemOnFeedbackItem = async (feedbackItemProps: IFeedbackItemProps, droppedItemId: string, targetItemId: string) => {
     const updatedFeedbackItems = await itemDataService.addFeedbackItemAsChild(feedbackItemProps.boardId, targetItemId, droppedItemId);
 
@@ -1040,9 +1037,7 @@ export class FeedbackItemHelper {
       ].filter((item) => item),
       true
     );
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemGrouped);
-
-    // TODO: Inform user when not all updates are successful due to race conditions.
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemGrouped, properties: feedbackItemProps});
   }
 }
 

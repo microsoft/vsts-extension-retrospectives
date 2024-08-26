@@ -1,16 +1,16 @@
-name: 'CI_Frontend'
+name: "CI_Frontend"
 
 on:
   push:
     branches:
       - main
       - dev
-      - 'releases/**'
+      - "releases/**"
   pull_request:
     branches:
       - main
       - dev
-      - 'releases/**'
+      - "releases/**"
   workflow_dispatch:
 
 jobs:
@@ -24,30 +24,30 @@ jobs:
       - uses: actions/setup-node@v4
         name: Setup node
         with:
-          node-version: '16'
+          node-version: "18"
 
       - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
             src:
-              - '.github/**'
-              - 'RetrospectiveExtension.Frontend/**'
+              - ".github/**"
+              - "RetrospectiveExtension.Frontend/**"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Install dependencies"
-        run: npm ci
-        working-directory: 'RetrospectiveExtension.Frontend'
+        run: npm install
+        working-directory: "RetrospectiveExtension.Frontend"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Lint node files"
         run: npm run lint
-        working-directory: 'RetrospectiveExtension.Frontend'
+        working-directory: "RetrospectiveExtension.Frontend"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Run tests"
         run: npm test
-        working-directory: 'RetrospectiveExtension.Frontend'
+        working-directory: "RetrospectiveExtension.Frontend"
 
       - if: success() || failure()
         uses: actions/upload-artifact@v4
@@ -55,21 +55,52 @@ jobs:
           name: jest-test-results
           path: RetrospectiveExtension.Frontend/reports/jest-junit.xml
 
-      # https://github.com/marketplace/actions/markdownlint-cli2-action
-      - uses: DavidAnson/markdownlint-cli2-action@v15
-        with:
-          config: .markdownlint.json
-          globs: |
-            #CODE_OF_CONDUCT.md
-            #LICENSE
-            #SECURITY.md
+      - name: Markdown lint
+        run: |
+          npm install markdownlint-cli2 --global
+          markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#RetrospectiveExtension.Frontend/node_modules"
 
-      # https://github.com/marketplace/actions/spellchecker-cli
-      - uses: tbroadley/spellchecker-cli-action@v1
+      - name: Spell check
+        run: |
+          wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/master/dictionaries/base.txt
+          echo "" >> base.txt
+          echo "emailable" >> base.txt
+          echo "anonymize" >> base.txt
+          echo "pre-populated" >> base.txt
+          echo "favorability" >> base.txt
+          echo "Dev" >> base.txt
+          echo "tooltip" >> base.txt
+          echo "outloud" >> base.txt
+          echo "timebox" >> base.txt
+          echo "uncast" >> base.txt
+          echo "PRs" >> base.txt
+          echo "CodeCov" >> base.txt
+          echo "Backend" >> base.txt
+          echo "WIP" >> base.txt
+          echo "OKR" >> base.txt
+          echo "OKRs" >> base.txt
+          echo "CSV" >> base.txt
+          echo "GitHub" >> base.txt
+          echo "DevOps" >> base.txt
+          echo "Frontend" >> base.txt
+          echo "ERD" >> base.txt
+          echo "Changelog" >> base.txt
+          echo "changelog" >> base.txt
+          echo "ReactTable" >> base.txt
+          echo "README" >> base.txt
+          echo "OpenSSF" >> base.txt
+          npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
+
+      - if: steps.changes.outputs.src == 'true'
+        name: OpenSSF Score Card
+        run: |
+          #!/bin/bash
+          set -e
+          docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable --repo=https://github.com/microsoft/vsts-extension-retrospectives || true
 
       - if: steps.changes.outputs.src == 'true'
         name: Code Coverage for CodeCov
-        uses: codecov/codecov-action@v4.0.1
+        uses: codecov/codecov-action@v4.5.0
         with:
           name: Codecov Run
           files: coverage/coverage-final.json

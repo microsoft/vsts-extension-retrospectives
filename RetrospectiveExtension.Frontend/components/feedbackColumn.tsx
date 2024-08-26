@@ -12,6 +12,7 @@ import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { ActionButton, IButton } from 'office-ui-fabric-react/lib/Button';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { appInsights, TelemetryEvents } from '../utilities/telemetryClient';
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -143,9 +144,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       true
     );
 
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUngrouped);
-
-    // TODO: Inform user when not all updates are successful due to race conditions.
+    appInsights.trackEvent({name: TelemetryEvents.FeedbackItemUngrouped, properties: {boardId, feedbackItemId, columnId}});
   };
 
   public static createFeedbackItemProps = (
@@ -155,7 +154,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
     let accentColor: string = columnProps.accentColor;
     if(columnItem.feedbackItem.originalColumnId !== columnProps.columnId) {
-      // Ensure that the item's accent color matches the original column's accent color.
       accentColor = columnProps.columns[columnItem.feedbackItem.originalColumnId]?.columnProperties?.accentColor ?? columnProps.accentColor;
     }
 
@@ -206,7 +204,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   }
 
   private renderFeedbackItems = () => {
-    // Build components to display the retrospective items, as individuals or groups.
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
     if (this.props.workflowPhase === WorkflowPhase.Act) {
@@ -243,7 +240,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       });
   }
 
-  private renderFeedbackColumn = () => {
+  public render() {
     return (
       <div className="feedback-column"
         onDoubleClick={this.createEmptyFeedbackItem}
@@ -278,9 +275,5 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         </div>
       </div>
     );
-  }
-
-  public render() {
-    return this.renderFeedbackColumn();
   }
 }
