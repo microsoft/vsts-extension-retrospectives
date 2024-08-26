@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/vscode/devcontainers/dotnet:0-6.0-bullseye-slim
+FROM mcr.microsoft.com/vscode/devcontainers/dotnet:0-6.0-bullseye-slim@sha256:9f7333b24a55710a66b479dfce6751443bb8458e3721ca777d3f95c24087167b
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
