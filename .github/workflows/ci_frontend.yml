@@ -93,6 +93,8 @@ jobs:
       - if: steps.changes.outputs.src == 'true'
         name: OpenSSF Score Card
         run: |
+          #!/bin/bash
+          set -e
           docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable --repo=https://github.com/microsoft/vsts-extension-retrospectives
 
       - if: steps.changes.outputs.src == 'true'
