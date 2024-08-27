@@ -18,6 +18,12 @@ window.crypto = {
     importKey: nodeSubtle.importKey.bind(nodeSubtle),
     exportKey: nodeSubtle.exportKey.bind(nodeSubtle),
   } as SubtleCrypto,
+  getRandomValues: (array: Uint8Array) => {
+    for (let i = 0; i < array.length; i++) {
+      array[i] = Math.floor(Math.random() * 256);
+    }
+    return array;
+  },
 } as Crypto;
 
 window.matchMedia = jest.fn().mockImplementation(query => {
