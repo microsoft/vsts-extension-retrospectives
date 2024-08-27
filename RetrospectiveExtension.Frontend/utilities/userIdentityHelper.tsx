@@ -38,23 +38,24 @@ export const getUserIdentity = (): IdentityRef => {
         console.log(encryptedId);
         console.log("=====================================");
 
-        userIdentity = {
-          id: currentUser.id,
-          displayName: currentUser.displayName,
-          uniqueName: currentUser.name,
-          imageUrl: currentUser.imageUrl,
-          _links: {
-            avatar: {
-              href: currentUser.imageUrl,
-            },
-          },
-        } as IdentityRef;
-
-        console.log(userIdentity);
-        console.log("=====================================");
+        //userIdentity.id = encryptedId;
       });
     });
 
+    userIdentity = {
+      id: currentUser.id,
+      displayName: currentUser.displayName,
+      uniqueName: currentUser.name,
+      imageUrl: currentUser.imageUrl,
+      _links: {
+        avatar: {
+          href: currentUser.imageUrl,
+        },
+      },
+    } as IdentityRef;
+
+    console.log(userIdentity);
+    console.log("=====================================");
   }
 
   return userIdentity;
