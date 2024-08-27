@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto"
+import { randomUUID, subtle as nodeSubtle } from "crypto"
 
 import Enzyme from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
@@ -10,7 +10,14 @@ import { MockSDK } from '../__mocks__/azure-devops-extension-sdk/sdk';
 Enzyme.configure({ adapter: new Adapter() });
 
 window.crypto = {
-  randomUUID: () => randomUUID() as `${string}-${string}-${string}-${string}-${string}`
+  randomUUID: () => randomUUID() as `${string}-${string}-${string}-${string}-${string}`,
+  subtle: {
+    generateKey: nodeSubtle.generateKey.bind(nodeSubtle),
+    encrypt: nodeSubtle.encrypt.bind(nodeSubtle),
+    decrypt: nodeSubtle.decrypt.bind(nodeSubtle),
+    importKey: nodeSubtle.importKey.bind(nodeSubtle),
+    exportKey: nodeSubtle.exportKey.bind(nodeSubtle),
+  } as SubtleCrypto,
 } as Crypto;
 
 window.matchMedia = jest.fn().mockImplementation(query => {
