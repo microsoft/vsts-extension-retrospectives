@@ -1,4 +1,5 @@
 import { randomUUID, subtle as nodeSubtle } from "crypto"
+import { TextEncoder, TextDecoder } from 'util';
 
 import Enzyme from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
@@ -25,6 +26,9 @@ window.crypto = {
     return array;
   },
 } as Crypto;
+
+(global as any).TextEncoder = TextEncoder;
+(global as any).TextDecoder = TextDecoder;
 
 window.matchMedia = jest.fn().mockImplementation(query => {
   return {
