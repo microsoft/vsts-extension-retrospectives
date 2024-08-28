@@ -14,10 +14,8 @@ export const getUserIdentity = (): IdentityRef => {
       return String.fromCharCode(char.charCodeAt(0) + 4);
     }).join('')
 
-    console.log(`${currentUser.id}: ${id}`);
-
     userIdentity = {
-      id: currentUser.id,
+      id,
       displayName: currentUser.displayName,
       uniqueName: currentUser.name,
       imageUrl: currentUser.imageUrl,
@@ -27,9 +25,6 @@ export const getUserIdentity = (): IdentityRef => {
         },
       },
     } as IdentityRef;
-
-    console.log(userIdentity);
-    console.log("=====================================");
   }
 
   return userIdentity;
