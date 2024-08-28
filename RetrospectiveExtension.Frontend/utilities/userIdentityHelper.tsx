@@ -31,9 +31,9 @@ export const getUserIdentity = (): IdentityRef => {
           encoder.encode(currentUser.id),
       ).then(encryptedData => {
         const buffer = new Uint8Array(encryptedData);
-        const encryptedHex = Array.from(buffer).map(byte => byte.toString(16).padStart(2, '0')).join('');
-        const ivHex = Array.from(iv).map(byte => byte.toString(16).padStart(2, '0')).join('');
-        const encryptedId = `${ivHex}:${encryptedHex}`;
+        const encryptedBase64 = btoa(String.fromCharCode(...buffer));
+        const ivBase64 = btoa(String.fromCharCode(...iv));
+        const encryptedId = `${ivBase64.replace(/=+$/, '')}:${encryptedBase64.replace(/=+$/, '')}`;
 
         console.log(encryptedId);
         console.log("=====================================");
