@@ -31,14 +31,14 @@ export const getUserIdentity = (): IdentityRef => {
           encoder.encode(currentUser.id),
       ).then(encryptedData => {
         const buffer = new Uint8Array(encryptedData);
-        const encryptedBase64 = btoa(String.fromCharCode(...buffer));
-        const ivBase64 = btoa(String.fromCharCode(...iv));
+        const encryptedBase64 = String.fromCharCode(...buffer);
+        const ivBase64 = String.fromCharCode(...iv);
         const encryptedId = `${ivBase64.replace(/=+$/, '')}:${encryptedBase64.replace(/=+$/, '')}`;
 
         console.log(encryptedId);
         console.log("=====================================");
 
-        //userIdentity.id = encryptedId;
+        userIdentity.id = encryptedId;
       });
     });
 
