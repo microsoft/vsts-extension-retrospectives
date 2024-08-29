@@ -1,6 +1,6 @@
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
-import { appInsights } from '../utilities/telemetryClient';
+import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
@@ -76,7 +76,7 @@ class ItemDataService {
     } catch (e: any) {
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
         // TODO (enpolat) : add a notification to the user that the board does not exist.
-        // TODO (enpolat) : appInsightsClient.trackTrace(TelemetryExceptions.ItemsNotFoundForBoard, e, AI.SeverityLevel.Warning);
+        appInsights.trackTrace({ message: TelemetryExceptions.FeedbackItemsNotFoundForBoard, properties: { boardId, e } });
       }
     }
 
@@ -546,7 +546,7 @@ class ItemDataService {
       feedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
     }
     catch (e) {
-      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
+      appInsights.trackException(e);
       throw new Error(`Failed to read Feedback item with id: ${feedbackItemId}.`);
     }
 
@@ -574,7 +574,7 @@ class ItemDataService {
       workItems = await workItemService.getWorkItemsByIds([associatedWorkItemId]);
     }
     catch (e) {
-      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
+      appInsights.trackException(e);
       return await this.removeAssociatedActionItem(boardId, feedbackItemId, associatedWorkItemId);
     }
 

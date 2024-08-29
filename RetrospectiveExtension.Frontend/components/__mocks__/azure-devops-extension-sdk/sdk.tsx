@@ -24,7 +24,7 @@ const mockProjectPageService = {
   },
 };
 
-const mockUser = {id: "userId", };
+const mockUser = { id: "userId", };
 const mockExtensionContext = { id: "contextId", };
 const getServiceMock = (id:string) => {
   if (id == CommonServiceIds.LocationService)

@@ -37,7 +37,7 @@ import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionFontAwesomeClass, questions } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { appInsights, reactPlugin } from '../utilities/telemetryClient';
+import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import copyToClipboard from 'copy-to-clipboard';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
@@ -230,12 +230,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   public componentDidUpdate(prevProps: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
-    // TODO (enpolat) : if (prevState.currentTeam !== this.state.currentTeam) {
-    // TODO (enpolat) : appInsightsClient.updateTeamInfo(this.state.currentTeam);
-    // TODO (enpolat) : }
+    if (prevState.currentTeam !== this.state.currentTeam) {
+      appInsights.trackEvent({name: TelemetryEvents.TeamSelectionChanged, properties: {teamId: this.state.currentTeam.id}});
+    }
     if (prevState.currentBoard !== this.state.currentBoard) {
       reflectBackendService.switchToBoard(this.state.currentBoard ? this.state.currentBoard.id : undefined);
-      // TODO (enpolat) : appInsightsClient.updateBoardInfo(this.state.currentBoard);
+      appInsights.trackEvent({name: TelemetryEvents.FeedbackBoardSelectionChanged, properties: {boardId: this.state.currentBoard?.id}});
       if (this.state.isAppInitialized) {
         userDataService.addVisit(this.state.currentTeam.id, this.state.currentBoard ? this.state.currentBoard.id : undefined);
       }
@@ -243,9 +243,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   public componentWillUnmount() {
-    // Remove event listeners.
     window.removeEventListener('resize', this.handleResolutionChange);
-    // TODO (enpolat) : window.removeEventListener('error', this.handleErrorEvent);
     reflectBackendService.removeOnReceiveNewBoard(this.handleNewBoardAvailable);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
@@ -328,10 +326,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return formatter.format(value / 100);
   }
-
-  // private handleErrorEvent = async (errorEvent: ErrorEvent) => {
-  // TODO (enpolat) : appInsightsClient.trackException(errorEvent.error);
-  // }
 
   private handleNewBoardAvailable = async (teamId: string, boardId: string) => {
     if (!teamId || this.state.currentTeam.id !== teamId) {
@@ -513,7 +507,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       }
     }
     catch (e) {
-      // TODO (enpolat) : appInsightsClient.trackException(e);
+      appInsights.trackException(e);
     }
 
     if (!info || !info.teamId) {
@@ -772,7 +766,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       }
 
       this.setCurrentTeam(team.id);
-      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.TeamSelectionChanged);
+      appInsights.trackEvent({name: TelemetryEvents.TeamSelectionChanged, properties: {teamId: team.id}});
     }
   }
 
@@ -780,12 +774,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     if (board) {
       this.setCurrentBoard(board);
       this.updateUrlWithBoardAndTeamInformation(this.state.currentTeam.id, board.id);
-      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardSelectionChanged);
+      appInsights.trackEvent({name: TelemetryEvents.FeedbackBoardSelectionChanged, properties: {boardId: board.id}});
     }
   }
 
   private clickWorkflowStateCallback = (clickedElement: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => {
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.WorkflowPhaseChanged, { [TelemetryEventProperties.OldWorkflowPhase]: this.state.currentBoard.activePhase, [TelemetryEventProperties.NewWorkflowPhase]: newPhase });
+    appInsights.trackEvent({name: TelemetryEvents.WorkflowPhaseChanged, properties: {oldWorkflowPhase: this.state.currentBoard.activePhase, newWorkflowPhase: newPhase}});
 
     this.setState(prevState => {
       const updatedCurrentBoard = prevState.currentBoard;
@@ -821,7 +815,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.hideBoardCreationDialog();
     this.hideBoardDuplicateDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardCreated);
+    appInsights.trackEvent({name: TelemetryEvents.FeedbackBoardCreated, properties: {boardId: createdBoard.id}});
   }
 
   private showBoardCreationDialog = (): void => {
@@ -985,7 +979,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     await this.reloadBoardsForCurrentTeam();
     this.hideDeleteBoardConfirmationDialog();
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardDeleted);
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardDeleted, properties: { boardId: this.state.currentBoard.id } });
   }
 
   private copyBoardUrl = async () => {
@@ -1067,11 +1061,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     this.hideBoardUpdateDialog();
     reflectBackendService.broadcastUpdatedBoard(this.state.currentTeam.id, updatedBoard.id);
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackBoardMetadataUpdated);
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardMetadataUpdated, properties: { boardId: updatedBoard.id } });
   }
 
-  // If an action needs to be hidden on desktop or mobile view, use the item's className property
-  // with .hide-mobile or .hide-desktop
   private readonly boardActionContexualMenuItems: IContextualMenuItem[] = [
     {
       key: 'createBoard',
@@ -1147,7 +1139,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private showCarouselDialog = () => {
     this.setState({ isCarouselDialogHidden: false });
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemCarouselLaunched);
+    appInsights.trackEvent({name: TelemetryEvents.FeedbackItemCarouselLaunched});
   }
 
   private hideCarouselDialog = () => {
@@ -1213,25 +1205,23 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     };
 
     const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
-      const userId: string = getUserIdentity().id;
-
       const currentBoard = this.state.currentBoard;
 
       if (currentBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection = [];
       }
 
-      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId) === undefined) {
+      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === this.state.currentUserId) === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.push({
-          userId: userId,
+          userId: this.state.currentUserId,
           responses: [],
         });
       }
 
-      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses.find(e => e.questionId === questionId);
+      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === this.state.currentUserId).responses.find(e => e.questionId === questionId);
 
       if (!currentVote) {
-        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses.push({
+        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === this.state.currentUserId).responses.push({
           questionId: questionId,
           selection: selected,
         });

@@ -10,8 +10,12 @@ export const getUserIdentity = (): IdentityRef => {
   if (!userIdentity){
     const currentUser: IUserContext = getUser();
 
+    const id = currentUser.id.split('').reverse().map(char => {
+      return String.fromCharCode(char.charCodeAt(0) + 4);
+    }).join('')
+
     userIdentity = {
-      id: currentUser.id,
+      id,
       displayName: currentUser.displayName,
       uniqueName: currentUser.name,
       imageUrl: currentUser.imageUrl,

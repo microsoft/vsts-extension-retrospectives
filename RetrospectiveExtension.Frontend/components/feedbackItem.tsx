@@ -29,8 +29,8 @@ export interface IFeedbackItemProps {
   columnIds: string[];
   createdBy?: string;
   createdByProfileImage?: string;
-  lastEditedDate: string;
   createdDate: string;
+  lastEditedDate: string;
   upvotes: number;
   accentColor: string;
   iconClass: string;
@@ -290,7 +290,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     }
 
     const updatedItems = await itemDataService.deleteFeedbackItem(this.props.boardId, this.props.id);
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemDeleted);
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemDeleted, properties: { boardId: this.props.boardId, feedbackItemId: this.props.id } });
     reflectBackendService.broadcastDeletedItem(
       'dummyColumn',
       this.props.id,
@@ -402,7 +402,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
   private onVote = async (feedbackItemId: string, decrement: boolean = false) => {
     const updatedFeedbackItem = await itemDataService.updateVote(this.props.boardId, this.props.team.id, getUserIdentity().id, feedbackItemId, decrement);
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemUpvoted);
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemUpvoted, properties: { boardId: this.props.boardId, feedbackItemId: this.props.id } });
 
     if (updatedFeedbackItem) {
       await this.isVoted(this.props.id);
@@ -475,9 +475,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     }
 
     if (newlyCreated) {
-      const newFeedbackItem = await itemDataService.createItemForBoard(
-        this.props.boardId, newTitle, this.props.columnId, !this.props.createdBy);
-      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemCreated);
+      const newFeedbackItem = await itemDataService.createItemForBoard(this.props.boardId, newTitle, this.props.columnId, !this.props.createdBy);
+      appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemCreated, properties: { boardId: this.props.boardId, feedbackItemId: newFeedbackItem.id } });
 
       // Replace empty card UI with populated feedback item
       this.removeFeedbackItem(feedbackItemId);
@@ -495,7 +494,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     }
 
     const updatedFeedbackItem = await itemDataService.updateTitle(this.props.boardId, feedbackItemId, newTitle);
-    // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.FeedbackItemTitleEdited);
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemTitleEdited, properties: { boardId: this.props.boardId, feedbackItemId: feedbackItemId } });
 
     if (updatedFeedbackItem) {
       this.props.refreshFeedbackItems([updatedFeedbackItem], true);

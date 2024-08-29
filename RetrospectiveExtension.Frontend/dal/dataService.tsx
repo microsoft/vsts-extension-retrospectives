@@ -52,7 +52,7 @@ export async function readDocument<T>(collectionName: string, id: string, isPriv
   try {
     data = await dataService.getDocument(collectionName, id, isPrivate ? { scopeType: 'User' } : undefined);
   } catch (e) {
-    // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
+    appInsights.trackException(e);
     console.error('An exception occurred while trying to read the document: ', e);
     data = undefined;
   }
@@ -86,7 +86,7 @@ export async function updateDocument<T>(collectionName: string, data: T, isPriva
   try {
     updatedData = await dataService.updateDocument(collectionName, data, isPrivate ? { scopeType: 'User' } : undefined);
   } catch (e) {
-    // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
+    appInsights.trackException(e);
     console.error('An exception occurred while trying to update the document: ', e);
     updatedData = undefined;
   }
@@ -112,7 +112,7 @@ export async function setValue<T>(id: string, data: T, isPrivate?: boolean): Pro
   try {
     return dataService.setValue(id, data, isPrivate ? { scopeType: 'User' } : undefined);
   } catch (e) {
-    // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
+    appInsights.trackException(e);
     console.error('An exception occurred while trying to read the value: ', e);
     updatedData = undefined;
   }
@@ -130,7 +130,7 @@ export async function getValue<T>(id: string, isPrivate?: boolean): Promise<T> {
   try {
     data = await dataService.getValue<T>(id, isPrivate ? { scopeType: 'User' } : undefined);
   } catch (e) {
-    // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
+    appInsights.trackException(e);
     console.error('An exception occurred while trying to read the value: ', e);
     data = undefined;
   }
