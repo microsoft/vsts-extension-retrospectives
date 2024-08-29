@@ -17,6 +17,11 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v4
 
+    - uses: actions/setup-node@v4
+      name: Setup node
+      with:
+        node-version: "18"
+
     - uses: dorny/paths-filter@v3
       id: changes
       with:
