@@ -177,7 +177,9 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
 
     if (this.state.linkedWorkItem) {
       const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(this.props.boardId, this.props.feedbackItemId, this.state.linkedWorkItem.id);
-      // TODO (enpolat) : appInsightsClient.trackEvent(TelemetryEvents.ExistingWorkItemLinked, { [TelemetryEventProperties.WorkItemType]: this.state.linkedWorkItem.fields['System.WorkItemType'] });
+
+      appInsights.trackEvent({name: TelemetryEvents.ExistingWorkItemLinked, properties: { workItemTypeName: this.state.linkedWorkItem.fields['System.WorkItemType'] }});
+
       this.props.onUpdateActionItem(updatedFeedbackItem);
     }
   }

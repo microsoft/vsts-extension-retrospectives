@@ -16,6 +16,12 @@ const appInsights = new ApplicationInsights({
 });
 appInsights.loadAppInsights();
 
+export const TelemetryExceptions = {
+  BoardsNotFoundForTeam: 'Feedback boards not found for team',
+  CurrentTeamIterationNotFound: 'Current iteration does not exist',
+  FeedbackItemsNotFoundForBoard: 'Feedback items not found for board',
+};
+
 export const TelemetryEvents = {
   WorkItemCreated: 'Work item created',
   ExistingWorkItemLinked: 'Existing work item linked',
