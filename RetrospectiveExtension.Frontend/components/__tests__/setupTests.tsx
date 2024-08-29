@@ -41,4 +41,3 @@ jest.mock('azure-devops-extension-api/Common', () => {
 });
 
 jest.mock('uuid', () => { return mockUuid });
-

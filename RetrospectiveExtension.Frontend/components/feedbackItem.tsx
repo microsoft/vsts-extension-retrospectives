@@ -29,8 +29,8 @@ export interface IFeedbackItemProps {
   columnIds: string[];
   createdBy?: string;
   createdByProfileImage?: string;
-  lastEditedDate: string;
   createdDate: string;
+  lastEditedDate: string;
   upvotes: number;
   accentColor: string;
   iconClass: string;
