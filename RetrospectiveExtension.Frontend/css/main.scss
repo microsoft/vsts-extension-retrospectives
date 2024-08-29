@@ -23,13 +23,6 @@
 
 @import "../node_modules/react-toastify/dist/ReactToastify.css";
 
-// TODO (enpolat): removed to improve accessibility, need to revisit.
-/*
-:focus {
-  outline: none;
-}
-*/
-
 body {
   overflow-y: auto;
   font-family: $default_vsts_font;

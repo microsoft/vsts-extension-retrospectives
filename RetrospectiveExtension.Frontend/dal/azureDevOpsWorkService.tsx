@@ -3,6 +3,7 @@ import { WorkRestClient } from 'azure-devops-extension-api/Work/WorkClient';
 import { getClient } from 'azure-devops-extension-api/Common';
 
 import { getProjectId } from '../utilities/servicesHelper';
+import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
 
 class WorkService {
   private _httpWorkClient: WorkRestClient;
@@ -34,11 +35,10 @@ class WorkService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (e: any) {
       if (e.serverError.typeKey === 'CurrentIterationDoesNotExistException') {
-        // TODO: Enable once trackTrace is supported
-        // appInsightsClient.trackTrace(TelemetryExceptions.CurrentTeamIterationNotFound, e);
+        appInsights.trackTrace({ message: TelemetryExceptions.CurrentTeamIterationNotFound, properties: { teamId, e } });
       }
       else {
-        // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
+        appInsights.trackException(e);
         console.error('An exception occurred while trying to get the team iterations ', e);
       }
     }
@@ -65,7 +65,7 @@ class WorkService {
       teamFieldValues = await this._httpWorkClient.getTeamFieldValues(teamContext);
     }
     catch (e) {
-      // TODO (enpolat) : appInsightsClient.trackException(new Error(e.message));
+      appInsights.trackException(e);
       console.error('An exception occurred while trying to get the team field values: ', e);
     }
 
