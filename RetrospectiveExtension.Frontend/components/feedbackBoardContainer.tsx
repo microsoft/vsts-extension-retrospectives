@@ -1213,25 +1213,23 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     };
 
     const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
-      const userId: string = getUserIdentity().id;
-
       const currentBoard = this.state.currentBoard;
 
       if (currentBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection = [];
       }
 
-      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId) === undefined) {
+      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === this.state.currentUserId) === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.push({
-          userId: userId,
+          userId: this.state.currentUserId,
           responses: [],
         });
       }
 
-      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses.find(e => e.questionId === questionId);
+      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === this.state.currentUserId).responses.find(e => e.questionId === questionId);
 
       if (!currentVote) {
-        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses.push({
+        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === this.state.currentUserId).responses.push({
           questionId: questionId,
           selection: selected,
         });
