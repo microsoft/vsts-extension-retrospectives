@@ -1653,11 +1653,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     }}
                     modalProps={{
                       isBlocking: true,
-                      containerClassName: 'retrospectives-delete-board-confirmation-dialog',
+                      containerClassName: 'team-archive-dialog',
                       className: 'retrospectives-dialog-modal',
                     }}>
                     <DialogContent>
                       Are you sure you want to archive the retrospective {this.state.currentBoard.title} and all of its feedback items?
+                      <br /><br />
+                      <i>{"> Archived retrospectives are not visible in the board list."}</i>
+                      <br /><br />
+                      <i>{"> No data will be deleted, Retrospective Board will be visible in the `History` tab."}</i>
                     </DialogContent>
                     <DialogFooter>
                       <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" />
