@@ -43,6 +43,7 @@ import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
 import { CommonServiceIds, IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
 import { getService } from 'azure-devops-extension-sdk';
+import { FontIcon, Icon } from 'office-ui-fabric-react';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -1659,9 +1660,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <DialogContent>
                       Are you sure you want to archive the retrospective {this.state.currentBoard.title} and all of its feedback items?
                       <br /><br />
-                      <i className="accent2">{"ℹ️ Archived retrospectives are not visible in the board list."}</i>
+                      <i className="accent3"><FontIcon iconName="LocationDot" /> Archived retrospectives are not visible in the board list.</i>
                       <br /><br />
-                      <i className="accent2">{"ℹ️ No data will be deleted, Retrospective Board will be visible in the `History` tab."}</i>
+                      <i className="accent3"><FontIcon iconName="LocationDot" /> No data will be deleted, Retrospective Board will be visible in the `History` tab.</i>
                     </DialogContent>
                     <DialogFooter>
                       <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />

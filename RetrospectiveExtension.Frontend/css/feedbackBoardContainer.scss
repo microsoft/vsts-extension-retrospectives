@@ -414,8 +414,8 @@ $team_selector_list_item_width: 450px;
       padding: 0 3px 5px;
     }
 
-    i.accent2 {
-      color: rgb(var(--palette-accent2));
+    i.accent3 {
+      color: rgba(var(--palette-accent3), .5);
     }
   }
 }
