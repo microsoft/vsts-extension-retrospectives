@@ -11,14 +11,14 @@ permissions:
 
 jobs:
   build:
-    name: Frontend - Build and Test
+    name: "Build, Test and Publish"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-        name: Check out repository
+        name: "Check out repository"
 
       - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
-        name: Setup node
+        name: "Setup node"
         with:
           node-version: "18"
 
@@ -30,7 +30,7 @@ jobs:
               - "RetrospectiveExtension.Frontend/**"
 
       - if: steps.changes.outputs.src == 'true'
-        name: Install tools used for deployment
+        name: "Install tools used for deployment"
         run: |
           npm install -g tfx-cli node-jq
 
@@ -52,15 +52,15 @@ jobs:
       - if: success() || failure()
         uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
         with:
-          name: jest-test-results
+          name: "Upload jest test results"
           path: RetrospectiveExtension.Frontend/reports/jest-junit.xml
 
-      - name: Markdown lint
+      - name: "Markdown lint"
         run: |
           npm install markdownlint-cli2 --global
           markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#RetrospectiveExtension.Frontend/node_modules"
 
-      - name: Spell check
+      - name: "Spell check"
         run: |
           wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/master/dictionaries/base.txt
           echo "" >> base.txt
@@ -92,21 +92,21 @@ jobs:
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'
-        name: OpenSSF Score Card
+        name: "OpenSSF Score Card"
         run: |
           #!/bin/bash
           set -e
           docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable --repo=https://github.com/microsoft/vsts-extension-retrospectives || true
 
       - if: steps.changes.outputs.src == 'true'
-        name: Code Coverage for CodeCov
+        name: "Code Coverage for CodeCov"
         uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
         with:
           name: Codecov Run
           files: coverage/coverage-final.json
 
       - if: steps.changes.outputs.src == 'true'
-        name: Prepare vss-extension-dev.json
+        name: "Prepare vss-extension-dev.json"
         working-directory: 'RetrospectiveExtension.Frontend'
         run: |
           cp vss-extension-dev.json.template vss-extension-dev.json
@@ -118,7 +118,7 @@ jobs:
             "${{ secrets.AZURE_DEVOPS_TOKEN }}"
 
       - if: steps.changes.outputs.src == 'true'
-        name: Prepare extension package
+        name: "Prepare extension package"
         working-directory: 'RetrospectiveExtension.Frontend'
         env:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
@@ -129,7 +129,7 @@ jobs:
           npm run pack:d
 
       - if: steps.changes.outputs.src == 'true'
-        name: Publish extension
+        name: "Publish extension to dev environment"
         working-directory: 'RetrospectiveExtension.Frontend'
         run: >
           tfx extension publish
