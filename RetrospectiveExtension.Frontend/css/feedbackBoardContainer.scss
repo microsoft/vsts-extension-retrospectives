@@ -413,6 +413,10 @@ $team_selector_list_item_width: 450px;
     .ms-Dialog-inner {
       padding: 0 3px 5px;
     }
+
+    i.accent2 {
+      color: rgb(var(--palette-accent2));
+    }
   }
 }
 
