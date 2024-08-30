@@ -21,10 +21,10 @@ jobs:
     name: Backend - Build and Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         name: Check out repository
 
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: changes
         with:
           filters: |
@@ -34,7 +34,7 @@ jobs:
               - 'RetrospectiveExtension.Backend.Tests/**'
 
       - if: steps.changes.outputs.src == 'true'
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4.0.1
         with:
           dotnet-version: '6.0.x'
 
@@ -53,7 +53,7 @@ jobs:
 
       - if: success() || failure()
         name: Upload backend test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
         with:
           name: dotnet-test-results
           path: RetrospectiveExtension.Backend.Tests/TestResults/test-results.trx
