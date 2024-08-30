@@ -32,11 +32,11 @@ jobs:
       - if: steps.changes.outputs.src == 'true'
         name: "Install tools used for deployment"
         run: |
-          npm install -g tfx-cli node-jq
+          npm install --global tfx-cli@0.17.0 node-jq@6.0.1
 
       - if: steps.changes.outputs.src == 'true'
         name: "Install dependencies"
-        run: npm install
+        run: npm ci
         working-directory: "RetrospectiveExtension.Frontend"
 
       - if: steps.changes.outputs.src == 'true'
@@ -57,7 +57,7 @@ jobs:
 
       - name: "Markdown lint"
         run: |
-          npm install markdownlint-cli2 --global
+          npm install --global markdownlint-cli2@0.13.0
           markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#RetrospectiveExtension.Frontend/node_modules"
 
       - name: "Spell check"
@@ -124,7 +124,6 @@ jobs:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
         run: |
-          npm ci
           npm run build:p
           npm run pack:d
 

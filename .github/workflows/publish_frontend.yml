@@ -35,7 +35,7 @@ jobs:
 
       - name: Install tools used for deployment
         run: |
-          npm install -g tfx-cli node-jq
+          npm install --global tfx-cli@0.17.0 node-jq@6.0.1
 
       - name: Publish extension package
         id: publish_extension_package
@@ -54,7 +54,7 @@ jobs:
 
           cat <<< $(jq ".version = \"${VERSION}\"" vss-extension-prod.json) > vss-extension-prod.json
 
-          npm install
+          npm ci
           npm run build:p
           npm run pack:p
 
