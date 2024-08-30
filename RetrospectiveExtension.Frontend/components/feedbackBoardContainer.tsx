@@ -1650,13 +1650,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     dialogContentProps={{
                       type: DialogType.close,
                       title: 'Archive Retrospective',
-                      subText: `Are you sure you want to archive the retrospective '${this.state.currentBoard.title}' and all of its feedback items?\n\ntest<br />,br />test`,
                     }}
                     modalProps={{
                       isBlocking: true,
                       containerClassName: 'retrospectives-delete-board-confirmation-dialog',
                       className: 'retrospectives-dialog-modal',
                     }}>
+                    <DialogContent>
+                      Are you sure you want to archive the retrospective {this.state.currentBoard.title} and all of its feedback items?
+                    </DialogContent>
                     <DialogFooter>
                       <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" />
                       <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
