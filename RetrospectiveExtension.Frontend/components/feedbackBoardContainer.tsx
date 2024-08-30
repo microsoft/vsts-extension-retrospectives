@@ -1123,6 +1123,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       title: 'Show Retrospective Summary',
     },
     {
+      key: 'archiveBoard',
+      iconProps: { iconName: 'Archive' },
+      onClick: this.showDeleteBoardConfirmationDialog,
+      text: 'Archive retrospective',
+      title: 'Archive retrospective',
+    },
+    {
       key: 'deleteBoard',
       iconProps: { iconName: 'Delete' },
       onClick: this.showDeleteBoardConfirmationDialog,
