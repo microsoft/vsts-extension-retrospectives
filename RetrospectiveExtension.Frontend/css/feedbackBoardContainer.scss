@@ -393,6 +393,7 @@ $team_selector_list_item_width: 450px;
   }
 }
 
+.team-archive-dialog,
 .team-effectiveness-dialog,
 .prime-directive-dialog {
   background-color: var(--background-color);
@@ -411,6 +412,10 @@ $team_selector_list_item_width: 450px;
 
     .ms-Dialog-inner {
       padding: 0 3px 5px;
+    }
+
+    i.accent3 {
+      color: rgba(var(--palette-accent3), .5);
     }
   }
 }

@@ -43,6 +43,7 @@ import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
 import { CommonServiceIds, IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
 import { getService } from 'azure-devops-extension-sdk';
+import { FontIcon, Icon } from 'office-ui-fabric-react';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -78,6 +79,7 @@ export interface FeedbackBoardContainerState {
   isBoardCreationDialogHidden: boolean;
   isBoardDuplicateDialogHidden: boolean;
   isBoardUpdateDialogHidden: boolean;
+  isArchiveBoardConfirmationDialogHidden: boolean;
   isDeleteBoardConfirmationDialogHidden: boolean;
   isMobileBoardActionsDialogHidden: boolean;
   isMobileTeamSelectorDialogHidden: boolean;
@@ -131,6 +133,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isCarouselDialogHidden: true,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
+      isArchiveBoardConfirmationDialogHidden: true,
       isDeleteBoardConfirmationDialogHidden: true,
       isDesktop: true,
       isDropIssueInEdgeMessageBarVisible: true,
@@ -545,6 +548,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
     if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
       boardsForMatchedTeam = boardsForMatchedTeam
+        .filter((board: IFeedbackBoardDocument) => board.isArchived !== true)
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
     }
@@ -944,6 +948,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isDeleteBoardConfirmationDialogHidden: true });
   }
 
+  private showArchiveBoardConfirmationDialog = () => {
+    this.setState({ isArchiveBoardConfirmationDialogHidden: false });
+  }
+
+  private hideArchiveBoardConfirmationDialog = () => {
+    this.setState({ isArchiveBoardConfirmationDialogHidden: true });
+  }
+
   private hideTeamBoardDeletedInfoDialog = () => {
     this.setState(
       {
@@ -972,6 +984,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     this.setState({ isReconnectingToBackendService: false });
+  }
+
+  private archiveCurrentBoard = async () => {
+    await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
+    reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
+    this.hideArchiveBoardConfirmationDialog();
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
   }
 
   private deleteCurrentBoard = async () => {
@@ -1121,6 +1140,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       onClick: this.showRetroSummaryDialog,
       text: 'Show Retrospective Summary',
       title: 'Show Retrospective Summary',
+    },
+    {
+      key: 'archiveBoard',
+      iconProps: { iconName: 'Archive' },
+      onClick: this.showArchiveBoardConfirmationDialog,
+      text: 'Archive retrospective',
+      title: 'Archive retrospective',
     },
     {
       key: 'deleteBoard',
@@ -1620,6 +1646,30 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <DialogFooter>
                       <PrimaryButton onClick={this.deleteCurrentBoard} text="Delete" />
                       <DefaultButton onClick={this.hideDeleteBoardConfirmationDialog} text="Cancel" />
+                    </DialogFooter>
+                  </Dialog>
+                  <Dialog
+                    hidden={this.state.isArchiveBoardConfirmationDialogHidden}
+                    onDismiss={this.hideArchiveBoardConfirmationDialog}
+                    dialogContentProps={{
+                      type: DialogType.close,
+                      title: 'Archive Retrospective',
+                    }}
+                    modalProps={{
+                      isBlocking: true,
+                      containerClassName: 'team-archive-dialog',
+                      className: 'retrospectives-dialog-modal',
+                    }}>
+                    <DialogContent>
+                      Are you sure you want to archive the retrospective `<i className="accent3">{this.state.currentBoard.title}</i>` and all of its feedback items?
+                      <br /><br />
+                      <i className="accent3"><FontIcon iconName="LocationDot" /> Archived retrospectives are not visible in the board list.</i>
+                      <br /><br />
+                      <i className="accent3"><FontIcon iconName="LocationDot" /> No data will be deleted, Retrospective Board will be visible in the `History` tab.</i>
+                    </DialogContent>
+                    <DialogFooter>
+                      <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
+                      <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
                     </DialogFooter>
                   </Dialog>
                 </div>
