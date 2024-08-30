@@ -548,6 +548,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
     if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
       boardsForMatchedTeam = boardsForMatchedTeam
+        .filter((board: IFeedbackBoardDocument) => board.isArchived !== true)
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
     }
@@ -986,6 +987,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private archiveCurrentBoard = async () => {
+    await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
+    reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     this.hideArchiveBoardConfirmationDialog();
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
   }
@@ -1658,7 +1661,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       className: 'retrospectives-dialog-modal',
                     }}>
                     <DialogContent>
-                      Are you sure you want to archive the retrospective {this.state.currentBoard.title} and all of its feedback items?
+                      Are you sure you want to archive the retrospective `<i className="accent3">{this.state.currentBoard.title}</i>` and all of its feedback items?
                       <br /><br />
                       <i className="accent3"><FontIcon iconName="LocationDot" /> Archived retrospectives are not visible in the board list.</i>
                       <br /><br />

@@ -31,6 +31,7 @@ export interface IFeedbackBoardDocument {
   teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[];
   permissions?: IFeedbackBoardDocumentPermissions;
   isPublic?: boolean;
+  isArchived?: boolean;
 }
 
 export class FeedbackBoardDocumentHelper {
