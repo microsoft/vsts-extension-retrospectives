@@ -78,6 +78,7 @@ export interface FeedbackBoardContainerState {
   isBoardCreationDialogHidden: boolean;
   isBoardDuplicateDialogHidden: boolean;
   isBoardUpdateDialogHidden: boolean;
+  isArchiveBoardConfirmationDialogHidden: boolean;
   isDeleteBoardConfirmationDialogHidden: boolean;
   isMobileBoardActionsDialogHidden: boolean;
   isMobileTeamSelectorDialogHidden: boolean;
@@ -131,6 +132,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isCarouselDialogHidden: true,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
+      isArchiveBoardConfirmationDialogHidden: true,
       isDeleteBoardConfirmationDialogHidden: true,
       isDesktop: true,
       isDropIssueInEdgeMessageBarVisible: true,
@@ -944,6 +946,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isDeleteBoardConfirmationDialogHidden: true });
   }
 
+  private showArchiveBoardConfirmationDialog = () => {
+    this.setState({ isArchiveBoardConfirmationDialogHidden: false });
+  }
+
+  private hideArchiveBoardConfirmationDialog = () => {
+    this.setState({ isArchiveBoardConfirmationDialogHidden: true });
+  }
+
   private hideTeamBoardDeletedInfoDialog = () => {
     this.setState(
       {
@@ -972,6 +982,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     this.setState({ isReconnectingToBackendService: false });
+  }
+
+  private archiveCurrentBoard = async () => {
+    this.hideArchiveBoardConfirmationDialog();
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
   }
 
   private deleteCurrentBoard = async () => {
@@ -1125,7 +1140,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     {
       key: 'archiveBoard',
       iconProps: { iconName: 'Archive' },
-      onClick: this.showDeleteBoardConfirmationDialog,
+      onClick: this.showArchiveBoardConfirmationDialog,
       text: 'Archive retrospective',
       title: 'Archive retrospective',
     },
@@ -1627,6 +1642,24 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <DialogFooter>
                       <PrimaryButton onClick={this.deleteCurrentBoard} text="Delete" />
                       <DefaultButton onClick={this.hideDeleteBoardConfirmationDialog} text="Cancel" />
+                    </DialogFooter>
+                  </Dialog>
+                  <Dialog
+                    hidden={this.state.isArchiveBoardConfirmationDialogHidden}
+                    onDismiss={this.hideArchiveBoardConfirmationDialog}
+                    dialogContentProps={{
+                      type: DialogType.close,
+                      title: 'Archive Retrospective',
+                      subText: `Are you sure you want to archive the retrospective '${this.state.currentBoard.title}' and all of its feedback items?\n\ntest<br />,br />test`,
+                    }}
+                    modalProps={{
+                      isBlocking: true,
+                      containerClassName: 'retrospectives-delete-board-confirmation-dialog',
+                      className: 'retrospectives-dialog-modal',
+                    }}>
+                    <DialogFooter>
+                      <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" />
+                      <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
                     </DialogFooter>
                   </Dialog>
                 </div>

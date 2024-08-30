@@ -30,6 +30,7 @@ export const TelemetryEvents = {
   TeamSelectionChanged: 'Team changed',
   FeedbackBoardSelectionChanged: 'Feedback board changed',
   WorkflowPhaseChanged: 'Workflow phase changed',
+  FeedbackBoardArchived: 'Feedback board archived',
   FeedbackBoardDeleted: 'Feedback board deleted',
   SummaryDashboardOpened: 'Summary dashboard opened',
   SummaryDashboardClosed: 'Summary dashboard closed',
