@@ -15,14 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
 
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b
       name: Setup node
       with:
         node-version: "18"
 
-    - uses: dorny/paths-filter@v3
+    - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
       id: changes
       with:
         filters: |
