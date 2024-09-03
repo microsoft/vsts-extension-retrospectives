@@ -4,7 +4,7 @@
   border-right: 2px solid rgba(var(--palette-neutral-20, 200, 200, 200), 1);
   border-left: 2px solid rgba(var(--palette-neutral-20, 200, 200, 200), 1);
   display: table-cell;
-  height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
+  height: calc(100vh - 55px - 55px);
 }
 
 .feedback-column:last-child {
