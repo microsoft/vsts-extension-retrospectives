@@ -548,7 +548,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
     if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
       boardsForMatchedTeam = boardsForMatchedTeam
-        .filter((board: IFeedbackBoardDocument) => board.isArchived !== true)
+        .filter((board: IFeedbackBoardDocument) => board.isArchived === null || board.isArchived !== true)
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
     }
