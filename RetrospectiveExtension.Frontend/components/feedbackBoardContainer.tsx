@@ -346,7 +346,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       const boardsForTeam = [...prevState.boards, boardToAdd]
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-
+console.log({ location: "handleNewBoardAvailable",  boardsForTeam });
       const baseResult = {
         boards: boardsForTeam,
         isTeamBoardDeletedInfoDialogHidden: true,
@@ -538,7 +538,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         teamBoardDeletedDialogTitle: 'Team not found',
         teamBoardDeletedDialogMessage: 'Could not find the team specified in the url.',
       }
-
+console.log({ location: "initializeFeedbackBoard - 0",  recentVisitWithDialogState });
       return {
         ...baseTeamState,
         ...recentVisitWithDialogState,
@@ -547,9 +547,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
     if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
+console.log({ location: "initializeFeedbackBoard - 1",  boardsForMatchedTeam });
       boardsForMatchedTeam = boardsForMatchedTeam
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+console.log({ location: "initializeFeedbackBoard - 2",  boardsForMatchedTeam });
     }
 
     const queryParamTeamAndDefaultBoardState = {
@@ -635,6 +637,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           boardsForTeam = boardsForTeam
             .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 0",  boardsForTeam });
         }
 
         const recentVisitState = {
@@ -657,6 +660,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       boardsForMatchedTeam = boardsForMatchedTeam
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 1",  boardsForMatchedTeam });
     }
 
     return {
@@ -682,6 +686,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         boardsForTeam = boardsForTeam
           .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
           .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+console.log({ location: "setCurrentTeam",  boardsForTeam });
       }
 
       // @ts-ignore TS2345
@@ -724,7 +729,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     boardsForTeam = boardsForTeam
       .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
       .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-
+console.log({ location: "reloadBoardsForCurrentTeam",  boardsForTeam });
     // Default to select most recently created board.
     const currentBoard: IFeedbackBoardDocument = boardsForTeam[0];
 
