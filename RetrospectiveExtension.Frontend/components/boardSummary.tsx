@@ -192,7 +192,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
     return actionItemsList;
   }
 
-  private onColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
+  private onColumnClick = (_: React.MouseEvent<HTMLElement>, column: IColumn): void => {
     const actionItems = this.state.actionItemTableItems;
     let newActionItems = actionItems.slice();
 
