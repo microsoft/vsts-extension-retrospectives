@@ -124,6 +124,7 @@ jobs:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
         run: |
+          npx browserslist@latest --update-db
           npm run build:p
           npm run pack:d
 
