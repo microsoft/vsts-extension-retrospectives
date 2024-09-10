@@ -51,12 +51,10 @@ export class FeedbackBoardDocumentHelper {
     const isBoardPublic = board.isPublic === undefined || board.isPublic === true;
     const hasAccessByMember = board.permissions?.Members === undefined || board.permissions.Members.includes(userId);
     const hasAccessByTeam = board.permissions?.Teams === undefined || teamIds.some(t => board.permissions.Teams.includes(t));
+    const isBoardArchived = board.isArchived === undefined || board.isArchived === true;
 
-    const hasAccess = isBoardOwner ||
-      isBoardPublic ||
-      hasAccessByMember ||
-      hasAccessByTeam;
-      
+    const hasAccess = isBoardOwner || isBoardPublic || !isBoardArchived || hasAccessByMember || hasAccessByTeam;
+
     return hasAccess;
   }
 }
