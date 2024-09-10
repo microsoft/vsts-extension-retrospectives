@@ -786,7 +786,7 @@ console.log({ location: "reloadBoardsForCurrentTeam",  boardsForTeam });
     }
   }
 
-  private clickWorkflowStateCallback = (clickedElement: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => {
+  private clickWorkflowStateCallback = (_: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => {
     appInsights.trackEvent({name: TelemetryEvents.WorkflowPhaseChanged, properties: {oldWorkflowPhase: this.state.currentBoard.activePhase, newWorkflowPhase: newPhase}});
 
     this.setState(prevState => {
