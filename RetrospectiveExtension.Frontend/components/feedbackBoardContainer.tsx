@@ -344,6 +344,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     // @ts-ignore TS2345
     this.setState(prevState => {
       const boardsForTeam = [...prevState.boards, boardToAdd]
+        .filter((board: IFeedbackBoardDocument) => board.isArchived === null || board.isArchived !== true)
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
@@ -634,6 +635,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
         if (boardsForTeam?.length) {
           boardsForTeam = boardsForTeam
+            .filter((board: IFeedbackBoardDocument) => board.isArchived === null || board.isArchived !== true)
             .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
         }
@@ -656,6 +658,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(defaultTeam.id);
     if (boardsForMatchedTeam?.length) {
       boardsForMatchedTeam = boardsForMatchedTeam
+        .filter((board: IFeedbackBoardDocument) => board.isArchived === null || board.isArchived !== true)
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
     }
@@ -681,6 +684,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       let boardsForTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
       if (boardsForTeam?.length) {
         boardsForTeam = boardsForTeam
+          .filter((board: IFeedbackBoardDocument) => board.isArchived === null || board.isArchived !== true)
           .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
           .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
       }
@@ -723,6 +727,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     boardsForTeam = boardsForTeam
+      .filter((board: IFeedbackBoardDocument) => board.isArchived === null || board.isArchived !== true)
       .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
       .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
