@@ -630,6 +630,7 @@ console.log({ location: "initializeFeedbackBoard - 40",  boardsForMatchedTeam })
 
     if (mostRecentUserVisit) {
       const mostRecentTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, mostRecentUserVisit.teamId);
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 5",  mostRecentUserVisit, mostRecentTeam });
 
       if (mostRecentTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
