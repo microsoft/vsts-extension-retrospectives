@@ -657,7 +657,7 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 30",  r
 
         if (boardsForTeam?.length && mostRecentUserVisit.boardId) {
           const mostRecentBoard = boardsForTeam.find((board) => board.id === mostRecentUserVisit.boardId);
-          recentVisitState.currentBoard = mostRecentBoard;
+          //recentVisitState.currentBoard = mostRecentBoard;
           console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 35",  mostRecentBoard });
         }
 
