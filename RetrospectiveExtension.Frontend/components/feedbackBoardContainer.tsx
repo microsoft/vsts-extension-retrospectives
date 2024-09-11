@@ -630,35 +630,25 @@ console.log({ location: "initializeFeedbackBoard - 40",  boardsForMatchedTeam })
 
     if (mostRecentUserVisit) {
       const mostRecentTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, mostRecentUserVisit.teamId);
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 5",  mostRecentUserVisit, mostRecentTeam });
 
       if (mostRecentTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
         if (boardsForTeam?.length > 0) {
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 10",  boardsForTeam });
           boardsForTeam = boardsForTeam
             .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 20",  boardsForTeam });
         }
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 22",  boardsForTeam });
-        const aBoard = boardsForTeam?.length > 0 ? boardsForTeam.at(0) : null;
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 24",  aBoard });
+        const currentBoard = boardsForTeam?.length > 0 ? boardsForTeam.at(0) : null;
 
         const recentVisitState = {
           boards: boardsForTeam,
-          currentBoard: aBoard,
+          currentBoard,
           currentTeam: mostRecentTeam,
         };
 
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 28",  aBoard });
-
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 30",  recentVisitState });
-
         if (boardsForTeam?.length && mostRecentUserVisit.boardId) {
           const mostRecentBoard = boardsForTeam.find((board) => board.id === mostRecentUserVisit.boardId);
-          //recentVisitState.currentBoard = mostRecentBoard;
-          console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 35",  mostRecentBoard });
+          recentVisitState.currentBoard = mostRecentBoard ? mostRecentBoard : currentBoard;
         }
 
 console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 40",  recentVisitState });
@@ -672,7 +662,6 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 40",  r
       boardsForMatchedTeam = boardsForMatchedTeam
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 50",  boardsForMatchedTeam });
     }
 
     return {
