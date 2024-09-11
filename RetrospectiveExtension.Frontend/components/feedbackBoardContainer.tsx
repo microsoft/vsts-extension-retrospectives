@@ -651,6 +651,8 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 24",  c
           currentTeam: mostRecentTeam,
         };
 
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 28",  currentBoard });
+
 console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 30",  recentVisitState });
 
         if (boardsForTeam?.length && mostRecentUserVisit.boardId) {
