@@ -179,7 +179,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     try {
       const initializedTeamAndBoardState = await this.initializeFeedbackBoard();
-console.log({ location: "componentDidMount",  initializedTeamAndBoardState });
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
@@ -346,11 +345,12 @@ console.log({ location: "componentDidMount",  initializedTeamAndBoardState });
       const boardsForTeam = [...prevState.boards, boardToAdd]
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "handleNewBoardAvailable",  boardsForTeam });
+
       const baseResult = {
         boards: boardsForTeam,
         isTeamBoardDeletedInfoDialogHidden: true,
       };
+
       if (boardsForTeam.length === 1) {
         return {
           ...baseResult,
@@ -517,7 +517,7 @@ console.log({ location: "handleNewBoardAvailable",  boardsForTeam });
       // If the teamId query param doesn't exist, attempt to pre-select a team and board by last
       // visited user records.
       const recentVisitState = await this.loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
-console.log({ location: "initializeFeedbackBoard - 10",  recentVisitState });
+
       return {
         ...baseTeamState,
         ...recentVisitState,
@@ -538,7 +538,7 @@ console.log({ location: "initializeFeedbackBoard - 10",  recentVisitState });
         teamBoardDeletedDialogTitle: 'Team not found',
         teamBoardDeletedDialogMessage: 'Could not find the team specified in the url.',
       }
-console.log({ location: "initializeFeedbackBoard - 20",  recentVisitWithDialogState });
+
       return {
         ...baseTeamState,
         ...recentVisitWithDialogState,
@@ -547,11 +547,9 @@ console.log({ location: "initializeFeedbackBoard - 20",  recentVisitWithDialogSt
 
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
     if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
-console.log({ location: "initializeFeedbackBoard - 30",  boardsForMatchedTeam });
       boardsForMatchedTeam = boardsForMatchedTeam
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "initializeFeedbackBoard - 40",  boardsForMatchedTeam });
     }
 
     const queryParamTeamAndDefaultBoardState = {
@@ -651,8 +649,6 @@ console.log({ location: "initializeFeedbackBoard - 40",  boardsForMatchedTeam })
           recentVisitState.currentBoard = mostRecentBoard ? mostRecentBoard : currentBoard;
         }
 
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 40",  recentVisitState });
-
         return recentVisitState;
       }
     }
@@ -687,7 +683,6 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 40",  r
         boardsForTeam = boardsForTeam
           .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
           .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "setCurrentTeam",  boardsForTeam });
       }
 
       // @ts-ignore TS2345
@@ -730,8 +725,7 @@ console.log({ location: "setCurrentTeam",  boardsForTeam });
     boardsForTeam = boardsForTeam
       .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
       .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "reloadBoardsForCurrentTeam",  boardsForTeam });
-    // Default to select most recently created board.
+
     const currentBoard: IFeedbackBoardDocument = boardsForTeam[0];
 
     this.setState({
