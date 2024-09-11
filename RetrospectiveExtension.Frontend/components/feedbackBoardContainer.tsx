@@ -179,7 +179,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     try {
       const initializedTeamAndBoardState = await this.initializeFeedbackBoard();
-
+console.log({ location: "componentDidMount",  initializedTeamAndBoardState });
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
@@ -517,7 +517,7 @@ console.log({ location: "handleNewBoardAvailable",  boardsForTeam });
       // If the teamId query param doesn't exist, attempt to pre-select a team and board by last
       // visited user records.
       const recentVisitState = await this.loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
-
+console.log({ location: "initializeFeedbackBoard - 10",  recentVisitState });
       return {
         ...baseTeamState,
         ...recentVisitState,
@@ -538,7 +538,7 @@ console.log({ location: "handleNewBoardAvailable",  boardsForTeam });
         teamBoardDeletedDialogTitle: 'Team not found',
         teamBoardDeletedDialogMessage: 'Could not find the team specified in the url.',
       }
-console.log({ location: "initializeFeedbackBoard - 0",  recentVisitWithDialogState });
+console.log({ location: "initializeFeedbackBoard - 20",  recentVisitWithDialogState });
       return {
         ...baseTeamState,
         ...recentVisitWithDialogState,
@@ -547,11 +547,11 @@ console.log({ location: "initializeFeedbackBoard - 0",  recentVisitWithDialogSta
 
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
     if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
-console.log({ location: "initializeFeedbackBoard - 1",  boardsForMatchedTeam });
+console.log({ location: "initializeFeedbackBoard - 30",  boardsForMatchedTeam });
       boardsForMatchedTeam = boardsForMatchedTeam
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "initializeFeedbackBoard - 2",  boardsForMatchedTeam });
+console.log({ location: "initializeFeedbackBoard - 40",  boardsForMatchedTeam });
     }
 
     const queryParamTeamAndDefaultBoardState = {
