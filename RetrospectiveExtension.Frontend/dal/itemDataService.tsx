@@ -74,6 +74,8 @@ class ItemDataService {
       feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
+      console.log("itemDataService");
+      console.error(e);
       if (e.serverError.typeKey === 'DocumentCollectionDoesNotExistException') {
         // TODO (enpolat) : add a notification to the user that the board does not exist.
         appInsights.trackTrace({ message: TelemetryExceptions.FeedbackItemsNotFoundForBoard, properties: { boardId, e } });
