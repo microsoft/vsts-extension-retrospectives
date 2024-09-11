@@ -642,16 +642,16 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 10",  b
 console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 20",  boardsForTeam });
         }
 console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 22",  boardsForTeam });
-        const currentBoard = boardsForTeam?.length > 0 ? boardsForTeam.at(0) : null;
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 24",  currentBoard });
+        const aBoard = boardsForTeam?.length > 0 ? boardsForTeam.at(0) : null;
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 24",  aBoard });
 
         const recentVisitState = {
           boards: boardsForTeam,
-          currentBoard: { ...currentBoard },
+          currentBoard: aBoard,
           currentTeam: mostRecentTeam,
         };
 
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 28",  currentBoard });
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 28",  aBoard });
 
 console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 30",  recentVisitState });
 
