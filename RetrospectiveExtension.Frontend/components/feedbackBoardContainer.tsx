@@ -634,17 +634,17 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 5",  mo
 
       if (mostRecentTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
-        if (boardsForTeam?.length) {
+        if (boardsForTeam?.length > 0) {
 console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 10",  boardsForTeam });
           boardsForTeam = boardsForTeam
             .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 20",  boardsForTeam });
-}
+        }
 
         const recentVisitState = {
           boards: boardsForTeam,
-          currentBoard: (boardsForTeam?.length) ? boardsForTeam[0] : null,
+          currentBoard: boardsForTeam.at(0),
           currentTeam: mostRecentTeam,
         };
 
