@@ -179,7 +179,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     try {
       const initializedTeamAndBoardState = await this.initializeFeedbackBoard();
-
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
@@ -351,6 +350,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         boards: boardsForTeam,
         isTeamBoardDeletedInfoDialogHidden: true,
       };
+
       if (boardsForTeam.length === 1) {
         return {
           ...baseResult,
@@ -548,7 +548,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
     if (boardsForMatchedTeam && boardsForMatchedTeam.length) {
       boardsForMatchedTeam = boardsForMatchedTeam
-        .filter((board: IFeedbackBoardDocument) => board.isArchived !== true)
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
     }
@@ -632,21 +631,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       if (mostRecentTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
-        if (boardsForTeam?.length) {
+        if (boardsForTeam?.length > 0) {
           boardsForTeam = boardsForTeam
             .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
         }
+        const currentBoard = boardsForTeam?.length > 0 ? boardsForTeam.at(0) : null;
 
         const recentVisitState = {
           boards: boardsForTeam,
-          currentBoard: (boardsForTeam?.length) ? boardsForTeam[0] : null,
+          currentBoard,
           currentTeam: mostRecentTeam,
         };
 
         if (boardsForTeam?.length && mostRecentUserVisit.boardId) {
           const mostRecentBoard = boardsForTeam.find((board) => board.id === mostRecentUserVisit.boardId);
-          recentVisitState.currentBoard = mostRecentBoard;
+          recentVisitState.currentBoard = mostRecentBoard ? mostRecentBoard : currentBoard;
         }
 
         return recentVisitState;
@@ -726,7 +726,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
       .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
-    // Default to select most recently created board.
     const currentBoard: IFeedbackBoardDocument = boardsForTeam[0];
 
     this.setState({
