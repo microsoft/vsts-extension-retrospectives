@@ -53,7 +53,7 @@ export class FeedbackBoardDocumentHelper {
     const hasAccessByTeam = board.permissions?.Teams === undefined || teamIds.some(t => board.permissions.Teams.includes(t));
     const isBoardNotArchived = board.isArchived === undefined || board.isArchived === false;
 
-    const hasAccess = isBoardOwner || isBoardPublic || isBoardNotArchived || hasAccessByMember || hasAccessByTeam;
+    const hasAccess = isBoardNotArchived && (isBoardOwner || isBoardPublic || hasAccessByMember || hasAccessByTeam);
 
     return hasAccess;
   }
