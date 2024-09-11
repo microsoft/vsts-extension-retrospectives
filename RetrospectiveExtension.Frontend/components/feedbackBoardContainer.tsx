@@ -647,7 +647,7 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 24",  c
 
         const recentVisitState = {
           boards: boardsForTeam,
-          currentBoard,
+          currentBoard: { ...currentBoard },
           currentTeam: mostRecentTeam,
         };
 
