@@ -634,12 +634,12 @@ console.log({ location: "initializeFeedbackBoard - 40",  boardsForMatchedTeam })
       if (mostRecentTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
         if (boardsForTeam?.length) {
-console.log("loadRecentlyVisitedOrDefaultTeamAndBoardState - 10",  boardsForTeam);
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 10",  boardsForTeam });
           boardsForTeam = boardsForTeam
             .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 20",  boardsForTeam });
-        }
+}
 
         const recentVisitState = {
           boards: boardsForTeam,
@@ -647,10 +647,15 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 20",  b
           currentTeam: mostRecentTeam,
         };
 
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 30",  recentVisitState });
+
         if (boardsForTeam?.length && mostRecentUserVisit.boardId) {
           const mostRecentBoard = boardsForTeam.find((board) => board.id === mostRecentUserVisit.boardId);
           recentVisitState.currentBoard = mostRecentBoard;
+          console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 35",  mostRecentBoard });
         }
+
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 40",  recentVisitState });
 
         return recentVisitState;
       }
@@ -661,7 +666,7 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 20",  b
       boardsForMatchedTeam = boardsForMatchedTeam
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 30",  boardsForMatchedTeam });
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 50",  boardsForMatchedTeam });
     }
 
     return {
