@@ -641,6 +641,8 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 10",  b
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 20",  boardsForTeam });
         }
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 22",  boardsForTeam });
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 24",  currentBoard: boardsForTeam.at(0) });
 
         const recentVisitState = {
           boards: boardsForTeam,
