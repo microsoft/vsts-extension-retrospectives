@@ -634,10 +634,11 @@ console.log({ location: "initializeFeedbackBoard - 40",  boardsForMatchedTeam })
       if (mostRecentTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
         if (boardsForTeam?.length) {
+console.log("loadRecentlyVisitedOrDefaultTeamAndBoardState - 10",  boardsForTeam);
           boardsForTeam = boardsForTeam
             .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 0",  boardsForTeam });
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 20",  boardsForTeam });
         }
 
         const recentVisitState = {
@@ -660,7 +661,7 @@ console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 0",  bo
       boardsForMatchedTeam = boardsForMatchedTeam
         .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), this.state.currentUserId))
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 1",  boardsForMatchedTeam });
+console.log({ location: "loadRecentlyVisitedOrDefaultTeamAndBoardState - 30",  boardsForMatchedTeam });
     }
 
     return {
