@@ -43,7 +43,7 @@ import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
 import { CommonServiceIds, IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
 import { getService } from 'azure-devops-extension-sdk';
-import { FontIcon } from 'office-ui-fabric-react';
+import { FontIcon, HighContrastSelectorWhite } from 'office-ui-fabric-react';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -480,6 +480,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamBoardDeletedDialogTitle: '',
       teamBoardDeletedDialogMessage: '',
     };
+
+    console.log(window.URL);
+    console.log(window.URLSearchParams);
+    console.log(window.location);
+    console.log(document.URL);
+    console.log(document.location);
 
     const info = await this.parseUrlForBoardAndTeamInformation();
     try {
