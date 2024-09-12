@@ -2,7 +2,7 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "backend.tests", "src\backend.tests\backend.tests.csproj", "{2B4D0A12-E529-44D5-9117-574027723588}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "backend.tests", "src\backend.tests\RetrospectiveExtension.Backend.Tests.csproj", "{2B4D0A12-E529-44D5-9117-574027723588}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "backend", "src\backend\CollaborationStateService.csproj", "{B7542D58-46A1-4950-995C-87A3C484E069}"
 EndProject
