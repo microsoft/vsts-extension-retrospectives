@@ -12,3 +12,18 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: nuget
+    directory: /RetrospectiveExtension.Backend.Tests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: nuget
+    directory: /RetrospectiveExtension.Backend
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /RetrospectiveExtension.Frontend
+    schedule:
+      interval: daily
