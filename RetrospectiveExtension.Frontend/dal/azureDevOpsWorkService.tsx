@@ -34,12 +34,10 @@ class WorkService {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (e: any) {
-      if (e.serverError.typeKey === 'CurrentIterationDoesNotExistException') {
+      console.error(e);
+      appInsights.trackException(e);
+      if (e.serverError?.typeKey === 'CurrentIterationDoesNotExistException') {
         appInsights.trackTrace({ message: TelemetryExceptions.CurrentTeamIterationNotFound, properties: { teamId, e } });
-      }
-      else {
-        appInsights.trackException(e);
-        console.error('An exception occurred while trying to get the team iterations ', e);
       }
     }
 
