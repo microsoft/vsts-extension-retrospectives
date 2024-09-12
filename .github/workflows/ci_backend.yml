@@ -1,11 +1,6 @@
 name: 'CI_Backend'
 
 on:
-  push:
-    branches:
-      - main
-      - dev
-      - 'releases/**'
   pull_request:
     branches:
       - main
@@ -29,9 +24,8 @@ jobs:
         with:
           filters: |
             src:
-              - '.github/**'
-              - 'RetrospectiveExtension.Backend/**'
-              - 'RetrospectiveExtension.Backend.Tests/**'
+              - 'src/backend/**'
+              - 'src/backend.tests/**'
 
       - if: steps.changes.outputs.src == 'true'
         uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4.0.1
@@ -43,17 +37,17 @@ jobs:
           dotnet restore
           dotnet build
         name: Build
-        working-directory: 'RetrospectiveExtension.Backend'
+        working-directory: 'src/backend'
 
       - if: steps.changes.outputs.src == 'true'
         run: |
           dotnet test --logger "trx;LogFileName=test-results.trx"
         name: Test
-        working-directory: 'RetrospectiveExtension.Backend.Tests'
+        working-directory: 'src/backend.tests'
 
       - if: success() || failure()
         name: Upload backend test report
         uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: dotnet-test-results
-          path: RetrospectiveExtension.Backend.Tests/TestResults/test-results.trx
+          path: src/backend.tests/TestResults/test-results.trx

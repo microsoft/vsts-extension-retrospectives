@@ -27,7 +27,7 @@ jobs:
         with:
           filters: |
             src:
-              - "RetrospectiveExtension.Frontend/**"
+              - "src/frontend/**"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Install tools used for deployment"
@@ -37,28 +37,28 @@ jobs:
       - if: steps.changes.outputs.src == 'true'
         name: "Install dependencies"
         run: npm ci
-        working-directory: "RetrospectiveExtension.Frontend"
+        working-directory: "src/frontend"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Lint node files"
         run: npm run lint
-        working-directory: "RetrospectiveExtension.Frontend"
+        working-directory: "src/frontend"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Run tests"
         run: npm test
-        working-directory: "RetrospectiveExtension.Frontend"
+        working-directory: "src/frontend"
 
       - if: success() || failure()
         uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: "Upload jest test results"
-          path: RetrospectiveExtension.Frontend/reports/jest-junit.xml
+          path: src/frontend/reports/jest-junit.xml
 
       - name: "Markdown lint"
         run: |
           npm install --global markdownlint-cli2@0.13.0
-          markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#RetrospectiveExtension.Frontend/node_modules"
+          markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#src/frontend/node_modules"
 
       - name: "Spell check"
         run: |
@@ -107,7 +107,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: "Prepare vss-extension-dev.json"
-        working-directory: 'RetrospectiveExtension.Frontend'
+        working-directory: 'src/frontend'
         run: |
           cp vss-extension-dev.json.template vss-extension-dev.json
 
@@ -119,7 +119,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: "Prepare extension package"
-        working-directory: 'RetrospectiveExtension.Frontend'
+        working-directory: 'src/frontend'
         env:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
@@ -129,7 +129,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: "Publish extension to dev environment"
-        working-directory: 'RetrospectiveExtension.Frontend'
+        working-directory: 'src/frontend'
         run: >
           tfx extension publish
           --manifests vss-extension-dev.json

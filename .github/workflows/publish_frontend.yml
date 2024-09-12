@@ -39,7 +39,7 @@ jobs:
 
       - name: Publish extension package
         id: publish_extension_package
-        working-directory: 'RetrospectiveExtension.Frontend'
+        working-directory: 'src/frontend'
         env:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
