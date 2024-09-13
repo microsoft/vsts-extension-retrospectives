@@ -489,7 +489,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       const name = searchParams.get("name") || currentDate.toISOString().split('T')[0];
       const maxVotes = searchParams.get("maxVotes") || "5";
       const isTeamAssessment = searchParams.get("isTeamAssessment") || "true";
-      const columns = getColumnsByTemplateId(searchParams.get("templateId") || "1");
+      const columns = getColumnsByTemplateId(searchParams.get("templateId") || "start-stop-continue");
 
       const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, false, { Members: [], Teams: [] });
 
