@@ -43,7 +43,7 @@ import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
 import { CommonServiceIds, IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
 import { getService } from 'azure-devops-extension-sdk';
-import { FontIcon, HighContrastSelectorWhite } from 'office-ui-fabric-react';
+import { FontIcon } from 'office-ui-fabric-react';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -481,11 +481,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamBoardDeletedDialogMessage: '',
     };
 
-    console.log(window.URL);
-    console.log(window.URLSearchParams);
-    console.log(window.location);
-    console.log(document.URL);
     console.log(document.location);
+    const searchParams = new URLSearchParams(document.location.search);
+    console.log(searchParams);
+    if (searchParams.size > 0) {
+      const currentDate = new Date();
+      const name = searchParams.get("name") || currentDate.toISOString().split('T')[0];
+      const maxVotes = searchParams.get("maxVotes") || "5";
+      const isTeamAssessment = searchParams.get("isTeamAssessment") || "true";
+      const columns = getColumnsByTemplateId(searchParams.get("templateId") || "1");
+
+      const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, false, { Members: [], Teams: [] });
+
+      console.log(newBoard);
+
+      this.changeSelectedBoard(newBoard);
+    }
 
     const info = await this.parseUrlForBoardAndTeamInformation();
     try {
@@ -825,6 +836,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.hideBoardDuplicateDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
     appInsights.trackEvent({name: TelemetryEvents.FeedbackBoardCreated, properties: {boardId: createdBoard.id}});
+    return createdBoard;
   }
 
   private showBoardCreationDialog = (): void => {
