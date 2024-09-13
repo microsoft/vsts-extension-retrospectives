@@ -491,6 +491,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     console.log(searchParams.values());
     console.log(searchParams.values.length);
     if (searchParams.keys.length > 0) {
+      console.log("Creating board from URL parameters");
       const currentDate = new Date();
       const name = searchParams.get("name") || currentDate.toISOString().split('T')[0];
       const maxVotes = searchParams.get("maxVotes") || "5";
