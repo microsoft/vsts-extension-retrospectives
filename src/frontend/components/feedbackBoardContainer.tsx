@@ -484,6 +484,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     console.log(document.location);
     const searchParams = new URLSearchParams(document.location.search);
     console.log(searchParams);
+    console.log(searchParams.keys);
+    console.log(searchParams.keys());
+    console.log(searchParams.keys.length);
+    console.log(searchParams.values);
+    console.log(searchParams.values());
+    console.log(searchParams.values.length);
     if (searchParams.keys.length > 0) {
       const currentDate = new Date();
       const name = searchParams.get("name") || currentDate.toISOString().split('T')[0];
