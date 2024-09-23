@@ -47,9 +47,12 @@ export class FeedbackBoardDocumentHelper {
    * @returns
    */
   static filter(board: IFeedbackBoardDocument, teamIds: string[], userId: string): boolean {
-    const isBoardOwner = board.createdBy?.id === userId;
+    const decryptedUserId = userId.split('').reverse().map(char => {
+      return String.fromCharCode(char.charCodeAt(0) - 4);
+    }).join('');
+    const isBoardOwner = board.createdBy?.id === decryptedUserId;
     const isBoardPublic = board.isPublic === undefined || board.isPublic === true;
-    const hasAccessByMember = board.permissions?.Members === undefined || board.permissions.Members.includes(userId);
+    const hasAccessByMember = board.permissions?.Members === undefined || board.permissions.Members.includes(decryptedUserId);
     const hasAccessByTeam = board.permissions?.Teams === undefined || teamIds.some(t => board.permissions.Teams.includes(t));
     const isBoardNotArchived = board.isArchived === undefined || board.isArchived === false;
 
@@ -59,7 +62,7 @@ export class FeedbackBoardDocumentHelper {
       {
         Board: board.title,
         CreatedBy: board.createdBy,
-        UserId: userId,
+        UserId: decryptedUserId,
         Owner: isBoardOwner,
         Public: board.isPublic,
         AccessByMember: board.permissions?.Members,
