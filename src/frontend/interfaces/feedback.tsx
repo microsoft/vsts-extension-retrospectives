@@ -55,6 +55,8 @@ export class FeedbackBoardDocumentHelper {
 
     const hasAccess = isBoardNotArchived && (isBoardOwner || isBoardPublic || hasAccessByMember || hasAccessByTeam);
 
+    console.log(`Board: ${board.title} - Owner: ${isBoardOwner} - Public: ${isBoardPublic} - Member: ${hasAccessByMember} - Team: ${hasAccessByTeam} - Archived: ${isBoardNotArchived} - Access: ${hasAccess}`);
+
     return hasAccess;
   }
 }
