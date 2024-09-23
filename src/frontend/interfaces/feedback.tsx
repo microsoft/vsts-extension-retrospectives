@@ -58,6 +58,23 @@ export class FeedbackBoardDocumentHelper {
 
     const hasAccess = isBoardNotArchived && (isBoardOwner || isBoardPublic || hasAccessByMember || hasAccessByTeam);
 
+    console.log(
+      {
+        Board: board.title,
+        CreatedBy: board.createdBy,
+        UserId: decryptedUserId,
+        Owner: isBoardOwner,
+        Public: board.isPublic,
+        AccessByMember: board.permissions?.Members,
+        AccessByTeam: board.permissions?.Teams,
+        Member: hasAccessByMember,
+        Team: hasAccessByTeam,
+        NotArchived: isBoardNotArchived,
+        IsArchived: board.isArchived,
+        Access: hasAccess
+      }
+    );
+
     return hasAccess;
   }
 }
