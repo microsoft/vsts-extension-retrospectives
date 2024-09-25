@@ -494,10 +494,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       console.log(isTeamAssessment);
       const columns = getColumnsByTemplateId(searchParams.get("templateId") || "start-stop-continue");
       console.log(columns);
+      const teamId = searchParams.get("teamId");
+      console.log(teamId);
+      if (teamId) {
+        console.log("Getting team from Azure DevOps");
+        const matchedTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, teamId);
+        console.log(matchedTeam);
+        if (matchedTeam) {
+          console.log("Setting current team to matched team");
+          this.setState({ currentTeam: matchedTeam });
+        }
+      }
       if (this.state.currentTeam === undefined) {
+        console.log("Setting current team to default team");
+        console.log(defaultTeam);
         this.setState({ currentTeam: defaultTeam });
       }
-      console.log(this.state);
 
       const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, false, { Members: [], Teams: [] });
 
