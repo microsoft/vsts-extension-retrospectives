@@ -481,6 +481,28 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamBoardDeletedDialogMessage: '',
     };
 
+    const searchParams = new URLSearchParams(document.location.search);
+    if (searchParams.has("name")) {
+      const name = searchParams.get("name");
+      const maxVotes = searchParams.get("maxVotes") || "5";
+      const isTeamAssessment = searchParams.get("isTeamAssessment") || "true";
+      const columns = getColumnsByTemplateId(searchParams.get("templateId") || "start-stop-continue");
+      const teamId = searchParams.get("teamId");
+      if (teamId) {
+        const matchedTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, teamId);
+        if (matchedTeam) {
+          this.setState({ currentTeam: matchedTeam });
+        }
+      }
+      if (this.state.currentTeam === undefined) {
+        this.setState({ currentTeam: defaultTeam });
+      }
+
+      const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, false, { Members: [], Teams: [] });
+
+      parent.location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id);
+    }
+
     const info = await this.parseUrlForBoardAndTeamInformation();
     try {
       if (!info) {
@@ -794,15 +816,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
-  private createBoard = async (
-    title: string,
-    maxvotesPerUser: number,
-    columns: IFeedbackColumn[],
-    isIncludeTeamEffectivenessMeasurement: boolean,
-    isBoardAnonymous: boolean,
-    shouldShowFeedbackAfterCollect: boolean,
-    displayPrimeDirective: boolean,
-    permissions: IFeedbackBoardDocumentPermissions) => {
+  private createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
     const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
       title,
       maxvotesPerUser,
@@ -819,6 +833,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.hideBoardDuplicateDialog();
     reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
     appInsights.trackEvent({name: TelemetryEvents.FeedbackBoardCreated, properties: {boardId: createdBoard.id}});
+    return createdBoard;
   }
 
   private showBoardCreationDialog = (): void => {
