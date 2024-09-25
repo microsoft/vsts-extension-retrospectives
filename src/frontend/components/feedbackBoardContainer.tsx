@@ -481,43 +481,26 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamBoardDeletedDialogMessage: '',
     };
 
-    console.log(document.location);
     const searchParams = new URLSearchParams(document.location.search);
-    console.log(searchParams);
     if (searchParams.has("name")) {
-      console.log("Creating board from URL parameters");
       const name = searchParams.get("name");
-      console.log(name);
       const maxVotes = searchParams.get("maxVotes") || "5";
-      console.log(maxVotes);
       const isTeamAssessment = searchParams.get("isTeamAssessment") || "true";
-      console.log(isTeamAssessment);
       const columns = getColumnsByTemplateId(searchParams.get("templateId") || "start-stop-continue");
-      console.log(columns);
       const teamId = searchParams.get("teamId");
-      console.log(teamId);
       if (teamId) {
-        console.log("Getting team from Azure DevOps");
         const matchedTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, teamId);
-        console.log(matchedTeam);
         if (matchedTeam) {
-          console.log("Setting current team to matched team");
           this.setState({ currentTeam: matchedTeam });
         }
       }
       if (this.state.currentTeam === undefined) {
-        console.log("Setting current team to default team");
-        console.log(defaultTeam);
         this.setState({ currentTeam: defaultTeam });
       }
 
       const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, false, { Members: [], Teams: [] });
 
-      console.log(newBoard);
-
-      location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id);
-
-      // this.changeSelectedBoard(newBoard);
+      parent.location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id);
     }
 
     const info = await this.parseUrlForBoardAndTeamInformation();
