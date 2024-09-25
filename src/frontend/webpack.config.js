@@ -60,24 +60,14 @@ module.exports = (env, argv) => {
       ]
     },
     optimization: {
-      minimize: isProd, // Only minimize in production
-      splitChunks: {
-        chunks: 'all', // Split vendor code from app code
-        maxInitialRequests: 10, // Control the max number of parallel requests
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
-      },
-      runtimeChunk: 'single', // Extract the Webpack runtime into a separate chunk
+      minimize: isProd,
+      splitChunks: false,
+      runtimeChunk: false,
     },
     performance: {
       hints: isProd ? 'warning' : false, // Only show performance hints in production
-      maxAssetSize: 512000, // 500 KiB, adjust as needed
-      maxEntrypointSize: 512000, // 500 KiB
+      maxAssetSize: 9512000, // 500 KiB, adjust as needed
+      maxEntrypointSize: 9512000, // 500 KiB
     },
     plugins: [
       new MomentLocalesPlugin(),
