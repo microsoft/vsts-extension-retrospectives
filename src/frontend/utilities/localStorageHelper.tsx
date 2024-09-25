@@ -1,12 +1,8 @@
 /**
- * Gets and removes the drag and drop id value from the browser's local storage
+ * Gets the drag and drop id value from the browser's local storage
  */
-const getIdValue = (andRemove: boolean = false): string => {
-  const value = localStorage.getItem("reflect/dnd/id");
-  if (andRemove) {
-    localStorage.removeItem("reflect/dnd/id");
-  }
-  return value;
+const getIdValue = (): string => {
+  return localStorage.getItem("reflect/dnd/id");
 }
 
 /**
