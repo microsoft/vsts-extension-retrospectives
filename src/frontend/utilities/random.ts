@@ -1,5 +1,5 @@
 export const generateUUID = () => {
-  if (crypto.randomUUID) {
+  if (crypto?.randomUUID) {
     return crypto.randomUUID();
   }
 
