@@ -2,8 +2,8 @@
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/microsoft/vsts-extension-retrospectives/badge)](https://scorecard.dev/viewer/?uri=github.com/microsoft/vsts-extension-retrospectives)
 [![CodeCov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
-[![CI and CD for Frontend](https://github.com/microsoft/vsts-extension-retrospectives/.github/workflows/ci_cd_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/.github/workflows/ci_cd_frontend.yml)
-[![CI - Backend](https://github.com/microsoft/vsts-extension-retrospectives/.github/workflows/ci_backend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/.github/workflows/ci_backend.yml)
+[![CI and CD for Frontend](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/.github/workflows/ci_cd_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/.github/workflows/ci_cd_frontend.yml)
+[![CI - Backend](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/.github/workflows/ci_backend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/.github/workflows/ci_backend.yml)
 
 Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform _smart and efficient retrospectives from within the Azure DevOps pipeline._
 
