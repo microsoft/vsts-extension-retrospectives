@@ -5,18 +5,23 @@ const Dotenv = require('dotenv-webpack');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
+const CompressionPlugin = require('compression-webpack-plugin');
+
 const BUILD_DIR = path.resolve(__dirname, 'dist');
 const APP_DIR = path.resolve(__dirname, '');
 
 module.exports = (env, argv) => {
   const mode = argv.mode || 'production';
+  const isProd = mode === 'production';
+
   return {
-    devtool: 'source-map',
+    devtool: isProd ? false : 'source-map',
     entry: `${APP_DIR}/index.tsx`,
     output: {
       path: BUILD_DIR,
       publicPath: './',
-      filename: './reflect-bundle.js',
+      filename: isProd ? '[name].[contenthash].js' : './reflect-bundle.js',
+      clean: true,
     },
     resolve: {
       fallback: {
@@ -45,9 +50,34 @@ module.exports = (env, argv) => {
         },
         {
           test: /.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/,
-          use: 'url-loader?limit=100000'
+          type: "asset",
+          parser: {
+            dataUrlCondition: {
+              maxSize: 100000,
+            },
+          },
         }
       ]
+    },
+    optimization: {
+      minimize: isProd, // Only minimize in production
+      splitChunks: {
+        chunks: 'all', // Split vendor code from app code
+        maxInitialRequests: 10, // Control the max number of parallel requests
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      },
+      runtimeChunk: 'single', // Extract the Webpack runtime into a separate chunk
+    },
+    performance: {
+      hints: isProd ? 'warning' : false, // Only show performance hints in production
+      maxAssetSize: 512000, // 500 KiB, adjust as needed
+      maxEntrypointSize: 512000, // 500 KiB
     },
     plugins: [
       new MomentLocalesPlugin(),
@@ -64,6 +94,7 @@ module.exports = (env, argv) => {
       new webpack.DefinePlugin({
         'process.env.BUILD_BUILDNUMBER': JSON.stringify(process.env.BUILD_BUILDNUMBER)
       }),
+      ...(isProd ? [new CompressionPlugin()] : [])
     ]
   };
 }
