@@ -494,7 +494,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       console.log(isTeamAssessment);
       const columns = getColumnsByTemplateId(searchParams.get("templateId") || "start-stop-continue");
       console.log(columns);
-      console.log(defaultTeam);
+      if (this.state.currentTeam === undefined) {
+        this.setState({ currentTeam: defaultTeam });
+      }
+      console.log(this.state);
 
       const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, false, { Members: [], Teams: [] });
 
@@ -816,18 +819,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
-  private createBoard = async (
-    title: string,
-    maxvotesPerUser: number,
-    columns: IFeedbackColumn[],
-    isIncludeTeamEffectivenessMeasurement: boolean,
-    isBoardAnonymous: boolean,
-    shouldShowFeedbackAfterCollect: boolean,
-    displayPrimeDirective: boolean,
-    permissions: IFeedbackBoardDocumentPermissions) => {
-console.log("Creating board with the following parameters:");
-console.log(this.state);
-console.log(title);
+  private createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
     const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
       title,
       maxvotesPerUser,
