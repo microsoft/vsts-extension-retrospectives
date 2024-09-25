@@ -12,10 +12,9 @@ const APP_DIR = path.resolve(__dirname, '');
 
 module.exports = (env, argv) => {
   const mode = argv.mode || 'production';
-  const isProd = mode === 'production';
 
   return {
-    devtool: isProd ? false : 'source-map',
+    devtool: mode === 'production' ? false : 'source-map',
     entry: `${APP_DIR}/index.tsx`,
     output: {
       path: BUILD_DIR,
@@ -60,14 +59,14 @@ module.exports = (env, argv) => {
       ]
     },
     optimization: {
-      minimize: isProd,
+      minimize: true,
       splitChunks: false,
       runtimeChunk: false,
     },
     performance: {
-      hints: isProd ? 'warning' : false, // Only show performance hints in production
-      maxAssetSize: 9512000, // 500 KiB, adjust as needed
-      maxEntrypointSize: 9512000, // 500 KiB
+      hints: 'warning',
+      maxAssetSize: 2100000, // 2.15 Mb
+      maxEntrypointSize: 2100000, // 2.15 Mb
     },
     plugins: [
       new MomentLocalesPlugin(),
@@ -84,7 +83,7 @@ module.exports = (env, argv) => {
       new webpack.DefinePlugin({
         'process.env.BUILD_BUILDNUMBER': JSON.stringify(process.env.BUILD_BUILDNUMBER)
       }),
-      ...(isProd ? [new CompressionPlugin()] : [])
+      new CompressionPlugin()
     ]
   };
 }
