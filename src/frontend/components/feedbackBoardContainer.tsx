@@ -515,7 +515,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       console.log(newBoard);
 
-      this.changeSelectedBoard(newBoard);
+      location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id);
+
+      // this.changeSelectedBoard(newBoard);
     }
 
     const info = await this.parseUrlForBoardAndTeamInformation();
