@@ -50,13 +50,30 @@ export class FeedbackBoardDocumentHelper {
     const decryptedUserId = userId.split('').reverse().map(char => {
       return String.fromCharCode(char.charCodeAt(0) - 4);
     }).join('');
-    const isBoardOwner = board.createdBy?.id === decryptedUserId;
+    const isBoardOwner = (board.createdBy?.id === userId) || (board.createdBy?.id === decryptedUserId);
     const isBoardPublic = board.isPublic === undefined || board.isPublic === true;
-    const hasAccessByMember = board.permissions?.Members === undefined || board.permissions.Members.includes(decryptedUserId);
+    const hasAccessByMember = (board.permissions?.Members === undefined || board.permissions.Members.includes(userId)) || (board.permissions?.Members === undefined || board.permissions.Members.includes(decryptedUserId));
     const hasAccessByTeam = board.permissions?.Teams === undefined || teamIds.some(t => board.permissions.Teams.includes(t));
     const isBoardNotArchived = board.isArchived === undefined || board.isArchived === false;
 
     const hasAccess = isBoardNotArchived && (isBoardOwner || isBoardPublic || hasAccessByMember || hasAccessByTeam);
+
+    console.log(
+      {
+        Board: board.title,
+        CreatedBy: board.createdBy,
+        UserId: decryptedUserId,
+        Owner: isBoardOwner,
+        Public: board.isPublic,
+        AccessByMember: board.permissions?.Members,
+        AccessByTeam: board.permissions?.Teams,
+        Member: hasAccessByMember,
+        Team: hasAccessByTeam,
+        NotArchived: isBoardNotArchived,
+        IsArchived: board.isArchived,
+        Access: hasAccess
+      }
+    );
 
     return hasAccess;
   }
