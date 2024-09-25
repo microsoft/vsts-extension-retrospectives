@@ -1,7 +1,7 @@
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
-import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { generateUUID } from '../utilities/random';
@@ -312,6 +312,7 @@ class ItemDataService {
    */
   public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[]): Promise<IFeedbackBoardDocument> => {
     const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
+    const currentUserId = encrypt(userId);
 
     if (boardItem === undefined) {
       return undefined;
@@ -321,11 +322,11 @@ class ItemDataService {
       boardItem.teamEffectivenessMeasurementVoteCollection = [];
     }
 
-    if (boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId) === undefined || boardItem.boardVoteCollection[userId] === null) {
-      boardItem.teamEffectivenessMeasurementVoteCollection.push({ userId: userId, responses: [] });
+    if (boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined || boardItem.boardVoteCollection[currentUserId] === null) {
+      boardItem.teamEffectivenessMeasurementVoteCollection.push({ userId: currentUserId, responses: [] });
     }
 
-    boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses = teamEffectivenessMeasurementVoteCollection.find(e => e.userId === userId).responses;
+    boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses = teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses;
 
     await this.updateBoardItem(teamId, boardItem);
 

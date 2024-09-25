@@ -33,7 +33,7 @@ import { itemDataService } from '../dal/itemDataService';
 import { TeamMember } from 'azure-devops-extension-api/WebApi';
 import EffectivenessMeasurementRow from './effectivenessMeasurementRow';
 
-import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionFontAwesomeClass, questions } from '../utilities/effectivenessMeasurementQuestionHelper';
 
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
@@ -1216,7 +1216,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const saveTeamEffectivenessMeasurement = () => {
       const teamEffectivenessMeasurementVoteCollection = this.state.currentBoard.teamEffectivenessMeasurementVoteCollection;
-      const currentUserVote = teamEffectivenessMeasurementVoteCollection.find((vote) => vote.userId === this.state.currentUserId);
+      const currentUserId = encrypt(this.state.currentUserId);
+      const currentUserVote = teamEffectivenessMeasurementVoteCollection.find((vote) => vote.userId === currentUserId);
       const responseCount = currentUserVote.responses.length;
 
       if (responseCount < questions.length) {
@@ -1236,17 +1237,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         currentBoard.teamEffectivenessMeasurementVoteCollection = [];
       }
 
-      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === this.state.currentUserId) === undefined) {
+      const currentUserId = encrypt(this.state.currentUserId);
+      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.push({
           userId: this.state.currentUserId,
           responses: [],
         });
       }
 
-      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === this.state.currentUserId).responses.find(e => e.questionId === questionId);
+      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
 
       if (!currentVote) {
-        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === this.state.currentUserId).responses.push({
+        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.push({
           questionId: questionId,
           selection: selected,
         });
