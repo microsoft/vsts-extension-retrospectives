@@ -10,12 +10,8 @@ export const getUserIdentity = (): IdentityRef => {
   if (!userIdentity){
     const currentUser: IUserContext = getUser();
 
-    const id = currentUser.id.split('').reverse().map(char => {
-      return String.fromCharCode(char.charCodeAt(0) + 4);
-    }).join('')
-
     userIdentity = {
-      id,
+      id: currentUser.id,
       displayName: currentUser.displayName,
       uniqueName: currentUser.name,
       imageUrl: currentUser.imageUrl,
@@ -28,4 +24,16 @@ export const getUserIdentity = (): IdentityRef => {
   }
 
   return userIdentity;
+}
+
+export const encrypt = (id: string): string => {
+  return id.split('').reverse().map(char => {
+    return String.fromCharCode(char.charCodeAt(0) + 4);
+  }).join('');
+}
+
+export const decrypt = (id: string): string => {
+  return id.split('').reverse().map(char => {
+    return String.fromCharCode(char.charCodeAt(0) - 4);
+  }).join('');
 }
