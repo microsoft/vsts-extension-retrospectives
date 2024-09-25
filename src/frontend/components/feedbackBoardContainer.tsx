@@ -494,6 +494,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       console.log(isTeamAssessment);
       const columns = getColumnsByTemplateId(searchParams.get("templateId") || "start-stop-continue");
       console.log(columns);
+      console.log(defaultTeam);
 
       const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, false, { Members: [], Teams: [] });
 
@@ -824,6 +825,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     shouldShowFeedbackAfterCollect: boolean,
     displayPrimeDirective: boolean,
     permissions: IFeedbackBoardDocumentPermissions) => {
+console.log("Creating board with the following parameters:");
+console.log(this.state);
+console.log(title);
     const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
       title,
       maxvotesPerUser,
