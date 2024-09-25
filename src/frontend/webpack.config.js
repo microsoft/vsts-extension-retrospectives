@@ -20,7 +20,7 @@ module.exports = (env, argv) => {
     output: {
       path: BUILD_DIR,
       publicPath: './',
-      filename: isProd ? '[name].[contenthash].js' : './reflect-bundle.js',
+      filename: './reflect-bundle.js',
       clean: true,
     },
     resolve: {
