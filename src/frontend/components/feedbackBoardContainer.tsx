@@ -484,15 +484,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     console.log(document.location);
     const searchParams = new URLSearchParams(document.location.search);
     console.log(searchParams);
-    console.log(searchParams.keys.length);
-    console.log(searchParams.values.length);
-    console.log(searchParams.has("name"));
     if (searchParams.has("name")) {
       console.log("Creating board from URL parameters");
       const name = searchParams.get("name");
+      console.log(name);
       const maxVotes = searchParams.get("maxVotes") || "5";
+      console.log(maxVotes);
       const isTeamAssessment = searchParams.get("isTeamAssessment") || "true";
+      console.log(isTeamAssessment);
       const columns = getColumnsByTemplateId(searchParams.get("templateId") || "start-stop-continue");
+      console.log(columns);
 
       const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, false, { Members: [], Teams: [] });
 
