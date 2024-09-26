@@ -5,7 +5,7 @@
 [![CI and CD for Frontend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_cd_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_cd_frontend.yml)
 [![CI_Backend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml)
 
-Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform _smart and efficient retrospectives from within the Azure DevOps pipeline._
+Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform _smart and efficient retrospectives from within the Azure DevOps._
 
 Retrospectives are an important practice in becoming an effective team, allowing the team to gather feedback and continuously improve based on the feedback.
 
