@@ -30,11 +30,6 @@ jobs:
               - "src/frontend/**"
 
       - if: steps.changes.outputs.src == 'true'
-        name: "Install tools used for deployment"
-        run: |
-          npm install --global tfx-cli@0.17.0 node-jq@6.0.1
-
-      - if: steps.changes.outputs.src == 'true'
         name: "Install dependencies"
         run: npm ci
         working-directory: "src/frontend"
@@ -131,7 +126,7 @@ jobs:
         name: "Publish extension to dev environment"
         working-directory: 'src/frontend'
         run: >
-          tfx extension publish
+          npx tfx extension publish
           --manifests vss-extension-dev.json
           --vsix ./dist/*.vsix
           --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
