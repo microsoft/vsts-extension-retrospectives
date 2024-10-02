@@ -39,6 +39,7 @@
     "file-saver": "2.0.5",
     "jest-environment-jsdom": "28.1.3",
     "jest-junit-reporter": "1.1.0",
+    "markdownlint-cli2": "0.13.0",
     "moment": "2.30.1",
     "office-ui-fabric-react": "7.204.0",
     "react": "17.0.2",
