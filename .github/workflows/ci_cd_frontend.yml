@@ -57,8 +57,7 @@ jobs:
 
       - name: "Markdown lint"
         run: |
-          npm install --global markdownlint-cli2@0.13.0
-          markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#src/frontend/node_modules"
+          npx markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#src/frontend/node_modules"
 
       - name: "Spell check"
         run: |
