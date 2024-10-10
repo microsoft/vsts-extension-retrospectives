@@ -115,7 +115,7 @@ jobs:
 
           cat <<< $(jq 'del(.baseUri)' $ext_file) > $ext_file
 
-          cat <<< $(jq ".publisher = \"$publisher\"" $ext_file) > $ext_file
+          cat <<< $(jq ".publisher = \"enginpolat\"" $ext_file) > $ext_file
 
           ext_info=$(npx tfx extension show --no-prompt --json --publisher "enginpolat" --extensionId "retrospective-vsts-extension-dev" --token "${{ secrets.AZURE_DEVOPS_TOKEN }}")
 
