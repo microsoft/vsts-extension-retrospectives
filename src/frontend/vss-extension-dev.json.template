@@ -21,7 +21,7 @@
       "path": "./assets/PACKAGE-DESCRIPTION.md"
     },
     "license": {
-        "path": "./assets/LICENSE.md"
+      "path": "./assets/LICENSE.md"
     }
   },
   "targets": [
@@ -45,7 +45,7 @@
     "uri": "https://github.com/microsoft/vsts-extension-retrospectives"
   },
   "CustomerQnASupport": {
-    "enableqna":"true"
+    "enableqna": "true"
   },
   "scopes": [
     "vso.work",
@@ -62,8 +62,8 @@
         "name": "Retrospectives (Dev)",
         "uri": "src/index.html",
         "icon": {
-            "light": "asset://images/logos/logo_navbar_light_theme.png",
-            "dark": "asset://images/logos/logo_navbar_dark_theme.png"
+          "light": "asset://images/logos/logo_navbar_light_theme.png",
+          "dark": "asset://images/logos/logo_navbar_dark_theme.png"
         }
       }
     }
