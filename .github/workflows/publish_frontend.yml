@@ -55,7 +55,7 @@ jobs:
             VERSION="${INPUT_VERSION}"
           fi
 
-          cat <<< $(npx jq ".version = \"${VERSION}\"" vss-extension-prod.json) > vss-extension-prod.json
+          cat <<< $(npx node-jq ".version = \"${VERSION}\"" vss-extension-prod.json) > vss-extension-prod.json
 
           npm run build:p
           npm run pack:p
@@ -63,7 +63,7 @@ jobs:
           npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
 
           ext_info=$(npx tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
-          VERSION=$(npx jq -r '.versions[0].version' <<< "$ext_info")
+          VERSION=$(npx node-jq -r '.versions[0].version' <<< "$ext_info")
 
           echo "EXTENSION_VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
