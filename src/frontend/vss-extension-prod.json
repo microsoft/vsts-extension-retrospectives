@@ -81,10 +81,6 @@
       "addressable": true
     },
     {
-      "path": "dist/reflect-bundle.js.map",
-      "addressable": true
-    },
-    {
       "path": "node_modules/applicationinsights-js/dist",
       "addressable": true
     },
