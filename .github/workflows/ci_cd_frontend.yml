@@ -111,11 +111,20 @@ jobs:
         run: |
           cp vss-extension-dev.json.template vss-extension-dev.json
 
-          scripts/update_ext_manifest.sh \
-            "vss-extension-dev.json" \
-            "enginpolat" \
-            "retrospective-vsts-extension-dev" \
-            "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+          ext_file="vss-extension-dev.json"
+
+          cat <<< $(jq 'del(.baseUri)' $ext_file) > $ext_file
+
+          cat <<< $(jq ".publisher = \"enginpolat\"" $ext_file) > $ext_file
+
+          ext_info=$(npx tfx extension show --no-prompt --json --publisher "enginpolat" --extensionId "retrospective-vsts-extension-dev" --token "${{ secrets.AZURE_DEVOPS_TOKEN }}")
+
+          if [[ "$ext_info" != "null" ]]; then
+            version=$(jq -r '.versions[0].version' <<< "$ext_info")
+            cat <<< $(jq ".version = \"$version\"" $ext_file) > $ext_file
+          fi
+
+          cat <<< $(jq ".contributions[0].properties.name = \"Retrospectives (Dev)\"" $ext_file) > $ext_file
 
       - if: steps.changes.outputs.src == 'true'
         name: "Prepare extension package"
