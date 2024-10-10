@@ -50,7 +50,7 @@ jobs:
 
           if [ -z "${INPUT_VERSION}" ]; then
             ext_info=$(npx tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
-            VERSION=$(npx jq -r '.versions[0].version' <<< "$ext_info")
+            VERSION=$(npx node-jq -r '.versions[0].version' <<< "$ext_info")
           else
             VERSION="${INPUT_VERSION}"
           fi
