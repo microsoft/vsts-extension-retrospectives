@@ -57,7 +57,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     const toastId = toast('Processing boards...');
     const exportedData: IExportImportDataSchema[] = [];
     const projectId = await getProjectId();
-    const teams = await azureDevOpsCoreService.getAllTeams(projectId, false);
+    const teams = await azureDevOpsCoreService.getAllTeams(projectId, true);
     for (let iLoop = 0; iLoop < teams.length; iLoop++) {
       const team = teams[iLoop];
       const boards = await boardDataService.getBoardsForTeam(team.id);
@@ -100,7 +100,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   private processImportedData = async (importedData: IExportImportDataSchema[]) => {
     const projectId = await getProjectId();
 
-    const teams = await azureDevOpsCoreService.getAllTeams(projectId, false);
+    const teams = await azureDevOpsCoreService.getAllTeams(projectId, true);
     const defaultTeam = await azureDevOpsCoreService.getDefaultTeam(projectId);
 
     const toastId = toast('Importing data...');

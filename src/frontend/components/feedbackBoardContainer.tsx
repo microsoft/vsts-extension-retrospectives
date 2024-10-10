@@ -614,7 +614,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
-    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, false);
+    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
     allTeams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
