@@ -1,9 +1,9 @@
 import { WorkItemTrackingProcessRestClient } from 'azure-devops-extension-api/WorkItemTrackingProcess/WorkItemTrackingProcessClient';
 import { getClient } from 'azure-devops-extension-api/Common';
 import { GetProcessExpandLevel } from 'azure-devops-extension-api/WorkItemTrackingProcess';
-import { WorkItemTrackingProcessDefinitionsRestClient } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+import { WorkItemTrackingProcessDefinitionsRestClient, WorkItemTypeFieldModel2 } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
 
-import { Control, FieldModel, Group, Page, PageType, PickListModel, WorkItemTypeFieldModel } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+import { Control, FieldModel, Group, Page, PageType, PickListModel } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
 import { retrospectiveWorkItemTypeModel } from '../interfaces/retrospectiveWorkItemType';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { getProjectId } from '../utilities/servicesHelper';
@@ -32,7 +32,7 @@ export class ProcessService {
         return this.workItemTrackingProcessDefinitionsHttpClient.createField(field, processId);
     }
 
-    public addFieldToWorkItemType = (field: WorkItemTypeFieldModel, processId: string, witRefNameForFields: string) => {
+    public addFieldToWorkItemType = (field: WorkItemTypeFieldModel2, processId: string, witRefNameForFields: string) => {
         return this.workItemTrackingProcessDefinitionsHttpClient.addFieldToWorkItemType(field, processId, witRefNameForFields);
     }
 
