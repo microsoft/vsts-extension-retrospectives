@@ -12,7 +12,6 @@ const mockedTestProps: EditableTextProps = {
 }
 
 describe('Editable Text Component', () => {
-
   it('renders correctly.', () => {
     const wrapper = shallow(<EditableText {...mockedTestProps} />);
     const component = wrapper.children().dive();
