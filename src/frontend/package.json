@@ -64,7 +64,7 @@
     "@typescript-eslint/parser": "5.30.7",
     "@wojtekmaj/enzyme-adapter-react-17": "0.6.7",
     "autoprefixer": "10.4.20",
-    "cheerio": "1.0.0-rc.12",
+    "cheerio": "1.0.0",
     "compression-webpack-plugin": "11.1.0",
     "crypto-browserify": "3.12.0",
     "css-loader": "7.1.2",
