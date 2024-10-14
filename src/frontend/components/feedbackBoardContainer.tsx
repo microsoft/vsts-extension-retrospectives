@@ -1233,7 +1233,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       const teamEffectivenessMeasurementVoteCollection = this.state.currentBoard.teamEffectivenessMeasurementVoteCollection;
       const currentUserId = encrypt(this.state.currentUserId);
       const currentUserVote = teamEffectivenessMeasurementVoteCollection.find((vote) => vote.userId === currentUserId);
-      const responseCount = currentUserVote.responses.length;
+      const responseCount = currentUserVote?.responses?.length || 0;
 
       if (responseCount < questions.length) {
         toast("Please answer all questions before saving");
@@ -1253,17 +1253,17 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       }
 
       const currentUserId = encrypt(this.state.currentUserId);
-      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
+      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => encrypt(e.userId) === currentUserId) === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.push({
           userId: this.state.currentUserId,
           responses: [],
         });
       }
 
-      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
+      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => encrypt(e.userId) === currentUserId).responses.find(e => e.questionId === questionId);
 
       if (!currentVote) {
-        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.push({
+        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => encrypt(e.userId) === currentUserId).responses.push({
           questionId: questionId,
           selection: selected,
         });
