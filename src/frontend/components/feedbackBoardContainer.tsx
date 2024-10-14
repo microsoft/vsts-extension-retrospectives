@@ -1231,14 +1231,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const saveTeamEffectivenessMeasurement = () => {
       const teamEffectivenessMeasurementVoteCollection = this.state.currentBoard.teamEffectivenessMeasurementVoteCollection;
-console.log("teamEffectivenessMeasurementVoteCollection", teamEffectivenessMeasurementVoteCollection);
       const currentUserId = encrypt(this.state.currentUserId);
-console.log("currentUserId", currentUserId);
       const currentUserVote = teamEffectivenessMeasurementVoteCollection.find((vote) => vote.userId === currentUserId);
-console.log("currentUserVote", currentUserVote);
       const responseCount = currentUserVote?.responses?.length || 0;
-console.log("responseCount", responseCount);
-console.log("questions.length", questions.length);
 
       if (responseCount < questions.length) {
         toast("Please answer all questions before saving");
