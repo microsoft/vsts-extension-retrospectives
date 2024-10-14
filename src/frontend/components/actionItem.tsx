@@ -150,13 +150,13 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
 
     return (
       <DocumentCard
-        key={this.props.actionItem.id + 'card'}
+        key={`${this.props.actionItem.id}card`}
         className={`related-task-sub-card ${resolvedBorderRight}`}
         type={DocumentCardType.compact}>
-        <DocumentCardPreview key={this.props.actionItem.id + 'preview'} {...iconProps} />
+        <DocumentCardPreview key={`${this.props.actionItem.id}preview`} {...iconProps} />
         <div
           ref={(element: HTMLElement) => this.openWorkItemButton = element}
-          key={this.props.actionItem.id + 'details'}
+          key={`${this.props.actionItem.id}details`}
           className="ms-DocumentCard-details"
           tabIndex={0}
           role="button"
@@ -167,7 +167,7 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
             }
           }}
           onClick={this.showWorkItemForm}>
-          <DocumentCardTitle key={this.props.actionItem.id + 'title'} title={title} shouldTruncate={true} />
+          <DocumentCardTitle key={`${this.props.actionItem.id}title`} title={title} shouldTruncate={true} />
         </div>
         {!this.props.areActionIconsHidden &&
           <DocumentCardActions
