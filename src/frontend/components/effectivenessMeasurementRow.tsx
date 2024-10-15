@@ -3,7 +3,7 @@ import React from 'react';
 import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 
-import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 
 import { ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 
@@ -26,7 +26,7 @@ export interface EffectivenessMeasurementRowState {
 export default class EffectivenessMeasurementRow extends React.Component<EffectivenessMeasurementRowProps, EffectivenessMeasurementRowState> {
   constructor(props: EffectivenessMeasurementRowProps) {
     super(props);
-    const currentUserId = getUserIdentity().id;
+    const currentUserId = encrypt(getUserIdentity().id);
     const votes = this.props.votes || [];
     const vote = votes.find(e => e.userId === currentUserId)?.responses || [];
     const currentVote = vote.filter(vote => vote.questionId === this.props.questionId || "");
