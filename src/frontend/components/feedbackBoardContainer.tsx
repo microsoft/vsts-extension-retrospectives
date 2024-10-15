@@ -1263,8 +1263,10 @@ console.log("responseCount", responseCount);
           responses: [],
         });
       }
-
-      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
+console.log("currentUserId", currentUserId);
+console.log("currentBoard", currentBoard);
+const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
+console.log("currentVote", currentVote);
 
       if (!currentVote) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.push({
@@ -1274,6 +1276,7 @@ console.log("responseCount", responseCount);
       } else {
         currentVote.selection = selected;
       }
+console.log("currentBoard", currentBoard);
 
       this.setState({ currentBoard });
     }
