@@ -19,7 +19,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
         name: "Check out repository"
 
       - uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
@@ -40,6 +40,16 @@ jobs:
         working-directory: "src/frontend"
 
       - if: steps.changes.outputs.src == 'true'
+        name: "Run pre-commit hooks"
+        run: |
+          sudo apt install pipx -y
+          sudo apt install shellcheck -y
+
+          pipx install pre-commit
+
+          pre-commit run --all-files
+
+      - if: steps.changes.outputs.src == 'true'
         name: "Lint node files"
         run: npm run lint
         working-directory: "src/frontend"
@@ -50,7 +60,7 @@ jobs:
         working-directory: "src/frontend"
 
       - if: success() || failure()
-        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
           name: "Upload jest test results"
           path: src/frontend/reports/jest-junit.xml
@@ -111,11 +121,20 @@ jobs:
         run: |
           cp vss-extension-dev.json.template vss-extension-dev.json
 
-          scripts/update_ext_manifest.sh \
-            "vss-extension-dev.json" \
-            "enginpolat" \
-            "retrospective-vsts-extension-dev" \
-            "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+          ext_file="vss-extension-dev.json"
+
+          cat <<< $(jq 'del(.baseUri)' $ext_file) > $ext_file
+
+          cat <<< $(jq ".publisher = \"enginpolat\"" $ext_file) > $ext_file
+
+          ext_info=$(npx tfx extension show --no-prompt --json --publisher "enginpolat" --extensionId "retrospective-vsts-extension-dev" --token "${{ secrets.AZURE_DEVOPS_TOKEN }}")
+
+          if [[ "$ext_info" != "null" ]]; then
+            version=$(jq -r '.versions[0].version' <<< "$ext_info")
+            cat <<< $(jq ".version = \"$version\"" $ext_file) > $ext_file
+          fi
+
+          cat <<< $(jq ".contributions[0].properties.name = \"Retrospectives (Dev)\"" $ext_file) > $ext_file
 
       - if: steps.changes.outputs.src == 'true'
         name: "Prepare extension package"

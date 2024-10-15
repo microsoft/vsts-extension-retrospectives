@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 ##
 ## This script adds the extension's dev certificate to the DeveloperOverrideCertificates
 ## configuration of the backend service.
@@ -48,7 +49,7 @@
         cert_ids="${cert_ids##*$'-\n'}"
 
         # Find the greatest index
-        while read p; do
+        while read -r p; do
             cur_id="${p##*$':'}"
             if [[ $cur_id -gt $id ]]; then
                 id=$cur_id

@@ -3,27 +3,16 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "npm"
-    directory: "/"
+    directory: "/src/frontend"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "nuget"
-    directory: "/"
+    directory: "/src/backend"
     schedule:
-      interval: "weekly"
-
-  - package-ecosystem: nuget
-    directory: /src/backend.tests
+      interval: "daily"
+  - package-ecosystem: "nuget"
+    directory: "/src/backend.tests"
     schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /src/backend
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /src/frontend
-    schedule:
-      interval: daily
+      interval: "daily"

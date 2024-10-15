@@ -1,4 +1,4 @@
-name: Publish - Production
+name: "Publish to Production"
 
 on:
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout repository
-        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
 
       - name: Check if the invoker is a member of the admin team
         run: |
@@ -50,20 +50,19 @@ jobs:
 
           if [ -z "${INPUT_VERSION}" ]; then
             ext_info=$(npx tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
-            VERSION=$(npx jq -r '.versions[0].version' <<< "$ext_info")
+            VERSION=$(npx node-jq -r '.versions[0].version' <<< "$ext_info")
           else
             VERSION="${INPUT_VERSION}"
           fi
 
-          cat <<< $(npx jq ".version = \"${VERSION}\"" vss-extension-prod.json) > vss-extension-prod.json
+          cat <<< $(npx node-jq ".version = \"${VERSION}\"" vss-extension-prod.json) > vss-extension-prod.json
 
-          npm run build:p
           npm run pack:p
 
           npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
 
           ext_info=$(npx tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
-          VERSION=$(npx jq -r '.versions[0].version' <<< "$ext_info")
+          VERSION=$(npx node-jq -r '.versions[0].version' <<< "$ext_info")
 
           echo "EXTENSION_VERSION=${VERSION}" >> $GITHUB_OUTPUT
 

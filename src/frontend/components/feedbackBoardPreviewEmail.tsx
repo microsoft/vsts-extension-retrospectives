@@ -55,7 +55,7 @@ class FeedbackBoardPreviewEmail extends React.Component<IFeedbackBoardPreviewEma
           ariaLive="assertive" />
       );
     }
-    
+
     return (
       <>
         <ActionButton className="copy-email-button"
