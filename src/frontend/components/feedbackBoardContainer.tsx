@@ -1244,7 +1244,7 @@ console.log("responseCount", responseCount);
         return;
       }
 
-      itemDataService.updateTeamEffectivenessMeasurement(this.state.currentBoard.id, this.state.currentTeam.id, this.state.currentUserId, this.state.currentBoard.teamEffectivenessMeasurementVoteCollection);
+      itemDataService.updateTeamEffectivenessMeasurement(this.state.currentBoard.id, this.state.currentTeam.id, currentUserId, this.state.currentBoard.teamEffectivenessMeasurementVoteCollection);
 
       this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
     };
@@ -1257,17 +1257,17 @@ console.log("responseCount", responseCount);
       }
 
       const currentUserId = encrypt(this.state.currentUserId);
-      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => encrypt(e.userId) === currentUserId) === undefined) {
+      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.push({
-          userId: this.state.currentUserId,
+          userId: currentUserId,
           responses: [],
         });
       }
 
-      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => encrypt(e.userId) === currentUserId).responses.find(e => e.questionId === questionId);
+      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
 
       if (!currentVote) {
-        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => encrypt(e.userId) === currentUserId).responses.push({
+        currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.push({
           questionId: questionId,
           selection: selected,
         });
