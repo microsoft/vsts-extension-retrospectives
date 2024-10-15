@@ -217,7 +217,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       }));
 
       updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ? { ...item, feedbackItemsCount } : item);
-      
+
       setBoardSummaryState({
         ...updatedState,
         allDataLoaded: true
@@ -329,7 +329,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
                         onMouseDown: header.getResizeHandler(),
                         onTouchStart: header.getResizeHandler(),
                         className: `
-                          ${header.column.getCanResize() ? 'resizer' : ''} 
+                          ${header.column.getCanResize() ? 'resizer' : ''}
                           ${header.column.getIsResizing() ? 'isResizing' : ''}
                         `
                       }}

@@ -50,18 +50,18 @@ describe('Feedback Carousel ', () => {
     it("should be set by default in the first position", () => {
       const wrapper = shallow(<FeedbackCarousel {...mockedProps} />);
       const component = wrapper.children().dive();
-  
+
       const allColumn = component.findWhere(c => c.prop('headerText')).first();
-  
+
       expect(allColumn.prop('headerText')).toEqual('All');
     });
 
     it("should not exist when there are no feedback columns", () => {
       const wrapper = shallow(<FeedbackCarousel feedbackColumnPropsList={[]} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
       const component = wrapper.children().dive();
-  
+
       const allColumn = component.findWhere(c => c.prop('headerText')).first();
-  
+
       expect(allColumn).toHaveLength(0);
     });
   })
