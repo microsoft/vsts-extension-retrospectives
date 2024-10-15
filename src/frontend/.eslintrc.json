@@ -20,6 +20,10 @@
     "@typescript-eslint",
     "react"
   ],
+  "env": {
+    "node": true,
+    "es6": true
+  },
   "rules": {
     "indent": "off",
     "quotes": "off",
