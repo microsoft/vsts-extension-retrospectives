@@ -40,6 +40,16 @@ jobs:
         working-directory: "src/frontend"
 
       - if: steps.changes.outputs.src == 'true'
+        name: "Run pre-commit hooks"
+        run: |
+          sudo apt install pipx -y
+          sudo apt install shellcheck -y
+
+          pipx install pre-commit
+
+          pre-commit run --all-files
+
+      - if: steps.changes.outputs.src == 'true'
         name: "Lint node files"
         run: npm run lint
         working-directory: "src/frontend"
