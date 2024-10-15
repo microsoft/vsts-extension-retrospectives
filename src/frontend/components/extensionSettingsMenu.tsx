@@ -256,7 +256,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             containerClassName: 'whatsnew-dialog',
           }}>
           <DialogBase>
-            
+
           </DialogBase>
           <DialogContent>
             <ul style={{listStyle: 'initial'}}>

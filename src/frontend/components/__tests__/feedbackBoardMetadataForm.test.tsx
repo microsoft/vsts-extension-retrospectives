@@ -39,7 +39,7 @@ describe('Board Metadata Form', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
       const component = wrapper.children().dive();
       const textField = component.findWhere(c => c.prop('id') === 'retrospective-title-input').find(TextField);
-  
+
       expect(textField).toBeDefined();
       expect(textField.prop('value')).toEqual("");
     });
@@ -108,7 +108,7 @@ describe('Board Metadata Form', () => {
   })
 
   describe('Existing Board', () => {
-    
+
     beforeEach(() => {
       mockedProps.isNewBoardCreation = false;
       mockedProps.currentBoard = testExistingBoard;
@@ -118,7 +118,7 @@ describe('Board Metadata Form', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
       const component = wrapper.children().dive();
       const textField = component.findWhere(c => c.prop('id') === 'retrospective-title-input').find(TextField);
-  
+
       expect(textField).toBeDefined();
       expect(textField.prop('value')).toEqual(testExistingBoard.title);
     });
@@ -187,7 +187,7 @@ describe('Board Metadata Form', () => {
   })
 
   describe('Duplicate Board', () => {
-    
+
     beforeEach(() => {
       mockedProps.isNewBoardCreation = true;
       mockedProps.isDuplicatingBoard = true;
@@ -198,7 +198,7 @@ describe('Board Metadata Form', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
       const component = wrapper.children().dive();
       const textField = component.findWhere(c => c.prop('id') === 'retrospective-title-input').find(TextField);
-  
+
       expect(textField).toBeDefined();
       expect(textField.prop('value')).toEqual(testExistingBoard.title + ' - copy');
     });
