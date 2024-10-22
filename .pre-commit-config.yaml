@@ -1,0 +1,29 @@
+repos:
+- repo: https://github.com/gitleaks/gitleaks
+  rev: v8.21.0
+  hooks:
+  - id: gitleaks
+
+- repo: https://github.com/jumanjihouse/pre-commit-hooks
+  rev: 3.0.0
+  hooks:
+  - id: shellcheck
+
+- repo: https://github.com/pre-commit/mirrors-eslint
+  rev: v8.38.0
+  hooks:
+  - id: eslint
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+  - id: check-case-conflict
+  - id: check-executables-have-shebangs
+  - id: check-json
+  - id: check-shebang-scripts-are-executable
+  - id: check-yaml
+  - id: mixed-line-ending
+  - id: pretty-format-json
+    exclude: package\.json|package-lock\.json|devcontainer\.json|\.eslintrc.json|vss-extension-prod\.json|tsconfig\.json|tsconfig.test\.json|appsettings\.json|appsettings\.development\.json

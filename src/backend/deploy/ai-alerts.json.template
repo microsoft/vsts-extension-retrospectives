@@ -40,7 +40,7 @@
         "actiongroups_externalid": {
             "defaultValue": "/subscriptions/VARSUBSCRIPTIONID/resourceGroups/VARRGNAME/providers/Microsoft.Insights/actionGroups/ag-VARRGSUFFIX",
             "type": "string"
-        }, 
+        },
         "location": {
             "defaultValue": "global",
             "type": "string"
@@ -70,8 +70,8 @@
             "apiVersion": "2018-03-01",
             "name": "[parameters('browser_exceptions_alert_name')]",
             "location": "[parameters('location')]",
-            "dependsOn": [ 
-                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]" 
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]"
             ],
             "properties": {
                 "description": "Dynamic threshold with Medium sensitivity",
@@ -115,8 +115,8 @@
             "apiVersion": "2018-03-01",
             "name": "[parameters('failed_requests_alert_name')]",
             "location": "[parameters('location')]",
-            "dependsOn": [ 
-                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]" 
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]"
             ],
             "properties": {
                 "description": "Dynamic threshold with Medium sensitivity",
@@ -160,8 +160,8 @@
             "apiVersion": "2018-03-01",
             "name": "[parameters('server_exceptions_alert_name')]",
             "location": "[parameters('location')]",
-            "dependsOn": [ 
-                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]" 
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]"
             ],
             "properties": {
                 "description": "Dynamic threshold with Medium sensitivity",
@@ -205,8 +205,8 @@
             "apiVersion": "2018-03-01",
             "name": "[parameters('server_respone_time_alert_name')]",
             "location": "[parameters('location')]",
-            "dependsOn": [ 
-                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]" 
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/actionGroups',parameters('action_group_name'))]"
             ],
             "properties": {
                 "description": "Dynamic threshold with Medium sensitivity",

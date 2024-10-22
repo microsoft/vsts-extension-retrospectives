@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 ##
 ## This script downloads the developer certificate of the extension from marketplace.
 ##
@@ -29,5 +30,5 @@
         -H "authorization: Basic $pat_b64" \
         -H "cache-control: no-cache" \
         -H "content-type: application/json" \
-        > $output_file
+        > "$output_file"
 )

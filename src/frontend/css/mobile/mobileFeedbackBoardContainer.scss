@@ -74,23 +74,23 @@ $mobile_team_selector_list_item_height: 90px;
       }
     }
 
-    &.retrospectives-delete-feedback-item-dialog, 
-    &.retrospectives-board-metadata-dialog, 
-    &.retrospectives-board-deleted-info-dialog, 
+    &.retrospectives-delete-feedback-item-dialog,
+    &.retrospectives-board-metadata-dialog,
+    &.retrospectives-board-deleted-info-dialog,
     &.retrospectives-unlink-feedback-item-confirmation-dialog,
     &.retrospectives-delete-board-confirmation-dialog,
     &.retrospectives-visit-history-cleared-info-dialog {
       .ms-Dialog-title {
         font-size: 40px;
       }
-    
+
       .ms-Dialog-subText {
         font-size: 30px;
       }
     }
 
     &.retrospectives-board-metadata-dialog {
-      .board-metadata-form {      
+      .board-metadata-form {
         .title-input-container {
           .ms-Label {
             font-size: 40px;
@@ -112,7 +112,7 @@ $mobile_team_selector_list_item_height: 90px;
 
     button {
       width: 60%;
-      
+
       .ms-Button-textContainer {
         margin-left: 12px;
       }

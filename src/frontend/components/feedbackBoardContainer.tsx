@@ -1231,16 +1231,20 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const saveTeamEffectivenessMeasurement = () => {
       const teamEffectivenessMeasurementVoteCollection = this.state.currentBoard.teamEffectivenessMeasurementVoteCollection;
-      const currentUserId = encrypt(this.state.currentUserId);
+console.log("teamEffectivenessMeasurementVoteCollection", teamEffectivenessMeasurementVoteCollection);
+const currentUserId = encrypt(this.state.currentUserId);
+console.log("currentUserIdFromState", this.state.currentUserId);
+console.log("currentUserId", currentUserId);
       const currentUserVote = teamEffectivenessMeasurementVoteCollection.find((vote) => vote.userId === currentUserId);
-      const responseCount = currentUserVote.responses.length;
-
+console.log("currentUserVote", currentUserVote);
+      const responseCount = currentUserVote?.responses?.length || 0;
+console.log("responseCount", responseCount);
       if (responseCount < questions.length) {
         toast("Please answer all questions before saving");
         return;
       }
 
-      itemDataService.updateTeamEffectivenessMeasurement(this.state.currentBoard.id, this.state.currentTeam.id, this.state.currentUserId, this.state.currentBoard.teamEffectivenessMeasurementVoteCollection);
+      itemDataService.updateTeamEffectivenessMeasurement(this.state.currentBoard.id, this.state.currentTeam.id, currentUserId, this.state.currentBoard.teamEffectivenessMeasurementVoteCollection);
 
       this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
     };
@@ -1255,12 +1259,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       const currentUserId = encrypt(this.state.currentUserId);
       if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.push({
-          userId: this.state.currentUserId,
+          userId: currentUserId,
           responses: [],
         });
       }
-
-      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
+console.log("currentUserId", currentUserId);
+console.log("currentBoard", currentBoard);
+const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
+console.log("currentVote", currentVote);
 
       if (!currentVote) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.push({
@@ -1270,6 +1276,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       } else {
         currentVote.selection = selected;
       }
+console.log("currentBoard", currentBoard);
 
       this.setState({ currentBoard });
     }

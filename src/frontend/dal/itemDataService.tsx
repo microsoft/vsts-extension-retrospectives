@@ -310,9 +310,8 @@ class ItemDataService {
   /**
    * Update the team effectiveness measurement.
    */
-  public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, userId: string, teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[]): Promise<IFeedbackBoardDocument> => {
+  public updateTeamEffectivenessMeasurement = async (boardId: string, teamId: string, currentUserId: string, teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[]): Promise<IFeedbackBoardDocument> => {
     const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
-    const currentUserId = encrypt(userId);
 
     if (boardItem === undefined) {
       return undefined;

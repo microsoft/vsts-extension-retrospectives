@@ -19,13 +19,13 @@
 .selector-list-container {
     max-height: none;
     overflow: visible;
-  
+
     .selector-list-item {
       height: $mobile_team_selector_list_item_height;
       width: 100%;
       align-items: center;
       font-size: 40px;
-  
+
       .selector-list-item-text {
         vertical-align: middle;
         text-align: center;
@@ -33,7 +33,7 @@
         margin-right: 15px;
         font-size: 40px;
       }
-  
+
       i {
         line-height: $mobile_team_selector_list_item_height;
         font-size: 40px;
