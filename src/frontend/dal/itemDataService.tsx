@@ -1,7 +1,7 @@
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
-import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
+import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { generateUUID } from '../utilities/random';
