@@ -204,7 +204,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     try {
       const votes = Object.values(initialCurrentBoard?.boardVoteCollection || []);
 
-      this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0 });
+      this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b, 0) : 0 });
     } catch (error) {
       console.error({ m: "votes", error });
     }
@@ -294,7 +294,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       actionItemIds: actionItemIds.filter(item => item !== undefined),
       feedbackItems,
       contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
-      castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b) : 0
+      castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b, 0) : 0
     });
   }
 
@@ -746,12 +746,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
       .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
-    const currentBoard: IFeedbackBoardDocument = boardsForTeam[0];
-
     this.setState({
-      boards: boardsForTeam,
-      currentBoard: currentBoard,
       isTeamDataLoaded: true,
+      boards: boardsForTeam,
+      currentBoard: boardsForTeam[0],
     });
   }
 
@@ -921,8 +919,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private readonly updateBoardMetadata = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
-    const updatedBoard =
-      await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxvotesPerUser, title, columns, permissions);
+    const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxvotesPerUser, title, columns, permissions);
 
     this.updateBoardAndBroadcast(updatedBoard);
   }
