@@ -23,7 +23,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     super(props);
 
     this.state = {
-      isEditing: this.props.text.trim() ? false : true,
+      isEditing: !this.props.text.trim(),
       newText: this.props.text,
       hasErrors: false,
     };
@@ -41,7 +41,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
 
   private editableTextRef: HTMLElement;
 
-  private handleTextChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string) => {
+  private readonly handleTextChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string) => {
     if (!newValue.trim()) {
       this.setState({
         newText: "",
@@ -60,7 +60,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     }
   }
 
-  private handleEdit = (event: React.MouseEvent<HTMLParagraphElement>) => {
+  private readonly handleEdit = (event: React.MouseEvent<HTMLParagraphElement>) => {
     event.stopPropagation();
     this.setState({
       isEditing: true,
@@ -68,8 +68,8 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     });
   }
 
-  private handleEditKeyDown = (event: React.KeyboardEvent<HTMLParagraphElement>) => {
-    if (event.keyCode === 13) {
+  private readonly handleEditKeyDown = (event: React.KeyboardEvent<HTMLParagraphElement>) => {
+    if (event.key === "Enter") {
       event.stopPropagation();
       this.setState({
         isEditing: true,
@@ -86,7 +86,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     document.removeEventListener("mousedown", this.handleClickOutside);
   }
 
-  private handleClickOutside = (event: Event) => {
+  private readonly handleClickOutside = (event: Event) => {
     if (this.editableTextRef && !this.editableTextRef.contains(event.target as Node)) {
       if (!this.state.newText.trim()) {
         this.setState({
@@ -106,11 +106,11 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     }
   }
 
-  private handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  private readonly handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     event.stopPropagation();
 
     // ESC
-    if (event.keyCode === 27) {
+    if (event.key === "Escape") {
       this.setState({
         isEditing: false,
         newText: this.props.text,
@@ -121,7 +121,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     }
 
     // Enter + Ctrl
-    if (event.keyCode === 13 && event.ctrlKey) {
+    if (event.key === "Enter" && event.ctrlKey) {
       if (!this.state.newText.trim()) {
         this.setState({ hasErrors: true });
         return;
@@ -136,8 +136,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
       return;
     }
 
-    // Enter or tab
-    if (event.keyCode === 13 || event.keyCode === 9) {
+    if (event.key === "Enter" || event.key === "Tab") {
       if (!this.state.newText.trim()) {
         this.setState({ hasErrors: true });
         return;
