@@ -1,7 +1,7 @@
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
 import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
-import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { generateUUID } from '../utilities/random';
@@ -235,6 +235,8 @@ class ItemDataService {
   public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
+    const encryptedUserId = encrypt(userId);
+
     if (!feedbackItem) {
       return undefined;
     }
@@ -245,39 +247,39 @@ class ItemDataService {
     }
 
     if (decrement) {
-      if (!boardItem.boardVoteCollection?.[userId] ||
-        boardItem.boardVoteCollection[userId] <= 0) {
+      if (!boardItem.boardVoteCollection?.[encryptedUserId] ||
+        boardItem.boardVoteCollection[encryptedUserId] <= 0) {
         return undefined;
       }
       if (feedbackItem.upvotes <= 0) {
         return undefined;
-      } else if (feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
+      } else if (feedbackItem.voteCollection[encryptedUserId] === null || feedbackItem.voteCollection[encryptedUserId] === 0) {
         return undefined;
       }
       else {
-        feedbackItem.voteCollection[userId]--;
+        feedbackItem.voteCollection[encryptedUserId]--;
         feedbackItem.upvotes--;
-        boardItem.boardVoteCollection[userId]--;
+        boardItem.boardVoteCollection[encryptedUserId]--;
       }
     } else {
       if (feedbackItem.voteCollection === undefined) {
         feedbackItem.voteCollection = {};
       }
-      if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null) {
-        feedbackItem.voteCollection[userId] = 0;
+      if (feedbackItem.voteCollection[encryptedUserId] === undefined || feedbackItem.voteCollection[encryptedUserId] === null) {
+        feedbackItem.voteCollection[encryptedUserId] = 0;
       }
       if (boardItem.boardVoteCollection === undefined) {
         boardItem.boardVoteCollection = {};
       }
-      if (boardItem.boardVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
-        boardItem.boardVoteCollection[userId] = 0;
+      if (boardItem.boardVoteCollection[encryptedUserId] === undefined || boardItem.boardVoteCollection[encryptedUserId] === null) {
+        boardItem.boardVoteCollection[encryptedUserId] = 0;
       }
-      if (boardItem.boardVoteCollection[userId] >= boardItem.maxVotesPerUser) {
+      if (boardItem.boardVoteCollection[encryptedUserId] >= boardItem.maxVotesPerUser) {
         return undefined;
       }
 
-      boardItem.boardVoteCollection[userId]++;
-      feedbackItem.voteCollection[userId]++;
+      boardItem.boardVoteCollection[encryptedUserId]++;
+      feedbackItem.voteCollection[encryptedUserId]++;
       feedbackItem.upvotes++;
     }
 
@@ -289,7 +291,7 @@ class ItemDataService {
 
     const updatedBoardItem = await this.updateBoardItem(teamId, boardItem);
     if (!updatedBoardItem) {
-      updatedFeedbackItem.voteCollection[userId] = decrement ? updatedFeedbackItem.voteCollection[userId]++ : updatedFeedbackItem.voteCollection[userId]--;
+      updatedFeedbackItem.voteCollection[encryptedUserId] = decrement ? updatedFeedbackItem.voteCollection[encryptedUserId]++ : updatedFeedbackItem.voteCollection[encryptedUserId]--;
       updatedFeedbackItem.upvotes = decrement ? updatedFeedbackItem.upvotes++ : updatedFeedbackItem.upvotes--;
 
       const feedbackItemWithOriginalVotes = await this.updateFeedbackItem(boardId, updatedFeedbackItem);
