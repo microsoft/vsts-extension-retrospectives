@@ -148,7 +148,6 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
         hasErrors: false
       });
     }
-
   }
 
   public render(): JSX.Element {
