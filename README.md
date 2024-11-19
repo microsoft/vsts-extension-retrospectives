@@ -1,4 +1,4 @@
-# Retrospectives
+# Retrospective Extension for Azure DevOps
 
 > ## TL;DR
 >
@@ -10,9 +10,9 @@
 >
 > Hi everyone!
 >
-> Maintaining the Retrospective Extension for Azure DevOps has been a passion project we’ve worked on in our personal time. While we’ll continue to handle security updates and occasional feature improvements when we can, our available time has become more limited. To take this project to the next level, we’d love to invite contributors to join and help make it even better for the community.
-
-If you're interested in contributing, please check out the repo! Together, we can ensure the project thrives. 🚀
+> Maintaining the `Retrospective Extension for Azure DevOps` has been a passion project we’ve worked on in our personal time. While we’ll continue to handle security updates and occasional feature improvements when we can, our available time has become more limited. To take this project to the next level, we’d love to invite contributors to join and help make it even better for the community.
+>
+> If you're interested in contributing, please check out the repo and the [Contributing Guideline](./CONTRIBUTING.md)! Together, we can ensure the project thrives. 🚀
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/microsoft/vsts-extension-retrospectives/badge)](https://scorecard.dev/viewer/?uri=github.com/microsoft/vsts-extension-retrospectives)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9514/badge)](https://www.bestpractices.dev/projects/9514)
