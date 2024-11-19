@@ -595,8 +595,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const ariaLabel = isNotGroupedItem ? 'Feedback item.' : (!isMainItem ? 'Feedback group item.' : `Feedback group main item. Group has ${groupItemsCount} items.`);
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
-    const originalColumnId = this.props.originalColumnId;
-    const originalColumnTitle = originalColumnId ? this.props.columns[originalColumnId]?.columnProperties.title : 'n/a';
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
 
@@ -809,7 +807,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </div>
                 }
                 {(this.props.workflowPhase !== WorkflowPhase.Collect) && (this.props.columnId !== this.props.originalColumnId) &&
-                  <div className="original-column-info">Original Column: <br />{originalColumnTitle}</div>
+                  <div className="original-column-info">Original Column: <br />{ this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? 'n/a' }</div>
                 }
                 {showVoteButton && this.props.isInteractable &&
                   <div>

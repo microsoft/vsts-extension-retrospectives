@@ -77,7 +77,6 @@ class ItemDataService {
       console.error(e);
       appInsights.trackException(e);
       if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
-        // TODO (enpolat) : add a notification to the user that the board does not exist.
         appInsights.trackTrace({ message: TelemetryExceptions.FeedbackItemsNotFoundForBoard, properties: { boardId, e } });
       }
     }
@@ -148,7 +147,7 @@ class ItemDataService {
   /**
    * Update the feedback item.
    */
-  private updateFeedbackItem = async (boardId: string, feedbackItem: IFeedbackItemDocument): Promise<IFeedbackItemDocument> => {
+  private readonly updateFeedbackItem = async (boardId: string, feedbackItem: IFeedbackItemDocument): Promise<IFeedbackItemDocument> => {
     const updatedFeedbackItem: IFeedbackItemDocument = await updateDocument<IFeedbackItemDocument>(boardId, feedbackItem);
     return updatedFeedbackItem;
   }
@@ -156,7 +155,7 @@ class ItemDataService {
   /**
    * Update the board item.
    */
-  private updateBoardItem = async (teamId: string, boardItem: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
+  private readonly updateBoardItem = async (teamId: string, boardItem: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
     const updatedBoardItem: IFeedbackBoardDocument = await updateDocument<IFeedbackBoardDocument>(teamId, boardItem);
     return updatedBoardItem;
   }
@@ -174,15 +173,12 @@ class ItemDataService {
 
     if (feedbackItem.upvotes <= 0) {
       return "0";
-    } else {
-      if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
-        return "0";
-      }
-      else {
-        return feedbackItem.voteCollection[userId].toString();
-      }
+    } else if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
+      return "0";
     }
-
+    else {
+      return feedbackItem.voteCollection[userId].toString();
+    }
   }
 
   /**
@@ -203,8 +199,11 @@ class ItemDataService {
     else {
       feedbackItem.timerstate = false;
     }
+
     feedbackItem.timerId = timerid;
+
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+
     return updatedFeedbackItem;
   }
 
@@ -224,7 +223,9 @@ class ItemDataService {
     else {
       feedbackItem.timerSecs++;
     }
+
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+
     return updatedFeedbackItem;
   }
 
@@ -244,23 +245,19 @@ class ItemDataService {
     }
 
     if (decrement) {
-      if (!boardItem.boardVoteCollection ||
-        !boardItem.boardVoteCollection[userId] ||
+      if (!boardItem.boardVoteCollection?.[userId] ||
         boardItem.boardVoteCollection[userId] <= 0) {
         return undefined;
       }
-
       if (feedbackItem.upvotes <= 0) {
         return undefined;
-      } else {
-        if (feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
-          return undefined;
-        }
-        else {
-          feedbackItem.voteCollection[userId]--;
-          feedbackItem.upvotes--;
-          boardItem.boardVoteCollection[userId]--;
-        }
+      } else if (feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
+        return undefined;
+      }
+      else {
+        feedbackItem.voteCollection[userId]--;
+        feedbackItem.upvotes--;
+        boardItem.boardVoteCollection[userId]--;
       }
     } else {
       if (feedbackItem.voteCollection === undefined) {
@@ -269,20 +266,17 @@ class ItemDataService {
       if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null) {
         feedbackItem.voteCollection[userId] = 0;
       }
-
       if (boardItem.boardVoteCollection === undefined) {
         boardItem.boardVoteCollection = {};
       }
       if (boardItem.boardVoteCollection[userId] === undefined || boardItem.boardVoteCollection[userId] === null) {
         boardItem.boardVoteCollection[userId] = 0;
       }
-
       if (boardItem.boardVoteCollection[userId] >= boardItem.maxVotesPerUser) {
         return undefined;
       }
 
       boardItem.boardVoteCollection[userId]++;
-
       feedbackItem.voteCollection[userId]++;
       feedbackItem.upvotes++;
     }
