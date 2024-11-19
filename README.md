@@ -32,7 +32,7 @@ The [Retrospectives extension](https://marketplace.visualstudio.com/items?itemNa
 
 ## Table of Contents
 
-- [Retrospectives](#retrospectives)
+- [Retrospectives](#retrospective-extension-for-azure-devops)
   - [Retrospective Features](#retrospective-features)
   - [Install](#install)
   - [Use](#use)
