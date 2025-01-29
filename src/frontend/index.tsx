@@ -10,7 +10,7 @@ import { reactPlugin } from './utilities/telemetryClient';
 import { AppInsightsErrorBoundary } from '@microsoft/applicationinsights-react-js';
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from './components/feedbackBoardContainer';
 
-initializeIcons();
+initializeIcons('https://res.cdn.office.net/files/fabric-cdn-prod_20240129.001/assets/icons/');
 
 sdkInit({ applyTheme: true }).then(() => {
   Promise.all([isHostedAzureDevOps(), getProjectId()]).then(res => {
