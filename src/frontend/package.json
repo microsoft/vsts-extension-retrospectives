@@ -50,7 +50,7 @@
     "telemetryclient-team-services-extension": "1.0.10"
   },
   "devDependencies": {
-    "@types/classnames": "2.3.1",
+    "@types/classnames": "2.3.4",
     "@types/enzyme": "3.10.12",
     "@types/file-saver": "2.0.7",
     "@types/jest": "28.1.6",
