@@ -57,6 +57,7 @@ export default [{
         }],
 
         "@typescript-eslint/ban-types": "off",
+        "comma-spacing": ["error", { "before": false, "after": true }],
         "jsx-quotes": ["error", "prefer-double"],
         "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-var-requires": "off",
@@ -65,10 +66,10 @@ export default [{
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/ban-ts-comment": "off",
-        "@typescript-eslint/comma-spacing": "error",
         "@typescript-eslint/no-unnecessary-type-constraint": "off",
         "@typescript-eslint/no-unused-expressions": "off",
         "@typescript-eslint/triple-slash-reference": "off",
         "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-empty-object-type": "off"
     },
 }];
