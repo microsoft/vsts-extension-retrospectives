@@ -9,11 +9,6 @@ repos:
   hooks:
   - id: shellcheck
 
-- repo: https://github.com/pre-commit/mirrors-eslint
-  rev: v8.38.0
-  hooks:
-  - id: eslint
-
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v5.0.0
   hooks:
