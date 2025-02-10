@@ -43,6 +43,7 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/comma-spacing": "error"
+    "@typescript-eslint/comma-spacing": "error",
+    "@typescript-eslint/no-unnecessary-type-constraint": "off"
   }
 }
