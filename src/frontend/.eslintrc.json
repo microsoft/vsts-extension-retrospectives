@@ -45,6 +45,7 @@
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/comma-spacing": "error",
     "@typescript-eslint/no-unnecessary-type-constraint": "off",
-    "@typescript-eslint/no-unused-expressions": "off"
+    "@typescript-eslint/no-unused-expressions": "off",
+    "@typescript-eslint/triple-slash-reference": "off"
   }
 }
