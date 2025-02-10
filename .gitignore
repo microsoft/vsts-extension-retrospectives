@@ -179,3 +179,4 @@ bin/
 obj/
 TestResults/
 test-report.xml
+dist/
