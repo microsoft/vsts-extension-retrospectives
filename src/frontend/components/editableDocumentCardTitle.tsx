@@ -1,7 +1,7 @@
-﻿import React from 'react';
-import EditableText from './editableText';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+﻿import React from "react";
+import EditableText from "./editableText";
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { reactPlugin } from "../utilities/telemetryClient";
 
 export interface EditableDocumentCardTitleProps {
   isDisabled?: boolean;
@@ -12,17 +12,7 @@ export interface EditableDocumentCardTitleProps {
   onSave: (newText: string) => void;
 }
 
-export interface EditableDocumentCardTitleState {
-}
-
-class EditableDocumentCardTitle extends React.Component<EditableDocumentCardTitleProps, EditableDocumentCardTitleState> {
-  constructor(props: EditableDocumentCardTitleProps) {
-    super(props);
-
-    this.state = {
-    };
-  }
-
+class EditableDocumentCardTitle extends React.Component<EditableDocumentCardTitleProps> {
   public render(): JSX.Element {
     return (
       <div className="editable-document-card-title">

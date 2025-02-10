@@ -218,7 +218,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     this.setState({ defaultActionItemAreaPath: defaultAreaPath, defaultActionItemIteration: defaultIteration });
   }
 
-  private getColumnsWithReleasedFocus = (currentFeedbackBoardState: FeedbackBoardState) => {
+  private readonly getColumnsWithReleasedFocus = (currentFeedbackBoardState: FeedbackBoardState) => {
     const resetFocusForStateColumns = { ...currentFeedbackBoardState.columns };
 
     for (const columnIdKey in currentFeedbackBoardState.columns) {
@@ -236,7 +236,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     return resetFocusForStateColumns;
   }
 
-  private addFeedbackItems = (
+  private readonly addFeedbackItems = (
     columnId: string, feedbackItems: IFeedbackItemDocument[],
     shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean,
     shouldHaveFocus: boolean, hideFeedbackItems: boolean) => {
@@ -286,7 +286,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     }
   }
 
-  private removeFeedbackItemFromColumn = (columnId: string, feedbackItemId: string, shouldSetFocusOnFirstAvailableItem: boolean) => {
+  private readonly removeFeedbackItemFromColumn = (columnId: string, feedbackItemId: string, shouldSetFocusOnFirstAvailableItem: boolean) => {
     this.setState((previousState: FeedbackBoardState) => {
       const removedItemIndex: number = previousState.columns[columnId].columnItems.findIndex((columnItem) => columnItem.feedbackItem.id === feedbackItemId);
       const updatedColumnItems = previousState.columns[columnId].columnItems.filter((columnItem) => {
@@ -326,12 +326,11 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     });
   }
 
-  private refreshFeedbackItems = async (updatedFeedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean): Promise<void> => {
+  private readonly refreshFeedbackItems = async (updatedFeedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean): Promise<void> => {
     if (updatedFeedbackItems.length) {
       const updatedColumnItems: IColumnItem[] = await Promise.all(updatedFeedbackItems.map(async (feedbackItem) => {
         // TODO: Optimize performance by only updating work items in action-item-related update scenario.
-        const actionItems = feedbackItem.associatedActionItemIds && feedbackItem.associatedActionItemIds.length ?
-          await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
+        const actionItems = feedbackItem.associatedActionItemIds?.length ? await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
 
         return {
           feedbackItem,
@@ -415,9 +414,10 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
         allWorkItemTypes: this.props.allWorkItemTypes,
         isBoardAnonymous: this.props.isAnonymous,
-        shouldFocusOnCreateFeedback: this.state.columns[columnId].shouldFocusOnCreateFeedback ? true : false,
+        shouldFocusOnCreateFeedback: !!this.state.columns[columnId].shouldFocusOnCreateFeedback,
         hideFeedbackItems: this.props.hideFeedbackItems,
         isFocusModalHidden: true,
+        groupIds: [],
         onVoteCasted: () => {
           itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
             const voteCollection = boardItem.boardVoteCollection;
@@ -425,7 +425,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[this.props.userId] === undefined ? "0" : voteCollection[this.props.userId].toString() });
           });
         },
-        groupIds: []
       };
     });
 
