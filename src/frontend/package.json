@@ -26,8 +26,8 @@
   "author": "Microsoft",
   "license": "ISC",
   "dependencies": {
-    "@microsoft/applicationinsights-react-js": "17.3.3",
-    "@microsoft/applicationinsights-web": "3.3.3",
+    "@microsoft/applicationinsights-react-js": "17.3.4",
+    "@microsoft/applicationinsights-web": "3.3.4",
     "@microsoft/signalr": "8.0.7",
     "@tanstack/react-table": "8.20.5",
     "azure-devops-extension-api": "1.152.0",
@@ -45,12 +45,12 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-slick": "0.30.2",
-    "react-toastify": "10.0.4",
+    "react-toastify": "9.0.7",
     "slick-carousel": "1.8.1",
     "telemetryclient-team-services-extension": "1.0.10"
   },
   "devDependencies": {
-    "@types/classnames": "2.3.1",
+    "@types/classnames": "2.3.4",
     "@types/enzyme": "3.10.12",
     "@types/file-saver": "2.0.7",
     "@types/jest": "28.1.6",
@@ -70,7 +70,7 @@
     "css-loader": "7.1.2",
     "enzyme": "3.11.0",
     "eslint": "8.20.0",
-    "eslint-plugin-react": "7.37.1",
+    "eslint-plugin-react": "7.37.4",
     "eslint-webpack-plugin": "3.2.0",
     "file-loader": "6.2.0",
     "jest": "28.1.3",
@@ -90,7 +90,7 @@
     "typescript": "5.6.3",
     "url-loader": "4.1.1",
     "util": "0.12.5",
-    "webpack": "5.95.0",
+    "webpack": "5.96.1",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "5.1.0"
   },

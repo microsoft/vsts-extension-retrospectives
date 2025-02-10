@@ -118,7 +118,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   }
 
   // Handle unlinking/ungrouping workitems and reload any updated items.
-  private handleDropFeedbackItemOnColumnSpace = async () => {
+  private readonly handleDropFeedbackItemOnColumnSpace = async () => {
     // Using localStorage as a temporary solution for Edge issue
     // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
     // const draggedItemId = e.dataTransfer.getData('id');
@@ -127,7 +127,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
   }
 
-  public static moveFeedbackItem = async (
+  public static readonly moveFeedbackItem = async (
     refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void,
     boardId: string,
     feedbackItemId: string,
@@ -147,7 +147,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     appInsights.trackEvent({name: TelemetryEvents.FeedbackItemUngrouped, properties: {boardId, feedbackItemId, columnId}});
   };
 
-  public static createFeedbackItemProps = (
+  public static readonly createFeedbackItemProps = (
     columnProps: FeedbackColumnProps,
     columnItem: IColumnItem,
     isInteractable: boolean): IFeedbackItemProps => {
@@ -203,7 +203,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     }
   }
 
-  private renderFeedbackItems = () => {
+  private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
     if (this.props.workflowPhase === WorkflowPhase.Act) {
@@ -243,6 +243,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   public render() {
     return (
       <div className="feedback-column"
+        role="application"
         onDoubleClick={this.createEmptyFeedbackItem}
         onDrop={this.handleDropFeedbackItemOnColumnSpace}
         onDragOver={this.dragFeedbackItemOverColumn}>
