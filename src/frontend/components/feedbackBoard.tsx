@@ -410,8 +410,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             const voteCollection = boardItem.boardVoteCollection;
             const userId = encrypt(this.props.userId);
 
-            console.log({ voteCollection, userId });
-
             this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[userId] === undefined ? "0" : voteCollection[userId].toString() });
           });
         },
