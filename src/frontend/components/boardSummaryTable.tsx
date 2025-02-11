@@ -230,7 +230,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     const actionItems = boardSummaryState.actionItemsByBoard[currentBoard.id];
     return <BoardSummary
       actionItems={actionItems?.actionItems}
-      isDataLoaded={true}
       pendingWorkItemsCount={currentBoard?.pendingWorkItemsCount}
       resolvedActionItemsCount={currentBoard?.totalWorkItemsCount - currentBoard?.pendingWorkItemsCount}
       boardName={currentBoard?.boardName}

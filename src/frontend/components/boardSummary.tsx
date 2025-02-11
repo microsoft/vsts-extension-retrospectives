@@ -10,7 +10,6 @@ import { reactPlugin } from '../utilities/telemetryClient';
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
-  isDataLoaded: boolean;
   pendingWorkItemsCount: number;
   resolvedActionItemsCount: number;
   boardName: string;
@@ -157,7 +156,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
     this.setState({ actionItemTableItems });
   }
 
-  private getIconForWorkItemType = (type: string): IIconProps => {
+  private readonly getIconForWorkItemType = (type: string): IIconProps => {
     const workItemType: WorkItemType = this.props.supportedWorkItemTypes.find(wit => wit.name === type);
 
     return {
@@ -167,7 +166,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
     };
   }
 
-  private buildActionItemsList = () => {
+  private readonly buildActionItemsList = () => {
     const actionItemsList = new Array<IActionItemsTableProps>();
 
     this.props.actionItems.forEach(workItem => {
@@ -192,7 +191,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
     return actionItemsList;
   }
 
-  private onColumnClick = (_: React.MouseEvent<HTMLElement>, column: IColumn): void => {
+  private readonly onColumnClick = (_: React.MouseEvent<HTMLElement>, column: IColumn): void => {
     const actionItems = this.state.actionItemTableItems;
     let newActionItems = actionItems.slice();
 
@@ -217,12 +216,12 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
     });
   }
 
-  private onItemInvoked = async (item: { id: number }) => {
+  private readonly onItemInvoked = async (item: { id: number }) => {
     const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
     await workItemNavSvc.openWorkItem(item.id);
   }
 
-  private sortActionItemsByColumn = (actionItems: IActionItemsTableProps[], columnName: string, descending = false): IActionItemsTableProps[] => {
+  private readonly sortActionItemsByColumn = (actionItems: IActionItemsTableProps[], columnName: string, descending = false): IActionItemsTableProps[] => {
     if (descending) {
       return actionItems.sort((itemA: IActionItemsTableProps, itemB: IActionItemsTableProps) => {
         if (itemA[columnName] < itemB[columnName]) {

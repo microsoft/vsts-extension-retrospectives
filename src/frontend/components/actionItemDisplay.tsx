@@ -65,7 +65,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
 
   private addActionItemButtonWrapper: HTMLElement | null;
 
-  private createAndLinkActionItem = async (workItemTypeName: string) => {
+  private readonly createAndLinkActionItem = async (workItemTypeName: string) => {
     const boardUrl = await getBoardUrl(this.props.team.id, this.props.boardId);
     const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
 
@@ -92,13 +92,13 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     }
   }
 
-  private renderAllWorkItemCards = () => {
+  private readonly renderAllWorkItemCards = () => {
     return this.props.actionItems.map((item) => {
       return this.renderWorkItemCard(item, false);
     });
   }
 
-  private renderWorkItemCard = (item: WorkItem, areActionIconsHidden: boolean) => {
+  private readonly renderWorkItemCard = (item: WorkItem, areActionIconsHidden: boolean) => {
     return (
       <ActionItem
         key={item.id}
@@ -113,40 +113,40 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     );
   }
 
-  private addActionItem = (workItemTypeName: string) => {
+  private readonly addActionItem = (workItemTypeName: string) => {
     this.createAndLinkActionItem(workItemTypeName);
   }
 
-  private onRenderWorkItemTypeIcon = (iconLocation: string, workItemType: string): JSX.Element => {
+  private readonly onRenderWorkItemTypeIcon = (iconLocation: string, workItemType: string): JSX.Element => {
     return <Image src={iconLocation} className="work-item-icon" aria-label={`icon for work item type ${workItemType}`} />;
   }
 
-  private hideSelectorCallout = () => {
+  private readonly hideSelectorCallout = () => {
     this.setState({
       isWorkItemTypeListCalloutVisible: false,
     });
   }
 
-  private toggleSelectorCallout = () => {
+  private readonly toggleSelectorCallout = () => {
     this.setState((prevState) => {
       return { isWorkItemTypeListCalloutVisible: !prevState.isWorkItemTypeListCalloutVisible };
     });
   }
 
-  private handleKeyPressSelectorButton = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.keyCode === 13) {
+  private readonly handleKeyPressSelectorButton = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter') {
       this.toggleSelectorCallout();
     }
   }
 
-  private handleClickWorkItemType = (event: React.MouseEvent<Button | HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | HTMLSpanElement>, item: WorkItemType) => {
+  private readonly handleClickWorkItemType = (event: React.MouseEvent<Button | HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | HTMLSpanElement>, item: WorkItemType) => {
     event && event.stopPropagation();
     this.hideSelectorCallout();
     this.addActionItem(item.name)
   }
 
-  private handleInputChange = async (event?: React.ChangeEvent<HTMLInputElement>, newValue?: string) => {
-    if (!newValue || !newValue.trim()) {
+  private readonly handleInputChange = async (event?: React.ChangeEvent<HTMLInputElement>, newValue?: string) => {
+    if (!newValue?.trim()) {
       this.setState({
         isLinkedWorkItemLoaded: false,
         workItemSearchTextboxHasErrors: false,
@@ -172,7 +172,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     });
   }
 
-  private linkExistingWorkItem = async () => {
+  private readonly linkExistingWorkItem = async () => {
     this.linkExistingItemDialogDismiss();
 
     if (this.state.linkedWorkItem) {
@@ -184,7 +184,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     }
   }
 
-  private handleLinkExistingWorkItemClick = (mouseEvent: React.MouseEvent<Button | HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton> = undefined) => {
+  private readonly handleLinkExistingWorkItemClick = (mouseEvent: React.MouseEvent<Button | HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton> = undefined) => {
     if (mouseEvent) {
       mouseEvent.stopPropagation();
     }
@@ -197,7 +197,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     });
   }
 
-  private linkExistingItemDialogDismiss = () => {
+  private readonly linkExistingItemDialogDismiss = () => {
     this.setState({
       isLinkExistingItemDialogHidden: true,
     });
@@ -246,7 +246,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
                     className="add-action-item-list-item"
                     onClick={this.handleLinkExistingWorkItemClick}
                     onKeyDown={(e) => {
-                      if (e.keyCode === 13) {
+                      if (e.key === 'Enter') {
                         e.stopPropagation();
                         this.handleLinkExistingWorkItemClick();
                       }
