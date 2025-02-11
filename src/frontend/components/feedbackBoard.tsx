@@ -15,6 +15,7 @@ import FeedbackItemCarousel from "./feedbackCarousel";
 import { Dialog, DialogType } from "office-ui-fabric-react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
+import { encrypt } from "../utilities/userIdentityHelper";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -61,6 +62,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   constructor(props: FeedbackBoardProps) {
     super(props);
 
+    const userId = encrypt(this.props.userId);
+
     this.state = {
       columnIds: [],
       columns: {},
@@ -68,7 +71,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       defaultActionItemIteration: "",
       hasItems: false,
       isDataLoaded: false,
-      currentVoteCount: (props.board.boardVoteCollection === undefined || props.board.boardVoteCollection === null) ? "0" : (props.board.boardVoteCollection[this.props.userId] === undefined || props.board.boardVoteCollection[this.props.userId] === null) ? "0" : props.board.boardVoteCollection[this.props.userId]?.toString()
+      currentVoteCount: (props.board.boardVoteCollection[userId] === undefined || props.board.boardVoteCollection[userId] === null) ? "0" : props.board.boardVoteCollection[userId]?.toString()
     };
   }
 
@@ -407,8 +410,9 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         onVoteCasted: () => {
           itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
             const voteCollection = boardItem.boardVoteCollection;
+            const userId = encrypt(this.props.userId);
 
-            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[this.props.userId] === undefined ? "0" : voteCollection[this.props.userId].toString() });
+            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[userId] === undefined ? "0" : voteCollection[userId].toString() });
           });
         },
       };
