@@ -43,8 +43,8 @@ export const questions = [
     id: 6,
     shortTitle: "Efficiency",
     discussActTemplate: "team-efficiency",
-    title: "Tools/resources/processes/procedures allow me to effectively meet my customers' needs",
-    fontAwesomeClass: "fa-solid fa-bolt",
+    title: "Tools, resources, processes, procedures allow me to effectively meet my customers' needs",
+    fontAwesomeClass: "fa-solid fa-gears",
     tooltip: "This question is an experimental question enabling teams to quickly identify and improve areas of inefficiency. Please provide any feedback using this link: <a target=\"_blank\" rel=\"noreferrer\" href=\"https://github.com/microsoft/vsts-extension-retrospectives/discussions/470\">New Experimental Question on Efficiency</a>",
   }
 ];
