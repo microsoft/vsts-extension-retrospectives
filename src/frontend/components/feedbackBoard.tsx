@@ -62,6 +62,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   constructor(props: FeedbackBoardProps) {
     super(props);
 
+    console.log({props});
+
     this.state = {
       columnIds: [],
       columns: {},
