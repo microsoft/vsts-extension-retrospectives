@@ -408,6 +408,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
           itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
             const voteCollection = boardItem.boardVoteCollection;
 
+            console.log({ voteCollection, userId: this.props.userId });
+
             this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[this.props.userId] === undefined ? "0" : voteCollection[this.props.userId].toString() });
           });
         },
