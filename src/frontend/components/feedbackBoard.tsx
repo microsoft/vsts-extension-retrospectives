@@ -62,7 +62,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   constructor(props: FeedbackBoardProps) {
     super(props);
 
-    console.log({props});
+    const userId = encrypt(this.props.userId);
 
     this.state = {
       columnIds: [],
@@ -71,7 +71,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       defaultActionItemIteration: "",
       hasItems: false,
       isDataLoaded: false,
-      currentVoteCount: (props.board.boardVoteCollection === undefined || props.board.boardVoteCollection === null) ? "0" : (props.board.boardVoteCollection[this.props.userId] === undefined || props.board.boardVoteCollection[this.props.userId] === null) ? "0" : props.board.boardVoteCollection[this.props.userId]?.toString()
+      currentVoteCount: (props.board.boardVoteCollection[userId] === undefined || props.board.boardVoteCollection[userId] === null) ? "0" : props.board.boardVoteCollection[userId]?.toString()
     };
   }
 
