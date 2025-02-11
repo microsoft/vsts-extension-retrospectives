@@ -15,6 +15,7 @@ import FeedbackItemCarousel from "./feedbackCarousel";
 import { Dialog, DialogType } from "office-ui-fabric-react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
+import { encrypt } from "../utilities/userIdentityHelper";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -407,10 +408,11 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         onVoteCasted: () => {
           itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
             const voteCollection = boardItem.boardVoteCollection;
+            const userId = encrypt(this.props.userId);
 
-            console.log({ voteCollection, userId: this.props.userId });
+            console.log({ voteCollection, userId });
 
-            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[this.props.userId] === undefined ? "0" : voteCollection[this.props.userId].toString() });
+            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[userId] === undefined ? "0" : voteCollection[userId].toString() });
           });
         },
       };
