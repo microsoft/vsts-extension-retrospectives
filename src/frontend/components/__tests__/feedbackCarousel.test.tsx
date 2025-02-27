@@ -21,14 +21,14 @@ jest.mock('uuid', () => ({ v4: () => mockUuid}));
 
 describe('Feedback Carousel ', () => {
   it('can be rendered', () => {
-    const wrapper = shallow(<FeedbackCarousel {...mockedProps} />);
+    const wrapper = shallow(<FeedbackCarousel {...mockedProps} /> as any);
     const component = wrapper.children().dive();
     expect(component.prop('className')).toBe('feedback-carousel-pivot');
     expect(component.findWhere(c => c.prop('headerText') === testColumnProps.columnName)).toHaveLength(1);
   });
 
   test('that groupIds are empty when there are no children', () => {
-    const wrapper = shallow(<FeedbackCarousel {...mockedProps} />);
+    const wrapper = shallow(<FeedbackCarousel {...mockedProps} /> as any);
     const component = wrapper.children().dive();
 
     const feedbackItem = component.findWhere(c => c.prop('className') === 'feedback-carousel-item').find(FeedbackItem).first();
@@ -37,7 +37,7 @@ describe('Feedback Carousel ', () => {
   })
 
   test('that groupIds are populate when there are children', () => {
-    const wrapper = shallow(<FeedbackCarousel {...mockedGroupProps} />);
+    const wrapper = shallow(<FeedbackCarousel {...mockedGroupProps} /> as any);
     const component = wrapper.children().dive();
 
     const feedbackItem = component.findWhere(c => c.prop('className') === 'feedback-carousel-item').find(FeedbackItem).first();
@@ -48,7 +48,7 @@ describe('Feedback Carousel ', () => {
 
   describe("'All' column", () => {
     it("should be set by default in the first position", () => {
-      const wrapper = shallow(<FeedbackCarousel {...mockedProps} />);
+      const wrapper = shallow(<FeedbackCarousel {...mockedProps} /> as any);
       const component = wrapper.children().dive();
 
       const allColumn = component.findWhere(c => c.prop('headerText')).first();
@@ -57,7 +57,7 @@ describe('Feedback Carousel ', () => {
     });
 
     it("should not exist when there are no feedback columns", () => {
-      const wrapper = shallow(<FeedbackCarousel feedbackColumnPropsList={[]} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
+      const wrapper = shallow(<FeedbackCarousel feedbackColumnPropsList={[]} isFeedbackAnonymous={true} isFocusModalHidden={false} /> as any);
       const component = wrapper.children().dive();
 
       const allColumn = component.findWhere(c => c.prop('headerText')).first();

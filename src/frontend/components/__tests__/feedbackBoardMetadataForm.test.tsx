@@ -21,7 +21,7 @@ jest.mock('uuid', () => ({ v4: () => mockUuid}));
 
 describe('Board Metadata Form', () => {
   it('can be rendered', () => {
-    const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+    const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
     const component = wrapper.children().dive();
     const textField = component.findWhere(c => c.prop('id') === 'retrospective-title-input').find(TextField);
 
@@ -36,7 +36,7 @@ describe('Board Metadata Form', () => {
     })
 
     it('should set the title to nothing', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const textField = component.findWhere(c => c.prop('id') === 'retrospective-title-input').find(TextField);
 
@@ -45,7 +45,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set max votes settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const textField = component.findWhere(c => c.prop('id') === 'max-vote-counter').find(TextField);
 
@@ -54,7 +54,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set include team assessment settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
@@ -64,7 +64,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set obscure feedback settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
 
@@ -74,7 +74,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set prime directive setting', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
@@ -84,7 +84,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set display names settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
@@ -94,7 +94,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set the column list', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const list = component.find(List).first();
 
@@ -115,7 +115,7 @@ describe('Board Metadata Form', () => {
     })
 
     it('should set the title', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const textField = component.findWhere(c => c.prop('id') === 'retrospective-title-input').find(TextField);
 
@@ -124,7 +124,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set max votes settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const textField = component.findWhere(c => c.prop('id') === 'max-vote-counter').find(TextField);
 
@@ -133,7 +133,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set include team assessment settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
@@ -143,7 +143,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set obscure feedback settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
 
@@ -153,7 +153,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set prime directive setting', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
@@ -163,7 +163,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set display names settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
@@ -173,7 +173,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set the column list', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const list = component.find(List).first();
 
@@ -195,7 +195,7 @@ describe('Board Metadata Form', () => {
     })
 
     it('should set the title with the duplicate copy addition', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const textField = component.findWhere(c => c.prop('id') === 'retrospective-title-input').find(TextField);
 
@@ -204,7 +204,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set max votes settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const textField = component.findWhere(c => c.prop('id') === 'max-vote-counter').find(TextField);
 
@@ -213,7 +213,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set include team assessment settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
@@ -223,7 +223,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set obscure feedback settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
 
@@ -233,7 +233,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set prime directive setting', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
@@ -243,7 +243,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set display names settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
@@ -253,7 +253,7 @@ describe('Board Metadata Form', () => {
     });
 
     it('should properly set the column list', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const list = component.find(List).first();
 

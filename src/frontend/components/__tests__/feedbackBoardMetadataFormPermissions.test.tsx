@@ -24,7 +24,7 @@ describe('Board Metadata Form Permissions', () => {
   });
 
   it('can be rendered', () => {
-    const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...mockedProps} />);
+    const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...mockedProps} /> as any);
     const component = wrapper.children().dive();
     const textField = component.findWhere(c => c.prop('id') === 'retrospective-permission-search-input').find(TextField);
 
@@ -36,7 +36,7 @@ describe('Board Metadata Form Permissions', () => {
     const publicBannerText: string = 'This board is visible to every member in the organization.';
 
     it('should show when there are not team or member permissions', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...mockedProps} />);
+      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...mockedProps} /> as any);
       const component = wrapper.children().dive();
       const element = component.findWhere(c => c.text() === publicBannerText);
 
@@ -51,7 +51,7 @@ describe('Board Metadata Form Permissions', () => {
           Members: [] as string[]
         }
       };
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
       const component = wrapper.children().dive();
       const element = component.findWhere(c => c.text() === publicBannerText);
 
@@ -66,7 +66,7 @@ describe('Board Metadata Form Permissions', () => {
           Members: [testUserId]
         }
       };
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
       const component = wrapper.children().dive();
       const element = component.findWhere(c => c.text() === publicBannerText);
 
@@ -96,7 +96,7 @@ describe('Board Metadata Form Permissions', () => {
           }
         ]
       };
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
       const component = wrapper.children().dive();
       const tableBody = component.find('tbody');
       const tableRows = tableBody.find('tr');
@@ -127,7 +127,7 @@ describe('Board Metadata Form Permissions', () => {
           }
         ]
       };
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
       const component = wrapper.children().dive();
       const tableBody = component.find('tbody');
       const tableRows = tableBody.find('tr');
@@ -165,7 +165,7 @@ describe('Board Metadata Form Permissions', () => {
           },
         ]
       };
-      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
       const tableBody = wrapper.find('tbody');
       const tableRows = tableBody.find('tr');
 
@@ -216,7 +216,7 @@ describe('Board Metadata Form Permissions', () => {
           },
         ]
       };
-      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
       const tableBody = wrapper.find('tbody');
       const tableRows = tableBody.find('tr');
 
@@ -274,7 +274,7 @@ describe('Board Metadata Form Permissions', () => {
           },
         ]
       };
-      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
       const tableBody = wrapper.find('tbody');
       const tableRows = tableBody.find('tr');
 

@@ -15,14 +15,14 @@ const mockedProps = mocked({
 describe('Workflow Stage ', () => {
   it('can be rendered when active.', () => {
     mockedProps.isActive = true;
-    const wrapper = shallow(<WorkflowStage {...mockedProps} />);
+    const wrapper = shallow(<WorkflowStage {...mockedProps} /> as any);
     const component = wrapper.children().dive();
     expect(component.prop('aria-label')).toBe(`Selected ${mockedProps.display} workflow stage`);
   });
 
   it('can be rendered when inactive.', () => {
     mockedProps.isActive = false;
-    const wrapper = shallow(<WorkflowStage {...mockedProps} />);
+    const wrapper = shallow(<WorkflowStage {...mockedProps} /> as any);
     const component = wrapper.children().dive();
 
     expect(component.prop('aria-label')).toBe(`Not selected ${mockedProps.display} workflow stage`);
@@ -30,7 +30,7 @@ describe('Workflow Stage ', () => {
 
   it('calls clickEventCallback when the Enter key is pressed.', () => {
     mockedProps.isActive = true;
-    const wrapper = shallow(<WorkflowStage {...mockedProps} />);
+    const wrapper = shallow(<WorkflowStage {...mockedProps} /> as any);
     const component = wrapper.children().dive();
 
     component.simulate('keydown', { keyCode: 13 });
@@ -40,7 +40,7 @@ describe('Workflow Stage ', () => {
 
   it('calls clickEventCallback when the component is clicked.', () => {
     mockedProps.isActive = true;
-    const wrapper = shallow(<WorkflowStage {...mockedProps} />);
+    const wrapper = shallow(<WorkflowStage {...mockedProps} /> as any);
     const component = wrapper.children().dive();
 
     component.simulate('click');
