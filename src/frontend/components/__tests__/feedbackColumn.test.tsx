@@ -7,7 +7,7 @@ import { IColumnItem } from '../feedbackBoard';
 
 describe('Feedback Column ', () => {
   it('can be rendered', () => {
-    const wrapper = shallow(<FeedbackColumn {...testColumnProps} />);
+    const wrapper = shallow(<FeedbackColumn {...testColumnProps} /> as any);
     expect(wrapper.prop('className')).toBe('feedback-column');
   });
 
@@ -16,10 +16,10 @@ describe('Feedback Column ', () => {
     testColumnProps.isDataLoaded = true;
 
     it('can be rendered', () => {
-      const wrapper = shallow(<FeedbackColumn {...testColumnProps} />);
+      const wrapper = shallow(<FeedbackColumn {...testColumnProps} /> as any);
       const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0], true);
 
-      expect(wrapper.containsMatchingElement(<FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />)).toEqual(true);
+      expect(wrapper.containsMatchingElement(<FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} /> as any)).toEqual(true);
     });
 
     it('should render with original accent color when the column ids are the same', () => {

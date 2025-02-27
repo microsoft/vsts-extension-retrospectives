@@ -32,7 +32,7 @@ describe('Feedback Item', () => {
     const testProps = FeedbackColumn.createFeedbackItemProps(
       testColumnProps, testColumnItem, true);
 
-    const wrapper = shallow(<FeedbackItem {...testProps} />);
+    const wrapper = shallow(<FeedbackItem {...testProps} /> as any);
     const component = wrapper.children().dive();
 
     // Expect all child Dialogs to be hidden.
@@ -111,7 +111,7 @@ describe('Feedback Item', () => {
     });
 
     it('should show the related feedback header', () => {
-      const wrapper = shallow(<FeedbackItem {...testProps} />);
+      const wrapper = shallow(<FeedbackItem {...testProps} /> as any);
       const component = wrapper.children().dive();
 
       component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
@@ -121,7 +121,7 @@ describe('Feedback Item', () => {
     })
 
     it('should show the related feedback item title', () => {
-      const wrapper = shallow(<FeedbackItem {...testProps} />);
+      const wrapper = shallow(<FeedbackItem {...testProps} /> as any);
       const component = wrapper.children().dive();
 
       component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
@@ -131,7 +131,7 @@ describe('Feedback Item', () => {
     })
 
     it('should show the original column information', () => {
-      const wrapper = shallow(<FeedbackItem {...testProps} />);
+      const wrapper = shallow(<FeedbackItem {...testProps} /> as any);
       const component = wrapper.children().dive();
 
       component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
