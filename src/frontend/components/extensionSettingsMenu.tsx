@@ -44,7 +44,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     };
   }
 
-  private getChangelog = (): string[] => {
+  private readonly getChangelog = (): string[] => {
     return [
       'Team Assessment form: Background colors for each number on the spectrum now more closely resemble the Retrospective summary\'s color separation for the three categories: Reds and Oranges for Unfavorable (1-6), Yellows for Neutral (7-8), Greens for Favorable (9-10).',
       'Related feedback items, in "Focus Mode", now show the original column textual as well as visually.',
@@ -53,19 +53,17 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     ];
   }
 
-  private exportData = async () => {
+  private readonly exportData = async () => {
     const toastId = toast('Processing boards...');
     const exportedData: IExportImportDataSchema[] = [];
     const projectId = await getProjectId();
     const teams = await azureDevOpsCoreService.getAllTeams(projectId, true);
-    for (let iLoop = 0; iLoop < teams.length; iLoop++) {
-      const team = teams[iLoop];
+    for (const team of teams) {
       const boards = await boardDataService.getBoardsForTeam(team.id);
-      for (let yLoop = 0; yLoop < boards.length; yLoop++) {
-        const board = boards[yLoop];
+      for (const board of boards) {
         const items = await itemDataService.getFeedbackItemsForBoard(board.id);
-        exportedData.push({team, board, items});
-        toast.update(toastId, { render: `Processing boards... (${board.title} is done)` })
+        exportedData.push({ team, board, items });
+        toast.update(toastId, { render: `Processing boards... (${board.title} is done)` });
       }
     }
     const content = [JSON.stringify(exportedData)];
@@ -80,7 +78,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     document.body.removeChild(a);
   }
 
-  private importData = async () => {
+  private readonly importData = async () => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.addEventListener('change', () => {
@@ -97,7 +95,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     return false;
   }
 
-  private processImportedData = async (importedData: IExportImportDataSchema[]) => {
+  private readonly processImportedData = async (importedData: IExportImportDataSchema[]) => {
     const projectId = await getProjectId();
 
     const teams = await azureDevOpsCoreService.getAllTeams(projectId, true);
@@ -105,15 +103,10 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
     const toastId = toast('Importing data...');
 
-    for (let iLoop = 0; iLoop < importedData.length; iLoop++) {
-      const dataToProcess = importedData[iLoop];
-
+    for (const dataToProcess of importedData) {
       const team = teams.find(e => e.name === dataToProcess.team.name) ?? defaultTeam;
-
       const oldBoard = dataToProcess.board;
-
       const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.isAnonymous, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.displayPrimeDirective, oldBoard.startDate, oldBoard.endDate);
-
       for (let yLoop = 0; yLoop < dataToProcess.items.length; yLoop++) {
         const oldItem = dataToProcess.items[yLoop];
         oldItem.boardId = newBoard.id;
@@ -125,40 +118,36 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     }
   };
 
-  private clearVisitHistory = async () => {
+  private readonly clearVisitHistory = async () => {
     await userDataService.clearVisits();
     this.hideClearVisitHistoryDialog();
   }
 
-  private showClearVisitHistoryDialog = () => {
+  private readonly showClearVisitHistoryDialog = () => {
     this.setState({ isClearVisitHistoryDialogHidden: false });
   }
 
-  private hideClearVisitHistoryDialog = () => {
+  private readonly hideClearVisitHistoryDialog = () => {
     this.setState({ isClearVisitHistoryDialogHidden: true });
   }
 
-  private showMobileExtensionSettingsMenuDialog = () => {
-    this.setState({ isMobileExtensionSettingsDialogHidden: false });
-  }
-
-  private showWhatsNewDialog = () => {
+  private readonly showWhatsNewDialog = () => {
     this.setState({ isWhatsNewDialogHidden: false });
   }
 
-  private hideWhatsNewDialog = () => {
+  private readonly hideWhatsNewDialog = () => {
     this.setState({ isWhatsNewDialogHidden: true });
   }
 
-  private hideMobileExtensionSettingsMenuDialog = () => {
+  private readonly hideMobileExtensionSettingsMenuDialog = () => {
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
-  private onChangeLogClicked = () => {
+  private readonly onChangeLogClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md', '_blank');
   }
 
-  private onContactUsClicked = () => {
+  private readonly onContactUsClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/issues', '_blank');
   }
 
@@ -256,7 +245,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             containerClassName: 'whatsnew-dialog',
           }}>
           <DialogBase>
-            
+
           </DialogBase>
           <DialogContent>
             <ul style={{listStyle: 'initial'}}>
@@ -326,7 +315,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
                   text={extensionSettingsMenuItem.text}
                   title={extensionSettingsMenuItem.title}
                 >
-                  <span className="ms-Button-icon"><i className={"fa-solid fa-" + extensionSettingsMenuItem.iconProps}></i></span>&nbsp;
+                  <span className="ms-Button-icon"><i className={"fa-solid fa-" + extensionSettingsMenuItem.iconProps.iconName}></i></span>&nbsp;
                   <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span>
                 </ActionButton>
               )

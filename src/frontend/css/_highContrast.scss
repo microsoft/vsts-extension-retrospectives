@@ -1,18 +1,18 @@
-@media screen and (-ms-high-contrast: active) {  
+@media screen and (-ms-high-contrast: active) {
   @media screen and (-ms-high-contrast: black-on-white) {
     /* Rules for users using black-on-white */
     .retrospective-notification-toast-container {
       .retrospective-notification-toast {
         border: 1px solid $hc_bow_hover_grey;
-        
+
         .retrospective-notification-toast-progress-bar {
           background: $hc_bow_main_blue;
         }
       }
     }
-    
+
     .retrospective-workflowState {
-      &.active {        
+      &.active {
         &::before {
           border-bottom: 2px solid $hc_bow_main_blue;
         }
@@ -38,7 +38,7 @@
       border: 1px solid $hc_bow_hover_grey;
     }
   }
-  
+
   @media screen and (-ms-high-contrast: white-on-black) {
     /* Rules for users using white-on-black */
     .retrospective-notification-toast-container {
@@ -52,7 +52,7 @@
     }
 
     .retrospective-workflowState {
-      &.active {        
+      &.active {
         &::before {
           border-bottom: 2px solid $hc_wob_main_blue;
         }
@@ -61,7 +61,7 @@
 
     .selector-list-item,
     .add-action-item-list-item,
-    .add-action-item-button {  
+    .add-action-item-button {
       &:hover, &:focus {
         background-color: $hc_wob_hover_grey;
         border-color: white;

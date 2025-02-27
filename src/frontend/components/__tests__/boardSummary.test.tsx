@@ -6,7 +6,6 @@ import BoardSummary, { IBoardSummaryProps } from '../boardSummary';
 
 const mockedDefaultProps: IBoardSummaryProps = {
   actionItems: [],
-  isDataLoaded: true,
   pendingWorkItemsCount: 0,
   resolvedActionItemsCount: 0,
   boardName: '',
@@ -16,7 +15,6 @@ const mockedDefaultProps: IBoardSummaryProps = {
 
 const mockedWorkItemCountProps: IBoardSummaryProps = {
   actionItems: [],
-  isDataLoaded: false,
   pendingWorkItemsCount: 2,
   resolvedActionItemsCount: 3,
   boardName: '',

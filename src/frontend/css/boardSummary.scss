@@ -23,13 +23,10 @@
   }
 }
 
-
-
 .board-summary-table-container {
   min-width: 1000px;
   overflow: auto;
   height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
-
 
   th, td {
     border: 1px solid rgba(0,0,0,0.02);
@@ -44,12 +41,11 @@
     border-collapse: collapse;
     overflow: auto;
     width: 100%;
-    
 
     thead {
       background-color: $azdo_blue;
       color: #fff;
-      
+
       tr {
         th {
           background-color: $azdo_blue;
@@ -231,7 +227,6 @@
             min-width: 270px;
             border: 1px solid var(--text-primary-color);
             border-radius: 4px;
-
 
             .resolved-green {
               color: var(--status-success-text);

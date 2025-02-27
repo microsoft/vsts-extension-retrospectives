@@ -1,21 +1,21 @@
-﻿import React from 'react';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
-import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+﻿import React from "react";
+import { WebApiTeam } from "azure-devops-extension-api/Core";
+import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 
-import { workService } from '../dal/azureDevOpsWorkService';
-import { workItemService } from '../dal/azureDevOpsWorkItemService';
-import BoardDataService from '../dal/boardDataService';
-import { itemDataService } from '../dal/itemDataService';
-import { reflectBackendService } from '../dal/reflectBackendService';
-import FeedbackColumn from './feedbackColumn';
-import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
-import { ExceptionCode } from '../interfaces/retrospectiveState';
-import { WorkflowPhase } from '../interfaces/workItem';
+import { workService } from "../dal/azureDevOpsWorkService";
+import { workItemService } from "../dal/azureDevOpsWorkItemService";
+import { itemDataService } from "../dal/itemDataService";
+import { reflectBackendService } from "../dal/reflectBackendService";
+import FeedbackColumn from "./feedbackColumn";
+import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from "../interfaces/feedback";
+import { ExceptionCode } from "../interfaces/retrospectiveState";
+import { WorkflowPhase } from "../interfaces/workItem";
 
-import FeedbackItemCarousel from './feedbackCarousel';
-import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+import FeedbackItemCarousel from "./feedbackCarousel";
+import { Dialog, DialogType } from "office-ui-fabric-react/lib/Dialog";
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { reactPlugin } from "../utilities/telemetryClient";
+import { encrypt } from "../utilities/userIdentityHelper";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -62,14 +62,16 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   constructor(props: FeedbackBoardProps) {
     super(props);
 
+    const userId = encrypt(this.props.userId);
+
     this.state = {
       columnIds: [],
       columns: {},
-      defaultActionItemAreaPath: '',
-      defaultActionItemIteration: '',
+      defaultActionItemAreaPath: "",
+      defaultActionItemIteration: "",
       hasItems: false,
       isDataLoaded: false,
-      currentVoteCount: (props.board.boardVoteCollection === undefined || props.board.boardVoteCollection === null) ? "0" : (props.board.boardVoteCollection[this.props.userId] === undefined || props.board.boardVoteCollection[this.props.userId] === null) ? "0" : props.board.boardVoteCollection[this.props.userId]?.toString()
+      currentVoteCount: (props.board.boardVoteCollection[userId] === undefined || props.board.boardVoteCollection[userId] === null) ? "0" : props.board.boardVoteCollection[userId]?.toString()
     };
   }
 
@@ -111,7 +113,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     reflectBackendService.removeOnReceiveUpdatedItem(this.receiveUpdatedItemHandler);
   }
 
-  private receiveNewItemHandler = async (columnId: string, feedbackItemId: string) => {
+  private readonly receiveNewItemHandler = async (columnId: string, feedbackItemId: string) => {
     const newItem = await itemDataService.getFeedbackItem(this.props.board.id, feedbackItemId);
     this.addFeedbackItems(
       columnId,
@@ -123,37 +125,25 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       this.props.hideFeedbackItems);
   }
 
-  private receiveUpdatedItemHandler = async (columnId: string, feedbackItemId: string) => {
+  private readonly receiveUpdatedItemHandler = async (columnId: string, feedbackItemId: string) => {
     const updatedItem = await itemDataService.getFeedbackItem(this.props.board.id, feedbackItemId);
     this.refreshFeedbackItems([updatedItem], false);
   }
 
-  private initColumns = () => {
+  private readonly initColumns = () => {
     const columnProperties = this.props.board.columns;
 
     const stateColumns: { [id: string]: IColumn } = {};
     const columnIds: string[] = new Array<string>();
 
-    columnProperties.map((col) => {
-      // If icon class is not present in the document, assign the smile and frown
-      // based on column id.
-      col.iconClass = col.iconClass
-        ? col.iconClass
-        : col.id === BoardDataService.legacyPositiveColumnId
-          ? 'far fa-smile'
-          : col.id === BoardDataService.legacyNegativeColumnId
-            ? 'far fa-frown'
-            // Default icon to a chalkboard if there's any issue.
-            : 'fas fa-chalkboard';
+    columnProperties.forEach((col) => {
+      if (!col.iconClass) {
+        col.iconClass = "fas fa-chalkboard";
+      }
 
-      col.accentColor = col.accentColor
-        ? col.accentColor
-        : col.id === BoardDataService.legacyPositiveColumnId
-          ? 'green'
-          : col.id === BoardDataService.legacyNegativeColumnId
-            ? '#cc293d'
-            // Default accent color to DevOps blue if there's any issue.
-            : '#0078d4';
+      if (!col.accentColor) {
+        col.accentColor = "#0078d4";
+      }
 
       const column: IColumn = {
         columnProperties: col,
@@ -167,8 +157,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     this.setState({ columns: stateColumns, columnIds: columnIds });
   }
 
-  // TODO: This throws a 404 if board does not have any items. This case and any such cases should be explicitly handled.
-  private getAllBoardFeedbackItems = async () => {
+  private readonly getAllBoardFeedbackItems = async () => {
     const feedbackItems = await itemDataService.getFeedbackItemsForBoard(this.props.board.id);
 
     if (!feedbackItems) {
@@ -177,7 +166,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     }
 
     const columnItemPromises: Promise<IColumnItem>[] = feedbackItems.map(async (feedbackItem) => {
-      const actionItems = feedbackItem.associatedActionItemIds && feedbackItem.associatedActionItemIds.length ? await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
+      const actionItems = feedbackItem.associatedActionItemIds?.length ? await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
 
       return {
         actionItems,
@@ -203,22 +192,22 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     });
   }
 
-  private setDefaultIterationAndAreaPath = async (teamId: string): Promise<void> => {
-    let currentIterations = await workService.getIterations(teamId, 'current');
-    if (!currentIterations || !currentIterations.length) {
+  private readonly setDefaultIterationAndAreaPath = async (teamId: string): Promise<void> => {
+    let currentIterations = await workService.getIterations(teamId, "current");
+    if (!currentIterations?.length) {
       // If no iterations cover the present timeframe, we simply choose an arbitrary iteration as default.
       currentIterations = await workService.getIterations(teamId);
     }
 
-    const defaultIteration = (currentIterations && currentIterations.length) ? currentIterations[0].path : '';
+    const defaultIteration = currentIterations?.[0]?.path ?? "";
 
     const teamFieldValues = await workService.getTeamFieldValues(teamId);
-    const defaultAreaPath = (teamFieldValues && teamFieldValues.values && teamFieldValues.values.length) ? teamFieldValues.values[0].value : '';
+    const defaultAreaPath = teamFieldValues?.values?.[0]?.value ?? "";
 
     this.setState({ defaultActionItemAreaPath: defaultAreaPath, defaultActionItemIteration: defaultIteration });
   }
 
-  private getColumnsWithReleasedFocus = (currentFeedbackBoardState: FeedbackBoardState) => {
+  private readonly getColumnsWithReleasedFocus = (currentFeedbackBoardState: FeedbackBoardState) => {
     const resetFocusForStateColumns = { ...currentFeedbackBoardState.columns };
 
     for (const columnIdKey in currentFeedbackBoardState.columns) {
@@ -236,7 +225,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     return resetFocusForStateColumns;
   }
 
-  private addFeedbackItems = (
+  private readonly addFeedbackItems = (
     columnId: string, feedbackItems: IFeedbackItemDocument[],
     shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean,
     shouldHaveFocus: boolean, hideFeedbackItems: boolean) => {
@@ -286,7 +275,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     }
   }
 
-  private removeFeedbackItemFromColumn = (columnId: string, feedbackItemId: string, shouldSetFocusOnFirstAvailableItem: boolean) => {
+  private readonly removeFeedbackItemFromColumn = (columnId: string, feedbackItemId: string, shouldSetFocusOnFirstAvailableItem: boolean) => {
     this.setState((previousState: FeedbackBoardState) => {
       const removedItemIndex: number = previousState.columns[columnId].columnItems.findIndex((columnItem) => columnItem.feedbackItem.id === feedbackItemId);
       const updatedColumnItems = previousState.columns[columnId].columnItems.filter((columnItem) => {
@@ -306,7 +295,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
           updatedColumnItemsWithActiveFocus[nextAvailableItemIndex] = { ...updatedColumnItemsWithActiveFocus[nextAvailableItemIndex], shouldHaveFocus: true };
         }
         else {
-          // If no items in colummn, set focus to column's create feedback button
+          // If no items in colummn, set focus to column"s create feedback button
           shouldFocusOnCreateFeedback = true;
         }
       }
@@ -326,12 +315,11 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     });
   }
 
-  private refreshFeedbackItems = async (updatedFeedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean): Promise<void> => {
+  private readonly refreshFeedbackItems = async (updatedFeedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean): Promise<void> => {
     if (updatedFeedbackItems.length) {
       const updatedColumnItems: IColumnItem[] = await Promise.all(updatedFeedbackItems.map(async (feedbackItem) => {
         // TODO: Optimize performance by only updating work items in action-item-related update scenario.
-        const actionItems = feedbackItem.associatedActionItemIds && feedbackItem.associatedActionItemIds.length ?
-          await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
+        const actionItems = feedbackItem.associatedActionItemIds?.length ? await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
 
         return {
           feedbackItem,
@@ -382,7 +370,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
     if (shouldBroadcast) {
       updatedFeedbackItems.forEach(updatedFeedbackItem => {
-        reflectBackendService.broadcastUpdatedItem('dummyColumn', updatedFeedbackItem.id);
+        reflectBackendService.broadcastUpdatedItem("dummyColumn", updatedFeedbackItem.id);
       });
     }
   }
@@ -415,17 +403,18 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
         allWorkItemTypes: this.props.allWorkItemTypes,
         isBoardAnonymous: this.props.isAnonymous,
-        shouldFocusOnCreateFeedback: this.state.columns[columnId].shouldFocusOnCreateFeedback ? true : false,
+        shouldFocusOnCreateFeedback: !!this.state.columns[columnId].shouldFocusOnCreateFeedback,
         hideFeedbackItems: this.props.hideFeedbackItems,
         isFocusModalHidden: true,
+        groupIds: [] as string[],
         onVoteCasted: () => {
           itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
             const voteCollection = boardItem.boardVoteCollection;
+            const userId = encrypt(this.props.userId);
 
-            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[this.props.userId] === undefined ? "0" : voteCollection[this.props.userId].toString() });
+            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[userId] === undefined ? "0" : voteCollection[userId].toString() });
           });
         },
-        groupIds: []
       };
     });
 
@@ -445,12 +434,12 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
           minWidth={900}
           dialogContentProps={{
             type: DialogType.close,
-            title: 'Focus Mode',
-            subText: 'Now is the time to focus! Discuss one feedback item at a time and create actionable work items',
+            title: "Focus Mode",
+            subText: "Now is the time to focus! Discuss one feedback item at a time and create actionable work items",
           }}
           modalProps={{
-            containerClassName: 'retrospectives-carousel-dialog',
-            className: 'retrospectives-carousel-dialog-modal hide-mobile',
+            containerClassName: "retrospectives-carousel-dialog",
+            className: "retrospectives-carousel-dialog-modal hide-mobile",
             isBlocking: true
           }}>
           <FeedbackItemCarousel

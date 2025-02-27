@@ -51,7 +51,7 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
 
   private openWorkItemButton: HTMLElement;
 
-  private getWorkItemTypeIconProps = (workItemType: WorkItemType): IDocumentCardPreviewProps => {
+  private readonly getWorkItemTypeIconProps = (workItemType: WorkItemType): IDocumentCardPreviewProps => {
     return {
       previewImages: [
         {
@@ -69,7 +69,7 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
     };
   }
 
-  private onActionItemClick = async (workItemId: number) => {
+  private readonly onActionItemClick = async (workItemId: number) => {
     const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
 
     await workItemNavSvc.openWorkItem(workItemId);
@@ -85,29 +85,29 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
     }
   }
 
-  private onUnlinkWorkItemClick = async (workItemId: number) => {
+  private readonly onUnlinkWorkItemClick = async (workItemId: number) => {
     const updatedFeedbackItem = await itemDataService.removeAssociatedActionItem(this.props.boardId, this.props.feedbackItemId, workItemId);
     this.props.onUpdateActionItem(updatedFeedbackItem);
   }
 
-  private showUnlinkWorkItemConfirmationDialog = () => {
+  private readonly showUnlinkWorkItemConfirmationDialog = () => {
     this.setState({
       isUnlinkWorkItemConfirmationDialogHidden: false,
     });
   }
 
-  private hideUnlinkWorkItemConfirmationDialog = () => {
+  private readonly hideUnlinkWorkItemConfirmationDialog = () => {
     this.setState({
       isUnlinkWorkItemConfirmationDialogHidden: true,
     });
   }
 
-  private onConfirmUnlinkWorkItem = async (workItemId: number) => {
+  private readonly onConfirmUnlinkWorkItem = async (workItemId: number) => {
     this.onUnlinkWorkItemClick(workItemId);
     this.hideUnlinkWorkItemConfirmationDialog();
   }
 
-  private updateLinkedItem = async (workItemId: number) => {
+  private readonly updateLinkedItem = async (workItemId: number) => {
     if (this.state.linkedWorkItem && this.state.linkedWorkItem.id === workItemId) {
       const updatedLinkedWorkItem: WorkItem[] = await workItemService.getWorkItemsByIds([workItemId]);
       if (updatedLinkedWorkItem) {
@@ -118,20 +118,19 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
     }
   }
 
-  private handleKeyPressSelectorButton = (event: React.KeyboardEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button>) => {
+  private readonly handleKeyPressSelectorButton = (event: React.KeyboardEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button>) => {
     if (event.key === 'Enter') {
       this.showUnlinkWorkItem(event);
-      return;
     }
   }
 
-  private showUnlinkWorkItem = (event: React.KeyboardEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button> | React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button | HTMLSpanElement, MouseEvent>) => {
+  private readonly showUnlinkWorkItem = (event: React.KeyboardEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button> | React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button | HTMLSpanElement, MouseEvent>) => {
     event.preventDefault();
     this.showUnlinkWorkItemConfirmationDialog();
     event.stopPropagation();
   }
 
-  private showWorkItemForm = (event: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  private readonly showWorkItemForm = (event: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event && event.stopPropagation();
     this.onActionItemClick(this.props.actionItem.id);
   }

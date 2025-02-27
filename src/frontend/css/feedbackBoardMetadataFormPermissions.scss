@@ -24,7 +24,7 @@ $content-padding: 10px;
 
     .board-metadata-table-container {
       max-height: 350px;
-      overflow: auto;      
+      overflow: auto;
     }
 
     .board-metadata-table {
@@ -32,12 +32,12 @@ $content-padding: 10px;
       border-collapse: collapse;
       overflow: auto;
       width: 100%;
-    
+
       td, th {
         color: var(--text-primary-color);
         padding: $content-padding;
       }
-    
+
       th {
         position: sticky;
         background-color: var(--background-color);
@@ -55,11 +55,11 @@ $content-padding: 10px;
         td {
           &.cell-content {
             background-color: var(--background-color);
-  
+
             .content-image {
               display: flex;
               padding-right: $content-padding;
-    
+
               .permission-image {
                 width: 44px;
                 min-width: 44px;
@@ -73,10 +73,10 @@ $content-padding: 10px;
                 background-color: var(--background-color);
               }
             }
-    
+
             .content-text {
               color: var(--text-primary-color);
-    
+
               .content-sub-text {
                 color: var(--text-secondary-color);
               }
@@ -101,6 +101,5 @@ $content-padding: 10px;
       }
     }
   }
-  
-}
 
+}

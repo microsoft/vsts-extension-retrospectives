@@ -139,7 +139,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   return <div className="board-metadata-form board-metadata-form-permissions">
     <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
       <PublicWarningBanner />
-      
+
       <div className="search-bar">
         <TextField
           ariaLabel="Search for a team or a member to add permissions"
