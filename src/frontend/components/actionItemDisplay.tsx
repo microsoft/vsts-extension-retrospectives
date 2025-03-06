@@ -74,7 +74,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
 
     const workItem = await workItemNavSvc.openNewWorkItem(workItemTypeName, {
       'System.AssignedTo': assignedUser,
-      'Tags': 'feedback', 
+      'Tags': 'feedback;reflect-hub', 
       'Title': '',
       'Description': `${this.props.feedbackItemTitle}`,
       'priority': 1,
