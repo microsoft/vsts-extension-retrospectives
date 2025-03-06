@@ -3,7 +3,7 @@ import { CommonServiceIds, IProjectPageService, IProjectInfo, ILocationService }
 import { CoreRestClient } from 'azure-devops-extension-api/Core';
 
 /**
- * Get the project info
+ * Get the project information
  */
 const getProjectInfo = async (): Promise<IProjectInfo> => {
   const projectPageService = await getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
