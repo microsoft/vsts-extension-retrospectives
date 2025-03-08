@@ -612,7 +612,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
-    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
+    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, false); // true my teams, false all teams
     allTeams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
@@ -1147,8 +1147,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       className: 'hide-mobile',
       iconProps: { iconName: 'ReportDocument' },
       onClick: this.showRetroSummaryDialog,
-      text: 'Show Retrospective Summary',
-      title: 'Show Retrospective Summary',
+      text: 'Show retrospective summary',
+      title: 'Show retrospective summary',
     },
     {
       key: 'archiveBoard',

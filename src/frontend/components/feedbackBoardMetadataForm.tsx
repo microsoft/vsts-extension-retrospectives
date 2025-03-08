@@ -71,7 +71,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultMaxVotes: number = 5;
     let defaultIsAnonymous: boolean = true;
     let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
-    let defaultDisplayPrimeDirective: boolean = true;
+    let defaultDisplayPrimeDirective: boolean = false;
     let defaultShowFeedbackAfterCollect: boolean = false;
     let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: []};
 
@@ -373,7 +373,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                       onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
                     />
                     <div className="italic text-sm font-thin text-left">
-                      Note: All user information for assessment answers is always stored anonymously.
+                      Note: User information for assessment answers is stored anonymously.
                     </div>
                   </div>
                 </div>
