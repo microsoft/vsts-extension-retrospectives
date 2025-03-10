@@ -1147,8 +1147,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       className: 'hide-mobile',
       iconProps: { iconName: 'ReportDocument' },
       onClick: this.showRetroSummaryDialog,
-      text: 'Show Retrospective Summary',
-      title: 'Show Retrospective Summary',
+      text: 'Show retrospective summary',
+      title: 'Show retrospective summary',
     },
     {
       key: 'archiveBoard',
