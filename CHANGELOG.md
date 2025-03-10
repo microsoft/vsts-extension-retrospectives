@@ -4,7 +4,12 @@ You can find the changelog of the Retrospective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
-## v1.XX.X
+## v1.92.34
+
+* Corrected User Votes on Vote tab header and Your Votes on individual cards
+* Changed icon used for Efficiency to be distinct from Energy for Team Assessment
+
+## v1.92.X
 
 * Boards can now restrict access down to specific teams or individuals. From [GitHub PR #650](https://github.com/microsoft/vsts-extension-retrospectives/pull/650)
 
