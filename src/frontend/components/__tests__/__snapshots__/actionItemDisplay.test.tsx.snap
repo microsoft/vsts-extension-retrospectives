@@ -6,14 +6,14 @@ exports[`Action Item Display component renders correctly when there are no actio
 >
   <Dialog
     dialogContentProps={
-      Object {
+      {
         "title": "Link existing work item",
         "type": 0,
       }
     }
     hidden={true}
     modalProps={
-      Object {
+      {
         "className": "retrospectives-dialog-modal",
         "containerClassName": "retrospectives-link-existing-work-item-dialog",
         "isBlocking": true,

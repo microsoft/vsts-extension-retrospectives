@@ -9,12 +9,12 @@ exports[`Action Item component renders correctly when there are no action items.
   <StyledDocumentCardPreviewBase
     key="1preview"
     previewImages={
-      Array [
-        Object {
+      [
+        {
           "previewIconContainerClass": "work-item-type-icon-container",
-          "previewIconProps": Object {
+          "previewIconProps": {
             "ariaLabel": "icon for work item type Test Work Item Type",
-            "imageProps": Object {
+            "imageProps": {
               "alt": "icon for work item type Test Work Item Type",
               "src": "testUrl",
             },
@@ -41,10 +41,10 @@ exports[`Action Item component renders correctly when there are no action items.
   </div>
   <StyledDocumentCardActionsBase
     actions={
-      Array [
-        Object {
+      [
+        {
           "ariaLabel": "Remove link to work item button",
-          "iconProps": Object {
+          "iconProps": {
             "iconName": "RemoveLink",
           },
           "onClick": [Function],
