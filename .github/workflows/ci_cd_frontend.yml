@@ -150,4 +150,7 @@ jobs:
         name: "Publish extension to dev environment"
         working-directory: 'src/frontend'
         run: >
-          npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+          npx tfx extension publish
+          --manifests vss-extension-dev.json
+          --vsix ./dist/*.vsix
+          --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
