@@ -43,9 +43,9 @@ export const questions = [
     id: 6,
     shortTitle: "Efficiency",
     discussActTemplate: "team-efficiency",
-    title: "Tools, resources, processes, procedures allow me to effectively meet my customers' needs",
+    title: "Tools, resources, processes, and procedures allow me to effectively meet my customers' needs",
     fontAwesomeClass: "fa-solid fa-gears",
-    tooltip: "This question is an experimental question enabling teams to quickly identify and improve areas of inefficiency. Please provide any feedback using this link: <a target=\"_blank\" rel=\"noreferrer\" href=\"https://github.com/microsoft/vsts-extension-retrospectives/discussions/470\">New Experimental Question on Efficiency</a>",
+    tooltip: "Case studies, such as those in <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.amazon.com/Accelerate-Software-Performing-Technology-Organizations/dp/1942788339/\">Accelerate</a> by Forsgren, Humble, and Kim, show that organizations that optimize their processes and tools see improvements in customer responsiveness, lead time, and developer satisfaction.",
   }
 ];
 
