@@ -612,7 +612,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
-    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
+    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, false); // true my teams, false all teams
     allTeams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
@@ -1774,7 +1774,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <>
               <section className="retro-summary-section">
                 <div className="retro-summary-section-header">Basic Settings</div>
-                <div id="retro-summary-session-date">Session date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
+                <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.createdDate)}</div>
                 <div id="retro-summary-created-by">Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} alt={this.state.currentBoard?.createdBy.displayName} /> {this.state.currentBoard?.createdBy.displayName} </div>
               </section>
               <section className="retro-summary-section">
