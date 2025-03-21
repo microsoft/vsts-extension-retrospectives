@@ -51,3 +51,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   border-color: var(--text-disabled-color) !important;
   color: var(--text-disabled-color) !important;
 }
+
+.ms-ContextualMenu-divider {
+  opacity: 0.2;
+}

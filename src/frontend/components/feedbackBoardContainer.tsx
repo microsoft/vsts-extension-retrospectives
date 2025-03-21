@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
-import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
+import { ContextualMenuItemType, IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
@@ -1117,6 +1117,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       title: 'Edit retrospective',
     },
     {
+      key: 'seperator',
+      itemType: ContextualMenuItemType.Divider,
+    },
+    {
       key: 'copyLink',
       iconProps: { iconName: 'Link' },
       onClick: async () => {
@@ -1125,6 +1129,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       },
       text: 'Copy retrospective link',
       title: 'Copy retrospective link',
+    },
+    {
+      key: 'seperator',
+      itemType: ContextualMenuItemType.Divider,
     },
     {
       key: 'exportCSV',
@@ -1143,12 +1151,20 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       title: 'Create email summary',
     },
     {
+      key: 'seperator',
+      itemType: ContextualMenuItemType.Divider,
+    },
+    {
       key: 'retroSummary',
       className: 'hide-mobile',
       iconProps: { iconName: 'ReportDocument' },
       onClick: this.showRetroSummaryDialog,
-      text: 'Show Retrospective Summary',
-      title: 'Show Retrospective Summary',
+      text: 'Show retrospective summary',
+      title: 'Show retrospective summary',
+    },
+    {
+      key: 'seperator',
+      itemType: ContextualMenuItemType.Divider,
     },
     {
       key: 'archiveBoard',
@@ -1758,7 +1774,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <>
               <section className="retro-summary-section">
                 <div className="retro-summary-section-header">Basic Settings</div>
-                <div id="retro-summary-session-date">Session date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
+                <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(this.state.currentBoard.createdDate))}</div>
                 <div id="retro-summary-created-by">Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} alt={this.state.currentBoard?.createdBy.displayName} /> {this.state.currentBoard?.createdBy.displayName} </div>
               </section>
               <section className="retro-summary-section">
