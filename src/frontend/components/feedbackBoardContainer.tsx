@@ -1295,7 +1295,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
             dialogContentProps={{
               type: DialogType.close,
-              title: 'Discuss and Act',
+              title: 'Discuss and Test',
               subText: `Are you sure you want to change the template of this board?`,
             }}
             modalProps={{
@@ -1337,7 +1337,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             nameGetter={(team) => team.name}
             selectorList={teamSelectorList}
             selectorListItemOnClick={this.changeSelectedTeam}
-            title={"Team"}
+            title={"Team and Test"}
           />
           <div style={{ flexGrow: 1 }}></div>
           <ExtensionSettingsMenu
@@ -1347,7 +1347,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         </div>
         <div className="flex w-full items-center justify-start">
           <Pivot>
-            <PivotItem headerText="Board">
+            <PivotItem headerText="Board and Test">
               {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible &&
                 <div className="pivot-content-wrapper">
                   <div className="feedback-board-container-header">
@@ -1416,7 +1416,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
                             dialogContentProps={{
                               type: DialogType.close,
-                              title: 'The Prime Directive',
+                              title: 'The Prime Directive and Test',
                             }}
                             minWidth={600}
                             modalProps={{
@@ -1435,7 +1435,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               <DefaultButton onClick={() => {
                                 window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank');
                               }}
-                                text="Open Retrospective Wiki Page" />
+                                text="Open Retrospective Wiki Page and Test" />
                               <PrimaryButton onClick={() => {
                                 this.setState({ isPrimeDirectiveDialogHidden: true });
                               }}
