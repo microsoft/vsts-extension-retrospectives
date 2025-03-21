@@ -946,7 +946,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 columnProps: this.props.columnProps,
                 columns: this.props.columns,
                 columnIds: this.props.columnIds,
-                lastEditedDate: searchItem.modifedDate ? searchItem.modifedDate.toString() : "",
+                lastEditedDate: searchItem.modifiedDate ? searchItem.modifiedDate.toString() : "",
                 createdDate: searchItem.createdDate.toString(),
                 upvotes: searchItem.upvotes,
                 accentColor: this.props.accentColor,
