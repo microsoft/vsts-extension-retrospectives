@@ -1774,7 +1774,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <>
               <section className="retro-summary-section">
                 <div className="retro-summary-section-header">Basic Settings</div>
-                <div id="retro-summary-session-date">Created date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
+                <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
                 <div id="retro-summary-created-by">Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} alt={this.state.currentBoard?.createdBy.displayName} /> {this.state.currentBoard?.createdBy.displayName} </div>
               </section>
               <section className="retro-summary-section">
