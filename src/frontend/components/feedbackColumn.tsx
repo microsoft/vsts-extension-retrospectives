@@ -207,7 +207,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
      // Order by modified date with newest first by default
-     columnItems = columnItems.sort((item1, item2) => 
+     columnItems = columnItems.sort((item1, item2) =>
       (new Date(item2.feedbackItem.modifedDate).getTime()) - (new Date(item1.feedbackItem.modifedDate).getTime())
     );
 
