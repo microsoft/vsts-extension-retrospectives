@@ -1,6 +1,6 @@
 {
   "name": "retrospective-vsts-extension",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Azure DevOps Retrospective Extension",
   "main": "index.tsx",
   "scripts": {
