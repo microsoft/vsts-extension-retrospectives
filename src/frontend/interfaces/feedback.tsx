@@ -91,7 +91,7 @@ export interface IFeedbackItemDocument {
   voteCollection: { [voter: string]: number };
   createdBy?: IdentityRef;
   createdDate: Date;
-  modifedDate?: Date;
+  modifiedDate?: Date;
   modifiedBy?: IdentityRef;
   userIdRef: string;
   timerSecs: number;
