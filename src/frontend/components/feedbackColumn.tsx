@@ -162,7 +162,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       title: columnItem.feedbackItem.title,
       createdBy: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy.displayName : null,
       createdByProfileImage: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy._links.avatar.href : null,
-      lastEditedDate: columnItem.feedbackItem.modifedDate ? columnItem.feedbackItem.modifedDate.toString() : '',
+      lastEditedDate: columnItem.feedbackItem.modifiedDate ? columnItem.feedbackItem.modifiedDate.toString() : '',
       upvotes: columnItem.feedbackItem.upvotes,
       timerSecs: columnItem.feedbackItem.timerSecs,
       timerState: columnItem.feedbackItem.timerstate,
@@ -206,6 +206,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
+     // Order by created date with newest first by default
+     columnItems = columnItems.sort((item1, item2) =>
+      (new Date(item2.feedbackItem.createdDate).getTime()) - (new Date(item1.feedbackItem.createdDate).getTime())
+    );
+
+    // Order by number of votes if Act column, retaining default order by created date for tied vote counts
     if (this.props.workflowPhase === WorkflowPhase.Act) {
       columnItems = columnItems.sort((item1, item2) => item2.feedbackItem.upvotes - item1.feedbackItem.upvotes);
     }
