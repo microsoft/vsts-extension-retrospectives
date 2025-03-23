@@ -373,7 +373,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                       onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
                     />
                     <div className="italic text-sm font-thin text-left">
-                      Note: User information for assessment answers is stored anonymously.
+                      Note: All responses for team assessment are stored anonymously.
                     </div>
                   </div>
                 </div>
