@@ -19,7 +19,7 @@ export const questions = [
     id: 3,
     shortTitle: "Psychological Safety",
     discussActTemplate: "psy-safety",
-    title: "I feel safe and do not fear making mistakes, raising tough issues, taking risks, or asking for help",
+    title: "I feel safe and do not fear making mistakes, raising issues, taking risks, or asking for help",
     fontAwesomeClass: "fa-regular fa-handshake",
     tooltip: "Psychological safety is the #1 predictor of team success according to a <a target=\"_blank\" rel=\"noreferrer\" href=\"https://rework.withgoogle.com/\">study done by Google</a> as well as numerous studies including those outlined in the book <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.amazon.com/Fearless-Organization-Psychological-Workplace-Innovation/dp/1119477247\">The Fearless Organization by Amy Edmonson</a>. Furthermore, data shows that psychological safety results in a 12% increase in productivity, a 27% reduction in turnover, and a 40% reduction in mistakes according to <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.gallup.com/workplace/236198/create-culture-psychological-safety.aspx\">Gallup</a>.",
   },
@@ -43,7 +43,7 @@ export const questions = [
     id: 6,
     shortTitle: "Efficiency",
     discussActTemplate: "team-efficiency",
-    title: "Tools, resources, processes, and procedures allow me to effectively meet my customers' needs",
+    title: "Tools, resources, processes, procedures allow me to effectively meet my customers' needs",
     fontAwesomeClass: "fa-solid fa-gears",
     tooltip: "Case studies, such as those in <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.amazon.com/Accelerate-Software-Performing-Technology-Organizations/dp/1942788339/\">Accelerate</a> by Forsgren, Humble, and Kim, show that organizations that optimize their processes and tools see improvements in customer responsiveness, lead time, and developer satisfaction.",
   }
