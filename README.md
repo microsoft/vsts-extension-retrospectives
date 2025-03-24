@@ -396,7 +396,7 @@ biggest opportunity with actions identified should be a part of that process.
 
 - Best practices for improving **clarity** include creation of and alignment to OKRs. Regular review
 of OKRs with stakeholders combined with the implementation of agile development methodologies to continually
-prioritize the work that will have the biggest impact on achieving the OKRs. A well groomed backlog
+prioritize the work that will have the biggest impact on achieving the OKRs. A well maintained backlog
 that is visible to the entire team and reviewed regularly will ensure clarity. The backlog should be
 stack ranked in order of priority with minimum work in process will ensure team clarity on the work
 that matters the most. Drive continuous improvement in clarity by using the “Clarity” Retrospective
@@ -418,7 +418,7 @@ different and, in most cases, simple changes can make a profound impact, but it 
 and taking action to improve.  Drive continuous improvement in psychological safety by using the
 “Psychological Safety” Retrospective Board template, following the standard retrospective process.
 - Best practices for improving **work-life balance** include the implementation of fundamental agile
-practices including backlog grooming and prioritization, limiting Work In Process by establishing WIP
+practices including backlog refinement and prioritization, limiting Work In Process by establishing WIP
 limits and adhering to them, and only committing to deliver at the same velocity as the data indicates
 the team has predictably delivered in the past. Finally, simply asking the question in the Team Effectiveness
 survey and conducting deep dive discussions to identify drivers combined with follow-through on the
@@ -430,7 +430,7 @@ different levels across your organization. Bringing transparency into the OKRs c
 individuals better understand how their work aligns to the organizations' priorities and can build
 confidence in doing the right work to deliver against those OKRs.
 - Best practices for improving **Efficiency** can also include the implementation of agile practices
-including backlog grooming and prioritization. Limiting Work In Process by establishing WIP limits
+including backlog refinement and prioritization. Limiting Work In Process by establishing WIP limits
 and adhering to them enables teams to be more efficient so they can "stop starting and start finishing"!
 
 ## Contribute
