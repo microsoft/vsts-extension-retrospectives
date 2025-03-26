@@ -16,7 +16,7 @@ _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 * Adds dividers to feedback board context menu for better organization. From [GitHub PR #1087](https://github.com/microsoft/vsts-extension-retrospectives/pull/1087)
 * Fixes inconsistent capitalization in feedback board menu. From [GitHub PR #1080](https://github.com/microsoft/vsts-extension-retrospectives/pull/1080)
 * Updated Efficiency team assessment tooltip to reference current research. From [GitHub PR #1068](https://github.com/microsoft/vsts-extension-retrospectives/pull/1068)
-* Fixed images in Marketplace extension. From [GitHub PR #1033](https://github.com/microsoft/vsts-extension-retrospectives/pull/1033) 
+* Fixed images in Marketplace extension. From [GitHub PR #1033](https://github.com/microsoft/vsts-extension-retrospectives/pull/1033)
 
 ## v1.92.34
 
