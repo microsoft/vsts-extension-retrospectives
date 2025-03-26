@@ -48,13 +48,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     return [
       'Removed redundant "reflect-hub" tag when adding work item using Act tab.',
       'Updated Marcus Buckingham hyperlinks in the Energy team assessment tooltip.',
-      'Replaces references to "backlog grooming" with "backlog refinement" in README file.',
+      'Replaced references to "backlog grooming" with "backlog refinement" in README file.',
       'Eliminated single word line wraps in Team Assessment for more compact views.',
-      'Corrects modified date typo in code.',
-      'Replaces undefined Session Date with Created Date in Retrospective Summary.',
+      'Corrected modified date typo in code.',
+      'Replaced undefined Session Date with Created Date in Retrospective Summary.',
       'Orders cards by Created Date, unless Act column, which orders cards by Votes, then Created Date.',
-      'Adds dividers to feedback board context menu for better organization.',
-      'Fixes inconsistent capitalization in feedback board menu.',
+      'Added dividers to feedback board context menu for better organization.',
+      'Fixed inconsistent capitalization in feedback board menu.',
       'Updated Efficiency team assessment tooltip to reference current research.',
       'Fixed images in Marketplace extension.'
     ];
