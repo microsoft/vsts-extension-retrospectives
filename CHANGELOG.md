@@ -20,8 +20,8 @@ _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
 ## v1.92.34
 
-* Corrected User Votes on Vote tab header and Your Votes on individual cards
-* Changed icon used for Efficiency to be distinct from Energy for Team Assessment
+* Corrected User Votes on Vote tab header and Your Votes on individual cards. From [GitHub PR #1023](https://github.com/microsoft/vsts-extension-retrospectives/pull/1023)
+* Changed icon used for Efficiency to be distinct from Energy for Team Assessment. From [GitHub PR #1022](https://github.com/microsoft/vsts-extension-retrospectives/pull/1022)
 
 ## v1.92.X
 
