@@ -46,10 +46,17 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private readonly getChangelog = (): string[] => {
     return [
-      'Team Assessment form: Background colors for each number on the spectrum now more closely resemble the Retrospective summary\'s color separation for the three categories: Reds and Oranges for Unfavorable (1-6), Yellows for Neutral (7-8), Greens for Favorable (9-10).',
-      'Related feedback items, in "Focus Mode", now show the original column textual as well as visually.',
-      'New tab in "Focus Mode", called "All", which contains every card on the current retrospective board so that your team can prioritize the highest voted cards first. ',
-      'Duplicate an existing board with the new menu option "Create a copy of retrospective".'
+      'Removed redundant "reflect-hub" tag when adding work item using Act tab.',
+      'Updated Marcus Buckingham hyperlinks in the Energy team assessment tooltip.',
+      'Replaces references to "backlog grooming" with "backlog refinement" in README file.',
+      'Eliminated single word line wraps in Team Assessment for more compact views.',
+      'Corrects modified date typo in code.',
+      'Replaces undefined Session Date with Created Date in Retrospective Summary.',
+      'Orders cards by Created Date, unless Act column, which orders cards by Votes, then Created Date.',
+      'Adds dividers to feedback board context menu for better organization.',
+      'Fixes inconsistent capitalization in feedback board menu.',
+      'Updated Efficiency team assessment tooltip to reference current research.',
+      'Fixed images in Marketplace extension.'
     ];
   }
 
