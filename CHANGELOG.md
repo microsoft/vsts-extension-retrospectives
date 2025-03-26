@@ -8,7 +8,7 @@ _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
 * Removed redundant "reflect-hub" tag when adding work item using Act tab. From [GitHub PR #1107](https://github.com/microsoft/vsts-extension-retrospectives/pull/1107)
 * Updated Marcus Buckingham hyperlinks in the Energy team assessment tooltip. From [GitHub PR #1106](https://github.com/microsoft/vsts-extension-retrospectives/pull/1106)
-* Replaces references to "backlog grooming" with "backlog refinement" in README file. From [GitHub PR #1101](https://github.com/microsoft/vsts-extension-retrospectives/pull/1101)
+* Replaces references to "backlog grooming" with "backlog refinement" in Readme file. From [GitHub PR #1101](https://github.com/microsoft/vsts-extension-retrospectives/pull/1101)
 * Eliminated single word line wrap in Team Assessment for more compact views. From [GitHub PR #1100](https://github.com/microsoft/vsts-extension-retrospectives/pull/1100)
 * Corrects modified date typo in code. From [GitHub PR #1097](https://github.com/microsoft/vsts-extension-retrospectives/pull/1097)
 * Replaces undefined Session Date with Created Date in Retrospective Summary. From [GitHub PR #1096](https://github.com/microsoft/vsts-extension-retrospectives/pull/1096)
