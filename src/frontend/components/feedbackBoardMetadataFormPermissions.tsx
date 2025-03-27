@@ -30,17 +30,11 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
-  const deduplicatePermissionOptions = (options: FeedbackBoardPermissionOption[]) => {
-    const seen = new Set();
-    return options.filter(option => {
-      if (seen.has(option.id)) {
-        return false;
-      }
-      seen.add(option.id);
-      return true;
-    });
-  };
-  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(deduplicatePermissionOptions(props.permissionOptions));
+  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(Array.from(
+    new Map(
+      props.permissionOptions.map(option => [option.id, option])
+    ).values()
+  ));
 
   const handleSelectAllClicked = (checked: boolean) => {
     if(checked) {
@@ -83,9 +77,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
       return o.name.toLowerCase().includes(newSearchTerm.toLowerCase());
     });
-    const deduplicatedOptions = deduplicatePermissionOptions(filteredOptions);
+
     setSelectAllState();
-    setFilteredPermissionOptions(orderedPermissionOptions(deduplicatedOptions));
+    setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
   }
 
   const setSelectAllState = () => {
@@ -141,11 +135,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }
 
   useEffect(() => {
-    const deduplicatedOptions = deduplicatePermissionOptions(filteredPermissionOptions);
     setSelectAllState();
-    setFilteredPermissionOptions(orderedPermissionOptions(deduplicatedOptions));
+    setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
     emitChangeEvent();
-    console.log('Permission options', filteredPermissionOptions);
   }, [teamPermissions, memberPermissions])
 
   return <div className="board-metadata-form board-metadata-form-permissions">
