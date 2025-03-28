@@ -182,7 +182,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
-   //   await this.initializeProjectTeams(initialCurrentTeam);
+      // removed await on initializeProjectTeams since not user allTeams
 
       this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true, });
     } catch (error) {
@@ -610,6 +610,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       };
     }
   }
+
+  // Removed initializeProjectTeams since using only My Teams, not All Teams
 
   /**
    * @description Load the last team and board that this user visited, if such records exist.
@@ -1198,11 +1200,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           header: { id: 'My Teams', title: 'My Teams' },
           items: this.state.userTeams,
         },
-//        {
-//          finishedLoading: this.state.isAllTeamsLoaded,
-//          header: { id: 'All Teams', title: 'All Teams' },
-//          items: this.state.projectTeams,
-//        },
+        // Removed All Teams
+        // Retrospectives should be a safe space for team members to share feedback.
+        // Therefore, team members should only have access to My Teams, not All Teams.
       ],
     };
 
