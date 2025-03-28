@@ -63,7 +63,7 @@ Navigate to the Azure 'Boards' tab in your account on the left hand navigation. 
 
 ### 2. Pick The Team
 
-You are now on the Retrospectives page. Select your Azure DevOps team from the selector in the header. Unlike the screenshot below, you will only be able to select from My Teams.
+You are now on the Retrospectives page. Select your Azure DevOps team from the dropdown in the header. Unlike the screenshot below, you will only be able to select from My Teams.
 
 Retrospectives should be a safe space for team members to share feedback. Therefore, you should not have access to other teams' retrospective boards. All Teams would provide access to see feedback from any team in the project.
 
