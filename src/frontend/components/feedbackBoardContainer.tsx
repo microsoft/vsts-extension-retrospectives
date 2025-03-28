@@ -1222,11 +1222,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           header: { id: 'My Teams', title: 'My Teams' },
           items: this.state.userTeams,
         },
-        {
-          finishedLoading: this.state.isAllTeamsLoaded,
-          header: { id: 'All Teams', title: 'All Teams' },
-          items: this.state.projectTeams,
-        },
+//        {
+//          finishedLoading: this.state.isAllTeamsLoaded,
+//          header: { id: 'All Teams', title: 'All Teams' },
+//          items: this.state.projectTeams,
+//        },
       ],
     };
 
