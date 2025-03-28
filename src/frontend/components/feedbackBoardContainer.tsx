@@ -182,7 +182,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
-      await this.initializeProjectTeams(initialCurrentTeam);
+   //   await this.initializeProjectTeams(initialCurrentTeam);
 
       this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true, });
     } catch (error) {
