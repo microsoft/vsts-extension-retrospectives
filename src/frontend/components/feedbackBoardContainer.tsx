@@ -611,17 +611,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
-  private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
-    const allTeams = await azureDevOpsCoreService.getMembers(this.props.projectId, defaultTeam.id);
-
-    this.setState({
-      allMembers: allTeamMembers,
-      projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-      filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-      isAllTeamsLoaded: true,
-    });
-  }
-
   /**
    * @description Load the last team and board that this user visited, if such records exist.
    * @returns An object to update the state with recently visited or default team and board data.
