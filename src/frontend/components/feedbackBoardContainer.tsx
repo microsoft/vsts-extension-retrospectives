@@ -611,7 +611,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
-  // Removed All Teams 
+  // Removed All Teams
   // Retrospectives should be safe space for team members to share feedback.
   // Therefore, should not have access to other teams' retrospective boards.
   }
@@ -1203,7 +1203,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           header: { id: 'My Teams', title: 'My Teams' },
           items: this.state.userTeams,
         },
-        // Removed All Teams 
+        // Removed All Teams
         // Retrospectives should be safe space for team members to share feedback.
         // Therefore, should not have access to other teams' retrospective boards.
       ],
