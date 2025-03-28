@@ -611,28 +611,30 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
-  private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
-    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
-    allTeams.sort((t1, t2) => {
-      return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
-    });
-
-    const promises = []
-    for (const team of allTeams) {
-      promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
-    }
-    Promise.all(promises).then((values) => {
-      const allTeamMembers: TeamMember[] = [];
-      for (const members of values) {
-        allTeamMembers.push(...members);
-      }
-      this.setState({
-        allMembers: allTeamMembers,
-        projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-        filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-        isAllTeamsLoaded: true,
-      });
-    });
+  // allTeams was intentionally returning same teams as userTeams, to avoid performance issues.
+  // Since retrospectives should be safe space, no reason to include teams that user is not a member of.
+  //private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
+  //  const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
+  //  allTeams.sort((t1, t2) => {
+  //    return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
+  //  });
+//
+ //   const promises = []
+ //   for (const team of allTeams) {
+ //     promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
+ //   }
+ //   Promise.all(promises).then((values) => {
+ //     const allTeamMembers: TeamMember[] = [];
+ //     for (const members of values) {
+  //      allTeamMembers.push(...members);
+ //     }
+  //    this.setState({
+  //      allMembers: allTeamMembers,
+  //      projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
+  //      filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
+  //      isAllTeamsLoaded: true,
+  //    });
+  //  });
   }
 
   /**
@@ -1222,11 +1224,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           header: { id: 'My Teams', title: 'My Teams' },
           items: this.state.userTeams,
         },
-        {
-          finishedLoading: this.state.isAllTeamsLoaded,
-          header: { id: 'All Teams', title: 'All Teams' },
-          items: this.state.projectTeams,
-        },
+        // Removed All Teams 
+        // Retrospectives should be safe space for team members to share feedback.
+        // Therefore, should not have access to other teams' retrospective boards.
       ],
     };
 
