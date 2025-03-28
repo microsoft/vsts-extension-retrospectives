@@ -612,26 +612,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
-    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
-    allTeams.sort((t1, t2) => {
-      return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
-    });
+    const allTeams = await azureDevOpsCoreService.getMembers(this.props.projectId, defaultTeam.id);
 
-    const promises = []
-    for (const team of allTeams) {
-      promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
-    }
-    Promise.all(promises).then((values) => {
-      const allTeamMembers: TeamMember[] = [];
-      for (const members of values) {
-        allTeamMembers.push(...members);
-      }
-      this.setState({
-        allMembers: allTeamMembers,
-        projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-        filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-        isAllTeamsLoaded: true,
-      });
+    this.setState({
+      allMembers: allTeamMembers,
+      projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
+      filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
+      isAllTeamsLoaded: true,
     });
   }
 
