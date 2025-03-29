@@ -30,11 +30,16 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
-  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(Array.from(
-    new Map(
-      props.permissionOptions.map(option => [option.id, option])
-    ).values()
-  ));
+  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>([]);
+
+  React.useEffect(() => {
+    if (props.permissionOptions && props.permissionOptions.length > 0) {
+      setFilteredPermissionOptions(Array.from(
+        new Map(props.permissionOptions.map(option => [option.id, option])).values()
+      ));
+    }
+  }, [props.permissionOptions]);
+
   const handleSelectAllClicked = (checked: boolean) => {
     if(checked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === 'team' && !teamPermissions.includes(o.id)).map(o => o.id)]);
