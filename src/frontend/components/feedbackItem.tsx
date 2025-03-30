@@ -626,6 +626,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 borderLeftColor: this.props.accentColor
               }}>
               <div className="card-header">
+              <div className="card-id">#{(this.props.columns[this.props.columnId].columnItems.findIndex((columnItem) => columnItem.feedbackItem.id === this.props.id)+1)}</div>
                 {
                   isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
                   <button className="feedback-expand-group-focus"
