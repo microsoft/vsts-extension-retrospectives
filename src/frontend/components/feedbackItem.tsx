@@ -625,8 +625,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               style={{
                 borderLeftColor: this.props.accentColor
               }}>
-              <div className="card-header">
+              <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div className="card-id">#{(this.props.columns[this.props.columnId].columnItems.findIndex((columnItem) => columnItem.feedbackItem.id === this.props.id)+1)}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 {
                   isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
                   <button className="feedback-expand-group-focus"
@@ -767,6 +768,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       </DialogFooter>
                     </Dialog>
                   </div>}
+              </div>
               </div>
               <div className="card-content">
                 <div id="actionTimer" className="card-action-timer">
