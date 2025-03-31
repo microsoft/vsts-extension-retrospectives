@@ -421,8 +421,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 </div>
                 {!this.props.isNewBoardCreation &&
                   <div className="board-metadata-form-section-information warning-information">
-                    <i className="fas fa-exclamation-triangle"></i>&nbsp;Warning:
-                    <br />Existing feedback items may not be available after changing the board template!
+                    <i className="fas fa-exclamation-triangle"></i>&nbsp;Warning: Existing feedback items may not be available after changing the board template!
                   </div>
                 }
                 <div className="board-metadata-form-section-subheader">
