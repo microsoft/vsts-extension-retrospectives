@@ -33,7 +33,7 @@ describe('Board Metadata Form Permissions', () => {
   });
 
   describe('Public Banner', () => {
-    const publicBannerText: string = 'This board is visible to every member in the organization.';
+    const publicBannerText: string = 'This board is visible to every member in the project.';
 
     it('should show when there are not team or member permissions', () => {
       const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...mockedProps} />);

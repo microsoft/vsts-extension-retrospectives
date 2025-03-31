@@ -123,7 +123,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const PublicWarningBanner = () => {
     if(teamPermissions.length === 0 && memberPermissions.length === 0) {
       return <div className="board-metadata-form-section-information">
-        <i className="fas fa-exclamation-circle" aria-label="Board is visible to every member in the organization"></i>&nbsp;This board is visible to every member in the organization.
+        <i className="fas fa-exclamation-circle" aria-label="Board is visible to every member in the organization"></i>&nbsp;This board is visible to every member in the project.
       </div>
     }
 
