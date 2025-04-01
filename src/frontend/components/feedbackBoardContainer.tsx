@@ -182,7 +182,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
-      await this.initializeProjectTeams(initialCurrentTeam);
+      // removed await on initializeProjectTeams since not using allTeams
 
       this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true, });
     } catch (error) {
@@ -611,29 +611,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
-  private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
-    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
-    allTeams.sort((t1, t2) => {
-      return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
-    });
-
-    const promises = []
-    for (const team of allTeams) {
-      promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
-    }
-    Promise.all(promises).then((values) => {
-      const allTeamMembers: TeamMember[] = [];
-      for (const members of values) {
-        allTeamMembers.push(...members);
-      }
-      this.setState({
-        allMembers: allTeamMembers,
-        projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-        filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-        isAllTeamsLoaded: true,
-      });
-    });
-  }
+  // Removed initializeProjectTeams since using only My Teams, not All Teams
 
   /**
    * @description Load the last team and board that this user visited, if such records exist.
@@ -1222,11 +1200,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           header: { id: 'My Teams', title: 'My Teams' },
           items: this.state.userTeams,
         },
-        {
-          finishedLoading: this.state.isAllTeamsLoaded,
-          header: { id: 'All Teams', title: 'All Teams' },
-          items: this.state.projectTeams,
-        },
+        // Removed All Teams
+        // Retrospectives should be safe space for team members to share feedback.
+        // Therefore, should not have access to other teams's retrospective boards.
       ],
     };
 
