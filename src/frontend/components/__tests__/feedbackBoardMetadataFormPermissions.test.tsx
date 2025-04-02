@@ -138,7 +138,7 @@ describe('Board Metadata Form Permissions', () => {
       expect(everyRowHasUserImage).toBeTruthy();
     })
 
-/*    it('should order alpha by name', () => {
+    it('should order team before user and users alphabetically', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
         ...mockedProps,
         permissionOptions: [
@@ -159,25 +159,32 @@ describe('Board Metadata Form Permissions', () => {
           {
             id: '3',
             name: 'Bravo',
-            uniqueName: 'Team 3',
+            uniqueName: 'Team 1',
             type: 'team',
             thumbnailUrl: ''
           },
+          {
+            id: '4',
+            name: 'Delta',
+            uniqueName: 'Team 2',
+            type: 'team',
+            thumbnailUrl: ''
+          }
         ]
       };
       const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
       const tableBody = wrapper.find('tbody');
       const tableRows = tableBody.find('tr');
 
-      expect(tableRows).toHaveLength(3);
+      expect(tableRows).toHaveLength(4);
 
       const first = tableRows.first().find('span').first();
-      expect(first.text()).toEqual('Alpha');
+      expect(first.text()).toEqual('Bravo');
 
       const last = tableRows.last().find('span').first();
       expect(last.text()).toEqual('Charlie');
     })
-*/
+
 /*
     it('should order options that have permission then by name', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
