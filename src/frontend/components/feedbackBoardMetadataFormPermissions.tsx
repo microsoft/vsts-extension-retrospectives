@@ -110,23 +110,20 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         return o;
       })
       .sort((a, b) => {
-        // Step 1: Sort alphabetically by name
-        const nameComparison = a.name.localeCompare(b.name);
-        if (nameComparison !== 0) {
-          return nameComparison;
+        // Step 1: Sort by hasPermission (true before false)
+        if (a.hasPermission !== b.hasPermission) {
+          return b.hasPermission ? -1 : 1;
         }
 
-        // Step 2: Sort by type, with teams before members
+        // Step 2: Sort by type (team before member)
         if (a.type === 'team' && b.type === 'member') {
           return -1;
         } else if (a.type === 'member' && b.type === 'team') {
           return 1;
         }
 
-        // Step 3: Sort by hasPermission, with true before false
-        const aPermissionValue = a.hasPermission ? 1 : 0;
-        const bPermissionValue = b.hasPermission ? 1 : 0;
-        return bPermissionValue - aPermissionValue; // Explicitly convert booleans to numbers
+        // Step 3: Sort alphabetically by name
+        return a.name.localeCompare(b.name);
       });
 
     return orderedPermissionOptions;
