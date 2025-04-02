@@ -138,7 +138,7 @@ describe('Board Metadata Form Permissions', () => {
       expect(everyRowHasUserImage).toBeTruthy();
     })
 
-    it('should order team before user and users alphabetically', () => {
+    it('should order teams alphabetically then users alphabetically', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
         ...mockedProps,
         permissionOptions: [
@@ -185,13 +185,12 @@ describe('Board Metadata Form Permissions', () => {
       expect(last.text()).toEqual('Charlie');
     })
 
-/*
-    it('should order options that have permission then by name', () => {
+    it('should order options that have permission before those without', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
         ...mockedProps,
         permissions: {
-          Teams: ['4'],
-          Members: []
+          Teams: ['4'],  // set id 4 to have permission
+          Members: ['2'] // set id 2 to have permission
         },
         permissionOptions: [
           {
@@ -211,14 +210,14 @@ describe('Board Metadata Form Permissions', () => {
           {
             id: '3',
             name: 'Bravo',
-            uniqueName: 'Team 3',
+            uniqueName: 'Team 1',
             type: 'team',
             thumbnailUrl: ''
           },
           {
             id: '4',
-            name: 'Zebra',
-            uniqueName: 'Team Z',
+            name: 'Delta',
+            uniqueName: 'Team 2',
             type: 'team',
             thumbnailUrl: ''
           },
@@ -232,12 +231,12 @@ describe('Board Metadata Form Permissions', () => {
       expect(tableRows).toHaveLength(4);
 
       const first = tableRows.first().find('span').first();
-      expect(first.text()).toEqual('Zebra');
+      expect(first.text()).toEqual('Delta');
 
       const last = tableRows.last().find('span').first();
-      expect(last.text()).toEqual('Charlie');
+      expect(last.text()).toEqual('Alpha');
     })
-*/
+
 /*
     it('should set an Owner label if the board is created by the user', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
