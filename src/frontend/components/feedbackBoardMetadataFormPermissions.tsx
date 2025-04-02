@@ -25,12 +25,12 @@ export interface FeedbackBoardPermissionOption {
   thumbnailUrl?: string;
 }
 
-if (!props.permissions) {
-  return <div>Loading permissions...</div>;
-}
-
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
-  console.log("Initial Props:", props);
+  console.log("Before Props:", props);
+  if (!props.permissions) {
+    return <div>Loading permissions...</div>;
+  }
+  console.log("After Props:", props);
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
