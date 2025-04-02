@@ -130,10 +130,10 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }
 
   useEffect(() => {
-    setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
+    setFilteredPermissionOptions(orderedPermissionOptions(props.permissionOptions));
     setSelectAllState();
     emitChangeEvent();
-  }, [teamPermissions, memberPermissions])
+  }, [teamPermissions, memberPermissions, props.permissionOptions])
 
   return <div className="board-metadata-form board-metadata-form-permissions">
     <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
