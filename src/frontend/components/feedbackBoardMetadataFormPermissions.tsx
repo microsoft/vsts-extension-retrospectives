@@ -63,7 +63,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
   const handleSearchTermChanged = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
-  
+
     const uniqueOptionsMap: Record<string, FeedbackBoardPermissionOption> = {};
     const filteredOptions = props.permissionOptions.filter(o => {
       if (newSearchTerm.length === 0 || o.name.toLowerCase().includes(newSearchTerm.toLowerCase())) {
@@ -72,9 +72,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       }
       return false;
     });
-  
+
     const uniqueOptions = Object.values(uniqueOptionsMap);
-  
+
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(uniqueOptions));
   };
