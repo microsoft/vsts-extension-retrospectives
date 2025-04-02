@@ -631,11 +631,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       }
       console.log("allTeamMembers:", allTeamMembers);
       // Deduplicate based on a unique property, e.g., `id`
-      //const uniqueTeamMembers = Array.from(
-      //  new Map(allTeamMembers.map(member => [member.id, member])).values()
-      //);
+      const uniqueTeamMembers = Array.from(
+      new Map(allTeamMembers.map(member => [member.identity.id, member])).values()
+      );
+      console.log("uniqueTeamMembers:", uniqueTeamMembers);
       this.setState({
-        allMembers: allTeamMembers,
+        allMembers: uniqueTeamMembers,
         projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
         filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
         isAllTeamsLoaded: true,
