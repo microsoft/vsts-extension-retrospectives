@@ -112,7 +112,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       .sort((a, b) => {
         // Step 1: Sort by hasPermission (true before false)
         if (a.hasPermission !== b.hasPermission) {
-          return b.hasPermission ? -1 : 1;
+          return b.hasPermission ? 1 : -1;
         }
 
         // Step 2: Sort by type (team before member)
