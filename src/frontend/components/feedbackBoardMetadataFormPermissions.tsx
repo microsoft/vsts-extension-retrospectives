@@ -28,12 +28,7 @@ export interface FeedbackBoardPermissionOption {
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
-//  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
-  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(Array.from(
-    new Map(
-      props.permissionOptions.map(option => [option.id, option])
-    ).values()
-  ));
+  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
@@ -61,12 +56,29 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
     if(option.type === 'team') {
       setTeamPermissions([...permissionList]);
-    }
-    else {
+    } else {
       setMemberPermissions([...permissionList]);
     }
   }
 
+  const handleSearchTermChanged = (newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm);
+  
+    const uniqueOptionsMap: Record<string, FeedbackBoardPermissionOption> = {};
+    const filteredOptions = props.permissionOptions.filter(o => {
+      if (newSearchTerm.length === 0 || o.name.toLowerCase().includes(newSearchTerm.toLowerCase())) {
+        uniqueOptionsMap[o.id] = o; // Ensure each `id` is unique
+        return true;
+      }
+      return false;
+    });
+  
+    const uniqueOptions = Object.values(uniqueOptionsMap);
+  
+    setSelectAllState();
+    setFilteredPermissionOptions(orderedPermissionOptions(uniqueOptions));
+  };
+/*
   const handleSearchTermChanged = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
 
@@ -81,7 +93,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
   }
-
+*/
   const setSelectAllState = () => {
     const allVisibleIds = filteredPermissionOptions.map(o => o.id);
     const allPermissionIds = [...teamPermissions, ...memberPermissions];
