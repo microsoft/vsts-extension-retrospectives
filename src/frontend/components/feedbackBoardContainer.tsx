@@ -613,7 +613,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
     // true returns all teams that user is a member in the project
-    // false returns all teams that are in project 
+    // false returns all teams that are in project
     // intentionally restricting to teams the user is a member
     const allUserTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
     allUserTeams.sort((t1, t2) => {

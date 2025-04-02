@@ -36,7 +36,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     if(checked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === 'team' && !teamPermissions.includes(o.id)).map(o => o.id)]);
       setMemberPermissions([...memberPermissions, ...filteredPermissionOptions.filter(o => o.type === 'member' && !memberPermissions.includes(o.id)).map(o => o.id)]);
-    } 
+    }
     else {
       setTeamPermissions(teamPermissions.filter(o => !filteredPermissionOptions.map(o => o.id).includes(o)));
       setMemberPermissions(memberPermissions.filter(o => !filteredPermissionOptions.map(o => o.id).includes(o)));
