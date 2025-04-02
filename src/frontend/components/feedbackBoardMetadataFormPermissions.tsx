@@ -35,6 +35,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       props.permissionOptions.map(option => [option.id, option])
     ).values()
   ));
+  console.log("after:", props);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
