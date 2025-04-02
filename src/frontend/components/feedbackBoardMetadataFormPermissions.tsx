@@ -97,7 +97,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         }
         return a.name.localeCompare(b.name);
       });
-  
+
       return orderedPermissionOptions;
     }
 
