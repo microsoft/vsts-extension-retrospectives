@@ -88,7 +88,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const orderedPermissionOptions = (options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
     return options
       .map(o => ({
-        ...o, // Create a new object
+        ...o,
         hasPermission: teamPermissions.includes(o.id) || memberPermissions.includes(o.id)
       }))
       .sort((a, b) => {
