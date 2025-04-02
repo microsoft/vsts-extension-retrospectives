@@ -291,6 +291,6 @@ describe('Board Metadata Form Permissions', () => {
       const hasOwnerLabel2 = last.find('span').last().text() === 'Owner';
       expect(hasOwnerLabel2).toBeFalsy();
     })
-  });
 */
+  });
 });
