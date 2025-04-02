@@ -95,7 +95,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         if (a.hasPermission !== b.hasPermission) {
           return b.hasPermission ? 1 : -1;
         }
-  
         return a.name.localeCompare(b.name);
       });
   };
