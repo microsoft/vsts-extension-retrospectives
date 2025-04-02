@@ -85,7 +85,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
     setSelectAllChecked(allVisibleIdsAreInFilteredOptions);
   };
-
+/*
   const orderedPermissionOptions = (options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
     const orderedPermissionOptions = options
       .map(o => {
@@ -102,6 +102,33 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
     return orderedPermissionOptions;
   }
+*/
+  const orderedPermissionOptions = (options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
+    const orderedPermissionOptions = options
+      .map(o => {
+        o.hasPermission = teamPermissions.includes(o.id) || memberPermissions.includes(o.id);
+        return o;
+      })
+      .sort((a, b) => {
+        // Step 1: Sort alphabetically by name
+        const nameComparison = a.name.localeCompare(b.name);
+        if (nameComparison !== 0) {
+          return nameComparison;
+        }
+
+        // Step 2: Sort by type, with teams before members
+        if (a.type === 'team' && b.type === 'member') {
+          return -1;
+        } else if (a.type === 'member' && b.type === 'team') {
+          return 1;
+        }
+
+        // Step 3: Sort by hasPermission, with true before false
+        return b.hasPermission - a.hasPermission; // b.hasPermission - a.hasPermission sorts true (1) before false (0)
+      });
+
+    return orderedPermissionOptions;
+  };
 
   const emitChangeEvent = () => {
     props.onPermissionChanged({
