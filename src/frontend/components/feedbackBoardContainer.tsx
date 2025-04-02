@@ -613,6 +613,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
+    // actually returning myTeams
     const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
     allTeams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
@@ -622,13 +623,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     for (const team of allTeams) {
       promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
     }
+    // creating duplicate team members
     Promise.all(promises).then((values) => {
       const allTeamMembers: TeamMember[] = [];
       for (const members of values) {
         allTeamMembers.push(...members);
       }
+      // Deduplicate based on a unique property, e.g., `id`
+      const uniqueTeamMembers = Array.from(
+        new Map(allTeamMembers.map(member => [member.id, member])).values()
+      );
       this.setState({
-        allMembers: allTeamMembers,
+        allMembers: uniqueTeamMembers,
         projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
         filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
         isAllTeamsLoaded: true,
