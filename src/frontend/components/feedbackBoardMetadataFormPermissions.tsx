@@ -85,7 +85,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
     setSelectAllChecked(allVisibleIdsAreInFilteredOptions);
   };
-/*
+
   const orderedPermissionOptions = (options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
     const orderedPermissionOptions = options
       .map(o => {
@@ -93,36 +93,26 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         return o;
       })
       .sort((a, b) => {
+
+        // Step 1: Ensure the board owner appears first
+        const isAOwner = a.id === props.board?.createdBy?.id;
+        const isBOwner = b.id === props.board?.createdBy?.id;
+        if (isAOwner && !isBOwner) return -1;
+        if (!isAOwner && isBOwner) return 1;
+
+        // Step 2: Sort by hasPermission (true before false)
         if (a.hasPermission !== b.hasPermission) {
           return b.hasPermission ? 1 : -1;
         }
 
-        return a.name.localeCompare(b.name);
-      });
-
-    return orderedPermissionOptions;
-  }
-*/
-  const orderedPermissionOptions = (options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
-    const orderedPermissionOptions = options
-      .map(o => {
-        o.hasPermission = teamPermissions.includes(o.id) || memberPermissions.includes(o.id);
-        return o;
-      })
-      .sort((a, b) => {
-        // Step 1: Sort by hasPermission (true before false)
-        if (a.hasPermission !== b.hasPermission) {
-          return b.hasPermission ? 1 : -1;
-        }
-
-        // Step 2: Sort by type (team before member)
+        // Step 3: Sort by type (team before member)
         if (a.type === 'team' && b.type === 'member') {
           return -1;
         } else if (a.type === 'member' && b.type === 'team') {
           return 1;
         }
 
-        // Step 3: Sort alphabetically by name
+        // Step 4: Sort alphabetically by name
         return a.name.localeCompare(b.name);
       });
 
