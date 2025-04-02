@@ -35,7 +35,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       props.permissionOptions.map(option => [option.id, option])
     ).values()
   ));
-  console.log("after:", props);
+  console.log("filteredPermissionOptions:", filteredPermissionOptions);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
@@ -48,6 +48,8 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       setMemberPermissions(memberPermissions.filter(o => !filteredPermissionOptions.map(o => o.id).includes(o)));
     }
     setSelectAllState();
+    console.log("teamPermissions:", teamPermissions);
+    console.log("memberPermissions:", memberPermissions);
   }
 
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
