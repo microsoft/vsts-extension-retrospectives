@@ -124,7 +124,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         }
 
         // Step 3: Sort by hasPermission, with true before false
-        return b.hasPermission - a.hasPermission; // b.hasPermission - a.hasPermission sorts true (1) before false (0)
+        const aPermissionValue = a.hasPermission ? 1 : 0;
+        const bPermissionValue = b.hasPermission ? 1 : 0;
+        return bPermissionValue - aPermissionValue; // Explicitly convert booleans to numbers
       });
 
     return orderedPermissionOptions;
