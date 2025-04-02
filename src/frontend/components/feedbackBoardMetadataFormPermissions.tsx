@@ -36,9 +36,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     if (!props.permissionOptions || props.permissionOptions.length === 0) {
       return;
     }
-    const uniqueOptions = Array.from(
-      new Map(props.permissionOptions.map(option => [option.id, option])).values()
-    );
+    const uniqueOptions = Array.from( new Map(props.permissionOptions.map(option => [option.id, option])).values() );
     setFilteredPermissionOptions(uniqueOptions);
   }, [props.permissionOptions]);
 
