@@ -183,7 +183,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
       await this.initializeProjectTeams(initialCurrentTeam);
-      // revert await on initializeProjectTeams; had removed since not using allTeams
 
       this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true, });
     } catch (error) {
@@ -613,28 +612,28 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
-    // actually returning myTeams
-    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
-    allTeams.sort((t1, t2) => {
+    // true returns all teams that user is a member in the project
+    // false returns all teams that are in project 
+    // intentionally restricting to teams the user is a member
+    const allUserTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
+    allUserTeams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
 
     const promises = []
-    for (const team of allTeams) {
+    for (const team of allUserTeams) {
       promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
     }
-    // creating duplicate team members
+    // if user is member of more than one team, then will return duplicates
     Promise.all(promises).then((values) => {
       const allTeamMembers: TeamMember[] = [];
       for (const members of values) {
         allTeamMembers.push(...members);
       }
-      console.log("allTeamMembers:", allTeamMembers);
-      // Deduplicate based on a unique property, e.g., `id`
+      // remove duplicate members
       const uniqueTeamMembers = Array.from(
-      new Map(allTeamMembers.map(member => [member.identity.id, member])).values()
-      );
-      console.log("uniqueTeamMembers:", uniqueTeamMembers);
+      new Map(allTeamMembers.map(member => [member.identity.id, member])).values());
+
       this.setState({
         allMembers: uniqueTeamMembers,
         projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
@@ -643,7 +642,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     });
   }
-  // revert initializeProjectTeams; had removed since using only My Teams, not All Teams
 
   /**
    * @description Load the last team and board that this user visited, if such records exist.
@@ -1055,7 +1053,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       })
     }
 
-//maybe try deduplicating here, if other approach unsuccessful
     for (const member of this.state.allMembers) {
       permissionOptions.push({
         id: member.identity.id,

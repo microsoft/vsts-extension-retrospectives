@@ -26,16 +26,9 @@ export interface FeedbackBoardPermissionOption {
 }
 
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
-  console.log("Props:", props);
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
-  // const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
-  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(Array.from(
-    new Map(
-      props.permissionOptions.map(option => [option.id, option])
-    ).values()
-  ));
-  console.log("filteredPermissionOptions:", filteredPermissionOptions);
+  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
@@ -43,13 +36,12 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     if(checked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === 'team' && !teamPermissions.includes(o.id)).map(o => o.id)]);
       setMemberPermissions([...memberPermissions, ...filteredPermissionOptions.filter(o => o.type === 'member' && !memberPermissions.includes(o.id)).map(o => o.id)]);
-    } else {
+    } 
+    else {
       setTeamPermissions(teamPermissions.filter(o => !filteredPermissionOptions.map(o => o.id).includes(o)));
       setMemberPermissions(memberPermissions.filter(o => !filteredPermissionOptions.map(o => o.id).includes(o)));
     }
     setSelectAllState();
-    console.log("teamPermissions:", teamPermissions);
-    console.log("memberPermissions:", memberPermissions);
   }
 
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
@@ -137,10 +129,10 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }
 
   useEffect(() => {
-    setFilteredPermissionOptions(orderedPermissionOptions(props.permissionOptions));
+    setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
     setSelectAllState();
     emitChangeEvent();
-  }, [teamPermissions, memberPermissions, props.permissionOptions])
+  }, [teamPermissions, memberPermissions])
 
   return <div className="board-metadata-form board-metadata-form-permissions">
     <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
