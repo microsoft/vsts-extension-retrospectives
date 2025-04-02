@@ -28,11 +28,9 @@ export interface FeedbackBoardPermissionOption {
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
-  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(Array.from(
-    new Map(
-      props.permissionOptions.map(option => [option.id, option])
-    ).values()
-  ));
+  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
+  const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = React.useState<string>('');
 
   const handleSelectAllClicked = (checked: boolean) => {
     if(checked) {
@@ -45,9 +43,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
     setSelectAllState();
   }
-
-  const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
-  const [searchTerm, setSearchTerm] = React.useState<string>('');
 
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
     let permissionList: string[] = option.type === 'team'
