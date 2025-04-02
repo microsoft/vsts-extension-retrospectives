@@ -85,6 +85,31 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const orderedPermissionOptions = (options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
+    // Deduplicate options based on unique IDs
+    const uniqueOptions = options.reduce((acc, option) => {
+      if (!acc.find(o => o.id === option.id)) {
+        acc.push(option); // Add only if the ID doesn't already exist
+      }
+      return acc;
+    }, [] as FeedbackBoardPermissionOption[]);
+
+    // Add hasPermission property and sort options
+    const orderedOptions = uniqueOptions
+      .map(o => {
+        o.hasPermission = teamPermissions.includes(o.id) || memberPermissions.includes(o.id);
+        return o;
+      })
+      .sort((a, b) => {
+        if (a.hasPermission !== b.hasPermission) {
+          return b.hasPermission ? 1 : -1; // Permissions come first
+        }
+        return a.name.localeCompare(b.name); // Sort alphabetically
+      });
+
+    return orderedOptions;
+  };
+/*
+  const orderedPermissionOptions = (options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
     const orderedPermissionOptions = options
       .map(o => {
         o.hasPermission = teamPermissions.includes(o.id) || memberPermissions.includes(o.id);
@@ -97,9 +122,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         return a.name.localeCompare(b.name);
       });
 
-      return orderedPermissionOptions;
-    }
-
+    return orderedPermissionOptions;
+  }
+*/
   const emitChangeEvent = () => {
     props.onPermissionChanged({
       permissions: {
