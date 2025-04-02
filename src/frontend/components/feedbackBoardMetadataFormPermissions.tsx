@@ -28,10 +28,7 @@ export interface FeedbackBoardPermissionOption {
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
   console.log("Initial Props:", props);
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
-//  const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
-  const [memberPermissions, setMemberPermissions] = React.useState(
-    Array.from(new Set(props.permissions?.Members ?? []))
-    );
+  const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
@@ -67,7 +64,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
   const handleSearchTermChanged = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
-
+    console.log("Search Term Updated:", newSearchTerm);
     const filteredOptions: FeedbackBoardPermissionOption[] = props.permissionOptions.filter(o => {
       if(newSearchTerm.length === 0) {
         return true
@@ -75,7 +72,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
       return o.name.toLowerCase().includes(newSearchTerm.toLowerCase());
     });
-
+    console.log("Filtered Options:", filteredOptions);
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
   }
