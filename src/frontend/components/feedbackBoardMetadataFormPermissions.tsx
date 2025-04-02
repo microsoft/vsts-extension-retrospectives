@@ -29,7 +29,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   console.log("Initial Props:", props);
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
 //  const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
-  console.log("Before member permissions:", memberPermissions);
   const [memberPermissions, setMemberPermissions] = React.useState(
     Array.from(new Set(props.permissions?.Members ?? []))
     );
