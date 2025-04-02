@@ -615,13 +615,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     // true returns all teams that user is a member in the project
     // false returns all teams that are in project
     // intentionally restricting to teams the user is a member
-    const allUserTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
-    allUserTeams.sort((t1, t2) => {
+    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
+    allTeams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
 
     const promises = []
-    for (const team of allUserTeams) {
+    for (const team of allTeams) {
       promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
     }
     // if user is member of more than one team, then will return duplicates
