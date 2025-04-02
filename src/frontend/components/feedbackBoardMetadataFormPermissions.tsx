@@ -64,24 +64,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const handleSearchTermChanged = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
 
-    const uniqueOptionsMap: Record<string, FeedbackBoardPermissionOption> = {};
-    const filteredOptions = props.permissionOptions.filter(o => {
-      if (newSearchTerm.length === 0 || o.name.toLowerCase().includes(newSearchTerm.toLowerCase())) {
-        uniqueOptionsMap[o.id] = o; // Ensure each `id` is unique
-        return true;
-      }
-      return false;
-    });
-
-    const uniqueOptions = Object.values(uniqueOptionsMap);
-
-    setSelectAllState();
-    setFilteredPermissionOptions(orderedPermissionOptions(uniqueOptions));
-  };
-/*
-  const handleSearchTermChanged = (newSearchTerm: string) => {
-    setSearchTerm(newSearchTerm);
-
     const filteredOptions: FeedbackBoardPermissionOption[] = props.permissionOptions.filter(o => {
       if(newSearchTerm.length === 0) {
         return true
@@ -93,7 +75,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
   }
-*/
+
   const setSelectAllState = () => {
     const allVisibleIds = filteredPermissionOptions.map(o => o.id);
     const allPermissionIds = [...teamPermissions, ...memberPermissions];
