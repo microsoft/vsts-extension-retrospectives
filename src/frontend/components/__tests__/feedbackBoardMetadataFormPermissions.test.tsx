@@ -248,8 +248,8 @@ describe('Board Metadata Form Permissions', () => {
           }
         },
         permissions: {
-          Teams: [4],
-          Members: [3]
+          Teams: ['4'],
+          Members: ['2']
         },
         permissionOptions: [
           {
