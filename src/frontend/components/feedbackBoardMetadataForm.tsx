@@ -69,7 +69,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultTitle: string = '';
     let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => { return { column, markedForDeletion: false } });
     let defaultMaxVotes: number = 5;
-    let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
+    let defaultIncludeTeamEffectivenessMeasurement: boolean = false;
     let defaultDisplayPrimeDirective: boolean = false;
     let defaultShowFeedbackAfterCollect: boolean = false;
     let defaultIsAnonymous: boolean = false;
