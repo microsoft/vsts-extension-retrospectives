@@ -433,20 +433,21 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     className="title-input-container column-template-dropdown"
                   >
                     <option value="">Select a template</option>
-                    <option value="speedboat">Speedboat</option>
-                    <option value="4ls">4Ls</option>
-                    <option value="1to1">1-to-1</option>
-                    <option value="daki">Drop-Add-Keep-Improve</option>
-                    <option value="mad-sad-glad">Mad-Sad-Glad</option>
-                    <option value="good-bad-ideas">Good-Bad-Ideas</option>
-                    <option value="kalm">Keep-Add-Less-More</option>
                     <option value="start-stop-continue">Start-Stop-Continue</option>
-                    <option value="psy-safety">Psychological Safety</option>
+                    <option value="good-bad-ideas">Good-Bad-Ideas</option>
+                    <option value="mad-sad-glad">Mad-Sad-Glad</option>
+                    <option value="4ls">4Ls</option>
+                    <option value="speedboat">Speedboat</option>
+                    <option value="daki">Drop-Add-Keep-Improve</option>
+                    <option value="kalm">Keep-Add-Less-More</option>
                     <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
+                    <option value="team-confidence">Team Confidence</option>
                     <option value="clarity">Clarity</option>
                     <option value="energy">Energy</option>
+                    <option value="psy-safety">Psychological Safety</option>
                     <option value="wlb">Work-life Balance</option>
                     <option value="team-confidence">Team Confidence</option>
+                    <option value="team-efficiency">Team Efficiency</option>
                   </select>
                 </div>
                 <List
