@@ -86,18 +86,20 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const orderedPermissionOptions = (options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
-    return options
-      .map(o => ({
-        ...o,
-        hasPermission: teamPermissions.includes(o.id) || memberPermissions.includes(o.id)
-      }))
+    const orderedPermissionOptions = options
+      .map(o => {
+        o.hasPermission = teamPermissions.includes(o.id) || memberPermissions.includes(o.id);
+        return o;
+      })
       .sort((a, b) => {
         if (a.hasPermission !== b.hasPermission) {
           return b.hasPermission ? 1 : -1;
         }
         return a.name.localeCompare(b.name);
       });
-  };
+  
+      return orderedPermissionOptions;
+    }
 
   const emitChangeEvent = () => {
     props.onPermissionChanged({
