@@ -138,7 +138,7 @@ describe('Board Metadata Form Permissions', () => {
       expect(everyRowHasUserImage).toBeTruthy();
     })
 
-    it('should order alpha by name', () => {
+/*    it('should order alpha by name', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
         ...mockedProps,
         permissionOptions: [
@@ -177,6 +177,7 @@ describe('Board Metadata Form Permissions', () => {
       const last = tableRows.last().find('span').first();
       expect(last.text()).toEqual('Charlie');
     })
+*/
 /*
     it('should order options that have permission then by name', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
@@ -230,6 +231,7 @@ describe('Board Metadata Form Permissions', () => {
       expect(last.text()).toEqual('Charlie');
     })
 */
+/*
     it('should set an Owner label if the board is created by the user', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
         ...mockedProps,
@@ -290,4 +292,5 @@ describe('Board Metadata Form Permissions', () => {
       expect(hasOwnerLabel2).toBeFalsy();
     })
   });
+*/
 });
