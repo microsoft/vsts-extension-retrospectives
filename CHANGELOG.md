@@ -6,6 +6,9 @@ _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
 ## v1.92.35
 
+* Removes duplicates from Permissions and sorts by owner, permission, teams and members. From [GitHub PR #1120](https://github.com/microsoft/vsts-extension-retrospectives/pull/1120)
+* Defaults Prime Directive and Anonymous to false and updates settings order. From [GitHub PR #1115](https://github.com/microsoft/vsts-extension-retrospectives/pull/1115)
+* Removes All Teams from team dropdown which was not supported since retrospectives should be safe space for teams to share feedback without concern that members not on team have access to their retrospective board. From [GitHub PR #1112](https://github.com/microsoft/vsts-extension-retrospectives/pull/1112)
 * Removed redundant "reflect-hub" tag when adding work item using Act tab. From [GitHub PR #1107](https://github.com/microsoft/vsts-extension-retrospectives/pull/1107)
 * Updated Marcus Buckingham hyperlinks in the Energy team assessment tooltip. From [GitHub PR #1106](https://github.com/microsoft/vsts-extension-retrospectives/pull/1106)
 * Replaces references to "backlog grooming" with "backlog refinement" in README file. From [GitHub PR #1101](https://github.com/microsoft/vsts-extension-retrospectives/pull/1101)
