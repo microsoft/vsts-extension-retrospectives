@@ -182,7 +182,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
-      // removed await on initializeProjectTeams since not using allTeams
+      await this.initializeProjectTeams(initialCurrentTeam);
 
       this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true, });
     } catch (error) {
@@ -611,7 +611,37 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
-  // Removed initializeProjectTeams since using only My Teams, not All Teams
+  private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
+    // true returns all teams that user is a member in the project
+    // false returns all teams that are in project
+    // intentionally restricting to teams the user is a member
+    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
+    allTeams.sort((t1, t2) => {
+      return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
+    });
+
+    const promises = []
+    for (const team of allTeams) {
+      promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
+    }
+    // if user is member of more than one team, then will return duplicates
+    Promise.all(promises).then((values) => {
+      const allTeamMembers: TeamMember[] = [];
+      for (const members of values) {
+        allTeamMembers.push(...members);
+      }
+      // remove duplicate members
+      const uniqueTeamMembers = Array.from(
+      new Map(allTeamMembers.map(member => [member.identity.id, member])).values());
+
+      this.setState({
+        allMembers: uniqueTeamMembers,
+        projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
+        filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
+        isAllTeamsLoaded: true,
+      });
+    });
+  }
 
   /**
    * @description Load the last team and board that this user visited, if such records exist.
