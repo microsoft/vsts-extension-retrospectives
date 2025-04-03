@@ -1,14 +1,16 @@
-import { getAccessToken, getExtensionContext, getService } from 'azure-devops-extension-sdk';
 import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from 'azure-devops-extension-api';
 import { appInsights } from '../utilities/telemetryClient';
+import { SDKContext } from './azureDevOpsContextProvider';
+import React from 'react';
 
 let extensionDataManager: IExtensionDataManager;
 
 async function getDataService(): Promise<IExtensionDataManager> {
   if (!extensionDataManager) {
-    const accessToken = await getAccessToken();
-    const extensionDataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
-    extensionDataManager = await extensionDataService.getExtensionDataManager(getExtensionContext().id, accessToken);
+    const { SDK } = React.useContext(SDKContext);
+    const accessToken = await SDK.getAccessToken();
+    const extensionDataService = await SDK.getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
+    extensionDataManager = await extensionDataService.getExtensionDataManager(SDK.getExtensionContext().id, accessToken);
   }
 
   return extensionDataManager;

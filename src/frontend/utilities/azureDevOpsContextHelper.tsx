@@ -1,4 +1,5 @@
-import { getHost } from 'azure-devops-extension-sdk';
+import React from 'react';
+import { SDKContext } from '../dal/azureDevOpsContextProvider';
 import { getHostAuthority } from '../utilities/servicesHelper';
 
 const internalOrgNames = [
@@ -15,7 +16,8 @@ const internalOrgNames = [
  * Returns whether the current org in VSTS context is a recognized internal org.
  */
 export const isInternalOrg = () => {
-  const host = getHost();
+  const { SDK } = React.useContext(SDKContext);
+  const host = SDK.getHost();
   return internalOrgNames.indexOf(host.name.toLowerCase().trim()) !== -1;
 };
 

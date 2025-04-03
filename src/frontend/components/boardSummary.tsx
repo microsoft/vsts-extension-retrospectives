@@ -1,5 +1,4 @@
 ﻿import React from 'react';
-import { getService } from 'azure-devops-extension-sdk';
 import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { DocumentCard, DocumentCardTitle, DocumentCardType } from 'office-ui-fabric-react/lib/DocumentCard';
 import { Image } from 'office-ui-fabric-react/lib/Image';
@@ -7,6 +6,7 @@ import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azur
 import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from 'office-ui-fabric-react/lib/DetailsList';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
+import { SDKContext } from '../dal/azureDevOpsContextProvider';
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
@@ -180,7 +180,8 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         priority: workItem.fields['Microsoft.VSTS.Common.Priority'],
         id: workItem.id,
         onActionItemClick: async (id: number) => {
-          const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+          const { SDK } = React.useContext(SDKContext);
+          const workItemNavSvc = await SDK.getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
           await workItemNavSvc.openWorkItem(id);
         }
       };
@@ -217,7 +218,8 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
   }
 
   private readonly onItemInvoked = async (item: { id: number }) => {
-    const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+    const { SDK } = React.useContext(SDKContext);
+    const workItemNavSvc = await SDK.getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
     await workItemNavSvc.openWorkItem(item.id);
   }
 

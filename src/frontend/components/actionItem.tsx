@@ -1,7 +1,6 @@
 import React from 'react';
 import { DefaultButton, IButtonProps, PrimaryButton, BaseButton, Button } from 'office-ui-fabric-react/lib/Button';
 import { DocumentCard, DocumentCardActions, DocumentCardTitle, DocumentCardType, DocumentCardPreview, IDocumentCardPreviewProps } from 'office-ui-fabric-react/lib/DocumentCard';
-import { getService } from 'azure-devops-extension-sdk';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
 
@@ -11,6 +10,7 @@ import { IFeedbackItemDocument } from '../interfaces/feedback';
 import Dialog, { DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
+import { SDKContext } from '../dal/azureDevOpsContextProvider';
 
 export interface ActionItemProps extends IButtonProps {
   feedbackItemId: string;
@@ -70,7 +70,8 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
   }
 
   private readonly onActionItemClick = async (workItemId: number) => {
-    const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+    const { SDK } = React.useContext(SDKContext);
+    const workItemNavSvc = await SDK.getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
 
     await workItemNavSvc.openWorkItem(workItemId);
 
