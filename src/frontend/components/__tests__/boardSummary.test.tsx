@@ -24,9 +24,8 @@ const mockedWorkItemCountProps: IBoardSummaryProps = {
 
 describe('Board Summary', () => {
   it('renders with no action or work items.', () => {
-    const wrapper = shallow(<BoardSummary {...mockedDefaultProps} /> as any);
-    const component = wrapper.children().dive();
-
+    const wrapper = shallow<IBoardSummaryProps>(<BoardSummary {...mockedDefaultProps} />);
+    const component = wrapper.dive();
     verifySummaryBoardCounts(component, mockedDefaultProps);
     verifyActionItemsSummaryCard(component, false);
   });

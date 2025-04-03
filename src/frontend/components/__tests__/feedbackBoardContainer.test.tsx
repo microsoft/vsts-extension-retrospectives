@@ -54,7 +54,7 @@ const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
 
 describe('Feedback Board Container ', () => {
   it('can be rendered without content.', () => {
-    const wrapper = shallow(<FeedbackBoardContainer {...feedbackBoardContainerProps} /> as any);
+    const wrapper = shallow(<FeedbackBoardContainer {...feedbackBoardContainerProps} />);
     expect(wrapper.children().dive().html()).toBe(
       '<div class="ms-Spinner initialization-spinner root-53"><div class="ms-Spinner-circle ms-Spinner--large circle-54">' +
       '</div><div class="ms-Spinner-label label-55">Loading...</div></div>');

@@ -24,8 +24,8 @@ const defaultTestProps: ActionItemDisplayProps = {
 
 describe("Action Item Display component", () => {
   it("renders correctly when there are no action items.", () => {
-    const wrapper = shallow(<ActionItemDisplay {...defaultTestProps} /> as any);
-    const component = wrapper.children().dive();
+    const wrapper = shallow(<ActionItemDisplay {...defaultTestProps} />);
+    const component = (wrapper.children().dive() as unknown) as React.ReactElement;
     expect(toJson(component)).toMatchSnapshot();
   });
 

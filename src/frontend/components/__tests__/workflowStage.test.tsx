@@ -15,8 +15,8 @@ const mockedProps = mocked({
 describe('Workflow Stage ', () => {
   it('can be rendered when active.', () => {
     mockedProps.isActive = true;
-    const wrapper = shallow(<WorkflowStage {...mockedProps} /> as any);
-    const component = wrapper.children().dive();
+    const wrapper = shallow(<WorkflowStage {...mockedProps} />);
+    const component = wrapper.dive();
     expect(component.prop('aria-label')).toBe(`Selected ${mockedProps.display} workflow stage`);
   });
 

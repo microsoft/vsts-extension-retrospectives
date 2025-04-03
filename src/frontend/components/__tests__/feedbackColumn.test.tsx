@@ -7,7 +7,7 @@ import { IColumnItem } from '../feedbackBoard';
 
 describe('Feedback Column ', () => {
   it('can be rendered', () => {
-    const wrapper = shallow(<FeedbackColumn {...testColumnProps} /> as any);
+    const wrapper = shallow(<FeedbackColumn {...testColumnProps} />);
     expect(wrapper.prop('className')).toBe('feedback-column');
   });
 

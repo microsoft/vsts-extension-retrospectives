@@ -21,8 +21,8 @@ jest.mock('uuid', () => ({ v4: () => mockUuid}));
 
 describe('Board Metadata Form', () => {
   it('can be rendered', () => {
-    const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} /> as any);
-    const component = wrapper.children().dive();
+    const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+    const component = (wrapper.children().dive() as unknown) as ShallowWrapper;
     const textField = component.findWhere(c => c.prop('id') === 'retrospective-title-input').find(TextField);
 
     expect(textField).toBeDefined();

@@ -13,8 +13,8 @@ const mockedTestProps: EditableTextProps = {
 
 describe('Editable Text Component', () => {
   it('renders correctly.', () => {
-    const wrapper = shallow(<EditableText {...mockedTestProps} /> as any);
-    const component = wrapper.children().dive();
+    const wrapper = shallow(<EditableText {...mockedTestProps} />);
+    const component = wrapper.dive();
     expect(toJson(component)).toMatchSnapshot();
   });
 

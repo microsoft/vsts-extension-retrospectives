@@ -11,7 +11,7 @@ const defaultTestProps: NoFeedbackBoardsViewProps = {
 
 describe('No Feedback Boards View component', () => {
   it ('renders correctly.', () => {
-    const wrapper = shallow(<NoFeedbackBoardsView {...defaultTestProps} /> as any);
+    const wrapper = shallow(<NoFeedbackBoardsView {...defaultTestProps} />);
     const component = wrapper.children().dive();
     expect(toJson(component)).toMatchSnapshot();
   });
