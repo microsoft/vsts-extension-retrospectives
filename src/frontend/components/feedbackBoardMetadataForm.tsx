@@ -69,20 +69,20 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultTitle: string = '';
     let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => { return { column, markedForDeletion: false } });
     let defaultMaxVotes: number = 5;
-    let defaultIsAnonymous: boolean = true;
     let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
-    let defaultDisplayPrimeDirective: boolean = true;
+    let defaultDisplayPrimeDirective: boolean = false;
     let defaultShowFeedbackAfterCollect: boolean = false;
+    let defaultIsAnonymous: boolean = false;
     let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: []};
 
     if (props.isDuplicatingBoard) {
       defaultTitle = `${this.props.currentBoard.title} - copy`;
       defaultColumns = this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } });
       defaultMaxVotes = this.props.currentBoard.maxVotesPerUser;
-      defaultIsAnonymous = this.props.currentBoard.isAnonymous;
       defaultIncludeTeamEffectivenessMeasurement = this.props.currentBoard.isIncludeTeamEffectivenessMeasurement;
       defaultDisplayPrimeDirective = this.props.currentBoard.displayPrimeDirective;
       defaultShowFeedbackAfterCollect = this.props.currentBoard.shouldShowFeedbackAfterCollect;
+      defaultIsAnonymous = this.props.currentBoard.isAnonymous;
       defaultPermissions = this.props.currentBoard.permissions;
     }
 
@@ -92,6 +92,8 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         ? defaultColumns
         : this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } }),
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? defaultIncludeTeamEffectivenessMeasurement : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
+      displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
+      shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
       isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? defaultMaxVotes : this.props.currentBoard.maxVotesPerUser,
       isBoardNameTaken: false,
@@ -101,8 +103,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       placeholderText: this.props.placeholderText,
       selectedAccentColorKey: undefined,
       selectedIconKey: undefined,
-      displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
-      shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
       initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       permissions: this.props.isNewBoardCreation ? defaultPermissions : this.props.currentBoard.permissions
@@ -156,9 +156,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     });
   }
 
-  private handleIsAnonymousCheckboxChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  private handleDisplayPrimeDirectiveChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({
-      isBoardAnonymous: checked,
+      displayPrimeDirective: checked,
     });
   }
 
@@ -168,9 +168,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     });
   }
 
-  private handleDisplayPrimeDirectiveChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  private handleIsAnonymousCheckboxChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({
-      displayPrimeDirective: checked,
+      isBoardAnonymous: checked,
     });
   }
 
@@ -373,21 +373,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                       onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
                     />
                     <div className="italic text-sm font-thin text-left">
-                      Note: User information for assessment answers is stored anonymously.
+                      Note: All responses for team assessment are stored anonymously.
                     </div>
                   </div>
-                </div>
-
-                <div className="board-metadata-form-section-subheader">
-                  <Checkbox
-                    id="obscure-feedback-checkbox"
-                    label="Obscure the feedback of others until after Collect phase"
-                    ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
-                    boxSide="start"
-                    defaultChecked={this.state.shouldShowFeedbackAfterCollect}
-                    disabled={!this.props.isNewBoardCreation}
-                    onChange={this.handleShouldShowFeedbackAfterCollectChange}
-                  />
                 </div>
 
                 <div className="board-metadata-form-section-subheader">
@@ -399,6 +387,18 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     defaultChecked={this.state.displayPrimeDirective}
                     disabled={!this.props.isNewBoardCreation}
                     onChange={this.handleDisplayPrimeDirectiveChange}
+                  />
+                </div>
+
+                <div className="board-metadata-form-section-subheader">
+                  <Checkbox
+                    id="obscure-feedback-checkbox"
+                    label="Obscure the feedback of others until after Collect phase"
+                    ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
+                    boxSide="start"
+                    defaultChecked={this.state.shouldShowFeedbackAfterCollect}
+                    disabled={!this.props.isNewBoardCreation}
+                    onChange={this.handleShouldShowFeedbackAfterCollectChange}
                   />
                 </div>
 
@@ -421,8 +421,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 </div>
                 {!this.props.isNewBoardCreation &&
                   <div className="board-metadata-form-section-information warning-information">
-                    <i className="fas fa-exclamation-triangle"></i>&nbsp;Warning:
-                    <br />Existing feedback items may not be available after changing the board template!
+                    <i className="fas fa-exclamation-triangle"></i>&nbsp;Warning: Existing feedback items may not be<br />available after changing the board template!
                   </div>
                 }
                 <div className="board-metadata-form-section-subheader">

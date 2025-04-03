@@ -63,9 +63,13 @@ Navigate to the Azure 'Boards' tab in your account on the left hand navigation. 
 
 ### 2. Pick The Team
 
-You are now on the Retrospectives page. Select your Azure DevOps team from the selector in the header.
+You are now on the Retrospectives page. Select your Azure DevOps team from the dropdown in the header. You will only be able to select from My Teams.
 
-![A screenshot of the Retrospective tool's Team dropdown. The selected team is "Backend Team" and the selection is darkened as though the mouse is hovering over.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/team-dropdown.png)
+Retrospectives should be a safe space for team members to share feedback. Therefore, you should not have access to other teams' retrospective boards. All Teams would provide access to see feedback from any team in the project.
+
+If you need to access another team's retrospective board in the project, you will need to be added as a member of that team.
+
+![Screenshot of the Retrospective tool's Team dropdown. In the example the user belongs to only one team, the "Backend Team". The selected team is darkened as though the mouse is hovering over the selection.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/team-dropdown-My-Teams.png)
 
 ### 3. Create New Retrospective
 
@@ -396,7 +400,7 @@ biggest opportunity with actions identified should be a part of that process.
 
 - Best practices for improving **clarity** include creation of and alignment to OKRs. Regular review
 of OKRs with stakeholders combined with the implementation of agile development methodologies to continually
-prioritize the work that will have the biggest impact on achieving the OKRs. A well groomed backlog
+prioritize the work that will have the biggest impact on achieving the OKRs. A well maintained backlog
 that is visible to the entire team and reviewed regularly will ensure clarity. The backlog should be
 stack ranked in order of priority with minimum work in process will ensure team clarity on the work
 that matters the most. Drive continuous improvement in clarity by using the “Clarity” Retrospective
@@ -418,7 +422,7 @@ different and, in most cases, simple changes can make a profound impact, but it 
 and taking action to improve.  Drive continuous improvement in psychological safety by using the
 “Psychological Safety” Retrospective Board template, following the standard retrospective process.
 - Best practices for improving **work-life balance** include the implementation of fundamental agile
-practices including backlog grooming and prioritization, limiting Work In Process by establishing WIP
+practices including backlog refinement and prioritization, limiting Work In Process by establishing WIP
 limits and adhering to them, and only committing to deliver at the same velocity as the data indicates
 the team has predictably delivered in the past. Finally, simply asking the question in the Team Effectiveness
 survey and conducting deep dive discussions to identify drivers combined with follow-through on the
@@ -430,7 +434,7 @@ different levels across your organization. Bringing transparency into the OKRs c
 individuals better understand how their work aligns to the organizations' priorities and can build
 confidence in doing the right work to deliver against those OKRs.
 - Best practices for improving **Efficiency** can also include the implementation of agile practices
-including backlog grooming and prioritization. Limiting Work In Process by establishing WIP limits
+including backlog refinement and prioritization. Limiting Work In Process by establishing WIP limits
 and adhering to them enables teams to be more efficient so they can "stop starting and start finishing"!
 
 ## Contribute
