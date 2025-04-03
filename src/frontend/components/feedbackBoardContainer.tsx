@@ -612,6 +612,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
+    // true returns all teams that user is a member in the project
+    // false returns all teams that are in project
+    // intentionally restricting to teams the user is a member
     const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
     allTeams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
@@ -621,13 +624,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     for (const team of allTeams) {
       promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
     }
+    // if user is member of more than one team, then will return duplicates
     Promise.all(promises).then((values) => {
       const allTeamMembers: TeamMember[] = [];
       for (const members of values) {
         allTeamMembers.push(...members);
       }
+      // remove duplicate members
+      const uniqueTeamMembers = Array.from(
+      new Map(allTeamMembers.map(member => [member.identity.id, member])).values());
+
       this.setState({
-        allMembers: allTeamMembers,
+        allMembers: uniqueTeamMembers,
         projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
         filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
         isAllTeamsLoaded: true,
@@ -1222,11 +1230,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           header: { id: 'My Teams', title: 'My Teams' },
           items: this.state.userTeams,
         },
-        {
-          finishedLoading: this.state.isAllTeamsLoaded,
-          header: { id: 'All Teams', title: 'All Teams' },
-          items: this.state.projectTeams,
-        },
+        // Removed All Teams
+        // Retrospectives should be safe space for team members to share feedback.
+        // Therefore, should not have access to other teams's retrospective boards.
       ],
     };
 
