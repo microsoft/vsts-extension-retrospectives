@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
-import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
+import { ContextualMenuItemType, IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Dialog, DialogType, DialogFooter, DialogContent } from 'office-ui-fabric-react/lib/Dialog';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
@@ -612,6 +612,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
+    // true returns all teams that user is a member in the project
+    // false returns all teams that are in project
+    // intentionally restricting to teams the user is a member
     const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
     allTeams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
@@ -621,13 +624,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     for (const team of allTeams) {
       promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
     }
+    // if user is member of more than one team, then will return duplicates
     Promise.all(promises).then((values) => {
       const allTeamMembers: TeamMember[] = [];
       for (const members of values) {
         allTeamMembers.push(...members);
       }
+      // remove duplicate members
+      const uniqueTeamMembers = Array.from(
+      new Map(allTeamMembers.map(member => [member.identity.id, member])).values());
+
       this.setState({
-        allMembers: allTeamMembers,
+        allMembers: uniqueTeamMembers,
         projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
         filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
         isAllTeamsLoaded: true,
@@ -1117,6 +1125,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       title: 'Edit retrospective',
     },
     {
+      key: 'seperator',
+      itemType: ContextualMenuItemType.Divider,
+    },
+    {
       key: 'copyLink',
       iconProps: { iconName: 'Link' },
       onClick: async () => {
@@ -1125,6 +1137,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       },
       text: 'Copy retrospective link',
       title: 'Copy retrospective link',
+    },
+    {
+      key: 'seperator',
+      itemType: ContextualMenuItemType.Divider,
     },
     {
       key: 'exportCSV',
@@ -1143,12 +1159,20 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       title: 'Create email summary',
     },
     {
+      key: 'seperator',
+      itemType: ContextualMenuItemType.Divider,
+    },
+    {
       key: 'retroSummary',
       className: 'hide-mobile',
       iconProps: { iconName: 'ReportDocument' },
       onClick: this.showRetroSummaryDialog,
-      text: 'Show Retrospective Summary',
-      title: 'Show Retrospective Summary',
+      text: 'Show retrospective summary',
+      title: 'Show retrospective summary',
+    },
+    {
+      key: 'seperator',
+      itemType: ContextualMenuItemType.Divider,
     },
     {
       key: 'archiveBoard',
@@ -1206,11 +1230,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           header: { id: 'My Teams', title: 'My Teams' },
           items: this.state.userTeams,
         },
-        {
-          finishedLoading: this.state.isAllTeamsLoaded,
-          header: { id: 'All Teams', title: 'All Teams' },
-          items: this.state.projectTeams,
-        },
+        // Removed All Teams
+        // Retrospectives should be safe space for team members to share feedback.
+        // Therefore, should not have access to other teams's retrospective boards.
       ],
     };
 
@@ -1758,7 +1780,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <>
               <section className="retro-summary-section">
                 <div className="retro-summary-section-header">Basic Settings</div>
-                <div id="retro-summary-session-date">Session date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(this.state.currentBoard.startDate)}</div>
+                <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(this.state.currentBoard.createdDate))}</div>
                 <div id="retro-summary-created-by">Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} alt={this.state.currentBoard?.createdBy.displayName} /> {this.state.currentBoard?.createdBy.displayName} </div>
               </section>
               <section className="retro-summary-section">

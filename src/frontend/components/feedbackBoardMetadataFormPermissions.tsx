@@ -93,15 +93,27 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         return o;
       })
       .sort((a, b) => {
+        // Step 1: Ensure the board owner appears first
+        const isAOwner = a.id === props.board?.createdBy?.id;
+        const isBOwner = b.id === props.board?.createdBy?.id;
+        if (isAOwner && !isBOwner) return -1;
+        if (!isAOwner && isBOwner) return 1;
+        // Step 2: Sort by hasPermission (true before false)
         if (a.hasPermission !== b.hasPermission) {
           return b.hasPermission ? 1 : -1;
         }
-
+        // Step 3: Sort by type (team before member)
+        if (a.type === 'team' && b.type === 'member') {
+          return -1;
+        } else if (a.type === 'member' && b.type === 'team') {
+          return 1;
+        }
+        // Step 4: Sort alphabetically by name
         return a.name.localeCompare(b.name);
       });
 
     return orderedPermissionOptions;
-  }
+  };
 
   const emitChangeEvent = () => {
     props.onPermissionChanged({
@@ -123,7 +135,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const PublicWarningBanner = () => {
     if(teamPermissions.length === 0 && memberPermissions.length === 0) {
       return <div className="board-metadata-form-section-information">
-        <i className="fas fa-exclamation-circle" aria-label="Board is visible to every member in the organization"></i>&nbsp;This board is visible to every member in the organization.
+        <i className="fas fa-exclamation-circle" aria-label="Board is visible to every member in the project"></i>&nbsp;This board is visible to every member in the project.
       </div>
     }
 

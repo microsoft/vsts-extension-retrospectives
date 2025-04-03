@@ -4,7 +4,29 @@ You can find the changelog of the Retrospective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
-## v1.XX.X
+## v1.92.35
+
+* Removes duplicates from Permissions and sorts by owner, permission, teams and members. From [GitHub PR #1120](https://github.com/microsoft/vsts-extension-retrospectives/pull/1120)
+* Defaults Prime Directive and Anonymous to false and updates settings order. From [GitHub PR #1115](https://github.com/microsoft/vsts-extension-retrospectives/pull/1115)
+* Removes All Teams from team dropdown which was not supported since retrospectives should be safe space for teams to share feedback without concern that members not on team have access to their retrospective board. From [GitHub PR #1112](https://github.com/microsoft/vsts-extension-retrospectives/pull/1112)
+* Removed redundant "reflect-hub" tag when adding work item using Act tab. From [GitHub PR #1107](https://github.com/microsoft/vsts-extension-retrospectives/pull/1107)
+* Updated Marcus Buckingham hyperlinks in the Energy team assessment tooltip. From [GitHub PR #1106](https://github.com/microsoft/vsts-extension-retrospectives/pull/1106)
+* Replaces references to "backlog grooming" with "backlog refinement" in README file. From [GitHub PR #1101](https://github.com/microsoft/vsts-extension-retrospectives/pull/1101)
+* Eliminated single word line wraps in Team Assessment for more compact views. From [GitHub PR #1100](https://github.com/microsoft/vsts-extension-retrospectives/pull/1100)
+* Corrects modified date typo in code. From [GitHub PR #1097](https://github.com/microsoft/vsts-extension-retrospectives/pull/1097)
+* Replaces undefined Session Date with Created Date in Retrospective Summary. From [GitHub PR #1096](https://github.com/microsoft/vsts-extension-retrospectives/pull/1096)
+* Orders cards by Created Date, unless Act column, which orders cards by Votes, then Created Date. From [GitHub PR #1095](https://github.com/microsoft/vsts-extension-retrospectives/pull/1095)
+* Adds dividers to feedback board context menu for better organization. From [GitHub PR #1087](https://github.com/microsoft/vsts-extension-retrospectives/pull/1087)
+* Fixes inconsistent capitalization in feedback board menu. From [GitHub PR #1080](https://github.com/microsoft/vsts-extension-retrospectives/pull/1080)
+* Updated Efficiency team assessment tooltip to reference current research. From [GitHub PR #1068](https://github.com/microsoft/vsts-extension-retrospectives/pull/1068)
+* Fixed images in Marketplace extension. From [GitHub PR #1033](https://github.com/microsoft/vsts-extension-retrospectives/pull/1033)
+
+## v1.92.34
+
+* Corrected User Votes on Vote tab header and Your Votes on individual cards. From [GitHub PR #1023](https://github.com/microsoft/vsts-extension-retrospectives/pull/1023)
+* Changed icon used for Efficiency to be distinct from Energy for Team Assessment. From [GitHub PR #1022](https://github.com/microsoft/vsts-extension-retrospectives/pull/1022)
+
+## v1.92.X
 
 * Boards can now restrict access down to specific teams or individuals. From [GitHub PR #650](https://github.com/microsoft/vsts-extension-retrospectives/pull/650)
 

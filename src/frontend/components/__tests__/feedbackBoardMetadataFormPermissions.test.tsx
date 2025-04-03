@@ -33,7 +33,7 @@ describe('Board Metadata Form Permissions', () => {
   });
 
   describe('Public Banner', () => {
-    const publicBannerText: string = 'This board is visible to every member in the organization.';
+    const publicBannerText: string = 'This board is visible to every member in the project.';
 
     it('should show when there are not team or member permissions', () => {
       const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...mockedProps} /> as any);
@@ -138,7 +138,7 @@ describe('Board Metadata Form Permissions', () => {
       expect(everyRowHasUserImage).toBeTruthy();
     })
 
-    it('should order alpha by name', () => {
+    it('should order teams alphabetically then users alphabetically', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
         ...mockedProps,
         permissionOptions: [
@@ -159,31 +159,38 @@ describe('Board Metadata Form Permissions', () => {
           {
             id: '3',
             name: 'Bravo',
-            uniqueName: 'Team 3',
+            uniqueName: 'Team 1',
             type: 'team',
             thumbnailUrl: ''
           },
+          {
+            id: '4',
+            name: 'Delta',
+            uniqueName: 'Team 2',
+            type: 'team',
+            thumbnailUrl: ''
+          }
         ]
       };
       const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
       const tableBody = wrapper.find('tbody');
       const tableRows = tableBody.find('tr');
 
-      expect(tableRows).toHaveLength(3);
+      expect(tableRows).toHaveLength(4);
 
       const first = tableRows.first().find('span').first();
-      expect(first.text()).toEqual('Alpha');
+      expect(first.text()).toEqual('Bravo');
 
       const last = tableRows.last().find('span').first();
       expect(last.text()).toEqual('Charlie');
     })
 
-    it('should order options that have permission then by name', () => {
+    it('should order options that have permission before those without', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
         ...mockedProps,
         permissions: {
-          Teams: ['4'],
-          Members: []
+          Teams: ['4'],  // set id 4 to have permission
+          Members: ['2'] // set id 2 to have permission
         },
         permissionOptions: [
           {
@@ -203,45 +210,46 @@ describe('Board Metadata Form Permissions', () => {
           {
             id: '3',
             name: 'Bravo',
-            uniqueName: 'Team 3',
+            uniqueName: 'Team 1',
             type: 'team',
             thumbnailUrl: ''
           },
           {
             id: '4',
-            name: 'Zebra',
-            uniqueName: 'Team Z',
+            name: 'Delta',
+            uniqueName: 'Team 2',
             type: 'team',
             thumbnailUrl: ''
-          },
+          }
         ]
       };
-      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
+
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
       const tableBody = wrapper.find('tbody');
       const tableRows = tableBody.find('tr');
 
       expect(tableRows).toHaveLength(4);
 
       const first = tableRows.first().find('span').first();
-      expect(first.text()).toEqual('Zebra');
+      expect(first.text()).toEqual('Delta');
 
       const last = tableRows.last().find('span').first();
-      expect(last.text()).toEqual('Charlie');
+      expect(last.text()).toEqual('Alpha');
     })
 
-    it('should set an Owner label if the board is created by the user', () => {
+    it('should set an Owner label for user that created the board and list board owner first', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
         ...mockedProps,
         board: {
           ...mockedProps.board,
           createdBy: {
             ...mockedProps.board.createdBy,
-            id: '1'
+            id: '5'
           }
         },
         permissions: {
-          Teams: [],
-          Members: []
+          Teams: ['4'],
+          Members: ['2']
         },
         permissionOptions: [
           {
@@ -261,24 +269,32 @@ describe('Board Metadata Form Permissions', () => {
           {
             id: '3',
             name: 'Bravo',
-            uniqueName: 'Team 3',
+            uniqueName: 'Team 1',
             type: 'team',
             thumbnailUrl: ''
           },
           {
             id: '4',
-            name: 'Zebra',
-            uniqueName: 'Team Z',
+            name: 'Delta',
+            uniqueName: 'Team 2',
             type: 'team',
             thumbnailUrl: ''
           },
+          // if Zebra wasn't owner, would sort last
+          {
+            id: '5',
+            name: 'Zebra',
+            uniqueName: 'User Z',
+            type: 'member',
+            thumbnailUrl: ''
+          }
         ]
       };
       const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} /> as any);
       const tableBody = wrapper.find('tbody');
       const tableRows = tableBody.find('tr');
 
-      expect(tableRows).toHaveLength(4);
+      expect(tableRows).toHaveLength(5);
 
       const first = tableRows.first();
       const hasOwnerLabel1 = first.find('span').last().text() === 'Owner';

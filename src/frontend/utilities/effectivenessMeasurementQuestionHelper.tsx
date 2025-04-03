@@ -13,13 +13,13 @@ export const questions = [
     discussActTemplate: "energy",
     title: "I am energized by the work I do",
     fontAwesomeClass: "fa-solid fa-bolt",
-    tooltip: "Only 2 out of 10 employees strongly indicate that they use their strengths every day at work according to <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.marcusbuckingham.com/business-case-for-strengths/\">Marcus Buckingham</a>, yet those who do have 38% higher productivity, 44% higher customer satisfaction scores, and 50% higher retention. Using your strengths at work results in being excited to work and is one of the strongest predictors of whether you are on a high performing team. Furthermore, <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.marcusbuckingham.com/spend-a-week/\">Marcus Buckingham</a> argues that if we spend less than 20% of our time at work doing what we love we are much more likely to burnout. An inspired (excited) employee is 2.25 times more productive than a merely satisfied employee according to research by the <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.bain.com/insights/summary-of-time-talent-and-energy/#:~:text=Energy%20is%20an%20intangible%20but%20powerful%20force%20that,inspiration%2C%20and%20a%20strong%20company%20culture.%20SUMMARY%20INTRODUCTION?msclkid=e1685e51c7ee11ec88caa816909a51ff\">Bain Company</a> summarized in the book 'Time, Talent, Energy'.",
+    tooltip: "Only 2 out of 10 employees strongly indicate that they use their strengths every day at work according to <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.tmbc.com/business-case-for-strengths/\">Marcus Buckingham</a>, yet those who do have 38% higher productivity, 44% higher customer satisfaction scores, and 50% higher retention. Using your strengths at work results in being excited to work and is one of the strongest predictors of whether you are on a high performing team. Furthermore, <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.youtube.com/watch?v=knxVp4u8fGA\">Marcus Buckingham</a> argues that if we spend less than 20% of our time at work doing what we love we are much more likely to burnout. An inspired (excited) employee is 2.25 times more productive than a merely satisfied employee according to research by the <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.bain.com/insights/summary-of-time-talent-and-energy/#:~:text=Energy%20is%20an%20intangible%20but%20powerful%20force%20that,inspiration%2C%20and%20a%20strong%20company%20culture.%20SUMMARY%20INTRODUCTION?msclkid=e1685e51c7ee11ec88caa816909a51ff\">Bain Company</a> summarized in the book 'Time, Talent, Energy'.",
   },
   {
     id: 3,
     shortTitle: "Psychological Safety",
     discussActTemplate: "psy-safety",
-    title: "I feel safe and do not fear making mistakes, raising tough issues, taking risks, or asking for help",
+    title: "I feel safe and do not fear making mistakes, raising issues, taking risks, or asking for help",
     fontAwesomeClass: "fa-regular fa-handshake",
     tooltip: "Psychological safety is the #1 predictor of team success according to a <a target=\"_blank\" rel=\"noreferrer\" href=\"https://rework.withgoogle.com/\">study done by Google</a> as well as numerous studies including those outlined in the book <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.amazon.com/Fearless-Organization-Psychological-Workplace-Innovation/dp/1119477247\">The Fearless Organization by Amy Edmonson</a>. Furthermore, data shows that psychological safety results in a 12% increase in productivity, a 27% reduction in turnover, and a 40% reduction in mistakes according to <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.gallup.com/workplace/236198/create-culture-psychological-safety.aspx\">Gallup</a>.",
   },
@@ -45,7 +45,7 @@ export const questions = [
     discussActTemplate: "team-efficiency",
     title: "Tools, resources, processes, procedures allow me to effectively meet my customers' needs",
     fontAwesomeClass: "fa-solid fa-gears",
-    tooltip: "This question is an experimental question enabling teams to quickly identify and improve areas of inefficiency. Please provide any feedback using this link: <a target=\"_blank\" rel=\"noreferrer\" href=\"https://github.com/microsoft/vsts-extension-retrospectives/discussions/470\">New Experimental Question on Efficiency</a>",
+    tooltip: "Case studies, such as those in <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.amazon.com/Accelerate-Software-Performing-Technology-Organizations/dp/1942788339/\">Accelerate</a> by Forsgren, Humble, and Kim, show that organizations that optimize their processes and tools see improvements in customer responsiveness, lead time, and developer satisfaction.",
   }
 ];
 
