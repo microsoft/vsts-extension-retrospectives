@@ -24,9 +24,8 @@ const mockedWorkItemCountProps: IBoardSummaryProps = {
 
 describe('Board Summary', () => {
   it('renders with no action or work items.', () => {
-    const wrapper = shallow(<BoardSummary {...mockedDefaultProps} />);
-    const component = wrapper.children().dive();
-
+    const wrapper = shallow<IBoardSummaryProps>(<BoardSummary {...mockedDefaultProps} />);
+    const component = wrapper.dive();
     verifySummaryBoardCounts(component, mockedDefaultProps);
     verifyActionItemsSummaryCard(component, false);
   });
@@ -34,7 +33,7 @@ describe('Board Summary', () => {
   it('renders with one action item.', () => {
     mockedDefaultProps.actionItems.push(mockWorkItem);
     mockedDefaultProps.supportedWorkItemTypes.push(mockWorkItemType);
-    const wrapper = shallow(<BoardSummary {...mockedDefaultProps} />);
+    const wrapper = shallow(<BoardSummary {...mockedDefaultProps} /> as any);
     const component = wrapper.children().dive();
 
     verifySummaryBoardCounts(component, mockedDefaultProps);
@@ -42,7 +41,7 @@ describe('Board Summary', () => {
   });
 
   it('renders when work item counts are greater than zero.', () => {
-    const wrapper = shallow(<BoardSummary {...mockedWorkItemCountProps} />);
+    const wrapper = shallow(<BoardSummary {...mockedWorkItemCountProps} /> as any);
     const component = wrapper.children().dive();
 
     verifySummaryBoardCounts(component, mockedWorkItemCountProps);
@@ -52,7 +51,7 @@ describe('Board Summary', () => {
   it('renders with one action item when work item counts are greater than zero.', () => {
     mockedWorkItemCountProps.actionItems.push(mockWorkItem);
     mockedWorkItemCountProps.supportedWorkItemTypes.push(mockWorkItemType);
-    const wrapper = shallow(<BoardSummary {...mockedWorkItemCountProps} />);
+    const wrapper = shallow(<BoardSummary {...mockedWorkItemCountProps} /> as any);
     const component = wrapper.children().dive();
 
     verifySummaryBoardCounts(component, mockedWorkItemCountProps);

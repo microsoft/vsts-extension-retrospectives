@@ -15,7 +15,7 @@ const mockedProps = mocked({
 describe('Editable Document Card Title ', () => {
   it('can be rendered when enabled.', () => {
     mockedProps.isDisabled = true;
-    const wrapper = shallow(<EditableDocumentCardTitle {...mockedProps} />);
+    const wrapper = shallow(<EditableDocumentCardTitle {...mockedProps} /> as any);
     const component = wrapper.children().dive();
 
     expect(component.prop('className')).toBe('editable-document-card-title');
