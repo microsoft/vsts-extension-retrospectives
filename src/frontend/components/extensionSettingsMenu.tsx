@@ -46,6 +46,9 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private readonly getChangelog = (): string[] => {
     return [
+      'Removes duplicates from Permissions and sorts by owner, permission, teams and members.',
+      'Defaults Prime Directive and Anonymous to false and updates settings order.',
+      'Removes All Teams from team dropdown since retrospectives should be safe space for teams to share feedback without concern that members not on team have access to their retrospective board.',
       'Removed redundant "reflect-hub" tag when adding work item using Act tab.',
       'Updated Marcus Buckingham hyperlinks in the Energy team assessment tooltip.',
       'Replaced references to "backlog grooming" with "backlog refinement" in README file.',
