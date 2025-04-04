@@ -433,7 +433,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   >
                     <option value="">Select a template</option>
                     <option value="start-stop-continue">Start-Stop-Continue</option>
-                    <option value="good-bad-ideas">Good-Bad-Ideas</option>
+                    <option value="good-improve-ideas">Good-Improve-Ideas</option>
                     <option value="mad-sad-glad">Mad-Sad-Glad</option>
                     <option value="4ls">4Ls</option>
                     <option value="daki">Drop-Add-Keep-Improve</option>
