@@ -432,6 +432,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     className="title-input-container column-template-dropdown"
                   >
                     <option value="">Select a template</option>
+                    <option disabled>─────────────</option>
                     <option value="start-stop-continue">Start-Stop-Continue</option>
                     <option value="good-improve-ideas">Good-Improve-Ideas</option>
                     <option value="mad-sad-glad">Mad-Sad-Glad</option>
@@ -439,8 +440,8 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     <option value="daki">Drop-Add-Keep-Improve</option>
                     <option value="kalm">Keep-Add-Less-More</option>
                     <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
+                    <option value="speedboat">Speedboat</option>                 
                     <option disabled>─────────────</option>
-                    <option value="speedboat">Speedboat</option>
                     <option value="clarity">Clarity</option>
                     <option value="energy">Energy</option>
                     <option value="psy-safety">Psychological Safety</option>
