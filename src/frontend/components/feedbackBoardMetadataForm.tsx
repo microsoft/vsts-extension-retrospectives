@@ -446,8 +446,8 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     <option value="energy">Energy</option>
                     <option value="psy-safety">Psychological Safety</option>
                     <option value="wlb">Work-life Balance</option>
-                    <option value="team-confidence">Team Confidence</option>
-                    <option value="team-efficiency">Team Efficiency</option>
+                    <option value="confidence">Confidence</option>
+                    <option value="efficiency">Efficiency</option>
                   </select>
                 </div>
                 <List

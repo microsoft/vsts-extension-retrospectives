@@ -286,7 +286,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           title: 'One action in next sprint',
         },
       ];
-    case 'team-confidence':
+    case 'confidence':
       return [
         {
           accentColor: '#008000',
@@ -307,7 +307,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           title: 'One action in next sprint',
         },
       ];
-    case 'team-efficiency':
+    case 'efficiency':
       return [
         {
           accentColor: '#008000',
