@@ -132,7 +132,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           title: 'Glad',
         },
       ];
-    case 'good-bad-ideas':
+    case 'good-improve-ideas':
       return [
         {
           accentColor: '#008000',
@@ -144,7 +144,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#cc293d',
           iconClass: 'far fa-angry',
           id: generateUUID(),
-          title: 'Bad',
+          title: 'Improve',
         },
         {
           accentColor: '#0078d4',
