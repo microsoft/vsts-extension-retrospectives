@@ -57,33 +57,6 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           title: 'Longed for',
         },
       ];
-    case '1to1': // 1-to-1 - Good, So-so, Improve, Done
-      return [
-        {
-          accentColor: '#008000',
-          iconClass: 'far fa-smile',
-          id: generateUUID(),
-          title: 'Good',
-        },
-        {
-          accentColor: '#f6af08',
-          iconClass: 'fas fa-exclamation',
-          id: generateUUID(),
-          title: 'So-so',
-        },
-        {
-          accentColor: '#0078d4',
-          iconClass: 'fas fa-balance-scale-right',
-          id: generateUUID(),
-          title: 'Improve',
-        },
-        {
-          accentColor: '#8063bf',
-          iconClass: 'fas fa-birthday-cake',
-          id: generateUUID(),
-          title: 'Done',
-        },
-      ];
     case 'daki': // Drop, Add, Keep, Improve
       return [
         {
@@ -142,7 +115,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#cc293d',
-          iconClass: 'far fa-angry',
+          iconClass: 'far fa-frown',
           id: generateUUID(),
           title: 'Improve',
         },
@@ -201,27 +174,34 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           title: 'Continue',
         },
       ];
-    case 'psy-safety':
+    case 'wlai': // Went Well, Learned, Impediments, Accelerators
       return [
         {
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What makes it safe',
+          title: 'Went Well',
         },
         {
-          accentColor: '#cc293d',
-          iconClass: 'far fa-frown',
+          accentColor: '#8063bf',
+          iconClass: 'fas fa-book',
           id: generateUUID(),
-          title: 'What hinders safety',
+          title: 'Learned',
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-compass',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: 'Accelerators',
+        },
+        {
+          accentColor: '#cc293d',
+          iconClass: 'fas fa-question',
+          id: generateUUID(),
+          title: 'Impediments',
         },
       ];
+    // Team Assessment Templates
     case 'clarity':
       return [
         {
@@ -256,6 +236,27 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           iconClass: 'far fa-frown',
           id: generateUUID(),
           title: 'What drains energy',
+        },
+        {
+          accentColor: '#0078d4',
+          iconClass: 'fas fa-exclamation',
+          id: generateUUID(),
+          title: 'One action in next sprint',
+        },
+      ];
+    case 'psy-safety':
+      return [
+        {
+          accentColor: '#008000',
+          iconClass: 'far fa-smile',
+          id: generateUUID(),
+          title: 'What makes it safe',
+        },
+        {
+          accentColor: '#cc293d',
+          iconClass: 'far fa-frown',
+          id: generateUUID(),
+          title: 'What hinders safety',
         },
         {
           accentColor: '#0078d4',
@@ -325,33 +326,6 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           iconClass: 'fas fa-exclamation',
           id: generateUUID(),
           title: 'One action in next sprint',
-        },
-      ];
-    case 'wlai': // Went Well, Learned, Impediments, Accelerators
-      return [
-        {
-          accentColor: '#008000',
-          iconClass: 'far fa-smile',
-          id: generateUUID(),
-          title: 'Went Well',
-        },
-        {
-          accentColor: '#8063bf',
-          iconClass: 'fas fa-book',
-          id: generateUUID(),
-          title: 'Learned',
-        },
-        {
-          accentColor: '#0078d4',
-          iconClass: 'far fa-compass',
-          id: generateUUID(),
-          title: 'Accelerators',
-        },
-        {
-          accentColor: '#cc293d',
-          iconClass: 'fas fa-question',
-          id: generateUUID(),
-          title: 'Impediments',
         },
       ];
     default: {
