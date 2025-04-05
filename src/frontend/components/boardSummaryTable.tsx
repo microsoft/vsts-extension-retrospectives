@@ -86,18 +86,29 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
           new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
         )
       },
-      size: 160,
+      size: 115,
+      sortDescFirst: true
+    }),
+    columnHelper.accessor('archivedDate', {
+      header: 'Archived Date',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
+        return (
+          new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.archivedDate)
+        )
+      },
+      size: 115,
       sortDescFirst: true
     }),
     columnHelper.accessor('pendingWorkItemsCount', {
-      header: 'Pending Work Items',
+      header: 'Open Work Items',
       footer: info => info.column.id,
-      size: 150,
+      size: 115,
     }),
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
       footer: info => info.column.id,
-      size: 150,
+      size: 115,
     })
   ]
 
@@ -150,6 +161,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
           boardName: board.title,
           createdDate: new Date(board.createdDate),
           isArchived: board.isArchived ?? false,
+          archivedDate: board.archivedDate ? new Date(board.archivedDate) : null,
           pendingWorkItemsCount: 0,
           totalWorkItemsCount: 0,
           id: board.id,

@@ -32,6 +32,8 @@ export interface IFeedbackBoardDocument {
   permissions?: IFeedbackBoardDocumentPermissions;
   isPublic?: boolean;
   isArchived?: boolean;
+  archivedDate?: Date;
+  archivedBy?: IdentifyRef;
 }
 
 export class FeedbackBoardDocumentHelper {

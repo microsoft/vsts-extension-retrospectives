@@ -104,6 +104,7 @@ class BoardDataService {
     }
 
     board.isArchived = true;
+    board.archivedDate = new Date();
 
     return await this.updateBoard(teamId, board);
   }
