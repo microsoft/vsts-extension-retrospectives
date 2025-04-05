@@ -208,19 +208,19 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What provides clarity',
+          title: 'What provides clarity?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What hinders clarity',
+          title: 'What hinders clarity?',
         },
         {
           accentColor: '#0078d4',
           iconClass: 'fas fa-exclamation',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: 'One action in next sprint.',
         },
       ];
     case 'energy':
@@ -229,19 +229,19 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What provides energy',
+          title: 'What provides energy?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What drains energy',
+          title: 'What drains energy?',
         },
         {
           accentColor: '#0078d4',
           iconClass: 'fas fa-exclamation',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: 'One action in next sprint.',
         },
       ];
     case 'psy-safety':
@@ -250,19 +250,19 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What makes it safe',
+          title: 'What makes it safe?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What hinders safety',
+          title: 'What hinders safety?',
         },
         {
           accentColor: '#0078d4',
           iconClass: 'fas fa-exclamation',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: 'One action in next sprint.',
         },
       ];
     case 'wlb':
@@ -271,19 +271,19 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What helps work-life balance',
+          title: 'What helps work-life balance?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What hinders work-life balance',
+          title: 'What hinders work-life balance?',
         },
         {
           accentColor: '#0078d4',
           iconClass: 'fas fa-exclamation',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: 'One action in next sprint.',
         },
       ];
     case 'confidence':
@@ -292,19 +292,19 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What increases confidence in team',
+          title: 'What increases confidence in team?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What decreases confidence in team',
+          title: 'What decreases confidence in team?',
         },
         {
           accentColor: '#0078d4',
           iconClass: 'fas fa-exclamation',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: 'One action in next sprint.',
         },
       ];
     case 'efficiency':
@@ -313,19 +313,19 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What helps efficiency',
+          title: 'What helps efficiency?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What hinders efficiency',
+          title: 'What hinders efficiency?',
         },
         {
           accentColor: '#0078d4',
           iconClass: 'fas fa-exclamation',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: 'One action in next sprint.',
         },
       ];
     default: {
@@ -333,12 +333,12 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         accentColor: '#008000',
         iconClass: 'far fa-smile',
         id: generateUUID(),
-        title: 'What went well',
+        title: 'What went well?',
       }, {
         accentColor: '#cc293d',
         iconClass: 'far fa-frown',
         id: generateUUID(),
-        title: "What didn't go well",
+        title: "What didn't go well?",
       }]
     }
   }
