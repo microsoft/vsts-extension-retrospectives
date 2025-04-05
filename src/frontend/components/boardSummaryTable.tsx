@@ -26,7 +26,8 @@ export interface IBoardSummaryTableState {
 export interface IBoardSummaryTableItem {
   boardName: string;
   createdDate: Date;
-  isArchived?: boolean;  // not defined yet, so make optional
+  isArchived?: boolean;
+  archivedDate?: Date; //archivedDate not set for legacy archived boards
   pendingWorkItemsCount: number;
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
