@@ -440,6 +440,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     <option value="daki">Drop-Add-Keep-Improve</option>
                     <option value="kalm">Keep-Add-Less-More</option>
                     <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
+                    <option value="1to1">1-to-1</option>
                     <option value="speedboat">Speedboat</option>
                     <option disabled>─────────────</option>
                     <option value="clarity">Clarity</option>
