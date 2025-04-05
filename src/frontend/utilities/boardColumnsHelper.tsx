@@ -314,7 +314,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas circle-exclamation',
+          iconClass: 'fas fa-circle-exclamation',
           id: generateUUID(),
           title: 'One action in next sprint.',
         },
@@ -335,7 +335,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas circle-exclamation',
+          iconClass: 'fas fa-circle-exclamation',
           id: generateUUID(),
           title: 'One action in next sprint.',
         },
@@ -356,7 +356,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas circle-exclamation',
+          iconClass: 'fas fa-circle-exclamation',
           id: generateUUID(),
           title: 'One action in next sprint.',
         },
