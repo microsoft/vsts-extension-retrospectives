@@ -184,19 +184,19 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: '#008000', //green
-          iconClass: 'far fa-balance-scale-left',
+          iconClass: 'fas fa-scale-unbalanced',
           id: generateUUID(),
           title: 'Good',
         },
         {
           accentColor: '#f6af08', //yellow
-          iconClass: 'fas fa-balanced',
+          iconClass: 'fas fa-scale-balanced',
           id: generateUUID(),
           title: 'So-so',
         },
         {
           accentColor: '#cc293d', //red
-          iconClass: 'fas fa-balance-scale-right',
+          iconClass: 'fas fa-scale-unbalanced-flip',
           id: generateUUID(),
           title: 'Not Good',
         },
