@@ -183,25 +183,25 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
     case '1to1': // 1-to-1 - Good, So-so, Not Good, Done
       return [
         {
-          accentColor: '#008000',
+          accentColor: '#008000', //green
           iconClass: 'far fa-balance-scale-left',
           id: generateUUID(),
           title: 'Good',
         },
         {
-          accentColor: '#f6af08',
+          accentColor: '#f6af08', //yellow
           iconClass: 'fas fa-balanced',
           id: generateUUID(),
           title: 'So-so',
         },
         {
-          accentColor: '#0078d4',
+          accentColor: '#cc293d', //red
           iconClass: 'fas fa-balance-scale-right',
           id: generateUUID(),
           title: 'Not Good',
         },
         {
-          accentColor: '#8063bf',
+          accentColor: '#8063bf', //purple
           iconClass: 'fas fa-birthday-cake',
           id: generateUUID(),
           title: 'Done',
