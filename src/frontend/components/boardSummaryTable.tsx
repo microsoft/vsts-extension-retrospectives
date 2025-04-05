@@ -149,7 +149,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         const boardSummaryItem: IBoardSummaryTableItem = {
           boardName: board.title,
           createdDate: new Date(board.createdDate),
-          isArchived: board.isArchived,
+          isArchived: board.isArchived ?? false,
           pendingWorkItemsCount: 0,
           totalWorkItemsCount: 0,
           id: board.id,
