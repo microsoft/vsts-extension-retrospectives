@@ -69,7 +69,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       footer: info => info.column.id
     }),
     columnHelper.accessor('isArchived', {
-      header: 'Is Archived',
+      header: 'Archived',
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
         const isArchived = cellContext.row.original.isArchived;
@@ -149,6 +149,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         const boardSummaryItem: IBoardSummaryTableItem = {
           boardName: board.title,
           createdDate: new Date(board.createdDate),
+          isArchived: false, // default to false; should no longer display "not set"
           pendingWorkItemsCount: 0,
           totalWorkItemsCount: 0,
           id: board.id,
