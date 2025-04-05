@@ -96,6 +96,7 @@ class BoardDataService {
 
   public archiveFeedbackBoard = async (teamId: string, boardId: string) => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
+    const userIdentity = getUserIdentity();
 
     // Check in case board was deleted by other user after option to update was selected by current user
     if (!board) {
