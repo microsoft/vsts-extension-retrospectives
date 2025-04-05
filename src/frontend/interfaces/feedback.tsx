@@ -33,7 +33,7 @@ export interface IFeedbackBoardDocument {
   isPublic?: boolean;
   isArchived?: boolean;
   archivedDate?: Date;
-  archivedBy?: IdentifyRef;
+  archivedBy?: IdentityRef;
 }
 
 export class FeedbackBoardDocumentHelper {
