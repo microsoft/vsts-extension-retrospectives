@@ -245,7 +245,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     {
       friendlyName: 'compass',
       iconClass: 'far fa-compass',
-    }
+    },
     {
       friendlyName: 'eye',
       iconClass: 'far fa-eye',
@@ -261,7 +261,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     {
       friendlyName: 'balance',
       iconClass: 'fas fa-scale-balanced',
-    }
+    },
     {
       friendlyName: 'rocket',
       iconClass: 'fas fa-rocket',
