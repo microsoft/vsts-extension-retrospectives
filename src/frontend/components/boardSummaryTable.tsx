@@ -93,10 +93,11 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
     columnHelper.accessor('archivedDate', {
       header: 'Archived Date',
       footer: info => info.column.id,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
-        return (
-          new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.archivedDate)
-        )
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date | undefined>) => {
+        const archivedDate = cellContext.row.original.archivedDate;
+        return archivedDate
+          ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(archivedDate)
+          : ''; // Return an empty string if archivedDate is null or undefined
       },
       size: 115,
       sortDescFirst: true
