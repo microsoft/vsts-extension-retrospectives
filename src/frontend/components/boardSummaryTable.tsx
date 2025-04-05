@@ -26,6 +26,7 @@ export interface IBoardSummaryTableState {
 export interface IBoardSummaryTableItem {
   boardName: string;
   createdDate: Date;
+  isArchived?: boolean;  // not defined yet, so make optional
   pendingWorkItemsCount: number;
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
@@ -67,6 +68,16 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       header: 'Retrospective Name',
       footer: info => info.column.id
     }),
+    columnHelper.accessor('isArchived', {
+      header: 'Is Archived',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
+        const isArchived = cellContext.row.original.isArchived;
+        return isArchived === undefined ? 'not set' : isArchived ? 'true' : 'false';
+      },
+      size: 35,
+      sortDescFirst: true
+    }),
     columnHelper.accessor('createdDate', {
       header: 'Created Date',
       footer: info => info.column.id,
@@ -75,18 +86,18 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
           new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
         )
       },
-      size: 175,
+      size: 160,
       sortDescFirst: true
     }),
     columnHelper.accessor('pendingWorkItemsCount', {
       header: 'Pending Work Items',
       footer: info => info.column.id,
-      size: 170,
+      size: 150,
     }),
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
       footer: info => info.column.id,
-      size: 170,
+      size: 150,
     })
   ]
 
