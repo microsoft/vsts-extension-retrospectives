@@ -87,7 +87,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
           new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
         )
       },
-      size: 115,
+      size: 120,
       sortDescFirst: true
     }),
     columnHelper.accessor('archivedDate', {
@@ -99,18 +99,18 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
           ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(archivedDate)
           : ''; // Return an empty string if archivedDate is null or undefined
       },
-      size: 115,
+      size: 120,
       sortDescFirst: true
     }),
     columnHelper.accessor('pendingWorkItemsCount', {
       header: 'Open Work Items',
       footer: info => info.column.id,
-      size: 115,
+      size: 110,
     }),
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
       footer: info => info.column.id,
-      size: 115,
+      size: 110,
     })
   ]
 
