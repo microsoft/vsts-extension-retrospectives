@@ -231,26 +231,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       iconClass: 'far fa-angry',
     },
     {
-      friendlyName: 'chalkboard',
-      iconClass: 'fas fa-chalkboard',
-    },
-    {
-      friendlyName: 'comments',
-      iconClass: 'far fa-comments',
-    },
-    {
-      friendlyName: 'book',
-      iconClass: 'fas fa-book',
-    },
-    {
-      friendlyName: 'compass',
-      iconClass: 'far fa-compass',
-    },
-    {
-      friendlyName: 'eye',
-      iconClass: 'far fa-eye',
-    },
-    {
       friendlyName: 'question',
       iconClass: 'fas fa-question',
     },
@@ -259,8 +239,16 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       iconClass: 'fas fa-exclamation',
     },
     {
-      friendlyName: 'rocket',
-      iconClass: 'fas fa-rocket',
+      friendlyName: 'comments',
+      iconClass: 'far fa-comments',
+    },
+    {
+      friendlyName: 'compass',
+      iconClass: 'far fa-compass',
+    }
+    {
+      friendlyName: 'eye',
+      iconClass: 'far fa-eye',
     },
     {
       friendlyName: 'life-ring',
@@ -271,13 +259,25 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       iconClass: 'fas fa-anchor',
     },
     {
+      friendlyName: 'balance',
+      iconClass: 'fas fa-scale-balanced',
+    }
+    {
+      friendlyName: 'rocket',
+      iconClass: 'fas fa-rocket',
+    },
+    {
+      friendlyName: 'chalkboard',
+      iconClass: 'fas fa-chalkboard',
+    },
+    {
+      friendlyName: 'book',
+      iconClass: 'fas fa-book',
+    },
+    {
       friendlyName: 'celebrate',
       iconClass: 'fas fa-birthday-cake',
     },
-    {
-      friendlyName: 'balance',
-      iconClass: 'fas fa-balance-scale-right',
-    }
   ];
 
   private allAccentColors: { friendlyName: string, colorCode: string }[] = [
