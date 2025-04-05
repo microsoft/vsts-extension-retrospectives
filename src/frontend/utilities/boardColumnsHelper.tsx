@@ -3,85 +3,46 @@ import { generateUUID } from './random';
 
 export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] => {
   switch (templateId) {
-    case 'speedboat': // Speedboat retrospective - Propellors, Life Preserver, Anchors, Rocks
-    return [
-      {
-        accentColor: '#008000',
-        iconClass: 'fas fa-rocket',
-        id: generateUUID(),
-        title: 'Propellors'
-      },
-      {
-        accentColor: '#f6af03',
-        iconClass: 'fas fa-life-ring',
-        id: generateUUID(),
-        title: 'Life preserver',
-      },
-      {
-        accentColor: '#F78A53',
-        iconClass: 'fas fa-anchor',
-        id: generateUUID(),
-        title: 'Anchors',
-      },
-      {
-        accentColor: '#cc293d',
-        iconClass: 'far fa-exclamation',
-        id: generateUUID(),
-        title: 'Rocks',
-      },
-    ];
-    case '4ls': // The 4 Ls - Like, Learned, Lacked, Longed For
+    case 'start-stop-continue':
       return [
         {
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'Liked'
+          title: 'Start',
+        },
+        {
+          accentColor: '#cc293d',
+          iconClass: 'far fa-frown',
+          id: generateUUID(),
+          title: 'Stop',
         },
         {
           accentColor: '#f6af08',
-          iconClass: 'fas fa-book',
-          id: generateUUID(),
-          title: 'Learned',
-        },
-        {
-          accentColor: '#0078d4',
-          iconClass: 'far fa-compass',
-          id: generateUUID(),
-          title: 'Lacked',
-        },
-        {
-          accentColor: '#8063bf',
           iconClass: 'far fa-eye',
           id: generateUUID(),
-          title: 'Longed for',
+          title: 'Continue',
         },
       ];
-    case 'daki': // Drop, Add, Keep, Improve
+    case 'good-improve-ideas':
       return [
         {
-          accentColor: '#cc293d',
-          iconClass: 'fas fa-exclamation',
+          accentColor: '#008000',
+          iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'Drop',
+          title: 'Good',
         },
         {
-          accentColor: '#008000',
-          iconClass: 'fas fa-smile',
+          accentColor: '#cc293d',
+          iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'Add',
+          title: 'Improve',
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-book',
+          iconClass: 'fas fa-lightbulb',
           id: generateUUID(),
-          title: 'Keep',
-        },
-        {
-          accentColor: '#8063bf',
-          iconClass: 'far fa-compass',
-          id: generateUUID(),
-          title: 'Improve',
+          title: 'Ideas',
         },
       ];
     case 'mad-sad-glad':
@@ -105,80 +66,92 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           title: 'Glad',
         },
       ];
-    case 'good-improve-ideas':
+    case '4ls': // The 4 Ls - Like, Learned, Lacked, Longed For
       return [
         {
           accentColor: '#008000',
-          iconClass: 'far fa-smile',
+          iconClass: 'far fa-thumbs-up',
           id: generateUUID(),
-          title: 'Good',
+          title: 'Liked'
         },
         {
-          accentColor: '#cc293d',
-          iconClass: 'far fa-frown',
+          accentColor: '#f6af08',
+          iconClass: 'fas fa-book',
           id: generateUUID(),
-          title: 'Improve',
+          title: 'Learned',
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-thumbs-down',
           id: generateUUID(),
-          title: 'Ideas',
+          title: 'Lacked',
+        },
+        {
+          accentColor: '#8063bf',
+          iconClass: 'far fa-star',
+          id: generateUUID(),
+          title: 'Longed for',
+        },
+      ];
+    case 'daki': // Drop, Add, Keep, Improve
+      return [
+        {
+          accentColor: '#cc293d',
+          iconClass: 'fas fa-trash',
+          id: generateUUID(),
+          title: 'Drop',
+        },
+        {
+          accentColor: '#008000',
+          iconClass: 'fas fa-cart-plus',
+          id: generateUUID(),
+          title: 'Add',
+        },
+        {
+          accentColor: '#0078d4',
+          iconClass: 'fas fa-lock',
+          id: generateUUID(),
+          title: 'Keep',
+        },
+        {
+          accentColor: '#8063bf',
+          iconClass: 'far fa-wrench',
+          id: generateUUID(),
+          title: 'Improve',
         },
       ];
     case 'kalm': // Keep, Add, Less, More
       return [
         {
           accentColor: '#008000',
-          iconClass: 'far fa-smile',
+          iconClass: 'far fa-circle-check',
           id: generateUUID(),
           title: 'Keep',
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-book',
+          iconClass: 'fas fa-circle-plus',
           id: generateUUID(),
           title: 'Add',
         },
         {
           accentColor: '#f6af08',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'fas fa-circle-down',
           id: generateUUID(),
           title: 'Less',
         },
         {
           accentColor: '#8063bf',
-          iconClass: 'far fa-comments',
+          iconClass: 'far fa-circle-up',
           id: generateUUID(),
           title: 'More',
         },
       ];
-    case 'start-stop-continue':
+    case 'wlai': // Went Well, Learned, Accelerators, Impediments
       return [
         {
           accentColor: '#008000',
-          iconClass: 'far fa-smile',
-          id: generateUUID(),
-          title: 'Start',
-        },
-        {
-          accentColor: '#cc293d',
-          iconClass: 'far fa-frown',
-          id: generateUUID(),
-          title: 'Stop',
-        },
-        {
-          accentColor: '#f6af08',
-          iconClass: 'far fa-eye',
-          id: generateUUID(),
-          title: 'Continue',
-        },
-      ];
-    case 'wlai': // Went Well, Learned, Impediments, Accelerators
-      return [
-        {
-          accentColor: '#008000',
-          iconClass: 'far fa-smile',
+          iconClass: 'far fa-star',
           id: generateUUID(),
           title: 'Went Well',
         },
@@ -190,15 +163,42 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'far fa-compass',
+          iconClass: 'far fa-rocket',
           id: generateUUID(),
           title: 'Accelerators',
         },
         {
           accentColor: '#cc293d',
-          iconClass: 'fas fa-question',
+          iconClass: 'fas fa-exclamation-triangle',
           id: generateUUID(),
           title: 'Impediments',
+        },
+      ];
+    case 'speedboat': // Speedboat retrospective - Propellors, Life Preserver, Anchors, Rocks
+      return [
+        {
+          accentColor: '#008000',
+          iconClass: 'fas fa-fan',
+          id: generateUUID(),
+          title: 'Propellors'
+        },
+        {
+          accentColor: '#f6af03',
+          iconClass: 'fas fa-life-ring',
+          id: generateUUID(),
+          title: 'Life preservers',
+        },
+        {
+          accentColor: '#F78A53',
+          iconClass: 'fas fa-anchor',
+          id: generateUUID(),
+          title: 'Anchors',
+        },
+        {
+          accentColor: '#cc293d',
+          iconClass: 'far fa-ban',
+          id: generateUUID(),
+          title: 'Rocks',
         },
       ];
     // Team Assessment Templates
