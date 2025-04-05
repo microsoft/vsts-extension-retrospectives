@@ -7,19 +7,19 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: '#008000',
-          iconClass: 'far fa-smile',
+          iconClass: 'far fa-circle-play',
           id: generateUUID(),
           title: 'Start',
         },
         {
           accentColor: '#cc293d',
-          iconClass: 'far fa-frown',
+          iconClass: 'far fa-circle-stop',
           id: generateUUID(),
           title: 'Stop',
         },
         {
           accentColor: '#f6af08',
-          iconClass: 'far fa-eye',
+          iconClass: 'far fa-circle-dot',
           id: generateUUID(),
           title: 'Continue',
         },
@@ -40,7 +40,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-lightbulb',
+          iconClass: 'far fa-lightbulb',
           id: generateUUID(),
           title: 'Ideas',
         },
@@ -115,7 +115,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#8063bf',
-          iconClass: 'far fa-wrench',
+          iconClass: 'fas fa-wrench',
           id: generateUUID(),
           title: 'Improve',
         },
@@ -130,13 +130,13 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-circle-plus',
+          iconClass: 'far fa-circle-plus',
           id: generateUUID(),
           title: 'Add',
         },
         {
           accentColor: '#f6af08',
-          iconClass: 'fas fa-circle-down',
+          iconClass: 'far fa-circle-down',
           id: generateUUID(),
           title: 'Less',
         },
@@ -151,7 +151,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: '#008000',
-          iconClass: 'far fa-star',
+          iconClass: 'fas fa-star',
           id: generateUUID(),
           title: 'Went Well',
         },
@@ -163,7 +163,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'far fa-rocket',
+          iconClass: 'fas fa-rocket',
           id: generateUUID(),
           title: 'Accelerators',
         },
@@ -196,7 +196,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#cc293d',
-          iconClass: 'far fa-ban',
+          iconClass: 'fas fa-skull-crossbones',
           id: generateUUID(),
           title: 'Rocks',
         },
