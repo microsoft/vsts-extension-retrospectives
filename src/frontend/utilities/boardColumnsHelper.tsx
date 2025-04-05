@@ -224,7 +224,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-circle-question',
           id: generateUUID(),
           title: 'One action in next sprint.',
         },
@@ -245,7 +245,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-circle-question',
           id: generateUUID(),
           title: 'One action in next sprint.',
         },
@@ -266,7 +266,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-circle-question',
           id: generateUUID(),
           title: 'One action in next sprint.',
         },
@@ -287,7 +287,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'fas circle-exclamation',
           id: generateUUID(),
           title: 'One action in next sprint.',
         },
@@ -308,7 +308,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'fas circle-exclamation',
           id: generateUUID(),
           title: 'One action in next sprint.',
         },
@@ -329,7 +329,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'fas circle-exclamation',
           id: generateUUID(),
           title: 'One action in next sprint.',
         },
