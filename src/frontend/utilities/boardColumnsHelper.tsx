@@ -41,6 +41,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         {
           accentColor: '#f6af08', //yellow
           iconClass: 'far fa-question',
+>>>>>>> 3120d33d043a3d3e9d1ee06b3228ba7a957beaf3
           id: generateUUID(),
           title: 'Ideas',
         },
@@ -51,6 +52,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           title: 'Thanks',
         }
       ];
+>>>>>>> 3120d33d043a3d3e9d1ee06b3228ba7a957beaf3
     case 'mad-sad-glad':
       return [
         {
