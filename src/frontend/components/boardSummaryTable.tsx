@@ -107,7 +107,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       },
       size: 35,
       sortDescFirst: true,
-    });
+    }),
     columnHelper.accessor('createdDate', {
       header: 'Created Date',
       footer: info => info.column.id,
