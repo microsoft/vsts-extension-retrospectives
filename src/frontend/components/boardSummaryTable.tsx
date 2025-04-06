@@ -43,6 +43,7 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
+//DPH
 function getTable(
   data: IBoardSummaryTableItem[],
   sortingState: SortingState,
@@ -86,6 +87,7 @@ function getTable(
       size: 120,
       sortDescFirst: true
     }),
+    //DPH
     columnHelper.accessor('isArchived', {
       header: 'Archived',
       footer: info => info.column.id,
@@ -183,6 +185,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
+  //DPH
   // added toggleArchiveStatus
   const toggleArchiveStatus = async (boardId: string) => {
     const board = this.state.boards.find(board => board.id === boardId);
@@ -205,8 +208,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       if (updatedStatus) {
         // Archive the board
         await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, boardId);
-        reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, boardId);
-        appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId } });
+        //reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, boardId);
+        //appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId } });
       } else {
         // Unarchive the board (implement unarchive logic here)
         board.isArchived = false; // Update locally for now
@@ -235,6 +238,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     }
   }
 
+  //DPH
   // const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting);
   const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting, toggleArchiveStatus);
 
