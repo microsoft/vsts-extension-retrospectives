@@ -4,6 +4,7 @@ import { generateUUID } from './random';
 export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] => {
   const NEXT_ACTION = 'One action to try next.';
 
+  switch (templateId) {
     case 'start-stop-continue':
       return [
         {
