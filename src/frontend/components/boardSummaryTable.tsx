@@ -9,6 +9,7 @@ import { Cell, CellContext, Header, OnChangeFn, Row, SortDirection, SortingState
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { archiveBoardById } from '../components/feedbackBoardContainer';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
