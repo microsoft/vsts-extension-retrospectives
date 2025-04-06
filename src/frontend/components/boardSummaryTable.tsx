@@ -46,7 +46,7 @@ export interface IActionItemsTableItems {
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
-  /*  columnHelper.accessor('id', {
+    columnHelper.accessor('id', {
       header: null,
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
@@ -64,38 +64,12 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       },
       enableResizing: false,
       enableSorting: false
-    }), */
-    columnHelper.accessor('id', {
-      header: null,
-      footer: info => info.column.id,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
-        return cellContext.row.getCanExpand() ? (
-          <DefaultButton
-            className="contextual-menu-button"
-            aria-label="Expand Row"
-            title="Expand Row"
-            onClick={() => cellContext.row.toggleExpanded()} // Restrict expansion toggle to button click
-          >
-            <span className="ms-Button-icon">
-              <i
-                className={`fas ${
-                  cellContext.row.getIsExpanded() ? 'fa-caret-down' : 'fa-caret-right'
-                }`}
-              ></i>
-            </span>
-          </DefaultButton>
-        ) : (
-          '' // Render empty if the row cannot expand
-        );
-      },
-      enableResizing: false,
-      enableSorting: false,
     }),
     columnHelper.accessor('boardName', {
       header: 'Retrospective Name',
       footer: info => info.column.id
     }),
-    columnHelper.accessor('isArchived', {
+/*    columnHelper.accessor('isArchived', {
       header: 'Archived',
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
@@ -112,7 +86,28 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       },
       size: 35,
       sortDescFirst: true
-    }),
+    }),*/
+    columnHelper.accessor('isArchived', {
+      header: 'Archived',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
+        const isArchived = cellContext.row.original.isArchived;
+        return (
+          <div
+            onClick={(event) => event.stopPropagation()} // Prevent click propagation
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+          >
+            <input
+              type="checkbox"
+              checked={!!isArchived} // Ensure boolean value
+              readOnly // Optional, makes the checkbox non-interactive
+            />
+          </div>
+        );
+      },
+      size: 35,
+      sortDescFirst: true,
+    });
     columnHelper.accessor('createdDate', {
       header: 'Created Date',
       footer: info => info.column.id,
