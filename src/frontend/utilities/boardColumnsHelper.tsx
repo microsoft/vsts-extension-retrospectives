@@ -2,7 +2,8 @@ import { IFeedbackColumn } from '../interfaces/feedback';
 import { generateUUID } from './random';
 
 export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] => {
-  switch (templateId) {
+  const NEXT_ACTION = 'One action to try next.';
+
     case 'start-stop-continue':
       return [
         {
@@ -253,7 +254,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#0078d4',
           iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint.',
+          title: NEXT_ACTION,
         },
       ];
     case 'energy':
@@ -274,7 +275,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#0078d4',
           iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint.',
+          title: NEXT_ACTION,
         },
       ];
     case 'psy-safety':
@@ -295,7 +296,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#0078d4',
           iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint.',
+          title: NEXT_ACTION,
         },
       ];
     case 'wlb':
@@ -316,7 +317,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#0078d4',
           iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint.',
+          title: NEXT_ACTION,
         },
       ];
     case 'confidence':
@@ -337,7 +338,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#0078d4',
           iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint.',
+          title: NEXT_ACTION,
         },
       ];
     case 'efficiency':
@@ -358,7 +359,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#0078d4',
           iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint.',
+          title: NEXT_ACTION,
         },
       ];
     default: {
