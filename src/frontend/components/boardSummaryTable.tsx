@@ -86,33 +86,6 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       header: 'Archived',
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
-        const board = cellContext.row.original;
-        const handleArchiveToggle = async (event: React.ChangeEvent<HTMLInputElement>) => {
-          event.stopPropagation();
-          const checked = event.target.checked;
-          if (checked && !board.isArchived) {
-            try {
-              await archiveBoardById(board.teamId, board.id); // <-- Use new method
-              // Optionally: trigger a re-fetch or local update here
-            } catch (error) {
-              console.error('Failed to archive board', error);
-            }
-          }
-        };
-        return (
-          <div
-            onClick={(event) => event.stopPropagation()}
-            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
-          >
-            <input
-              type="checkbox"
-              checked={!!board.isArchived}
-              onChange={handleArchiveToggle}
-            />
-          </div>
-        );
-      },
-      /* cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
         const isArchived = cellContext.row.original.isArchived;
         return (
           <div
@@ -127,7 +100,6 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
           </div>
         );
       },
-      */
       size: 35,
       sortDescFirst: true,
     }),
