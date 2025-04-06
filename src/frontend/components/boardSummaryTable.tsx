@@ -32,6 +32,7 @@ export interface IBoardSummaryTableItem {
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
   id: string;
+  teamId: string; // add for archiving
 }
 
 export interface IBoardActionItemsData {
@@ -207,6 +208,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
           totalWorkItemsCount: 0,
           id: board.id,
           feedbackItemsCount: 0,
+          teamId: this.props.teamId, // added for archiving
         };
 
         boardsTableItems.push(boardSummaryItem);
