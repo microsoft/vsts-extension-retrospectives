@@ -44,9 +44,9 @@ export interface IActionItemsTableItems {
 }
 
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
-  /* const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
+  const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
-    columnHelper.accessor('id', {
+  /*  columnHelper.accessor('id', {
       header: null,
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
