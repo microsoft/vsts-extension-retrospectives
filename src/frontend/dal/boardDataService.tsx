@@ -108,7 +108,7 @@ class BoardDataService {
     board.archivedDate = new Date();
     board.archivedBy = userIdentity;
 
-    console.log(`archivedBy: ${board.archivedBy}`);
+    console.log('archivedBy:', board.archivedBy);
 
     return await this.updateBoard(teamId, board);
   }
