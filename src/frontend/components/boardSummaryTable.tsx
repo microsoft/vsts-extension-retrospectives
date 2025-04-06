@@ -44,7 +44,7 @@ export interface IActionItemsTableItems {
 }
 
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
-  const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
+  /* const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
       header: null,
@@ -64,6 +64,32 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       },
       enableResizing: false,
       enableSorting: false
+    }), */
+    columnHelper.accessor('id', {
+      header: null,
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
+        return cellContext.row.getCanExpand() ? (
+          <DefaultButton
+            className="contextual-menu-button"
+            aria-label="Expand Row"
+            title="Expand Row"
+            onClick={() => cellContext.row.toggleExpanded()} // Restrict expansion toggle to button click
+          >
+            <span className="ms-Button-icon">
+              <i
+                className={`fas ${
+                  cellContext.row.getIsExpanded() ? 'fa-caret-down' : 'fa-caret-right'
+                }`}
+              ></i>
+            </span>
+          </DefaultButton>
+        ) : (
+          '' // Render empty if the row cannot expand
+        );
+      },
+      enableResizing: false,
+      enableSorting: false,
     }),
     columnHelper.accessor('boardName', {
       header: 'Retrospective Name',
