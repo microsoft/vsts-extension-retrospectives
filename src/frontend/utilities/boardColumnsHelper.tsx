@@ -182,7 +182,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           title: 'Impediments',
         },
       ];
-    case '1to1': // 1-to-1 - Good, So-so, Not Good, Done
+    case '1to1': // 1-to-1 - Good, So-so, Not-so-good, Done
       return [
         {
           accentColor: '#008000', //green
@@ -200,7 +200,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#cc293d', //red
           iconClass: 'fas fa-scale-unbalanced-flip',
           id: generateUUID(),
-          title: 'Not Good',
+          title: 'Not-so-good',
         },
         {
           accentColor: '#8063bf', //purple
