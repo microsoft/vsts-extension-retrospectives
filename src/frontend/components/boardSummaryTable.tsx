@@ -85,11 +85,9 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
         const { id, isArchived } = cellContext.row.original;
-      
         const handleChange = () => {
           toggleArchiveStatus(id); // Call the handler
         };
-      
         return (
           <div
             onClick={(event) => event.stopPropagation()}
@@ -189,13 +187,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       const updatedBoards = prevState.boardsTableItems.map((board) =>
         board.id === boardId ? { ...board, isArchived: !board.isArchived } : board
       );
-
       return {
         ...prevState,
         boardsTableItems: updatedBoards,
       };
     });
-
     console.log(`Toggled archive status for board ID: ${boardId}`);
   };
 
