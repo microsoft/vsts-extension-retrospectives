@@ -69,7 +69,17 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       header: 'Retrospective Name',
       footer: info => info.column.id
     }),
-    /*
+    columnHelper.accessor('createdDate', {
+      header: 'Created Date',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
+        return (
+          new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
+        )
+      },
+      size: 120,
+      sortDescFirst: true
+    }),
     columnHelper.accessor('isArchived', {
       header: 'Archived',
       footer: info => info.column.id,
@@ -90,50 +100,6 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       },
       size: 35,
       sortDescFirst: true,
-    }),*/
-    columnHelper.accessor('isArchived', {
-      header: 'Archived',
-      footer: info => info.column.id,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
-        const board = cellContext.row.original; // Access the board row data
-
-        const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-          if (event.target.checked) {
-            // Checkbox is checked: User is archiving the board (true)
-            console.log(`Archiving board: ${board.boardName}`);
-            board.isArchived = true;
-            board.archivedDate = new Date();
-            //board.archivedBy = userIdentity;
-          } else {
-            // Checkbox is unchecked: Reset archiving details
-            console.log(`Unarchiving board: ${board.boardName}`);
-            board.isArchived = false;
-            board.archivedDate = null;
-            //board.archivedBy = null;
-            // Optionally trigger an API call to persist the changes if needed
-          }
-        };
-        return (
-          <input
-            type="checkbox"
-            checked={!!board.isArchived} // Ensure boolean value; default to false if undefined
-            onChange={handleCheckboxChange} // Attach the change handler
-          />
-        );
-      },
-      size: 35,
-      sortDescFirst: true,
-    }),
-    columnHelper.accessor('createdDate', {
-      header: 'Created Date',
-      footer: info => info.column.id,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
-        return (
-          new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
-        )
-      },
-      size: 120,
-      sortDescFirst: true
     }),
     columnHelper.accessor('archivedDate', {
       header: 'Archived Date',
