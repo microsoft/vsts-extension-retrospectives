@@ -84,6 +84,26 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       header: 'Archived',
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
+        const { id, isArchived } = cellContext.row.original;
+      
+        const handleChange = () => {
+          toggleArchiveStatus(id); // Call the handler
+        };
+      
+        return (
+          <div
+            onClick={(event) => event.stopPropagation()}
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+          >
+            <input
+              type="checkbox"
+              checked={!!isArchived}
+              onChange={handleChange}
+            />
+          </div>
+        );
+      },
+/*      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
         const isArchived = cellContext.row.original.isArchived;
         return (
           <div
@@ -98,6 +118,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
           </div>
         );
       },
+*/
       size: 35,
       sortDescFirst: true,
     }),
@@ -155,11 +176,28 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     actionItemsByBoard: {},
     allDataLoaded: false
   })
+
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
   const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting);
 
   const updatedState: IBoardSummaryTableState = boardSummaryState;
+
+  // added toggleArchiveStatus
+  const toggleArchiveStatus = (boardId: string) => {
+    setBoardSummaryState((prevState) => {
+      const updatedBoards = prevState.boardsTableItems.map((board) =>
+        board.id === boardId ? { ...board, isArchived: !board.isArchived } : board
+      );
+
+      return {
+        ...prevState,
+        boardsTableItems: updatedBoards,
+      };
+    });
+
+    console.log(`Toggled archive status for board ID: ${boardId}`);
+  };
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     if((boardDocuments ?? []).length === 0) {
