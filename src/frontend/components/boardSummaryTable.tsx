@@ -114,7 +114,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       sortDescFirst: true
     }),
     columnHelper.accessor('pendingWorkItemsCount', {
-      header: 'Pending Work Items',
+      header: 'Open Work Items',
       footer: info => info.column.id,
       size: 110,
     }),
