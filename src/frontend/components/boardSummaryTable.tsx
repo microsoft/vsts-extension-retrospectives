@@ -184,18 +184,56 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
   // added toggleArchiveStatus
-  const toggleArchiveStatus = (boardId: string) => {
-    setBoardSummaryState((prevState) => {
-      const updatedBoards = prevState.boardsTableItems.map((board) =>
-        board.id === boardId ? { ...board, isArchived: !board.isArchived } : board
-      );
-      return {
-        ...prevState,
-        boardsTableItems: updatedBoards,
-      };
-    });
-     console.log(`Toggled archive status for board ID: ${boardId}`);
-  };
+  const toggleArchiveStatus = async (boardId: string) => {
+    const board = this.state.boards.find(board => board.id === boardId);
+
+    if (!board) {
+      console.error(`Board with ID ${boardId} not found`);
+      return;
+    }
+
+    const updatedStatus = !board.isArchived;
+
+    try {
+      // Optimistically update local state
+      this.setState((prevState) => ({
+        boards: prevState.boards.map((b) =>
+          b.id === boardId ? { ...b, isArchived: updatedStatus } : b
+        ),
+      }));
+
+      if (updatedStatus) {
+        // Archive the board
+        await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, boardId);
+        reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, boardId);
+        appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId } });
+      } else {
+        // Unarchive the board (implement unarchive logic here)
+        board.isArchived = false; // Update locally for now
+        board.archivedDate = undefined;
+        board.archivedBy = undefined;
+        await BoardDataService.updateBoardMetadata(
+          this.state.currentTeam.id,
+          boardId,
+          board.maxVotesPerUser,
+          board.title,
+          board.columns,
+          board.permissions
+        );
+      }
+
+      console.log(`Archive status for board ${boardId} updated successfully`);
+    } catch (error) {
+      console.error(`Failed to update archive status for board ${boardId}:`, error);
+
+      // Rollback state on failure
+      this.setState((prevState) => ({
+        boards: prevState.boards.map((b) =>
+          b.id === boardId ? { ...b, isArchived: !updatedStatus } : b
+        ),
+      }));
+    }
+  }
 
   // const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting);
   const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting, toggleArchiveStatus);
