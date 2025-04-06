@@ -75,24 +75,6 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
         const isArchived = cellContext.row.original.isArchived;
         return (
-          <div className="centered-cell">
-            <input
-              type="checkbox"
-              checked={!!isArchived} // Ensure boolean value; default to false if undefined
-              readOnly // Make the checkbox read-only if needed
-            />
-          </div>
-        );
-      },
-      size: 35,
-      sortDescFirst: true
-    }),*/
-    columnHelper.accessor('isArchived', {
-      header: 'Archived',
-      footer: info => info.column.id,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
-        const isArchived = cellContext.row.original.isArchived;
-        return (
           <div
             onClick={(event) => event.stopPropagation()} // Prevent click propagation
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
@@ -107,7 +89,33 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       },
       size: 35,
       sortDescFirst: true,
-    }),
+    }), */
+    columnHelper.accessor('isArchived', {
+      header: 'Archived',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
+        const isArchived = cellContext.row.original.isArchived;
+        const handleCellClick = () => {
+          if (!isArchived) {
+            this.showArchiveBoardConfirmationDialog(cellContext.row.original); // Call the confirmation dialog
+          }
+        };
+        return (
+          <div
+            onClick={handleCellClick} // Attach click handler to the cell
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', cursor: 'pointer' }}
+          >
+            <input
+              type="checkbox"
+              checked={!!isArchived} // Ensure boolean value; default to false if undefined
+              readOnly // Makes the checkbox non-editable
+            />
+          </div>
+        );
+      },
+      size: 35,
+      sortDescFirst: true,
+    });
     columnHelper.accessor('createdDate', {
       header: 'Created Date',
       footer: info => info.column.id,
