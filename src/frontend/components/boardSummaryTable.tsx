@@ -72,9 +72,18 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
     columnHelper.accessor('isArchived', {
       header: 'Archived',
       footer: info => info.column.id,
+//      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
+//        const isArchived = cellContext.row.original.isArchived;
+//        return isArchived === undefined ? 'not set' : isArchived ? 'true' : 'false';
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
         const isArchived = cellContext.row.original.isArchived;
-        return isArchived === undefined ? 'not set' : isArchived ? 'true' : 'false';
+        return (
+          <input
+            type="checkbox"
+            checked={!!isArchived} // Ensure boolean value; default to false if undefined
+            readOnly // Make the checkbox read-only if you don't want it to be interactive
+          />
+        );
       },
       size: 35,
       sortDescFirst: true
