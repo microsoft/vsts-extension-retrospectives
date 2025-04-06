@@ -1015,7 +1015,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.broadcastDeletedBoard(teamId, boardId);
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId } });
   }
- 
+
   private readonly deleteCurrentBoard = async () => {
     await BoardDataService.deleteFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
