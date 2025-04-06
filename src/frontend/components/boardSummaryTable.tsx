@@ -43,7 +43,13 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
+function getTable(
+  data: IBoardSummaryTableItem[],
+  sortingState: SortingState,
+  onSortingChange: OnChangeFn<SortingState>,
+  toggleArchiveStatus: (boardId: string) => void // Add the function here
+): Table<IBoardSummaryTableItem> {
+//function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
@@ -177,7 +183,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting);
+  // const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting);
+  const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting, toggleArchiveStatus);
 
   const updatedState: IBoardSummaryTableState = boardSummaryState;
 
