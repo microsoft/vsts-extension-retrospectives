@@ -68,7 +68,8 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
     columnHelper.accessor('boardName', {
       header: 'Retrospective Name',
       footer: info => info.column.id
-    }),/*
+    }),
+    /*
     columnHelper.accessor('isArchived', {
       header: 'Archived',
       footer: info => info.column.id,
