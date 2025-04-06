@@ -101,13 +101,15 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
           if (event.target.checked) {
             // Checkbox is checked: User is archiving the board (true)
             console.log(`Archiving board: ${board.boardName}`);
-            // Optionally trigger an archiving confirmation dialog here if needed
+            board.isArchived = true;
+            board.archivedDate = new Date();
+            //board.archivedBy = userIdentity;
           } else {
             // Checkbox is unchecked: Reset archiving details
             console.log(`Unarchiving board: ${board.boardName}`);
             board.isArchived = false;
             board.archivedDate = null;
-            board.archivedBy = null;
+            //board.archivedBy = null;
             // Optionally trigger an API call to persist the changes if needed
           }
         };
