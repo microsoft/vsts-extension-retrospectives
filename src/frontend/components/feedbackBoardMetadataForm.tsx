@@ -260,7 +260,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     },
     {
       friendlyName: 'balance',
-      iconClass: 'fas fa-scale-balanced',
+      iconClass: 'fas fa-scale-unbalanced',
     },
     {
       friendlyName: 'rocket',
