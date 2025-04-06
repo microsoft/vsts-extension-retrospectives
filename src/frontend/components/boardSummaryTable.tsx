@@ -110,7 +110,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
             />
           </div>
         );
-      }
+      },
       /* cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
         const isArchived = cellContext.row.original.isArchived;
         return (
