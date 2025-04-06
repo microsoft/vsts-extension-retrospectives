@@ -221,7 +221,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#0078d4', //blue
           iconClass: 'fas fa-life-ring',
           id: generateUUID(),
-          title: 'Life preservers',
+          title: 'Lifesavers',
         },
         {
           accentColor: '#cc293d', //red
