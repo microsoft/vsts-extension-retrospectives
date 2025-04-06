@@ -183,11 +183,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  // const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting);
-  const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting, toggleArchiveStatus);
-
-  const updatedState: IBoardSummaryTableState = boardSummaryState;
-
   // added toggleArchiveStatus
   const toggleArchiveStatus = (boardId: string) => {
     setBoardSummaryState((prevState) => {
@@ -199,8 +194,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         boardsTableItems: updatedBoards,
       };
     });
-    console.log(`Toggled archive status for board ID: ${boardId}`);
+     console.log(`Toggled archive status for board ID: ${boardId}`);
   };
+
+  // const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting);
+  const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting, toggleArchiveStatus);
+
+  const updatedState: IBoardSummaryTableState = boardSummaryState;
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     if((boardDocuments ?? []).length === 0) {
