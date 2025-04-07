@@ -112,6 +112,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
                 if (newIsArchived) {
                   await BoardDataService.archiveFeedbackBoard(teamId, boardId);
                   reflectBackendService.broadcastDeletedBoard(teamId, boardId);
+                  appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
                 } else {
                   await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
                 }
