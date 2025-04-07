@@ -46,7 +46,12 @@ export interface IActionItemsTableItems {
 
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
   // Add state for managing table data
-  const [tableData, setTableData] = React.useState(data)
+  //const [tableData, setTableData] = React.useState(data)
+  const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data);
+  React.useEffect(() => {setTableData(data); }, [data]);
+  if (!data || data.length === 0) {
+    console.error("No data provided to getTable. Ensure `data` is not empty or undefined.");
+  }
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
