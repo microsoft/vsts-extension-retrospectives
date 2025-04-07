@@ -193,6 +193,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
           totalWorkItemsCount: 0,
           id: board.id,
           feedbackItemsCount: 0,
+          teamId: board.teamId,
         };
 
         boardsTableItems.push(boardSummaryItem);
