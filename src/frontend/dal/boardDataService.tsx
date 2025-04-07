@@ -111,6 +111,23 @@ class BoardDataService {
     return await this.updateBoard(teamId, board);
   }
 
+  public restoreArchivedFeedbackBoard = async (teamId: string, boardId: string) => {
+    const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
+    const userIdentity = getUserIdentity();
+
+    // Check in case board was deleted by other user after option to update was selected by current user
+    if (!board) {
+      console.log(`Cannot restore for a non-existent feedback board. Board: ${boardId}`);
+      return undefined;
+    }
+
+    board.isArchived = false;
+    board.archivedDate = undefined;
+    board.archivedBy = undefined;
+
+    return await this.updateBoard(teamId, board);
+  }
+
   public updateBoardMetadata = async (teamId: string, boardId: string, maxvotesPerUser: number, title: string, newColumns: IFeedbackColumn[], permissions: IFeedbackBoardDocumentPermissions): Promise<IFeedbackBoardDocument> => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
 

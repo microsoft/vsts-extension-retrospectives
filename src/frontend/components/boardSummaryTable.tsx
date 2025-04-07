@@ -84,7 +84,11 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       header: 'Archived',
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
+        const boardId = cellContext.row.original.id; // Using `id` as the boardId
+        //const teamId = cellContext.table.options.meta.teamId; // Retrieve `teamId` from table meta
+        const teamId = cellContext.row.original.teamId; // Ensure `teamId` exists in your data model
         const isArchived = cellContext.row.original.isArchived;
+
         return (
           <div
             onClick={(event) => event.stopPropagation()} // Prevent click propagation
@@ -93,7 +97,17 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
             <input
               type="checkbox"
               checked={!!isArchived} // Ensure boolean value
-              readOnly // Optional, makes the checkbox non-interactive
+              onChange={async (event) => {
+                try {
+                  if (event.target.checked) {
+                    await archiveFeedbackBoard(teamId, boardId); // Archive the board
+                  } else {
+                    await restoreArchivedFeedbackBoard(teamId, boardId); // Restore the board
+                  }
+                } catch (error) {
+                  console.error("Error while toggling archive state:", error);
+                }
+              }}
             />
           </div>
         );
@@ -141,6 +155,9 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       },
       sorting: sortingState
     }
+    meta: {
+      teamId, // Pass `teamId` from props here
+    },
   }
 
   return useReactTable(tableOptions);
