@@ -111,7 +111,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
               try {
                 if (newIsArchived) {
                   await BoardDataService.archiveFeedbackBoard(teamId, boardId);
-                  ReflectBackendServiceeflectBackendService.broadcastDeletedBoard(teamId, boardId);
+                  ReflectBackendService.broadcastDeletedBoard(teamId, boardId);
                 } else {
                   await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
                 }
