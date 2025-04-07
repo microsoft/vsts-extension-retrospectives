@@ -46,7 +46,7 @@ export interface IActionItemsTableItems {
 
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
   // Add state for managing table data
-  const [tableData, setTableData] = React.useState(data);
+  const [tableData, setTableData] = React.useState(data)
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
