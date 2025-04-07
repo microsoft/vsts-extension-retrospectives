@@ -31,7 +31,8 @@ export interface IBoardSummaryTableItem {
   pendingWorkItemsCount: number;
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
-  id: string;
+  id: string; // Board ID
+  teamId: string; // Added teamId to the definition
 }
 
 export interface IBoardActionItemsData {
@@ -84,9 +85,8 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
       header: 'Archived',
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
-        const boardId = cellContext.row.original.id; // Using `id` as the boardId
-        //const teamId = cellContext.table.options.meta.teamId; // Retrieve `teamId` from table meta
-        const teamId = cellContext.row.original.teamId; // Ensure `teamId` exists in your data model
+        const boardId = cellContext.row.original.id; // Board ID
+        const teamId = cellContext.row.original.teamId; // Team ID
         const isArchived = cellContext.row.original.isArchived;
 
         return (
@@ -100,9 +100,9 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
               onChange={async (event) => {
                 try {
                   if (event.target.checked) {
-                    await archiveFeedbackBoard(teamId, boardId); // Archive the board
+                    await BoardDataService.archiveFeedbackBoard(teamId, boardId); // Archive the board
                   } else {
-                    await restoreArchivedFeedbackBoard(teamId, boardId); // Restore the board
+                    await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId); // Restore the board
                   }
                 } catch (error) {
                   console.error("Error while toggling archive state:", error);
@@ -154,9 +154,6 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
         pageIndex: 0
       },
       sorting: sortingState
-    },
-    meta: {
-      teamId, // Pass `teamId` from props here
     },
   }
 
