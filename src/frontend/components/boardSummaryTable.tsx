@@ -46,7 +46,7 @@ export interface IActionItemsTableItems {
 
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
   // Add state for managing table data
-  const [tableData, setTableData] = React.useState(initialData);
+  const [tableData, setTableData] = React.useState(data);
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
@@ -108,8 +108,9 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
                   await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
                 }
                 // Update local state to reflect changes instantly
-                setTableData(prevData => // <-- Update state
-                  prevData.map(item => item.id === boardId
+                setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
+                  prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
+                    item.id === boardId
                       ? { ...item,
                           isArchived: newIsArchived,
                           archivedDate: newIsArchived ? new Date() : null
