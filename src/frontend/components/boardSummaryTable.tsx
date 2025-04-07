@@ -154,7 +154,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
         pageIndex: 0
       },
       sorting: sortingState
-    }
+    },
     meta: {
       teamId, // Pass `teamId` from props here
     },
