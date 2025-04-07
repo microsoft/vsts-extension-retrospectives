@@ -154,7 +154,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
-    data,
+    data: tableData, // <-- Use state instead of original data
     columns,
     columnResizeMode: 'onChange',
     onSortingChange: onSortingChange,
@@ -164,7 +164,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
     getRowCanExpand: () => true,
     state: {
       pagination: {
-        pageSize: data.length,
+        pageSize: tableData.length, // <-- Use state instead of original data
         pageIndex: 0
       },
       sorting: sortingState
