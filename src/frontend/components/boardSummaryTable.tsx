@@ -111,10 +111,11 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
               try {
                 if (newIsArchived) {
                   await BoardDataService.archiveFeedbackBoard(teamId, boardId);
-                  reflectBackendService.broadcastDeletedBoard(teamId, boardId);
+                  reflectBackendService.broadcastArchivedBoard(teamId, boardId);
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
                 } else {
                   await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
+                  reflectBackendService.broadcastRestoredBoard(teamId, boardId);
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
                 }
                 // Update local state to reflect changes instantly

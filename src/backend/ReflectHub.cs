@@ -18,7 +18,9 @@ namespace ReflectBackend
         receiveUpdatedBoard,
         receiveDeletedItem,
         receiveDeletedBoard,
-        receiveNewBoard
+        receiveNewBoard,
+        receiveArchivedBoard,
+        receiveRestoredBoard
     }
 
     [Authorize]
@@ -46,7 +48,7 @@ namespace ReflectBackend
             /* Broadcast to self so Retrospectives dropdown list will exclude archived board. */
             /* Safe for other users to continue using archived board, since not deleted, only hidden from dropdown. */
             /* The archive will not impact other users until they reload the Retrospectives page. */
-            return Clients.Caller.SendAsync("receiveArchivedBoard", teamId, reflectBoardId);
+            return Clients.Caller.SendAsync(receiveArchivedBoard.ToString(), teamId, reflectBoardId);
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace ReflectBackend
             /* Broadcast to self so Retrospectives dropdown list will include restored board. */
             /* Safe for other users to continue without restored board, since only hidden from dropdown list. */
             /* Other users will see the restored board after reloading the Retrospectives page. */
-            return Clients.Caller.SendAsync("receiveRestoredBoard", teamId, reflectBoardId);
+            return Clients.Caller.SendAsync(receiveRestoredBoard.ToString(), teamId, reflectBoardId);
         }
 
         /// <summary>
