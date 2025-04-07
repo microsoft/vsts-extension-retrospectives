@@ -34,10 +34,42 @@ namespace ReflectBackend
         }
 
         /// <summary>
+        /// Broadcast receiveArchivedBoard only to the sender.
+        /// </summary>
+        /// <param name="teamId">The id of the team to which the board belongs.</param>
+        /// <param name="reflectBoardId">The id of the archived Retrospectives board.</param>
+        public Task BroadcastArchivedBoard(string teamId, string reflectBoardId)
+        {
+            _logger.LogInformation($"BroadcastArchivedBoard connectionID: {Context.ConnectionId}");
+            _insights.TrackEvent("Broadcasting archived board");
+
+            /* Broadcast to self so Retrospectives dropdown list will exclude archived board. */
+            /* Safe for other users to continue using archived board, since not deleted, only hidden from dropdown. */
+            /* The archive will not impact other users until they reload the Retrospectives page. */
+            return Clients.Caller.SendAsync("receiveArchivedBoard", teamId, reflectBoardId);
+        }
+
+        /// <summary>
+        /// Broadcast receiveRestoredBoard only to the sender.
+        /// </summary>
+        /// <param name="teamId">The id of the team to which the board belongs.</param>
+        /// <param name="reflectBoardId">The id of the restored Retrospectives board.</param>
+        public Task BroadcastRestoredBoard(string teamId, string reflectBoardId)
+        {
+            _logger.LogInformation($"BroadcastRestoredBoard connectionID: {Context.ConnectionId}");
+            _insights.TrackEvent("Broadcasting restored board");
+
+            /* Broadcast to self so Retrospectives dropdown list will include restored board. */
+            /* Safe for other users to continue without restored board, since only hidden from dropdown list. */
+            /* Other users will see the restored board after reloading the Retrospectives page. */
+            return Clients.Caller.SendAsync("receiveRestoredBoard", teamId, reflectBoardId);
+        }
+
+        /// <summary>
         /// Broadcast receiveDeletedBoard to all connected clients except the sender.
         /// </summary>
         /// <param name="teamId">The id of the team to which the board belongs.</param>
-        /// <param name="reflectBoardId">The id of the deleted Reflect board.</param>
+        /// <param name="reflectBoardId">The id of the deleted Retrospectives board.</param>
         public Task BroadcastDeletedBoard(string teamId, string reflectBoardId)
         {
             _logger.LogInformation($"BroadcastDeletedBoard connectionID: {Context.ConnectionId}");
@@ -47,9 +79,9 @@ namespace ReflectBackend
         }
 
         /// <summary>
-        /// Broadcast receiveDeletedItem to all other clients viewing the same reflect board.
+        /// Broadcast receiveDeletedItem to all other clients viewing the same Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the reflect board.</param>
+        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
         /// <param name="columnId">The id of column this item is associated with.</param>
         /// <param name="feedbackItemId">The id of the new feedback item.</param>
         public Task BroadcastDeletedItem(string reflectBoardId, string columnId, string feedbackItemId)
@@ -64,7 +96,7 @@ namespace ReflectBackend
         /// Broadcast receiveNewBoard to all connected clients except the sender.
         /// </summary>
         /// <param name="teamId">The id of the team to which the board belongs.</param>
-        /// <param name="reflectBoardId">The id of the new Reflect board.</param>
+        /// <param name="reflectBoardId">The id of the new Retrospectives board.</param>
         public Task BroadcastNewBoard(string teamId, string reflectBoardId)
         {
             _logger.LogInformation($"BroadcastNewBoard connectionID: {Context.ConnectionId}");
@@ -74,9 +106,9 @@ namespace ReflectBackend
         }
 
         /// <summary>
-        /// Broadcast receiveNewItem to all other clients viewing the same reflect board.
+        /// Broadcast receiveNewItem to all other clients viewing the same Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the reflect board.</param>
+        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
         /// <param name="columnId">The id of column this item is associated with.</param>
         /// <param name="feedbackItemId">The id of the new feedback item.</param>
         public Task BroadcastNewItem(string reflectBoardId, string columnId, string feedbackItemId)
@@ -91,7 +123,7 @@ namespace ReflectBackend
         /// Broadcast receiveUpdatedBoard to all other clients except the sender.
         /// </summary>
         /// <param name="teamId">The id of the team to which the board belongs.</param>
-        /// <param name="reflectBoardId">The id of the reflect board.</param>
+        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
         public Task BroadcastUpdatedBoard(string teamId, string reflectBoardId)
         {
             _logger.LogInformation($"BroadcastUpdatedBoard connectionID: {Context.ConnectionId}");
@@ -101,9 +133,9 @@ namespace ReflectBackend
         }
 
         /// <summary>
-        /// Broadcast receiveUpdatedItem to all other clients viewing the same reflect board.
+        /// Broadcast receiveUpdatedItem to all other clients viewing the same Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the reflect board.</param>
+        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
         /// <param name="columnId">The id of column this item is associated with.</param>
         /// <param name="feedbackItemId">The id of the new feedback item.</param>
         public Task BroadcastUpdatedItem(string reflectBoardId, string columnId, string feedbackItemId)
@@ -115,9 +147,9 @@ namespace ReflectBackend
         }
 
         /// <summary>
-        /// Adds the client to the group for this reflect board.
+        /// Adds the client to the group for this Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the reflect board.</param>
+        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
         public Task JoinReflectBoardGroup(string reflectBoardId)
         {
             _logger.LogInformation($"JoinReflectBoardGroup connectionID: {Context.ConnectionId}");
@@ -127,9 +159,9 @@ namespace ReflectBackend
         }
 
         /// <summary>
-        /// Removes the client from the group for this reflect board.
+        /// Removes the client from the group for this Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the reflect board.</param>
+        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
         public Task LeaveReflectBoardGroup(string reflectBoardId)
         {
             _logger.LogInformation($"LeaveReflectBoardGroup connectionID: {Context.ConnectionId}");
@@ -149,7 +181,7 @@ namespace ReflectBackend
         }
 
         /// <summary>
-        /// Called when a connection with the hub is terminated.
+        /// Called when a connection with the reflect hub is terminated.
         /// </summary>
         /// <param name="exception">The exception occurred when disconnecting.</param>
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -162,7 +194,7 @@ namespace ReflectBackend
         }
 
         /// <summary>
-        /// Called when a new connection is established with the hub.
+        /// Called when a new connection is established with the reflect hub.
         /// </summary>
         public override Task OnConnectedAsync()
         {
