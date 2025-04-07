@@ -98,6 +98,9 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
               type="checkbox"
               checked={!!isArchived} // Ensure boolean value
               onChange={async (event) => {
+                console.log('Checkbox clicked, is checked:', event.target.checked);
+                console.log('Board ID:', boardId);
+                console.log('Team ID:', teamId);
                 try {
                   if (event.target.checked) {
                     await BoardDataService.archiveFeedbackBoard(teamId, boardId); // Archive the board
@@ -191,8 +194,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
           archivedDate: board.archivedDate ? new Date(board.archivedDate) : null,
           pendingWorkItemsCount: 0,
           totalWorkItemsCount: 0,
-          id: board.id,
           feedbackItemsCount: 0,
+          id: board.id,
           teamId: board.teamId,
         };
 
