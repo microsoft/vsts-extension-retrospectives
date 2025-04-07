@@ -1,7 +1,7 @@
 import React, { Fragment, KeyboardEvent, useEffect, useState } from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
-import ReflectBackendService from '../dal/reflectBackendService';
+import { reflectBackendService } from '../dal/reflectBackendService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
@@ -111,7 +111,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
               try {
                 if (newIsArchived) {
                   await BoardDataService.archiveFeedbackBoard(teamId, boardId);
-                  ReflectBackendService.broadcastDeletedBoard(teamId, boardId);
+                  reflectBackendService.broadcastDeletedBoard(teamId, boardId);
                 } else {
                   await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
                 }
