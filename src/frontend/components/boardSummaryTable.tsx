@@ -45,6 +45,14 @@ export interface IActionItemsTableItems {
 }
 
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
+  const updateRowState = (updatedRow: Partial<IBoardSummaryTableItem>, rowId: string) => {
+    setTableData((prevData) =>
+      prevData.map((row) =>
+        row.id === rowId ? { ...row, ...updatedRow } : row
+      )
+    );
+  }
+
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
@@ -99,14 +107,13 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
               checked={!!isArchived} // Ensure boolean value
               onChange={async (event) => {
                 console.log('Checkbox clicked, is checked:', event.target.checked);
-                console.log('Board ID:', boardId);
-                console.log('Team ID:', teamId);
                 try {
                   if (event.target.checked) {
-                    await BoardDataService.archiveFeedbackBoard(teamId, boardId); // Archive the board
+                    await BoardDataService.archiveFeedbackBoard(teamId, boardId);
+                    updateRowState({ isArchived: true, archivedDate: new Date() });
                   } else {
-                    await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId); // Restore the board
-                  }
+                    await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
+                    updateRowState({ isArchived: false, archivedDate: null });                  }
                 } catch (error) {
                   console.error("Error while toggling archive state:", error);
                 }
