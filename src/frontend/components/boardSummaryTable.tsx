@@ -45,14 +45,8 @@ export interface IActionItemsTableItems {
 }
 
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
-  const updateRowState = (updatedRow: Partial<IBoardSummaryTableItem>, rowId: string) => {
-    setTableData((prevData) =>
-      prevData.map((row) =>
-        row.id === rowId ? { ...row, ...updatedRow } : row
-      )
-    );
-  }
-
+  // Add state for managing table data
+  const [tableData, setTableData] = React.useState(initialData);
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
@@ -102,19 +96,29 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
             onClick={(event) => event.stopPropagation()} // Prevent click propagation
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
           >
-            <input
-              type="checkbox"
-              checked={!!isArchived} // Ensure boolean value
-              onChange={async (event) => {
-                console.log('Checkbox clicked, is checked:', event.target.checked);
-                try {
-                  if (event.target.checked) {
-                    await BoardDataService.archiveFeedbackBoard(teamId, boardId);
-                    updateRowState({ isArchived: true, archivedDate: new Date() });
-                  } else {
-                    await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
-                    updateRowState({ isArchived: false, archivedDate: null });                  }
-                } catch (error) {
+          <input
+            type="checkbox"
+            checked={!!isArchived} // Ensure boolean value
+            onChange={async (event) => {
+              const newIsArchived = event.target.checked;
+              try {
+                if (newIsArchived) {
+                  await BoardDataService.archiveFeedbackBoard(teamId, boardId);
+                } else {
+                  await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
+                }
+                // Update local state to reflect changes instantly
+                setTableData(prevData => // <-- Update state
+                  prevData.map(item => item.id === boardId
+                      ? { ...item,
+                          isArchived: newIsArchived,
+                          archivedDate: newIsArchived ? new Date() : null
+                         }
+                      : item
+                  )
+                )
+              }
+              catch (error) {
                   console.error("Error while toggling archive state:", error);
                 }
               }}
