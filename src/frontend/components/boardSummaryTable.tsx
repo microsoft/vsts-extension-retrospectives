@@ -8,9 +8,8 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
 import { Cell, CellContext, Header, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { appInsights, reactPlugin } from '../utilities/telemetryClient';
-import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
+import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -116,6 +115,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
                 } else {
                   await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
+                  appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
                 }
                 // Update local state to reflect changes instantly
                 setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
