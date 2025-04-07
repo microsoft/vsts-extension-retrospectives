@@ -23,7 +23,8 @@ const enum ReflectBackendSignals {
   BroadcastDeletedItem = 'broadcastDeletedItem',
   BroadcastDeletedBoard = 'broadcastDeletedBoard',
   BroadcastNewBoard = 'broadcastNewBoard',
-}
+  BroadcastArchivedBoard = 'broadcastArchivedBoard',
+  BroadcastRestoredBoard = 'broadcastRestoredBoard',}
 
 class ReflectBackendService {
   private static signalRHubUrl = new URL('/collaborationUpdates', config.CollaborationStateServiceUrl);
@@ -188,6 +189,40 @@ class ReflectBackendService {
 
     this._signalRConnection.send(
       ReflectBackendSignals.BroadcastUpdatedBoard,
+      teamId,
+      boardId
+    );
+  }
+
+  /**
+   * Sends a BroadcastArchivedBoard signal for own instance.
+   * @param teamId The id of the parent team.
+   * @param boardId The id of the board.
+   */
+  public broadcastArchivedBoard = (teamId: string, boardId: string) => {
+    if (!this._connectionAvailable) {
+      return;
+    }
+
+    this._signalRConnection.send(
+      ReflectBackendSignals.BroadcastArchivedBoard,
+      teamId,
+      boardId
+    );
+  }
+
+  /**
+   * Sends a BroadcastRestoredBoard signal for own instance.
+   * @param teamId The id of the parent team.
+   * @param boardId The id of the board.
+   */
+  public broadcastRestoredBoard = (teamId: string, boardId: string) => {
+    if (!this._connectionAvailable) {
+      return;
+    }
+
+    this._signalRConnection.send(
+      ReflectBackendSignals.BroadcastRestoredBoard,
       teamId,
       boardId
     );
