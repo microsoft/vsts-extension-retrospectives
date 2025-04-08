@@ -19,8 +19,8 @@ namespace ReflectBackend
         receiveDeletedItem,
         receiveDeletedBoard,
         receiveNewBoard,
-        receiveArchivedBoard,
-        receiveRestoredBoard
+        receiveArchivedBoard, //DPH remove if abandon broadcast
+        receiveRestoredBoard //DPH remove if abandon broadcast
     }
 
     [Authorize]
@@ -35,6 +35,7 @@ namespace ReflectBackend
             this._insights = new TelemetryClient(new TelemetryConfiguration(options.Value.InstrumentationKey));
         }
 
+//DPH remove if abandon broadcast
         /// <summary>
         /// Broadcast receiveArchivedBoard only to the sender.
         /// </summary>
@@ -51,6 +52,7 @@ namespace ReflectBackend
             return Clients.Caller.SendAsync(receiveArchivedBoard.ToString(), teamId, reflectBoardId);
         }
 
+//DPH remove if abandon broadcast
         /// <summary>
         /// Broadcast receiveRestoredBoard only to the sender.
         /// </summary>

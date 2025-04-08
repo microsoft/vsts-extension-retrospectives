@@ -1,7 +1,7 @@
 import React, { Fragment, KeyboardEvent, useEffect, useState } from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
-import { reflectBackendService } from '../dal/reflectBackendService';
+import { reflectBackendService } from '../dal/reflectBackendService';  //DPH remove if abandon broadcast
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
@@ -10,10 +10,6 @@ import { Cell, CellContext, Header, OnChangeFn, Row, SortDirection, SortingState
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
-//DPH: added to test reloading board from summary table
-import { FeedbackBoardContainer } from '../components/feedbackBoardContainer';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
-import { FeedbackBoardDocumentHelper } from '../interfaces/feedback';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -49,25 +45,8 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-async function reloadBoardsForCurrentTeamHelper(teamId: string, userTeams: WebApiTeam[], currentUserId: string) {
-  let boardsForTeam = await BoardDataService.getBoardsForTeam(teamId);
-
-  if (!boardsForTeam.length) {
-      return { boards: [], currentBoard: null };
-  }
-
-  boardsForTeam = boardsForTeam
-      .filter((board: IFeedbackBoardDocument) =>
-          FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), currentUserId)
-      )
-      .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-
-  return { boards: boardsForTeam, currentBoard: boardsForTeam[0] };
-}
-
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
   // Add state for managing table data
-  //const [tableData, setTableData] = React.useState(data)
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   React.useEffect(() => {setTableData(data); }, [data]);
   if (!data || data.length === 0) {
@@ -126,24 +105,23 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
             type="checkbox"
             checked={!!isArchived} // Ensure boolean value
             onChange={async (event) => {
-              const newIsArchived = event.target.checked;
+              const toggleIsArchived = event.target.checked;
               try {
-                if (newIsArchived) {
+                if (toggleIsArchived) {
                   await BoardDataService.archiveFeedbackBoard(teamId, boardId);
-                  //reflectBackendService.broadcastArchivedBoard(teamId, boardId);
+                  //reflectBackendService.broadcastArchivedBoard(teamId, boardId); //must be easier way; can't test in dev
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
                 } else {
                   await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
-                  //reflectBackendService.broadcastRestoredBoard(teamId, boardId);
+                  //reflectBackendService.broadcastRestoredBoard(teamId, boardId); //must be easier way; can't test in dev
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
                 }
-                //DPH: try reloading boards
-                // better if called when click Board tab, but try here for now
-                const { boards, currentBoard } = await reloadBoardsForCurrentTeamHelper(teamId, userTeams, currentUserId);
+                //DPH: unsuccessful attempt to reload boards
+                //await feedbackBoardContainer.reloadBoardsForCurrentTeam();
                 // update local state to reflect updated archive status immediately
                 setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
                 prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
-                    item.id === boardId ? { ...item, isArchived: newIsArchived, archivedDate: newIsArchived ? new Date() : null } : item
+                    item.id === boardId ? { ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null } : item
                   )
                 )
               }

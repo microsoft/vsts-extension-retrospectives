@@ -111,8 +111,7 @@ export interface FeedbackBoardContainerState {
   questionIdForDiscussAndActBoardUpdate: number;
 }
 
-//DPH: added export to test reloading boards from summary table
-export class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
+class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
   constructor(props: FeedbackBoardContainerProps) {
     super(props);
     this.state = {
@@ -223,8 +222,8 @@ export class FeedbackBoardContainer extends React.Component<FeedbackBoardContain
       reflectBackendService.onReceiveNewBoard(this.handleBoardCreated);
       reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
-      reflectBackendService.onReceiveArchivedBoard(this.handleBoardArchived);
-      reflectBackendService.onReceiveRestoredBoard(this.handleBoardRestored);
+      reflectBackendService.onReceiveArchivedBoard(this.handleBoardArchived); //DPH remove if abandon broadcast
+      reflectBackendService.onReceiveRestoredBoard(this.handleBoardRestored); //DPH remove if abandon broadcast
     }
     catch (e) {
       console.error(e);
@@ -252,8 +251,8 @@ export class FeedbackBoardContainer extends React.Component<FeedbackBoardContain
     reflectBackendService.removeOnReceiveNewBoard(this.handleBoardCreated);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
-    reflectBackendService.removeOnReceiveArchivedBoard(this.handleBoardArchived);
-    reflectBackendService.removeOnReceiveRestoredBoard(this.handleBoardRestored);
+    reflectBackendService.removeOnReceiveArchivedBoard(this.handleBoardArchived); //DPH remove if abandon broadcast
+    reflectBackendService.removeOnReceiveRestoredBoard(this.handleBoardRestored); //DPH remove if abandon broadcast
   }
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
@@ -365,6 +364,7 @@ export class FeedbackBoardContainer extends React.Component<FeedbackBoardContain
     });
   }
 
+  //DPH remove if abandon broadcast
   private readonly handleBoardRestored = async (teamId: string, boardId: string) => {
     if (!teamId || this.state.currentTeam.id !== teamId) {
       return;
@@ -484,6 +484,7 @@ export class FeedbackBoardContainer extends React.Component<FeedbackBoardContain
     });
   }
 
+  //DPH remove if abandon broadcast
   private readonly handleBoardArchived = async (teamId: string, archivedBoardId: string) => {
     if (!teamId || this.state.currentTeam.id !== teamId) {
       return;

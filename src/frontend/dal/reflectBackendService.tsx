@@ -17,16 +17,16 @@ const enum ReflectBackendSignals {
   ReceiveDeletedItem = 'receiveDeletedItem',
   ReceiveDeletedBoard = 'receiveDeletedBoard',
   ReceiveNewBoard = 'receiveNewBoard',
-  ReceiveArchivedBoard = 'receiveArchivedBoard',
-  ReceiveRestoredBoard = 'receiveRestoredBoard',
+  ReceiveArchivedBoard = 'receiveArchivedBoard', //DPH remove if abandon broadcast
+  ReceiveRestoredBoard = 'receiveRestoredBoard', //DPH remove if abandon broadcast
   BroadcastNewItem = 'broadcastNewItem',
   BroadcastUpdatedItem = 'broadcastUpdatedItem',
   BroadcastUpdatedBoard = 'broadcastUpdatedBoard',
   BroadcastDeletedItem = 'broadcastDeletedItem',
   BroadcastDeletedBoard = 'broadcastDeletedBoard',
   BroadcastNewBoard = 'broadcastNewBoard',
-  BroadcastArchivedBoard = 'broadcastArchivedBoard',
-  BroadcastRestoredBoard = 'broadcastRestoredBoard',
+  BroadcastArchivedBoard = 'broadcastArchivedBoard', //DPH remove if abandon broadcast
+  BroadcastRestoredBoard = 'broadcastRestoredBoard', //DPH remove if abandon broadcast
 }
 
 class ReflectBackendService {
@@ -197,6 +197,7 @@ class ReflectBackendService {
     );
   }
 
+  //DPH remove if abandon broadcast
   /**
    * Sends a BroadcastArchivedBoard signal for own instance.
    * @param teamId The id of the parent team.
@@ -214,6 +215,7 @@ class ReflectBackendService {
     );
   }
 
+  //DPH remove if abandon broadcast
   /**
    * Sends a BroadcastRestoredBoard signal for own instance.
    * @param teamId The id of the parent team.
@@ -267,7 +269,7 @@ class ReflectBackendService {
   }
 
   /**
-   * Sends a BroadcaseDeleteItem signal for other instances.
+   * Sends a BroadcastDeletedItem signal for other instances.
    * @param columnId The column id that the feedback item is a part of.
    * @param feedbackItemId The id of the feedback item to update.
    */
@@ -337,6 +339,7 @@ class ReflectBackendService {
     );
   }
 
+  //DPH remove if abandon broadcast
   /**
    * Registers a callback to execute when a ReceiveRestoredBoard signal is received.
    * @param callback The callback function: (teamId: string, boardId: string) => void
@@ -362,6 +365,7 @@ class ReflectBackendService {
     this.removeSignalCallback(ReflectBackendSignals.ReceiveNewBoard, callback);
   }
 
+  //DPH remove if abandon broadcast
   /**
    * Removes the specified callback for the ReceiveRestoredBoard signal.
    * You must pass the exact same Function instance as was previously passed to {@link onReceiveRestoredBoard}.
@@ -437,6 +441,7 @@ class ReflectBackendService {
     );
   }
 
+  //DPH remove if abandon broadcast
   /**
    * Registers a callback to execute when a ReceiveArchivedBoard signal is received.
    * @param callback The callback function: (teamId: string, boardId: string) => void
@@ -462,6 +467,7 @@ class ReflectBackendService {
     this.removeSignalCallback(ReflectBackendSignals.ReceiveDeletedBoard, callback);
   }
 
+  //DPH remove if abandon broadcast
   /**
    * Removes the specified callback for the ReceiveArchiveddBoard signal.
    * You must pass the exact same Function instance as was previously passed to {@link onReceiveArchivedBoard}.
