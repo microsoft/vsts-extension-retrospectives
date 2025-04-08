@@ -144,7 +144,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
                     item.id === boardId ? { ...item, isArchived: newIsArchived, archivedDate: newIsArchived ? new Date() : null } : item
                   )
                 )
-              } 
+              }
               catch (error) {
                 console.error("Error while toggling archive state:", error);
               }
