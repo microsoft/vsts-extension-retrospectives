@@ -10,6 +10,8 @@ import { Cell, CellContext, Header, OnChangeFn, Row, SortDirection, SortingState
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+//DPH: added to test reloading board from summary table
+import { FeedbackBoardContainer } from '../components/feedbackBoardContainer';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -45,10 +47,25 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
+async function reloadBoardsForCurrentTeamHelper(teamId: string, userTeams: WebApiTeam[], currentUserId: string) {
+  let boardsForTeam = await BoardDataService.getBoardsForTeam(teamId);
+
+  if (!boardsForTeam.length) {
+      return { boards: [], currentBoard: null };
+  }
+
+  boardsForTeam = boardsForTeam
+      .filter((board: IFeedbackBoardDocument) =>
+          FeedbackBoardDocumentHelper.filter(board, userTeams.map(t => t.id), currentUserId)
+      )
+      .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+
+  return { boards: boardsForTeam, currentBoard: boardsForTeam[0] };
+}
+
 function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
   // Add state for managing table data
   //const [tableData, setTableData] = React.useState(data)
-  //console.log("data:", data)
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   React.useEffect(() => {setTableData(data); }, [data]);
   if (!data || data.length === 0) {
@@ -111,30 +128,29 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
               try {
                 if (newIsArchived) {
                   await BoardDataService.archiveFeedbackBoard(teamId, boardId);
-                  reflectBackendService.broadcastArchivedBoard(teamId, boardId);
+                  //reflectBackendService.broadcastArchivedBoard(teamId, boardId);
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
                 } else {
                   await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
-                  reflectBackendService.broadcastRestoredBoard(teamId, boardId);
+                  //reflectBackendService.broadcastRestoredBoard(teamId, boardId);
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
                 }
-                // Update local state to reflect changes instantly
+                //DPH: try reloading boards
+                // better if called when click Board tab, but try here for now
+                const { boards, currentBoard } = await reloadBoardsForCurrentTeamHelper(teamId, userTeams, currentUserId);
+                // update local state to reflect updated archive status immediately
                 setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
-                  prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
-                    item.id === boardId
-                      ? { ...item,
-                          isArchived: newIsArchived,
-                          archivedDate: newIsArchived ? new Date() : null
-                         }
-                      : item
+                prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
+                    item.id === boardId ? { ...item, isArchived: newIsArchived, archivedDate: newIsArchived ? new Date() : null } : item
                   )
                 )
-              }
+              } 
               catch (error) {
-                  console.error("Error while toggling archive state:", error);
-                }
-              }}
-            />
+                console.error("Error while toggling archive state:", error);
+              }
+            }
+          }
+          />
           </div>
         );
       },

@@ -111,6 +111,9 @@ export interface FeedbackBoardContainerState {
   questionIdForDiscussAndActBoardUpdate: number;
 }
 
+//DPH: added to test reloading boards from summary table
+export class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> { ... }
+
 class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
   constructor(props: FeedbackBoardContainerProps) {
     super(props);
