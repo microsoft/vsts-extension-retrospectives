@@ -12,6 +12,8 @@ import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetr
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 //DPH: added to test reloading board from summary table
 import { FeedbackBoardContainer } from '../components/feedbackBoardContainer';
+import { WebApiTeam } from 'azure-devops-extension-api/Core';
+import { FeedbackBoardDocumentHelper } from '../interfaces/feedback';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
