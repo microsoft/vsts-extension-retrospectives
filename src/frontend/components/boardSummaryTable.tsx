@@ -33,7 +33,7 @@ export interface IBoardSummaryTableItem {
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
   id: string; // Board ID
-  teamId: string; // Added teamId to the definition
+  teamId: string;
 }
 
 export interface IBoardActionItemsData {
