@@ -445,7 +445,7 @@ class ReflectBackendService {
     if (!this._connectionAvailable) {
       return;
     }
-  
+
     this._signalRConnection.on(
       ReflectBackendSignals.ReceiveArchivedBoard,
       callback

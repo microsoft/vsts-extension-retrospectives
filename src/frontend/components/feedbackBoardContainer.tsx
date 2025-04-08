@@ -222,8 +222,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       reflectBackendService.onReceiveNewBoard(this.handleNewBoardAvailable);
       reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
-      reflectBackendService.onReceiveArchivedBoard(this.handleBoardDeleted);
-      reflectBackendService.onReceiveRestoredBoard(this.handleNewBoardAvailable);    }
+      reflectBackendService.onReceiveArchivedBoard(this.handleBoardArchived);
+      reflectBackendService.onReceiveRestoredBoard(this.handleRestoredBoardAvailable);    }
     catch (e) {
       console.error(e);
       appInsights.trackException(e);
@@ -250,8 +250,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveNewBoard(this.handleNewBoardAvailable);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
-    reflectBackendService.removeOnReceiveArchivedBoard(this.handleBoardDeleted);
-    reflectBackendService.removeOnReceiveRestoredBoard(this.handleNewBoardAvailable);
+    reflectBackendService.removeOnReceiveArchivedBoard(this.handleBoardArchived);
+    reflectBackendService.removeOnReceiveRestoredBoard(this.handleRestoredBoardAvailable);
   }
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
