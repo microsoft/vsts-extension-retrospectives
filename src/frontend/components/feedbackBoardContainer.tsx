@@ -63,7 +63,7 @@ export interface FeedbackBoardContainerState {
   isSummaryDashboardVisible: boolean;
   isTeamDataLoaded: boolean;
   isAllTeamsLoaded: boolean;
-  maxvotesPerUser: number;
+  maxVotesPerUser: number;
   /**
    * Teams that the current user is specifically a member of.
    */
@@ -152,7 +152,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamBoardDeletedDialogMessage: '',
       teamBoardDeletedDialogTitle: '',
       userTeams: [],
-      maxvotesPerUser: 5,
+      maxVotesPerUser: 5,
       feedbackItems: [],
       contributors: [],
       effectivenessMeasurementSummary: [],
@@ -222,7 +222,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       reflectBackendService.onReceiveNewBoard(this.handleNewBoardAvailable);
       reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
-    }
+      reflectBackendService.onReceiveArchivedBoard(this.handleBoardDeleted);
+      reflectBackendService.onReceiveRestoredBoard(this.handleNewBoardAvailable);    }
     catch (e) {
       console.error(e);
       appInsights.trackException(e);
@@ -249,6 +250,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveNewBoard(this.handleNewBoardAvailable);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
+    reflectBackendService.removeOnReceiveArchivedBoard(this.handleBoardDeleted);
+    reflectBackendService.removeOnReceiveRestoredBoard(this.handleNewBoardAvailable);
   }
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
@@ -820,10 +823,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
-  private readonly createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+  private readonly createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
     const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
       title,
-      maxvotesPerUser,
+      maxVotesPerUser,
       columns,
       isIncludeTeamEffectivenessMeasurement,
       isBoardAnonymous,
@@ -926,8 +929,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isRetroSummaryDialogHidden: true });
   }
 
-  private readonly updateBoardMetadata = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
-    const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxvotesPerUser, title, columns, permissions);
+  private readonly updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+    const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
 
     this.updateBoardAndBroadcast(updatedBoard);
   }
@@ -1080,7 +1083,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           isDuplicatingBoard={isDuplicatingBoard}
           currentBoard={this.state.currentBoard}
           teamId={this.state.currentTeam.id}
-          maxvotesPerUser={this.state.maxvotesPerUser}
+          maxVotesPerUser={this.state.maxVotesPerUser}
           placeholderText={placeholderText}
           availablePermissionOptions={permissionOptions}
           onFormSubmit={onSubmit}

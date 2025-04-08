@@ -17,6 +17,8 @@ const enum ReflectBackendSignals {
   ReceiveDeletedItem = 'receiveDeletedItem',
   ReceiveDeletedBoard = 'receiveDeletedBoard',
   ReceiveNewBoard = 'receiveNewBoard',
+  ReceiveArchivedBoard = 'receiveArchivedBoard',
+  ReceiveRestoredBoard = 'receiveRestoredBoard',
   BroadcastNewItem = 'broadcastNewItem',
   BroadcastUpdatedItem = 'broadcastUpdatedItem',
   BroadcastUpdatedBoard = 'broadcastUpdatedBoard',
@@ -24,7 +26,8 @@ const enum ReflectBackendSignals {
   BroadcastDeletedBoard = 'broadcastDeletedBoard',
   BroadcastNewBoard = 'broadcastNewBoard',
   BroadcastArchivedBoard = 'broadcastArchivedBoard',
-  BroadcastRestoredBoard = 'broadcastRestoredBoard',}
+  BroadcastRestoredBoard = 'broadcastRestoredBoard',
+}
 
 class ReflectBackendService {
   private static signalRHubUrl = new URL('/collaborationUpdates', config.CollaborationStateServiceUrl);
@@ -335,6 +338,21 @@ class ReflectBackendService {
   }
 
   /**
+   * Registers a callback to execute when a ReceiveRestoredBoard signal is received.
+   * @param callback The callback function: (teamId: string, boardId: string) => void
+   */
+  public onReceiveRestoredBoard = (callback: (teamId: string, boardId: string) => void) => {
+    if (!this._connectionAvailable) {
+      return;
+    }
+
+    this._signalRConnection.on(
+      ReflectBackendSignals.ReceiveRestoredBoard,
+      callback
+    );
+  }
+
+  /**
    * Removes the specified callback for the ReceiveNewBoard signal.
    * You must pass the exact same Function instance as was previously passed to {@link onReceiveNewBoard}.
    * Passing a different instance (even if the function body is the same) will not remove the callback.
@@ -344,6 +362,16 @@ class ReflectBackendService {
     this.removeSignalCallback(ReflectBackendSignals.ReceiveNewBoard, callback);
   }
 
+  /**
+   * Removes the specified callback for the ReceiveRestoredBoard signal.
+   * You must pass the exact same Function instance as was previously passed to {@link onReceiveRestoredBoard}.
+   * Passing a different instance (even if the function body is the same) will not remove the callback.
+   * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
+   */
+    public removeOnReceiveRestoredBoard = (callback: (columnId: string, feedbackItemId: string) => void) => {
+      this.removeSignalCallback(ReflectBackendSignals.ReceiveRestoredBoard, callback);
+    }
+  
   /**
    * Registers a callback to execute when a ReceiveUpdatedItem signal is received.
    * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
@@ -410,6 +438,21 @@ class ReflectBackendService {
   }
 
   /**
+   * Registers a callback to execute when a ReceiveArchivedBoard signal is received.
+   * @param callback The callback function: (teamId: string, boardId: string) => void
+   */
+  public onReceiveArchivedBoard = (callback: (teamId: string, boardId: string) => void) => {
+      if (!this._connectionAvailable) {
+        return;
+      }
+  
+      this._signalRConnection.on(
+        ReflectBackendSignals.ReceiveArchivedBoard,
+        callback
+      );
+    }
+  
+  /**
    * Removes the specified callback for the ReceiveDeletedBoard signal.
    * You must pass the exact same Function instance as was previously passed to {@link onReceiveDeletedBoard}.
    * Passing a different instance (even if the function body is the same) will not remove the callback.
@@ -419,6 +462,16 @@ class ReflectBackendService {
     this.removeSignalCallback(ReflectBackendSignals.ReceiveDeletedBoard, callback);
   }
 
+  /**
+   * Removes the specified callback for the ReceiveArchiveddBoard signal.
+   * You must pass the exact same Function instance as was previously passed to {@link onReceiveArchivedBoard}.
+   * Passing a different instance (even if the function body is the same) will not remove the callback.
+   * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
+   */
+  public removeOnReceiveArchivedBoard = (callback: (columnId: string, feedbackItemId: string) => void) => {
+    this.removeSignalCallback(ReflectBackendSignals.ReceiveArchivedBoard, callback);
+  }
+  
   /**
    * Registers a callback to execute when a ReceiveUpdatedBoard signal is received.
    * @param callback The callback function: (teamId: string, boardId: string) => void
