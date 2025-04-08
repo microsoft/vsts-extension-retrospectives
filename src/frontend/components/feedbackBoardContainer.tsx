@@ -219,11 +219,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
 
       // Listen for signals for board updates.
-      reflectBackendService.onReceiveNewBoard(this.handleNewBoardAvailable);
+      reflectBackendService.onReceiveNewBoard(this.handleBoardCreated);
       reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
       reflectBackendService.onReceiveArchivedBoard(this.handleBoardArchived);
-      reflectBackendService.onReceiveRestoredBoard(this.handleRestoredBoardAvailable);
+      reflectBackendService.onReceiveRestoredBoard(this.handleBoardRestored);
     }
     catch (e) {
       console.error(e);
@@ -248,11 +248,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   public componentWillUnmount() {
     window.removeEventListener('resize', this.handleResolutionChange);
-    reflectBackendService.removeOnReceiveNewBoard(this.handleNewBoardAvailable);
+    reflectBackendService.removeOnReceiveNewBoard(this.handleBoardCreated);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
     reflectBackendService.removeOnReceiveArchivedBoard(this.handleBoardArchived);
-    reflectBackendService.removeOnReceiveRestoredBoard(this.handleRestoredBoardAvailable);
+    reflectBackendService.removeOnReceiveRestoredBoard(this.handleBoardRestored);
   }
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
@@ -331,7 +331,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return formatter.format(value / 100);
   }
 
-  private readonly handleNewBoardAvailable = async (teamId: string, boardId: string) => {
+  private readonly handleBoardCreated = async (teamId: string, boardId: string) => {
     if (!teamId || this.state.currentTeam.id !== teamId) {
       return;
     }
@@ -364,7 +364,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
-  private readonly handleRestoredBoardAvailable = async (teamId: string, boardId: string) => {
+  private readonly handleBoardRestored = async (teamId: string, boardId: string) => {
     if (!teamId || this.state.currentTeam.id !== teamId) {
       return;
     }
