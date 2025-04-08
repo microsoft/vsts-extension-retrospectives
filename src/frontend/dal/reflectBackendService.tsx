@@ -267,10 +267,10 @@ class ReflectBackendService {
   }
 
   /**
- * Sends a BroadcaseDeleteItem signal for other instances.
- * @param columnId The column id that the feedback item is a part of.
- * @param feedbackItemId The id of the feedback item to update.
- */
+   * Sends a BroadcaseDeleteItem signal for other instances.
+   * @param columnId The column id that the feedback item is a part of.
+   * @param feedbackItemId The id of the feedback item to update.
+   */
   public broadcastDeletedItem = (columnId: string, feedbackItemId: string) => {
     if (!this._connectionAvailable) {
       return;
@@ -368,10 +368,10 @@ class ReflectBackendService {
    * Passing a different instance (even if the function body is the same) will not remove the callback.
    * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
    */
-    public removeOnReceiveRestoredBoard = (callback: (columnId: string, feedbackItemId: string) => void) => {
-      this.removeSignalCallback(ReflectBackendSignals.ReceiveRestoredBoard, callback);
-    }
-  
+  public removeOnReceiveRestoredBoard = (callback: (columnId: string, feedbackItemId: string) => void) => {
+    this.removeSignalCallback(ReflectBackendSignals.ReceiveRestoredBoard, callback);
+  }
+
   /**
    * Registers a callback to execute when a ReceiveUpdatedItem signal is received.
    * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
@@ -442,16 +442,16 @@ class ReflectBackendService {
    * @param callback The callback function: (teamId: string, boardId: string) => void
    */
   public onReceiveArchivedBoard = (callback: (teamId: string, boardId: string) => void) => {
-      if (!this._connectionAvailable) {
-        return;
-      }
-  
-      this._signalRConnection.on(
-        ReflectBackendSignals.ReceiveArchivedBoard,
-        callback
-      );
+    if (!this._connectionAvailable) {
+      return;
     }
   
+    this._signalRConnection.on(
+      ReflectBackendSignals.ReceiveArchivedBoard,
+      callback
+    );
+  }
+
   /**
    * Removes the specified callback for the ReceiveDeletedBoard signal.
    * You must pass the exact same Function instance as was previously passed to {@link onReceiveDeletedBoard}.
@@ -471,7 +471,7 @@ class ReflectBackendService {
   public removeOnReceiveArchivedBoard = (callback: (columnId: string, feedbackItemId: string) => void) => {
     this.removeSignalCallback(ReflectBackendSignals.ReceiveArchivedBoard, callback);
   }
-  
+
   /**
    * Registers a callback to execute when a ReceiveUpdatedBoard signal is received.
    * @param callback The callback function: (teamId: string, boardId: string) => void

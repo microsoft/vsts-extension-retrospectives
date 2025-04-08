@@ -363,6 +363,39 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
+  private readonly handleRestoredBoardAvailable = async (teamId: string, boardId: string) => {
+    if (!teamId || this.state.currentTeam.id !== teamId) {
+      return;
+    }
+
+    const boardToAdd = await BoardDataService.getBoardForTeamById(this.state.currentTeam.id, boardId);
+
+    if (!boardToAdd) {
+      return;
+    }
+
+    // @ts-ignore TS2345
+    this.setState(prevState => {
+      const boardsForTeam = [...prevState.boards, boardToAdd]
+        .filter((board: IFeedbackBoardDocument) => FeedbackBoardDocumentHelper.filter(board, this.state.userTeams.map(t => t.id), this.state.currentUserId))
+        .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+
+      const baseResult = {
+        boards: boardsForTeam,
+        isTeamBoardArchivedInfoDialogHidden: true,  //was deleted
+      };
+
+      if (boardsForTeam.length === 1) {
+        return {
+          ...baseResult,
+          currentBoard: boardsForTeam[0],
+        };
+      }
+
+      return baseResult;
+    });
+  }
+
   private readonly setSupportedWorkItemTypesForProject = async (): Promise<void> => {
     const allWorkItemTypes: WorkItemType[] = await workItemService.getWorkItemTypesForCurrentProject();
     const hiddenWorkItemTypes: WorkItemTypeReference[] = await workItemService.getHiddenWorkItemTypes();
@@ -438,6 +471,50 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           isTeamBoardDeletedInfoDialogHidden: false,
           teamBoardDeletedDialogTitle: 'Retrospective deleted',
           teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been deleted by another user. You will be switched to the last created retrospective for this team.',
+        };
+      }
+
+      return {
+        boards: boardsForTeam,
+      };
+    }, async () => {
+      await userDataService.addVisit(this.state.currentTeam?.id, this.state.currentBoard?.id);
+    });
+  }
+
+  private readonly handleBoardArchived = async (teamId: string, archivedBoardId: string) => {
+    if (!teamId || this.state.currentTeam.id !== teamId) {
+      return;
+    }
+
+    // @ts-ignore TS2345
+    this.setState(prevState => {
+      const currentBoards = prevState.boards;
+      // Note: Javascript filter maintains order.
+      const boardsForTeam = currentBoards.filter(board => board.id !== archivedBoardId);
+
+      if (prevState.currentBoard && archivedBoardId === prevState.currentBoard.id) {
+        if (!boardsForTeam || boardsForTeam.length === 0) {
+          reflectBackendService.switchToBoard(undefined);
+          return {
+            boards: [],
+            currentBoard: null,
+            isBoardUpdateDialogHidden: true,
+            isTeamBoardArchivedInfoDialogHidden: false,
+            teamBoardArchivedDialogTitle: 'Retrospective archived',
+            teamBoardArchivedDialogMessage: 'The retrospective you were viewing has been archived.', // if using History tab, this should not be possible
+          }
+        }
+
+        const currentBoard = boardsForTeam[0];
+        reflectBackendService.switchToBoard(currentBoard.id);
+        return {
+          boards: boardsForTeam,
+          currentBoard: currentBoard,
+          isBoardUpdateDialogHidden: true,
+          isTeamBoardArchivedInfoDialogHidden: false,
+          teamBoardArchivedDialogTitle: 'Retrospective archived',
+          teamBoardArchivedDialogMessage: 'The retrospective you were viewing has been archived. You will be switched to the last created retrospective for this team.',
         };
       }
 
