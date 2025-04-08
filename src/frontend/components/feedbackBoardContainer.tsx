@@ -223,9 +223,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
       //reflectBackendService.onReceiveArchivedBoard(this.handleBoardArchived);
-      //reflectBackendService.onReceiveRestoredBoard(this.handleRestoredBoardAvailable);    
+      //reflectBackendService.onReceiveRestoredBoard(this.handleRestoredBoardAvailable);
       reflectBackendService.onReceiveArchivedBoard(this.handleBoardDeleted);
-      reflectBackendService.onReceiveRestoredBoard(this.handleNewBoardAvailable);    
+      reflectBackendService.onReceiveRestoredBoard(this.handleNewBoardAvailable);
     }
     catch (e) {
       console.error(e);
