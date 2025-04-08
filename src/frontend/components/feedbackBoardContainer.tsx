@@ -222,8 +222,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       reflectBackendService.onReceiveNewBoard(this.handleNewBoardAvailable);
       reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
-      reflectBackendService.onReceiveArchivedBoard(this.handleBoardArchived);
-      reflectBackendService.onReceiveRestoredBoard(this.handleRestoredBoardAvailable);    }
+      //reflectBackendService.onReceiveArchivedBoard(this.handleBoardArchived);
+      //reflectBackendService.onReceiveRestoredBoard(this.handleRestoredBoardAvailable);    
+      reflectBackendService.onReceiveArchivedBoard(this.handleBoardDeleted);
+      reflectBackendService.onReceiveRestoredBoard(this.handleNewBoardAvailable);    
+    }
     catch (e) {
       console.error(e);
       appInsights.trackException(e);
@@ -250,8 +253,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveNewBoard(this.handleNewBoardAvailable);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
-    reflectBackendService.removeOnReceiveArchivedBoard(this.handleBoardArchived);
-    reflectBackendService.removeOnReceiveRestoredBoard(this.handleRestoredBoardAvailable);
+    //reflectBackendService.removeOnReceiveArchivedBoard(this.handleBoardArchived);
+    //reflectBackendService.removeOnReceiveRestoredBoard(this.handleRestoredBoardAvailable);
+    reflectBackendService.removeOnReceiveArchivedBoard(this.handleBoardDeleted);
+    reflectBackendService.removeOnReceiveRestoredBoard(this.handleNewBoardAvailable);
   }
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
@@ -367,7 +372,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     if (!teamId || this.state.currentTeam.id !== teamId) {
       return;
     }
-    console.log("Restored Board Handle");
+
     const boardToAdd = await BoardDataService.getBoardForTeamById(this.state.currentTeam.id, boardId);
 
     if (!boardToAdd) {
@@ -486,7 +491,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     if (!teamId || this.state.currentTeam.id !== teamId) {
       return;
     }
-    console.log("Archived Board Handle");
+
     // @ts-ignore TS2345
     this.setState(prevState => {
       const currentBoards = prevState.boards;
