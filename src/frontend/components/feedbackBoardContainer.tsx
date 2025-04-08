@@ -442,7 +442,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     if (!teamId || this.state.currentTeam.id !== teamId) {
       return;
     }
-    console.log("Deleted Board Handle");
+
     // @ts-ignore TS2345
     this.setState(prevState => {
       const currentBoards = prevState.boards;
@@ -486,7 +486,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     if (!teamId || this.state.currentTeam.id !== teamId) {
       return;
     }
-
+    console.log("Archived Board Handle");
     // @ts-ignore TS2345
     this.setState(prevState => {
       const currentBoards = prevState.boards;
