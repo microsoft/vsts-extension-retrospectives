@@ -124,7 +124,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       currentTeam: undefined,
       filteredProjectTeams: [],
       filteredUserTeams: [],
-      hasToggledArchive: false, // Track whether isArchived toggle occurred
+      hasToggledArchive: false,
       isAllTeamsLoaded: false,
       isAppInitialized: false,
       isAutoResizeEnabled: true,
@@ -1813,9 +1813,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <PivotItem headerText="History">
               <div className="pivot-content-wrapper">
                 <BoardSummaryTable 
-                  teamId={this.state.currentTeam.id} 
-                  supportedWorkItemTypes={this.state.allWorkItemTypes} 
-                  onArchiveToggle={this.handleArchiveToggle} // Pass the archive toggle handler
+                  teamId={this.state.currentTeam.id}
+                  supportedWorkItemTypes={this.state.allWorkItemTypes}
+                  onArchiveToggle={this.handleArchiveToggle}
                 />
               </div>
             </PivotItem>
