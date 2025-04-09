@@ -196,7 +196,7 @@ The contents of the `.env` file are
 
     ```bash
     # Backend Service URL
-    REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service url here"
+    REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service URL here"
     # App Instrumentation Key
     REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
     ```
@@ -205,7 +205,7 @@ The contents of the `.env` file are
 
     - When using the CI/CD github action(s) pipeline to deploy the extension,
       environment variables are used to set Application Insights instrumentation
-      key and the backend service url.
+      key and the backend service URL.
 
 4. Run `npm run build:d` or `npm run build:p` to build the project. The
     difference in commands is `development` versus `production`, respectively;
@@ -432,7 +432,7 @@ extension.
 
 4. Run the `deploy/env_setup.sh` script.
 
-5. Once the script completes, it will output the url of the backend service. You can navigate to the
+5. Once the script completes, it will output the URL of the backend service. You can navigate to the
    [Azure Portal](https://portal.azure.com) and validate that the `rg-<RESOURCE_NAME_SUFFIX>` resource
    group exists and contains the App Service, App Service Plan and SignalR resources.
 
@@ -538,7 +538,7 @@ deploy a single backend to support multiple developer test extensions.
    If you are part of a team working on the retro tool you can add additional
    secrets. Remember to increment the name index to add additional secrets.
 1. Run the `deploy/env_setup.sh` script.
-1. Once the script completes, it will output the url of the backend service. You can navigate to the
+1. Once the script completes, it will output the URL of the backend service. You can navigate to the
   [Azure Portal](https://portal.azure.com) and validate that the `rg-<RESOURCE_NAME_SUFFIX>` resource
   group exists and contains the App Service, App Service Plan and SignalR resources.
 1. Update the `RetrospectiveExtension.FrontEnd/config/environment.tsx` to reflect changes to:

@@ -118,10 +118,13 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
                 }
                 //DPH: unsuccessful attempt to reload boards
                 //await feedbackBoardContainer.reloadBoardsForCurrentTeam();
+                const boards = await BoardDataService.getBoardsForTeam(teamId);
                 // update local state to reflect updated archive status immediately
                 setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
                 prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
-                    item.id === boardId ? { ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null } : item
+                    item.id === boardId ? {
+                      ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null
+                    } : item
                   )
                 )
               }

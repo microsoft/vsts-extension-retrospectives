@@ -459,8 +459,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             currentBoard: null,
             isBoardUpdateDialogHidden: true,
             isTeamBoardDeletedInfoDialogHidden: false,
-            teamBoardDeletedDialogTitle: 'Retrospective deleted',
-            teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been deleted by another user.',
+            teamBoardDeletedDialogTitle: 'Retrospective archived or deleted',
+            teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been archived or deleted by another user.',
           }
         }
 
@@ -471,8 +471,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           currentBoard: currentBoard,
           isBoardUpdateDialogHidden: true,
           isTeamBoardDeletedInfoDialogHidden: false,
-          teamBoardDeletedDialogTitle: 'Retrospective deleted',
-          teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been deleted by another user. You will be switched to the last created retrospective for this team.',
+          teamBoardDeletedDialogTitle: 'Retrospective archived or deleted',
+          teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.',
         };
       }
 
@@ -639,7 +639,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         ...recentVisitState,
         isTeamBoardDeletedInfoDialogHidden: false,
         teamBoardDeletedDialogTitle: 'Team not found',
-        teamBoardDeletedDialogMessage: 'Could not find the team specified in the url.',
+        teamBoardDeletedDialogMessage: 'Could not find the team specified in the URL.',
       }
 
       return {
@@ -689,7 +689,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         ...queryParamTeamAndDefaultBoardState,
         isTeamBoardDeletedInfoDialogHidden: false,
         teamBoardDeletedDialogTitle: 'Board not found',
-        teamBoardDeletedDialogMessage: 'Could not find the board specified in the url.'
+        teamBoardDeletedDialogMessage: 'Could not find the board specified in the URL.'
       };
     }
   }
