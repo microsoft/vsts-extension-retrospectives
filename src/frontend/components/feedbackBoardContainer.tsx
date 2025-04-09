@@ -1812,7 +1812,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </PivotItem>
             <PivotItem headerText="History">
               <div className="pivot-content-wrapper">
-                <BoardSummaryTable 
+                <BoardSummaryTable
                   teamId={this.state.currentTeam.id}
                   supportedWorkItemTypes={this.state.allWorkItemTypes}
                   onArchiveToggle={this.handleArchiveToggle}
