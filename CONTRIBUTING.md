@@ -203,7 +203,7 @@ The contents of the `.env` file are
 
     - In lieu of the .env file you can set actual environment variables.
 
-    - When using the CI/CD github action(s) pipeline to deploy the extension,
+    - When using the CI/CD Github action(s) pipeline to deploy the extension,
       environment variables are used to set Application Insights instrumentation
       key and the backend service URL.
 
