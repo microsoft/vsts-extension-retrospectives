@@ -17,16 +17,12 @@ const enum ReflectBackendSignals {
   ReceiveDeletedItem = 'receiveDeletedItem',
   ReceiveDeletedBoard = 'receiveDeletedBoard',
   ReceiveNewBoard = 'receiveNewBoard',
-  ReceiveArchivedBoard = 'receiveArchivedBoard', //DPH remove if abandon broadcast
-  ReceiveRestoredBoard = 'receiveRestoredBoard', //DPH remove if abandon broadcast
   BroadcastNewItem = 'broadcastNewItem',
   BroadcastUpdatedItem = 'broadcastUpdatedItem',
   BroadcastUpdatedBoard = 'broadcastUpdatedBoard',
   BroadcastDeletedItem = 'broadcastDeletedItem',
   BroadcastDeletedBoard = 'broadcastDeletedBoard',
   BroadcastNewBoard = 'broadcastNewBoard',
-  BroadcastArchivedBoard = 'broadcastArchivedBoard', //DPH remove if abandon broadcast
-  BroadcastRestoredBoard = 'broadcastRestoredBoard', //DPH remove if abandon broadcast
 }
 
 class ReflectBackendService {
@@ -197,42 +193,6 @@ class ReflectBackendService {
     );
   }
 
-  //DPH remove if abandon broadcast
-  /**
-   * Sends a BroadcastArchivedBoard signal for own instance.
-   * @param teamId The id of the parent team.
-   * @param boardId The id of the board.
-   */
-  public broadcastArchivedBoard = (teamId: string, boardId: string) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
-    this._signalRConnection.send(
-      ReflectBackendSignals.BroadcastArchivedBoard,
-      teamId,
-      boardId
-    );
-  }
-
-  //DPH remove if abandon broadcast
-  /**
-   * Sends a BroadcastRestoredBoard signal for own instance.
-   * @param teamId The id of the parent team.
-   * @param boardId The id of the board.
-   */
-  public broadcastRestoredBoard = (teamId: string, boardId: string) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
-    this._signalRConnection.send(
-      ReflectBackendSignals.BroadcastRestoredBoard,
-      teamId,
-      boardId
-    );
-  }
-
   /**
    * Sends a BroadcastDeletedBoard signal for other instances.
    * @param teamId The id of the parent team.
@@ -339,22 +299,6 @@ class ReflectBackendService {
     );
   }
 
-  //DPH remove if abandon broadcast
-  /**
-   * Registers a callback to execute when a ReceiveRestoredBoard signal is received.
-   * @param callback The callback function: (teamId: string, boardId: string) => void
-   */
-  public onReceiveRestoredBoard = (callback: (teamId: string, boardId: string) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
-    this._signalRConnection.on(
-      ReflectBackendSignals.ReceiveRestoredBoard,
-      callback
-    );
-  }
-
   /**
    * Removes the specified callback for the ReceiveNewBoard signal.
    * You must pass the exact same Function instance as was previously passed to {@link onReceiveNewBoard}.
@@ -363,17 +307,6 @@ class ReflectBackendService {
    */
   public removeOnReceiveNewBoard = (callback: (columnId: string, feedbackItemId: string) => void) => {
     this.removeSignalCallback(ReflectBackendSignals.ReceiveNewBoard, callback);
-  }
-
-  //DPH remove if abandon broadcast
-  /**
-   * Removes the specified callback for the ReceiveRestoredBoard signal.
-   * You must pass the exact same Function instance as was previously passed to {@link onReceiveRestoredBoard}.
-   * Passing a different instance (even if the function body is the same) will not remove the callback.
-   * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
-   */
-  public removeOnReceiveRestoredBoard = (callback: (columnId: string, feedbackItemId: string) => void) => {
-    this.removeSignalCallback(ReflectBackendSignals.ReceiveRestoredBoard, callback);
   }
 
   /**
@@ -441,22 +374,6 @@ class ReflectBackendService {
     );
   }
 
-  //DPH remove if abandon broadcast
-  /**
-   * Registers a callback to execute when a ReceiveArchivedBoard signal is received.
-   * @param callback The callback function: (teamId: string, boardId: string) => void
-   */
-  public onReceiveArchivedBoard = (callback: (teamId: string, boardId: string) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
-    this._signalRConnection.on(
-      ReflectBackendSignals.ReceiveArchivedBoard,
-      callback
-    );
-  }
-
   /**
    * Removes the specified callback for the ReceiveDeletedBoard signal.
    * You must pass the exact same Function instance as was previously passed to {@link onReceiveDeletedBoard}.
@@ -465,17 +382,6 @@ class ReflectBackendService {
    */
   public removeOnReceiveDeletedBoard = (callback: (columnId: string, feedbackItemId: string) => void) => {
     this.removeSignalCallback(ReflectBackendSignals.ReceiveDeletedBoard, callback);
-  }
-
-  //DPH remove if abandon broadcast
-  /**
-   * Removes the specified callback for the ReceiveArchiveddBoard signal.
-   * You must pass the exact same Function instance as was previously passed to {@link onReceiveArchivedBoard}.
-   * Passing a different instance (even if the function body is the same) will not remove the callback.
-   * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
-   */
-  public removeOnReceiveArchivedBoard = (callback: (columnId: string, feedbackItemId: string) => void) => {
-    this.removeSignalCallback(ReflectBackendSignals.ReceiveArchivedBoard, callback);
   }
 
   /**

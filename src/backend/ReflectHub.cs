@@ -18,9 +18,7 @@ namespace ReflectBackend
         receiveUpdatedBoard,
         receiveDeletedItem,
         receiveDeletedBoard,
-        receiveNewBoard,
-        receiveArchivedBoard, //DPH remove if abandon broadcast
-        receiveRestoredBoard //DPH remove if abandon broadcast
+        receiveNewBoard
     }
 
     [Authorize]
@@ -33,40 +31,6 @@ namespace ReflectBackend
         {
             this._logger = logger;
             this._insights = new TelemetryClient(new TelemetryConfiguration(options.Value.InstrumentationKey));
-        }
-
-//DPH remove if abandon broadcast
-        /// <summary>
-        /// Broadcast receiveArchivedBoard only to the sender.
-        /// </summary>
-        /// <param name="teamId">The id of the team to which the board belongs.</param>
-        /// <param name="reflectBoardId">The id of the archived Retrospectives board.</param>
-        public Task BroadcastArchivedBoard(string teamId, string reflectBoardId)
-        {
-            _logger.LogInformation($"BroadcastArchivedBoard connectionID: {Context.ConnectionId}");
-            _insights.TrackEvent("Broadcasting archived board");
-
-            /* Broadcast to self so Retrospectives dropdown list will exclude archived board. */
-            /* Safe for other users to continue using archived board, since not deleted, only hidden from dropdown. */
-            /* The archive will not impact other users until they reload the Retrospectives page. */
-            return Clients.Caller.SendAsync(receiveArchivedBoard.ToString(), teamId, reflectBoardId);
-        }
-
-//DPH remove if abandon broadcast
-        /// <summary>
-        /// Broadcast receiveRestoredBoard only to the sender.
-        /// </summary>
-        /// <param name="teamId">The id of the team to which the board belongs.</param>
-        /// <param name="reflectBoardId">The id of the restored Retrospectives board.</param>
-        public Task BroadcastRestoredBoard(string teamId, string reflectBoardId)
-        {
-            _logger.LogInformation($"BroadcastRestoredBoard connectionID: {Context.ConnectionId}");
-            _insights.TrackEvent("Broadcasting restored board");
-
-            /* Broadcast to self so Retrospectives dropdown list will include restored board. */
-            /* Safe for other users to continue without restored board, since only hidden from dropdown list. */
-            /* Other users will see the restored board after reloading the Retrospectives page. */
-            return Clients.Caller.SendAsync(receiveRestoredBoard.ToString(), teamId, reflectBoardId);
         }
 
         /// <summary>
