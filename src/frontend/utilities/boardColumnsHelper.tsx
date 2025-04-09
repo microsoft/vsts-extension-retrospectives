@@ -2,245 +2,260 @@ import { IFeedbackColumn } from '../interfaces/feedback';
 import { generateUUID } from './random';
 
 export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] => {
+  const NEXT_ACTION = 'One action to try next.';
+
   switch (templateId) {
-    case 'speedboat': // Speedboat retrospective - Propellors, Life Preserver, Anchors, Rocks
-    return [
-      {
-        accentColor: '#008000',
-        iconClass: 'fas fa-rocket',
-        id: generateUUID(),
-        title: 'Propellors'
-      },
-      {
-        accentColor: '#f6af03',
-        iconClass: 'fas fa-life-ring',
-        id: generateUUID(),
-        title: 'Life preserver',
-      },
-      {
-        accentColor: '#F78A53',
-        iconClass: 'fas fa-anchor',
-        id: generateUUID(),
-        title: 'Anchors',
-      },
-      {
-        accentColor: '#cc293d',
-        iconClass: 'far fa-exclamation',
-        id: generateUUID(),
-        title: 'Rocks',
-      },
-    ];
-    case '4ls': // The 4 Ls - Like, Learned, Lacked, Longed For
+    case 'start-stop-continue':
       return [
         {
-          accentColor: '#008000',
-          iconClass: 'far fa-smile',
+          accentColor: '#008000', //green
+          iconClass: 'far fa-circle-play',
           id: generateUUID(),
-          title: 'Liked'
+          title: 'Start',
         },
         {
-          accentColor: '#f6af08',
-          iconClass: 'fas fa-book',
+          accentColor: '#cc293d', //red
+          iconClass: 'far fa-circle-stop',
           id: generateUUID(),
-          title: 'Learned',
+          title: 'Stop',
         },
         {
-          accentColor: '#0078d4',
-          iconClass: 'far fa-compass',
+          accentColor: '#f6af08', //yellow
+          iconClass: 'far fa-circle-dot',
           id: generateUUID(),
-          title: 'Lacked',
-        },
-        {
-          accentColor: '#8063bf',
-          iconClass: 'far fa-eye',
-          id: generateUUID(),
-          title: 'Longed for',
+          title: 'Continue',
         },
       ];
-    case '1to1': // 1-to-1 - Good, So-so, Improve, Done
+    case 'good-improve-ideas-thanks':
       return [
         {
-          accentColor: '#008000',
+          accentColor: '#008000', //green
           iconClass: 'far fa-smile',
           id: generateUUID(),
           title: 'Good',
         },
         {
-          accentColor: '#f6af08',
-          iconClass: 'fas fa-exclamation',
-          id: generateUUID(),
-          title: 'So-so',
-        },
-        {
-          accentColor: '#0078d4',
-          iconClass: 'fas fa-balance-scale-right',
+          accentColor: '#cc293d', //red
+          iconClass: 'far fa-frown',
           id: generateUUID(),
           title: 'Improve',
         },
         {
-          accentColor: '#8063bf',
-          iconClass: 'fas fa-birthday-cake',
+          accentColor: '#f6af08', //yellow
+          iconClass: 'far fa-question',
           id: generateUUID(),
-          title: 'Done',
-        },
-      ];
-    case 'daki': // Drop, Add, Keep, Improve
-      return [
-        {
-          accentColor: '#cc293d',
-          iconClass: 'fas fa-exclamation',
-          id: generateUUID(),
-          title: 'Drop',
+          title: 'Ideas',
         },
         {
-          accentColor: '#008000',
-          iconClass: 'fas fa-smile',
+          accentColor: '#0078d4', //blue
+          iconClass: 'far fa-exclamation',
           id: generateUUID(),
-          title: 'Add',
-        },
-        {
-          accentColor: '#0078d4',
-          iconClass: 'fas fa-book',
-          id: generateUUID(),
-          title: 'Keep',
-        },
-        {
-          accentColor: '#8063bf',
-          iconClass: 'far fa-compass',
-          id: generateUUID(),
-          title: 'Improve',
-        },
+          title: 'Thanks',
+        }
       ];
     case 'mad-sad-glad':
       return [
         {
-          accentColor: '#cc293d',
+          accentColor: '#cc293d', //red
           iconClass: 'far fa-angry',
           id: generateUUID(),
           title: 'Mad',
         },
         {
-          accentColor: '#f6af08',
+          accentColor: '#f6af08', //yellow
           iconClass: 'far fa-frown',
           id: generateUUID(),
           title: 'Sad',
         },
         {
-          accentColor: '#008000',
+          accentColor: '#008000', //green
           iconClass: 'far fa-smile',
           id: generateUUID(),
           title: 'Glad',
         },
       ];
-    case 'good-bad-ideas':
+    case '4ls': // The 4 Ls - Like, Learned, Lacked, Longed For
       return [
         {
-          accentColor: '#008000',
-          iconClass: 'far fa-smile',
+          accentColor: '#008000', //green
+          iconClass: 'far fa-thumbs-up',
           id: generateUUID(),
-          title: 'Good',
+          title: 'Liked'
         },
         {
-          accentColor: '#cc293d',
-          iconClass: 'far fa-angry',
+          accentColor: '#0078d4', //blue
+          iconClass: 'far fa-lightbulb',
           id: generateUUID(),
-          title: 'Bad',
+          title: 'Learned',
         },
         {
-          accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          accentColor: '#cc293d', //red
+          iconClass: 'far fa-thumbs-down',
           id: generateUUID(),
-          title: 'Ideas',
+          title: 'Lacked',
+        },
+        {
+          accentColor: '#f6af08', //yellow
+          iconClass: 'far fa-star',
+          id: generateUUID(),
+          title: 'Longed for',
+        },
+      ];
+    case 'daki': // Drop, Add, Keep, Improve
+      return [
+        {
+          accentColor: '#cc293d', //red
+          iconClass: 'fas fa-trash',
+          id: generateUUID(),
+          title: 'Drop',
+        },
+        {
+          accentColor: '#008000', //green
+          iconClass: 'fas fa-cart-plus',
+          id: generateUUID(),
+          title: 'Add',
+        },
+        {
+          accentColor: '#0078d4', //blue
+          iconClass: 'fas fa-lock',
+          id: generateUUID(),
+          title: 'Keep',
+        },
+        {
+          accentColor: '#f6af08', //yellow
+          iconClass: 'fas fa-wrench',
+          id: generateUUID(),
+          title: 'Improve',
         },
       ];
     case 'kalm': // Keep, Add, Less, More
       return [
         {
-          accentColor: '#008000',
-          iconClass: 'far fa-smile',
+          accentColor: '#0078d4', //blue
+          iconClass: 'far fa-square-check',
           id: generateUUID(),
           title: 'Keep',
         },
         {
-          accentColor: '#0078d4',
-          iconClass: 'fas fa-book',
+          accentColor: '#008000', //green
+          iconClass: 'far fa-square-plus',
           id: generateUUID(),
           title: 'Add',
         },
         {
-          accentColor: '#f6af08',
-          iconClass: 'fas fa-exclamation',
+          accentColor: '#f6af08', //yellow
+          iconClass: 'far fa-circle-down',
           id: generateUUID(),
           title: 'Less',
         },
         {
-          accentColor: '#8063bf',
-          iconClass: 'far fa-comments',
+          accentColor: '#8063bf', //purple
+          iconClass: 'far fa-circle-up',
           id: generateUUID(),
           title: 'More',
         },
       ];
-    case 'start-stop-continue':
+    case 'wlai': // Went Well, Learned, Accelerators, Impediments
       return [
         {
-          accentColor: '#008000',
-          iconClass: 'far fa-smile',
+          accentColor: '#008000', //green
+          iconClass: 'fas fa-star',
           id: generateUUID(),
-          title: 'Start',
+          title: 'Went Well',
         },
         {
-          accentColor: '#cc293d',
-          iconClass: 'far fa-frown',
+          accentColor: '#8063bf', //purple
+          iconClass: 'fas fa-book',
           id: generateUUID(),
-          title: 'Stop',
+          title: 'Learned',
         },
         {
-          accentColor: '#f6af08',
-          iconClass: 'far fa-eye',
+          accentColor: '#0078d4', //blue
+          iconClass: 'fas fa-rocket',
           id: generateUUID(),
-          title: 'Continue',
+          title: 'Accelerators',
+        },
+        {
+          accentColor: '#cc293d', //red
+          iconClass: 'fas fa-exclamation-triangle',
+          id: generateUUID(),
+          title: 'Impediments',
         },
       ];
-    case 'psy-safety':
+    case '1to1': // 1-to-1 - Good, So-so, Not-so-good, Done
       return [
         {
-          accentColor: '#008000',
-          iconClass: 'far fa-smile',
+          accentColor: '#008000', //green
+          iconClass: 'fas fa-scale-unbalanced',
           id: generateUUID(),
-          title: 'What makes it safe',
+          title: 'Good',
         },
         {
-          accentColor: '#cc293d',
-          iconClass: 'far fa-frown',
+          accentColor: '#f6af08', //yellow
+          iconClass: 'fas fa-scale-balanced',
           id: generateUUID(),
-          title: 'What hinders safety',
+          title: 'So-so',
         },
         {
-          accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          accentColor: '#cc293d', //red
+          iconClass: 'fas fa-scale-unbalanced-flip',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: 'Not-so-good',
+        },
+        {
+          accentColor: '#8063bf', //purple
+          iconClass: 'fas fa-birthday-cake',
+          id: generateUUID(),
+          title: 'Done',
         },
       ];
+    case 'speedboat': // Speedboat retrospective - Propellors, Life Preserver, Anchors, Rocks
+      return [
+        {
+          accentColor: '#008000', //green
+          iconClass: 'fas fa-fan',
+          id: generateUUID(),
+          title: 'Propellors'
+        },
+        {
+          accentColor: '#0078d4', //blue
+          iconClass: 'fas fa-life-ring',
+          id: generateUUID(),
+          title: 'Lifesavers',
+        },
+        {
+          accentColor: '#cc293d', //red
+          iconClass: 'fas fa-anchor',
+          id: generateUUID(),
+          title: 'Anchors',
+        },
+        {
+          accentColor: '#f6af08', //yellow
+          iconClass: 'fas fa-skull-crossbones',
+          id: generateUUID(),
+          title: 'Rocks',
+        },
+      ];
+    // Team Assessment Templates
     case 'clarity':
       return [
         {
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What provides clarity',
+          title: 'What provides clarity?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What hinders clarity',
+          title: 'What obstructs clarity?',
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: NEXT_ACTION,
         },
       ];
     case 'energy':
@@ -249,19 +264,40 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What provides energy',
+          title: 'What boosts energy?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What drains energy',
+          title: 'What drains energy?',
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: NEXT_ACTION,
+        },
+      ];
+    case 'psy-safety':
+      return [
+        {
+          accentColor: '#008000',
+          iconClass: 'far fa-smile',
+          id: generateUUID(),
+          title: 'What fosters psychological safety?',
+        },
+        {
+          accentColor: '#cc293d',
+          iconClass: 'far fa-frown',
+          id: generateUUID(),
+          title: 'What undermines pyschological safety?',
+        },
+        {
+          accentColor: '#0078d4',
+          iconClass: 'far fa-circle-check',
+          id: generateUUID(),
+          title: NEXT_ACTION,
         },
       ];
     case 'wlb':
@@ -270,88 +306,61 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What helps work-life balance',
+          title: 'What helps work-life balance?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What hinders work-life balance',
+          title: 'What hinders work-life balance?',
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: NEXT_ACTION,
         },
       ];
-    case 'team-confidence':
+    case 'confidence':
       return [
         {
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What increases confidence in team',
+          title: 'What enhances confidence in team?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What decreases confidence in team',
+          title: 'What reduces confidence in team?',
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint',
+          title: NEXT_ACTION,
         },
       ];
-    case 'team-efficiency':
+    case 'efficiency':
       return [
         {
           accentColor: '#008000',
           iconClass: 'far fa-smile',
           id: generateUUID(),
-          title: 'What helps efficiency',
+          title: 'What increases efficiency?',
         },
         {
           accentColor: '#cc293d',
           iconClass: 'far fa-frown',
           id: generateUUID(),
-          title: 'What hinders efficiency',
+          title: 'What decreases efficiency?',
         },
         {
           accentColor: '#0078d4',
-          iconClass: 'fas fa-exclamation',
+          iconClass: 'far fa-circle-check',
           id: generateUUID(),
-          title: 'One action in next sprint',
-        },
-      ];
-    case 'wlai': // Went Well, Learned, Impediments, Accelerators
-      return [
-        {
-          accentColor: '#008000',
-          iconClass: 'far fa-smile',
-          id: generateUUID(),
-          title: 'Went Well',
-        },
-        {
-          accentColor: '#8063bf',
-          iconClass: 'fas fa-book',
-          id: generateUUID(),
-          title: 'Learned',
-        },
-        {
-          accentColor: '#0078d4',
-          iconClass: 'far fa-compass',
-          id: generateUUID(),
-          title: 'Accelerators',
-        },
-        {
-          accentColor: '#cc293d',
-          iconClass: 'fas fa-question',
-          id: generateUUID(),
-          title: 'Impediments',
+          title: NEXT_ACTION,
         },
       ];
     default: {
@@ -359,12 +368,12 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         accentColor: '#008000',
         iconClass: 'far fa-smile',
         id: generateUUID(),
-        title: 'What went well',
+        title: 'What went well?',
       }, {
         accentColor: '#cc293d',
         iconClass: 'far fa-frown',
         id: generateUUID(),
-        title: "What didn't go well",
+        title: "What didn't go well?",
       }]
     }
   }
