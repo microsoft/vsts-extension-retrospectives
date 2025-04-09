@@ -814,6 +814,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
+  // Event handler for tab click
+  private readonly handlePivotClick = (item?: PivotItem): void => {
+    if (item) {
+      const selectedTab = item.props.headerText; // Get which tab was clicked
+      console.log(`User clicked the ${selectedTab} tab`);
+    }
+  };
+
   /**
    * @description Loads all feedback boards for the current team. Defaults the selected board to
    * the most recently created board.
@@ -1435,7 +1443,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           />
         </div>
         <div className="flex w-full items-center justify-start">
-          <Pivot>
+          <Pivot onLinkClick={this.handlePivotClick}>
             <PivotItem headerText="Board">
               {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible &&
                 <div className="pivot-content-wrapper">
