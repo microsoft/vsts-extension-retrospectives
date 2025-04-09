@@ -51,14 +51,6 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void
 ): Table<IBoardSummaryTableItem> {
-  // Add state for managing table data (opportunity to simplify or remove?)
-  const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
-  React.useEffect(() => {setTableData(data); }, [data]);
-  if (!data || data.length === 0) {
-    console.error("No data provided to getTable:", data);
-  } else {
-    console.log("Data provided to getTable:", data);
-  }
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
@@ -122,13 +114,11 @@ function getTable(
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
                 }
                 // update local state to reflect updated archive status
-                setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
-                prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
-                    item.id === boardId ? {
-                      ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null
-                    } : item
-                  )
-                )
+                data.map((item: IBoardSummaryTableItem) => // Specify type for item
+                  item.id === boardId ? {
+                    ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null
+                  } : item
+                );
                 onArchiveToggle();
               }
               catch (error) {
@@ -168,7 +158,7 @@ function getTable(
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
-    data: tableData, // <-- Use state instead of original data
+    data, // <-- Use state instead of original data
     columns,
     columnResizeMode: 'onChange',
     onSortingChange: onSortingChange,
@@ -178,7 +168,7 @@ function getTable(
     getRowCanExpand: () => true,
     state: {
       pagination: {
-        pageSize: tableData.length, // <-- Use state instead of original data
+        pageSize: data.length, // <-- Use state instead of original data
         pageIndex: 0
       },
       sorting: sortingState
@@ -199,8 +189,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  const table: Table<IBoardSummaryTableItem> =
-    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle);
+  const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle);
 
   const updatedState: IBoardSummaryTableState = boardSummaryState;
 
