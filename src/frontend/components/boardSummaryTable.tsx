@@ -114,14 +114,12 @@ function getTable(
               try {
                 if (toggleIsArchived) {
                   await BoardDataService.archiveFeedbackBoard(teamId, boardId);
-                  //reflectBackendService.broadcastArchivedBoard(teamId, boardId); //must be easier way; can't test in dev
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
                 } else {
                   await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
-                  //reflectBackendService.broadcastRestoredBoard(teamId, boardId); //must be easier way; can't test in dev
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
                 }
-                // update local state to reflect updated archive status immediately
+                // update local state to reflect updated archive status
                 setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
                 prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
                     item.id === boardId ? {
@@ -129,7 +127,6 @@ function getTable(
                     } : item
                   )
                 )
-                // Notify the parent component about the archive toggle
                 onArchiveToggle();
               }
               catch (error) {
