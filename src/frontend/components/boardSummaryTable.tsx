@@ -14,6 +14,7 @@ import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 export interface IBoardSummaryTableProps {
   teamId: string;
   supportedWorkItemTypes: WorkItemType[];
+  onArchiveToggle: () => void; // New prop to notify the parent about archive toggles
 }
 
 export interface IBoardSummaryTableState {
@@ -116,9 +117,6 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
                   //reflectBackendService.broadcastRestoredBoard(teamId, boardId); //must be easier way; can't test in dev
                   appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
                 }
-                //DPH: unsuccessful attempt to reload boards
-                //await feedbackBoardContainer.reloadBoardsForCurrentTeam();
-                const boards = await BoardDataService.getBoardsForTeam(teamId);
                 // update local state to reflect updated archive status immediately
                 setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
                 prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
@@ -127,6 +125,8 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
                     } : item
                   )
                 )
+                // Notify the parent component about the archive toggle
+                props.onArchiveToggle();
               }
               catch (error) {
                 console.error("Error while toggling archive state:", error);

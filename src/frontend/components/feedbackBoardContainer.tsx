@@ -57,6 +57,7 @@ export interface FeedbackBoardContainerState {
   currentTeam: WebApiTeam;
   filteredProjectTeams: WebApiTeam[];
   filteredUserTeams: WebApiTeam[];
+  hasToggledArchive: boolean;
   isAppInitialized: boolean;
   isBackendServiceConnected: boolean;
   isReconnectingToBackendService: boolean;
@@ -123,6 +124,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       currentTeam: undefined,
       filteredProjectTeams: [],
       filteredUserTeams: [],
+      hasToggledArchive: false, // Track whether isArchived toggle occurred
       isAllTeamsLoaded: false,
       isAppInitialized: false,
       isAutoResizeEnabled: true,
@@ -162,7 +164,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       allMembers: [],
       castedVoteCount: 0,
       boardColumns: [],
-      questionIdForDiscussAndActBoardUpdate: -1
+      questionIdForDiscussAndActBoardUpdate: -1,
     };
   }
 
@@ -814,12 +816,20 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
-  // Event handler for tab click
+  private readonly handleArchiveToggle = (): void => {
+    this.setState({ hasToggledArchive: true });
+  };
+
+  // Handle when "Board" tab is clicked
   private readonly handlePivotClick = async (item?: PivotItem): Promise<void> => {
-    if (item?.props.headerText === 'Board') { // Check if "Board" tab was clicked
-      console.log('Boards will be reloaded');
-      await this.reloadBoardsForCurrentTeam(); // Reload the boards
-      console.log('Boards have been reloaded');
+    if (item?.props.headerText === 'Board') { // Check if "Board" tab is clicked
+      if (this.state.hasToggledArchive) { // Reload only if archive was toggled
+        console.log('Reloading boards because archive state was toggled earlier...');
+        await this.reloadBoardsForCurrentTeam();
+        this.setState({ hasToggledArchive: false }); // Reset the flag after reload
+      } else {
+        console.log('Archive state was not toggled, skipping reload.');
+      }
     }
   };
 
@@ -1802,7 +1812,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </PivotItem>
             <PivotItem headerText="History">
               <div className="pivot-content-wrapper">
-                <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} />
+                <BoardSummaryTable 
+                  teamId={this.state.currentTeam.id} 
+                  supportedWorkItemTypes={this.state.allWorkItemTypes} 
+                  onArchiveToggle={this.handleArchiveToggle} // Pass the archive toggle handler
+                />
               </div>
             </PivotItem>
           </Pivot>
