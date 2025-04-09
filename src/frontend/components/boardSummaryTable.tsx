@@ -47,11 +47,18 @@ export interface IActionItemsTableItems {
 }
 
 function getTable(
+  data: IBoardSummaryTableItem[], 
+  sortingState: SortingState, 
+  onSortingChange: OnChangeFn<SortingState>
+): Table<IBoardSummaryTableItem> {
+/*
+function getTable(
   data: IBoardSummaryTableItem[],
   sortingState: SortingState,
   onSortingChange: OnChangeFn<SortingState>,
-  onArchiveToggle: () => void, // Accept `onArchiveToggle` as an argument
+  onArchiveToggle: () => void // Accept `onArchiveToggle` as an argument
 ): Table<IBoardSummaryTableItem> {
+*/
   // Add state for managing table data
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   React.useEffect(() => {setTableData(data); }, [data]);
