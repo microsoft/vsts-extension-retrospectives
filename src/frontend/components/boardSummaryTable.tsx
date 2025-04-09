@@ -47,8 +47,8 @@ export interface IActionItemsTableItems {
 }
 
 function getTable(
-  data: IBoardSummaryTableItem[], 
-  sortingState: SortingState, 
+  data: IBoardSummaryTableItem[],
+  sortingState: SortingState,
   onSortingChange: OnChangeFn<SortingState>
 ): Table<IBoardSummaryTableItem> {
 /*
