@@ -51,11 +51,13 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void // Accept `onArchiveToggle` as an argument
 ): Table<IBoardSummaryTableItem> {
-  // Add state for managing table data
+  // Add state for managing table data (opportunity to simplify or remove?)
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   React.useEffect(() => {setTableData(data); }, [data]);
   if (!data || data.length === 0) {
     console.error("No data provided to getTable. Ensure `data` is not empty or undefined.");
+  } else {
+    console.log("Data provided to getTable:", data);
   }
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
