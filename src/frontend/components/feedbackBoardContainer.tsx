@@ -815,9 +815,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   // Event handler for tab click
-  private readonly handlePivotClick = (item?: PivotItem): void => {
+  private readonly handlePivotClick = async (item?: PivotItem): Promise<void> => {
     if (item?.props.headerText === 'Board') { // Check if "Board" tab was clicked
-      console.log('User clicked the Board tab');
+      console.log('Boards will be reloaded');
+      await this.reloadBoardsForCurrentTeam(); // Reload the boards
+      console.log('Boards have been reloaded');
     }
   };
 
