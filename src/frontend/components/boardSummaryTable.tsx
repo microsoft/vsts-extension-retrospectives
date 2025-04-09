@@ -46,7 +46,12 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
+function getTable(
+  data: IBoardSummaryTableItem[],
+  sortingState: SortingState,
+  onSortingChange: OnChangeFn<SortingState>,
+  onArchiveToggle: () => void // Accept `onArchiveToggle` as an argument
+): Table<IBoardSummaryTableItem> {
   // Add state for managing table data
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   React.useEffect(() => {setTableData(data); }, [data]);
@@ -126,7 +131,7 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
                   )
                 )
                 // Notify the parent component about the archive toggle
-                props.onArchiveToggle();
+                onArchiveToggle();
               }
               catch (error) {
                 console.error("Error while toggling archive state:", error);
