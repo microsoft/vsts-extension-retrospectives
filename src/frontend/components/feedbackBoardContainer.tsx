@@ -816,9 +816,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   // Event handler for tab click
   private readonly handlePivotClick = (item?: PivotItem): void => {
-    if (item) {
-      const selectedTab = item.props.headerText; // Get which tab was clicked
-      console.log(`User clicked the ${selectedTab} tab`);
+    if (item?.props.headerText === 'Board') { // Check if "Board" tab was clicked
+      console.log('User clicked the Board tab');
     }
   };
 
