@@ -19,7 +19,7 @@ This release focused on a _refresh_ of the existing retrospective templates. Cha
 * Tweaked a prompt on Speedboat and on Good to Done templates.
 * Revised named of Confidence and Efficiency templates to follow consistent pattern with other team assessment templates.
 * Updated team assessment retrospective prompts to follow consistent pattern but with variety.
-* Revised team assessment retrospective prompt on "One action" column to use neutral language supporting Scrum or Kanban.
+* Revised team assessment retrospective prompt on "One action" column to support teams not sprinting.
 * Updated icons used in templates to better align with the varied template column prompts.
 * Updated associated color palate to follow a green, yellow, red pattern for positive, neutral, negative feedback.
 * Reorganized icon selection pane to align similarly themed icons on the same row.
