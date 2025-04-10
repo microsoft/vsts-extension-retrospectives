@@ -55,9 +55,8 @@ function getTable(
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   React.useEffect(() => {setTableData(data); }, [data]);
   if (!data || data.length === 0) {
+    // get this error twice at the start
     console.error("No data provided to getTable:", data);
-  } else {
-    console.log("Data provided to getTable:", data);
   }
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
