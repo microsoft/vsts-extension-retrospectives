@@ -111,7 +111,24 @@ class BoardDataService {
     return await this.updateBoard(teamId, board);
   }
 
-  public updateBoardMetadata = async (teamId: string, boardId: string, maxvotesPerUser: number, title: string, newColumns: IFeedbackColumn[], permissions: IFeedbackBoardDocumentPermissions): Promise<IFeedbackBoardDocument> => {
+  public restoreArchivedFeedbackBoard = async (teamId: string, boardId: string) => {
+    const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
+    const userIdentity = getUserIdentity();
+
+    // Check in case board was deleted by other user after option to update was selected by current user
+    if (!board) {
+      console.log(`Cannot restore for a non-existent feedback board. Board: ${boardId}`);
+      return undefined;
+    }
+
+    board.isArchived = false;
+    board.archivedDate = undefined;
+    board.archivedBy = undefined;
+
+    return await this.updateBoard(teamId, board);
+  }
+
+  public updateBoardMetadata = async (teamId: string, boardId: string, maxVotesPerUser: number, title: string, newColumns: IFeedbackColumn[], permissions: IFeedbackBoardDocumentPermissions): Promise<IFeedbackBoardDocument> => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
 
     // Check in case board was deleted by other user after option to update was selected by current user
@@ -121,7 +138,7 @@ class BoardDataService {
     }
 
     board.title = title;
-    board.maxVotesPerUser = maxvotesPerUser;
+    board.maxVotesPerUser = maxVotesPerUser;
     board.columns = newColumns;
     board.modifiedDate = new Date(Date.now());
     board.isPublic = this.isBoardPublic(permissions),
