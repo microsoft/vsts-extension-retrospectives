@@ -229,10 +229,10 @@ class ReflectBackendService {
   }
 
   /**
- * Sends a BroadcaseDeleteItem signal for other instances.
- * @param columnId The column id that the feedback item is a part of.
- * @param feedbackItemId The id of the feedback item to update.
- */
+   * Sends a BroadcastDeletedItem signal for other instances.
+   * @param columnId The column id that the feedback item is a part of.
+   * @param feedbackItemId The id of the feedback item to update.
+   */
   public broadcastDeletedItem = (columnId: string, feedbackItemId: string) => {
     if (!this._connectionAvailable) {
       return;

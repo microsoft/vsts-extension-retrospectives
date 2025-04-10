@@ -57,13 +57,14 @@ export interface FeedbackBoardContainerState {
   currentTeam: WebApiTeam;
   filteredProjectTeams: WebApiTeam[];
   filteredUserTeams: WebApiTeam[];
+  hasToggledArchive: boolean;
   isAppInitialized: boolean;
   isBackendServiceConnected: boolean;
   isReconnectingToBackendService: boolean;
   isSummaryDashboardVisible: boolean;
   isTeamDataLoaded: boolean;
   isAllTeamsLoaded: boolean;
-  maxvotesPerUser: number;
+  maxVotesPerUser: number;
   /**
    * Teams that the current user is specifically a member of.
    */
@@ -123,6 +124,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       currentTeam: undefined,
       filteredProjectTeams: [],
       filteredUserTeams: [],
+      hasToggledArchive: false,
       isAllTeamsLoaded: false,
       isAppInitialized: false,
       isAutoResizeEnabled: true,
@@ -152,7 +154,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       teamBoardDeletedDialogMessage: '',
       teamBoardDeletedDialogTitle: '',
       userTeams: [],
-      maxvotesPerUser: 5,
+      maxVotesPerUser: 5,
       feedbackItems: [],
       contributors: [],
       effectivenessMeasurementSummary: [],
@@ -162,7 +164,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       allMembers: [],
       castedVoteCount: 0,
       boardColumns: [],
-      questionIdForDiscussAndActBoardUpdate: -1
+      questionIdForDiscussAndActBoardUpdate: -1,
     };
   }
 
@@ -219,7 +221,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
 
       // Listen for signals for board updates.
-      reflectBackendService.onReceiveNewBoard(this.handleNewBoardAvailable);
+      reflectBackendService.onReceiveNewBoard(this.handleBoardCreated);
       reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
     }
@@ -246,7 +248,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   public componentWillUnmount() {
     window.removeEventListener('resize', this.handleResolutionChange);
-    reflectBackendService.removeOnReceiveNewBoard(this.handleNewBoardAvailable);
+    reflectBackendService.removeOnReceiveNewBoard(this.handleBoardCreated);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
   }
@@ -327,7 +329,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return formatter.format(value / 100);
   }
 
-  private readonly handleNewBoardAvailable = async (teamId: string, boardId: string) => {
+  private readonly handleBoardCreated = async (teamId: string, boardId: string) => {
     if (!teamId || this.state.currentTeam.id !== teamId) {
       return;
     }
@@ -421,8 +423,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             currentBoard: null,
             isBoardUpdateDialogHidden: true,
             isTeamBoardDeletedInfoDialogHidden: false,
-            teamBoardDeletedDialogTitle: 'Retrospective deleted',
-            teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been deleted by another user.',
+            teamBoardDeletedDialogTitle: 'Retrospective archived or deleted',
+            teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been archived or deleted by another user.',
           }
         }
 
@@ -433,8 +435,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           currentBoard: currentBoard,
           isBoardUpdateDialogHidden: true,
           isTeamBoardDeletedInfoDialogHidden: false,
-          teamBoardDeletedDialogTitle: 'Retrospective deleted',
-          teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been deleted by another user. You will be switched to the last created retrospective for this team.',
+          teamBoardDeletedDialogTitle: 'Retrospective archived or deleted',
+          teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.',
         };
       }
 
@@ -556,7 +558,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         ...recentVisitState,
         isTeamBoardDeletedInfoDialogHidden: false,
         teamBoardDeletedDialogTitle: 'Team not found',
-        teamBoardDeletedDialogMessage: 'Could not find the team specified in the url.',
+        teamBoardDeletedDialogMessage: 'Could not find the team specified in the URL.',
       }
 
       return {
@@ -606,7 +608,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         ...queryParamTeamAndDefaultBoardState,
         isTeamBoardDeletedInfoDialogHidden: false,
         teamBoardDeletedDialogTitle: 'Board not found',
-        teamBoardDeletedDialogMessage: 'Could not find the board specified in the url.'
+        teamBoardDeletedDialogMessage: 'Could not find the board specified in the URL.'
       };
     }
   }
@@ -731,6 +733,21 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   }
 
+  private readonly handleArchiveToggle = (): void => {
+    this.setState({ hasToggledArchive: true });
+  };
+
+  // Handle when "Board" tab is clicked
+  private readonly handlePivotClick = async (item?: PivotItem): Promise<void> => {
+    if (item?.props.headerText === 'Board') { // Check if "Board" tab is clicked
+      if (this.state.hasToggledArchive) { // Reload only if archive was toggled
+        console.log('Reloading boards because archive state was toggled.');
+        await this.reloadBoardsForCurrentTeam();
+        this.setState({ hasToggledArchive: false }); // Reset the flag after reload
+      }
+    }
+  };
+
   /**
    * @description Loads all feedback boards for the current team. Defaults the selected board to
    * the most recently created board.
@@ -820,10 +837,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
-  private readonly createBoard = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+  private readonly createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
     const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
       title,
-      maxvotesPerUser,
+      maxVotesPerUser,
       columns,
       isIncludeTeamEffectivenessMeasurement,
       isBoardAnonymous,
@@ -926,8 +943,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isRetroSummaryDialogHidden: true });
   }
 
-  private readonly updateBoardMetadata = async (title: string, maxvotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
-    const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxvotesPerUser, title, columns, permissions);
+  private readonly updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+    const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
 
     this.updateBoardAndBroadcast(updatedBoard);
   }
@@ -1080,7 +1097,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           isDuplicatingBoard={isDuplicatingBoard}
           currentBoard={this.state.currentBoard}
           teamId={this.state.currentTeam.id}
-          maxvotesPerUser={this.state.maxvotesPerUser}
+          maxVotesPerUser={this.state.maxVotesPerUser}
           placeholderText={placeholderText}
           availablePermissionOptions={permissionOptions}
           onFormSubmit={onSubmit}
@@ -1352,7 +1369,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           />
         </div>
         <div className="flex w-full items-center justify-start">
-          <Pivot>
+          <Pivot onLinkClick={this.handlePivotClick}>
             <PivotItem headerText="Board">
               {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible &&
                 <div className="pivot-content-wrapper">
@@ -1694,11 +1711,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       className: 'retrospectives-dialog-modal',
                     }}>
                     <DialogContent>
-                      Are you sure you want to archive the retrospective `<i className="accent3">{this.state.currentBoard.title}</i>` and all of its feedback items?
+                      Are you sure you want to archive the retrospective `<i>{this.state.currentBoard.title}</i>` and all of its feedback items?
                       <br /><br />
-                      <i className="accent3"><FontIcon iconName="LocationDot" /> Archived retrospectives are not visible in the board list.</i>
+                      <i><FontIcon iconName="LocationDot" /> Archived retrospectives are not visible in the board list, however no data will be deleted.</i>
                       <br /><br />
-                      <i className="accent3"><FontIcon iconName="LocationDot" /> No data will be deleted, Retrospective Board will be visible in the `History` tab.</i>
+                      <i><FontIcon iconName="LocationDot" /> The retrospective board will be visible and can be restored via the `History` tab.</i>
                     </DialogContent>
                     <DialogFooter>
                       <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
@@ -1710,7 +1727,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </PivotItem>
             <PivotItem headerText="History">
               <div className="pivot-content-wrapper">
-                <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} />
+                <BoardSummaryTable
+                  teamId={this.state.currentTeam.id}
+                  supportedWorkItemTypes={this.state.allWorkItemTypes}
+                  onArchiveToggle={this.handleArchiveToggle}
+                />
               </div>
             </PivotItem>
           </Pivot>

@@ -23,11 +23,11 @@ export interface IFeedbackBoardMetadataFormProps {
   currentBoard: IFeedbackBoardDocument;
   teamId: string;
   placeholderText: string;
-  maxvotesPerUser: number;
+  maxVotesPerUser: number;
   availablePermissionOptions: FeedbackBoardPermissionOption[]
   onFormSubmit: (
     title: string,
-    maxvotesPerUser: number,
+    maxVotesPerUser: number,
     columns: IFeedbackColumn[],
     isIncludeTeamEffectivenessMeasurement: boolean,
     isBoardAnonymous: boolean,
@@ -345,7 +345,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 <hr></hr>
                 <div className="board-metadata-form-section-subheader">
                   <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                    Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxvotesPerUser : this.props.currentBoard.maxVotesPerUser}):
+                    Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxVotesPerUser : this.props.currentBoard.maxVotesPerUser}):
                   </label>
                   <TextField
                     className="title-input-container max-vote-counter"
