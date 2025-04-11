@@ -599,6 +599,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
       return sum + (childCard?.feedbackItem.upvotes || 0);
     }, 0);
+    const totalUserVotes = this.props.userVotes + childrenIds.reduce((sum, id) => {
+      const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
+      return sum + (childCard?.feedbackItem.userVotes || 0);
+    }, 0);
 
     return (
       <div
@@ -836,8 +840,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   <div className="original-column-info">Original Column: <br />{ this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a" }</div>
                 }
                 {showVoteButton && this.props.isInteractable &&
+//                  <div>
+//                    <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
+//                  </div>
                   <div>
-                    <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
+                    <span className="feedback-yourvote-count">[Your Votes: {totalUserVotes}]</span>
                   </div>
                 }
               </div>
