@@ -599,11 +599,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
       return sum + (childCard?.feedbackItem.upvotes || 0);
     }, 0);
-    const totalUserVotes = this.state.userVotes + childrenIds.reduce((sum, id) => {
+/*    const totalUserVotes = this.state.userVotes + childrenIds.reduce((sum, id) => { //ChatGPT suggested this.props.userVotes
       const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
       return sum + (childCard?.feedbackItem.userVotes || 0);
     }, 0);
-
+*/
     return (
       <div
         ref={this.itemElementRef}
@@ -671,30 +671,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
                 {showVotes && this.props.isInteractable &&
                   // Using standard button tag here due to no onAnimationEnd support in fabricUI
-/*                <button
-                    title="Vote"
-                    aria-live="polite"
-                    aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-                    tabIndex={0}
-                    disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-                    className={classNames(
-                      "feedback-action-button",
-                      "feedback-add-vote",
-                      { voteAnimation: this.state.showVotedAnimation }
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id).then(() => this.props.onVoteCasted());
-                    }}
-                    onAnimationEnd={() => {
-                      this.setState({ showVotedAnimation: false });
-                    }}>
-                    <i className="fas fa-arrow-circle-up" />
-                    <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
-                  </button>
-*/
+                  // modified for summing grouped cards
                   <button
                     title="Vote"
                     aria-live="polite"
@@ -840,12 +817,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   <div className="original-column-info">Original Column: <br />{ this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a" }</div>
                 }
                 {showVoteButton && this.props.isInteractable &&
-//                  <div>
-//                    <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
-//                  </div>
                   <div>
-                    <span className="feedback-yourvote-count">[Your Votes: {totalUserVotes}]</span>
+                    <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
                   </div>
+//                  <div>
+//                   <span className="feedback-yourvote-count">[Your Votes: {totalUserVotes}]</span>
+//                  </div>
                 }
               </div>
               {this.feedbackCreationInformationContent()}
