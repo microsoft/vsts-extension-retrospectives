@@ -595,6 +595,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
 
+    const totalVotes = this.props.upvotes + childrenIds.reduce((sum, id) => {
+      const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
+      return sum + (childCard?.feedbackItem.upvotes || 0);
+    }, 0);
+
     return (
       <div
         ref={this.itemElementRef}
@@ -662,7 +667,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
                 {showVotes && this.props.isInteractable &&
                   // Using standard button tag here due to no onAnimationEnd support in fabricUI
-                  <button
+/*                <button
                     title="Vote"
                     aria-live="polite"
                     aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
@@ -684,6 +689,30 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     }}>
                     <i className="fas fa-arrow-circle-up" />
                     <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
+                  </button>
+*/
+                  <button
+                    title="Vote"
+                    aria-live="polite"
+                    aria-label={`Click to vote on feedback titled ${this.props.title}. Total vote count is ${totalVotes}`}
+                    tabIndex={0}
+                    disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+                    className={classNames(
+                      "feedback-action-button",
+                      "feedback-add-vote",
+                      { voteAnimation: this.state.showVotedAnimation }
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      this.setState({ showVotedAnimation: true });
+                      this.onVote(this.props.id).then(() => this.props.onVoteCasted());
+                    }}
+                    onAnimationEnd={() => {
+                      this.setState({ showVotedAnimation: false });
+                    }}>
+                    <i className="fas fa-arrow-circle-up" />
+                    <span className="feedback-upvote-count"> {totalVotes}</span>
                   </button>
                 }
                 {showVotes && this.props.isInteractable &&
