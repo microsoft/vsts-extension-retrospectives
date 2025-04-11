@@ -599,7 +599,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
       return sum + (childCard?.feedbackItem.upvotes || 0);
     }, 0);
-    const totalUserVotes = this.props.userVotes + childrenIds.reduce((sum, id) => {
+    const totalUserVotes = this.state.userVotes + childrenIds.reduce((sum, id) => {
       const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
       return sum + (childCard?.feedbackItem.userVotes || 0);
     }, 0);
