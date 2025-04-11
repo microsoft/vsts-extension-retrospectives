@@ -26,6 +26,7 @@
   background-color: var(--callout-background-color);
   height: 155px;
   margin-top: -10px;
+  overflow-y: auto;
 
   button.ms-ContextualMenu-link {
     color: var(--text-primary-color);
