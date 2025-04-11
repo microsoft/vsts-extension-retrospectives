@@ -196,16 +196,16 @@ The contents of the `.env` file are
 
     ```bash
     # Backend Service URL
-    REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service url here"
+    REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service URL here"
     # App Instrumentation Key
     REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
     ```
 
     - In lieu of the .env file you can set actual environment variables.
 
-    - When using the CI/CD github action(s) pipeline to deploy the extension,
+    - When using the CI/CD Github action(s) pipeline to deploy the extension,
       environment variables are used to set Application Insights instrumentation
-      key and the backend service url.
+      key and the backend service URL.
 
 4. Run `npm run build:d` or `npm run build:p` to build the project. The
     difference in commands is `development` versus `production`, respectively;
@@ -214,8 +214,8 @@ The contents of the `.env` file are
     Azure DevOps publisher account. Refer to the
     [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts)
     on publishing extensions. You can publish it to any test Azure DevOps
-    organization that you are an admin of (As a Microsoft employee, you can create
-    a new test organization from your Azure DevOps profile page). Currently this is
+    organization that you are an admin of. (As a Microsoft employee, you can create
+    a new test organization from your Azure DevOps profile page.) Currently this is
     the only way to test the extension.
 6. Copy the file `vss-extension-dev.json.template` into a new
     `vss-extension-dev.json` file with the new publisher that you setup. Also
@@ -261,7 +261,7 @@ The contents of the `.env` file are
   publisher id and your extension's unique key. To enable real time updates for
   your test extension, please
   [reach out to us](https://github.com/microsoft/vsts-extension-retrospectives/issues)
-  with your publisher id and the
+  with your publisher ID and the
   [unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key)
   of your extension.
 
@@ -385,7 +385,7 @@ to add real time support. The backend codebase can be found
 [here](https://github.com/microsoft/vsts-extension-retrospectives/tree/main/RetrospectiveExtension.Backend).
 
 To enable real time updates from your test extension you will need to deploy
-the backend to Azure specifying your publisher id and the unique key of your
+the backend to Azure specifying your publisher ID and the unique key of your
 extension.
 
 ---
@@ -415,13 +415,13 @@ extension.
    - Add the `RESOURCE_NAME_SUFFIX` value. This will be used for naming
      all Azure resources including the App Service name - `https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
      **Note:** The app name must be globally unique so select something accordingly.
-   - Add the `LOCATION` value i.e. "eastus", "westus", etc.
+   - Add the `LOCATION` value i.e., "eastus", "westus", etc.
 
 2. Copy `/allowed_origins.json.template` to `/allowed_origins.json` and replace
-   the `<publisher id>` with your publisher id. This id uniquely identifies your
+   the `<publisher id>` with your publisher ID. This ID uniquely identifies your
    publisher in the Visual Studio Marketplace. If you are part of a team working
    on the retro tool you can add additional allowed origins. There should be two
-   allowed origins per publisher id. Remember to increment the name index as you
+   allowed origins per publisher ID. Remember to increment the name index as you
    add additional origins.
 
 3. Copy `/dev_certs.json.template` to `/dev_certs.json` and replace the
@@ -432,7 +432,7 @@ extension.
 
 4. Run the `deploy/env_setup.sh` script.
 
-5. Once the script completes, it will output the url of the backend service. You can navigate to the
+5. Once the script completes, it will output the URL of the backend service. You can navigate to the
    [Azure Portal](https://portal.azure.com) and validate that the `rg-<RESOURCE_NAME_SUFFIX>` resource
    group exists and contains the App Service, App Service Plan and SignalR resources.
 
@@ -525,12 +525,12 @@ deploy a single backend to support multiple developer test extensions.
    - Add the `RESOURCE_NAME_SUFFIX` value. This will be used for naming
      all Azure resources including the App Service name - `https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
      **Note:** The app name must be globally unique so select something accordingly.
-   - Add the `LOCATION` value i.e. "eastus", "westus", etc.
+   - Add the `LOCATION` value i.e., "eastus", "westus", etc.
 1. Copy `/allowed_origins.json.template` to `/allowed_origins.json` and replace
-   the `<publisher id>` with your publisher id. This id uniquely identifies your
+   the `<publisher id>` with your publisher ID. This ID uniquely identifies your
    publisher in the Visual Studio Marketplace. If you are part of a team working
    on the retro tool you can add additional allowed origins. There should be two
-   allowed origins per publisher id. Remember to increment the name index as you
+   allowed origins per publisher ID. Remember to increment the name index as you
    add additional origins.
 1. Copy `/dev_certs.json.template` to `/dev_certs.json` and replace the
    `<extension secret>` with your secret. [Instructions on how to download the
@@ -538,7 +538,7 @@ deploy a single backend to support multiple developer test extensions.
    If you are part of a team working on the retro tool you can add additional
    secrets. Remember to increment the name index to add additional secrets.
 1. Run the `deploy/env_setup.sh` script.
-1. Once the script completes, it will output the url of the backend service. You can navigate to the
+1. Once the script completes, it will output the URL of the backend service. You can navigate to the
   [Azure Portal](https://portal.azure.com) and validate that the `rg-<RESOURCE_NAME_SUFFIX>` resource
   group exists and contains the App Service, App Service Plan and SignalR resources.
 1. Update the `RetrospectiveExtension.FrontEnd/config/environment.tsx` to reflect changes to:
