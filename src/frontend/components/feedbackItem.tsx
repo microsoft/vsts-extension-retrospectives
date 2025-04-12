@@ -581,9 +581,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   private renderGroupExpandFocusButton(isGroupedCarouselItem: boolean, isMainItem: boolean, showAddActionItem: boolean, isFocusModalHidden: boolean, groupItemsCount: number): JSX.Element | null {
-    if (!(isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden)) {
-      return null;
-    }
     return (
       <button
         className="feedback-expand-group-focus"
@@ -607,11 +604,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
-  // This controls the top level feedback item in a group in the vote phase and outside the focus mode
   private renderGroupExpandButton(isMainItem: boolean, groupItemsCount: number, isFocusModalHidden: boolean): JSX.Element | null {
-    if (!isMainItem || this.props.groupCount <= 0 || !isFocusModalHidden) {
-      return null;
-    }
     return (
       <button
         className="feedback-expand-group"
@@ -635,59 +628,40 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
-  private renderVoteButton(isMainItem: boolean, showVoteButton: boolean) {
-    // Using standard button tag here due to no onAnimationEnd support in fabricUI
+  private renderGroupExpansionButton(type: "focus" | "expand", isMainItem: boolean, groupItemsCount: number, isFocusModalHidden: boolean): JSX.Element | null {
+    const isFocusButton = type === "focus";
+    const isVisible = isFocusButton
+      ? this.props.isGroupedCarouselItem && isMainItem && this.props.workflowPhase === WorkflowPhase.Act && !isFocusModalHidden
+      : isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
+    if (!isVisible) {
+      return null;
+    }
     return (
       <button
-        title="Vote"
+        className={isFocusButton ? "feedback-expand-group-focus" : "feedback-expand-group"}
         aria-live="polite"
-        aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-        tabIndex={0}
-        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-        className={classNames(
-          "feedback-action-button",
-          "feedback-add-vote",
-          { voteAnimation: this.state.showVotedAnimation }
-        )}
+        aria-label={
+          this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded
+            ? `Expand Feedback Group button. Group has ${groupItemsCount} items.`
+            : `Collapse Feedback Group button. Group has ${groupItemsCount} items.`
+        }
+        style={isFocusButton ? {} : { color: this.props.accentColor }}
         onClick={(e) => {
-          e.preventDefault();
           e.stopPropagation();
-          this.setState({ showVotedAnimation: true });
-          this.onVote(this.props.id).then(() => this.props.onVoteCasted());
-        }}
-        onAnimationEnd={() => {
-          this.setState({ showVotedAnimation: false });
+          if (isFocusButton) {
+            this.toggleShowGroupedChildrenTitles();
+          } else {
+            this.props.groupedItemProps.toggleGroupExpand();
+          }
         }}>
-        <i className="fas fa-arrow-circle-up" />
-        <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
-      </button>
-    );
-  }
-
-  private renderUnvoteButton(isMainItem: boolean, showVoteButton: boolean) {
-    // Using standard button tag here due to no onAnimationEnd support in fabricUI
-    return (
-      <button
-        title="UnVote"
-        aria-live="polite"
-        aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-        tabIndex={0}
-        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-        className={classNames(
-          "feedback-action-button",
-          "feedback-add-vote",
-          { voteAnimation: this.state.showVotedAnimation }
-        )}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.setState({ showVotedAnimation: true });
-          this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
-        }}
-        onAnimationEnd={() => {
-          this.setState({ showVotedAnimation: false });
-        }}>
-        <i className="fas fa-arrow-circle-down" />
+        <i className={classNames("fa", {
+          "fa-angle-double-down": isFocusButton && this.state.isShowingGroupedChildrenTitles,
+          "fa-angle-double-right": isFocusButton && !this.state.isShowingGroupedChildrenTitles,
+          "fa-chevron-down": !isFocusButton && this.props.groupedItemProps.isGroupExpanded,
+          "fa-chevron-right": !isFocusButton && !this.props.groupedItemProps.isGroupExpanded,
+        })} />
+        &nbsp;
+        {this.props.groupCount + 1} Items
       </button>
     );
   }
@@ -774,15 +748,20 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               }}>
               <div className="card-header">
                 {
+                  isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
                   this.renderGroupExpandFocusButton(isGroupedCarouselItem, isMainItem, showAddActionItem, isFocusModalHidden, groupItemsCount)
                 }
                 {
+                  // This controls the top level feedback item in a group in the vote phase and outside the focus mode
+                  !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
                   this.renderGroupExpandButton(isMainItem, groupItemsCount, isFocusModalHidden)
                 }
-                {showVotes && this.props.isInteractable &&
+                {
+                  showVotes && this.props.isInteractable &&
                   this.renderVoteActionButton(isMainItem, showVoteButton, true) // For voting
                 }
-                {showVotes && this.props.isInteractable &&
+                {
+                  showVotes && this.props.isInteractable &&
                   this.renderVoteActionButton(isMainItem, showVoteButton, false) // For unvoting
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
