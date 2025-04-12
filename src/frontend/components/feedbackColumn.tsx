@@ -206,41 +206,26 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     }
   }
 
+  //DPH not sure what original working state was
   const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({
-      mainFeedbackItem,
-      groupedWorkItems,
-      workflowState,
-      yourVotes
-  }) => {
-      const isGroupCollapsed = /* Logic to check if the group is collapsed */;
+    mainFeedbackItem,
+    groupedWorkItems,
+    workflowState
+}) => {
+    const isGroupCollapsed = /* Logic to check if the group is collapsed */;
 
-      return (
-          <div>
-              {isGroupCollapsed 
-                  ? `Your Votes: ${yourVotes}` // Total "Your Votes" when collapsed
-                  : groupedWorkItems.map((item) => (
-                      <div key={item.id}>Your Votes for {item.title}: {item.userVotes}</div>
-                    ))}
-          </div>
-      );
-  };  
-
-  private calculateYourTotalVotes(columnItem: IColumnItem): number {
-    // Get the user's ID from props or context
-    const currentUserId = this.props.userIdRef;
-
-    // Calculate votes for all child feedback items
-    const childVotes = (columnItem.feedbackItem.childFeedbackItemIds || []).reduce((sum, childId) => {
-        const childItem = this.props.columnItems?.find((child) => child.feedbackItem.id === childId);
-        const userVotes = childItem?.feedbackItem.voteCollection[currentUserId] || 0; // Get the user's vote count
-        return sum + userVotes;
-    }, 0);
-
-    // Add votes for the parent feedback item
-    const parentVotes = columnItem.feedbackItem.voteCollection[currentUserId] || 0;
-
-    return parentVotes + childVotes;
-  }
+    return (
+        <div>
+            {isGroupCollapsed 
+                ? <div>{mainFeedbackItem.title}</div> // Show the main item title when collapsed
+                : groupedWorkItems.map((item) => (
+                    <div key={item.id}>
+                        <div>{item.title}</div> // Display child item titles when expanded
+                    </div>
+                ))}
+        </div>
+    );
+};
 
   private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
@@ -298,7 +283,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
                       mainFeedbackItem={feedbackItemProps}
                       groupedWorkItems={childItemsToGroup}
                       workflowState={this.props.workflowPhase}
-                      yourVotes={this.calculateYourTotalVotes(columnItem)} // Pass total "Your Votes"
                   />
                 );
             } else {
