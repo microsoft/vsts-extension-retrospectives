@@ -150,7 +150,7 @@
         }
 
         .feedback-yourvote-count {
-          font-size: 0.9em;
+          font-size: 0.85em;
         }
       }
 
@@ -233,7 +233,8 @@
           .related-feedback-title {
             margin-left: 10px;
             color: var(--text-primary-color);
-
+            line-height: 1.1; // Reduce vertical spacing between lines
+            font-size: 0.9em; // Optional: Adjust font size for compactness
             @include max-line-render(2);
           }
         }
