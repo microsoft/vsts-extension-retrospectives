@@ -111,8 +111,8 @@ describe('Feedback Item', () => {
     });
 
     it('should show the related feedback header', () => {
-      const wrapper = shallow(<FeedbackItem {...testProps} />);
-      const component = wrapper.children().dive();
+      const wrapper = mount(<FeedbackItem {...testProps} />);
+      const component = wrapper;
 
       component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
 
@@ -121,8 +121,8 @@ describe('Feedback Item', () => {
     })
 
     it('should show the related feedback item title', () => {
-      const wrapper = shallow(<FeedbackItem {...testProps} />);
-      const component = wrapper.children().dive();
+      const wrapper = mount(<FeedbackItem {...testProps} />);
+      const component = wrapper;
 
       component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
 
@@ -131,8 +131,8 @@ describe('Feedback Item', () => {
     })
 
     it('should show the original column information', () => {
-      const wrapper = shallow(<FeedbackItem {...testProps} />);
-      const component = wrapper.children().dive();
+      const wrapper = mount(<FeedbackItem {...testProps} />);
+      const component = wrapper;
 
       component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
 
