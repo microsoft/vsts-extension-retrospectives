@@ -745,12 +745,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               <div className="card-header">
                 {
                   isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
-                  this.renderGroupButton(groupItemsCount, false) // For focus
+                  this.renderGroupButton(groupItemsCount, true) // For focus
                 }
                 {
                   // This controls the top level feedback item in a group in the vote phase and outside the focus mode
                   !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
-                  this.renderGroupButton(groupItemsCount, true) // For expand
+                  this.renderGroupButton(groupItemsCount, false) // For expand
                 }
                 {
                   showVotes && this.props.isInteractable &&
