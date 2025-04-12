@@ -580,6 +580,67 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
+  renderVoteButtons() {
+    const { upvotes, downvotes, showVoteButton, isMainItem, title } = this.props;
+    const { showVotedAnimation } = this.state;
+
+    return (
+      <div className="feedback-vote-buttons">
+        {/* Upvote Button */}
+        <button
+          title="Upvote"
+          aria-live="polite"
+          aria-label={`Click to upvote on feedback with title ${title}. Current vote count is ${upvotes}`}
+          tabIndex={0}
+          disabled={!isMainItem || !showVoteButton || showVotedAnimation}
+          className={classNames(
+            "feedback-action-button",
+            "feedback-add-vote",
+            { voteAnimation: showVotedAnimation }
+          )}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.setState({ showVotedAnimation: true });
+            this.onVote(this.props.id).then(() => this.props.onVoteCasted());
+          }}
+          onAnimationEnd={() => {
+            this.setState({ showVotedAnimation: false });
+          }}
+        >
+          <i className="fas fa-arrow-circle-up" /> {/* Font Awesome Upvote Icon */}
+          <span className="feedback-upvote-count">{upvotes.toString()}</span>
+        </button>
+
+        {/* Downvote Button */}
+        <button
+          title="Downvote"
+          aria-live="polite"
+          aria-label={`Click to downvote on feedback with title ${title}. Current vote count is ${downvotes}`}
+          tabIndex={0}
+          disabled={!isMainItem || !showVoteButton || showVotedAnimation}
+          className={classNames(
+            "feedback-action-button",
+            "feedback-remove-vote",
+            { voteAnimation: showVotedAnimation }
+          )}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.setState({ showVotedAnimation: true });
+            this.onDownvote(this.props.id).then(() => this.props.onVoteCasted());
+          }}
+          onAnimationEnd={() => {
+            this.setState({ showVotedAnimation: false });
+          }}
+        >
+          <i className="fas fa-arrow-circle-down" /> {/* Font Awesome Downvote Icon */}
+          <span className="feedback-downvote-count">{downvotes.toString()}</span>
+        </button>
+      </div>
+    );
+  }
+
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
     const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
@@ -661,55 +722,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </button>
                 }
                 {showVotes && this.props.isInteractable &&
-                  // Using standard button tag here due to no onAnimationEnd support in fabricUI
-                  <button
-                    title="Vote"
-                    aria-live="polite"
-                    aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-                    tabIndex={0}
-                    disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-                    className={classNames(
-                      "feedback-action-button",
-                      "feedback-add-vote",
-                      { voteAnimation: this.state.showVotedAnimation }
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id).then(() => this.props.onVoteCasted());
-                    }}
-                    onAnimationEnd={() => {
-                      this.setState({ showVotedAnimation: false });
-                    }}>
-                    <i className="fas fa-arrow-circle-up" />
-                    <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
-                  </button>
-                }
-                {showVotes && this.props.isInteractable &&
-                  // Using standard button tag here due to no onAnimationEnd support in fabricUI
-                  <button
-                    title="UnVote"
-                    aria-live="polite"
-                    aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-                    tabIndex={0}
-                    disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-                    className={classNames(
-                      "feedback-action-button",
-                      "feedback-add-vote",
-                      { voteAnimation: this.state.showVotedAnimation }
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
-                    }}
-                    onAnimationEnd={() => {
-                      this.setState({ showVotedAnimation: false });
-                    }}>
-                    <i className="fas fa-arrow-circle-down" />
-                  </button>
+                  this.renderVoteButtons(isMainItem, showVoteButton)
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
@@ -839,7 +852,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   {childrenIds.map((id: string) => {
                     const childCard: IColumnItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
                     const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
-
                     return childCard &&
                       <li key={id}>
                         <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}><i className="fa-solid fa-quote-left" /></span>
