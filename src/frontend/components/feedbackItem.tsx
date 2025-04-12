@@ -663,7 +663,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const curTimerState = this.props.timerState;
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
-/*   alternatively ask about passing childrenIds and calcuating like this is methods */
+    // total votes for grouped cards
     const totalVotes = this.props.upvotes + childrenIds.reduce((sum, id) => {
       const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
       return sum + (childCard?.feedbackItem.upvotes || 0);
