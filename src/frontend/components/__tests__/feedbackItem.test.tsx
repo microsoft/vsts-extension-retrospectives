@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import FeedbackItem, { IFeedbackItemProps } from '../feedbackItem';
 import FeedbackColumn from '../feedbackColumn';
 import EditableDocumentCardTitle from '../editableDocumentCardTitle';
@@ -32,8 +32,8 @@ describe('Feedback Item', () => {
     const testProps = FeedbackColumn.createFeedbackItemProps(
       testColumnProps, testColumnItem, true);
 
-    const wrapper = shallow(<FeedbackItem {...testProps} />);
-    const component = wrapper.children().dive();
+    const wrapper = mount(<FeedbackItem {...testProps} />);
+    const component = wrapper;
 
     // Expect all child Dialogs to be hidden.
     const childDialogs = component.find(Dialog);

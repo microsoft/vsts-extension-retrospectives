@@ -609,7 +609,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           }}
         >
           <i className="fas fa-arrow-circle-up" /> {/* Font Awesome Upvote Icon */}
-          <span className="feedback-upvote-count">{upvotes.toString()}</span>
+          <span className="feedback-upvote-count"> {upvotes.toString()}</span>
         </button>
 
         {/* Downvote Button */}
