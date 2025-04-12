@@ -580,54 +580,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
-  private renderGroupExpandFocusButton(isGroupedCarouselItem: boolean, isMainItem: boolean, showAddActionItem: boolean, isFocusModalHidden: boolean, groupItemsCount: number): JSX.Element | null {
-    return (
-      <button
-        className="feedback-expand-group-focus"
-        aria-live="polite"
-        aria-label={
-          this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded
-            ? `Expand Feedback Group button. Group has ${groupItemsCount} items.`
-            : `Collapse Feedback Group button. Group has ${groupItemsCount} items.`
-        }
-        onClick={(e) => {
-          e.stopPropagation();
-          this.toggleShowGroupedChildrenTitles();
-        }}>
-        <i className={classNames("fa", {
-          "fa-angle-double-down": this.state.isShowingGroupedChildrenTitles,
-          "fa-angle-double-right": !this.state.isShowingGroupedChildrenTitles,
-        })} />
-        &nbsp;
-        {this.props.groupCount + 1} Items <i className="far fa-comments" />
-      </button>
-    );
-  }
-
-  private renderGroupExpandButton(isMainItem: boolean, groupItemsCount: number, isFocusModalHidden: boolean): JSX.Element | null {
-    return (
-      <button
-        className="feedback-expand-group"
-        aria-live="polite"
-        aria-label={
-          this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded
-            ? `Expand Feedback Group button. Group has ${groupItemsCount} items.`
-            : `Collapse Feedback Group button. Group has ${groupItemsCount} items.`
-        }
-        style={{ color: this.props.accentColor }}
-        onClick={(e) => {
-          e.stopPropagation();
-          this.props.groupedItemProps.toggleGroupExpand();
-        }}>
-        <i className={classNames("fa", {
-          "fa-chevron-down": this.props.groupedItemProps.isGroupExpanded,
-          "fa-chevron-right": !this.props.groupedItemProps.isGroupExpanded,
-        })} />
-        {groupItemsCount} Items
-      </button>
-    );
-  }
-
   private renderGroupButton(groupItemsCount: number, isFocusButton: boolean): JSX.Element | null {
     return (
       <button
@@ -697,6 +649,54 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
+  private getTotalVotes(): number {
+    if (!this.props.groupedItemProps) {
+      // If the card is not grouped, return its individual vote count.
+      return this.props.upvotes;
+    }
+    // Aggregate votes for all items in the group.
+    const groupedVotes = this.props.groupedItemProps.groupedItems.reduce((total, item) => {
+      return total + item.upvotes;
+    }, 0);
+    return groupedVotes;
+  }
+
+  private renderTotalVoteActionButton(isMainItem: boolean, showVoteButton: boolean, isUpvote: boolean) {
+    const totalVotes = this.getTotalVotes(); // Get the total vote count.
+    const buttonTitle = isUpvote ? "Vote" : "UnVote";
+    const buttonAriaLabel = isUpvote
+      ? `Click to vote on feedback with title ${this.props.title}. Current total vote count is ${totalVotes}`
+      : `Click to unvote on feedback with title ${this.props.title}. Current total vote count is ${totalVotes}`;
+    const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
+    return (
+      <button
+        title={buttonTitle}
+        aria-live="polite"
+        aria-label={buttonAriaLabel}
+        tabIndex={0}
+        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+        className={classNames(
+          "feedback-action-button",
+          "feedback-add-vote",
+          { voteAnimation: this.state.showVotedAnimation }
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.setState({ showVotedAnimation: true });
+          this.onVote(this.props.id, !isUpvote).then(() => this.props.onVoteCasted());
+        }}
+        onAnimationEnd={() => {
+          this.setState({ showVotedAnimation: false });
+        }}>
+        <i className={buttonIconClass} />
+        {isUpvote && (
+          <span className="feedback-upvote-count"> {totalVotes.toString()}</span>
+        )}
+      </button>
+    );
+  }
+
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
     const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
@@ -754,11 +754,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderVoteActionButton(isMainItem, showVoteButton, true) // For voting
+                  this.renderTotalVoteActionButton(isMainItem, showVoteButton, true) // For voting
                 }
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderVoteActionButton(isMainItem, showVoteButton, false) // For unvoting
+                  this.renderTotalVoteActionButton(isMainItem, showVoteButton, false) // For unvoting
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
