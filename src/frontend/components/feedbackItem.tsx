@@ -32,7 +32,6 @@ export interface IFeedbackItemProps {
   createdDate: string;
   lastEditedDate: string;
   upvotes: number;
-  downvotes: number;
   accentColor: string;
   iconClass: string;
   workflowPhase: WorkflowPhase;
@@ -63,8 +62,6 @@ export interface IFeedbackItemProps {
   isShowingGroupedChildrenTitles: boolean;
   isFocusModalHidden: boolean;
   onVoteCasted: () => void;
-  showVoteButton: boolean;
-  isMainItem: boolean;
 
   addFeedbackItems: (
     columnId: string,
@@ -583,8 +580,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
-  private renderVoteButtons() {
-    const { upvotes, downvotes, showVoteButton, isMainItem, title } = this.props;
+  private renderVoteButtons(isMainItem: boolean, showVoteButton: boolean) {
+    const { upvotes, title } = this.props;
     const { showVotedAnimation } = this.state;
 
     return (
@@ -593,13 +590,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         <button
           title="Vote"
           aria-live="polite"
-          aria-label={`Click to upvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
+          aria-label={`Click to upvote on feedback with title ${title}. Current vote count is ${upvotes}`}
           tabIndex={0}
-          disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+          disabled={!isMainItem || !showVoteButton || showVotedAnimation}
           className={classNames(
             "feedback-action-button",
             "feedback-add-vote",
-            { voteAnimation: this.state.showVotedAnimation }
+            { voteAnimation: showVotedAnimation }
           )}
           onClick={(e) => {
             e.preventDefault();
@@ -612,20 +609,20 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           }}
         >
           <i className="fas fa-arrow-circle-up" /> {/* Font Awesome Upvote Icon */}
-          <span className="feedback-upvote-count">{this.props.upvotes.toString()}</span>
+          <span className="feedback-upvote-count">{upvotes.toString()}</span>
         </button>
 
         {/* Downvote Button */}
         <button
           title="Unvote"
           aria-live="polite"
-          aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
+          aria-label={`Click to unvote on feedback with title ${title}. Current vote count is ${upvotes}`}
           tabIndex={0}
-          disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+          disabled={!isMainItem || !showVoteButton || showVotedAnimation}
           className={classNames(
             "feedback-action-button",
             "feedback-add-vote",
-            { voteAnimation: this.state.showVotedAnimation }
+            { voteAnimation: showVotedAnimation }
           )}
           onClick={(e) => {
             e.preventDefault();
@@ -724,8 +721,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </button>
                 }
                 {showVotes && this.props.isInteractable &&
-                  /*this.renderVoteButtons(isMainItem, showVoteButton)*/
-                  this.renderVoteButtons()
+                  this.renderVoteButtons(isMainItem, showVoteButton)
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
