@@ -814,8 +814,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
                 {showVoteButton && this.props.isInteractable &&
                   <div>
-                    <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
-                    {/*<span className="feedback-yourvote-count"> {what's the right logic ? `[Your Votes: ${this.state.userVotes}]` : `[Your Votes: expand card for your votes]`} </span>*/}
+                    {/*<span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>*/}
+                    <span className="feedback-yourvote-count"> 
+                      {isNotGroupedItem ? `[Your Votes: ${this.state.userVotes}]` : `[expand items for your votes]`}
+                    </span>
                   </div>
                 }
               </div>
