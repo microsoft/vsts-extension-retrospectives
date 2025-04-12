@@ -35,6 +35,12 @@ describe('Feedback Item', () => {
     const wrapper = mount(<FeedbackItem {...testProps} />);
     const component = wrapper;
 
+console.log("Dialog count:", childDialogs.length);
+console.log("Dialog list:");
+childDialogs.forEach((dialog, idx) => {
+  console.log(`  #${idx}:`, dialog.debug());
+});
+
     // Expect all child Dialogs to be hidden.
     const childDialogs = component.find(Dialog);
     expect(childDialogs).toHaveLength(childDialogCount);
