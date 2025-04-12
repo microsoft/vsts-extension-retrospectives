@@ -596,8 +596,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         onClick={(e) => {
           e.stopPropagation();
           this.toggleShowGroupedChildrenTitles();
-        }}
-      >
+        }}>
         <i className={classNames("fa", {
           "fa-angle-double-down": this.state.isShowingGroupedChildrenTitles,
           "fa-angle-double-right": !this.state.isShowingGroupedChildrenTitles,
@@ -626,8 +625,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         onClick={(e) => {
           e.stopPropagation();
           this.props.groupedItemProps.toggleGroupExpand();
-        }}
-      >
+        }}>
         <i className={classNames("fa", {
           "fa-chevron-down": this.props.groupedItemProps.isGroupExpanded,
           "fa-chevron-right": !this.props.groupedItemProps.isGroupExpanded,
@@ -635,7 +633,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         {groupItemsCount} Items
       </button>
     );
-  }  
+  }
 
   private renderVoteButton(isMainItem: boolean, showVoteButton: boolean) {
     // Using standard button tag here due to no onAnimationEnd support in fabricUI
