@@ -711,11 +711,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderVoteActionButton(isMainItem, showVoteButton, totalVotes, true) // For voting
+                  this.renderVoteActionButton(isMainItem, showVoteButton, totalVotes, true) // render voting button
                 }
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderVoteActionButton(isMainItem, showVoteButton, totalVotes, false) // For unvoting
+                  this.renderVoteActionButton(isMainItem, showVoteButton, totalVotes, false) // render unvoting button
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
@@ -816,7 +816,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   <div>
                     {/*<span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>*/}
                     <span className="feedback-yourvote-count">
-                      {!isFocusModalHidden ? `[Your Votes: ${this.state.userVotes}]` : `[Your Votes: expand card for your votes]`}
+                      {isFocusModalHidden ? `[Your Votes: ${this.state.userVotes}]` : `[Your Votes: expand card for your votes]`}
                     </span>
                   </div>
                 }
