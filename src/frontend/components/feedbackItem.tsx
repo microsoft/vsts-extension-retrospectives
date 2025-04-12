@@ -692,6 +692,42 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
+  private renderVoteActionButton(isMainItem: boolean, showVoteButton: boolean, isUpvote: boolean) {
+    const buttonTitle = isUpvote ? "Vote" : "UnVote";
+    const buttonAriaLabel = isUpvote 
+      ? `Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`
+      : `Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`;
+    const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
+    return (
+      <button
+        title={buttonTitle}
+        aria-live="polite"
+        aria-label={buttonAriaLabel}
+        tabIndex={0}
+        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+        className={classNames(
+          "feedback-action-button",
+          "feedback-add-vote",
+          { voteAnimation: this.state.showVotedAnimation }
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.setState({ showVotedAnimation: true });
+          this.onVote(this.props.id, !isUpvote).then(() => this.props.onVoteCasted());
+        }}
+        onAnimationEnd={() => {
+          this.setState({ showVotedAnimation: false });
+        }}
+      >
+        <i className={buttonIconClass} />
+        {isUpvote && (
+          <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
+        )}
+      </button>
+    );
+  }
+
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
     const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
@@ -745,10 +781,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   this.renderGroupExpandButton(isMainItem, groupItemsCount, isFocusModalHidden)
                 }
                 {showVotes && this.props.isInteractable &&
-                  this.renderVoteButton(isMainItem, showVoteButton)
+                  this.renderVoteActionButton(isMainItem, showVoteButton, true) // For voting
                 }
                 {showVotes && this.props.isInteractable &&
-                  this.renderUnvoteButton(isMainItem, showVoteButton)
+                  this.renderVoteActionButton(isMainItem, showVoteButton, false) // For unvoting
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
