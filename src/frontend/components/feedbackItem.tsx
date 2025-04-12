@@ -583,7 +583,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
-  private readonly renderVoteButtons() {
+  private renderVoteButtons() {
     const { upvotes, downvotes, showVoteButton, isMainItem, title } = this.props;
     const { showVotedAnimation } = this.state;
 
