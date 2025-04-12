@@ -88,7 +88,6 @@ export interface IGroupedFeedbackItemProps {
   isGroupExpanded: boolean;
   isMainItem: boolean;
   parentItemId: string;
-  groupedItems: IFeedbackItemProps[]; //DPH added for summing totals
 
   setIsGroupBeingDragged: (isBeingDragged: boolean) => void;
   toggleGroupExpand: () => void;
@@ -615,56 +614,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
-  private renderVoteActionButton(isMainItem: boolean, showVoteButton: boolean, isUpvote: boolean) {
+  private renderVoteActionButton(isMainItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
     const buttonTitle = isUpvote ? "Vote" : "UnVote";
     const buttonAriaLabel = isUpvote
       ? `Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`
       : `Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`;
-    const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
-    return (
-      <button
-        title={buttonTitle}
-        aria-live="polite"
-        aria-label={buttonAriaLabel}
-        tabIndex={0}
-        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-        className={classNames(
-          "feedback-action-button",
-          "feedback-add-vote",
-          { voteAnimation: this.state.showVotedAnimation }
-        )}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.setState({ showVotedAnimation: true });
-          this.onVote(this.props.id, !isUpvote).then(() => this.props.onVoteCasted());
-        }}
-        onAnimationEnd={() => {
-          this.setState({ showVotedAnimation: false });
-        }}>
-        <i className={buttonIconClass} />
-        {isUpvote && (
-          <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
-        )}
-      </button>
-    );
-  }
-
-  private getTotalVotes(): number {
-    if (!this.props.groupedItemProps || !this.props.groupedItemProps.groupedItems) {
-      // If the card is not grouped, return its individual vote count.
-      return this.props.upvotes;
-    }
-    // Aggregate votes for all items in the group.
-    return this.props.groupedItemProps.groupedItems.reduce((total, item) => total + item.upvotes, 0);
-  }
-
-  private renderTotalVoteActionButton(isMainItem: boolean, showVoteButton: boolean, isUpvote: boolean) {
-    const totalVotes = this.getTotalVotes(); // Get the aggregated total votes
-    const buttonTitle = isUpvote ? "Vote" : "UnVote";
-    const buttonAriaLabel = isUpvote
-      ? `Click to vote on feedback with title ${this.props.title}. Current total vote count is ${totalVotes}`
-      : `Click to unvote on feedback with title ${this.props.title}. Current total vote count is ${totalVotes}`;
     const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
     return (
       <button
@@ -709,13 +663,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const curTimerState = this.props.timerState;
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
-/* try using this solution, if current approach doesn't work; ask about passing to method
-   alternatively ask about passing childrenIds and calcuating like this is methods
+/*   alternatively ask about passing childrenIds and calcuating like this is methods */
     const totalVotes = this.props.upvotes + childrenIds.reduce((sum, id) => {
       const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
       return sum + (childCard?.feedbackItem.upvotes || 0);
     }, 0);
-*/
+
     return (
       <div
         ref={this.itemElementRef}
@@ -758,11 +711,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderTotalVoteActionButton(isMainItem, showVoteButton, true) // For voting
+                  this.renderVoteActionButton(isMainItem, showVoteButton, totalVotes, true) // For voting
                 }
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderTotalVoteActionButton(isMainItem, showVoteButton, false) // For unvoting
+                  this.renderVoteActionButton(isMainItem, showVoteButton, totalVotes, false) // For unvoting
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
