@@ -605,7 +605,7 @@ private renderVoteButton(isMainItem: boolean, showVoteButton: boolean) {
       }}
     >
       <i className="fas fa-arrow-circle-up" />
-      <span className="feedback-upvote-count">{this.props.upvotes.toString()}</span>
+      <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
     </button>
   );
 }
