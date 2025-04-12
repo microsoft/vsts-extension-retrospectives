@@ -610,6 +610,35 @@ private renderVoteButton(isMainItem: boolean, showVoteButton: boolean) {
   );
 }
 
+private renderUnvoteButton(isMainItem: boolean, showVoteButton: boolean) {
+  // Using standard button tag here due to no onAnimationEnd support in fabricUI
+  return (
+    <button
+      title="UnVote"
+      aria-live="polite"
+      aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
+      tabIndex={0}
+      disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+      className={classNames(
+        "feedback-action-button",
+        "feedback-add-vote",
+        { voteAnimation: this.state.showVotedAnimation }
+      )}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.setState({ showVotedAnimation: true });
+        this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
+      }}
+      onAnimationEnd={() => {
+        this.setState({ showVotedAnimation: false });
+      }}>
+      <i className="fas fa-arrow-circle-down" />
+    </button>
+  );
+}
+
+
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
     const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
@@ -694,29 +723,7 @@ private renderVoteButton(isMainItem: boolean, showVoteButton: boolean) {
                   this.renderVoteButton(isMainItem, showVoteButton)
                 }
                 {showVotes && this.props.isInteractable &&
-                  // Using standard button tag here due to no onAnimationEnd support in fabricUI
-                  <button
-                    title="UnVote"
-                    aria-live="polite"
-                    aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-                    tabIndex={0}
-                    disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-                    className={classNames(
-                      "feedback-action-button",
-                      "feedback-add-vote",
-                      { voteAnimation: this.state.showVotedAnimation }
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
-                    }}
-                    onAnimationEnd={() => {
-                      this.setState({ showVotedAnimation: false });
-                    }}>
-                    <i className="fas fa-arrow-circle-down" />
-                  </button>
+                  this.renderUnvoteButton(isMainItem, showVoteButton)
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
