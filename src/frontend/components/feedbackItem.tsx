@@ -88,6 +88,7 @@ export interface IGroupedFeedbackItemProps {
   isGroupExpanded: boolean;
   isMainItem: boolean;
   parentItemId: string;
+  groupedItems: IFeedbackItemProps[]; //DPH added for summing totals
 
   setIsGroupBeingDragged: (isBeingDragged: boolean) => void;
   toggleGroupExpand: () => void;
@@ -650,19 +651,16 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   private getTotalVotes(): number {
-    if (!this.props.groupedItemProps) {
+    if (!this.props.groupedItemProps || !this.props.groupedItemProps.groupedItems) {
       // If the card is not grouped, return its individual vote count.
       return this.props.upvotes;
     }
     // Aggregate votes for all items in the group.
-    const groupedVotes = this.props.groupedItemProps.groupedItems.reduce((total, item) => {
-      return total + item.upvotes;
-    }, 0);
-    return groupedVotes;
+    return this.props.groupedItemProps.groupedItems.reduce((total, item) => total + item.upvotes, 0);
   }
 
   private renderTotalVoteActionButton(isMainItem: boolean, showVoteButton: boolean, isUpvote: boolean) {
-    const totalVotes = this.getTotalVotes(); // Get the total vote count.
+    const totalVotes = this.getTotalVotes(); // Get the aggregated total votes
     const buttonTitle = isUpvote ? "Vote" : "UnVote";
     const buttonAriaLabel = isUpvote
       ? `Click to vote on feedback with title ${this.props.title}. Current total vote count is ${totalVotes}`
@@ -711,7 +709,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const curTimerState = this.props.timerState;
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
-
+/* try using this solution, if current approach doesn't work; ask about passing to method
+   alternatively ask about passing childrenIds and calcuating like this is methods
+    const totalVotes = this.props.upvotes + childrenIds.reduce((sum, id) => {
+      const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
+      return sum + (childCard?.feedbackItem.upvotes || 0);
+    }, 0);
+*/
     return (
       <div
         ref={this.itemElementRef}
