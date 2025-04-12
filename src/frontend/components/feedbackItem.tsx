@@ -32,6 +32,7 @@ export interface IFeedbackItemProps {
   createdDate: string;
   lastEditedDate: string;
   upvotes: number;
+  downvotes: number;
   accentColor: string;
   iconClass: string;
   workflowPhase: WorkflowPhase;
@@ -62,6 +63,8 @@ export interface IFeedbackItemProps {
   isShowingGroupedChildrenTitles: boolean;
   isFocusModalHidden: boolean;
   onVoteCasted: () => void;
+  showVoteButton: boolean;
+  isMainItem: boolean;
 
   addFeedbackItems: (
     columnId: string,
@@ -580,7 +583,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
-  renderVoteButtons() {
+  private readonly renderVoteButtons() {
     const { upvotes, downvotes, showVoteButton, isMainItem, title } = this.props;
     const { showVotedAnimation } = this.state;
 
