@@ -608,6 +608,35 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
+  // This controls the top level feedback item in a group in the vote phase and outside the focus mode
+  private renderGroupExpandButton(isMainItem: boolean, groupItemsCount: number, isFocusModalHidden: boolean): JSX.Element | null {
+    if (!isMainItem || this.props.groupCount <= 0 || !isFocusModalHidden) {
+      return null;
+    }
+    return (
+      <button
+        className="feedback-expand-group"
+        aria-live="polite"
+        aria-label={
+          this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded
+            ? `Expand Feedback Group button. Group has ${groupItemsCount} items.`
+            : `Collapse Feedback Group button. Group has ${groupItemsCount} items.`
+        }
+        style={{ color: this.props.accentColor }}
+        onClick={(e) => {
+          e.stopPropagation();
+          this.props.groupedItemProps.toggleGroupExpand();
+        }}
+      >
+        <i className={classNames("fa", {
+          "fa-chevron-down": this.props.groupedItemProps.isGroupExpanded,
+          "fa-chevron-right": !this.props.groupedItemProps.isGroupExpanded,
+        })} />
+        {groupItemsCount} Items
+      </button>
+    );
+  }  
+
   private renderVoteButton(isMainItem: boolean, showVoteButton: boolean) {
     // Using standard button tag here due to no onAnimationEnd support in fabricUI
     return (
@@ -715,22 +744,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   this.renderGroupExpandFocusButton(isGroupedCarouselItem, isMainItem, showAddActionItem, isFocusModalHidden, groupItemsCount)
                 }
                 {
-                  // This controls the top level feedback item in a group in the vote phase and outside the focus mode
-                  !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
-                  <button className="feedback-expand-group"
-                    aria-live="polite"
-                    aria-label={this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded ? "Expand Feedback Group button. Group has " + groupItemsCount + " items." : "Collapse Feedback Group button. Group has " + groupItemsCount + " items."}
-                    style={{ color: this.props.accentColor }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      this.props.groupedItemProps.toggleGroupExpand();
-                    }}>
-                    <i className={classNames("fa", {
-                      "fa-chevron-down": this.props.groupedItemProps.isGroupExpanded,
-                      "fa-chevron-right": !this.props.groupedItemProps.isGroupExpanded
-                    })} />
-                    {groupItemsCount} Items
-                  </button>
+                  this.renderGroupExpandButton(isMainItem, groupItemsCount, isFocusModalHidden)
                 }
                 {showVotes && this.props.isInteractable &&
                   this.renderVoteButton(isMainItem, showVoteButton)
