@@ -580,6 +580,36 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
+private renderVoteButton(isMainItem: boolean, showVoteButton: boolean) {
+  // Using standard button tag here due to no onAnimationEnd support in fabricUI
+  return (
+    <button
+      title="Vote"
+      aria-live="polite"
+      aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
+      tabIndex={0}
+      disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+      className={classNames(
+        "feedback-action-button",
+        "feedback-add-vote",
+        { voteAnimation: this.state.showVotedAnimation }
+      )}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.setState({ showVotedAnimation: true });
+        this.onVote(this.props.id).then(() => this.props.onVoteCasted());
+      }}
+      onAnimationEnd={() => {
+        this.setState({ showVotedAnimation: false });
+      }}
+    >
+      <i className="fas fa-arrow-circle-up" />
+      <span className="feedback-upvote-count">{this.props.upvotes.toString()}</span>
+    </button>
+  );
+}
+
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
     const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
@@ -661,30 +691,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </button>
                 }
                 {showVotes && this.props.isInteractable &&
-                  // Using standard button tag here due to no onAnimationEnd support in fabricUI
-                  <button
-                    title="Vote"
-                    aria-live="polite"
-                    aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-                    tabIndex={0}
-                    disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-                    className={classNames(
-                      "feedback-action-button",
-                      "feedback-add-vote",
-                      { voteAnimation: this.state.showVotedAnimation }
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id).then(() => this.props.onVoteCasted());
-                    }}
-                    onAnimationEnd={() => {
-                      this.setState({ showVotedAnimation: false });
-                    }}>
-                    <i className="fas fa-arrow-circle-up" />
-                    <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
-                  </button>
+                  this.renderVoteButton(isMainItem, showVoteButton)
                 }
                 {showVotes && this.props.isInteractable &&
                   // Using standard button tag here due to no onAnimationEnd support in fabricUI
