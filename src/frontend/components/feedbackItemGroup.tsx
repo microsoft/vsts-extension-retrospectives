@@ -10,6 +10,7 @@ export interface IFeedbackItemGroupProps {
   groupedWorkItems: IFeedbackItemProps[];
   mainFeedbackItem: IFeedbackItemProps;
   workflowState: WorkflowPhase;
+  yourVotes: number; // DPH Add aggregated "Your Votes" for the group
 }
 
 export interface RetrospectiveItemGroupState {

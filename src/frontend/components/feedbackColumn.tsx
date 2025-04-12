@@ -14,6 +14,8 @@ import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { appInsights, TelemetryEvents } from '../utilities/telemetryClient';
 
+import { IFeedbackItemGroupProps } from './feedbackItemGroup';
+
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
   columnIds: string[];
@@ -37,6 +39,7 @@ export interface FeedbackColumnProps {
   hideFeedbackItems: boolean;
   groupIds: string[];
   onVoteCasted: () => void;
+  userIdRef: string; // DPH Add this property, good luck
 
   addFeedbackItems: (
     columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
@@ -203,50 +206,43 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     }
   }
 
-  private readonly renderFeedbackItems = () => {
-    let columnItems: IColumnItem[] = this.props.columnItems || [];
+  const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({
+      mainFeedbackItem,
+      groupedWorkItems,
+      workflowState,
+      yourVotes
+  }) => {
+      const isGroupCollapsed = /* Logic to check if the group is collapsed */;
 
-     // Order by created date with newest first by default
-     columnItems = columnItems.sort((item1, item2) =>
-      (new Date(item2.feedbackItem.createdDate).getTime()) - (new Date(item1.feedbackItem.createdDate).getTime())
-    );
+      return (
+          <div>
+              {isGroupCollapsed 
+                  ? `Your Votes: ${yourVotes}` // Total "Your Votes" when collapsed
+                  : groupedWorkItems.map((item) => (
+                      <div key={item.id}>Your Votes for {item.title}: {item.userVotes}</div>
+                    ))}
+          </div>
+      );
+  };  
 
-    // Order by number of votes if Act column, retaining default order by created date for tied vote counts
-    if (this.props.workflowPhase === WorkflowPhase.Act) {
-      columnItems = columnItems.sort((item1, item2) => item2.feedbackItem.upvotes - item1.feedbackItem.upvotes);
-    }
+  private calculateYourTotalVotes(columnItem: IColumnItem): number {
+    // Get the user's ID from props or context
+    const currentUserId = this.props.userIdRef;
 
-    return columnItems
-      .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
-      .map((columnItem) => {
-        const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem, true);
+    // Calculate votes for all child feedback items
+    const childVotes = (columnItem.feedbackItem.childFeedbackItemIds || []).reduce((sum, childId) => {
+        const childItem = this.props.columnItems?.find((child) => child.feedbackItem.id === childId);
+        const userVotes = childItem?.feedbackItem.voteCollection[currentUserId] || 0; // Get the user's vote count
+        return sum + userVotes;
+    }, 0);
 
-        if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
-          const childItemsToGroup = this.props.columnItems
-            .filter((childColumnItem) => columnItem.feedbackItem.childFeedbackItemIds.some((childId) => childId === childColumnItem.feedbackItem.id))
-            .map((childColumnItem) => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem, true));
+    // Add votes for the parent feedback item
+    const parentVotes = columnItem.feedbackItem.voteCollection[currentUserId] || 0;
 
-          return (
-            <FeedbackItemGroup
-              key={feedbackItemProps.id}
-              mainFeedbackItem={feedbackItemProps}
-              groupedWorkItems={childItemsToGroup}
-              workflowState={this.props.workflowPhase}
-            />
-          );
-        }
-        else {
-          return (
-            <FeedbackItem
-              key={feedbackItemProps.id}
-              {...feedbackItemProps}
-            />
-          );
-        }
-      });
+    return parentVotes + childVotes;
   }
 
-  private readonly newRenderFeedbackItems = () => {
+  private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
     // Helper function to calculate the total votes for a feedback item (including grouped children)
@@ -297,12 +293,13 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
                     );
 
                 return (
-                    <FeedbackItemGroup
-                        key={feedbackItemProps.id}
-                        mainFeedbackItem={feedbackItemProps}
-                        groupedWorkItems={childItemsToGroup}
-                        workflowState={this.props.workflowPhase}
-                    />
+                  <FeedbackItemGroup
+                      key={feedbackItemProps.id}
+                      mainFeedbackItem={feedbackItemProps}
+                      groupedWorkItems={childItemsToGroup}
+                      workflowState={this.props.workflowPhase}
+                      yourVotes={this.calculateYourTotalVotes(columnItem)} // Pass total "Your Votes"
+                  />
                 );
             } else {
                 return <FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />;
@@ -340,7 +337,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           }
           {this.props.isDataLoaded &&
             <div className={classNames('feedback-items-container', { 'feedback-items-actions': this.props.workflowPhase === WorkflowPhase.Act })}>
-              {this.newRenderFeedbackItems()}
+              {this.renderFeedbackItems()}
             </div>
           }
         </div>
