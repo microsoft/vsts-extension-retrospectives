@@ -223,6 +223,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()
     );
 
+    // DPH try to extend this for Focus Mode
     // Order by grouped total votes if Act workflow, retaining the default created date order for tied votes
     if (this.props.workflowPhase === WorkflowPhase.Act) {
         columnItems = columnItems.sort((item1, item2) => {

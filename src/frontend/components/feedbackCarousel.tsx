@@ -21,6 +21,52 @@ export interface IFeedbackCarouselState {
 }
 
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
+  // Helper method to calculate totalVotes for a feedback item
+  private calculateTotalVotes = (feedbackItem: IColumnItem, feedbackColumnProps: FeedbackColumnProps): number => {
+    const childrenIds = feedbackItem.feedbackItem.childFeedbackItemIds || [];
+
+    // Compute total votes: parent votes + child votes
+    return (feedbackItem.feedbackItem.upvotes || 0) + childrenIds.reduce((sum, id) => {
+      const childCard = feedbackColumnProps.columnItems.find((c) => c.feedbackItem.id === id);
+      return sum + (childCard?.feedbackItem.upvotes || 0);
+    }, 0);
+  };
+
+  // Render carousel items with totalVotes-based sorting
+  private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
+    const columnItems = feedbackColumnProps.columnItems
+      // Sort items based on their total votes
+      .sort((item1, item2) => {
+        const totalVotes1 = this.calculateTotalVotes(item1, feedbackColumnProps);
+        const totalVotes2 = this.calculateTotalVotes(item2, feedbackColumnProps);
+
+        return totalVotes2 - totalVotes1; // Descending order of total votes
+      });
+
+    return columnItems
+      // Carousel only shows main item cards.
+      .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
+      .map((columnItem) => {
+        const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);
+        const isFocusModalHidden = this.props.isFocusModalHidden;
+
+        feedbackItemProps.isGroupedCarouselItem = !isFocusModalHidden && columnItem.feedbackItem.childFeedbackItemIds
+          ? (columnItem.feedbackItem.childFeedbackItemIds.length > 0)
+          : false;
+        feedbackItemProps.isFocusModalHidden = isFocusModalHidden;
+
+        return (
+          <div key={feedbackItemProps.id} className="feedback-carousel-item">
+            <FeedbackItem
+              key={feedbackItemProps.id}
+              {...feedbackItemProps}
+            />
+          </div>
+        );
+      });
+  };
+
+/*
   private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
     const columnItems = feedbackColumnProps.columnItems.sort((item1, item2) => item2.feedbackItem.upvotes - item1.feedbackItem.upvotes);
 
@@ -46,6 +92,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         );
       });
   }
+*/
 
   private renderSingleFeedbackCarouselItem = (feedbackColumnProps: FeedbackColumnProps) => {
     return (
