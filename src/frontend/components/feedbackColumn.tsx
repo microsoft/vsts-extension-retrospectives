@@ -39,7 +39,6 @@ export interface FeedbackColumnProps {
   hideFeedbackItems: boolean;
   groupIds: string[];
   onVoteCasted: () => void;
-  userIdRef: string; // DPH Add this property, good luck
 
   addFeedbackItems: (
     columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean,
@@ -205,27 +204,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       isFocusModalHidden: true
     }
   }
-
-  //DPH not sure what original working state was
-  const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({
-    mainFeedbackItem,
-    groupedWorkItems,
-    workflowState
-}) => {
-    const isGroupCollapsed = /* Logic to check if the group is collapsed */;
-
-    return (
-        <div>
-            {isGroupCollapsed 
-                ? <div>{mainFeedbackItem.title}</div> // Show the main item title when collapsed
-                : groupedWorkItems.map((item) => (
-                    <div key={item.id}>
-                        <div>{item.title}</div> // Display child item titles when expanded
-                    </div>
-                ))}
-        </div>
-    );
-};
 
   private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
