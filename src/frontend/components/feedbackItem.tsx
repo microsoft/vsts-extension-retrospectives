@@ -638,7 +638,6 @@ private renderUnvoteButton(isMainItem: boolean, showVoteButton: boolean) {
   );
 }
 
-
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
     const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
