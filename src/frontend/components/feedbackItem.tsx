@@ -580,63 +580,90 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
-private renderVoteButton(isMainItem: boolean, showVoteButton: boolean) {
-  // Using standard button tag here due to no onAnimationEnd support in fabricUI
-  return (
-    <button
-      title="Vote"
-      aria-live="polite"
-      aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-      tabIndex={0}
-      disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-      className={classNames(
-        "feedback-action-button",
-        "feedback-add-vote",
-        { voteAnimation: this.state.showVotedAnimation }
-      )}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.setState({ showVotedAnimation: true });
-        this.onVote(this.props.id).then(() => this.props.onVoteCasted());
-      }}
-      onAnimationEnd={() => {
-        this.setState({ showVotedAnimation: false });
-      }}
-    >
-      <i className="fas fa-arrow-circle-up" />
-      <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
-    </button>
-  );
-}
+  private renderGroupExpandFocusButton(isGroupedCarouselItem: boolean, isMainItem: boolean, showAddActionItem: boolean, isFocusModalHidden: boolean, groupItemsCount: number): JSX.Element | null {
+    if (!(isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden)) {
+      return null;
+    }
+    return (
+      <button
+        className="feedback-expand-group-focus"
+        aria-live="polite"
+        aria-label={
+          this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded
+            ? `Expand Feedback Group button. Group has ${groupItemsCount} items.`
+            : `Collapse Feedback Group button. Group has ${groupItemsCount} items.`
+        }
+        onClick={(e) => {
+          e.stopPropagation();
+          this.toggleShowGroupedChildrenTitles();
+        }}
+      >
+        <i className={classNames("fa", {
+          "fa-angle-double-down": this.state.isShowingGroupedChildrenTitles,
+          "fa-angle-double-right": !this.state.isShowingGroupedChildrenTitles,
+        })} />
+        &nbsp;
+        {this.props.groupCount + 1} Items <i className="far fa-comments" />
+      </button>
+    );
+  }
 
-private renderUnvoteButton(isMainItem: boolean, showVoteButton: boolean) {
-  // Using standard button tag here due to no onAnimationEnd support in fabricUI
-  return (
-    <button
-      title="UnVote"
-      aria-live="polite"
-      aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-      tabIndex={0}
-      disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-      className={classNames(
-        "feedback-action-button",
-        "feedback-add-vote",
-        { voteAnimation: this.state.showVotedAnimation }
-      )}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.setState({ showVotedAnimation: true });
-        this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
-      }}
-      onAnimationEnd={() => {
-        this.setState({ showVotedAnimation: false });
-      }}>
-      <i className="fas fa-arrow-circle-down" />
-    </button>
-  );
-}
+  private renderVoteButton(isMainItem: boolean, showVoteButton: boolean) {
+    // Using standard button tag here due to no onAnimationEnd support in fabricUI
+    return (
+      <button
+        title="Vote"
+        aria-live="polite"
+        aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
+        tabIndex={0}
+        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+        className={classNames(
+          "feedback-action-button",
+          "feedback-add-vote",
+          { voteAnimation: this.state.showVotedAnimation }
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.setState({ showVotedAnimation: true });
+          this.onVote(this.props.id).then(() => this.props.onVoteCasted());
+        }}
+        onAnimationEnd={() => {
+          this.setState({ showVotedAnimation: false });
+        }}>
+        <i className="fas fa-arrow-circle-up" />
+        <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
+      </button>
+    );
+  }
+
+  private renderUnvoteButton(isMainItem: boolean, showVoteButton: boolean) {
+    // Using standard button tag here due to no onAnimationEnd support in fabricUI
+    return (
+      <button
+        title="UnVote"
+        aria-live="polite"
+        aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
+        tabIndex={0}
+        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+        className={classNames(
+          "feedback-action-button",
+          "feedback-add-vote",
+          { voteAnimation: this.state.showVotedAnimation }
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.setState({ showVotedAnimation: true });
+          this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
+        }}
+        onAnimationEnd={() => {
+          this.setState({ showVotedAnimation: false });
+        }}>
+        <i className="fas fa-arrow-circle-down" />
+      </button>
+    );
+  }
 
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
@@ -685,20 +712,7 @@ private renderUnvoteButton(isMainItem: boolean, showVoteButton: boolean) {
               }}>
               <div className="card-header">
                 {
-                  isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
-                  <button className="feedback-expand-group-focus"
-                    aria-live="polite"
-                    aria-label={this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded ? "Expand Feedback Group button. Group has " + groupItemsCount + " items." : "Collapse Feedback Group button. Group has " + groupItemsCount + " items."}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      this.toggleShowGroupedChildrenTitles();
-                    }}>
-                    <i className={classNames("fa", {
-                      "fa-angle-double-down": this.state.isShowingGroupedChildrenTitles,
-                      "fa-angle-double-right": !this.state.isShowingGroupedChildrenTitles
-                    })} />&nbsp;
-                    {this.props.groupCount + 1} Items <i className="far fa-comments" />
-                  </button>
+                  this.renderGroupExpandFocusButton(isGroupedCarouselItem, isMainItem, showAddActionItem, isFocusModalHidden, groupItemsCount)
                 }
                 {
                   // This controls the top level feedback item in a group in the vote phase and outside the focus mode
