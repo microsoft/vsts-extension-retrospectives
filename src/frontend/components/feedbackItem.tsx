@@ -628,14 +628,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
-  private renderGroupExpansionButton(type: "focus" | "expand", isMainItem: boolean, groupItemsCount: number, isFocusModalHidden: boolean): JSX.Element | null {
-    const isFocusButton = type === "focus";
-    const isVisible = isFocusButton
-      ? this.props.isGroupedCarouselItem && isMainItem && this.props.workflowPhase === WorkflowPhase.Act && !isFocusModalHidden
-      : isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
-    if (!isVisible) {
-      return null;
-    }
+  private renderGroupButton(groupItemsCount: number, isFocusButton: boolean): JSX.Element | null {
     return (
       <button
         className={isFocusButton ? "feedback-expand-group-focus" : "feedback-expand-group"}
@@ -645,7 +638,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             ? `Expand Feedback Group button. Group has ${groupItemsCount} items.`
             : `Collapse Feedback Group button. Group has ${groupItemsCount} items.`
         }
-        style={isFocusButton ? {} : { color: this.props.accentColor }}
+        style={!isFocusButton ? { color: this.props.accentColor } : undefined}
         onClick={(e) => {
           e.stopPropagation();
           if (isFocusButton) {
@@ -654,14 +647,17 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             this.props.groupedItemProps.toggleGroupExpand();
           }
         }}>
-        <i className={classNames("fa", {
-          "fa-angle-double-down": isFocusButton && this.state.isShowingGroupedChildrenTitles,
-          "fa-angle-double-right": isFocusButton && !this.state.isShowingGroupedChildrenTitles,
-          "fa-chevron-down": !isFocusButton && this.props.groupedItemProps.isGroupExpanded,
-          "fa-chevron-right": !isFocusButton && !this.props.groupedItemProps.isGroupExpanded,
-        })} />
+        <i
+          className={classNames("fa", {
+            "fa-angle-double-down": isFocusButton && this.state.isShowingGroupedChildrenTitles,
+            "fa-angle-double-right": isFocusButton && !this.state.isShowingGroupedChildrenTitles,
+            "fa-chevron-down": !isFocusButton && this.props.groupedItemProps.isGroupExpanded,
+            "fa-chevron-right": !isFocusButton && !this.props.groupedItemProps.isGroupExpanded,
+          })}
+        />
         &nbsp;
-        {this.props.groupCount + 1} Items
+        {isFocusButton ? `${this.props.groupCount + 1} Items` : `${groupItemsCount} Items`}
+        {isFocusButton && <i className="far fa-comments" />}
       </button>
     );
   }
@@ -749,12 +745,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               <div className="card-header">
                 {
                   isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
-                  this.renderGroupExpandFocusButton(isGroupedCarouselItem, isMainItem, showAddActionItem, isFocusModalHidden, groupItemsCount)
+                  this.renderGroupButton(groupItemsCount, false) // For focus
                 }
                 {
                   // This controls the top level feedback item in a group in the vote phase and outside the focus mode
                   !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
-                  this.renderGroupExpandButton(isMainItem, groupItemsCount, isFocusModalHidden)
+                  this.renderGroupButton(groupItemsCount, true) // For expand
                 }
                 {
                   showVotes && this.props.isInteractable &&
