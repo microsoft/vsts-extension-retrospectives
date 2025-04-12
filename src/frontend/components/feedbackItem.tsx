@@ -591,15 +591,15 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       <div className="feedback-vote-buttons">
         {/* Upvote Button */}
         <button
-          title="Upvote"
+          title="Vote"
           aria-live="polite"
-          aria-label={`Click to upvote on feedback with title ${title}. Current vote count is ${upvotes}`}
+          aria-label={`Click to upvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
           tabIndex={0}
-          disabled={!isMainItem || !showVoteButton || showVotedAnimation}
+          disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
           className={classNames(
             "feedback-action-button",
             "feedback-add-vote",
-            { voteAnimation: showVotedAnimation }
+            { voteAnimation: this.state.showVotedAnimation }
           )}
           onClick={(e) => {
             e.preventDefault();
@@ -612,33 +612,32 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           }}
         >
           <i className="fas fa-arrow-circle-up" /> {/* Font Awesome Upvote Icon */}
-          <span className="feedback-upvote-count">{upvotes.toString()}</span>
+          <span className="feedback-upvote-count">{this.props.upvotes.toString()}</span>
         </button>
 
         {/* Downvote Button */}
         <button
-          title="Downvote"
+          title="Unvote"
           aria-live="polite"
-          aria-label={`Click to downvote on feedback with title ${title}. Current vote count is ${downvotes}`}
+          aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
           tabIndex={0}
-          disabled={!isMainItem || !showVoteButton || showVotedAnimation}
+          disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
           className={classNames(
             "feedback-action-button",
-            "feedback-remove-vote",
-            { voteAnimation: showVotedAnimation }
+            "feedback-add-vote",
+            { voteAnimation: this.state.showVotedAnimation }
           )}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             this.setState({ showVotedAnimation: true });
-            this.onDownvote(this.props.id).then(() => this.props.onVoteCasted());
+            this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
           }}
           onAnimationEnd={() => {
             this.setState({ showVotedAnimation: false });
           }}
         >
           <i className="fas fa-arrow-circle-down" /> {/* Font Awesome Downvote Icon */}
-          <span className="feedback-downvote-count">{downvotes.toString()}</span>
         </button>
       </div>
     );
@@ -725,7 +724,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </button>
                 }
                 {showVotes && this.props.isInteractable &&
-                  this.renderVoteButtons(isMainItem, showVoteButton)
+                  /*this.renderVoteButtons(isMainItem, showVoteButton)*/
+                  this.renderVoteButtons()
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
