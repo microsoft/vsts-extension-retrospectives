@@ -4,21 +4,21 @@ import { ActionButton, PrimaryButton, DefaultButton } from "office-ui-fabric-rea
 import { IContextualMenuItem } from "office-ui-fabric-react/lib/ContextualMenu";
 import { Dialog, DialogType, DialogFooter } from "office-ui-fabric-react/lib/Dialog";
 import { DocumentCard, DocumentCardActivity } from "office-ui-fabric-react/lib/DocumentCard";
+import { SearchBox } from "office-ui-fabric-react/lib/SearchBox";
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
+import { WebApiTeam } from "azure-devops-extension-api/Core";
 
 import { WorkflowPhase } from "../interfaces/workItem";
 import ActionItemDisplay from "./actionItemDisplay";
 import EditableDocumentCardTitle from "./editableDocumentCardTitle";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { itemDataService } from "../dal/itemDataService";
-import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { reflectBackendService } from "../dal/reflectBackendService";
-import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { IColumn, IColumnItem } from "./feedbackBoard";
-import { SearchBox } from "office-ui-fabric-react/lib/SearchBox";
 import { FeedbackColumnProps } from "./feedbackColumn";
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 
 export interface IFeedbackItemProps {
@@ -615,7 +615,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   private renderVoteActionButton(isMainItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
-    const buttonTitle = isUpvote ? "Vote" : "UnVote";
+    const buttonTitle = isUpvote ? "Vote" : "Unvote";
     const buttonAriaLabel = isUpvote
       ? `Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`
       : `Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`;
@@ -814,7 +814,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
                 {showVoteButton && this.props.isInteractable &&
                   <div>
-                    <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
+                    {/*<span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>*/}
+                    <span className="feedback-yourvote-count">
+                      {isNotGroupedItem ? `[Your Votes: ${this.state.userVotes}]` : `[Your Votes: expand card for your votes]`}
+                    </span>
                   </div>
                 }
               </div>
