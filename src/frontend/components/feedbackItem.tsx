@@ -678,7 +678,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const userId = encrypt(getUserIdentity().id);
 
     const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
-    const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
+    const votesByUser = this.state.userVotes; // use the direct method since available
+    //const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
     const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : 0;
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : 0;
 

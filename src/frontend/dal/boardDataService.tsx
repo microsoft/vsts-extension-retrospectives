@@ -136,4 +136,6 @@ class BoardDataService {
     return permissions === undefined || (permissions.Teams.length === 0 && permissions.Members.length === 0);
   }
 
+}
+
 export default new BoardDataService();
