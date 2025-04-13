@@ -653,8 +653,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           <span
             className="feedback-upvote-count"
             style={isMainItem ? { fontWeight: "bold" } : { fontWeight: "normal" }}
-          >
-            {totalVotes.toString()}
+          > {totalVotes.toString()}
           </span>
         )}
       </button>
