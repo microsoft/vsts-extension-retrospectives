@@ -684,7 +684,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : 0;
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : 0;
 
-        // DPH; keep this around until tested with someone else's votes
+        // DPH; keep this around until tested with someone else's votes; ready, only one
         // total votes for grouped cards
         const totalVotes = this.props.upvotes + childrenIds.reduce((sum, id) => {
           const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
