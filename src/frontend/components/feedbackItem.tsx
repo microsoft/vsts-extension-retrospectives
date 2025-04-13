@@ -614,7 +614,54 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
-  private renderVoteActionButton(isMainItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
+  private renderVoteActionButton(
+    isMainItem: boolean,
+    showVoteButton: boolean,
+    totalVotes: number,
+    isUpvote: boolean
+  ) {
+    const buttonTitle = isUpvote ? "Vote" : "Unvote";
+    const buttonAriaLabel = isUpvote
+      ? `Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`
+      : `Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`;
+    const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
+
+    return (
+      <button
+        title={buttonTitle}
+        aria-live="polite"
+        aria-label={buttonAriaLabel}
+        tabIndex={0}
+        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+        className={classNames(
+          "feedback-action-button",
+          "feedback-add-vote",
+          { voteAnimation: this.state.showVotedAnimation }
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.setState({ showVotedAnimation: true });
+          this.onVote(this.props.id, !isUpvote).then(() => this.props.onVoteCasted());
+        }}
+        onAnimationEnd={() => {
+          this.setState({ showVotedAnimation: false });
+        }}
+      >
+        <i className={buttonIconClass} />
+        {isUpvote && (
+          <span
+            className="feedback-upvote-count"
+            style={isMainItem ? { fontWeight: "bold" } : { fontWeight: "normal" }}
+          >
+            {totalVotes.toString()}
+          </span>
+        )}
+      </button>
+    );
+  }
+
+  private originalRenderVoteActionButton(isMainItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
     const buttonTitle = isUpvote ? "Vote" : "Unvote";
     const buttonAriaLabel = isUpvote
       ? `Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`
@@ -680,18 +727,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
     const votesByUser = this.state.userVotes; // use the direct method since available
     //const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
-    // DPH: should groupedVotes default to votes if no items grouped?
-    const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : 0;
-    const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : 0;
-
-        // DPH; keep this around until tested with someone else's votes; ready, only one
-        // total votes for grouped cards
-        const totalVotes = this.props.upvotes + childrenIds.reduce((sum, id) => {
-          const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
-          return sum + (childCard?.feedbackItem.upvotes || 0);
-        }, 0);
-        // Reset totalVotes with fallback logic
-        //const totalVotes = groupedVotes || votes || 0;
+    const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
+    const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
+    // groupedVotes and groupedVotesByUser returns same value as votes and votesByUser when not grouped
 
     return (
       <div
@@ -733,7 +771,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
                   this.renderGroupButton(groupItemsCount, false) // For expand
                 }
-                {/*DPH: is groupedVotes as robust as totalVotes? possibly one of these should be votes and the other groupedVotes?*/}
                 {
                   showVotes && this.props.isInteractable &&
                   this.renderVoteActionButton(isMainItem, showVoteButton, groupedVotes, true) // render voting button
