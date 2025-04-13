@@ -163,7 +163,6 @@ class ItemDataService {
   /**
    * Check if the user has voted on this item.
    */
-
   public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
@@ -180,6 +179,71 @@ class ItemDataService {
       return feedbackItem.voteCollection[userId].toString();
     }
   }
+
+  //DPH Add voting helper functions here
+  /**
+   * Calculate total votes for a feedback item.
+   */
+  public getVotes(feedbackItem: IFeedbackItemDocument): number {
+    return Object.values(feedbackItem.voteCollection || {}).reduce((sum, votes) => sum + votes, 0);
+  }
+
+  /**
+   * Calculate total votes for a specific user on a feedback item.
+   */
+  public getVotesByUser(feedbackItem: IFeedbackItemDocument, userId: string): number {
+    return feedbackItem.voteCollection?.[userId] || 0;
+  }
+
+  /**
+   * Calculate total votes for grouped feedback items.
+   */
+  public getVotesForGroupedItems(
+    mainFeedbackItem: IFeedbackItemDocument,
+    groupedFeedbackItems: IFeedbackItemDocument[]
+  ): number {
+    const mainItemVotes = itemDataService.getVotes(mainFeedbackItem);
+    const groupedItemsVotes = groupedFeedbackItems.reduce((sum, item) => {
+      return sum + itemDataService.getVotes(item);
+    }, 0);
+
+    return mainItemVotes + groupedItemsVotes;
+  }
+
+  /**
+   * Calculate total votes for a specific user on a set of grouped feedback items.
+   */
+  /**
+   * Calculate the total votes by a specific user for grouped feedback items, including the main feedback item.
+   * @param mainFeedbackItem - The main feedback item in the group.
+   * @param groupedFeedbackItems - Array of grouped feedback items.
+   * @param userId - The ID of the user whose votes are being calculated.
+   * @returns The total votes cast by the user across all items in the group.
+   */
+  public getVotesForGroupedItemsByUser(
+    mainFeedbackItem: IFeedbackItemDocument,
+    groupedFeedbackItems: IFeedbackItemDocument[],
+    userId: string
+  ): number {
+    // Calculate votes for the main feedback item using getTotalVotesByUser
+    const mainItemVotesByUser = this.getVotesByUser(mainFeedbackItem, userId);
+  
+    // Calculate votes for all grouped feedback items using getTotalVotesByUser
+    const groupedItemsVotesByUser = groupedFeedbackItems.reduce((sum, item) => {
+      return sum + this.getVotesByUser(item, userId);
+    }, 0);
+  
+    // Return the total votes cast by the user
+    return mainItemVotesByUser + groupedItemsVotesByUser;
+  }
+
+  /* DPH sample usage
+  const votes = ItemDataService.getVotes(feedbackItem);
+  const votesByUser = ItemDataService.getVotesByUser(feedbackItem, "user123");
+  const groupedVotes = ItemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems);
+  const groupedVotesByUser = ItemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, "user123");
+  */
+  //DPH voting helper functions above
 
   /**
    * flip the timer state.
@@ -230,7 +294,7 @@ class ItemDataService {
   }
 
   /**
-   * Increment/Decrement the vote of the feedback item.
+   * Increment or decrement the vote of the feedback item.
    */
   public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);

@@ -655,19 +655,49 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const showVotes = showVoteButton || showAddActionItem;
     const isDraggable = this.props.isInteractable && this.props.workflowPhase === WorkflowPhase.Group && !this.state.isMarkedForDeletion;
     const isNotGroupedItem = !this.props.groupedItemProps;
-    const isMainItem = isNotGroupedItem || this.props.groupedItemProps.isMainItem;
+    const isMainItem = isNotGroupedItem || this.props.groupedItemProps?.isMainItem;
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
-    const ariaLabel = isNotGroupedItem ? "Feedback item." : (!isMainItem ? "Feedback group item." : `Feedback group main item. Group has ${groupItemsCount} items.`);
+    const ariaLabel = isNotGroupedItem
+      ? "Feedback item."
+      : (!isMainItem
+        ? "Feedback group item."
+        : `Feedback group main item. Group has ${groupItemsCount} items.`);
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
+
+    // DPH work in progress
+    // next output these on the cards 
+    // if works remove old approach
+    // if works look to refactor counts elsewhere...
+    // Use helper functions to calculate votes
+    const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
+    const groupedFeedbackItems = this.props.groupIds.map(id => {
+      const item = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id)?.feedbackItem;
+      return item;
+    }).filter(item => item !== undefined) as IFeedbackItemDocument[];
+
+    const userId = getUserIdentity().id;
+
+    const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
+    const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
+    const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : 0;
+    const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : 0;
+
     // total votes for grouped cards
     const totalVotes = this.props.upvotes + childrenIds.reduce((sum, id) => {
       const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
       return sum + (childCard?.feedbackItem.upvotes || 0);
     }, 0);
+
+    console.log('Votes by all: ${votes}');
+    console.log('Votes by user: ${this.state.userVotes} (original)');
+    console.log('Votes by user: ${votesByUser} (refactored)');
+    console.log('Grouped votes by all: ${totalVotes} (original)');
+    console.log('Grouped votes by all: ${groupedVotes}');
+    console.log('Grouped votes by user: ${groupedVotesByUser}');
 
     return (
       <div
