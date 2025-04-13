@@ -678,8 +678,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const userId = encrypt(getUserIdentity().id);
 
     const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
-    //const votesByUser = this.state.userVotes; // use the direct method since available
-    const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
+    const votesByUser = this.state.userVotes; // use the direct method since available
+    //const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
     const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : 0;
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : 0;
 
@@ -688,13 +688,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
       return sum + (childCard?.feedbackItem.upvotes || 0);
     }, 0);
-
-    console.log(`Votes by all: ${votes}`);
-    console.log(`Votes by user: ${this.state.userVotes} (original)`);
-    console.log(`Votes by user: ${votesByUser} (refactored)`);
-    console.log(`Grouped votes by all: ${totalVotes} (original)`);
-    console.log(`Grouped votes by all: ${groupedVotes} (refactored)`);
-    console.log(`Grouped votes by user: ${groupedVotesByUser}`);
 
     return (
       <div
@@ -842,9 +835,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 {showVoteButton && this.props.isInteractable &&
                   <div>
                     <span className="feedback-yourvote-count">
-                      {isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) || totalVotes === 0
-                        ? `[Your Votes: ${this.state.userVotes}]`
-                        : `[expand items for your votes]`}
+                      {isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded)
+                        ? `[Your Votes: ${votesByUser}]`
+                        : `[Your Votes: ${groupedVotesByUser}]`}
                     </span>
                   </div>
                 }
