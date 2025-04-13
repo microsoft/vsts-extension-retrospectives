@@ -816,8 +816,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   <div>
                     <span className="feedback-yourvote-count">
                       {isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) || totalVotes === 0
-                        ? `[Your Votes: ${totalVotes}]`
-                        : `[expand items for your votes ${totalVotes}]`}
+                        ? `[Your Votes: ${this.state.userVotes}]`
+                        : `[expand items for your votes ${this.state.userVotes}]`}
                     </span>
                   </div>
                 }
