@@ -680,14 +680,18 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
     const votesByUser = this.state.userVotes; // use the direct method since available
     //const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
+    // DPH: should groupedVotes default to votes if no items grouped?
     const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : 0;
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : 0;
 
-    // total votes for grouped cards
-    const totalVotes = this.props.upvotes + childrenIds.reduce((sum, id) => {
-      const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
-      return sum + (childCard?.feedbackItem.upvotes || 0);
-    }, 0);
+        // DPH; keep this around until tested with someone else's votes
+        // total votes for grouped cards
+        const totalVotes = this.props.upvotes + childrenIds.reduce((sum, id) => {
+          const childCard = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
+          return sum + (childCard?.feedbackItem.upvotes || 0);
+        }, 0);
+        // Reset totalVotes with fallback logic
+        //const totalVotes = groupedVotes || votes || 0;
 
     return (
       <div
@@ -729,13 +733,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
                   this.renderGroupButton(groupItemsCount, false) // For expand
                 }
+                {/*DPH: is groupedVotes as robust as totalVotes? possibly one of these should be votes and the other groupedVotes?*/}
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderVoteActionButton(isMainItem, showVoteButton, totalVotes, true) // render voting button
+                  this.renderVoteActionButton(isMainItem, showVoteButton, groupedVotes, true) // render voting button
                 }
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderVoteActionButton(isMainItem, showVoteButton, totalVotes, false) // render unvoting button
+                  this.renderVoteActionButton(isMainItem, showVoteButton, groupedVotes, false) // render unvoting button
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
