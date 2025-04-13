@@ -192,9 +192,17 @@ class ItemDataService {
    * Calculate total votes for a specific user on a feedback item.
    */
   public getVotesByUser(feedbackItem: IFeedbackItemDocument, userId: string): number {
+    const encryptedUserId = encrypt(userId);
+    return feedbackItem.voteCollection?.[encryptedUserId] || 0;
+  }
+/*DPH temp for debug
+  public getTotalVotesByUser(feedbackItem: IFeedbackItemDocument, userId: string): number {
+    console.log("Feedback Item: ", feedbackItem);
+    console.log("Vote Collection: ", feedbackItem.voteCollection);
+    console.log("User ID: ", userId);
     return feedbackItem.voteCollection?.[userId] || 0;
   }
-
+*/
   /**
    * Calculate total votes for grouped feedback items.
    */
