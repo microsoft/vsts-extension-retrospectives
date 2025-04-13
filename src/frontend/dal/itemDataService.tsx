@@ -180,7 +180,6 @@ class ItemDataService {
     }
   }
 
-  //DPH Add voting helper functions here
   /**
    * Calculate total votes for a feedback item.
    */
@@ -191,18 +190,10 @@ class ItemDataService {
   /**
    * Calculate total votes for a specific user on a feedback item.
    */
-  public getVotesByUser(feedbackItem: IFeedbackItemDocument, userId: string): number {
-    const encryptedUserId = encrypt(userId);
+  public getVotesByUser(feedbackItem: IFeedbackItemDocument, encryptedUserId: string): number {
     return feedbackItem.voteCollection?.[encryptedUserId] || 0;
   }
-/*DPH temp for debug
-  public getTotalVotesByUser(feedbackItem: IFeedbackItemDocument, userId: string): number {
-    console.log("Feedback Item: ", feedbackItem);
-    console.log("Vote Collection: ", feedbackItem.voteCollection);
-    console.log("User ID: ", userId);
-    return feedbackItem.voteCollection?.[userId] || 0;
-  }
-*/
+
   /**
    * Calculate total votes for grouped feedback items.
    */
@@ -221,84 +212,21 @@ class ItemDataService {
   /**
    * Calculate total votes for a specific user on a set of grouped feedback items.
    */
-  /**
-   * Calculate the total votes by a specific user for grouped feedback items, including the main feedback item.
-   * @param mainFeedbackItem - The main feedback item in the group.
-   * @param groupedFeedbackItems - Array of grouped feedback items.
-   * @param userId - The ID of the user whose votes are being calculated.
-   * @returns The total votes cast by the user across all items in the group.
-   */
   public getVotesForGroupedItemsByUser(
     mainFeedbackItem: IFeedbackItemDocument,
     groupedFeedbackItems: IFeedbackItemDocument[],
-    userId: string
+    encryptedUserId: string
   ): number {
     // Calculate votes for the main feedback item using getTotalVotesByUser
-    const mainItemVotesByUser = this.getVotesByUser(mainFeedbackItem, userId);
+    const mainItemVotesByUser = this.getVotesByUser(mainFeedbackItem, encryptedUserId);
 
     // Calculate votes for all grouped feedback items using getTotalVotesByUser
     const groupedItemsVotesByUser = groupedFeedbackItems.reduce((sum, item) => {
-      return sum + this.getVotesByUser(item, userId);
+      return sum + this.getVotesByUser(item, encryptedUserId);
     }, 0);
 
     // Return the total votes cast by the user
     return mainItemVotesByUser + groupedItemsVotesByUser;
-  }
-
-  /* DPH sample usage
-  const votes = ItemDataService.getVotes(feedbackItem);
-  const votesByUser = ItemDataService.getVotesByUser(feedbackItem, "user123");
-  const groupedVotes = ItemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems);
-  const groupedVotesByUser = ItemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, "user123");
-  */
-  //DPH voting helper functions above
-
-  /**
-   * flip the timer state.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> => {
-    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
-
-    if (!feedbackItem) {
-      console.log(`Cannot flip the timer state for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
-      return undefined;
-    }
-
-    if (feedbackItem.timerstate === false) {
-      feedbackItem.timerstate = true;
-    }
-    else {
-      feedbackItem.timerstate = false;
-    }
-
-    feedbackItem.timerId = timerid;
-
-    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
-
-    return updatedFeedbackItem;
-  }
-
-  /**
-   * update the timer count.
-   */
-  public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean = false): Promise<IFeedbackItemDocument> => {
-    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
-
-    if (!feedbackItem) {
-      return undefined;
-    }
-
-    if (setZero) {
-      feedbackItem.timerSecs = 0;
-    }
-    else {
-      feedbackItem.timerSecs++;
-    }
-
-    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
-
-    return updatedFeedbackItem;
   }
 
   /**
@@ -371,6 +299,54 @@ class ItemDataService {
         return feedbackItemWithOriginalVotes;
       }
     }
+
+    return updatedFeedbackItem;
+  }
+
+  /**
+   * flip the timer state.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> => {
+    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
+
+    if (!feedbackItem) {
+      console.log(`Cannot flip the timer state for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
+      return undefined;
+    }
+
+    if (feedbackItem.timerstate === false) {
+      feedbackItem.timerstate = true;
+    }
+    else {
+      feedbackItem.timerstate = false;
+    }
+
+    feedbackItem.timerId = timerid;
+
+    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+
+    return updatedFeedbackItem;
+  }
+
+  /**
+   * update the timer count.
+   */
+  public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean = false): Promise<IFeedbackItemDocument> => {
+    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
+
+    if (!feedbackItem) {
+      return undefined;
+    }
+
+    if (setZero) {
+      feedbackItem.timerSecs = 0;
+    }
+    else {
+      feedbackItem.timerSecs++;
+    }
+
+    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
 
     return updatedFeedbackItem;
   }

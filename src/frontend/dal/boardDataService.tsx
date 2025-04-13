@@ -1,7 +1,7 @@
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { WorkflowPhase } from '../interfaces/workItem';
-import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
+import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { generateUUID } from '../utilities/random';
 import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
 
@@ -135,28 +135,5 @@ class BoardDataService {
   private isBoardPublic = (permissions: IFeedbackBoardDocumentPermissions): boolean => {
     return permissions === undefined || (permissions.Teams.length === 0 && permissions.Members.length === 0);
   }
-
-  // DPH experiment
-  public getTotalVotesForUser = (
-    userId: string,
-    mainItem: IFeedbackItemDocument,
-    columnItems: IFeedbackItemDocument[]
-  ): number => {
-    // Encrypt the userId to match the keys in voteCollection
-    const encryptedUserId = encrypt(userId);
-
-    // Start with the main item's votes
-    let totalVotesForUser = mainItem.voteCollection?.[encryptedUserId] || 0;
-
-    // Sum votes from all child items
-    const childrenIds = mainItem.childFeedbackItemIds || [];
-    totalVotesForUser += childrenIds.reduce((sum, childId) => {
-      const childItem = columnItems.find(item => item.id === childId);
-      return sum + (childItem?.voteCollection?.[encryptedUserId] || 0);
-    }, 0);
-
-    return totalVotesForUser;
-  }
-}
 
 export default new BoardDataService();

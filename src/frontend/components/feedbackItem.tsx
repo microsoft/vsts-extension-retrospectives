@@ -668,10 +668,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const childrenIds = this.props.groupIds;
     const isFocusModalHidden = this.props.isFocusModalHidden;
 
-    // DPH work in progress
-    // next output these on the cards
-    // if works remove old approach
-    // if works look to refactor counts elsewhere...
     // Use helper functions to calculate votes
     const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
     const groupedFeedbackItems = this.props.groupIds.map(id => {
@@ -679,11 +675,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       return item;
     }).filter(item => item !== undefined) as IFeedbackItemDocument[];
 
-    const userId = getUserIdentity().id;
+    const userId = encrypt(getUserIdentity().id);
 
     const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
     const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
-    //const totalVotesByUser = mainFeedbackItem ? itemDataService.getTotalVotesByUser(mainFeedbackItem, userId) : 0;
     const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : 0;
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : 0;
 
@@ -695,7 +690,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
     console.log(`Votes by all: ${votes}`);
     console.log(`Votes by user: ${this.state.userVotes} (original)`);
-    //console.log(`Votes by user: ${totalVotesByUser} (debug)`);
     console.log(`Votes by user: ${votesByUser} (refactored)`);
     console.log(`Grouped votes by all: ${totalVotes} (original)`);
     console.log(`Grouped votes by all: ${groupedVotes} (refactored)`);
