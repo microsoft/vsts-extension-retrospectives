@@ -661,41 +661,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
-  private originalRenderVoteActionButton(isMainItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
-    const buttonTitle = isUpvote ? "Vote" : "Unvote";
-    const buttonAriaLabel = isUpvote
-      ? `Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`
-      : `Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`;
-    const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
-    return (
-      <button
-        title={buttonTitle}
-        aria-live="polite"
-        aria-label={buttonAriaLabel}
-        tabIndex={0}
-        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-        className={classNames(
-          "feedback-action-button",
-          "feedback-add-vote",
-          { voteAnimation: this.state.showVotedAnimation }
-        )}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.setState({ showVotedAnimation: true });
-          this.onVote(this.props.id, !isUpvote).then(() => this.props.onVoteCasted());
-        }}
-        onAnimationEnd={() => {
-          this.setState({ showVotedAnimation: false });
-        }}>
-        <i className={buttonIconClass} />
-        {isUpvote && (
-          <span className="feedback-upvote-count"> {totalVotes.toString()}</span>
-        )}
-      </button>
-    );
-  }
-
   public render(): JSX.Element {
     const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
     const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
@@ -876,11 +841,15 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
                 {showVoteButton && this.props.isInteractable &&
                   <div>
-                    <span className="feedback-yourvote-count">
-                      {isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded)
-                        ? `[Your Votes: ${votesByUser}]`
-                        : `[Your Votes: ${groupedVotesByUser}]`}
-                    </span>
+                    {isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? (
+                      <span className="feedback-yourvote-count">
+                        [Your Votes: {votesByUser}]
+                      </span>
+                    ) : (
+                      <span className="feedback-yourvote-count" style={{ fontWeight: 500 }}>
+                        [Your Votes: {groupedVotesByUser}]
+                      </span>
+                    )}
                   </div>
                 }
               </div>
