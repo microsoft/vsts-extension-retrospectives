@@ -4,6 +4,10 @@ You can find the changelog of the Retrospective Extension below.
 
 _PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
 
+## v1.92.TBD test version
+
+* Archive redesign to support restoring from archive. From [GitHub PR #1184](https://github.com/microsoft/vsts-extension-retrospectives/pull/1184)
+
 ## v1.92.35
 
 * Removes duplicates from Permissions and sorts by owner, permission, teams and members. From [GitHub PR #1120](https://github.com/microsoft/vsts-extension-retrospectives/pull/1120)
