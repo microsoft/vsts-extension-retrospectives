@@ -692,12 +692,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       return sum + (childCard?.feedbackItem.upvotes || 0);
     }, 0);
 
-    console.log('Votes by all: ${votes}');
-    console.log('Votes by user: ${this.state.userVotes} (original)');
-    console.log('Votes by user: ${votesByUser} (refactored)');
-    console.log('Grouped votes by all: ${totalVotes} (original)');
-    console.log('Grouped votes by all: ${groupedVotes}');
-    console.log('Grouped votes by user: ${groupedVotesByUser}');
+    console.log(`Votes by all: ${votes}`);
+    console.log(`Votes by user: ${this.state.userVotes} (original)`);
+    console.log(`Votes by user: ${votesByUser} (refactored)`);
+    console.log(`Grouped votes by all: ${totalVotes} (original)`);
+    console.log(`Grouped votes by all: ${groupedVotes}`);
+    console.log(`Grouped votes by user: ${groupedVotesByUser}`);
 
     return (
       <div
