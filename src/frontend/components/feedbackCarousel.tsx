@@ -32,6 +32,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
     }, 0);
   };
 
+  // DPH refactor opportunity
   // Render carousel items with totalVotes-based sorting
   private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
     const columnItems = feedbackColumnProps.columnItems
@@ -65,34 +66,6 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         );
       });
   };
-
-/*
-  private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
-    const columnItems = feedbackColumnProps.columnItems.sort((item1, item2) => item2.feedbackItem.upvotes - item1.feedbackItem.upvotes);
-
-    return columnItems
-      // Carousel only shows main item cards.
-      .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
-      .map((columnItem) => {
-        const feedbackItemProps =
-          FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);
-
-        const isFocusModalHidden = this.props.isFocusModalHidden;
-
-        feedbackItemProps.isGroupedCarouselItem = !isFocusModalHidden && columnItem.feedbackItem.childFeedbackItemIds ? (columnItem.feedbackItem.childFeedbackItemIds.length > 0 ? true : false) : false;
-        feedbackItemProps.isFocusModalHidden = isFocusModalHidden;
-
-        return (
-          <div key={feedbackItemProps.id} className="feedback-carousel-item">
-            <FeedbackItem
-              key={feedbackItemProps.id}
-              {...feedbackItemProps}
-            />
-          </div>
-        );
-      });
-  }
-*/
 
   private renderSingleFeedbackCarouselItem = (feedbackColumnProps: FeedbackColumnProps) => {
     return (

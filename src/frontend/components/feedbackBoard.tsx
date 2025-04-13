@@ -27,7 +27,6 @@ export interface FeedbackBoardProps {
   allWorkItemTypes: WorkItemType[];
   isAnonymous: boolean;
   hideFeedbackItems: boolean;
-
   isCarouselDialogHidden: boolean;
   hideCarouselDialog: () => void;
   userId: string;
@@ -435,7 +434,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
           dialogContentProps={{
             type: DialogType.close,
             title: "Focus Mode",
-            subText: "Now is the time to focus! Discuss one feedback item at a time and create actionable work items",
+            subText: "Now is the time to focus! Discuss one feedback item at a time and create actionable work items.",
           }}
           modalProps={{
             containerClassName: "retrospectives-carousel-dialog",
