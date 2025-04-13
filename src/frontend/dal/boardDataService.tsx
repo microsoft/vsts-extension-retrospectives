@@ -144,7 +144,7 @@ class BoardDataService {
   ): number => {
     // Encrypt the userId to match the keys in voteCollection
     const encryptedUserId = encrypt(userId);
-  
+
     // Start with the main item's votes
     let totalVotesForUser = mainItem.voteCollection?.[encryptedUserId] || 0;
   
@@ -154,7 +154,7 @@ class BoardDataService {
       const childItem = columnItems.find(item => item.id === childId);
       return sum + (childItem?.voteCollection?.[encryptedUserId] || 0);
     }, 0);
-  
+
     return totalVotesForUser;
   }
 }

@@ -669,7 +669,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isFocusModalHidden = this.props.isFocusModalHidden;
 
     // DPH work in progress
-    // next output these on the cards 
+    // next output these on the cards
     // if works remove old approach
     // if works look to refactor counts elsewhere...
     // Use helper functions to calculate votes

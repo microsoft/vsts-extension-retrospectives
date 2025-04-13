@@ -227,12 +227,12 @@ class ItemDataService {
   ): number {
     // Calculate votes for the main feedback item using getTotalVotesByUser
     const mainItemVotesByUser = this.getVotesByUser(mainFeedbackItem, userId);
-  
+
     // Calculate votes for all grouped feedback items using getTotalVotesByUser
     const groupedItemsVotesByUser = groupedFeedbackItems.reduce((sum, item) => {
       return sum + this.getVotesByUser(item, userId);
     }, 0);
-  
+
     // Return the total votes cast by the user
     return mainItemVotesByUser + groupedItemsVotesByUser;
   }
