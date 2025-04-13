@@ -147,7 +147,7 @@ class BoardDataService {
 
     // Start with the main item's votes
     let totalVotesForUser = mainItem.voteCollection?.[encryptedUserId] || 0;
-  
+
     // Sum votes from all child items
     const childrenIds = mainItem.childFeedbackItemIds || [];
     totalVotesForUser += childrenIds.reduce((sum, childId) => {
