@@ -698,7 +698,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     //DPH if works, still needs refactoring
     let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
     //Override for Focus mode
-    if (isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden) 
+    if (isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden)
     {totalVotes = groupedVotes}
 
     return (
