@@ -698,7 +698,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     // groupedVotes and groupedVotesByUser returns same value as votes and votesByUser when not grouped
     const totalVotes = isMainCollapsedItem ? groupedVotes : votes;
     if (isMainCollapsedItem) {
-      console.log("grouped");
+      console.log("grouped" + totalVotes);
     }
 
     return (
