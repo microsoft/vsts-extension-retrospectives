@@ -616,7 +616,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
   private renderVoteActionButton(
     isMainItem: boolean,
-    isGroupedItem: boolean,
+    isBoldItem: boolean,
     showVoteButton: boolean,
     totalVotes: number,
     isUpvote: boolean
@@ -653,7 +653,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         {isUpvote && (
           <span
             className="feedback-upvote-count"
-            style={isMainItem && isGroupedItem ? { fontWeight: 600 } : { fontWeight: "normal" }} // 600 is a "lighter" bold
+            style={isMainItem && isBoldItem ? { fontWeight: 600 } : { fontWeight: "normal" }} // 600 is a "lighter" bold
           > {totalVotes.toString()}
           </span>
         )}
@@ -695,11 +695,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     //const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
     const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
-    // groupedVotes and groupedVotesByUser returns same value as votes and votesByUser when not grouped
     const totalVotes = isMainCollapsedItem ? groupedVotes : votes;
-    if (isMainCollapsedItem) {
-      console.log("grouped" + totalVotes);
-    }
 
     return (
       <div
@@ -743,11 +739,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 }
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderVoteActionButton(isMainItem, !isNotGroupedItem, showVoteButton, totalVotes, true) // render voting button
+                  this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, true) // render voting button
                 }
                 {
                   showVotes && this.props.isInteractable &&
-                  this.renderVoteActionButton(isMainItem, !isNotGroupedItem, showVoteButton, totalVotes, false) // render unvoting button
+                  this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, false) // render unvoting button
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
