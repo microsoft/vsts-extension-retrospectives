@@ -3,6 +3,7 @@ import { Settings } from "react-slick";
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 //import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import FeedbackItem from './feedbackItem';
+import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { IColumnItem } from './feedbackBoard';
 import { itemDataService } from '../dal/itemDataService';
 import { reactPlugin } from '../utilities/telemetryClient';
@@ -109,15 +110,14 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       }
     );
   };
-  
-    // Utility method to fetch child feedback items based on IDs
-    private getChildFeedbackItems = (childIds: string[], feedbackColumnProps: FeedbackColumnProps): IFeedbackItemDocument[] => {
-      return childIds
-        .map(id => feedbackColumnProps.columnItems.find(c => c.feedbackItem.id === id))
-        .filter((child): child is IColumnItem => child !== undefined) // Filter out undefined items
-        .map(item => item.feedbackItem); // Extract feedbackItem from IColumnItem
-    };
-  }
+
+  // Utility method to fetch child feedback items based on IDs
+  private getChildFeedbackItems = (childIds: string[], feedbackColumnProps: FeedbackColumnProps): IFeedbackItemDocument[] => {
+    return childIds
+      .map(id => feedbackColumnProps.columnItems.find(c => c.feedbackItem.id === id))
+      .filter((child): child is IColumnItem => child !== undefined) // Filter out undefined items
+      .map(item => item.feedbackItem); // Extract feedbackItem from IColumnItem
+  };
 //DPH New above
 
   private renderSingleFeedbackCarouselItem = (feedbackColumnProps: FeedbackColumnProps) => {
