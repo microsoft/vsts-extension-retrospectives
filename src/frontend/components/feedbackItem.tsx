@@ -699,7 +699,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
     //Override for Focus mode
     if (isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden)
-    {totalVotes = groupedVotes}
+      {totalVotes = groupedVotes}
 
     return (
       <div
@@ -739,7 +739,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 {
                   // This controls the top level feedback item in a group in the vote phase and outside the focus mode
                   !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
-                  this.renderGroupButton(groupItemsCount, false) 
+                  this.renderGroupButton(groupItemsCount, false)
                 }
                 {
                   showVotes && this.props.isInteractable &&
