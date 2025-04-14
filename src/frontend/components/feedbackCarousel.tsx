@@ -20,6 +20,7 @@ export interface IFeedbackCarouselProps {
 export interface IFeedbackCarouselState {
 }
 
+//DPH refactor opportunity with feedbackColumn
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
 
   // Helper method to calculate totalVotes for a feedback item
@@ -33,22 +34,6 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
     }, 0);
   };
 
-/*
-  private calculateTotalVotes = (feedbackItem: IColumnItem, feedbackColumnProps: FeedbackColumnProps): number => {
-    const childrenIds = feedbackItem.feedbackItem.childFeedbackItemIds || [];
-
-    // Find child feedback items based on IDs
-    const childItems = childrenIds
-      .map(id => feedbackColumnProps.columnItems.find(c => c.feedbackItem.id === id))
-      .filter((child): child is IColumnItem => child !== undefined); // Filter out undefined items
-
-    // Use itemDataService public helper to calculate votes
-    return itemDataService.getVotesForGroupedItems(
-      feedbackItem.feedbackItem,
-      childItems.map(item => item.feedbackItem)
-    );
-  };
-*/
   // Render carousel items with totalVotes-based sorting
   private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
     const columnItems = feedbackColumnProps.columnItems

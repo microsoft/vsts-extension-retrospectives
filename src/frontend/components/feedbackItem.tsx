@@ -695,7 +695,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     //const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
     const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
-    const totalVotes = isMainCollapsedItem ? groupedVotes : votes;
+    //DPH if works, still needs refactoring
+    let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
+    //Override for Focus mode
+    if (isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden) 
+    {totalVotes = groupedVotes}
 
     return (
       <div
@@ -730,12 +734,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               <div className="card-header">
                 {
                   isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
-                  this.renderGroupButton(groupItemsCount, true) // For focus
+                  this.renderGroupButton(groupItemsCount, true) // For focus mode
                 }
                 {
                   // This controls the top level feedback item in a group in the vote phase and outside the focus mode
                   !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
-                  this.renderGroupButton(groupItemsCount, false) // For expand
+                  this.renderGroupButton(groupItemsCount, false) 
                 }
                 {
                   showVotes && this.props.isInteractable &&

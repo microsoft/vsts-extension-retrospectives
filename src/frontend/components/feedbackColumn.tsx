@@ -203,6 +203,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     }
   }
 
+  // DPH refactor opportunity with feedbackCarousel
   private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
@@ -221,7 +222,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()
     );
 
-    // DPH refactor opportunity
     // Order by grouped total votes if Act workflow, retaining the default created date order for tied votes
     if (this.props.workflowPhase === WorkflowPhase.Act) {
       columnItems = columnItems.sort((item1, item2) => {
