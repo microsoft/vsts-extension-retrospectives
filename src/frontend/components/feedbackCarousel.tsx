@@ -43,7 +43,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
 
     // Use itemDataService public helper to calculate votes
     return itemDataService.getVotesForGroupedItems(
-      feedbackItem.feedbackItem, 
+      feedbackItem.feedbackItem,
       childItems.map(item => item.feedbackItem)
     );
   };
