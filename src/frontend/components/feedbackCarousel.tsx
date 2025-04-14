@@ -1,15 +1,15 @@
 import React from 'react';
-import Slider, { Settings } from "react-slick";
+import { Settings } from "react-slick";
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
-import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
+//import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import FeedbackItem from './feedbackItem';
-
+import { IColumnItem } from './feedbackBoard';
+import { itemDataService } from '../dal/itemDataService';
+import { reactPlugin } from '../utilities/telemetryClient';
+import { generateUUID } from '../utilities/random';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
-import { IColumnItem } from './feedbackBoard';
-import { generateUUID } from '../utilities/random';
 
 export interface IFeedbackCarouselProps {
   feedbackColumnPropsList: FeedbackColumnProps[];
@@ -20,7 +20,9 @@ export interface IFeedbackCarouselProps {
 export interface IFeedbackCarouselState {
 }
 
+// DPH refactor opportunities?
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
+  /*DPH remove below
   // Helper method to calculate totalVotes for a feedback item
   private calculateTotalVotes = (feedbackItem: IColumnItem, feedbackColumnProps: FeedbackColumnProps): number => {
     const childrenIds = feedbackItem.feedbackItem.childFeedbackItemIds || [];
@@ -32,7 +34,6 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
     }, 0);
   };
 
-  // DPH refactor opportunity
   // Render carousel items with totalVotes-based sorting
   private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
     const columnItems = feedbackColumnProps.columnItems
@@ -66,6 +67,58 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         );
       });
   };
+  DPH remove above */
+
+  //DPH new below
+  private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
+    const columnItems = feedbackColumnProps.columnItems
+      // Sort items based on their total votes
+      .sort((item1, item2) => {
+        // Use public helper from itemDataService to calculate votes
+        const totalVotes1 = itemDataService.getVotesForGroupedItems(
+          item1.feedbackItem,
+          this.getChildFeedbackItems(item1.feedbackItem.childFeedbackItemIds, feedbackColumnProps)
+        );
+
+        const totalVotes2 = itemDataService.getVotesForGroupedItems(
+          item2.feedbackItem,
+          this.getChildFeedbackItems(item2.feedbackItem.childFeedbackItemIds, feedbackColumnProps)
+        );
+
+        return totalVotes2 - totalVotes1; // Descending order of total votes
+      }
+    );
+
+    return columnItems
+      // Carousel only shows main item cards.
+      .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
+      .map((columnItem) => {
+        const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);
+        const isFocusModalHidden = this.props.isFocusModalHidden;
+
+        feedbackItemProps.isGroupedCarouselItem = !isFocusModalHidden && columnItem.feedbackItem.childFeedbackItemIds
+          ? columnItem.feedbackItem.childFeedbackItemIds.length > 0
+          : false;
+        feedbackItemProps.isFocusModalHidden = isFocusModalHidden;
+
+        return (
+          <div key={feedbackItemProps.id} className="feedback-carousel-item">
+            <FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />
+          </div>
+        );
+      }
+    );
+  };
+  
+    // Utility method to fetch child feedback items based on IDs
+    private getChildFeedbackItems = (childIds: string[], feedbackColumnProps: FeedbackColumnProps): IFeedbackItemDocument[] => {
+      return childIds
+        .map(id => feedbackColumnProps.columnItems.find(c => c.feedbackItem.id === id))
+        .filter((child): child is IColumnItem => child !== undefined) // Filter out undefined items
+        .map(item => item.feedbackItem); // Extract feedbackItem from IColumnItem
+    };
+  }
+//DPH New above
 
   private renderSingleFeedbackCarouselItem = (feedbackColumnProps: FeedbackColumnProps) => {
     return (
