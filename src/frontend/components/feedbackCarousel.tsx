@@ -1,7 +1,7 @@
 import React from 'react';
-import { Settings } from "react-slick";
+import Slider, { Settings } from "react-slick";
 import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
-//import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
+import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import FeedbackItem from './feedbackItem';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { IColumnItem } from './feedbackBoard';
