@@ -163,7 +163,6 @@ class ItemDataService {
   /**
    * Check if the user has voted on this item.
    */
-
   public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
@@ -182,55 +181,56 @@ class ItemDataService {
   }
 
   /**
-   * flip the timer state.
+   * Calculate total votes for a feedback item.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> => {
-    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
-
-    if (!feedbackItem) {
-      console.log(`Cannot flip the timer state for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
-      return undefined;
-    }
-
-    if (feedbackItem.timerstate === false) {
-      feedbackItem.timerstate = true;
-    }
-    else {
-      feedbackItem.timerstate = false;
-    }
-
-    feedbackItem.timerId = timerid;
-
-    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
-
-    return updatedFeedbackItem;
+  public getVotes(feedbackItem: IFeedbackItemDocument): number {
+    return Object.values(feedbackItem.voteCollection || {}).reduce((sum, votes) => sum + votes, 0);
   }
 
   /**
-   * update the timer count.
+   * Calculate total votes for a specific user on a feedback item.
    */
-  public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean = false): Promise<IFeedbackItemDocument> => {
-    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
-
-    if (!feedbackItem) {
-      return undefined;
-    }
-
-    if (setZero) {
-      feedbackItem.timerSecs = 0;
-    }
-    else {
-      feedbackItem.timerSecs++;
-    }
-
-    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
-
-    return updatedFeedbackItem;
+  public getVotesByUser(feedbackItem: IFeedbackItemDocument, encryptedUserId: string): number {
+    return feedbackItem.voteCollection?.[encryptedUserId] || 0;
   }
 
   /**
-   * Increment/Decrement the vote of the feedback item.
+   * Calculate total votes for grouped feedback items.
+   */
+  public getVotesForGroupedItems(
+    mainFeedbackItem: IFeedbackItemDocument,
+    groupedFeedbackItems: IFeedbackItemDocument[]
+  ): number {
+    const mainItemVotes = itemDataService.getVotes(mainFeedbackItem);
+    const groupedItemsVotes = groupedFeedbackItems.reduce((sum, item) => {
+      return sum + itemDataService.getVotes(item);
+    }, 0);
+
+    return mainItemVotes + groupedItemsVotes;
+  }
+
+  /**
+   * Calculate total votes for a specific user on a set of grouped feedback items.
+   */
+  public getVotesForGroupedItemsByUser(
+    mainFeedbackItem: IFeedbackItemDocument,
+    groupedFeedbackItems: IFeedbackItemDocument[],
+    encryptedUserId: string
+  ): number {
+    // Calculate votes for the main feedback item using getTotalVotesByUser
+    const mainItemVotesByUser = this.getVotesByUser(mainFeedbackItem, encryptedUserId);
+
+    // Calculate votes for all grouped feedback items using getTotalVotesByUser
+    const groupedItemsVotesByUser = groupedFeedbackItems.reduce((sum, item) => {
+      return sum + this.getVotesByUser(item, encryptedUserId);
+    }, 0);
+
+    // Return the total votes cast by the user
+    return mainItemVotesByUser + groupedItemsVotesByUser;
+  }
+
+  /**
+   * Increment or decrement the vote of the feedback item.
    */
   public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
@@ -299,6 +299,54 @@ class ItemDataService {
         return feedbackItemWithOriginalVotes;
       }
     }
+
+    return updatedFeedbackItem;
+  }
+
+  /**
+   * flip the timer state.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> => {
+    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
+
+    if (!feedbackItem) {
+      console.log(`Cannot flip the timer state for a non-existent feedback item. Board: ${boardId}, Item: ${feedbackItemId}`);
+      return undefined;
+    }
+
+    if (feedbackItem.timerstate === false) {
+      feedbackItem.timerstate = true;
+    }
+    else {
+      feedbackItem.timerstate = false;
+    }
+
+    feedbackItem.timerId = timerid;
+
+    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+
+    return updatedFeedbackItem;
+  }
+
+  /**
+   * update the timer count.
+   */
+  public updateTimer = async (boardId: string, feedbackItemId: string, setZero: boolean = false): Promise<IFeedbackItemDocument> => {
+    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
+
+    if (!feedbackItem) {
+      return undefined;
+    }
+
+    if (setZero) {
+      feedbackItem.timerSecs = 0;
+    }
+    else {
+      feedbackItem.timerSecs++;
+    }
+
+    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
 
     return updatedFeedbackItem;
   }

@@ -203,28 +203,56 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     }
   }
 
+  // DPH refactor opportunity with feedbackCarousel
   private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
-     // Order by created date with newest first by default
-     columnItems = columnItems.sort((item1, item2) =>
-      (new Date(item2.feedbackItem.createdDate).getTime()) - (new Date(item1.feedbackItem.createdDate).getTime())
+    // Helper function to calculate the total votes for a feedback item (including grouped children)
+    const calculateTotalVotes = (columnItem: IColumnItem): number => {
+      const childVotes = columnItem.feedbackItem.childFeedbackItemIds?.reduce((sum, childId) => {
+          const childItem = this.props.columnItems.find(child => child.feedbackItem.id === childId);
+          return sum + (childItem?.feedbackItem.upvotes || 0);
+      }, 0) || 0;
+
+      return columnItem.feedbackItem.upvotes + childVotes;
+    };
+
+    // Order by created date with newest first by default
+    columnItems = columnItems.sort((item1, item2) =>
+      new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()
     );
 
-    // Order by number of votes if Act column, retaining default order by created date for tied vote counts
+    // Order by grouped total votes if Act workflow, retaining the default created date order for tied votes
     if (this.props.workflowPhase === WorkflowPhase.Act) {
-      columnItems = columnItems.sort((item1, item2) => item2.feedbackItem.upvotes - item1.feedbackItem.upvotes);
+      columnItems = columnItems.sort((item1, item2) => {
+        const totalVotes1 = calculateTotalVotes(item1);
+        const totalVotes2 = calculateTotalVotes(item2);
+
+        // Primary sort by total votes (descending)
+        if (totalVotes2 !== totalVotes1) {
+          return totalVotes2 - totalVotes1;
+        }
+
+        // Secondary sort by created date (ascending)
+          return new Date(item1.feedbackItem.createdDate).getTime() - new Date(item2.feedbackItem.createdDate).getTime();
+      });
     }
 
     return columnItems
-      .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
+      .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId) // Exclude child items
       .map((columnItem) => {
         const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem, true);
 
         if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
           const childItemsToGroup = this.props.columnItems
-            .filter((childColumnItem) => columnItem.feedbackItem.childFeedbackItemIds.some((childId) => childId === childColumnItem.feedbackItem.id))
-            .map((childColumnItem) => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem, true));
+            .filter((childColumnItem) =>
+              columnItem.feedbackItem.childFeedbackItemIds.some(
+                (childId) => childId === childColumnItem.feedbackItem.id
+              )
+            )
+            .map((childColumnItem) =>
+              FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem, true)
+            );
 
           return (
             <FeedbackItemGroup
@@ -234,17 +262,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
               workflowState={this.props.workflowPhase}
             />
           );
+        } else {
+          return <FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />;
         }
-        else {
-          return (
-            <FeedbackItem
-              key={feedbackItemProps.id}
-              {...feedbackItemProps}
-            />
-          );
-        }
-      });
-  }
+      }
+    );
+  };
 
   public render() {
     return (
