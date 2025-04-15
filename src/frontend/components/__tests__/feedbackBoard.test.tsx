@@ -54,7 +54,10 @@ jest.mock('azure-devops-extension-api/Work/WorkClient', () => {
 });
 
 jest.mock('azure-devops-extension-api/Common', () => ({
-  getClient: (clientClass: typeof Object) => new clientClass(),
+  getClient: () => ({
+    getIdentities: jest.fn().mockResolvedValue([]),
+    getUserInfo: jest.fn().mockResolvedValue({ displayName: 'Mock User' }),
+  })
 }));
 
 const mockedIdentity: IdentityRef = {
