@@ -5,6 +5,7 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extensi
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
+//DPH: seeing warnings
 import { Cell, CellContext, Header, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
