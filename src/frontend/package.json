@@ -102,7 +102,7 @@
       "./components/__tests__/setupTests.tsx"
     ],
     "transform": {
-      ".+\\.(js|ts|tsx|jsx)$": "ts-jest"
+      ".+\\.(js|ts|tsx|jsx)$": ["ts-jest", { "tsconfig": "tsconfig.test.json" }]
     },
     "transformIgnorePatterns": [
       "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)"
@@ -126,12 +126,7 @@
       "html",
       "cobertura",
       "text"
-    ],
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.test.json"
-      }
-    }
+    ]
   },
   "jest-junit": {
     "outputDirectory": "reports",
