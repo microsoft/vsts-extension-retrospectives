@@ -51,4 +51,16 @@ describe("Action Item component", () => {
   });
 
   it("renders correctly when action items exist", () => {});
+
+  it("renders correctly when action items exist and areActionIconsHidden is true", () => {
+    const wrapper = shallow(<ActionItem {...defaultTestProps} areActionIconsHidden={true} />);
+    const component = wrapper.children().dive();
+    expect(toJson(component)).toMatchSnapshot();
+  });
+
+  it("renders correctly when action items exist and shouldFocus is true", () => {
+    const wrapper = shallow(<ActionItem {...defaultTestProps} shouldFocus={true} />);
+    const component = wrapper.children().dive();
+    expect(toJson(component)).toMatchSnapshot();
+  });
 });
