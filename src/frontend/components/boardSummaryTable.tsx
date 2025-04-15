@@ -13,7 +13,7 @@ import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 export interface IBoardSummaryTableProps {
   teamId: string;
   supportedWorkItemTypes: WorkItemType[];
-  onArchiveToggle: () => void; // New prop to notify the parent about archive toggles
+  onArchiveToggle: () => void;
 }
 
 export interface IBoardSummaryTableState {
@@ -28,11 +28,11 @@ export interface IBoardSummaryTableItem {
   boardName: string;
   createdDate: Date;
   isArchived?: boolean;
-  archivedDate?: Date; //archivedDate not set for legacy archived boards
+  archivedDate?: Date;
   pendingWorkItemsCount: number;
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
-  id: string; // Board ID
+  id: string;
   teamId: string;
 }
 
@@ -51,6 +51,7 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void
 ): Table<IBoardSummaryTableItem> {
+  const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>(data || []);
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
@@ -91,42 +92,43 @@ function getTable(
       header: 'Archived',
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
-        const boardId = cellContext.row.original.id; // Board ID
-        const teamId = cellContext.row.original.teamId; // Team ID
+        const boardId = cellContext.row.original.id;
+        const teamId = cellContext.row.original.teamId;
         const isArchived = cellContext.row.original.isArchived;
 
         return (
           <div
-            onClick={(event) => event.stopPropagation()} // Prevent click propagation
+            onClick={(event) => event.stopPropagation()}
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
           >
-          <input
-            type="checkbox"
-            checked={!!isArchived} // Ensure boolean value
-            onChange={async (event) => {
-              const toggleIsArchived = event.target.checked;
-              try {
-                if (toggleIsArchived) {
-                  await BoardDataService.archiveFeedbackBoard(teamId, boardId);
-                  appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
-                } else {
-                  await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
-                  appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
+            <input
+              type="checkbox"
+              checked={!!isArchived}
+              onChange={async (event) => {
+                const toggleIsArchived = event.target.checked;
+                try {
+                  if (toggleIsArchived) {
+                    await BoardDataService.archiveFeedbackBoard(teamId, boardId);
+                    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
+                  } else {
+                    await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
+                    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
+                  }
+                  setTableData((prevData) =>
+                    prevData.map((item: IBoardSummaryTableItem) =>
+                      item.id === boardId ? {
+                        ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null
+                      } : item
+                    )
+                  );
+                  onArchiveToggle();
                 }
-                // update local state to reflect updated archive status
-                data.map((item: IBoardSummaryTableItem) => // Specify type for item
-                  item.id === boardId ? {
-                    ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null
-                  } : item
-                );
-                onArchiveToggle();
+                catch (error) {
+                  console.error("Error while toggling archive state:", error);
+                }
               }
-              catch (error) {
-                console.error("Error while toggling archive state:", error);
               }
-            }
-          }
-          />
+            />
           </div>
         );
       },
@@ -140,7 +142,7 @@ function getTable(
         const archivedDate = cellContext.row.original.archivedDate;
         return archivedDate
           ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(archivedDate)
-          : ''; // Return an empty string if archivedDate is null or undefined
+          : '';
       },
       size: 120,
       sortDescFirst: true
@@ -158,7 +160,7 @@ function getTable(
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
-    data, // <-- Use state instead of original data
+    data,
     columns,
     columnResizeMode: 'onChange',
     onSortingChange: onSortingChange,
@@ -168,7 +170,7 @@ function getTable(
     getRowCanExpand: () => true,
     state: {
       pagination: {
-        pageSize: data.length, // <-- Use state instead of original data
+        pageSize: data.length,
         pageIndex: 0
       },
       sorting: sortingState
@@ -194,7 +196,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const updatedState: IBoardSummaryTableState = boardSummaryState;
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
-    if((boardDocuments ?? []).length === 0) {
+    if ((boardDocuments ?? []).length === 0) {
       updatedState.boardsTableItems = [];
       updatedState.isDataLoaded = true;
     } else {
@@ -312,7 +314,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     const sortDirection: false | SortDirection = header.column.getIsSorted()
     let sortClassName: string = "";
     let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
-    if(sortDirection) {
+    if (sortDirection) {
       sortClassName = sortDirection;
       ariaSort = `${sortDirection}ending`;
     }
@@ -361,7 +363,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }
 
   useEffect(() => {
-    if(teamId !== props.teamId) {
+    if (teamId !== props.teamId) {
       BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
         setTeamId(props.teamId);
         handleBoardsDocuments(boardDocuments);
@@ -371,7 +373,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     }
   }, [props.teamId])
 
-  if(boardSummaryState.allDataLoaded !== true) {
+  if (boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
       label="Loading..."
@@ -382,35 +384,35 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   return (
     <div className="board-summary-table-container">
       <table>
-          <thead role="rowgroup">
-            {table.getHeaderGroups().map(headerGroup => (
-                <tr key={headerGroup.id} role="row">
-                  {headerGroup.headers.map(header => (
-                    <th {...getThProps(header)} onClick={header.column.getToggleSortingHandler()}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                      <div
-                      {...{
-                        onMouseDown: header.getResizeHandler(),
-                        onTouchStart: header.getResizeHandler(),
-                        className: `
+        <thead role="rowgroup">
+          {table.getHeaderGroups().map(headerGroup => (
+            <tr key={headerGroup.id} role="row">
+              {headerGroup.headers.map(header => (
+                <th {...getThProps(header)} onClick={header.column.getToggleSortingHandler()}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  <div
+                    {...{
+                      onMouseDown: header.getResizeHandler(),
+                      onTouchStart: header.getResizeHandler(),
+                      className: `
                           ${header.column.getCanResize() ? 'resizer' : ''}
                           ${header.column.getIsResizing() ? 'isResizing' : ''}
                         `
-                      }}
-                    />
-                    </th>
-                  ))}
-                </tr>
+                    }}
+                  />
+                </th>
               ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map(row => (
-              <Fragment key={row.id}>
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map(row => (
+            <Fragment key={row.id}>
               <tr
                 tabIndex={0}
                 aria-label="Board summary row. Click row to expand and view more statistics for this board."
@@ -424,14 +426,14 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
                 ))}
               </tr>
               {row.getIsExpanded() &&
-              <tr>
-                <td colSpan={row.getVisibleCells().length}>
-                  { boardRowSummary(row) }
-                </td>
-              </tr>}
-              </Fragment>
-            ))}
-          </tbody>
+                <tr>
+                  <td colSpan={row.getVisibleCells().length}>
+                    {boardRowSummary(row)}
+                  </td>
+                </tr>}
+            </Fragment>
+          ))}
+        </tbody>
       </table>
     </div>
   );
