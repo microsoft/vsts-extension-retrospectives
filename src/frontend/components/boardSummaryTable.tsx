@@ -114,13 +114,17 @@ function getTable(
                     await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
                     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
                   }
-                  setTableData((prevData) =>
-                    prevData.map((item: IBoardSummaryTableItem) =>
+                  console.log("Toggling archive state for board:", boardId, "to", toggleIsArchived);
+                  setTableData((prevData) => {
+                    console.log("Updating table data:", prevData);
+                    const r = prevData.map((item: IBoardSummaryTableItem) =>
                       item.id === boardId ? {
                         ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null
                       } : item
                     )
-                  );
+                    console.log("Updated table data:", r);
+                    return r;
+                  });
                   onArchiveToggle();
                 }
                 catch (error) {
@@ -218,10 +222,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
         boardsTableItems.push(boardSummaryItem);
 
-        const actionItemsForBoard = new Array<WorkItem>();
         actionItems[board.id] = {
           isDataLoaded: false,
-          actionItems: actionItemsForBoard,
+          actionItems: new Array<WorkItem>(),
         };
       });
 
