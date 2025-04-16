@@ -51,7 +51,7 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void
 ): Table<IBoardSummaryTableItem> {
-  // Add state for managing table data (opportunity to simplify or remove?)
+  // Add state for managing table data
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   React.useEffect(() => {
     if (!data || data.length === 0) {
