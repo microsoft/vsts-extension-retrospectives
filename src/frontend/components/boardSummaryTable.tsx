@@ -198,7 +198,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  // if this works then don't pass isDataLoaded
+  // if this works then do not pass isDataLoaded
   const table: Table<IBoardSummaryTableItem> = boardSummaryState.isDataLoaded ?
     getTable(
       boardSummaryState.boardsTableItems,
