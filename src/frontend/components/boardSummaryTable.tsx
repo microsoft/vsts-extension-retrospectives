@@ -177,7 +177,7 @@ function getTable(
     getRowCanExpand: () => true,
     state: {
       pagination: {
-        pageSize: tableData.length, 
+        pageSize: tableData.length,
         pageIndex: 0
       },
       sorting: sortingState
