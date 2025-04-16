@@ -51,6 +51,138 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void
 ): Table<IBoardSummaryTableItem> {
+  // If data is empty or invalid, gracefully handle the scenario
+  if (!data || data.length === 0) {
+    console.warn("No data provided to getTable.");
+    return null; // Do not render the table
+  }
+
+  const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
+
+  // Define columns for the table
+  const columns = [
+    columnHelper.accessor('id', {
+      header: null,
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) =>
+        cellContext.row.getCanExpand() ? (
+          <DefaultButton
+            className="contextual-menu-button"
+            aria-label="Expand Row"
+            title="Expand Row"
+          >
+            <span className="ms-Button-icon">
+              <i className={`fas ${cellContext.row.getIsExpanded() ? 'fa-caret-down' : 'fa-caret-right'}`}></i>
+            </span>
+          </DefaultButton>
+        ) : (
+          ''
+        ),
+      enableResizing: false,
+      enableSorting: false,
+    }),
+    columnHelper.accessor('boardName', {
+      header: 'Retrospective Name',
+      footer: info => info.column.id,
+    }),
+    columnHelper.accessor('createdDate', {
+      header: 'Created Date',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) =>
+        new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(
+          cellContext.row.original.createdDate
+        ),
+      size: 120,
+      sortDescFirst: true,
+    }),
+    columnHelper.accessor('isArchived', {
+      header: 'Archived',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
+        const boardId = cellContext.row.original.id;
+        const teamId = cellContext.row.original.teamId;
+        const isArchived = cellContext.row.original.isArchived;
+
+        return (
+          <div
+            onClick={(event) => event.stopPropagation()} // Prevent click propagation
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+          >
+            <input
+              type="checkbox"
+              checked={!!isArchived} // Ensure boolean value
+              onChange={async (event) => {
+                const toggleIsArchived = event.target.checked;
+                try {
+                  if (toggleIsArchived) {
+                    await BoardDataService.archiveFeedbackBoard(teamId, boardId);
+                  } else {
+                    await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
+                  }
+                  onArchiveToggle();
+                } catch (error) {
+                  console.error("Error while toggling archive state:", error);
+                }
+              }}
+            />
+          </div>
+        );
+      },
+      size: 35,
+      sortDescFirst: true,
+    }),
+    columnHelper.accessor('archivedDate', {
+      header: 'Archived Date',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date | undefined>) => {
+        const archivedDate = cellContext.row.original.archivedDate;
+        return archivedDate
+          ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(archivedDate)
+          : ''; // Return empty string if archivedDate is null or undefined
+      },
+      size: 120,
+      sortDescFirst: true,
+    }),
+    columnHelper.accessor('pendingWorkItemsCount', {
+      header: 'Open Work Items',
+      footer: info => info.column.id,
+      size: 110,
+    }),
+    columnHelper.accessor('totalWorkItemsCount', {
+      header: 'Total Work Items',
+      footer: info => info.column.id,
+      size: 110,
+    }),
+  ];
+
+  const tableOptions: TableOptions<IBoardSummaryTableItem> = {
+    data, // Use the passed-in data from BoardSummaryTable
+    columns,
+    columnResizeMode: 'onChange',
+    onSortingChange,
+    getSortedRowModel: getSortedRowModel(),
+    getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getRowCanExpand: () => true,
+    state: {
+      pagination: {
+        pageSize: data.length, // Dynamically set page size based on data length
+        pageIndex: 0,
+      },
+      sorting: sortingState,
+    },
+  };
+
+  return useReactTable(tableOptions); // Render table using React Table
+}
+
+/*
+function originalGetTable(
+  data: IBoardSummaryTableItem[],
+  sortingState: SortingState,
+  onSortingChange: OnChangeFn<SortingState>,
+  onArchiveToggle: () => void
+): Table<IBoardSummaryTableItem> {
   // Add state for managing table data (opportunity to simplify or remove?)
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   React.useEffect(() => {setTableData(data); }, [data]);
@@ -186,28 +318,49 @@ function getTable(
 
   return useReactTable(tableOptions);
 }
-
+*/
+//DPH made a lot of changes; good luck; may need to abandon and start over
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
-    boardsTableItems: new Array<IBoardSummaryTableItem>(),
+    boardsTableItems: new Array<IBoardSummaryTableItem>(), //[],
     isDataLoaded: false,
-    feedbackBoards: new Array<IFeedbackBoardDocument>(),
+    feedbackBoards: new Array<IFeedbackBoardDocument>(), //[],
     actionItemsByBoard: {},
     allDataLoaded: false
   })
-  const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
+
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'createdDate', desc: true }]);
+  //const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
   const table: Table<IBoardSummaryTableItem> =
     getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle);
 
   const updatedState: IBoardSummaryTableState = boardSummaryState;
 
+  useEffect(() => {
+    // Load data when teamId changes
+    if (teamId !== props.teamId) {
+      BoardDataService.getBoardsForTeam(props.teamId)
+        .then((boardDocuments: IFeedbackBoardDocument[]) => {
+          setTeamId(props.teamId);
+          handleBoardsDocuments(boardDocuments); // Process board documents into state
+        })
+        .catch(e => appInsights.trackException(e));
+    }
+  }, [props.teamId]);
+
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
-    if((boardDocuments ?? []).length === 0) {
-      updatedState.boardsTableItems = [];
-      updatedState.isDataLoaded = true;
-    } else {
+//DPH New
+    const updatedState: IBoardSummaryTableState = {
+      ...boardSummaryState,
+      boardsTableItems: [],
+      feedbackBoards: boardDocuments,
+      isDataLoaded: true,
+      allDataLoaded: boardDocuments.length > 0
+    };
+//DPH revised
+    if (boardDocuments.length > 0) {
       const boardsTableItems = new Array<IBoardSummaryTableItem>();
       const actionItems: IActionItemsTableItems = {};
 
@@ -237,11 +390,15 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         return (new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime());
       });
 
+      //DPH does this replace the direct settings below?
+      //setBoardSummaryState(updatedState);
       updatedState.boardsTableItems = boardsTableItems;
       updatedState.isDataLoaded = true;
       updatedState.feedbackBoards = boardDocuments;
       updatedState.actionItemsByBoard = actionItems;
     }
+    //DPH, new, set here or above?
+    //setBoardSummaryState(updatedState);
 
     handleActionItems().then();
   }
