@@ -167,7 +167,7 @@ function getTable(
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
-    data: tableData, 
+    data: tableData,
     columns,
     columnResizeMode: 'onChange',
     onSortingChange: onSortingChange,
