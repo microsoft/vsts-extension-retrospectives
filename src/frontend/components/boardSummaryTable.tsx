@@ -53,11 +53,12 @@ function getTable(
 ): Table<IBoardSummaryTableItem> {
   // Add state for managing table data (opportunity to simplify or remove?)
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
-  React.useEffect(() => {setTableData(data); }, [data]);
-  if (!data || data.length === 0) {
-    // get this error twice at the start
-    console.error("No data provided to getTable:", data);
-  }
+  React.useEffect(() => {
+    if (!data || data.length === 0) {
+      console.error("No data provided to getTable:", data);
+    }
+  }, [data]);
+
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
