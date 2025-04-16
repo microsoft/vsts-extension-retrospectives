@@ -323,9 +323,9 @@ function originalGetTable(
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
-    boardsTableItems: new Array<IBoardSummaryTableItem>(), //[],
+    boardsTableItems: [],
     isDataLoaded: false,
-    feedbackBoards: new Array<IFeedbackBoardDocument>(), //[],
+    feedbackBoards: [],
     actionItemsByBoard: {},
     allDataLoaded: false
   })
