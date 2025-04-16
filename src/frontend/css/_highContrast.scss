@@ -1,5 +1,5 @@
-@media screen and (-ms-high-contrast: active) {
-  @media screen and (-ms-high-contrast: black-on-white) {
+@media screen and (forced-colors: active) {
+  @media screen and (forced-colors: active) and (prefers-color-scheme: light) {
     /* Rules for users using black-on-white */
     .retrospective-notification-toast-container {
       .retrospective-notification-toast {
@@ -39,7 +39,7 @@
     }
   }
 
-  @media screen and (-ms-high-contrast: white-on-black) {
+  @media screen and (forced-colors: active) and (prefers-color-scheme: dark) {
     /* Rules for users using white-on-black */
     .retrospective-notification-toast-container {
       .retrospective-notification-toast {

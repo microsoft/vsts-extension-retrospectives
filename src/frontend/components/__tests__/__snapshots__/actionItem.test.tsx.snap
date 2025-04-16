@@ -1,5 +1,218 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Action Item component renders correctly when action items exist and areActionIconsHidden is false 1`] = `
+<StyledDocumentCardBase
+  className="related-task-sub-card "
+  key="1card"
+  type={1}
+>
+  <StyledDocumentCardPreviewBase
+    key="1preview"
+    previewImages={
+      [
+        {
+          "previewIconContainerClass": "work-item-type-icon-container",
+          "previewIconProps": {
+            "ariaLabel": "icon for work item type Test Work Item Type",
+            "imageProps": {
+              "alt": "icon for work item type Test Work Item Type",
+              "src": "testUrl",
+            },
+          },
+          "width": 36,
+        },
+      ]
+    }
+  />
+  <div
+    aria-label="Test Work Item Type Test Title, click to open work item"
+    className="ms-DocumentCard-details"
+    key="1details"
+    onClick={[Function]}
+    onKeyPress={[Function]}
+    role="button"
+    tabIndex={0}
+  >
+    <StyledDocumentCardTitleBase
+      key="1title"
+      shouldTruncate={true}
+      title="Test Title"
+    />
+  </div>
+  <StyledDocumentCardActionsBase
+    actions={
+      [
+        {
+          "ariaLabel": "Remove link to work item button",
+          "iconProps": {
+            "iconName": "RemoveLink",
+          },
+          "onClick": [Function],
+          "onKeyPress": [Function],
+          "title": "Remove link to work item",
+        },
+      ]
+    }
+  />
+</StyledDocumentCardBase>
+`;
+
+exports[`Action Item component renders correctly when action items exist and areActionIconsHidden is true 1`] = `
+<StyledDocumentCardBase
+  className="related-task-sub-card "
+  key="1card"
+  type={1}
+>
+  <StyledDocumentCardPreviewBase
+    key="1preview"
+    previewImages={
+      [
+        {
+          "previewIconContainerClass": "work-item-type-icon-container",
+          "previewIconProps": {
+            "ariaLabel": "icon for work item type Test Work Item Type",
+            "imageProps": {
+              "alt": "icon for work item type Test Work Item Type",
+              "src": "testUrl",
+            },
+          },
+          "width": 36,
+        },
+      ]
+    }
+  />
+  <div
+    aria-label="Test Work Item Type Test Title, click to open work item"
+    className="ms-DocumentCard-details"
+    key="1details"
+    onClick={[Function]}
+    onKeyPress={[Function]}
+    role="button"
+    tabIndex={0}
+  >
+    <StyledDocumentCardTitleBase
+      key="1title"
+      shouldTruncate={true}
+      title="Test Title"
+    />
+  </div>
+</StyledDocumentCardBase>
+`;
+
+exports[`Action Item component renders correctly when action items exist and shouldFocus is false 1`] = `
+<StyledDocumentCardBase
+  className="related-task-sub-card "
+  key="1card"
+  type={1}
+>
+  <StyledDocumentCardPreviewBase
+    key="1preview"
+    previewImages={
+      [
+        {
+          "previewIconContainerClass": "work-item-type-icon-container",
+          "previewIconProps": {
+            "ariaLabel": "icon for work item type Test Work Item Type",
+            "imageProps": {
+              "alt": "icon for work item type Test Work Item Type",
+              "src": "testUrl",
+            },
+          },
+          "width": 36,
+        },
+      ]
+    }
+  />
+  <div
+    aria-label="Test Work Item Type Test Title, click to open work item"
+    className="ms-DocumentCard-details"
+    key="1details"
+    onClick={[Function]}
+    onKeyPress={[Function]}
+    role="button"
+    tabIndex={0}
+  >
+    <StyledDocumentCardTitleBase
+      key="1title"
+      shouldTruncate={true}
+      title="Test Title"
+    />
+  </div>
+  <StyledDocumentCardActionsBase
+    actions={
+      [
+        {
+          "ariaLabel": "Remove link to work item button",
+          "iconProps": {
+            "iconName": "RemoveLink",
+          },
+          "onClick": [Function],
+          "onKeyPress": [Function],
+          "title": "Remove link to work item",
+        },
+      ]
+    }
+  />
+</StyledDocumentCardBase>
+`;
+
+exports[`Action Item component renders correctly when action items exist and shouldFocus is true 1`] = `
+<StyledDocumentCardBase
+  className="related-task-sub-card "
+  key="1card"
+  type={1}
+>
+  <StyledDocumentCardPreviewBase
+    key="1preview"
+    previewImages={
+      [
+        {
+          "previewIconContainerClass": "work-item-type-icon-container",
+          "previewIconProps": {
+            "ariaLabel": "icon for work item type Test Work Item Type",
+            "imageProps": {
+              "alt": "icon for work item type Test Work Item Type",
+              "src": "testUrl",
+            },
+          },
+          "width": 36,
+        },
+      ]
+    }
+  />
+  <div
+    aria-label="Test Work Item Type Test Title, click to open work item"
+    className="ms-DocumentCard-details"
+    key="1details"
+    onClick={[Function]}
+    onKeyPress={[Function]}
+    role="button"
+    tabIndex={0}
+  >
+    <StyledDocumentCardTitleBase
+      key="1title"
+      shouldTruncate={true}
+      title="Test Title"
+    />
+  </div>
+  <StyledDocumentCardActionsBase
+    actions={
+      [
+        {
+          "ariaLabel": "Remove link to work item button",
+          "iconProps": {
+            "iconName": "RemoveLink",
+          },
+          "onClick": [Function],
+          "onKeyPress": [Function],
+          "title": "Remove link to work item",
+        },
+      ]
+    }
+  />
+</StyledDocumentCardBase>
+`;
+
 exports[`Action Item component renders correctly when there are no action items. 1`] = `
 <StyledDocumentCardBase
   className="related-task-sub-card "
