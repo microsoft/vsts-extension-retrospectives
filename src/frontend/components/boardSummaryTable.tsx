@@ -391,11 +391,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       });
 
       //DPH does this replace the direct settings below?
-      //setBoardSummaryState(updatedState);
+      setBoardSummaryState(updatedState);
+      /*
       updatedState.boardsTableItems = boardsTableItems;
       updatedState.isDataLoaded = true;
       updatedState.feedbackBoards = boardDocuments;
       updatedState.actionItemsByBoard = actionItems;
+      */
     }
     //DPH, new, set here or above?
     //setBoardSummaryState(updatedState);
