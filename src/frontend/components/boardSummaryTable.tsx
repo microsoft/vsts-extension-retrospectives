@@ -98,8 +98,8 @@ function getTable(
       header: 'Archived',
       footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
-        const boardId = cellContext.row.original.id; // Board ID
-        const teamId = cellContext.row.original.teamId; // Team ID
+        const boardId = cellContext.row.original.id;
+        const teamId = cellContext.row.original.teamId;
         const isArchived = cellContext.row.original.isArchived;
 
         return (
