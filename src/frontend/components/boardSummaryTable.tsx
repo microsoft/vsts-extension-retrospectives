@@ -298,12 +298,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       }));
 
       updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ? { ...item, feedbackItemsCount } : item);
-
-      setBoardSummaryState({
-        ...updatedState,
-        allDataLoaded: true
-      });
     }));
+    //DPH move setBoardSummaryState outside await promise
+    setBoardSummaryState({
+      ...updatedState,
+      allDataLoaded: true
+    });
   }
 
   const boardRowSummary = (row: Row<IBoardSummaryTableItem>) => {
