@@ -1,4 +1,4 @@
-import React, { Fragment, KeyboardEvent, useEffect, useState } from 'react';
+import React, { Fragment, KeyboardEvent, useEffect, useState, useMemo } from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
@@ -198,8 +198,18 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  const table: Table<IBoardSummaryTableItem> =
-    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
+  const table = useMemo(() => {
+    return getTable(
+      boardSummaryState.boardsTableItems,
+      sorting,
+      setSorting,
+      props.onArchiveToggle,
+      boardSummaryState.isDataLoaded
+    );
+  }, [boardSummaryState.boardsTableItems, boardSummaryState.isDataLoaded, sorting]);
+  
+//  const table: Table<IBoardSummaryTableItem> =
+//    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
 
   //const updatedState: IBoardSummaryTableState = boardSummaryState;
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
