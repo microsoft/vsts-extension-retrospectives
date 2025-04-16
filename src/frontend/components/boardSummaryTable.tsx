@@ -167,7 +167,7 @@ function getTable(
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
-    data: tableData, // <-- Use state instead of original data
+    data: tableData, 
     columns,
     columnResizeMode: 'onChange',
     onSortingChange: onSortingChange,
@@ -177,7 +177,7 @@ function getTable(
     getRowCanExpand: () => true,
     state: {
       pagination: {
-        pageSize: tableData.length, // <-- Use state instead of original data
+        pageSize: tableData.length, 
         pageIndex: 0
       },
       sorting: sortingState
@@ -198,31 +198,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  /*
-  const table = useMemo(() => {
-    return getTable(
-      boardSummaryState.boardsTableItems,
-      sorting,
-      setSorting,
-      props.onArchiveToggle,
-      boardSummaryState.isDataLoaded
-    );
-  }, [boardSummaryState.boardsTableItems, boardSummaryState.isDataLoaded, sorting]);
-*/
-//  const table: Table<IBoardSummaryTableItem> =
-//    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
+  const table: Table<IBoardSummaryTableItem> =
+    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
 
-  const table = boardSummaryState.isDataLoaded
-    ? getTable(
-      boardSummaryState.boardsTableItems,
-      sorting,
-      setSorting,
-      props.onArchiveToggle,
-      true // you know it’s loaded
-    )
-  : null;
-
-  //const updatedState: IBoardSummaryTableState = boardSummaryState;
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
@@ -320,7 +298,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
       updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ? { ...item, feedbackItemsCount } : item);
     }));
-    //DPH move setBoardSummaryState outside await promise
+
     setBoardSummaryState({
       ...updatedState,
       allDataLoaded: true
