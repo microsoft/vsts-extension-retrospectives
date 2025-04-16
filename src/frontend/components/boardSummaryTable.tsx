@@ -209,8 +209,18 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     );
   }, [boardSummaryState.boardsTableItems, boardSummaryState.isDataLoaded, sorting]);
 */
-  const table: Table<IBoardSummaryTableItem> =
-    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
+//  const table: Table<IBoardSummaryTableItem> =
+//    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
+
+  const table = boardSummaryState.isDataLoaded
+    ? getTable(
+      boardSummaryState.boardsTableItems,
+      sorting,
+      setSorting,
+      props.onArchiveToggle,
+      true // you know it’s loaded
+    )
+  : null;
 
   //const updatedState: IBoardSummaryTableState = boardSummaryState;
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
