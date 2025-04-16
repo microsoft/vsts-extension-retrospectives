@@ -7,12 +7,13 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
 import { Cell, CellContext, Header, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { appInsights, reactPlugin } from '../utilities/telemetryClient';
+import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
   supportedWorkItemTypes: WorkItemType[];
+  onArchiveToggle: () => void; // New prop to notify the parent about archive toggles
 }
 
 export interface IBoardSummaryTableState {
@@ -26,10 +27,13 @@ export interface IBoardSummaryTableState {
 export interface IBoardSummaryTableItem {
   boardName: string;
   createdDate: Date;
+  isArchived?: boolean;
+  archivedDate?: Date; //archivedDate not set for legacy archived boards
   pendingWorkItemsCount: number;
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
-  id: string;
+  id: string; // Board ID
+  teamId: string;
 }
 
 export interface IBoardActionItemsData {
@@ -41,7 +45,20 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
-function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>): Table<IBoardSummaryTableItem> {
+function getTable(
+  data: IBoardSummaryTableItem[],
+  sortingState: SortingState,
+  onSortingChange: OnChangeFn<SortingState>,
+  onArchiveToggle: () => void
+): Table<IBoardSummaryTableItem> {
+  // Add state for managing table data
+  const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
+  React.useEffect(() => {
+    if (!data || data.length === 0) {
+      console.error("No data provided to getTable:", data);
+    }
+  }, [data]);
+
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
   const columns = [
     columnHelper.accessor('id', {
@@ -75,23 +92,83 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
           new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
         )
       },
-      size: 175,
+      size: 120,
+      sortDescFirst: true
+    }),
+    columnHelper.accessor('isArchived', {
+      header: 'Archived',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
+        const boardId = cellContext.row.original.id; // Board ID
+        const teamId = cellContext.row.original.teamId; // Team ID
+        const isArchived = cellContext.row.original.isArchived;
+
+        return (
+          <div
+            onClick={(event) => event.stopPropagation()} // Prevent click propagation
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+          >
+          <input
+            type="checkbox"
+            checked={!!isArchived} // Ensure boolean value
+            onChange={async (event) => {
+              const toggleIsArchived = event.target.checked;
+              try {
+                if (toggleIsArchived) {
+                  await BoardDataService.archiveFeedbackBoard(teamId, boardId);
+                  appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
+                } else {
+                  await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
+                  appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
+                }
+                // update local state to reflect updated archive status
+                setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
+                prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
+                    item.id === boardId ? {
+                      ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null
+                    } : item
+                  )
+                )
+                onArchiveToggle();
+              }
+              catch (error) {
+                console.error("Error while toggling archive state:", error);
+              }
+            }
+          }
+          />
+          </div>
+        );
+      },
+      size: 35,
+      sortDescFirst: true,
+    }),
+    columnHelper.accessor('archivedDate', {
+      header: 'Archived Date',
+      footer: info => info.column.id,
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date | undefined>) => {
+        const archivedDate = cellContext.row.original.archivedDate;
+        return archivedDate
+          ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(archivedDate)
+          : ''; // Return an empty string if archivedDate is null or undefined
+      },
+      size: 120,
       sortDescFirst: true
     }),
     columnHelper.accessor('pendingWorkItemsCount', {
-      header: 'Pending Work Items',
+      header: 'Open Work Items',
       footer: info => info.column.id,
-      size: 170,
+      size: 110,
     }),
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
       footer: info => info.column.id,
-      size: 170,
+      size: 110,
     })
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
-    data,
+    data: tableData, // <-- Use state instead of original data
     columns,
     columnResizeMode: 'onChange',
     onSortingChange: onSortingChange,
@@ -101,11 +178,11 @@ function getTable(data: IBoardSummaryTableItem[], sortingState: SortingState, on
     getRowCanExpand: () => true,
     state: {
       pagination: {
-        pageSize: data.length,
+        pageSize: tableData.length, // <-- Use state instead of original data
         pageIndex: 0
       },
       sorting: sortingState
-    }
+    },
   }
 
   return useReactTable(tableOptions);
@@ -122,7 +199,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  const table: Table<IBoardSummaryTableItem> = getTable(boardSummaryState.boardsTableItems, sorting, setSorting);
+  const table: Table<IBoardSummaryTableItem> =
+    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle);
 
   const updatedState: IBoardSummaryTableState = boardSummaryState;
 
@@ -138,10 +216,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         const boardSummaryItem: IBoardSummaryTableItem = {
           boardName: board.title,
           createdDate: new Date(board.createdDate),
+          isArchived: board.isArchived ?? false,
+          archivedDate: board.archivedDate ? new Date(board.archivedDate) : null,
           pendingWorkItemsCount: 0,
           totalWorkItemsCount: 0,
-          id: board.id,
           feedbackItemsCount: 0,
+          id: board.id,
+          teamId: board.teamId,
         };
 
         boardsTableItems.push(boardSummaryItem);
