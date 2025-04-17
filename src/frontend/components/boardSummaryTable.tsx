@@ -203,7 +203,7 @@ async function loadTable(): Promise<Table<IBoardSummaryTableItem> | undefined> {
 }
 */
 
-function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
+async function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
     boardsTableItems: new Array<IBoardSummaryTableItem>(),
@@ -214,18 +214,33 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  /* If this works then do not pass isDataLoaded
-  const table: Table<IBoardSummaryTableItem> = boardSummaryState.isDataLoaded ?
-    getTable(
+  let table: Table<IBoardSummaryTableItem> | undefined;
+
+  if (boardSummaryState.isDataLoaded) {
+    table = getTable(
       boardSummaryState.boardsTableItems,
       sorting,
       setSorting,
       props.onArchiveToggle,
       boardSummaryState.isDataLoaded
-    ) : undefined;
-*/
-  const table: Table<IBoardSummaryTableItem> =
-    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
+    );
+    console.log('did not wait');
+  } else {
+    while (!boardSummaryState.isDataLoaded) {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 100ms before checking again
+    }
+    table = getTable(
+      boardSummaryState.boardsTableItems,
+      sorting,
+      setSorting,
+      props.onArchiveToggle,
+      boardSummaryState.isDataLoaded
+    );
+    console.log('waited');
+  }
+
+//  const table: Table<IBoardSummaryTableItem> =
+//    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
 
 //  const table: Table<IBoardSummaryTableItem> | undefined =
 //    boardSummaryState.isDataLoaded ? await loadTable() : undefined;
