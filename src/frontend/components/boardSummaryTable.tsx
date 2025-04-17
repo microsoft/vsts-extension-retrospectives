@@ -187,22 +187,6 @@ function getTable(
   return useReactTable(tableOptions);
 }
 
-/*
-async function loadTable(): Promise<Table<IBoardSummaryTableItem> | undefined> {
-  while (!boardSummaryState.isDataLoaded) {
-    await new Promise(resolve => setTimeout(resolve, 100)); // Poll every 100ms
-  }
-
-  return getTable(
-    boardSummaryState.boardsTableItems,
-    sorting,
-    setSorting,
-    props.onArchiveToggle,
-    boardSummaryState.isDataLoaded
-  );
-}
-*/
-
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
@@ -214,42 +198,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  //DPH try new waiting approach; seems redundant with getTable function
-  const [table, setTable] = React.useState<Table<IBoardSummaryTableItem> | undefined>(undefined);
-
-  React.useEffect(() => {
-    let isMounted = true;
-
-    async function loadTable() {
-      while (!boardSummaryState.isDataLoaded) {
-        await new Promise(resolve => setTimeout(resolve, 100)); // Poll until data is loaded
-      }
-
-      if (isMounted) {
-        setTable(
-          getTable(
-            boardSummaryState.boardsTableItems,
-            sorting,
-            setSorting,
-            props.onArchiveToggle,
-            boardSummaryState.isDataLoaded
-          )
-        );
-      }
-    }
-
-    loadTable();
-
-    return () => {
-      isMounted = false; // Prevent state updates after the component is unmounted
-    };
-  }, [props.onArchiveToggle, sorting]);
-
-//  const table: Table<IBoardSummaryTableItem> =
-//    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
-
-//  const table: Table<IBoardSummaryTableItem> | undefined =
-//    boardSummaryState.isDataLoaded ? await loadTable() : undefined;
+  const table: Table<IBoardSummaryTableItem> =
+    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
