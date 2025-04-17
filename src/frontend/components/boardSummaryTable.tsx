@@ -54,7 +54,6 @@ function getTable(
 ): Table<IBoardSummaryTableItem> {
   // Add state for managing table data (opportunity to simplify or remove?)
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
-  console.log('after useState, before useEffect')
   React.useEffect(() => {setTableData(data); }, [data]);
   if (isDataLoaded && (!data || data.length === 0)) {
     console.error("No data provided to getTable:", data);
@@ -372,26 +371,32 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-readonly': true
     };
   }
-  console.log('after getTdProps, before useEffect'); // Check lifecycle progress
-useEffect(() => {
-  console.log('Inside useEffect - props.teamId:', props.teamId, 'teamId:', teamId);
-  if (teamId !== props.teamId) {
-    console.log('teamId mismatch, fetching boards for team:', props.teamId);
-    BoardDataService.getBoardsForTeam(props.teamId)
-      .then((boardDocuments: IFeedbackBoardDocument[]) => {
-        console.log('Fetched boardDocuments:', boardDocuments);
-        setTeamId(props.teamId);
-        handleBoardsDocuments(boardDocuments);
-      })
-      .catch(e => {
-        console.error('Error fetching boards for team:', props.teamId, e);
-        appInsights.trackException(e);
-      });
-  }
-}, [props.teamId]);
-console.log('after useEffect, before if'); // Check if it executes too early
+
+  useEffect(() => {
+    // Log to track execution and props state
+    console.log('useEffect triggered - teamId:', teamId, 'props.teamId:', props.teamId);
+    // Prevent duplicate calls with stricter condition
+    if (teamId !== props.teamId) {
+      console.log('Fetching boards for team:', props.teamId);
+      BoardDataService.getBoardsForTeam(props.teamId)
+        .then((boardDocuments: IFeedbackBoardDocument[]) => {
+          console.log('Successfully fetched boardDocuments:', boardDocuments);
+          // Update teamId state and process boards
+          setTeamId(props.teamId);
+          handleBoardsDocuments(boardDocuments);
+        })
+        .catch((e) => {
+          console.error('Error fetching boards for team:', e);
+          // Ensure app doesn't get stuck by allowing rendering to proceed
+          setBoardSummaryState((prevState) => ({
+            ...prevState,
+            allDataLoaded: true,
+          }));
+          appInsights.trackException(e);
+        });
+    }
+  }, [props.teamId]);
 /*
-console.log('after getTdProps, before useEffect')
   useEffect(() => {
     if(teamId !== props.teamId) {
       BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
@@ -402,8 +407,8 @@ console.log('after getTdProps, before useEffect')
       })
     }
   }, [props.teamId])
-  console.log('after useEffect, before if')
 */
+  console.log('before spinner');
   if(boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
@@ -411,7 +416,7 @@ console.log('after getTdProps, before useEffect')
       ariaLive="assertive"
     />
   }
-console.log('after spinner, before return')
+  console.log('after spinner');
   return (
     <div className="board-summary-table-container">
       <table>
