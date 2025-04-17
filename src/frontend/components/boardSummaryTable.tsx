@@ -199,10 +199,10 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     allDataLoaded: false
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
-  console.log('before getTable called')
+
   const table: Table<IBoardSummaryTableItem> =
     getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
-  console.log('after getTable called')
+
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
@@ -371,35 +371,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-readonly': true
     };
   }
-//DPH
-  let isFetching = false;
 
-  useEffect(() => {
-    console.log('useEffect triggered - teamId:', teamId, 'props.teamId:', props.teamId);
-    if (teamId !== props.teamId && !isFetching) {
-      isFetching = true; // Prevent duplicate calls
-      console.log('Fetching boards for team:', props.teamId);
-      BoardDataService.getBoardsForTeam(props.teamId)
-        .then((boardDocuments) => {
-          console.log('Successfully fetched boardDocuments:', boardDocuments);
-          setTeamId(props.teamId); // Update teamId
-          handleBoardsDocuments(boardDocuments); // Process board documents
-        })
-        .catch((e) => {
-          console.error('Error fetching boards for team:', e);
-          setBoardSummaryState((prevState) => ({
-            ...prevState,
-            allDataLoaded: true, // Allow rendering to proceed
-          }));
-          appInsights.trackException(e);
-        })
-        .finally(() => {
-          isFetching = false; // Reset flag after completion
-        });
-    }
-  }, [props.teamId]);
-
-/*
   useEffect(() => {
     if(teamId !== props.teamId) {
       BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
@@ -410,8 +382,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       })
     }
   }, [props.teamId])
-*/
-  console.log('before spinner');
+
   if(boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
@@ -419,7 +390,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       ariaLive="assertive"
     />
   }
-  console.log('after spinner');
+
   return (
     <div className="board-summary-table-container">
       <table>
