@@ -372,6 +372,25 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-readonly': true
     };
   }
+  console.log('after getTdProps, before useEffect'); // Check lifecycle progress
+useEffect(() => {
+  console.log('Inside useEffect - props.teamId:', props.teamId, 'teamId:', teamId);
+  if (teamId !== props.teamId) {
+    console.log('teamId mismatch, fetching boards for team:', props.teamId);
+    BoardDataService.getBoardsForTeam(props.teamId)
+      .then((boardDocuments: IFeedbackBoardDocument[]) => {
+        console.log('Fetched boardDocuments:', boardDocuments);
+        setTeamId(props.teamId);
+        handleBoardsDocuments(boardDocuments);
+      })
+      .catch(e => {
+        console.error('Error fetching boards for team:', props.teamId, e);
+        appInsights.trackException(e);
+      });
+  }
+}, [props.teamId]);
+console.log('after useEffect, before if'); // Check if it executes too early
+/*
 console.log('after getTdProps, before useEffect')
   useEffect(() => {
     if(teamId !== props.teamId) {
@@ -384,6 +403,7 @@ console.log('after getTdProps, before useEffect')
     }
   }, [props.teamId])
   console.log('after useEffect, before if')
+*/
   if(boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
