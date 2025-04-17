@@ -115,9 +115,9 @@ function getTable(
                     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
                   }
                   console.log("Toggling archive state for board:", boardId, "to", toggleIsArchived);
-                  setTableData((prevData) => {
-                    console.log("Updating table data:", prevData);
-                    const r = prevData.map((item: IBoardSummaryTableItem) =>
+                  setTableData(() => {
+                    console.log("Updating table data:", tableData);
+                    const r = tableData.map((item: IBoardSummaryTableItem) =>
                       item.id === boardId ? {
                         ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null
                       } : item
