@@ -202,9 +202,8 @@ async function loadTable(): Promise<Table<IBoardSummaryTableItem> | undefined> {
   );
 }
 */
-async function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): Promise<JSX.Element> {
 
-//async function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
+function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
     boardsTableItems: new Array<IBoardSummaryTableItem>(),
@@ -215,30 +214,36 @@ async function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): Prom
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  let table: Table<IBoardSummaryTableItem> | undefined;
+  //DPH try new waiting approach; seems redundant with getTable function
+  const [table, setTable] = React.useState<Table<IBoardSummaryTableItem> | undefined>(undefined);
 
-  if (boardSummaryState.isDataLoaded) {
-    table = getTable(
-      boardSummaryState.boardsTableItems,
-      sorting,
-      setSorting,
-      props.onArchiveToggle,
-      boardSummaryState.isDataLoaded
-    );
-    console.log('did not wait');
-  } else {
-    while (!boardSummaryState.isDataLoaded) {
-      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 100ms before checking again
+  React.useEffect(() => {
+    let isMounted = true;
+
+    async function loadTable() {
+      while (!boardSummaryState.isDataLoaded) {
+        await new Promise(resolve => setTimeout(resolve, 100)); // Poll until data is loaded
+      }
+
+      if (isMounted) {
+        setTable(
+          getTable(
+            boardSummaryState.boardsTableItems,
+            sorting,
+            setSorting,
+            props.onArchiveToggle,
+            boardSummaryState.isDataLoaded
+          )
+        );
+      }
     }
-    table = getTable(
-      boardSummaryState.boardsTableItems,
-      sorting,
-      setSorting,
-      props.onArchiveToggle,
-      boardSummaryState.isDataLoaded
-    );
-    console.log('waited');
-  }
+
+    loadTable();
+
+    return () => {
+      isMounted = false; // Prevent state updates after the component is unmounted
+    };
+  }, [props.onArchiveToggle, sorting]);
 
 //  const table: Table<IBoardSummaryTableItem> =
 //    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
