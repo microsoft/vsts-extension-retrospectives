@@ -202,8 +202,9 @@ async function loadTable(): Promise<Table<IBoardSummaryTableItem> | undefined> {
   );
 }
 */
+async function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): Promise<JSX.Element> {
 
-async function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
+//async function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
     boardsTableItems: new Array<IBoardSummaryTableItem>(),
