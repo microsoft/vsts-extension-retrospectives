@@ -54,11 +54,15 @@ function getTable(
 ): Table<IBoardSummaryTableItem> {
   // Add state for managing table data (opportunity to simplify or remove?)
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
+  console.log('after useState, before useEffect')
   React.useEffect(() => {setTableData(data); }, [data]);
+  console.log('after useEffect, before if')
   if (isDataLoaded && (!data || data.length === 0)) {
     console.error("No data provided to getTable:", data);
   }
+  console.log('after if, before columnHelper')
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
+  console.log('after columnHelper, before columns')
   const columns = [
     columnHelper.accessor('id', {
       header: null,
@@ -165,7 +169,7 @@ function getTable(
       size: 110,
     })
   ]
-
+  console.log('After columns defined, before tableOptions')
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
     data: tableData,
     columns,
@@ -183,7 +187,7 @@ function getTable(
       sorting: sortingState
     },
   }
-
+  console.log('After tableOptions, before return')
   return useReactTable(tableOptions);
 }
 
