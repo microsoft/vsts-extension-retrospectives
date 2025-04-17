@@ -371,31 +371,34 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-readonly': true
     };
   }
+//DPH
+  let isFetching = false;
 
   useEffect(() => {
-    // Log to track execution and props state
     console.log('useEffect triggered - teamId:', teamId, 'props.teamId:', props.teamId);
-    // Prevent duplicate calls with stricter condition
-    if (teamId !== props.teamId) {
+    if (teamId !== props.teamId && !isFetching) {
+      isFetching = true; // Prevent duplicate calls
       console.log('Fetching boards for team:', props.teamId);
       BoardDataService.getBoardsForTeam(props.teamId)
-        .then((boardDocuments: IFeedbackBoardDocument[]) => {
+        .then((boardDocuments) => {
           console.log('Successfully fetched boardDocuments:', boardDocuments);
-          // Update teamId state and process boards
-          setTeamId(props.teamId);
-          handleBoardsDocuments(boardDocuments);
+          setTeamId(props.teamId); // Update teamId
+          handleBoardsDocuments(boardDocuments); // Process board documents
         })
         .catch((e) => {
           console.error('Error fetching boards for team:', e);
-          // Ensure app doesn't get stuck by allowing rendering to proceed
           setBoardSummaryState((prevState) => ({
             ...prevState,
-            allDataLoaded: true,
+            allDataLoaded: true, // Allow rendering to proceed
           }));
           appInsights.trackException(e);
+        })
+        .finally(() => {
+          isFetching = false; // Reset flag after completion
         });
     }
   }, [props.teamId]);
+
 /*
   useEffect(() => {
     if(teamId !== props.teamId) {
