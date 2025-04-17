@@ -227,7 +227,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const table: Table<IBoardSummaryTableItem> =
     getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
 
-//  const table: Table<IBoardSummaryTableItem> | undefined = 
+//  const table: Table<IBoardSummaryTableItem> | undefined =
 //    boardSummaryState.isDataLoaded ? await loadTable() : undefined;
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
