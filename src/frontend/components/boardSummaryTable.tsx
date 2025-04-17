@@ -53,16 +53,16 @@ function getTable(
   isDataLoaded: boolean
 ): Table<IBoardSummaryTableItem> {
   // Add state for managing table data (opportunity to simplify or remove?)
+  console.log('first line in getTable, before tableData')
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   console.log('after useState, before useEffect')
   React.useEffect(() => {setTableData(data); }, [data]);
-  console.log('after useEffect, before if')
   if (isDataLoaded && (!data || data.length === 0)) {
     console.error("No data provided to getTable:", data);
   }
-  console.log('after if, before columnHelper')
+
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
-  console.log('after columnHelper, before columns')
+
   const columns = [
     columnHelper.accessor('id', {
       header: null,
@@ -169,7 +169,7 @@ function getTable(
       size: 110,
     })
   ]
-  console.log('After columns defined, before tableOptions')
+
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
     data: tableData,
     columns,
@@ -201,12 +201,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     allDataLoaded: false
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
-
+  console.log('before getTable called')
   const table: Table<IBoardSummaryTableItem> =
     getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
-
+  console.log('after getTable called')
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
-
+  console.log('before handleBoardsDocuments')
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     if((boardDocuments ?? []).length === 0) {
       updatedState.boardsTableItems = [];
@@ -249,7 +249,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
     handleActionItems().then();
   }
-
+  console.log('after handleBoardsDocuments, before handleActionItems')
   const handleActionItems = async () => {
     await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
       const feedbackBoardId: string = feedbackBoard.id;
@@ -308,7 +308,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       allDataLoaded: true
     });
   }
-
+console.log('after handleActionItems, before boardRowSummary')
   const boardRowSummary = (row: Row<IBoardSummaryTableItem>) => {
     const currentBoard = boardSummaryState.boardsTableItems.find(board => board.id === row.original.id);
     const actionItems = boardSummaryState.actionItemsByBoard[currentBoard.id];
@@ -321,7 +321,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       supportedWorkItemTypes={props.supportedWorkItemTypes}
     />
   }
-
+console.log('after boardRowSummary, before getThProps')
   const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
     const sortDirection: false | SortDirection = header.column.getIsSorted()
     let sortClassName: string = "";
@@ -373,7 +373,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-readonly': true
     };
   }
-
+console.log('after getTdProps, before useEffect')
   useEffect(() => {
     if(teamId !== props.teamId) {
       BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
@@ -392,7 +392,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       ariaLive="assertive"
     />
   }
-
+console.log('after spinner, before return')
   return (
     <div className="board-summary-table-container">
       <table>
