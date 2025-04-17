@@ -252,10 +252,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 console.log('handleActionItems begin')
     await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
       const feedbackBoardId: string = feedbackBoard.id;
+console.log('feedbackBoardId:'+feedbackBoardId);
       const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
-
+console.log('feedbackItems:'+feedbackItems);
       if (!feedbackItems.length) {
-console.log('1st return');
+console.log('1st return: no feedback items');
         return;
       }
 
@@ -270,13 +271,13 @@ console.log('1st return');
 
       await Promise.all(feedbackItems.map(async (feedbackItem) => {
         if (!feedbackItem.associatedActionItemIds?.length) {
-console.log('2nd return');
+console.log('2nd return: no associated action items');
           return;
         }
 
         const workItems = await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds);
         if (!workItems.length) {
-console.log('3rd return')
+console.log('3rd return: no work items');
           return
         }
 
@@ -306,7 +307,7 @@ console.log('6th return');
 
       updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ? { ...item, feedbackItemsCount } : item);
     }));
-console.log('setBoardSummaryState')
+
     setBoardSummaryState({
       ...updatedState,
       allDataLoaded: true
