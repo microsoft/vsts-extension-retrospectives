@@ -53,7 +53,6 @@ function getTable(
   isDataLoaded: boolean
 ): Table<IBoardSummaryTableItem> {
   // Add state for managing table data (opportunity to simplify or remove?)
-  console.log('first line in getTable, before tableData')
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   console.log('after useState, before useEffect')
   React.useEffect(() => {setTableData(data); }, [data]);
@@ -187,7 +186,7 @@ function getTable(
       sorting: sortingState
     },
   }
-  console.log('After tableOptions, before return')
+
   return useReactTable(tableOptions);
 }
 
@@ -206,7 +205,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
   console.log('after getTable called')
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
-  console.log('before handleBoardsDocuments')
+
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     if((boardDocuments ?? []).length === 0) {
       updatedState.boardsTableItems = [];
@@ -249,7 +248,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
     handleActionItems().then();
   }
-  console.log('after handleBoardsDocuments, before handleActionItems')
+
   const handleActionItems = async () => {
     await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
       const feedbackBoardId: string = feedbackBoard.id;
@@ -308,7 +307,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       allDataLoaded: true
     });
   }
-console.log('after handleActionItems, before boardRowSummary')
+
   const boardRowSummary = (row: Row<IBoardSummaryTableItem>) => {
     const currentBoard = boardSummaryState.boardsTableItems.find(board => board.id === row.original.id);
     const actionItems = boardSummaryState.actionItemsByBoard[currentBoard.id];
@@ -321,7 +320,7 @@ console.log('after handleActionItems, before boardRowSummary')
       supportedWorkItemTypes={props.supportedWorkItemTypes}
     />
   }
-console.log('after boardRowSummary, before getThProps')
+
   const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
     const sortDirection: false | SortDirection = header.column.getIsSorted()
     let sortClassName: string = "";
@@ -384,7 +383,7 @@ console.log('after getTdProps, before useEffect')
       })
     }
   }, [props.teamId])
-
+  console.log('after useEffect, before if')
   if(boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
