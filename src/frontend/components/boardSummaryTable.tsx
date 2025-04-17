@@ -187,6 +187,22 @@ function getTable(
   return useReactTable(tableOptions);
 }
 
+/*
+async function loadTable(): Promise<Table<IBoardSummaryTableItem> | undefined> {
+  while (!boardSummaryState.isDataLoaded) {
+    await new Promise(resolve => setTimeout(resolve, 100)); // Poll every 100ms
+  }
+
+  return getTable(
+    boardSummaryState.boardsTableItems,
+    sorting,
+    setSorting,
+    props.onArchiveToggle,
+    boardSummaryState.isDataLoaded
+  );
+}
+*/
+
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
@@ -198,7 +214,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
 
-  // If this works then do not pass isDataLoaded
+  /* If this works then do not pass isDataLoaded
   const table: Table<IBoardSummaryTableItem> = boardSummaryState.isDataLoaded ?
     getTable(
       boardSummaryState.boardsTableItems,
@@ -207,11 +223,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       props.onArchiveToggle,
       boardSummaryState.isDataLoaded
     ) : undefined;
+*/
+  const table: Table<IBoardSummaryTableItem> =
+    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
 
- // const table: Table<IBoardSummaryTableItem> =
- //   getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
-
-  const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
+//  const table: Table<IBoardSummaryTableItem> | undefined = 
+//    boardSummaryState.isDataLoaded ? await loadTable() : undefined;
+//  const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     if((boardDocuments ?? []).length === 0) {
