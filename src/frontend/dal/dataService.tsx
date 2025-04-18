@@ -26,8 +26,8 @@ export async function readDocuments<T>(
     data = await dataService.getDocuments(collectionName, isPrivate ? { scopeType: 'User' } : undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
+    console.log("error orginates from readDocuments, while processing:"+collectionName);
     console.error(e);
-    console.log("error orginates from readDocuments");
     appInsights.trackException(e);
     if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
       if (throwCollectionDoesNotExistException) {

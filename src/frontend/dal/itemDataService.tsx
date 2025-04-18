@@ -74,7 +74,7 @@ class ItemDataService {
       feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-      console.log("error orginates from getFeedbackItemsForBoard");
+      console.log("error orginates from getFeedbackItemsForBoard while processing:"+boardId);
       console.error(e);
       appInsights.trackException(e);
       if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
