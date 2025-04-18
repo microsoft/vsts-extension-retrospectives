@@ -9,6 +9,7 @@ import './css/main.scss';
 import { reactPlugin } from './utilities/telemetryClient';
 import { AppInsightsErrorBoundary } from '@microsoft/applicationinsights-react-js';
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from './components/feedbackBoardContainer';
+import { SDKProvider } from './dal/azureDevOpsContextProvider';
 
 initializeIcons('https://res.cdn.office.net/files/fabric-cdn-prod_20240129.001/assets/icons/');
 
@@ -20,9 +21,11 @@ sdkInit({ applyTheme: true }).then(() => {
     };
 
     ReactDOM.render(
-      <AppInsightsErrorBoundary onError={() => <h1>We detected an error in the application</h1>} appInsights={reactPlugin}>
+      <SDKProvider>
+        <AppInsightsErrorBoundary onError={() => <h1>We detected an error in the application</h1>} appInsights={reactPlugin}>
           <FeedbackBoardContainer {...feedbackBoardContainerProps} />
-      </AppInsightsErrorBoundary>,
+        </AppInsightsErrorBoundary>
+      </SDKProvider>,
       document.getElementById('root') as HTMLElement,
     );
   });

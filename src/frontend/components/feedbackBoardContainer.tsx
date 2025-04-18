@@ -42,8 +42,8 @@ import copyToClipboard from 'copy-to-clipboard';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
 import { CommonServiceIds, IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
-import { getService } from 'azure-devops-extension-sdk';
 import { FontIcon } from 'office-ui-fabric-react';
+import { SDKContext } from '../dal/azureDevOpsContextProvider';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -252,13 +252,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
-    getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
+    const { SDK } = React.useContext(SDKContext);
+    SDK.getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
       service.setHash(`teamId=${teamId}&boardId=${boardId}`);
     });
   }
 
   private async parseUrlForBoardAndTeamInformation(): Promise<{ teamId: string, boardId: string }> {
-    const service = await getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
+    const { SDK } = React.useContext(SDKContext);
+    const service = await SDK.getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
     let hash = await service.getHash();
     if (hash.startsWith('#')) {
       hash = hash.substring(1);

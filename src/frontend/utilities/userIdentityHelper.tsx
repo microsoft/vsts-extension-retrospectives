@@ -1,5 +1,6 @@
+import React from 'react';
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
-import { IUserContext, getUser } from 'azure-devops-extension-sdk';
+import { SDKContext } from '../dal/azureDevOpsContextProvider';
 
 let userIdentity: IdentityRef;
 
@@ -8,7 +9,8 @@ let userIdentity: IdentityRef;
  */
 export const getUserIdentity = (): IdentityRef => {
   if (!userIdentity){
-    const currentUser: IUserContext = getUser();
+    const { SDK } = React.useContext(SDKContext);
+    const currentUser = SDK.getUser();
 
     userIdentity = {
       id: currentUser.id,
