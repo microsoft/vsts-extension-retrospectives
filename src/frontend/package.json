@@ -27,7 +27,7 @@
   "license": "ISC",
   "dependencies": {
     "@microsoft/applicationinsights-react-js": "17.3.5",
-    "@microsoft/applicationinsights-web": "3.3.5",
+    "@microsoft/applicationinsights-web": "3.3.6",
     "@microsoft/signalr": "8.0.7",
     "@tanstack/react-table": "8.20.5",
     "azure-devops-extension-api": "1.152.0",
