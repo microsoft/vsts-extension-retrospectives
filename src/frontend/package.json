@@ -82,7 +82,7 @@
     "node-jq": "6.0.1",
     "postcss": "8.4.47",
     "process": "0.11.10",
-    "sass": "1.86.2",
+    "sass": "1.86.3",
     "sass-loader": "16.0.2",
     "stream-browserify": "3.0.0",
     "style-loader": "4.0.0",
