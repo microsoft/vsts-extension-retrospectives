@@ -27,6 +27,7 @@ export async function readDocuments<T>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     console.error(e);
+    console.log("error orginates from readDocuments");
     appInsights.trackException(e);
     if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
       if (throwCollectionDoesNotExistException) {
