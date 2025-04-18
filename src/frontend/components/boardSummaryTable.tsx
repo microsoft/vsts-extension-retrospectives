@@ -289,7 +289,7 @@ console.log('3rd return: no work items');
         const pendingWorkItems = updatedItems.map((updatedItem) => {
           const states = workItemTypeToStatesMap[updatedItem.fields['System.WorkItemType']].filter((workItemState) => workItemState.name === updatedItem.fields['System.State']);
           if (states.length) {
-console.log('4th return')
+console.log('4th return: no states')
             return states[0];
           }
 console.log('5th return');
