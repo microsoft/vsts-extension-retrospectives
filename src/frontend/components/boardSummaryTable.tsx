@@ -249,12 +249,10 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }
 
   const handleActionItems = async () => {
-console.log('handleActionItems begin')
     await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
       const feedbackBoardId: string = feedbackBoard.id;
       const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
       if (!feedbackItems.length) {
-console.log('1st return: no feedback items');
         return;
       }
 
@@ -269,13 +267,11 @@ console.log('1st return: no feedback items');
 
       await Promise.all(feedbackItems.map(async (feedbackItem) => {
         if (!feedbackItem.associatedActionItemIds?.length) {
-console.log('2nd return: no associated action items');
           return;
         }
 
         const workItems = await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds);
         if (!workItems.length) {
-console.log('3rd return: no work items');
           return
         }
 
@@ -287,13 +283,10 @@ console.log('3rd return: no work items');
         const pendingWorkItems = updatedItems.map((updatedItem) => {
           const states = workItemTypeToStatesMap[updatedItem.fields['System.WorkItemType']].filter((workItemState) => workItemState.name === updatedItem.fields['System.State']);
           if (states.length) {
-console.log('4th return: no states')
             return states[0];
           }
-console.log('5th return');
           return null;
         }).filter((workItemState) => {
-console.log('6th return');
           return !workItemState || (workItemState.category !== 'Completed' && workItemState.category !== 'Removed');
         });
 
@@ -310,7 +303,6 @@ console.log('6th return');
       ...updatedState,
       allDataLoaded: true
     });
-console.log('handleActionItems end')
   }
 
   const boardRowSummary = (row: Row<IBoardSummaryTableItem>) => {

@@ -95,24 +95,6 @@ class ItemDataService {
 
     return feedbackItems; // Return fetched data or an empty array
   };
-/*
-  public getFeedbackItemsForBoard = async (boardId: string): Promise<IFeedbackItemDocument[]> => {
-    let feedbackItems: IFeedbackItemDocument[] = [];
-
-    try {
-      feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      console.error(e);
-      appInsights.trackException(e);
-      if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
-        appInsights.trackTrace({ message: TelemetryExceptions.FeedbackItemsNotFoundForBoard, properties: { boardId, e } });
-      }
-    }
-
-    return feedbackItems;
-  }
-*/
 
   /**
    * Get feedback items in the board matching the specified item ids.

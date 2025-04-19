@@ -52,32 +52,6 @@ export async function readDocuments<T>(
   }
   return data; // Return the fetched data or fallback value
 }
-/*
-export async function readDocuments<T>(
-  collectionName: string, isPrivate?: boolean, throwCollectionDoesNotExistException?: boolean): Promise<T[]> {
-  const dataService: IExtensionDataManager = await getDataService();
-  let data: T[];
-
-  try {
-    data = await dataService.getDocuments(collectionName, isPrivate ? { scopeType: 'User' } : undefined);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
-    console.error(e);
-    appInsights.trackException(e);
-    if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
-      if (throwCollectionDoesNotExistException) {
-        throw e;
-      }
-    }
-
-    appInsights.trackException(e);
-
-    data = [];
-  }
-
-  return data;
-}
-*/
 
 /**
  * Read a specific user/account scoped document.
