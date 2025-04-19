@@ -63,7 +63,6 @@ function getTable(
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
   //const defaultFooter = <TValue>(info: HeaderContext<IBoardSummaryTableItem, TValue>) => info.column.id;
 
-
   const columns = [
     columnHelper.accessor('id', {
       header: null,
