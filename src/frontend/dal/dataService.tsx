@@ -18,6 +18,44 @@ async function getDataService(): Promise<IExtensionDataManager> {
  * Read user/account scoped documents.
  */
 export async function readDocuments<T>(
+  collectionName: string,
+  isPrivate?: boolean,
+  throwCollectionDoesNotExistException?: boolean
+): Promise<T[]> {
+  const dataService: IExtensionDataManager = await getDataService();
+  let data: T[];
+
+  try {
+    // Attempt to fetch documents
+    data = await dataService.getDocuments(
+      collectionName,
+      isPrivate ? { scopeType: 'User' } : undefined
+    );
+  } catch (e: any) {
+    // Check for specific exception type
+    if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
+      console.warn(
+        `Collection ${collectionName} does not exist or contains no documents.`
+      ); // expect no documents for new collections
+      appInsights.trackTrace({
+        message: `Collection ${collectionName} is missing or empty.`,
+        properties: { collectionName }
+      });
+      if (throwCollectionDoesNotExistException) {
+        throw e; // Rethrow only if explicitly required
+      }
+      return []; // Fallback to an empty array
+    }
+
+    // Log unexpected errors as exceptions
+    console.error(e);
+    appInsights.trackException(e);
+    data = []; // Fallback for other exceptions
+  }
+  return data; // Return the fetched data or fallback value
+}
+/*
+export async function readDocuments<T>(
   collectionName: string, isPrivate?: boolean, throwCollectionDoesNotExistException?: boolean): Promise<T[]> {
   const dataService: IExtensionDataManager = await getDataService();
   let data: T[];
@@ -26,7 +64,6 @@ export async function readDocuments<T>(
     data = await dataService.getDocuments(collectionName, isPrivate ? { scopeType: 'User' } : undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    console.log("error orginates from readDocuments, while processing:"+collectionName);
     console.error(e);
     appInsights.trackException(e);
     if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
@@ -42,6 +79,7 @@ export async function readDocuments<T>(
 
   return data;
 }
+*/
 
 /**
  * Read a specific user/account scoped document.
