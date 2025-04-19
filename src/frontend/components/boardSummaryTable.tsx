@@ -252,9 +252,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 console.log('handleActionItems begin')
     await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
       const feedbackBoardId: string = feedbackBoard.id;
-//console.log('feedbackBoardId:'+feedbackBoardId);
       const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
-console.log('feedbackItems:'+feedbackItems);
       if (!feedbackItems.length) {
 console.log('1st return: no feedback items');
         return;
