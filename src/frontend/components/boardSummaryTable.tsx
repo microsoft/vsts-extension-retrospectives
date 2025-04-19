@@ -5,10 +5,16 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extensi
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
-import { Cell, CellContext, Header, HeaderGroup, HeaderContext, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { /*Cell,*/ CellContext, /*Header,*/ HeaderGroup, HeaderContext, OnChangeFn, /*Row,*/ SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+
+import {
+  type Row,
+  type Cell,
+  type Header,
+} from '@tanstack/table-core';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -397,10 +403,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     <div className="board-summary-table-container">
       <table>
           <thead role="rowgroup">
-{/*            {table.getHeaderGroups().map(headerGroup => ( */}
             {table.getHeaderGroups().map((headerGroup: HeaderGroup<IBoardSummaryTableItem>) => (
                 <tr key={headerGroup.id} role="row">
-{/*                  {headerGroup.headers.map(header => ( */}
                   {headerGroup.headers.map((header: Header<IBoardSummaryTableItem, unknown>) => (
                     <th {...getThProps(header)} onClick={header.column.getToggleSortingHandler()}>
                       {header.isPlaceholder
@@ -425,7 +429,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
               ))}
           </thead>
           <tbody>
-{/*            {table.getRowModel().rows.map(row => ( */}
               {table.getRowModel().rows.map((row: Row<IBoardSummaryTableItem>) => (
               <Fragment key={row.id}>
               <tr
@@ -434,7 +437,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
                 onKeyPress={(e: KeyboardEvent) => { if (e.key === 'Enter') row.toggleExpanded(); }}
                 onClick={() => row.toggleExpanded()}
               >
-{/*                {row.getVisibleCells().map(cell => ( */}
                   {row.getVisibleCells().map((cell: Cell<IBoardSummaryTableItem, unknown>) => (
                   <td key={cell.id} {...getTdProps(cell)}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
