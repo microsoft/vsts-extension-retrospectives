@@ -318,25 +318,27 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     />
   }
 
-  type SortDirection = "ascending" | "descending" | false;
-
   const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
-    const sortDirection: false | SortDirection = header.column.getIsSorted();
-    const sortClassName: string = sortDirection || "";
-    const ariaSort: "none" | "ascending" | "descending" = sortDirection ? (sortDirection === "ascending" ? "ascending" : "descending") : "none";
+    const sortDirection: false | SortDirection = header.column.getIsSorted()
+    let sortClassName: string = "";
+    let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
+    if(sortDirection) {
+      sortClassName = sortDirection;
+      ariaSort = `${sortDirection}ending`;
+    }
 
     return {
       key: header.id,
       role: "columnheader",
       'aria-sort': ariaSort,
       style: {
-        minWidth: header.getSize() ?? 100, // Default to 100px if undefined
-        width: header.getSize() ?? 100
+        minWidth: header.getSize(),
+        width: header.getSize()
       },
-      className: `table-header ${sortClassName}`, // Flexible class names
-      onClick: header.column.getToggleSortingHandler?.() || (() => {})
-    };
-  };
+      className: sortClassName,
+      onClick: header.column.getToggleSortingHandler()
+    }
+  }
 
   const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
     const hasPendingItems: boolean = cell?.row?.original?.pendingWorkItemsCount > 0;
