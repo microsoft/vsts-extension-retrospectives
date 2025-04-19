@@ -8,9 +8,13 @@ import BoardSummary from './boardSummary';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
-import { /*Cell, CellContext, Header, HeaderGroup, HeaderContext, OnChangeFn, Row,*/ SortDirection, /*SortingState, Table, TableOptions,*/ createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { flexRender, useReactTable } from '@tanstack/react-table';
 
 import {
+  createColumnHelper,
+  getCoreRowModel,
+  getExpandedRowModel,
+  getSortedRowModel,
   type Cell,
   type CellContext,
   type Header,
@@ -18,6 +22,7 @@ import {
   type HeaderGroup,
   type OnChangeFn,
   type Row,
+  type SortDirection,
   type SortingState,
   type Table,
   type TableOptions
