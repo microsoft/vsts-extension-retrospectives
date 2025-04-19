@@ -5,7 +5,7 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extensi
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
-import { Cell, CellContext, Header, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { Cell, CellContext, Header, HeaderContext, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
@@ -60,11 +60,13 @@ function getTable(
   }
 
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
+  const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, any>) => info.column.id;
 
   const columns = [
     columnHelper.accessor('id', {
       header: null,
-      footer: info => info.column.id,
+      footer: defaultFooter,
+      //footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
         return cellContext.row.getCanExpand() ? (
           <DefaultButton
