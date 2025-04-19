@@ -73,6 +73,7 @@ class ItemDataService {
     try {
       // Attempt to fetch feedback items
       feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       // Handle specific case where the collection does not exist
       if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
@@ -94,7 +95,7 @@ class ItemDataService {
 
     return feedbackItems; // Return fetched data or an empty array
   };
-/*  
+/*
   public getFeedbackItemsForBoard = async (boardId: string): Promise<IFeedbackItemDocument[]> => {
     let feedbackItems: IFeedbackItemDocument[] = [];
 
