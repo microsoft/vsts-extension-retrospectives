@@ -319,15 +319,23 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }
 
   const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
-    const sortDirection: false | SortDirection = header.column.getIsSorted()
-    let sortClassName: string = "";
-    let ariaSort: "none" | "asc" | "desc" | "other" = "none";    
-    //let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
-    if(sortDirection) {
+    const sortDirection: false | SortDirection = header.column.getIsSorted();
+    /*let sortClassName: string = "";*/
+    /*let ariaSort: "none" | "ascending" | "descending" | "other" = "none"; */
+    /*if (sortDirection === "asc") {
       sortClassName = sortDirection;
-      ariaSort = sortDirection;
-      //ariaSort = `${sortDirection}ending`;
-    }
+      ariaSort = "ascending";
+    } else if (sortDirection === "desc") {
+      sortClassName = sortDirection;
+      ariaSort = "descending";
+    }*/
+    //refactor
+    const ariaSort: "none" | "ascending" | "descending" | "other" =
+      sortDirection === "asc" ? "ascending" :
+      sortDirection === "desc" ? "descending" :
+      "none"; // "other" is treated as "none"
+
+    const sortClassName: string = sortDirection && sortDirection !== "none" ? sortDirection : "";
 
     return {
       key: header.id,
