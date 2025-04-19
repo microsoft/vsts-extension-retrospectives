@@ -61,13 +61,11 @@ function getTable(
 
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
-  //const defaultFooter = <TValue>(info: HeaderContext<IBoardSummaryTableItem, TValue>) => info.column.id;
 
   const columns = [
     columnHelper.accessor('id', {
       header: null,
       footer: defaultFooter,
-      //footer: info => info.column.id,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
         return cellContext.row.getCanExpand() ? (
           <DefaultButton
@@ -86,11 +84,11 @@ function getTable(
     }),
     columnHelper.accessor('boardName', {
       header: 'Retrospective Name',
-      footer: info => info.column.id
+      footer: defaultFooter
     }),
     columnHelper.accessor('createdDate', {
       header: 'Created Date',
-      footer: info => info.column.id,
+      footer: defaultFooter,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
         return (
           new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
@@ -101,7 +99,7 @@ function getTable(
     }),
     columnHelper.accessor('isArchived', {
       header: 'Archived',
-      footer: info => info.column.id,
+      footer: defaultFooter,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
         const boardId = cellContext.row.original.id;
         const teamId = cellContext.row.original.teamId;
@@ -149,7 +147,7 @@ function getTable(
     }),
     columnHelper.accessor('archivedDate', {
       header: 'Archived Date',
-      footer: info => info.column.id,
+      footer: defaultFooter,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, Date | undefined>) => {
         const archivedDate = cellContext.row.original.archivedDate;
         return archivedDate
@@ -161,12 +159,12 @@ function getTable(
     }),
     columnHelper.accessor('pendingWorkItemsCount', {
       header: 'Open Work Items',
-      footer: info => info.column.id,
+      footer: defaultFooter,
       size: 110,
     }),
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
-      footer: info => info.column.id,
+      footer: defaultFooter,
       size: 110,
     })
   ]
