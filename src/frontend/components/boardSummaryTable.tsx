@@ -5,7 +5,7 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extensi
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
-import { Cell, CellContext, Header, HeaderContext, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { Cell, CellContext, Header, HeaderGroup, HeaderContext, OnChangeFn, Row, SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
@@ -397,9 +397,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     <div className="board-summary-table-container">
       <table>
           <thead role="rowgroup">
-            {table.getHeaderGroups().map(headerGroup => (
+{/*            {table.getHeaderGroups().map(headerGroup => ( */}
+            {table.getHeaderGroups().map((headerGroup: HeaderGroup<IBoardSummaryTableItem>) => (
                 <tr key={headerGroup.id} role="row">
-                  {headerGroup.headers.map(header => (
+{/*                  {headerGroup.headers.map(header => ( */}
+                  {headerGroup.headers.map((header: Header<IBoardSummaryTableItem, unknown>) => (
                     <th {...getThProps(header)} onClick={header.column.getToggleSortingHandler()}>
                       {header.isPlaceholder
                         ? null
