@@ -321,10 +321,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
     const sortDirection: false | SortDirection = header.column.getIsSorted()
     let sortClassName: string = "";
-    let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
+    let ariaSort: "none" | "asc" | "desc" | "other" = "none";    
+    //let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
     if(sortDirection) {
       sortClassName = sortDirection;
-      ariaSort = `${sortDirection}ending`;
+      ariaSort = sortDirection;
+      //ariaSort = `${sortDirection}ending`;
     }
 
     return {
