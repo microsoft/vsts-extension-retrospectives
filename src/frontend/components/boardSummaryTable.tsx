@@ -8,12 +8,19 @@ import BoardSummary from './boardSummary';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
-import { /*Cell,*/ CellContext, /*Header,*/ HeaderGroup, HeaderContext, OnChangeFn, /*Row,*/ SortDirection, SortingState, Table, TableOptions, createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { /*Cell, CellContext, Header, HeaderGroup, HeaderContext, OnChangeFn, Row,*/ SortDirection, /*SortingState, Table, TableOptions,*/ createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 
 import {
-  type Row,
   type Cell,
+  type CellContext,
   type Header,
+  type HeaderContext,
+  type HeaderGroup,
+  type OnChangeFn,
+  type Row,
+  type SortingState,
+  type Table,
+  type TableOptions
 } from '@tanstack/table-core';
 
 export interface IBoardSummaryTableProps {
