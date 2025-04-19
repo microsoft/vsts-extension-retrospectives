@@ -59,8 +59,10 @@ function getTable(
     console.error("No data provided to getTable:", data);
   }
 
-  const columnHelper = createColumnHelper<IBoardSummaryTableItem>()
-  const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, any>) => info.column.id;
+  const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
+  const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
+  //const defaultFooter = <TValue>(info: HeaderContext<IBoardSummaryTableItem, TValue>) => info.column.id;
+
 
   const columns = [
     columnHelper.accessor('id', {
