@@ -425,7 +425,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
               ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map(row => (
+{/*            {table.getRowModel().rows.map(row => ( */}
+              {table.getRowModel().rows.map((row: Row<IBoardSummaryTableItem>) => (
               <Fragment key={row.id}>
               <tr
                 tabIndex={0}
@@ -433,7 +434,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
                 onKeyPress={(e: KeyboardEvent) => { if (e.key === 'Enter') row.toggleExpanded(); }}
                 onClick={() => row.toggleExpanded()}
               >
-                {row.getVisibleCells().map(cell => (
+{/*                {row.getVisibleCells().map(cell => ( */}
+                  {row.getVisibleCells().map((cell: Cell<IBoardSummaryTableItem, unknown>) => (
                   <td key={cell.id} {...getTdProps(cell)}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
