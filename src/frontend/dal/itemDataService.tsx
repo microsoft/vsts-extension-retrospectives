@@ -71,18 +71,30 @@ class ItemDataService {
     let feedbackItems: IFeedbackItemDocument[] = [];
 
     try {
+      // Attempt to fetch feedback items
       feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-      console.error(e);
-      appInsights.trackException(e);
+      // Handle specific case where the collection does not exist
       if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
-        appInsights.trackTrace({ message: TelemetryExceptions.FeedbackItemsNotFoundForBoard, properties: { boardId, e } });
+        console.warn(`No feedback items found for board ${boardId}—expected for new or unused boards.`);
+
+        // Add telemetry for observability
+        appInsights.trackTrace({
+          message: `Feedback items not found for board ${boardId}.`,
+          properties: { boardId, exception: e }
+        });
+
+        return []; // Gracefully return an empty array
       }
+
+      // Log unexpected exceptions
+      console.error(`Unexpected error fetching feedback items for board ${boardId}:`, e);
+      appInsights.trackException(e);
     }
 
-    return feedbackItems;
-  }
+    return feedbackItems; // Return fetched data or an empty array
+  };
 
   /**
    * Get feedback items in the board matching the specified item ids.

@@ -11,7 +11,7 @@ const mockedProps: IFeedbackBoardMetadataFormProps = {
   currentBoard: null,
   teamId: testTeamId,
   placeholderText: '',
-  maxvotesPerUser: 5,
+  maxVotesPerUser: 5,
   availablePermissionOptions: [],
   onFormSubmit: () => null,
   onFormCancel: () => null
