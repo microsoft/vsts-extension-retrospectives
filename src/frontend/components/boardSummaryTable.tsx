@@ -9,7 +9,7 @@ import { Cell, CellContext, Header, OnChangeFn, Row, SortDirection, SortingState
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
-//what's wrong?
+
 export interface IBoardSummaryTableProps {
   teamId: string;
   supportedWorkItemTypes: WorkItemType[];
@@ -52,7 +52,7 @@ function getTable(
   onArchiveToggle: () => void,
   isDataLoaded: boolean
 ): Table<IBoardSummaryTableItem> {
-  // Add state for managing table data (opportunity to simplify or remove?)
+  // Add state for managing table data
   const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
   React.useEffect(() => {setTableData(data); }, [data]);
   if (isDataLoaded && (!data || data.length === 0)) {
@@ -318,26 +318,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     />
   }
 
-  type SortDirection = "none" | "ascending" | "descending";
-
-  const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
-    const sortDirection: SortDirection = header.column.getIsSorted() || "none";
-    const sortClassName: string = sortDirection || "";
-    const ariaSort: SortDirection = sortDirection;
-
-    return {
-      key: header.id,
-      role: "columnheader",
-      'aria-sort': ariaSort,
-      style: {
-        minWidth: header.getSize() ?? 100, // Default to 100px if undefined
-        width: header.getSize() ?? 100
-      },
-      className: `table-header ${sortClassName}`, // Flexible class names
-      onClick: header.column.getToggleSortingHandler?.() || (() => {})
-   };
-  };
-/*
   const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
     const sortDirection: false | SortDirection = header.column.getIsSorted()
     let sortClassName: string = "";
@@ -359,7 +339,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       onClick: header.column.getToggleSortingHandler()
     }
   }
-*/
+
   const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
     const hasPendingItems: boolean = cell?.row?.original?.pendingWorkItemsCount > 0;
     const columnId: keyof IBoardSummaryTableItem | undefined = cell?.column?.id as keyof IBoardSummaryTableItem | undefined;
