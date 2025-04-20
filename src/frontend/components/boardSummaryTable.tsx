@@ -1,4 +1,4 @@
-import React, { Fragment, KeyboardEvent, useEffect, useState, useCallback } from 'react';
+import React, { Fragment, KeyboardEvent, useEffect, useState } from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
@@ -426,7 +426,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     />
   }
 
-  const getThProps = useCallback((header: Header<IBoardSummaryTableItem, unknown>) => {
+  const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
     const sortDirection: false | SortDirection = header.column.getIsSorted();
     let sortClassName: string = "";
     let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
@@ -449,9 +449,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       className: sortClassName,
       onClick: header.column.getToggleSortingHandler()
     }
-  }, []);
+  }
 
-  const getTdProps = useCallback((cell: Cell<IBoardSummaryTableItem, unknown>) => {
+  const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
     const hasPendingItems: boolean = cell?.row?.original?.pendingWorkItemsCount > 0;
     const columnId: keyof IBoardSummaryTableItem | undefined = cell?.column?.id as keyof IBoardSummaryTableItem | undefined;
     const cellValue = (cell?.row?.original && columnId && cell.row.original[columnId]) ? cell.row.original[columnId] : null;
@@ -479,7 +479,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-label': ariaLabel,
       'aria-readonly': true
     };
-  }, []);
+  }
 
   useEffect(() => {
     if(teamId !== props.teamId) {
@@ -493,13 +493,14 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [props.teamId])
 
   if(boardSummaryState.allDataLoaded !== true) {
+    console.log(`Loading: ${new Date()}`);
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
       label="Loading..."
       ariaLive="assertive"
     />
   }
-
+  console.log(`Rendering: ${new Date()}`);
   return (
     <div className="board-summary-table-container">
       <table>
