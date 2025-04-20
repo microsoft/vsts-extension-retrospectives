@@ -302,14 +302,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [props.teamId])
 
   if(boardSummaryState.allDataLoaded !== true) {
-    console.log('Loading: '+new Date().toLocaleTimeString());
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
       label="Loading..."
       ariaLive="assertive"
     />
   }
-  console.log('Render: '+new Date().toLocaleTimeString());
+
   return (
     <div className="board-summary-table-container">
       <table>
