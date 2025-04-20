@@ -215,7 +215,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]); // added
   useEffect(() => {
     setTableData(boardSummaryState.boardsTableItems);
-  }, [boardSummaryState.boardsTableItems]); // added  
+  }, [boardSummaryState.boardsTableItems]); // added
 
   const table: Table<IBoardSummaryTableItem> =
   getTable(tableData, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded, setTableData); // added
