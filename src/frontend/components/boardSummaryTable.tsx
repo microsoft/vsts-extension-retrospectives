@@ -169,33 +169,7 @@ function getTable(
               const toggleIsArchived = event.target.checked;
               handleArchiveToggle(teamId, boardId, toggleIsArchived, setTableData, onArchiveToggle);
             }}
-{/*
-            onChange={async (event) => {
-              const toggleIsArchived = event.target.checked;
-              try {
-                if (toggleIsArchived) {
-                  await BoardDataService.archiveFeedbackBoard(teamId, boardId);
-                  appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: boardId } });
-                } else {
-                  await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
-                  appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardRestored, properties: { boardId: boardId } });
-                }
-                // update local state to reflect updated archive status
-                setTableData((prevData: IBoardSummaryTableItem[]) => // Specify type for prevData
-                prevData.map((item: IBoardSummaryTableItem) => // Specify type for item
-                    item.id === boardId ? {
-                      ...item, isArchived: toggleIsArchived, archivedDate: toggleIsArchived ? new Date() : null
-                    } : item
-                  )
-                )
-                onArchiveToggle();
-              }
-              catch (error) {
-                console.error("Error while toggling archive state:", error);
-              }
-            }
-          }
-*/}
+// removed
           />
           </div>
         );
