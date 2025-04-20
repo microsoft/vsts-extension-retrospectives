@@ -1,4 +1,4 @@
-import React, { Fragment, KeyboardEvent, useEffect, useState } from 'react';
+import React, { Fragment, KeyboardEvent, useEffect, useState, useCallback } from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
@@ -150,11 +150,6 @@ function getTable(
       cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
         return dateFormatter.format(cellContext.row.original.createdDate);
       },
-      /*cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
-        return (
-          new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
-        )
-      }, */
       size: 120,
       sortDescFirst: true
     }),
@@ -192,12 +187,6 @@ function getTable(
         const archivedDate = cellContext.row.original.archivedDate;
         return archivedDate ? dateFormatter.format(archivedDate) : '';
       },
-    /* cell: (cellContext: CellContext<IBoardSummaryTableItem, Date | undefined>) => {
-        const archivedDate = cellContext.row.original.archivedDate;
-        return archivedDate
-          ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(archivedDate)
-          : ''; // Return an empty string if archivedDate is null or undefined
-      },*/
       size: 120,
       sortDescFirst: true
     }),
@@ -254,7 +243,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
-  //new version
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     const newState: IBoardSummaryTableState = { ...boardSummaryState };
     if ((boardDocuments ?? []).length === 0) {
@@ -302,50 +290,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       });
     });
   };
-
-  // old version
-  const oldHandleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
-    if((boardDocuments ?? []).length === 0) {
-      updatedState.boardsTableItems = [];
-      updatedState.isDataLoaded = true;
-    } else {
-      const boardsTableItems = new Array<IBoardSummaryTableItem>();
-      const actionItems: IActionItemsTableItems = {};
-
-      boardDocuments.forEach(board => {
-        const boardSummaryItem: IBoardSummaryTableItem = {
-          boardName: board.title,
-          createdDate: new Date(board.createdDate),
-          isArchived: board.isArchived ?? false,
-          archivedDate: board.archivedDate ? new Date(board.archivedDate) : null,
-          pendingWorkItemsCount: 0,
-          totalWorkItemsCount: 0,
-          feedbackItemsCount: 0,
-          id: board.id,
-          teamId: board.teamId,
-        };
-
-        boardsTableItems.push(boardSummaryItem);
-
-        const actionItemsForBoard = new Array<WorkItem>();
-        actionItems[board.id] = {
-          isDataLoaded: false,
-          actionItems: actionItemsForBoard,
-        };
-      });
-
-      boardsTableItems.sort((b1, b2) => {
-        return (new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime());
-      });
-
-      updatedState.boardsTableItems = boardsTableItems;
-      updatedState.isDataLoaded = true;
-      updatedState.feedbackBoards = boardDocuments;
-      updatedState.actionItemsByBoard = actionItems;
-    }
-
-    handleActionItems().then();
-  }
 
   const handleActionItems = async () => {
     await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
@@ -417,7 +361,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     />
   }
 
-  const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
+  const getThProps = useCallback((header: Header<IBoardSummaryTableItem, unknown>) => {
+  //const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
     const sortDirection: false | SortDirection = header.column.getIsSorted();
     let sortClassName: string = "";
     let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
@@ -440,9 +385,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       className: sortClassName,
       onClick: header.column.getToggleSortingHandler()
     }
-  }
+  //}
+  }, []);
 
-  const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
+  const getTdProps = useCallback((cell: Cell<IBoardSummaryTableItem, unknown>) => {
+  //const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
     const hasPendingItems: boolean = cell?.row?.original?.pendingWorkItemsCount > 0;
     const columnId: keyof IBoardSummaryTableItem | undefined = cell?.column?.id as keyof IBoardSummaryTableItem | undefined;
     const cellValue = (cell?.row?.original && columnId && cell.row.original[columnId]) ? cell.row.original[columnId] : null;
@@ -470,7 +417,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-label': ariaLabel,
       'aria-readonly': true
     };
-  }
+//  }
+  }, []);
 
   useEffect(() => {
     if(teamId !== props.teamId) {
