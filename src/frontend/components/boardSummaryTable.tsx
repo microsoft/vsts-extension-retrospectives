@@ -31,7 +31,7 @@ import {
 export interface IBoardSummaryTableProps {
   teamId: string;
   supportedWorkItemTypes: WorkItemType[];
-  onArchiveToggle: () => void; // New prop to notify the parent about archive toggles
+  onArchiveToggle: () => void; // Notify the parent about archive toggles
 }
 
 export interface IBoardSummaryTableState {
@@ -46,7 +46,7 @@ export interface IBoardSummaryTableItem {
   boardName: string;
   createdDate: Date;
   isArchived?: boolean;
-  archivedDate?: Date; //archivedDate not set for legacy archived boards
+  archivedDate?: Date; // archivedDate not set for legacy archived boards
   pendingWorkItemsCount: number;
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
@@ -165,7 +165,6 @@ function getTable(
           <div
             onClick={(event) => event.stopPropagation()} // Prevent click propagation
             className="centered-cell"
-            /*style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}*/
           >
           <input
             type="checkbox"
