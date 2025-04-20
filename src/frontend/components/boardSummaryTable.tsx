@@ -63,6 +63,12 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+
 async function handleArchiveToggle(
   teamId: string,
   boardId: string,
@@ -109,7 +115,7 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
   isDataLoaded: boolean,
-  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>> // added
+  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
@@ -142,10 +148,13 @@ function getTable(
       header: 'Created Date',
       footer: defaultFooter,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
+        return dateFormatter.format(cellContext.row.original.createdDate);
+      },
+      /*cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
         return (
           new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(cellContext.row.original.createdDate)
         )
-      },
+      }, */
       size: 120,
       sortDescFirst: true
     }),
@@ -169,7 +178,6 @@ function getTable(
               const toggleIsArchived = event.target.checked;
               handleArchiveToggle(teamId, boardId, toggleIsArchived, setTableData, onArchiveToggle);
             }}
-// removed
           />
           </div>
         );
@@ -182,10 +190,14 @@ function getTable(
       footer: defaultFooter,
       cell: (cellContext: CellContext<IBoardSummaryTableItem, Date | undefined>) => {
         const archivedDate = cellContext.row.original.archivedDate;
+        return archivedDate ? dateFormatter.format(archivedDate) : '';
+      },
+    /* cell: (cellContext: CellContext<IBoardSummaryTableItem, Date | undefined>) => {
+        const archivedDate = cellContext.row.original.archivedDate;
         return archivedDate
           ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(archivedDate)
           : ''; // Return an empty string if archivedDate is null or undefined
-      },
+      },*/
       size: 120,
       sortDescFirst: true
     }),
@@ -232,16 +244,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     allDataLoaded: false
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
-  const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]); // added
+  const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]);
   useEffect(() => {
     setTableData(boardSummaryState.boardsTableItems);
-  }, [boardSummaryState.boardsTableItems]); // added
+  }, [boardSummaryState.boardsTableItems]);
 
   const table: Table<IBoardSummaryTableItem> =
-  getTable(tableData, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded, setTableData); // added
-
-  //const table: Table<IBoardSummaryTableItem> =
-  //  getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
+    getTable(tableData, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded, setTableData);
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
