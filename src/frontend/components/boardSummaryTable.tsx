@@ -244,10 +244,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
-    const newState: IBoardSummaryTableState = { ...boardSummaryState };
+//    const newState: IBoardSummaryTableState = { ...boardSummaryState }; // differ
     if ((boardDocuments ?? []).length === 0) {
-      newState.boardsTableItems = [];
-      newState.isDataLoaded = true;
+//      newState.boardsTableItems = []; //differ
+ //     newState.isDataLoaded = true;
+      updatedState.boardsTableItems = []; //differ
+      updatedState.isDataLoaded = true;
     } else {
       const boardsTableItems = new Array<IBoardSummaryTableItem>();
       const actionItems: IActionItemsTableItems = {};
@@ -266,6 +268,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         };
 
         boardsTableItems.push(boardSummaryItem);
+
         const actionItemsForBoard = new Array<WorkItem>();
         actionItems[board.id] = {
           isDataLoaded: false,
@@ -277,18 +280,22 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         return new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime();
       });
 
-      newState.boardsTableItems = boardsTableItems;
-      newState.isDataLoaded = true;
-      newState.feedbackBoards = boardDocuments;
-      newState.actionItemsByBoard = actionItems;
+//      newState.boardsTableItems = boardsTableItems;
+//      newState.isDataLoaded = true;
+//      newState.feedbackBoards = boardDocuments;
+//      newState.actionItemsByBoard = actionItems;
+      updatedState.boardsTableItems = boardsTableItems;
+      updatedState.isDataLoaded = true;
+      updatedState.feedbackBoards = boardDocuments;
+      updatedState.actionItemsByBoard = actionItems;
     }
-
-    handleActionItems().then(() => {
-      setBoardSummaryState({
-        ...newState,
-        allDataLoaded: true,
-      });
-    });
+    handleActionItems().then()
+//    handleActionItems().then(() => {
+//      setBoardSummaryState({  //differ
+//        ...newState,
+//        allDataLoaded: true,
+//      });
+//    });
   };
 
   const handleActionItems = async () => {
