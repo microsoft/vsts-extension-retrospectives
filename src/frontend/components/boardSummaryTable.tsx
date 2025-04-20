@@ -63,6 +63,46 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
+async function handleArchiveToggle(
+  teamId: string,
+  boardId: string,
+  toggleIsArchived: boolean,
+  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
+  onArchiveToggle: () => void
+) {
+  try {
+    if (toggleIsArchived) {
+      await BoardDataService.archiveFeedbackBoard(teamId, boardId);
+      appInsights.trackEvent({
+        name: TelemetryEvents.FeedbackBoardArchived,
+        properties: { boardId }
+      });
+    } else {
+      await BoardDataService.restoreArchivedFeedbackBoard(teamId, boardId);
+      appInsights.trackEvent({
+        name: TelemetryEvents.FeedbackBoardRestored,
+        properties: { boardId }
+      });
+    }
+
+    setTableData(prevData =>
+      prevData.map(item =>
+        item.id === boardId
+          ? {
+              ...item,
+              isArchived: toggleIsArchived,
+              archivedDate: toggleIsArchived ? new Date() : null
+            }
+          : item
+      )
+    );
+
+    onArchiveToggle();
+  } catch (error) {
+    console.error('Error while toggling archive state: ', error);
+  }
+}
+
 function getTable(
   tableData: IBoardSummaryTableItem[],
   sortingState: SortingState,
@@ -125,6 +165,11 @@ function getTable(
           <input
             type="checkbox"
             checked={!!isArchived} // Ensure boolean value
+            onChange={(event) => {
+              const toggleIsArchived = event.target.checked;
+              handleArchiveToggle(teamId, boardId, toggleIsArchived, setTableData, onArchiveToggle);
+            }}
+{/*
             onChange={async (event) => {
               const toggleIsArchived = event.target.checked;
               try {
@@ -150,6 +195,7 @@ function getTable(
               }
             }
           }
+*/}
           />
           </div>
         );
