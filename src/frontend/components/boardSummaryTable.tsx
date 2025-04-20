@@ -244,11 +244,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
-//    const newState: IBoardSummaryTableState = { ...boardSummaryState }; // differ
     if ((boardDocuments ?? []).length === 0) {
-//      newState.boardsTableItems = []; //differ
- //     newState.isDataLoaded = true;
-      updatedState.boardsTableItems = []; //differ
+      updatedState.boardsTableItems = [];
       updatedState.isDataLoaded = true;
     } else {
       const boardsTableItems = new Array<IBoardSummaryTableItem>();
@@ -280,25 +277,86 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         return new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime();
       });
 
-//      newState.boardsTableItems = boardsTableItems;
-//      newState.isDataLoaded = true;
-//      newState.feedbackBoards = boardDocuments;
-//      newState.actionItemsByBoard = actionItems;
       updatedState.boardsTableItems = boardsTableItems;
       updatedState.isDataLoaded = true;
       updatedState.feedbackBoards = boardDocuments;
       updatedState.actionItemsByBoard = actionItems;
     }
     handleActionItems().then()
-//    handleActionItems().then(() => {
-//      setBoardSummaryState({  //differ
-//        ...newState,
-//        allDataLoaded: true,
-//      });
-//    });
   };
 
   const handleActionItems = async () => {
+    const updatedBoardsTableItems = [...updatedState.boardsTableItems];
+    const updatedActionItemsByBoard = { ...updatedState.actionItemsByBoard };
+
+    await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
+      const feedbackBoardId: string = feedbackBoard.id;
+
+      // Fetch feedback items for the board
+      const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
+      if (!feedbackItems.length) {
+        return;
+      }
+
+      const feedbackItemsCount = feedbackItems.length;
+
+      const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
+      await Promise.all(props.supportedWorkItemTypes.map(async (workItemType) => {
+        const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
+        workItemTypeToStatesMap[workItemType.name] = workItemTypeStates;
+      }));
+
+      const aggregatedWorkItems: WorkItem[] = [];
+      await Promise.all(feedbackItems.map(async (feedbackItem) => {
+        if (!feedbackItem.associatedActionItemIds?.length) {
+          return;
+        }
+
+        const workItems = await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds);
+        if (!workItems.length) {
+          return;
+        }
+
+        aggregatedWorkItems.push(...workItems);
+      }));
+
+      // Update action items for the board
+      updatedActionItemsByBoard[feedbackBoardId] = {
+        isDataLoaded: true,
+        actionItems: aggregatedWorkItems,
+      };
+
+      const pendingWorkItems = aggregatedWorkItems.filter((workItem) => {
+        const states = workItemTypeToStatesMap[workItem.fields['System.WorkItemType']]
+          .filter((workItemState) => workItemState.name === workItem.fields['System.State']);
+        return !states.length || (states[0].category !== 'Completed' && states[0].category !== 'Removed');
+      });
+
+      const pendingWorkItemsCount = pendingWorkItems.length;
+      const totalWorkItemsCount = aggregatedWorkItems.length;
+
+      // Batch update for the boards table items
+      const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
+      if (boardIndex !== -1) {
+        updatedBoardsTableItems[boardIndex] = {
+          ...updatedBoardsTableItems[boardIndex],
+          feedbackItemsCount,
+          pendingWorkItemsCount,
+          totalWorkItemsCount,
+        };
+      }
+    }));
+
+    // Final state update
+    setBoardSummaryState({
+      ...updatedState,
+      boardsTableItems: updatedBoardsTableItems,
+      actionItemsByBoard: updatedActionItemsByBoard,
+      allDataLoaded: true,
+    });
+  };
+
+  const oldhandleActionItems = async () => {
     await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
       const feedbackBoardId: string = feedbackBoard.id;
       const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
