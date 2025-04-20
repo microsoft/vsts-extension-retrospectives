@@ -254,7 +254,57 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
+  //new version
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
+    let newState: IBoardSummaryTableState = { ...boardSummaryState };
+    if ((boardDocuments ?? []).length === 0) {
+      newState.boardsTableItems = [];
+      newState.isDataLoaded = true;
+    } else {
+      const boardsTableItems = new Array<IBoardSummaryTableItem>();
+      const actionItems: IActionItemsTableItems = {};
+
+      boardDocuments.forEach(board => {
+        const boardSummaryItem: IBoardSummaryTableItem = {
+          boardName: board.title,
+          createdDate: new Date(board.createdDate),
+          isArchived: board.isArchived ?? false,
+          archivedDate: board.archivedDate ? new Date(board.archivedDate) : null,
+          pendingWorkItemsCount: 0,
+          totalWorkItemsCount: 0,
+          feedbackItemsCount: 0,
+          id: board.id,
+          teamId: board.teamId,
+        };
+
+        boardsTableItems.push(boardSummaryItem);
+        const actionItemsForBoard = new Array<WorkItem>();
+        actionItems[board.id] = {
+          isDataLoaded: false,
+          actionItems: actionItemsForBoard,
+        };
+      });
+
+      boardsTableItems.sort((b1, b2) => {
+        return new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime();
+      });
+
+      newState.boardsTableItems = boardsTableItems;
+      newState.isDataLoaded = true;
+      newState.feedbackBoards = boardDocuments;
+      newState.actionItemsByBoard = actionItems;
+    }
+
+    handleActionItems().then(() => {
+      setBoardSummaryState({
+        ...newState,
+        allDataLoaded: true,
+      });
+    });
+  };
+
+  // old version
+  const oldHandleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     if((boardDocuments ?? []).length === 0) {
       updatedState.boardsTableItems = [];
       updatedState.isDataLoaded = true;
