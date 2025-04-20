@@ -164,7 +164,8 @@ function getTable(
         return (
           <div
             onClick={(event) => event.stopPropagation()} // Prevent click propagation
-            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+            className="centered-cell"
+            /*style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}*/
           >
           <input
             type="checkbox"
@@ -362,7 +363,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }
 
   const getThProps = useCallback((header: Header<IBoardSummaryTableItem, unknown>) => {
-  //const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
     const sortDirection: false | SortDirection = header.column.getIsSorted();
     let sortClassName: string = "";
     let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
@@ -385,11 +385,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       className: sortClassName,
       onClick: header.column.getToggleSortingHandler()
     }
-  //}
   }, []);
 
   const getTdProps = useCallback((cell: Cell<IBoardSummaryTableItem, unknown>) => {
-  //const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
     const hasPendingItems: boolean = cell?.row?.original?.pendingWorkItemsCount > 0;
     const columnId: keyof IBoardSummaryTableItem | undefined = cell?.column?.id as keyof IBoardSummaryTableItem | undefined;
     const cellValue = (cell?.row?.original && columnId && cell.row.original[columnId]) ? cell.row.original[columnId] : null;
@@ -417,7 +415,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-label': ariaLabel,
       'aria-readonly': true
     };
-//  }
   }, []);
 
   useEffect(() => {
