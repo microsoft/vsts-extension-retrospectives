@@ -64,19 +64,13 @@ export interface IActionItemsTableItems {
 }
 
 function getTable(
-  data: IBoardSummaryTableItem[],
+  tableData: IBoardSummaryTableItem[],
   sortingState: SortingState,
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
-  isDataLoaded: boolean
+  isDataLoaded: boolean,
+  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>> // added
 ): Table<IBoardSummaryTableItem> {
-  // Add state for managing table data
-  const [tableData, setTableData] = React.useState<IBoardSummaryTableItem[]>(data || []);
-  React.useEffect(() => {setTableData(data); }, [data]);
-  if (isDataLoaded && (!data || data.length === 0)) {
-    console.error("No data provided to getTable:", data);
-  }
-
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
 
@@ -218,9 +212,16 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     allDataLoaded: false
   })
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
+  const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]); // added
+  useEffect(() => {
+    setTableData(boardSummaryState.boardsTableItems);
+  }, [boardSummaryState.boardsTableItems]); // added  
 
   const table: Table<IBoardSummaryTableItem> =
-    getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
+  getTable(tableData, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded, setTableData); // added
+
+  //const table: Table<IBoardSummaryTableItem> =
+  //  getTable(boardSummaryState.boardsTableItems, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded);
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
