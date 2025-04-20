@@ -256,7 +256,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   //new version
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
-    let newState: IBoardSummaryTableState = { ...boardSummaryState };
+    const newState: IBoardSummaryTableState = { ...boardSummaryState };
     if ((boardDocuments ?? []).length === 0) {
       newState.boardsTableItems = [];
       newState.isDataLoaded = true;
