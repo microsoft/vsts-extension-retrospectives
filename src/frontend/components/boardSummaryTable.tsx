@@ -94,6 +94,47 @@ const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ heade
   </thead>
 );
 
+
+interface BoardSummaryTableBodyProps {
+  rows: Row<IBoardSummaryTableItem>[];
+  getTdProps: (cell: Cell<IBoardSummaryTableItem, unknown>) => object;
+  boardRowSummary: (row: Row<IBoardSummaryTableItem>) => JSX.Element;
+}
+
+const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({
+  rows,
+  getTdProps,
+  boardRowSummary,
+}) => (
+  <tbody>
+    {rows.map((row) => (
+      <Fragment key={row.id}>
+        <tr
+          tabIndex={0}
+          aria-label="Board summary row. Click row to expand and view more statistics for this board."
+          onKeyPress={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter') row.toggleExpanded();
+          }}
+          onClick={() => row.toggleExpanded()}
+        >
+          {row.getVisibleCells().map((cell) => (
+            <td key={cell.id} {...getTdProps(cell)}>
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </td>
+          ))}
+        </tr>
+        {row.getIsExpanded() && (
+          <tr>
+            <td colSpan={row.getVisibleCells().length}>
+              {boardRowSummary(row)}
+            </td>
+          </tr>
+        )}
+      </Fragment>
+    ))}
+  </tbody>
+);
+
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
   month: 'short',
@@ -482,30 +523,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
           headerGroups={table.getHeaderGroups()}
           getThProps={getThProps}
         />
-          <tbody>
-              {table.getRowModel().rows.map((row: Row<IBoardSummaryTableItem>) => (
-              <Fragment key={row.id}>
-              <tr
-                tabIndex={0}
-                aria-label="Board summary row. Click row to expand and view more statistics for this board."
-                onKeyPress={(e: KeyboardEvent) => { if (e.key === 'Enter') row.toggleExpanded(); }}
-                onClick={() => row.toggleExpanded()}
-              >
-                  {row.getVisibleCells().map((cell: Cell<IBoardSummaryTableItem, unknown>) => (
-                  <td key={cell.id} {...getTdProps(cell)}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-              {row.getIsExpanded() &&
-              <tr>
-                <td colSpan={row.getVisibleCells().length}>
-                  { boardRowSummary(row) }
-                </td>
-              </tr>}
-              </Fragment>
-            ))}
-          </tbody>
+        <BoardSummaryTableBody
+          rows={table.getRowModel().rows}
+          getTdProps={getTdProps}
+          boardRowSummary={boardRowSummary}
+        />
       </table>
     </div>
   );
