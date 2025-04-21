@@ -371,7 +371,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       }
 
       const feedbackItemsCount = feedbackItems.length;
-
+/*
       const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
       await Promise.all(props.supportedWorkItemTypes.map(async (workItemType) => {
         const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
@@ -398,7 +398,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         actionItems: aggregatedWorkItems,
       };
 
-/*
       const pendingWorkItems = aggregatedWorkItems.filter((workItem) => {
         const states = workItemTypeToStatesMap[workItem.fields['System.WorkItemType']]
           .filter((workItemState) => workItemState.name === workItem.fields['System.State']);
@@ -406,9 +405,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       });
 
       const pendingWorkItemsCount = pendingWorkItems.length;
-      */
+      const totalWorkItemsCount = aggregatedWorkItems.length; */
       const pendingWorkItemsCount = -1;
-      const totalWorkItemsCount = aggregatedWorkItems.length;
+      const totalWorkItemsCount = -2;
 
       // Batch update for the boards table items
       const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
