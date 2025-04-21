@@ -64,6 +64,9 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
     const userId = encrypt(this.props.userId);
 
+    const boardVoteCollection = props?.board?.boardVoteCollection ?? {};
+    const voteCount = boardVoteCollection[userId]?.toString() || "0";
+
     this.state = {
       columnIds: [],
       columns: {},
@@ -71,7 +74,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       defaultActionItemIteration: "",
       hasItems: false,
       isDataLoaded: false,
-      currentVoteCount: (props.board.boardVoteCollection[userId] === undefined || props.board.boardVoteCollection[userId] === null) ? "0" : props.board.boardVoteCollection[userId]?.toString()
+      currentVoteCount: voteCount
     };
   }
 
@@ -412,7 +415,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             const voteCollection = boardItem.boardVoteCollection;
             const userId = encrypt(this.props.userId);
 
-            this.setState({ currentVoteCount: voteCollection === undefined ? "0" : voteCollection[userId] === undefined ? "0" : voteCollection[userId].toString() });
+            this.setState({ currentVoteCount: voteCollection?.[userId]?.toString() || "0" });
           });
         },
       };

@@ -30,7 +30,7 @@ export interface ActionItemState {
   workItemSearchTextboxHasErrors: boolean;
 }
 
-class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
+export class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
   constructor(props: ActionItemProps) {
     super(props);
 
@@ -49,7 +49,7 @@ class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
     }
   }
 
-  private openWorkItemButton: HTMLElement;
+  public openWorkItemButton: HTMLElement;
 
   private readonly getWorkItemTypeIconProps = (workItemType: WorkItemType): IDocumentCardPreviewProps => {
     return {
