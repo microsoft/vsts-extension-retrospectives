@@ -403,7 +403,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     }
     handleActionItems().then();
   };
-  
+
   const oldHandleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     if ((boardDocuments ?? []).length === 0) {
       updatedState.boardsTableItems = [];
