@@ -63,6 +63,37 @@ export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
 
+interface BoardSummaryTableHeaderProps {
+  headerGroups: HeaderGroup<IBoardSummaryTableItem>[];
+  getThProps: (header: Header<IBoardSummaryTableItem, unknown>) => object;
+}
+
+const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ headerGroups, getThProps }) => (
+  <thead role="rowgroup">
+    {headerGroups.map((headerGroup) => (
+      <tr key={headerGroup.id} role="row">
+        {headerGroup.headers.map((header) => (
+          <th {...getThProps(header)}>
+            {header.isPlaceholder
+              ? null
+              : flexRender(header.column.columnDef.header, header.getContext())}
+            <div
+              {...{
+                onMouseDown: header.getResizeHandler(),
+                onTouchStart: header.getResizeHandler(),
+                className: `
+                  ${header.column.getCanResize() ? 'resizer' : ''}
+                  ${header.column.getIsResizing() ? 'isResizing' : ''}
+                `,
+              }}
+            />
+          </th>
+        ))}
+      </tr>
+    ))}
+  </thead>
+);
+
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
   month: 'short',
@@ -356,63 +387,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     });
   };
 
-  const oldhandleActionItems = async () => {
-    await Promise.all(updatedState.feedbackBoards.map(async (feedbackBoard) => {
-      const feedbackBoardId: string = feedbackBoard.id;
-      const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
-      if (!feedbackItems.length) {
-        return;
-      }
-
-      const feedbackItemsCount = feedbackItems.length;
-
-      const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
-
-      await Promise.all(props.supportedWorkItemTypes.map(async (workItemType) => {
-        const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
-        workItemTypeToStatesMap[workItemType.name] = workItemTypeStates;
-      }));
-
-      await Promise.all(feedbackItems.map(async (feedbackItem) => {
-        if (!feedbackItem.associatedActionItemIds?.length) {
-          return;
-        }
-
-        const workItems = await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds);
-        if (!workItems.length) {
-          return
-        }
-
-        const updatedActionItemsForBoard = updatedState.actionItemsByBoard[feedbackBoardId];
-        const updatedItems = updatedActionItemsForBoard.actionItems.concat(workItems);
-        updatedActionItemsForBoard.actionItems = updatedItems;
-        updatedActionItemsForBoard.isDataLoaded = true;
-
-        const pendingWorkItems = updatedItems.map((updatedItem) => {
-          const states = workItemTypeToStatesMap[updatedItem.fields['System.WorkItemType']].filter((workItemState) => workItemState.name === updatedItem.fields['System.State']);
-          if (states.length) {
-            return states[0];
-          }
-          return null;
-        }).filter((workItemState) => {
-          return !workItemState || (workItemState.category !== 'Completed' && workItemState.category !== 'Removed');
-        });
-
-        const pendingWorkItemsCount = pendingWorkItems.length;
-        const totalWorkItemsCount = updatedItems.length;
-
-        updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ? { ...item, feedbackItemsCount, pendingWorkItemsCount, totalWorkItemsCount } : item);
-      }));
-
-      updatedState.boardsTableItems = updatedState.boardsTableItems.map(item => item.id === feedbackBoardId ? { ...item, feedbackItemsCount } : item);
-    }));
-
-    setBoardSummaryState({
-      ...updatedState,
-      allDataLoaded: true
-    });
-  }
-
   const boardRowSummary = (row: Row<IBoardSummaryTableItem>) => {
     const currentBoard = boardSummaryState.boardsTableItems.find(board => board.id === row.original.id);
     const actionItems = boardSummaryState.actionItemsByBoard[currentBoard.id];
@@ -504,32 +478,10 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   return (
     <div className="board-summary-table-container">
       <table>
-          <thead role="rowgroup">
-            {table.getHeaderGroups().map((headerGroup: HeaderGroup<IBoardSummaryTableItem>) => (
-                <tr key={headerGroup.id} role="row">
-                  {headerGroup.headers.map((header: Header<IBoardSummaryTableItem, unknown>) => (
-                    <th {...getThProps(header)} onClick={header.column.getToggleSortingHandler()}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                      <div
-                      {...{
-                        onMouseDown: header.getResizeHandler(),
-                        onTouchStart: header.getResizeHandler(),
-                        className: `
-                          ${header.column.getCanResize() ? 'resizer' : ''}
-                          ${header.column.getIsResizing() ? 'isResizing' : ''}
-                        `
-                      }}
-                    />
-                    </th>
-                  ))}
-                </tr>
-              ))}
-          </thead>
+        <BoardSummaryTableHeader
+          headerGroups={table.getHeaderGroups()}
+          getThProps={getThProps}
+        />
           <tbody>
               {table.getRowModel().rows.map((row: Row<IBoardSummaryTableItem>) => (
               <Fragment key={row.id}>
