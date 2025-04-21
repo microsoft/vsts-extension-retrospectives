@@ -304,7 +304,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     allDataLoaded: false,
   });
 
-  const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'createdDate', desc: true }])
   const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]);
   useEffect(() => {
     setTableData(boardSummaryState.boardsTableItems);
