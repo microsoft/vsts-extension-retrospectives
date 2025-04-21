@@ -94,7 +94,6 @@ const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ heade
   </thead>
 );
 
-
 interface BoardSummaryTableBodyProps {
   rows: Row<IBoardSummaryTableItem>[];
   getTdProps: (cell: Cell<IBoardSummaryTableItem, unknown>) => object;
