@@ -398,6 +398,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         actionItems: aggregatedWorkItems,
       };
 
+/*
       const pendingWorkItems = aggregatedWorkItems.filter((workItem) => {
         const states = workItemTypeToStatesMap[workItem.fields['System.WorkItemType']]
           .filter((workItemState) => workItemState.name === workItem.fields['System.State']);
@@ -405,6 +406,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       });
 
       const pendingWorkItemsCount = pendingWorkItems.length;
+      */
+      const pendingWorkItemsCount = -1;
       const totalWorkItemsCount = aggregatedWorkItems.length;
 
       // Batch update for the boards table items
@@ -508,13 +511,14 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [props.teamId])
 
   if(boardSummaryState.allDataLoaded !== true) {
+    console.log('Loading: '+new Date());
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
       label="Loading..."
       ariaLive="assertive"
     />
   }
-
+  console.log('Rendering: '+new Date());
   return (
     <div className="board-summary-table-container">
       <table>
