@@ -1,4 +1,4 @@
-import React, { Fragment, KeyboardEvent, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState, useReducer } from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
@@ -294,15 +294,63 @@ function getTable(
   return useReactTable(tableOptions);
 }
 
+const BoardSummaryActions = {
+  SET_BOARDS_TABLE_ITEMS: "SET_BOARDS_TABLE_ITEMS",
+  SET_IS_DATA_LOADED: "SET_IS_DATA_LOADED",
+  SET_FEEDBACK_BOARDS: "SET_FEEDBACK_BOARDS",
+  SET_ACTION_ITEMS_BY_BOARD: "SET_ACTION_ITEMS_BY_BOARD",
+  SET_ALL_DATA_LOADED: "SET_ALL_DATA_LOADED",
+};
+
+type BoardSummaryAction =
+  | { type: "SET_BOARDS_TABLE_ITEMS"; payload: IBoardSummaryTableItem[] }
+  | { type: "SET_IS_DATA_LOADED"; payload: boolean }
+  | { type: "SET_FEEDBACK_BOARDS"; payload: IFeedbackBoardDocument[] }
+  | { type: "SET_ACTION_ITEMS_BY_BOARD"; payload: IActionItemsTableItems }
+  | { type: "SET_ALL_DATA_LOADED"; payload: boolean };
+
+function boardSummaryReducer(
+  state: IBoardSummaryTableState,
+  action: BoardSummaryAction
+): IBoardSummaryTableState {
+  switch (action.type) {
+    case "SET_BOARDS_TABLE_ITEMS":
+      return { ...state, boardsTableItems: action.payload };
+    case "SET_IS_DATA_LOADED":
+      return { ...state, isDataLoaded: action.payload };
+    case "SET_FEEDBACK_BOARDS":
+      return { ...state, feedbackBoards: action.payload };
+    case "SET_ACTION_ITEMS_BY_BOARD":
+      return { ...state, actionItemsByBoard: action.payload };
+    case "SET_ALL_DATA_LOADED":
+      return { ...state, allDataLoaded: action.payload };
+    default:
+      throw new Error(`Unknown action type: ${action.type}`);
+  }
+}
+
+const [boardSummaryState, dispatchBoardSummary] = useReducer(
+  boardSummaryReducer,
+  {
+    boardsTableItems: [],
+    feedbackBoards: [],
+    isDataLoaded: false,
+    actionItemsByBoard: {},
+    allDataLoaded: false,
+  } as IBoardSummaryTableState
+);
+
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [teamId, setTeamId] = useState<string>();
-  const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
+//  const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
+  const [boardSummaryState, dispatchBoardSummary] = useReducer(boardSummaryReducer, {
     boardsTableItems: new Array<IBoardSummaryTableItem>(),
     isDataLoaded: false,
     feedbackBoards: new Array<IFeedbackBoardDocument>(),
     actionItemsByBoard: {},
-    allDataLoaded: false
-  })
+    allDataLoaded: false,
+  });
+
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'createdDate', desc: true }])
   const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]);
   useEffect(() => {
@@ -315,6 +363,48 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
+    if ((boardDocuments ?? []).length === 0) {
+      dispatchBoardSummary({ type: BoardSummaryActions.SET_BOARDS_TABLE_ITEMS, payload: [] });
+      dispatchBoardSummary({ type: BoardSummaryActions.SET_IS_DATA_LOADED, payload: true });
+    } else {
+      const boardsTableItems = new Array<IBoardSummaryTableItem>();
+      const actionItems: IActionItemsTableItems = {};
+  
+      boardDocuments.forEach(board => {
+        const boardSummaryItem: IBoardSummaryTableItem = {
+          boardName: board.title,
+          createdDate: new Date(board.createdDate),
+          isArchived: board.isArchived ?? false,
+          archivedDate: board.archivedDate ? new Date(board.archivedDate) : null,
+          pendingWorkItemsCount: 0,
+          totalWorkItemsCount: 0,
+          feedbackItemsCount: 0,
+          id: board.id,
+          teamId: board.teamId,
+        };
+  
+        boardsTableItems.push(boardSummaryItem);
+  
+        const actionItemsForBoard = new Array<WorkItem>();
+        actionItems[board.id] = {
+          isDataLoaded: false,
+          actionItems: actionItemsForBoard,
+        };
+      });
+  
+      boardsTableItems.sort((b1, b2) => {
+        return new Date(b2.createdDate).getTime() - new Date(b1.createdDate).getTime();
+      });
+  
+      dispatchBoardSummary({ type: BoardSummaryActions.SET_BOARDS_TABLE_ITEMS, payload: boardsTableItems });
+      dispatchBoardSummary({ type: BoardSummaryActions.SET_IS_DATA_LOADED, payload: true });
+      dispatchBoardSummary({ type: BoardSummaryActions.SET_FEEDBACK_BOARDS, payload: boardDocuments });
+      dispatchBoardSummary({ type: BoardSummaryActions.SET_ACTION_ITEMS_BY_BOARD, payload: actionItems });
+    }
+    handleActionItems().then();
+  };
+  
+  const oldHandleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     if ((boardDocuments ?? []).length === 0) {
       updatedState.boardsTableItems = [];
       updatedState.isDataLoaded = true;
