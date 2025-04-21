@@ -371,7 +371,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       }
 
       const feedbackItemsCount = feedbackItems.length;
-/*
+
       const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
       await Promise.all(props.supportedWorkItemTypes.map(async (workItemType) => {
         const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
@@ -405,9 +405,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       });
 
       const pendingWorkItemsCount = pendingWorkItems.length;
-      const totalWorkItemsCount = aggregatedWorkItems.length; */
-      const pendingWorkItemsCount = -1;
-      const totalWorkItemsCount = -2;
+      const totalWorkItemsCount = aggregatedWorkItems.length;
 
       // Batch update for the boards table items
       const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
@@ -510,14 +508,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [props.teamId])
 
   if(boardSummaryState.allDataLoaded !== true) {
-    console.log('Loading: '+new Date());
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
       label="Loading..."
       ariaLive="assertive"
     />
   }
-  console.log('Rendering: '+new Date());
+
   return (
     <div className="board-summary-table-container">
       <table>
