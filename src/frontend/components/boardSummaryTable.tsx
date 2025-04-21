@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useReducer } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
@@ -508,14 +508,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [props.teamId])
 
   if(boardSummaryState.allDataLoaded !== true) {
-    console.log(`Loading: ${new Date()}`);
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
       label="Loading..."
       ariaLive="assertive"
     />
   }
-  console.log(`Rendering: ${new Date()}`);
+
   return (
     <div className="board-summary-table-container">
       <table>
