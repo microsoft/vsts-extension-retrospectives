@@ -314,7 +314,7 @@ If there is a team assessment, then a charted summary will show the vote breakdo
 
 ### 10. Board History
 
-The __History__ tab appears in the top-left navigation header, next to the __Board__ tab. This view lists past retrospectives, shows the status of action items, and offers options to archive or restore retrospectives.
+The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, shows the status of action items, and offers options to archive or restore retrospectives.
 
 ![History tab showing a table with columns: Retrospective Name, Created Date, Pending Work Items, and Total Work Items. Archived status and Archived Date columns are not shown.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-darkmode.png)
 
