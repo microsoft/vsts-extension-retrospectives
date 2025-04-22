@@ -326,8 +326,7 @@ To _archive_ a retrospective, check the box in the Archived column. The retrospe
 
 To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective reappears in the Board selection dropdown.
 
-> **Note:** Archiving takes effect immediately for the user who performs the action.  
-> Other users see the change after reloading the Retrospectives boards.
+> **Note:** Archiving takes effect immediately for the user who performs the action. Other users see the change after reloading the Retrospectives boards.
 
 ## Best Practices
 
