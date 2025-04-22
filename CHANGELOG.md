@@ -4,7 +4,7 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.36
 
-This release included an update of the archive functionality to include restoring the archvie, as well as a _refresh_ of the existing retrospective templates.
+This release included an update of the archive functionality to include restoring the archive, as well as a _refresh_ of the existing retrospective templates.
 
 Changes related to the archive functionality include:
 
