@@ -11,6 +11,7 @@ Changes related to the archive functionality include:
 * Archived status and date were added to the History tab.
 * Archive functionality can be toggled on and off from the History tab.
 * Archive messaging from the Boards menu was updated to reference the ability to restore the archived board from the History tab.
+* Count of feedback items replaced count of pending work items.
 * History tab performance was improved dramatically.
 
 From [GitHub PR #1162](https://github.com/microsoft/vsts-extension-retrospectives/pull/1162)

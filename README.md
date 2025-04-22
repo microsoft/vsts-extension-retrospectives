@@ -314,17 +314,17 @@ If there is a team assessment, then a charted summary will show the vote breakdo
 
 ### 10. Board History
 
-The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, shows the status of action items, and offers options to archive or restore retrospectives.
+The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, showing the count of feedback items and action items, and supports archiving or restoring archived retrospectives.
 
-![History tab showing a table with columns: Retrospective Name, Created Date, Pending Work Items, and Total Work Items. Archived status and Archived Date columns are not shown.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-darkmode.png)
+![History tab showing a table with columns: Retrospective Name, Created Date, Pending Work Items, and Total Work Items. Archived status, Archived Date, and Feedback Items are not shown.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-darkmode.png)
 
-Selecting a retrospective expands the row to reveal more details, including a count of feedback items and a detailed list of action items.
+Selecting a retrospective expands the row to reveal more details, including a count of action items by status and a detailed list of each action item.
 
 ![Expanded retrospective view showing a summary of feedback and work item counts on the left and a work item table on the right with columns: Title, State, Type, Last Updated, Assigned To, and Priority. Archived status and Archived Date columns are not shown.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-expanded-summary-lightmode.png)
 
-To _archive_ a retrospective, check the box in the Archived column. The retrospective no longer appears in the Board selection dropdown, though all data remains preserved.
+To _archive_ a retrospective, check the box in the Archived column. The retrospective will no longer appear in the Board selection dropdown, though all data remains preserved.
 
-To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective reappears in the Board selection dropdown.
+To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective will reappear in the Board selection dropdown.
 
 > **Note:** Archiving takes effect immediately for the user who performs the action. Other users see the change after reloading the Retrospectives boards.
 
