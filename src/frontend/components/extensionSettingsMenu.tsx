@@ -46,7 +46,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private readonly getChangelog = (): string[] => {
     return [
-      'This release focused on a refresh of the existing retrospective templates.',
+      'The latest release includes an update of the archive functionality to include restoring archived retrospectives, as well as a refresh of the existing retrospective templates.',
       'See the Changelog for a comprehensive listing of the updates included.'
     ];
   }
