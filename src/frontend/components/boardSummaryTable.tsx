@@ -484,7 +484,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         workItemsClass = 'workItemsCount total-work-item-count';
         break;
       case 'feedbackItemsCount':
-        workItemsClass = 'workItemsCount pending-action-item-count';
+        workItemsClass = 'workItemsCount total-work-item-count';
         break;
       case 'pendingWorkItemsCount':
         workItemsClass = 'workItemsCount';
