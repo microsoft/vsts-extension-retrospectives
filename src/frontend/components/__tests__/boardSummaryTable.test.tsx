@@ -33,11 +33,11 @@ it('calls onArchiveToggle when archive toggle is triggered', () => {
 
     // Find the archive toggle button or child component, simulate toggle
     // For example:
-    // component.find('ArchiveToggleButton').simulate('click');
+  component.find('ArchiveToggleButton').simulate('click');
 
     // Or call the prop directly if you're testing a pure function
-    // component.prop('onArchiveToggle')('board-id-1', true);
+  //component.prop('onArchiveToggle')('board-id-1', true);
 
     // Then assert
-    // expect(onArchiveToggle).toHaveBeenCalledWith('board-id-1', true);
+  expect(onArchiveToggle).toHaveBeenCalledWith('board-id-1', true);
 });
