@@ -19,7 +19,11 @@ describe('BoardSummaryTable', () => {
 
   it('simulates archive toggle', () => {
     const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
-    const checkbox = wrapper.find('input[type="checkbox"]'); // Adjust if your checkbox has a specific selector
+    
+    // Dive into the component if necessary
+    const componentWithCheckbox = wrapper.dive().dive(); // Add another dive if checkbox is in a deeper child component
+
+    const checkbox = componentWithCheckbox.find('input[type="checkbox"]'); // Adjust if your checkbox has a specific selector
 
     // Check if the checkbox exists
     expect(checkbox.exists()).toBeTruthy();
