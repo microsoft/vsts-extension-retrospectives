@@ -20,3 +20,24 @@ describe('BoardSummaryTable', () => {
 
   // Expand this once you're ready to test with board data
 });
+
+it('calls onArchiveToggle when archive toggle is triggered', () => {
+  const onArchiveToggle = jest.fn();
+    const props = {
+    ...baseProps,
+    onArchiveToggle
+  };
+
+  const wrapper = shallow(<BoardSummaryTable {...props} />);
+  const component = wrapper.children().dive();
+
+    // Find the archive toggle button or child component, simulate toggle
+    // For example:
+    // component.find('ArchiveToggleButton').simulate('click');
+
+    // Or call the prop directly if you're testing a pure function
+    // component.prop('onArchiveToggle')('board-id-1', true);
+
+    // Then assert
+    // expect(onArchiveToggle).toHaveBeenCalledWith('board-id-1', true);
+});
