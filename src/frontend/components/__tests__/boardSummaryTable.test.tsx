@@ -16,4 +16,17 @@ describe('BoardSummaryTable', () => {
 
     expect(component.exists()).toBeTruthy();
   });
+
+  it('simulates archive toggle', () => {
+    const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
+    const checkbox = wrapper.find('input[type="checkbox"]'); // Adjust if your checkbox has a specific selector
+
+    // Simulate checking the checkbox
+    checkbox.simulate('change', { target: { checked: true } });
+    expect(baseProps.onArchiveToggle).toHaveBeenCalledWith(true); // Ensure the callback was called with the correct value
+
+    // Simulate unchecking the checkbox
+    checkbox.simulate('change', { target: { checked: false } });
+    expect(baseProps.onArchiveToggle).toHaveBeenCalledWith(false); // Ensure the callback was called with the correct value
+  });
 });
