@@ -19,7 +19,7 @@ describe('BoardSummaryTable', () => {
 
   it('simulates archive toggle', () => {
     const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
-    
+
     // Dive into the component if necessary
     const componentWithCheckbox = wrapper.dive().dive(); // Add another dive if checkbox is in a deeper child component
 
