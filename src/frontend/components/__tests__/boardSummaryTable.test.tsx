@@ -16,4 +16,10 @@ describe('BoardSummaryTable', () => {
 
     expect(component.exists()).toBeTruthy();
   });
+
+  it('shows a spinner when data is not yet loaded', () => {
+    const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
+    const spinner = wrapper.find('Spinner');
+    expect(spinner.exists()).toBe(true);
+  });
 });
