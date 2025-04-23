@@ -29,12 +29,10 @@ it('calls onArchiveToggle when archive toggle is triggered', () => {
     };
 
     const wrapper = shallow(<BoardSummaryTable {...props} />);
-    const component = wrapper.children().dive(); // First dive if needed
+    const component = wrapper.children().dive();
 
-    // Find the checkbox by type or class name, assuming it's a checkbox element
+    // Find the checkbox input by type and simulate change event
     const checkbox = component.find('input[type="checkbox"]');
-
-    // Simulate a change event to trigger the toggle
     checkbox.simulate('change', { target: { checked: true } });
 
     // Assert that onArchiveToggle was called with correct arguments
