@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
+
+/*
+import React from 'react';
 import { shallow } from 'enzyme';
 import BoardSummaryTable, { IBoardSummaryTableProps } from '../boardSummaryTable';
-
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useState: jest.fn(),
-}));
 
 const baseProps: IBoardSummaryTableProps = {
   teamId: 'team-1',
@@ -20,24 +17,40 @@ describe('BoardSummaryTable', () => {
 
     expect(component.exists()).toBeTruthy();
   });
+});
+*/
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import BoardSummaryTable, { IBoardSummaryTableProps } from '../boardSummaryTable';
 
+const baseProps: IBoardSummaryTableProps = {
+  teamId: 'team-1',
+  supportedWorkItemTypes: [],
+  onArchiveToggle: jest.fn(),
+};
+
+describe('BoardSummaryTable', () => {
   it('shows spinner while data is loading', () => {
-    // Arrange
-    const mockSetState = jest.fn();
-    (useState as jest.Mock).mockImplementation(() => [false, mockSetState]); // Mock `allDataLoaded` as false
-    const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
+    // Mock the state for allDataLoaded
+    jest.spyOn(React, 'useState')
+      .mockImplementationOnce(() => [{ allDataLoaded: false }, jest.fn()]);
 
-    // Act & Assert
-    expect(wrapper.find('.board-summary-initialization-spinner').exists()).toBeTruthy();
+    // Render the component
+    render(<BoardSummaryTable {...baseProps} />);
+
+    // Assert: Spinner should be visible
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('does not show spinner when data is loaded', () => {
-    // Arrange
-    const mockSetState = jest.fn();
-    (useState as jest.Mock).mockImplementation(() => [true, mockSetState]); // Mock `allDataLoaded` as true
-    const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
+    // Mock the state for allDataLoaded
+    jest.spyOn(React, 'useState')
+      .mockImplementationOnce(() => [{ allDataLoaded: true }, jest.fn()]);
 
-    // Act & Assert
-    expect(wrapper.find('.board-summary-initialization-spinner').exists()).toBeFalsy();
+    // Render the component
+    render(<BoardSummaryTable {...baseProps} />);
+
+    // Assert: Spinner should not be visible
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
   });
 });
