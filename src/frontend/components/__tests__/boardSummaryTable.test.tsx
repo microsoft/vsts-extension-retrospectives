@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import BoardSummaryTable, { IBoardSummaryTableProps } from '../boardSummaryTable';
 
 const baseProps: IBoardSummaryTableProps = {
@@ -18,9 +18,7 @@ describe('BoardSummaryTable', () => {
   });
 
   it('shows a spinner when data is not loaded', () => {
-    const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
-    const component = wrapper.dive(); // try one or two dives depending on your HOC structure
-
-    expect(component.find('Spinner').exists()).toBe(true);
+    const wrapper = mount(<BoardSummaryTable {...baseProps} />);
+    expect(wrapper.find('Spinner').exists()).toBe(true);
   });
 });
