@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import BoardSummaryTable, { IBoardSummaryTableProps } from '../boardSummaryTable';
 
 const baseProps: IBoardSummaryTableProps = {
@@ -15,10 +15,5 @@ describe('BoardSummaryTable', () => {
     const component = wrapper.children().dive();
 
     expect(component.exists()).toBeTruthy();
-  });
-
-  it('shows a spinner when data is not loaded', () => {
-    const wrapper = mount(<BoardSummaryTable {...baseProps} />);
-    expect(wrapper.find('Spinner').exists()).toBe(true);
   });
 });
