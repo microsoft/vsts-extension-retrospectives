@@ -19,6 +19,8 @@ describe('BoardSummaryTable', () => {
 
   it('shows a spinner when data is not loaded', () => {
     const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
-    expect(wrapper.find('Spinner').exists()).toBe(true);
+    const component = wrapper.dive(); // try one or two dives depending on your HOC structure
+
+    expect(component.find('Spinner').exists()).toBe(true);
   });
 });
