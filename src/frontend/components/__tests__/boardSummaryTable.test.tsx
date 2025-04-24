@@ -9,10 +9,34 @@ const baseProps: IBoardSummaryTableProps = {
 };
 
 describe('BoardSummaryTable', () => {
-  it('renders with empty board list (shallow test)', () => {
+  it('renders when no boards exist', () => {
     const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
     const component = wrapper.children().dive();
 
     expect(component.exists()).toBeTruthy();
+  });
+
+  it('shows spinner while data is loading', () => {
+    // Arrange
+    const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
+    const component = wrapper.children().dive();
+
+    // Act
+    component.setState({ allDataLoaded: false });
+
+    // Assert
+    expect(component.find('.board-summary-initialization-spinner').exists()).toBeTruthy();
+  });
+
+  it('does not show spinner when data is loaded', () => {
+    // Arrange
+    const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
+    const component = wrapper.children().dive();
+
+    // Act
+    component.setState({ allDataLoaded: true });
+
+    // Assert
+    expect(component.find('.board-summary-initialization-spinner').exists()).toBeFalsy();
   });
 });
