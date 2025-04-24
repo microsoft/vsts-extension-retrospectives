@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { shallow } from 'enzyme';
 import BoardSummaryTable, { IBoardSummaryTableProps } from '../boardSummaryTable';
+
+jest.mock('react', () => ({
+  ...jest.requireActual('react'),
+  useState: jest.fn(),
+}));
 
 const baseProps: IBoardSummaryTableProps = {
   teamId: 'team-1',
@@ -18,25 +23,21 @@ describe('BoardSummaryTable', () => {
 
   it('shows spinner while data is loading', () => {
     // Arrange
+    const mockSetState = jest.fn();
+    (useState as jest.Mock).mockImplementation(() => [false, mockSetState]); // Mock `allDataLoaded` as false
     const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
-    const component = wrapper.children().dive();
 
-    // Act
-    component.setState({ allDataLoaded: false });
-
-    // Assert
-    expect(component.find('.board-summary-initialization-spinner').exists()).toBeTruthy();
+    // Act & Assert
+    expect(wrapper.find('.board-summary-initialization-spinner').exists()).toBeTruthy();
   });
 
   it('does not show spinner when data is loaded', () => {
     // Arrange
+    const mockSetState = jest.fn();
+    (useState as jest.Mock).mockImplementation(() => [true, mockSetState]); // Mock `allDataLoaded` as true
     const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
-    const component = wrapper.children().dive();
 
-    // Act
-    component.setState({ allDataLoaded: true });
-
-    // Assert
-    expect(component.find('.board-summary-initialization-spinner').exists()).toBeFalsy();
+    // Act & Assert
+    expect(wrapper.find('.board-summary-initialization-spinner').exists()).toBeFalsy();
   });
 });
