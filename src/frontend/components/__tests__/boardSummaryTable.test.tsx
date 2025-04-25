@@ -13,6 +13,7 @@ describe('BoardSummaryTable', () => {
   it('renders when no boards exist', () => {
     const wrapper = shallow(<BoardSummaryTable {...baseProps} />);
     const component = wrapper.children().dive();
+
     expect(component.exists()).toBeTruthy();
   });
 });
