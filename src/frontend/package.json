@@ -4,16 +4,16 @@
   "description": "Azure DevOps Retrospective Extension",
   "main": "index.tsx",
   "scripts": {
-    "clean": "rm -rf ./dist ./coverage ./reports && rm -rf ./node_modules/applicationinsights-js/dist/*.map",
+    "clean": "npx rimraf ./dist ./coverage ./reports ./node_modules/applicationinsights-js/dist/*.map",
     "compile": "npx tailwindcss -i ./css/index.css -o ./css/bundle.css --minify",
-    "build:p": "npm run clean && npm run compile && webpack --mode=production",
+    "build:p": "npm run clean && npm run compile && npx webpack --mode=production",
     "lint": "npx eslint **/*.ts*",
-    "pack:d": "npm run build:p && tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
-    "pack:test": "npm run compile && webpack --mode=production && tfx extension create --manifests vss-extension-prod.json --output-path ./dist/testing",
-    "pack:p": "npm run build:p && tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
-    "publish:d": "npm run pack:d && tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
-    "publish:p": "npm run pack:p && tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
-    "start:dev": "npm run compile && webpack-dev-server --mode development",
+    "pack:d": "npm run build:p && npx tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
+    "pack:test": "npm run compile && npx webpack --mode=production && npx tfx extension create --manifests vss-extension-prod.json --output-path ./dist/testing",
+    "pack:p": "npm run build:p && npx tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
+    "publish:d": "npm run pack:d && npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
+    "publish:p": "npm run pack:p && npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
+    "start:dev": "npm run compile && npx webpack-dev-server --mode development",
     "test": "jest --env=jsdom --silent -ci --reporters=default --reporters=jest-junit --coverage",
     "test:watch": "jest --env=jsdom --watch",
     "ncu": "npx npm-check-updates",
@@ -27,7 +27,7 @@
   "license": "ISC",
   "dependencies": {
     "@microsoft/applicationinsights-react-js": "17.3.5",
-    "@microsoft/applicationinsights-web": "3.3.5",
+    "@microsoft/applicationinsights-web": "3.3.6",
     "@microsoft/signalr": "8.0.7",
     "@tanstack/react-table": "8.20.5",
     "azure-devops-extension-api": "1.152.0",
@@ -41,7 +41,7 @@
     "jest-junit-reporter": "1.1.0",
     "markdownlint-cli2": "0.14.0",
     "moment": "2.30.1",
-    "office-ui-fabric-react": "7.204.0",
+    "office-ui-fabric-react": "7.204.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-slick": "0.30.2",
@@ -65,7 +65,7 @@
     "@typescript-eslint/eslint-plugin": "8.24.0",
     "@typescript-eslint/parser": "8.24.0",
     "@wojtekmaj/enzyme-adapter-react-17": "0.6.7",
-    "autoprefixer": "10.4.20",
+    "autoprefixer": "10.4.21",
     "cheerio": "1.0.0-rc.12",
     "compression-webpack-plugin": "11.1.0",
     "crypto-browserify": "3.12.1",
@@ -82,8 +82,9 @@
     "node-jq": "6.0.1",
     "postcss": "8.4.47",
     "process": "0.11.10",
-    "sass": "1.86.2",
-    "sass-loader": "16.0.2",
+    "rimraf": "6.0.1",
+    "sass": "1.86.3",
+    "sass-loader": "16.0.5",
     "stream-browserify": "3.0.0",
     "style-loader": "4.0.0",
     "tailwindcss": "3.4.13",
@@ -102,7 +103,7 @@
       "./components/__tests__/setupTests.tsx"
     ],
     "transform": {
-      ".+\\.(js|ts|tsx|jsx)$": "ts-jest"
+      ".+\\.(js|ts|tsx|jsx)$": ["ts-jest", { "tsconfig": "tsconfig.test.json" }]
     },
     "transformIgnorePatterns": [
       "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)"
@@ -126,12 +127,7 @@
       "html",
       "cobertura",
       "text"
-    ],
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.test.json"
-      }
-    }
+    ]
   },
   "jest-junit": {
     "outputDirectory": "reports",

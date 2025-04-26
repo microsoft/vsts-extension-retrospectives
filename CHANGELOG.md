@@ -2,11 +2,21 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-_PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
-
 ## v1.92.36
 
-This release focused on a _refresh_ of the existing retrospective templates. Changes include:
+This release included an update of the archive functionality to include _restoring_ archived retrospectives, as well as a _refresh_ of the existing retrospective templates.
+
+Changes related to the archive functionality include:
+
+* Archived status and date were added to the History tab.
+* Archive functionality can be toggled on and off from the History tab.
+* Archive messaging from the Boards menu was updated to reference the ability to restore the archived board from the History tab.
+* Count of feedback items replaced count of pending work items.
+* History tab performance was improved dramatically.
+
+From [GitHub PR #1162](https://github.com/microsoft/vsts-extension-retrospectives/pull/1162)
+
+Changes related to the templates include:
 
 * Moved the standard retrospective templates before those designed to support the team assessment.
 * Reordered retrospective templates with more common templates before less common templates.
@@ -160,3 +170,5 @@ one of those templates, such as, _Mad-Sad-Glad_, _Start-Stop-Continue_, etc.
 
 * Bazillion tiny fixes, here and there
 * Support for Light, Dark and Custom themes of Azure DevOps
+
+_PS: Changelog before v1.0.46 is not available_ 🤦‍♂️

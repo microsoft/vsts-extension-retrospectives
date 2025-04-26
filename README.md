@@ -61,7 +61,7 @@ Navigate to the Azure 'Boards' tab in your account on the left hand navigation. 
 
 ![A screenshot of the Azure DevOps left-hand navigation. Under the Boards heading, the extension for the retrospective is darkened as though hovered by a mouse.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/azdo-side-bar.png)
 
-### 2. Pick The Team
+### 2. Pick the Team
 
 You are now on the Retrospectives page. Select your Azure DevOps team from the dropdown in the header. You will only be able to select from My Teams.
 
@@ -212,7 +212,7 @@ improvement.
   the largest opportunities for improvement based on each team members' responses to the team assessment.
   - Section 7.1 below outlines the Six Steps in a Team Assessment Retrospective
 
-### 7.1 The Six Steps To a Team Assessment Retrospective
+### 7.1 The Six Steps to a Team Assessment Retrospective
 
 #### Setup
 
@@ -310,28 +310,29 @@ Once there, there is a summary of the Retrospective. This includes:
 
 ![A screenshot that shows an example retrospective summary without a team assessment.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-summary-no-assessment-darkmode.png)
 
-If there is a team assessment, then a charted summary will show the vote breakdown by favorability,
-along with an average score.
+If there is a team assessment, then a charted summary will show the vote breakdown by favorability, along with an average score.
 
 ### 10. Board History
 
-There may be times that a team may want to reflect on past retrospectives they have
-run. There is a History tab in the top navigation of the tool, next to "Board" header.
+The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, showing the count of feedback items and action items, and supports archiving or restoring archived retrospectives.
 
-![A screenshot that shows the history view tab. There is a table that shows four
-columns: Retrospective Name, Created Date, Pending Work Items, and Total Work Items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-darkmode.png)
+![History tab showing a table with columns: Retrospective Name, Created Date, Pending Work Items, and Total Work Items. Archived status, Archived Date, and Feedback Items are not shown.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-darkmode.png)
 
-From here, one can look at past retrospectives and see a few high level stats and
-the action items created after each by clicking the individual retrospective.
+Selecting a retrospective expands the row to reveal more details, including a count of action items by status and a detailed list of each action item.
 
-![A screenshot that shows an expanded retrospective. On the left-hand side, there is the summary: how many feedback items were created, how many work items created, how many work items pending, and how many work items resolved. On the right-hand side, there is the list of work items in a table of their own. The work item table has the columns: Title, State, Type, Last Updated, Assigned To, and Priority. The work items have example data for three different items.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-expanded-summary-lightmode.png)
+![Expanded retrospective view showing a summary of feedback and work item counts on the left and a work item table on the right with columns: Title, State, Type, Last Updated, Assigned To, and Priority. Archived status and Archived Date columns are not shown.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-expanded-summary-lightmode.png)
+
+To _archive_ a retrospective, check the box in the Archived column. The retrospective will no longer appear in the Board selection dropdown, though all data remains preserved.
+
+To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective will reappear in the Board selection dropdown.
+
+> **Note:** Archiving takes effect immediately for the user who performs the action. Other users see the change after reloading the Retrospectives boards.
 
 ## Best Practices
 
 ### Plan for a Team Assessment Retrospective
 
-Planning in advance will help you make the best use of the team's time in completing a Team Assessment
-Retrospective.
+Planning in advance will help you make the best use of the team's time in completing a Team Assessment Retrospective.
 
 #### In Advance of the Event
 
@@ -351,7 +352,7 @@ Retrospective.
 | Determine action plan(s) | 10 min | [Collect, Review, Group and Vote on Column 3](https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#act) |
 | Close the meeting | 2 min | Thank attendees for participation and summarize |
 
-### Use Retrospectives to give Kudos
+### Use Retrospectives to Give Kudos
 
 Giving kudos, or recognizing others for their achievements, is one of the highest drivers of employee
 satisfaction and retention. When people feel appreciated and supported, they will be more engaged and
@@ -361,7 +362,7 @@ and it just takes a moment for people to add a few pieces of feedback to acknowl
 of others.  When you finish your retrospective, make sure to read through each kudos feedback item
 and take a moment to celebrate!
 
-### Use Retrospectives to create a Team Working Agreement
+### Use Retrospectives to Create a Team Working Agreement
 
 Team Working Agreements are shared commitments to ways of working together. They establish team members'
 work preferences. A shared agreement will balance individual and team needs, and set clear expectations

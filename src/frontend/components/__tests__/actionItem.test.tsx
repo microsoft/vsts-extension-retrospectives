@@ -1,7 +1,7 @@
 import * as React from "react";
 import { shallow } from 'enzyme';
 import toJson from "enzyme-to-json";
-import ActionItem, { ActionItemProps } from "../actionItem";
+import { ActionItem, ActionItemProps } from "../actionItem";
 
 const mockOnUpdateActionItem = jest.fn(() => {});
 
@@ -46,9 +46,35 @@ const defaultTestProps: ActionItemProps = {
 describe("Action Item component", () => {
   it("renders correctly when there are no action items.", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
-    const component = wrapper.children().dive();
-    expect(toJson(component)).toMatchSnapshot();
+    expect(toJson(wrapper)).toMatchSnapshot();
   });
 
-  it("renders correctly when action items exist", () => {});
+  it("renders correctly when action items exist and areActionIconsHidden is true", () => {
+    const wrapper = shallow(<ActionItem {...defaultTestProps} areActionIconsHidden={true} />);
+    expect(toJson(wrapper)).toMatchSnapshot();
+  });
+
+  it("renders correctly when action items exist and shouldFocus is true", () => {
+    const wrapper = shallow(<ActionItem {...defaultTestProps} shouldFocus={true} />);
+    expect(toJson(wrapper)).toMatchSnapshot();
+  });
+
+  it("renders correctly when action items exist and areActionIconsHidden is false", () => {
+    const wrapper = shallow(<ActionItem {...defaultTestProps} areActionIconsHidden={false} />);
+    expect(toJson(wrapper)).toMatchSnapshot();
+  });
+
+  it("renders correctly when action items exist and shouldFocus is false", () => {
+    const wrapper = shallow(<ActionItem {...defaultTestProps} shouldFocus={false} />);
+    expect(toJson(wrapper)).toMatchSnapshot();
+  });
+
+  it("focuses the openWorkItemButton when shouldFocus is true", () => {
+    const wrapper = shallow(<ActionItem {...defaultTestProps} shouldFocus={true} />);
+    const instance = wrapper.instance() as ActionItem;
+    const mockFocus = jest.fn();
+    instance.openWorkItemButton = { focus: mockFocus } as unknown as HTMLButtonElement;
+    instance.componentDidMount();
+    expect(mockFocus).toHaveBeenCalled();
+  });
 });
