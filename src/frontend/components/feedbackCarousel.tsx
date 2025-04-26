@@ -20,23 +20,13 @@ export interface IFeedbackCarouselProps {
 export interface IFeedbackCarouselState {
 }
 
-//DPH refactor opportunity with feedbackColumn
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
-  // Render carousel items with totalVotes-based sorting
+  // Render carousel with grouped feedback items ordered by total votes and created date
   private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
-   /* const columnItems = feedbackColumnProps.columnItems
-      // Sort items based on their total votes
-      .sort((item1, item2) => {
-        const totalVotes1 = calculateTotalVotes(item1, feedbackColumnProps.columnItems);
-        const totalVotes2 = calculateTotalVotes(item2, feedbackColumnProps.columnItems);
-        return totalVotes2 - totalVotes1; // Descending order of total votes
-      });
-
-    return columnItems*/
     const sortedItems = sortItemsByVotesAndDate(feedbackColumnProps.columnItems, feedbackColumnProps.columnItems);
 
-          // Carousel only shows main item cards.
     return sortedItems
+      // Carousel only shows main item cards
       .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
       .map((columnItem) => {
         const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);

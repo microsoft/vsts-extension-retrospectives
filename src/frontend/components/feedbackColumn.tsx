@@ -202,34 +202,16 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     }
   }
 
-  // DPH refactor opportunity with feedbackCarousel
   private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
-    // Order by created date with newest first by default
-    columnItems = columnItems.sort((item1, item2) =>
-      new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()
-    );
-/*
-    // Order by grouped total votes if Act workflow, retaining the default created date order for tied votes
-    if (this.props.workflowPhase === WorkflowPhase.Act) {
-      columnItems = columnItems.sort((item1, item2) => {
-        const totalVotes1 = calculateTotalVotes(item1, this.props.columnItems);
-        const totalVotes2 = calculateTotalVotes(item2, this.props.columnItems);
-
-        // Primary sort by total votes (descending)
-        if (totalVotes2 !== totalVotes1) {
-          return totalVotes2 - totalVotes1;
-        }
-
-        // Secondary sort by created date (ascending)
-          return new Date(item1.feedbackItem.createdDate).getTime() - new Date(item2.feedbackItem.createdDate).getTime();
-      });
-    }
-*/
-    // Sort by grouped total votes if Act workflow
+    // Sort by grouped total votes if Act workflow else sort by created date
     if (this.props.workflowPhase === WorkflowPhase.Act) {
       columnItems = sortItemsByVotesAndDate(columnItems, this.props.columnItems);
+    } else {
+      columnItems = columnItems.sort((item1, item2) =>
+        new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()
+      );
     }
 
     return columnItems
