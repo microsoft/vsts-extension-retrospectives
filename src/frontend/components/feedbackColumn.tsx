@@ -205,14 +205,13 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
-    // sort by created date 
-    columnItems = columnItems.sort((item1, item2) =>
-      new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()
-    );
-
-    // Sort by grouped total votes if Act workflow
+    // Sort by grouped total votes if Act workflow else sort by created date
     if (this.props.workflowPhase === WorkflowPhase.Act) {
       columnItems = sortItemsByVotesAndDate(columnItems, this.props.columnItems);
+    } else {
+      columnItems = columnItems.sort((item1, item2) =>
+        new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()
+      );
     }
 
     return columnItems

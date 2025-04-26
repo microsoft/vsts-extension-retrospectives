@@ -27,8 +27,8 @@ export function sortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnI
       return totalVotesB - totalVotesA;
     }
 
-    // Secondary sort: By created date (ascending order)
-    return new Date(a.feedbackItem.createdDate).getTime() - new Date(b.feedbackItem.createdDate).getTime();
+    // Secondary sort: By created date (descending order)
+    return new Date(b.feedbackItem.createdDate).getTime() - new Date(a.feedbackItem.createdDate).getTime();
   });
 }
 
