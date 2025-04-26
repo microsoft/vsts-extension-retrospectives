@@ -12,7 +12,7 @@ Changes related to the archive functionality include:
 * Archive functionality can be toggled on and off from the History tab.
 * Archive messaging from the Boards menu was updated to reference the ability to restore the archived board from the History tab.
 * Count of feedback items replaced count of pending work items.
-* History tab performance was improved dramatically.
+* Significantly reduced loading time for History tab.
 
 From [GitHub PR #1162](https://github.com/microsoft/vsts-extension-retrospectives/pull/1162)
 
@@ -26,8 +26,8 @@ Changes related to the templates include:
 * Renamed 1-to-1 template as Good-to-Done template.
 * Revised Good-Bad-Ideas to Good-Improve-Ideas, since Improve has a better connotation than Bad.
 * Added Thanks to Good-Improve-Ideas to demonstrate incorporating a column for appreciation.
-* Tweaked a prompt on Speedboat and on Good to Done templates.
-* Revised named of Confidence and Efficiency templates to follow consistent pattern with other team assessment templates.
+* Tweaked prompts on Speedboat and Good-to-Done templates.
+* Revised name of Confidence and Efficiency templates to follow consistent pattern with other team assessment templates.
 * Updated team assessment retrospective prompts to follow consistent pattern but with variety.
 * Revised team assessment retrospective prompt on "One action" column to support teams not sprinting.
 * Updated icons used in templates to better align with the varied template column prompts.
