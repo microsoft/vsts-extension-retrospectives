@@ -1,6 +1,6 @@
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
-import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
+import { appInsights } from '../utilities/telemetryClient';
 import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
@@ -16,16 +16,38 @@ export function calculateTotalVotes(item: IColumnItem, items: IColumnItem[]): nu
   return (item.feedbackItem.upvotes || 0) + childVotes;
 }
 
+export function sortItemsByTotalVotes(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
+  return [...items].sort((a, b) =>
+    calculateTotalVotes(b, allItems) - calculateTotalVotes(a, allItems)
+  );
+}
+
+export function sortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
+  return [...items].sort((a, b) => {
+    // Calculate total votes for each item
+    const totalVotesA = calculateTotalVotes(a, allItems);
+    const totalVotesB = calculateTotalVotes(b, allItems);
+
+    // Primary sort: By total votes (descending order)
+    if (totalVotesB !== totalVotesA) {
+      return totalVotesB - totalVotesA;
+    }
+
+    // Secondary sort: By created date (ascending order)
+    return new Date(a.feedbackItem.createdDate).getTime() - new Date(b.feedbackItem.createdDate).getTime();
+  });
+}
+
 class ItemDataService {
   /**
-   * Create an item with given title and column id in the board.
+   * Create an item with given title and column ID in the board.
    */
   public appendItemToBoard = async (item: IFeedbackItemDocument): Promise<IFeedbackItemDocument> => {
     return await createDocument<IFeedbackItemDocument>(item.boardId, item);
   }
 
   /**
-   * Create an item with given title and column id in the board.
+   * Create an item with given title and column ID in the board.
    */
   public createItemForBoard = async (
     boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
@@ -107,7 +129,7 @@ class ItemDataService {
   };
 
   /**
-   * Get feedback items in the board matching the specified item ids.
+   * Get feedback items in the board matching the specified item IDs.
    */
   public getFeedbackItemsByIds = async (boardId: string, feedbackItemIds: string[]): Promise<IFeedbackItemDocument[]> => {
     const feedbackitemsForBoard: IFeedbackItemDocument[] = await this.getFeedbackItemsForBoard(boardId);

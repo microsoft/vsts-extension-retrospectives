@@ -4,7 +4,7 @@ import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import FeedbackItem from './feedbackItem';
 import { IColumnItem } from './feedbackBoard';
-import { calculateTotalVotes } from '../dal/itemDataService';
+import { sortItemsByVotesAndDate } from '../dal/itemDataService';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { generateUUID } from '../utilities/random';
 import "slick-carousel/slick/slick.css";
@@ -22,34 +22,21 @@ export interface IFeedbackCarouselState {
 
 //DPH refactor opportunity with feedbackColumn
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
-/*
-  // Helper method to calculate totalVotes for a feedback item
-  private oldCalculateTotalVotes = (feedbackItem: IColumnItem, feedbackColumnProps: FeedbackColumnProps): number => {
-    const childrenIds = feedbackItem.feedbackItem.childFeedbackItemIds || [];
-
-    // Compute total votes: parent votes + child votes
-    return (feedbackItem.feedbackItem.upvotes || 0) + childrenIds.reduce((sum, id) => {
-      const childCard = feedbackColumnProps.columnItems.find((c) => c.feedbackItem.id === id);
-      return sum + (childCard?.feedbackItem.upvotes || 0);
-    }, 0);
-  };
-*/
   // Render carousel items with totalVotes-based sorting
   private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
-    const columnItems = feedbackColumnProps.columnItems
+   /* const columnItems = feedbackColumnProps.columnItems
       // Sort items based on their total votes
       .sort((item1, item2) => {
         const totalVotes1 = calculateTotalVotes(item1, feedbackColumnProps.columnItems);
         const totalVotes2 = calculateTotalVotes(item2, feedbackColumnProps.columnItems);
-/*
-        const totalVotes1 = this.calculateTotalVotes(item1, feedbackColumnProps);
-        const totalVotes2 = this.calculateTotalVotes(item2, feedbackColumnProps);
-*/
         return totalVotes2 - totalVotes1; // Descending order of total votes
       });
 
-    return columnItems
-      // Carousel only shows main item cards.
+    return columnItems*/
+    const sortedItems = sortItemsByVotesAndDate(feedbackColumnProps.columnItems, feedbackColumnProps.columnItems);
+
+          // Carousel only shows main item cards.
+    return sortedItems
       .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
       .map((columnItem) => {
         const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, columnItem, true);
