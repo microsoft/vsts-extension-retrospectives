@@ -22,7 +22,7 @@ export interface IFeedbackCarouselState {
 
 //DPH refactor opportunity with feedbackColumn
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
-
+/*
   // Helper method to calculate totalVotes for a feedback item
   private oldCalculateTotalVotes = (feedbackItem: IColumnItem, feedbackColumnProps: FeedbackColumnProps): number => {
     const childrenIds = feedbackItem.feedbackItem.childFeedbackItemIds || [];
@@ -33,7 +33,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       return sum + (childCard?.feedbackItem.upvotes || 0);
     }, 0);
   };
-
+*/
   // Render carousel items with totalVotes-based sorting
   private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
     const columnItems = feedbackColumnProps.columnItems

@@ -16,12 +16,6 @@ export function calculateTotalVotes(item: IColumnItem, items: IColumnItem[]): nu
   return (item.feedbackItem.upvotes || 0) + childVotes;
 }
 
-export function sortItemsByTotalVotes(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
-  return [...items].sort((a, b) =>
-    calculateTotalVotes(b, allItems) - calculateTotalVotes(a, allItems)
-  );
-}
-
 class ItemDataService {
   /**
    * Create an item with given title and column id in the board.

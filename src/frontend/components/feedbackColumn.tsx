@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
-import { itemDataService, calculateTotalVotes } from '../dal/itemDataService';
+import { calculateTotalVotes, itemDataService } from '../dal/itemDataService';
 import FeedbackItem, { IFeedbackItemProps } from './feedbackItem';
 import FeedbackItemGroup from './feedbackItemGroup';
 import { IColumnItem, IColumn } from './feedbackBoard';
@@ -226,9 +226,10 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       columnItems = columnItems.sort((item1, item2) => {
         const totalVotes1 = calculateTotalVotes(item1, this.props.columnItems);
         const totalVotes2 = calculateTotalVotes(item2, this.props.columnItems);
-/*        const totalVotes1 = calculateTotalVotes(item1);
-        const totalVotes2 = calculateTotalVotes(item2); */
-
+/*
+        const totalVotes1 = calculateTotalVotes(item1);
+        const totalVotes2 = calculateTotalVotes(item2);
+*/
         // Primary sort by total votes (descending)
         if (totalVotes2 !== totalVotes1) {
           return totalVotes2 - totalVotes1;
