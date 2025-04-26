@@ -5,6 +5,22 @@ import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { generateUUID } from '../utilities/random';
+import { IColumnItem } from '../../frontend/components/feedbackBoard';
+
+export function calculateTotalVotes(item: IColumnItem, items: IColumnItem[]): number {
+  const childVotes = item.feedbackItem.childFeedbackItemIds?.reduce((sum, childId) => {
+    const child = items.find(c => c.feedbackItem.id === childId);
+    return sum + (child?.feedbackItem.upvotes || 0);
+  }, 0) || 0;
+
+  return (item.feedbackItem.upvotes || 0) + childVotes;
+}
+
+export function sortItemsByTotalVotes(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
+  return [...items].sort((a, b) =>
+    calculateTotalVotes(b, allItems) - calculateTotalVotes(a, allItems)
+  );
+}
 
 class ItemDataService {
   /**

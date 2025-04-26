@@ -1,9 +1,8 @@
 import React from 'react';
 import classNames from 'classnames';
-
 import { WorkflowPhase } from '../interfaces/workItem';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
-import { itemDataService } from '../dal/itemDataService';
+import { itemDataService, calculateTotalVotes } from '../dal/itemDataService';
 import FeedbackItem, { IFeedbackItemProps } from './feedbackItem';
 import FeedbackItemGroup from './feedbackItemGroup';
 import { IColumnItem, IColumn } from './feedbackBoard';
@@ -206,7 +205,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   // DPH refactor opportunity with feedbackCarousel
   private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
-
+/*
     // Helper function to calculate the total votes for a feedback item (including grouped children)
     const calculateTotalVotes = (columnItem: IColumnItem): number => {
       const childVotes = columnItem.feedbackItem.childFeedbackItemIds?.reduce((sum, childId) => {
@@ -216,7 +215,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
       return columnItem.feedbackItem.upvotes + childVotes;
     };
-
+*/
     // Order by created date with newest first by default
     columnItems = columnItems.sort((item1, item2) =>
       new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()
@@ -225,8 +224,10 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     // Order by grouped total votes if Act workflow, retaining the default created date order for tied votes
     if (this.props.workflowPhase === WorkflowPhase.Act) {
       columnItems = columnItems.sort((item1, item2) => {
-        const totalVotes1 = calculateTotalVotes(item1);
-        const totalVotes2 = calculateTotalVotes(item2);
+        const totalVotes1 = calculateTotalVotes(item1, this.props.columnItems);
+        const totalVotes2 = calculateTotalVotes(item2, this.props.columnItems);
+/*        const totalVotes1 = calculateTotalVotes(item1);
+        const totalVotes2 = calculateTotalVotes(item2); */
 
         // Primary sort by total votes (descending)
         if (totalVotes2 !== totalVotes1) {

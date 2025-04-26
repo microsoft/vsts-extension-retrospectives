@@ -4,7 +4,7 @@ import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import FeedbackItem from './feedbackItem';
 import { IColumnItem } from './feedbackBoard';
-import { itemDataService } from '../dal/itemDataService';
+import { calculateTotalVotes } from '../dal/itemDataService';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { generateUUID } from '../utilities/random';
 import "slick-carousel/slick/slick.css";
@@ -24,7 +24,7 @@ export interface IFeedbackCarouselState {
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
 
   // Helper method to calculate totalVotes for a feedback item
-  private calculateTotalVotes = (feedbackItem: IColumnItem, feedbackColumnProps: FeedbackColumnProps): number => {
+  private oldCalculateTotalVotes = (feedbackItem: IColumnItem, feedbackColumnProps: FeedbackColumnProps): number => {
     const childrenIds = feedbackItem.feedbackItem.childFeedbackItemIds || [];
 
     // Compute total votes: parent votes + child votes
@@ -39,9 +39,12 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
     const columnItems = feedbackColumnProps.columnItems
       // Sort items based on their total votes
       .sort((item1, item2) => {
+        const totalVotes1 = calculateTotalVotes(item1, feedbackColumnProps.columnItems);
+        const totalVotes2 = calculateTotalVotes(item2, feedbackColumnProps.columnItems);
+/*
         const totalVotes1 = this.calculateTotalVotes(item1, feedbackColumnProps);
         const totalVotes2 = this.calculateTotalVotes(item2, feedbackColumnProps);
-
+*/
         return totalVotes2 - totalVotes1; // Descending order of total votes
       });
 
