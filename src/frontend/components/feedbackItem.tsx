@@ -696,9 +696,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
 
+    const inFocusMode = isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden;
+
     let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
     //Override for Focus mode
-    if (isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden)
+    if (inFocusMode)
       {totalVotes = groupedVotes}
 
     return (
@@ -733,8 +735,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               }}>
               <div className="card-header">
                 {
-                  isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
-                  this.renderGroupButton(groupItemsCount, true) // For focus mode
+                  inFocusMode &&
+                  this.renderGroupButton(groupItemsCount, true)
                 }
                 {
                   // This controls the top level feedback item in a group in the vote phase and outside the focus mode
