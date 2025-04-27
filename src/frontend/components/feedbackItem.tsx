@@ -662,16 +662,31 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   public render(): JSX.Element {
-    const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
-    const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
-    const showVotes = showVoteButton || showAddActionItem;
-    const isDraggable = this.props.isInteractable && this.props.workflowPhase === WorkflowPhase.Group && !this.state.isMarkedForDeletion;
+    const workflowState = {
+      isCollectPhase: this.props.workflowPhase === WorkflowPhase.Collect,
+      isGroupPhase: this.props.workflowPhase === WorkflowPhase.Group,
+      isVotePhase: this.props.workflowPhase === WorkflowPhase.Vote,
+      isActPhase: this.props.workflowPhase === WorkflowPhase.Act,
+    };
+
+    const groupState = {
+      isNotGroupedItem: !this.props.groupedItemProps,
+      isMainItem: !this.props.groupedItemProps || this.props.groupedItemProps.isMainItem,
+      isMainCollapsedItem: this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded,
+      isGroupedCarouselItem: this.props.isGroupedCarouselItem,
+    };
     const isNotGroupedItem = !this.props.groupedItemProps;
     const isMainItem = isNotGroupedItem || this.props.groupedItemProps?.isMainItem;
     const isMainCollapsedItem = !isNotGroupedItem && !this.props.groupedItemProps.isGroupExpanded;
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
+
+    const showVoteButton = workflowState.isVotePhase;
+    const showAddActionItem = workflowState.isActPhase;
+    const showVotes = showVoteButton || showAddActionItem;
+    const isDraggable = this.props.isInteractable && workflowState.isGroupPhase && !this.state.isMarkedForDeletion;
+
     const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
-    const ariaLabel = isNotGroupedItem
+    const ariaLabel = groupState.isNotGroupedItem
       ? "Feedback item."
       : (!isMainItem
         ? "Feedback group item."
@@ -697,7 +712,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
 
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden;
-    const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
+    const mainGroupedItemNotInFocusMode = !groupState.isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
 
     let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
     //Override for Focus mode
@@ -711,18 +726,18 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         aria-live="polite"
         aria-label={ariaLabel}
         className={classNames({
-          feedbackItem: isNotGroupedItem,
-          feedbackItemGroupItem: !isNotGroupedItem,
-          feedbackItemGroupGroupedItem: !isNotGroupedItem && !isMainItem,
+          feedbackItem: groupState.isNotGroupedItem,
+          feedbackItemGroupItem: !groupState.isNotGroupedItem,
+          feedbackItemGroupGroupedItem: !groupState.isNotGroupedItem && !isMainItem,
           newFeedbackItem: this.props.showAddedAnimation,
           removeFeedbackItem: this.state.isMarkedForDeletion,
           hideFeedbackItem: hideFeedbackItems,
         })}
         draggable={isDraggable}
         onDragStart={this.dragFeedbackItemStart}
-        onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null}
+        onDragOver={groupState.isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null}
         onDragEnd={this.dragFeedbackItemEnd}
-        onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null}
+        onDrop={groupState.isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null}
         onAnimationEnd={this.onAnimationEnd}>
         <div className="document-card-wrapper">
           <DocumentCard className={classNames({
@@ -845,12 +860,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     </p>
                   </div>
                 }
-                {(this.props.workflowPhase !== WorkflowPhase.Collect) && (this.props.columnId !== this.props.originalColumnId) &&
+                {(!workflowState.isCollectPhase) && (this.props.columnId !== this.props.originalColumnId) &&
                   <div className="original-column-info">Original Column: <br />{ this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a" }</div>
                 }
                 {showVoteButton && this.props.isInteractable &&
                   <div>
-                    {isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? (
+                    {groupState.isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? (
                       <span className="feedback-yourvote-count">
                         [Your Votes: {votesByUser}]
                       </span>
@@ -915,7 +930,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             type: DialogType.close,
             title: "Delete Feedback",
             subText: `Are you sure you want to delete the feedback "${this.props.title}"?
-              ${!isNotGroupedItem && isMainItem
+              ${!groupState.isNotGroupedItem && isMainItem
                 ? "Any feedback grouped underneath this one will be ungrouped."
                 : ""}`,
           }}
