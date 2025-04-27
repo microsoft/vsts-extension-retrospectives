@@ -718,7 +718,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     // Universal Flag
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
 
-
     return (
       <div
         ref={this.itemElementRef}
