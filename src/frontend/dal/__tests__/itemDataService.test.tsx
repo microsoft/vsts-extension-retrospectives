@@ -52,18 +52,13 @@ const feedbackItemWithNoVotes: IFeedbackItemDocument = {
   upvotes: 0
 };
 
-/*
 describe("ItemDataService - isVoted", () => {
   beforeEach(() => {
     jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (feedbackItemId: string) => {
       if (feedbackItemId === 'test-item') {
         return { ...feedbackItemWithVotes };
       } else if (feedbackItemId === 'no-votes-item') {
-        return {
-          ...baseFeedbackItem,
-          voteCollection: { user1: 0, user2: 0, user3: 0 },
-          upvotes: 0,
-        };
+        return { ...feedbackItemWithNoVotes };
       } else if (feedbackItemId === 'undefined-votes-item') {
         return {
           ...baseFeedbackItem,
@@ -80,7 +75,7 @@ describe("ItemDataService - isVoted", () => {
     const result = await itemDataService.isVoted('test-board', 'user1', 'test-item');
     expect(result).toBe("3");
   });
-
+/*
   it("should return '0' if the user has not voted but the item has upvotes", async () => {
     const result = await itemDataService.isVoted('test-board', 'user2', 'test-item');
     expect(result).toBe("0");
@@ -100,8 +95,9 @@ describe("ItemDataService - isVoted", () => {
     const result = await itemDataService.isVoted('test-board', 'user1', 'non-existent-item');
     expect(result).toBeUndefined();
   });
-});
 */
+});
+
 describe("ItemDataService - getVotes", () => {
   it("should return the total votes for a feedback item", () => {
     const result = itemDataService.getVotes(feedbackItemWithVotes);
