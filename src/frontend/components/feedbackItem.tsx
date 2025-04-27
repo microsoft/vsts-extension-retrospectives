@@ -670,20 +670,42 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       isActPhaseFocusMode: this.props.workflowPhase === WorkflowPhase.Act && !this.props.isFocusModalHidden,
     };
 
-    // Grouped State Booleans
+    // Grouped State Booleans and Children
     const isNotGroupedItem = !this.props.groupedItemProps;
     const isMainItem = isNotGroupedItem || this.props.groupedItemProps?.isMainItem;
     const isMainCollapsedItem = !isNotGroupedItem && !this.props.groupedItemProps.isGroupExpanded;
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
+    const childrenIds = this.props.groupIds;
 
+    // Focus Mode Booleans
     const isFocusModalHidden = this.props.isFocusModalHidden; // when false, in focus mode
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
     const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
 
+    // Vote Count Helpers
+    const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
+    const groupedFeedbackItems = this.props.groupIds.map(id => {
+      const item = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id)?.feedbackItem;
+      return item;
+    }).filter(item => item !== undefined) as IFeedbackItemDocument[];
+    const userId = encrypt(getUserIdentity().id);
+
+    // Vote Count Getters
+    const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
+    const votesByUser = this.state.userVotes; // use the direct method since available
+    const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
+    const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
+
+    let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
+    // In focus mode does not toggle between grouped and ungrouped vote counts, always displays grouped count
+    if (mainGroupedItemInFocusMode)
+      {totalVotes = groupedVotes}
+
+    // Group, Vote, Act (and Focus) Options
+    const isDraggable = this.props.isInteractable && workflowState.isGroupPhase && !this.state.isMarkedForDeletion;
     const showVoteButton = workflowState.isVotePhase;
     const showAddActionItem = workflowState.isActPhase;
     const showVotes = showVoteButton || showAddActionItem;
-    const isDraggable = this.props.isInteractable && workflowState.isGroupPhase && !this.state.isMarkedForDeletion;
 
     const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
     const ariaLabel = isNotGroupedItem
@@ -691,31 +713,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       : (!isMainItem
         ? "Feedback group item."
         : `Feedback group main item. Group has ${groupItemsCount} items.`);
-    const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
-    const childrenIds = this.props.groupIds;
 
-    // Use helper functions to calculate votes
-    const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
-    const groupedFeedbackItems = this.props.groupIds.map(id => {
-      const item = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id)?.feedbackItem;
-      return item;
-    }).filter(item => item !== undefined) as IFeedbackItemDocument[];
+    // Universal Flag
+    const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
 
-    const userId = encrypt(getUserIdentity().id);
-
-    const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
-    const votesByUser = this.state.userVotes; // use the direct method since available
-    //const votesByUser = mainFeedbackItem ? itemDataService.getVotesByUser(mainFeedbackItem, userId) : 0;
-    const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
-    const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
-
-
-
-    let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
-    //Override for Focus mode
-    if (mainGroupedItemInFocusMode)
-      {totalVotes = groupedVotes}
 
     return (
       <div
