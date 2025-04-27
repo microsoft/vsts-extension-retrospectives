@@ -176,7 +176,7 @@ class ItemDataService {
   /**
    * Check if the user has voted on this item.
    */
-  public oldisVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
+  public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
@@ -191,26 +191,6 @@ class ItemDataService {
     else {
       return feedbackItem.voteCollection[userId].toString();
     }
-  }
-
-  public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
-    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
-
-    if (!feedbackItem) {
-      return undefined;
-    }
-
-    if (feedbackItem.upvotes <= 0 || !feedbackItem.voteCollection) {
-      return "0";
-    }
-
-    const userVotes = feedbackItem.voteCollection[userId];
-
-    if (userVotes === undefined || userVotes === null || userVotes === 0) {
-      return "0";
-    }
-
-    return userVotes.toString();
   }
 
   /**
