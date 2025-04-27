@@ -149,3 +149,56 @@ describe("ItemDataService - getVotesForGroupedItems", () => {
     expect(result).toBe(0); // No votes at all
   });
 });
+
+describe("ItemDataService - getVotesForGroupedItemsByUser", () => {
+  it("should return the total votes for a specific user across main and grouped items", () => {
+    // Main Feedback Item with votes for the user
+    const mainFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      voteCollection: { user1: 3 }, // Votes for user1
+    };
+
+    // Grouped Feedback Items with votes for the same user
+    const groupedFeedbackItems: IFeedbackItemDocument[] = [
+      { ...baseFeedbackItem, voteCollection: { user1: 5 } },
+      { ...baseFeedbackItem, voteCollection: { user1: 2 } },
+    ];
+
+    // Calculate total votes for user1
+    const result = itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, "user1");
+
+    expect(result).toBe(10); // 3 (main) + 5 + 2
+  });
+
+  it("should return 0 if the user has no votes in both main and grouped items", () => {
+    const mainFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      voteCollection: { user2: 3 }, // Votes for user2, not user1
+    };
+
+    const groupedFeedbackItems: IFeedbackItemDocument[] = [
+      { ...baseFeedbackItem, voteCollection: { user2: 5 } },
+      { ...baseFeedbackItem, voteCollection: { user2: 2 } },
+    ];
+
+    const result = itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, "user1");
+
+    expect(result).toBe(0); // No votes for user1
+  });
+
+  it("should return 0 if voteCollection is undefined for all items", () => {
+    const mainFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      voteCollection: undefined, // No votes for main item
+    };
+
+    const groupedFeedbackItems: IFeedbackItemDocument[] = [
+      { ...baseFeedbackItem, voteCollection: undefined },
+      { ...baseFeedbackItem, voteCollection: undefined },
+    ]; // No votes for grouped items
+
+    const result = itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, "user1");
+
+    expect(result).toBe(0); // No votes at all
+  });
+});
