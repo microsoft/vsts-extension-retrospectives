@@ -678,18 +678,16 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const childrenIds = this.props.groupIds;
 
     // New Set of Booleans
-    const isParentItem = !isNotGroupedItem && isMainItem;
-    const isCollapsedParent = isParentItem && isMainCollapsedItem;
-    const isExpandedParent = isMainItem && !isMainCollapsedItem;
+    const isParent = !isNotGroupedItem && isMainItem;
+    const isCollapsedParent = isParent && isMainCollapsedItem;
+    const isExpandedParent = isParent && !isMainCollapsedItem;
     const isChild = !isNotGroupedItem && !isMainItem;
-    const isNotParentChildItem = isNotGroupedItem;
+    const isNotParentChild = isNotGroupedItem; 
 
     // Focus Mode Booleans
     const isFocusModalHidden = this.props.isFocusModalHidden; // when false, in focus mode
-    //const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
-    //const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
-    const mainGroupedItemInFocusMode = isParentItem && workflowState.isActPhaseFocusMode;
-    const mainGroupedItemNotInFocusMode = isParentItem && isFocusModalHidden;
+    const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
+    const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
 
     // Vote Count Helpers
     const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
