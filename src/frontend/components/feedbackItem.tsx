@@ -735,13 +735,17 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               }}>
               <div className="card-header">
                 {
-                  inFocusMode &&
-                  this.renderGroupButton(groupItemsCount, true)
+                  inFocusMode && ( 
+                    console.log('Focus Mode Group Button'),
+                    this.renderGroupButton(groupItemsCount, true)
+                  )
                 }
                 {
                   // This controls the top level feedback item in a group in the vote phase and outside the focus mode
-                  !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
-                  this.renderGroupButton(groupItemsCount, false)
+                  !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden && (
+                    console.log('Vote Phase Group Button'),
+                    this.renderGroupButton(groupItemsCount, false)
+                  )
                 }
                 {
                   showVotes && this.props.isInteractable &&
