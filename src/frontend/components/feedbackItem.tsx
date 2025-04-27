@@ -677,13 +677,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const childrenIds = this.props.groupIds;
 
-    // New Set of Booleans
-    const isParent = !isNotGroupedItem && isMainItem;
-    const isCollapsedParent = isParent && isMainCollapsedItem;
-    const isExpandedParent = isParent && !isMainCollapsedItem;
-    const isChild = !isNotGroupedItem && !isMainItem;
-    const isNotParentChild = isNotGroupedItem;
-
     // Focus Mode Booleans
     const isFocusModalHidden = this.props.isFocusModalHidden; // when false, in focus mode
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
