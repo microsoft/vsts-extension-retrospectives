@@ -6,7 +6,7 @@ import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { generateUUID } from '../utilities/random';
 import { IColumnItem } from '../../frontend/components/feedbackBoard';
-
+/*
 function calculateTotalVotes(item: IColumnItem, items: IColumnItem[]): number {
   const childVotes = item.feedbackItem.childFeedbackItemIds?.reduce((sum, childId) => {
     const child = items.find(c => c.feedbackItem.id === childId);
@@ -31,7 +31,7 @@ export function sortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnI
     return new Date(b.feedbackItem.createdDate).getTime() - new Date(a.feedbackItem.createdDate).getTime();
   });
 }
-
+*/
 class ItemDataService {
   /**
    * Create an item with given title and column ID in the board.
@@ -265,6 +265,34 @@ class ItemDataService {
 
     // Return the total votes cast by the user
     return mainItemVotesByUser + groupedItemsVotesByUser;
+  }
+
+  // Private method to calculate total votes
+  private calculateTotalVotes(item: IColumnItem, items: IColumnItem[]): number {
+    const childVotes = item.feedbackItem.childFeedbackItemIds?.reduce((sum, childId) => {
+      const child = items.find(c => c.feedbackItem.id === childId);
+      return sum + (child?.feedbackItem.upvotes || 0);
+    }, 0) || 0;
+
+    return (item.feedbackItem.upvotes || 0) + childVotes;
+  }
+
+  /**
+   * Sort feedback items by total grouped votes then by created date
+   */
+  public sortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
+    return [...items].sort((a, b) => {
+      const totalVotesA = this.calculateTotalVotes(a, allItems);
+      const totalVotesB = this.calculateTotalVotes(b, allItems);
+
+      // Primary sort by total votes (descending)
+      if (totalVotesB !== totalVotesA) {
+        return totalVotesB - totalVotesA;
+      }
+
+      // Secondary sort by created date (descending)
+      return new Date(b.feedbackItem.createdDate).getTime() - new Date(a.feedbackItem.createdDate).getTime();
+    });
   }
 
   /**

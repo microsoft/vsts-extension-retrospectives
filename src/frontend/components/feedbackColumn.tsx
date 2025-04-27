@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
-import { sortItemsByVotesAndDate, itemDataService } from '../dal/itemDataService';
+import { itemDataService } from '../dal/itemDataService';
 import FeedbackItem, { IFeedbackItemProps } from './feedbackItem';
 import FeedbackItemGroup from './feedbackItemGroup';
 import { IColumnItem, IColumn } from './feedbackBoard';
@@ -207,7 +207,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
     // Sort by grouped total votes if Act workflow else sort by created date
     if (this.props.workflowPhase === WorkflowPhase.Act) {
-      columnItems = sortItemsByVotesAndDate(columnItems, this.props.columnItems);
+      columnItems = itemDataService.sortItemsByVotesAndDate(columnItems, this.props.columnItems);
     } else {
       columnItems = columnItems.sort((item1, item2) =>
         new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()

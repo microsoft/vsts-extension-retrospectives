@@ -4,7 +4,7 @@ import FeedbackColumn, { FeedbackColumnProps } from './feedbackColumn';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import FeedbackItem from './feedbackItem';
 import { IColumnItem } from './feedbackBoard';
-import { sortItemsByVotesAndDate } from '../dal/itemDataService';
+import { itemDataService } from '../dal/itemDataService';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { generateUUID } from '../utilities/random';
 import "slick-carousel/slick/slick.css";
@@ -23,7 +23,7 @@ export interface IFeedbackCarouselState {
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState>{
   // Render carousel with grouped feedback items ordered by total votes and created date
   private renderFeedbackCarouselItems = (feedbackColumnProps: FeedbackColumnProps) => {
-    const sortedItems = sortItemsByVotesAndDate(feedbackColumnProps.columnItems, feedbackColumnProps.columnItems);
+    const sortedItems = itemDataService.sortItemsByVotesAndDate(feedbackColumnProps.columnItems, feedbackColumnProps.columnItems);
 
     return sortedItems
       // Carousel only shows main item cards
