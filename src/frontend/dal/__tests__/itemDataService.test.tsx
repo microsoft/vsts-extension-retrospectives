@@ -54,7 +54,7 @@ const feedbackItemWithNoVotes: IFeedbackItemDocument = {
 
 describe("ItemDataService - isVoted", () => {
   beforeEach(() => {
-    jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (feedbackItemId: string) => {
+    jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (boardId, feedbackItemId: string) => {
       if (feedbackItemId === 'test-item') {
         return { ...feedbackItemWithVotes };
       } else if (feedbackItemId === 'no-votes-item') {
