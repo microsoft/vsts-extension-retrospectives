@@ -42,6 +42,7 @@ const baseFeedbackItem: IFeedbackItemDocument = {
 const feedbackItemWithVotes: IFeedbackItemDocument = {
   ...baseFeedbackItem,
   voteCollection: { user1: 3, user2: 0, user3: 5, user4: 2 },
+  upvotes: 10
 };
 
 describe("ItemDataService - isVoted", () => {
@@ -49,7 +50,7 @@ describe("ItemDataService - isVoted", () => {
     // Mock the `getFeedbackItem` method
     jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (feedbackItemId: string) => {
       if (feedbackItemId === 'test-item') {
-        return { ...feedbackItemWithVotes, upvotes: 10 };
+        return { ...feedbackItemWithVotes };
       } else if (feedbackItemId === 'no-votes-item') {
         return {
           ...baseFeedbackItem,
