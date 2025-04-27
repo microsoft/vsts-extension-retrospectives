@@ -106,7 +106,7 @@ describe("ItemDataService - getVotes", () => {
   it("should return 0 if voteCollection is undefined", () => {
     const feedbackItemWithUndefinedVotes: IFeedbackItemDocument = {
       ...baseFeedbackItem,
-//      voteCollection: undefined,//
+      voteCollection: undefined,
     };
     const result = itemDataService.getVotes(feedbackItemWithUndefinedVotes);
     expect(result).toBe(0);
@@ -157,6 +157,19 @@ describe("ItemDataService - getVotesForGroupedItems", () => {
     expect(result).toBe(8);
   });
 
+  it("should return the total votes for the main item and grouped items for same user", () => {
+    const mainFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      voteCollection: { user1: 3 },
+    };
+    const groupedFeedbackItems: IFeedbackItemDocument[] = [
+      { ...baseFeedbackItem, voteCollection: { user1: 0 } },
+      { ...baseFeedbackItem, voteCollection: { user1: 5 } },
+    ];
+    const result = itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems);
+    expect(result).toBe(8);
+  });
+
   it("should return only the main item votes if grouped items are empty", () => {
     const mainFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
@@ -170,11 +183,11 @@ describe("ItemDataService - getVotesForGroupedItems", () => {
   it("should return 0 if both main item and grouped items have no votes", () => {
     const mainFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
-      voteCollection: undefined,
+      voteCollection: { user1: 0 },
     };
     const groupedFeedbackItems: IFeedbackItemDocument[] = [
-      { ...baseFeedbackItem, voteCollection: undefined },
-      { ...baseFeedbackItem, voteCollection: undefined },
+      { ...baseFeedbackItem, voteCollection: { user2: 0 } },
+      { ...baseFeedbackItem, voteCollection: { user3: 0 } },
     ];
     const result = itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems);
     expect(result).toBe(0);
@@ -188,11 +201,11 @@ describe("ItemDataService - getVotesForGroupedItemsByUser", () => {
       voteCollection: { user1: 3 },
     };
     const groupedFeedbackItems: IFeedbackItemDocument[] = [
+      { ...baseFeedbackItem, voteCollection: { user1: 0 } },
       { ...baseFeedbackItem, voteCollection: { user1: 5 } },
-      { ...baseFeedbackItem, voteCollection: { user1: 2 } },
     ];
     const result = itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, "user1");
-    expect(result).toBe(10);
+    expect(result).toBe(8);
   });
 
   it("should return 0 if the user has no votes in both main and grouped items", () => {
@@ -201,8 +214,8 @@ describe("ItemDataService - getVotesForGroupedItemsByUser", () => {
       voteCollection: { user2: 3 },
     };
     const groupedFeedbackItems: IFeedbackItemDocument[] = [
+      { ...baseFeedbackItem, voteCollection: { user2: 0 } },
       { ...baseFeedbackItem, voteCollection: { user2: 5 } },
-      { ...baseFeedbackItem, voteCollection: { user2: 2 } },
     ];
     const result = itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, "user1");
     expect(result).toBe(0);
