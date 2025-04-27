@@ -80,12 +80,12 @@ describe("ItemDataService - isVoted", () => {
     const result = await itemDataService.isVoted('test-board', 'user2', 'test-item');
     expect(result).toBe("0");
   });
-/*
+
   it("should return '0' if the item has no upvotes and the user has not voted", async () => {
     const result = await itemDataService.isVoted('test-board', 'user1', 'no-votes-item');
     expect(result).toBe("0");
   });
-
+/*
   it("should return '0' if voteCollection is undefined", async () => {
     const result = await itemDataService.isVoted('test-board', 'user1', 'undefined-votes-item');
     expect(result).toBe("0");
