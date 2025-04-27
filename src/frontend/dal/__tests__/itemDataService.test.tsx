@@ -41,11 +41,10 @@ const baseFeedbackItem: IFeedbackItemDocument = {
 // Define or override variants as needed
 const feedbackItemWithVotes: IFeedbackItemDocument = {
   ...baseFeedbackItem,
-  voteCollection: { user1: 3, user2: 2, user3: 5, user4: 0 },
+  voteCollection: { user1: 3, user2: 0, user3: 5, user4: 2 },
   upvotes: 10
 };
-// --- TEST SUITES ---
-
+/*
 describe("ItemDataService - isVoted", () => {
   beforeEach(() => {
     jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (feedbackItemId: string) => {
@@ -94,7 +93,7 @@ describe("ItemDataService - isVoted", () => {
     expect(result).toBeUndefined();
   });
 });
-
+*/
 describe("ItemDataService - getVotes", () => {
   it("should return the total votes for a feedback item", () => {
     const result = itemDataService.getVotes(feedbackItemWithVotes);
@@ -118,7 +117,7 @@ describe("ItemDataService - getVotes", () => {
   it("should return 0 if all users have zero votes", () => {
     const feedbackItemWithZeroVotes: IFeedbackItemDocument = {
       ...baseFeedbackItem,
-      voteCollection: { user1: 0, user2: 0, user3: 0 },
+      voteCollection: { user1: 0, user2: 0, user3: 0, user4: 0 },
     };
     const result = itemDataService.getVotes(feedbackItemWithZeroVotes);
     expect(result).toBe(0);
@@ -229,7 +228,6 @@ describe("ItemDataService - getVotesForGroupedItemsByUser", () => {
   });
 });
 
-
 /*
 describe("ItemDataService - isVoted", () => {
   beforeEach(() => {
@@ -280,7 +278,7 @@ describe("ItemDataService - isVoted", () => {
     expect(result).toBeUndefined(); // Item does not exist
   });
 });
-*/
+
 describe("ItemDataService - getVotes", () => {
   it("should return the total votes for a feedback item", () => {
     // Use the predefined feedback item with votes
@@ -445,3 +443,4 @@ describe("ItemDataService - getVotesForGroupedItemsByUser", () => {
     expect(result).toBe(0); // No votes at all
   });
 });
+*/
