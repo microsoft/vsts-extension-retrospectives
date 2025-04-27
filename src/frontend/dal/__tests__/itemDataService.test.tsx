@@ -38,26 +38,26 @@ const baseFeedbackItem: IFeedbackItemDocument = {
   timerId: null,
 };
 
-// You can also define other reusable variants as needed
+// Define or override variants as needed
 const feedbackItemWithVotes: IFeedbackItemDocument = {
   ...baseFeedbackItem,
-  voteCollection: { user1: 3, user2: 2, user3: 5, user4: 0 },
+  voteCollection: { user1: 3, user2: 0, user3: 5, user4: 2 },
 };
 
 describe("ItemDataService - isVoted", () => {
   beforeEach(() => {
     // Mock the `getFeedbackItem` method
-    jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (boardId, feedbackItemId) => {
+    jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (feedbackItemId: string) => {
       if (feedbackItemId === 'test-item') {
         return {
           ...baseFeedbackItem,
           voteCollection: { user1: 3, user2: 0 },
-          upvotes: 5,
+          upvotes: 3,
         };
       } else if (feedbackItemId === 'no-votes-item') {
         return {
           ...baseFeedbackItem,
-          voteCollection: { user1: 0 },
+          voteCollection: { user1: 0, user2: 0 },
           upvotes: 0,
         };
       } else if (feedbackItemId === 'undefined-votes-item') {
@@ -87,14 +87,14 @@ describe("ItemDataService - isVoted", () => {
     expect(result).toBe("0"); // No votes at all
   });
 
-  it("should return undefined if the feedback item does not exist", async () => {
-    const result = await itemDataService.isVoted('test-board', 'user1', 'non-existent-item');
-    expect(result).toBeUndefined(); // Item does not exist
-  });
-
   it("should return '0' if voteCollection is undefined", async () => {
     const result = await itemDataService.isVoted('test-board', 'user1', 'undefined-votes-item');
     expect(result).toBe("0"); // voteCollection is undefined
+  });
+
+  it("should return undefined if the feedback item does not exist", async () => {
+    const result = await itemDataService.isVoted('test-board', 'user1', 'non-existent-item');
+    expect(result).toBeUndefined(); // Item does not exist
   });
 });
 
@@ -102,14 +102,12 @@ describe("ItemDataService - getVotes", () => {
   it("should return the total votes for a feedback item", () => {
     // Use the predefined feedback item with votes
     const result = itemDataService.getVotes(feedbackItemWithVotes);
-
-    expect(result).toBe(10); // 3 + 2 + 5 + 0
+    expect(result).toBe(10); // 3 + 0 + 5 + 2
   });
 
   it("should return 0 if voteCollection is empty", () => {
     // Use the base feedback item with an empty voteCollection
     const result = itemDataService.getVotes(baseFeedbackItem);
-
     expect(result).toBe(0);
   });
 
@@ -118,9 +116,7 @@ describe("ItemDataService - getVotes", () => {
       ...baseFeedbackItem,
       voteCollection: undefined,
     };
-
     const result = itemDataService.getVotes(feedbackItemWithUndefinedVotes);
-
     expect(result).toBe(0);
   });
 
@@ -129,7 +125,6 @@ describe("ItemDataService - getVotes", () => {
       ...baseFeedbackItem,
       voteCollection: { user1: 0, user2: 0, user3: 0, user4: 0 }, // Override with zero votes
     };
-
     const result = itemDataService.getVotes(feedbackItemWithZeroVotes);
     expect(result).toBe(0); // All votes are zero
   });
@@ -175,14 +170,14 @@ describe("ItemDataService - getVotesForGroupedItems", () => {
 
     // Grouped Feedback Items
     const groupedFeedbackItems: IFeedbackItemDocument[] = [
-      { ...baseFeedbackItem, voteCollection: { user2: 2 } },
+      { ...baseFeedbackItem, voteCollection: { user2: 0 } },
       { ...baseFeedbackItem, voteCollection: { user3: 5 } },
     ];
 
     // Calculate total votes for the main and grouped items
     const result = itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems);
 
-    expect(result).toBe(10); // 3 (main) + 2 + 5
+    expect(result).toBe(8); // 3 (main) + 0 + 5
   });
 
   it("should return only the main item votes if grouped items are empty", () => {
