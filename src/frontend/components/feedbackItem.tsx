@@ -682,7 +682,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isCollapsedParent = isParentItem && isMainCollapsedItem;
     const isExpandedParent = isMainItem && !isMainCollapsedItem;
     const isChild = !isNotGroupedItem && !isMainItem;
-    const isNotParentChildItem = isNotGroupedItem; 
+    const isNotParentChildItem = isNotGroupedItem;
 
     // Focus Mode Booleans
     const isFocusModalHidden = this.props.isFocusModalHidden; // when false, in focus mode
