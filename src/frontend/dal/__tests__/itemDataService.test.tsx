@@ -45,7 +45,6 @@ const feedbackItemWithVotes: IFeedbackItemDocument = {
   upvotes: 10
 };
 
-// Define or override variants as needed
 const feedbackItemWithNoVotes: IFeedbackItemDocument = {
   ...baseFeedbackItem,
   voteCollection: { user1: 0, user2: 0, user3: 0, user4: 0 },
@@ -107,7 +106,7 @@ describe("ItemDataService - getVotes", () => {
   it("should return 0 if voteCollection is undefined", () => {
     const feedbackItemWithUndefinedVotes: IFeedbackItemDocument = {
       ...baseFeedbackItem,
-      voteCollection: undefined,
+//      voteCollection: undefined,//
     };
     const result = itemDataService.getVotes(feedbackItemWithUndefinedVotes);
     expect(result).toBe(0);
