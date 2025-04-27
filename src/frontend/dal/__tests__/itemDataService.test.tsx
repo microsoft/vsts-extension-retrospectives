@@ -62,8 +62,8 @@ describe("ItemDataService - isVoted", () => {
       } else if (feedbackItemId === 'undefined-votes-item') {
         return {
           ...baseFeedbackItem,
-          voteCollection: undefined,
-          upvotes: 0,
+/*          voteCollection: undefined,
+          upvotes: 0,*/
         };
       } else {
         return undefined;
