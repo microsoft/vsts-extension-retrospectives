@@ -6,32 +6,7 @@ import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { generateUUID } from '../utilities/random';
 import { IColumnItem } from '../../frontend/components/feedbackBoard';
-/*
-function calculateTotalVotes(item: IColumnItem, items: IColumnItem[]): number {
-  const childVotes = item.feedbackItem.childFeedbackItemIds?.reduce((sum, childId) => {
-    const child = items.find(c => c.feedbackItem.id === childId);
-    return sum + (child?.feedbackItem.upvotes || 0);
-  }, 0) || 0;
 
-  return (item.feedbackItem.upvotes || 0) + childVotes;
-}
-
-export function sortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
-  return [...items].sort((a, b) => {
-    // Calculate total votes for each item
-    const totalVotesA = calculateTotalVotes(a, allItems);
-    const totalVotesB = calculateTotalVotes(b, allItems);
-
-    // Primary sort: By total votes (descending order)
-    if (totalVotesB !== totalVotesA) {
-      return totalVotesB - totalVotesA;
-    }
-
-    // Secondary sort: By created date (descending order)
-    return new Date(b.feedbackItem.createdDate).getTime() - new Date(a.feedbackItem.createdDate).getTime();
-  });
-}
-*/
 class ItemDataService {
   /**
    * Create an item with given title and column ID in the board.
@@ -280,10 +255,29 @@ class ItemDataService {
   /**
    * Sort feedback items by total grouped votes then by created date
    */
-  public sortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
+  public oldSortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
     return [...items].sort((a, b) => {
       const totalVotesA = this.calculateTotalVotes(a, allItems);
       const totalVotesB = this.calculateTotalVotes(b, allItems);
+
+      // Primary sort by total votes (descending)
+      if (totalVotesB !== totalVotesA) {
+        return totalVotesB - totalVotesA;
+      }
+
+      // Secondary sort by created date (descending)
+      return new Date(b.feedbackItem.createdDate).getTime() - new Date(a.feedbackItem.createdDate).getTime();
+    });
+  }
+  public sortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
+    return [...items].sort((a, b) => {
+      // Get child items (grouped items) for both a and b
+      const groupedItemsA = allItems.filter(item => a.feedbackItem.childFeedbackItemIds?.includes(item.feedbackItem.id));
+      const groupedItemsB = allItems.filter(item => b.feedbackItem.childFeedbackItemIds?.includes(item.feedbackItem.id));
+
+      // Calculate total votes using getVotesForGroupedItems
+      const totalVotesA = this.getVotesForGroupedItems(a.feedbackItem, groupedItemsA.map(item => item.feedbackItem));
+      const totalVotesB = this.getVotesForGroupedItems(b.feedbackItem, groupedItemsB.map(item => item.feedbackItem));
 
       // Primary sort by total votes (descending)
       if (totalVotesB !== totalVotesA) {
