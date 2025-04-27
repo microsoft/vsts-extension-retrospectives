@@ -4,31 +4,31 @@ import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 
 // Mock IdentityRef object
 const mockIdentityRef: IdentityRef = {
-  id: 'user-1',
-  displayName: 'Test User',
-  uniqueName: 'testuser@domain.com',
-  imageUrl: 'https://example.com/user.png',
-  directoryAlias: 'testuser',
+  id: "user-1",
+  displayName: "Test User",
+  uniqueName: "testuser@domain.com",
+  imageUrl: "https://example.com/user.png",
+  directoryAlias: "testuser",
   inactive: false,
   isAadIdentity: true,
   isContainer: false,
-  isDeletedInOrigin: false, // Additional required property
-  profileUrl: 'https://example.com/profile', // Additional required property
-  _links: {}, // Placeholder for required _links object
-  descriptor: 'descriptor-string', // Additional required property
-  url: 'https://example.com/user', // Additional required property
+  isDeletedInOrigin: false,
+  profileUrl: "https://example.com/profile",
+  _links: {},
+  descriptor: "descriptor-string",
+  url: "https://example.com/user",
 };
 
-// Define reusable base feedback items
+// Define reusable base feedback item
 const baseFeedbackItem: IFeedbackItemDocument = {
-  id: 'test-id',
-  boardId: 'test-board',
-  title: 'Test Title',
-  columnId: 'test-column',
+  id: "test-id",
+  boardId: "test-board",
+  title: "Test Title",
+  columnId: "test-column",
   createdBy: mockIdentityRef,
   createdDate: new Date(),
-  userIdRef: 'test-user-ref',
-  originalColumnId: 'test-column',
+  userIdRef: "test-user-ref",
+  originalColumnId: "test-column",
   voteCollection: {},
   upvotes: 0,
   groupIds: [],
@@ -38,28 +38,31 @@ const baseFeedbackItem: IFeedbackItemDocument = {
   timerId: null,
 };
 
-// Define or override variants as needed
+// Define collection with votes
 const feedbackItemWithVotes: IFeedbackItemDocument = {
   ...baseFeedbackItem,
   voteCollection: { user1: 3, user2: 0, user3: 5, user4: 2 },
-  upvotes: 10
+  upvotes: 10,
 };
 
+// Define collection with no votes
 const feedbackItemWithNoVotes: IFeedbackItemDocument = {
   ...baseFeedbackItem,
-  voteCollection: { user1: 0, user2: 0, user3: 0, user4: 0 },
-  upvotes: 0
+  voteCollection: { user1: 0, user2: 0 },
+  upvotes: 0,
 };
 
 describe("ItemDataService - isVoted", () => {
   beforeEach(() => {
-    jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (_boardId: string, feedbackItemId: string) => {
-      if (feedbackItemId === 'test-item') {
-        return { ...feedbackItemWithVotes };
-      } else if (feedbackItemId === 'no-votes-item') {
-        return { ...feedbackItemWithNoVotes };
-      } else if (feedbackItemId === 'undefined-votes-item') {
+    jest.spyOn(itemDataService, "getFeedbackItem").mockImplementation(async (_boardId: string, feedbackItemId: string): Promise<IFeedbackItemDocument | undefined> => {
+      if (feedbackItemId === "withVotes") {
+        return feedbackItemWithVotes;
+      } else if (feedbackItemId === "withNoVotes") {
+        return feedbackItemWithNoVotes;
+      } else if (feedbackItemId === "emptyVotes") {
         return { ...baseFeedbackItem };
+      } else if (feedbackItemId === "maxVotes") {
+        return { ...baseFeedbackItem, voteCollection: { user1: 12 }, upvotes: 12 };
       } else {
         return undefined;
       }
@@ -67,27 +70,37 @@ describe("ItemDataService - isVoted", () => {
   });
 
   it("should return the user's vote count as a string if the user has voted", async () => {
-    const result = await itemDataService.isVoted('test-board', 'user1', 'test-item');
+    const result = await itemDataService.isVoted("test-board", "user1", "withVotes");
     expect(result).toBe("3");
   });
 
   it("should return '0' if the user has not voted but the item has upvotes", async () => {
-    const result = await itemDataService.isVoted('test-board', 'user2', 'test-item');
+    const result = await itemDataService.isVoted("test-board", "user2", "withVotes");
+    expect(result).toBe("0");
+  });
+
+  it("should return '0' if the user does not exist but the item has upvotes", async () => {
+    const result = await itemDataService.isVoted("test-board", "user5", "withVotes");
     expect(result).toBe("0");
   });
 
   it("should return '0' if the item has no upvotes and the user has not voted", async () => {
-    const result = await itemDataService.isVoted('test-board', 'user1', 'no-votes-item');
+    const result = await itemDataService.isVoted("test-board", "user1", "withNoVotes");
     expect(result).toBe("0");
   });
 
-  it("should return '0' if voteCollection is undefined", async () => {
-    const result = await itemDataService.isVoted('test-board', 'user1', 'undefined-votes-item');
+  it("should return '0' if voteCollection is empty", async () => {
+    const result = await itemDataService.isVoted("test-board", "user1", "emptyVotes");
     expect(result).toBe("0");
+  });
+
+  it("should handle the maximum votes allowed for a user (12)", async () => {
+    const result = await itemDataService.isVoted("test-board", "user1", "maxVotes");
+    expect(result).toBe("12");
   });
 
   it("should return undefined if the feedback item does not exist", async () => {
-    const result = await itemDataService.isVoted('test-board', 'user1', 'non-existent-item');
+    const result = await itemDataService.isVoted("test-board", "user1", "nonExistentItem");
     expect(result).toBeUndefined();
   });
 });

@@ -179,12 +179,13 @@ class ItemDataService {
   public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
-    if (!feedbackItem) {
+    if (!feedbackItem) { // no test
       return undefined;
     }
 
-    if (feedbackItem.upvotes <= 0) {
+    if (feedbackItem.upvotes <= 0) { // tested
       return "0";
+      // tested, not tested, tested
     } else if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
       return "0";
     }
