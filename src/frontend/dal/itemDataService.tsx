@@ -242,33 +242,9 @@ class ItemDataService {
     return mainItemVotesByUser + groupedItemsVotesByUser;
   }
 
-  // Private method to calculate total votes
-  private calculateTotalVotes(item: IColumnItem, items: IColumnItem[]): number {
-    const childVotes = item.feedbackItem.childFeedbackItemIds?.reduce((sum, childId) => {
-      const child = items.find(c => c.feedbackItem.id === childId);
-      return sum + (child?.feedbackItem.upvotes || 0);
-    }, 0) || 0;
-
-    return (item.feedbackItem.upvotes || 0) + childVotes;
-  }
-
   /**
    * Sort feedback items by total grouped votes then by created date
    */
-  public oldSortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
-    return [...items].sort((a, b) => {
-      const totalVotesA = this.calculateTotalVotes(a, allItems);
-      const totalVotesB = this.calculateTotalVotes(b, allItems);
-
-      // Primary sort by total votes (descending)
-      if (totalVotesB !== totalVotesA) {
-        return totalVotesB - totalVotesA;
-      }
-
-      // Secondary sort by created date (descending)
-      return new Date(b.feedbackItem.createdDate).getTime() - new Date(a.feedbackItem.createdDate).getTime();
-    });
-  }
   public sortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
     return [...items].sort((a, b) => {
       // Get child items (grouped items) for both a and b
