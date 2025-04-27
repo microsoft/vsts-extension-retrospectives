@@ -679,7 +679,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
     const curTimerState = this.props.timerState;
     const childrenIds = this.props.groupIds;
-    const isFocusModalHidden = this.props.isFocusModalHidden;
+    const isFocusModalHidden = this.props.isFocusModalHidden; // when false, in focus mode
 
     // Use helper functions to calculate votes
     const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
