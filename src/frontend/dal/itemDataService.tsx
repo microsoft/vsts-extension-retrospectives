@@ -176,7 +176,6 @@ class ItemDataService {
   /**
    * Check if the user has voted on this item.
    */
-
   public oldisVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
