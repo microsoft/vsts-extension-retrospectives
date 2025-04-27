@@ -312,15 +312,15 @@ Once there, there is a summary of the Retrospective. This includes:
 
 If there is a team assessment, then a charted summary will show the vote breakdown by favorability, along with an average score.
 
-### 10. Board History
+### 9. Board History
 
 The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, showing the count of feedback items and action items, and supports archiving or restoring archived retrospectives.
 
-![History tab showing a table with columns: Retrospective Name, Created Date, Pending Work Items, and Total Work Items. Archived status, Archived Date, and Feedback Items are not shown.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-darkmode.png)
+![History tab showing table with 6 columns and 5 rows. Columns include: Retrospective Name, Created Date, Archived, Archived Date, Feedback Items, and Total Work Items. Rows include: 4th Retrospective, 3rd Retrospective, Lean Coffee (archived), 2nd Retrospective, and 1st Retrospective.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-with-archive.png)
 
 Selecting a retrospective expands the row to reveal more details, including a count of action items by status and a detailed list of each action item.
 
-![Expanded retrospective view showing a summary of feedback and work item counts on the left and a work item table on the right with columns: Title, State, Type, Last Updated, Assigned To, and Priority. Archived status and Archived Date columns are not shown.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-expanded-summary-lightmode.png)
+![Expanded retrospective view showing a summary of feedback and work item counts on the left and a work item table on the right with columns: Title, State, Type, Last Updated, Assigned To, and Priority.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-row-expanded.png)
 
 To _archive_ a retrospective, check the box in the Archived column. The retrospective will no longer appear in the Board selection dropdown, though all data remains preserved.
 
