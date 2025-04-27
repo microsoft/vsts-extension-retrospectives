@@ -677,10 +677,19 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const childrenIds = this.props.groupIds;
 
+    // New Set of Booleans
+    const isParentItem = !isNotGroupedItem && isMainItem;
+    const isCollapsedParent = isParentItem && isMainCollapsedItem;
+    const isExpandedParent = isMainItem && !isMainCollapsedItem;
+    const isChild = !isNotGroupedItem && !isMainItem;
+    const isNotParentChildItem = isNotGroupedItem; 
+
     // Focus Mode Booleans
     const isFocusModalHidden = this.props.isFocusModalHidden; // when false, in focus mode
-    const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
-    const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
+    //const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
+    //const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
+    const mainGroupedItemInFocusMode = isParentItem && workflowState.isActPhaseFocusMode;
+    const mainGroupedItemNotInFocusMode = isParentItem && isFocusModalHidden;
 
     // Vote Count Helpers
     const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
@@ -697,7 +706,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
 
     let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
-    // In focus mode does not toggle between grouped and ungrouped vote counts, always displays grouped count
+    // In focus mode, does not toggle between grouped and ungrouped vote counts, always displays grouped count
     if (mainGroupedItemInFocusMode)
       {totalVotes = groupedVotes}
 
