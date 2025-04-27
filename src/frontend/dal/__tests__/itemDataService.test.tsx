@@ -44,6 +44,14 @@ const feedbackItemWithVotes: IFeedbackItemDocument = {
   voteCollection: { user1: 3, user2: 0, user3: 5, user4: 2 },
   upvotes: 10
 };
+
+// Define or override variants as needed
+const feedbackItemWithNoVotes: IFeedbackItemDocument = {
+  ...baseFeedbackItem,
+  voteCollection: { user1: 0, user2: 0, user3: 0, user4: 0 },
+  upvotes: 0
+};
+
 /*
 describe("ItemDataService - isVoted", () => {
   beforeEach(() => {
@@ -115,11 +123,7 @@ describe("ItemDataService - getVotes", () => {
   });
 
   it("should return 0 if all users have zero votes", () => {
-    const feedbackItemWithZeroVotes: IFeedbackItemDocument = {
-      ...baseFeedbackItem,
-      voteCollection: { user1: 0, user2: 0, user3: 0, user4: 0 },
-    };
-    const result = itemDataService.getVotes(feedbackItemWithZeroVotes);
+    const result = itemDataService.getVotes(feedbackItemWithNoVotes);
     expect(result).toBe(0);
   });
 });
