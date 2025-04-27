@@ -735,7 +735,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               }}>
               <div className="card-header">
                 {
-                  inFocusMode && ( 
+                  inFocusMode && (
                     console.log('Focus Mode Group Button'),
                     this.renderGroupButton(groupItemsCount, true)
                   )
