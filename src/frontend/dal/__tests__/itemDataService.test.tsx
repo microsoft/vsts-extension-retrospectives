@@ -2,6 +2,7 @@ import { itemDataService } from '../itemDataService';
 import { IFeedbackItemDocument } from '../../interfaces/feedback';
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 
+// Mock IdentityRef object
 const mockIdentityRef: IdentityRef = {
   id: 'user-1',
   displayName: 'Test User',
@@ -13,7 +14,7 @@ const mockIdentityRef: IdentityRef = {
   isContainer: false,
   isDeletedInOrigin: false, // Additional required property
   profileUrl: 'https://example.com/profile', // Additional required property
-  _links: {}, // Placeholder for the required _links object
+  _links: {}, // Placeholder for required _links object
   descriptor: 'descriptor-string', // Additional required property
   url: 'https://example.com/user', // Additional required property
 };
@@ -42,6 +43,60 @@ const feedbackItemWithVotes: IFeedbackItemDocument = {
   ...baseFeedbackItem,
   voteCollection: { user1: 3, user2: 2, user3: 5 },
 };
+
+describe("ItemDataService - isVoted", () => {
+  beforeEach(() => {
+    // Mock the `getFeedbackItem` method
+    jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (boardId, feedbackItemId) => {
+      if (feedbackItemId === 'test-item') {
+        return {
+          ...baseFeedbackItem,
+          voteCollection: { user1: 3, user2: 0 },
+          upvotes: 5,
+        };
+      } else if (feedbackItemId === 'no-votes-item') {
+        return {
+          ...baseFeedbackItem,
+          voteCollection: { user1: 0 },
+          upvotes: 0,
+        };
+      } else if (feedbackItemId === 'undefined-votes-item') {
+        return {
+          ...baseFeedbackItem,
+          voteCollection: undefined,
+          upvotes: 0,
+        };
+      } else {
+        return undefined;
+      }
+    });
+  });
+
+  it("should return the user's vote count as a string if the user has voted", async () => {
+    const result = await itemDataService.isVoted('test-board', 'user1', 'test-item');
+    expect(result).toBe("3"); // User1 has voted 3 times
+  });
+
+  it("should return '0' if the user has not voted but the item has upvotes", async () => {
+    const result = await itemDataService.isVoted('test-board', 'user2', 'test-item');
+    expect(result).toBe("0"); // User2 has not voted
+  });
+
+  it("should return '0' if the item has no upvotes and the user has not voted", async () => {
+    const result = await itemDataService.isVoted('test-board', 'user1', 'no-votes-item');
+    expect(result).toBe("0"); // No votes at all
+  });
+
+  it("should return undefined if the feedback item does not exist", async () => {
+    const result = await itemDataService.isVoted('test-board', 'user1', 'non-existent-item');
+    expect(result).toBeUndefined(); // Item does not exist
+  });
+
+  it("should return '0' if voteCollection is undefined", async () => {
+    const result = await itemDataService.isVoted('test-board', 'user1', 'undefined-votes-item');
+    expect(result).toBe("0"); // voteCollection is undefined
+  });
+});
 
 describe("ItemDataService - getVotes", () => {
   it("should return the total votes for a feedback item", () => {
