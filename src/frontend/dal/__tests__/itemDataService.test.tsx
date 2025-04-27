@@ -49,11 +49,11 @@ describe("ItemDataService - isVoted", () => {
     // Mock the `getFeedbackItem` method
     jest.spyOn(itemDataService, 'getFeedbackItem').mockImplementation(async (feedbackItemId: string) => {
       if (feedbackItemId === 'test-item') {
-        return { ...feedbackItemWithVotes, };
+        return { ...feedbackItemWithVotes };
       } else if (feedbackItemId === 'no-votes-item') {
         return {
           ...baseFeedbackItem,
-          voteCollection: { user1: 0, user2: 0 },
+          voteCollection: { user1: 0, user2: 0, user3: 0, user4: 0 },
           upvotes: 0,
         };
       } else if (feedbackItemId === 'undefined-votes-item') {
