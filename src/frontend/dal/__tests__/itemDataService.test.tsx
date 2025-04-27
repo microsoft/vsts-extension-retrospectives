@@ -1,5 +1,5 @@
-import { itemDataService } from '../itemDataService'; // Import the service instance
-import { IFeedbackItemDocument } from '../../interfaces/feedback'; // Import the interface
+import { itemDataService } from '../itemDataService';
+import { IFeedbackItemDocument } from '../../interfaces/feedback';
 
 describe("ItemDataService - getVotes", () => {
   it("should return the total votes for a feedback item", () => {
@@ -30,6 +30,38 @@ describe("ItemDataService - getVotes", () => {
     };
 
     const result = itemDataService.getVotes(feedbackItem as IFeedbackItemDocument);
+
+    expect(result).toBe(0);
+  });
+});
+
+describe("ItemDataService - getVotesByUser", () => {
+  it("should return the total votes for a specific user", () => {
+    const feedbackItem: Partial<IFeedbackItemDocument> = {
+        voteCollection: { user1: 3, user2: 2, user3: 5 },
+    };
+
+    const result = itemDataService.getVotesByUser(feedbackItem, "user1");
+
+    expect(result).toBe(3);
+  });
+
+  it("should return 0 if user does not exist in voteCollection", () => {
+    const feedbackItem: Partial<IFeedbackItemDocument> = {
+        voteCollection: { user1: 3, user2: 2 },
+    };
+
+    const result = itemDataService.getVotesByUser(feedbackItem, "user3");
+
+    expect(result).toBe(0);
+  });
+
+  it("should return 0 if voteCollection is undefined", () => {
+    const feedbackItem = {
+      voteCollection: undefined,
+    } as IFeedbackItemDocument;
+
+    const result = itemDataService.getVotesByUser(feedbackItem, "user1");
 
     expect(result).toBe(0);
   });
