@@ -1,41 +1,6 @@
 import { itemDataService } from '../itemDataService';
 import { IFeedbackItemDocument } from '../../interfaces/feedback';
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
-/*
-describe("ItemDataService - getVotes", () => {
-  it("should return the total votes for a feedback item", () => {
-    // Define a partial feedback item
-    const feedbackItem: Partial<IFeedbackItemDocument> = {
-      voteCollection: { user1: 3, user2: 2, user3: 5 },
-    };
-
-    // Cast it to IFeedbackItemDocument before calling the method
-    const result = itemDataService.getVotes(feedbackItem as IFeedbackItemDocument);
-
-    expect(result).toBe(10); // 3 + 2 + 5
-  });
-
-  it("should return 0 if voteCollection is empty", () => {
-    const feedbackItem: Partial<IFeedbackItemDocument> = {
-      voteCollection: {},
-    };
-
-    const result = itemDataService.getVotes(feedbackItem as IFeedbackItemDocument);
-
-    expect(result).toBe(0);
-  });
-
-  it("should return 0 if voteCollection is undefined", () => {
-    const feedbackItem: Partial<IFeedbackItemDocument> = {
-      voteCollection: undefined,
-    };
-
-    const result = itemDataService.getVotes(feedbackItem as IFeedbackItemDocument);
-
-    expect(result).toBe(0);
-  });
-});
-*/
 
 const mockIdentityRef: IdentityRef = {
   id: 'user-1',
@@ -132,5 +97,55 @@ describe("ItemDataService - getVotesByUser", () => {
     const result = itemDataService.getVotesByUser(feedbackItemWithUndefinedVotes, "user1");
 
     expect(result).toBe(0);
+  });
+});
+
+describe("ItemDataService - getVotesForGroupedItems", () => {
+  it("should return the total votes for the main item and grouped items", () => {
+    // Main Feedback Item with votes
+    const mainFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      voteCollection: { user1: 3 }, // Mock votes for the main item
+    };
+
+    // Grouped Feedback Items
+    const groupedFeedbackItems: IFeedbackItemDocument[] = [
+      { ...baseFeedbackItem, voteCollection: { user2: 2 } },
+      { ...baseFeedbackItem, voteCollection: { user3: 5 } },
+    ];
+
+    // Calculate total votes for the main and grouped items
+    const result = itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems);
+
+    expect(result).toBe(10); // 3 (main) + 2 + 5
+  });
+
+  it("should return only the main item votes if grouped items are empty", () => {
+    const mainFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      voteCollection: { user1: 3 }, // Mock votes for the main item
+    };
+
+    const groupedFeedbackItems: IFeedbackItemDocument[] = []; // No grouped items
+
+    const result = itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems);
+
+    expect(result).toBe(3); // Only main item votes
+  });
+
+  it("should return 0 if both main item and grouped items have no votes", () => {
+    const mainFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      voteCollection: undefined, // No votes for the main item
+    };
+
+    const groupedFeedbackItems: IFeedbackItemDocument[] = [
+      { ...baseFeedbackItem, voteCollection: undefined },
+      { ...baseFeedbackItem, voteCollection: undefined },
+    ]; // No votes for grouped items
+
+    const result = itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems);
+
+    expect(result).toBe(0); // No votes at all
   });
 });
