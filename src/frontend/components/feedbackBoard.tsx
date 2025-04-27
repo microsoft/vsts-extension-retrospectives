@@ -112,28 +112,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     }
   }
 
-  public async original_componentDidUpdate(prevProps: FeedbackBoardProps) {
-    if (prevProps.board.id !== this.props.board.id) {
-      this.setState({
-        isDataLoaded: false,
-        columns: {},
-        columnIds: [],
-        hasItems: false,
-      });
-      this.initColumns();
-      await this.getAllBoardFeedbackItems();
-    }
-
-    if (prevProps.board.modifiedDate !== this.props.board.modifiedDate) {
-      this.initColumns();
-      await this.getAllBoardFeedbackItems();
-    }
-
-    if (prevProps.team.id !== this.props.team.id) {
-      await this.setDefaultIterationAndAreaPath(this.props.team.id);
-    }
-  }
-
   // DPH
   private updateCurrentVoteCount = async () => {
     // Assuming userId is encrypted in props and vote data is available
@@ -141,7 +119,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     const boardItem = await itemDataService.getBoardItem(this.props.team.id, this.props.board.id);
     const voteCollection = boardItem?.boardVoteCollection || {};
     const currentVoteCount = voteCollection[userId]?.toString() || "0";
-  
+
     this.setState({ currentVoteCount });
   }
 
