@@ -270,7 +270,93 @@ class ItemDataService {
   /**
    * Increment or decrement the vote of the feedback item.
    */
-  public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
+  public updateVote = async (
+    boardId: string,
+    teamId: string,
+    userId: string,
+    feedbackItemId: string,
+    decrement: boolean = false
+  ): Promise<IFeedbackItemDocument> => {
+    const encryptedUserId = encrypt(userId);
+
+    // Step 1: Fetch Feedback and Board Items
+    const feedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
+    const boardItem = await this.getBoardItem(teamId, boardId);
+
+    // Early return if either item is not found
+    if (!feedbackItem || !boardItem) {
+      return undefined;
+    }
+
+    // Step 2: Validate Voting Eligibility
+    if (!this.validateVotingEligibility(feedbackItem, boardItem, encryptedUserId, decrement)) {
+      return undefined;
+    }
+
+    // Step 3: Modify Votes
+    this.modifyVotes(feedbackItem, boardItem, encryptedUserId, decrement);
+
+    // Step 4: Update Feedback and Board Items
+    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+    const updatedBoardItem = await this.updateBoardItem(teamId, boardItem);
+
+    // Handle rollback in case of update failure
+    if (!updatedBoardItem) {
+      this.rollbackVotes(feedbackItem, encryptedUserId, decrement);
+      return await this.updateFeedbackItem(boardId, feedbackItem);
+    }
+
+    return updatedFeedbackItem;
+  };
+
+  private validateVotingEligibility(
+    feedbackItem: IFeedbackItemDocument,
+    boardItem: IFeedbackBoardDocument,
+    userId: string,
+    decrement: boolean
+  ): boolean {
+    const userVotes = boardItem.boardVoteCollection?.[userId] || 0;
+    const itemVotes = feedbackItem.voteCollection?.[userId] || 0;
+
+    if (decrement) {
+      // Check if the user has votes to decrement
+      return userVotes > 0 && itemVotes > 0 && feedbackItem.upvotes > 0;
+    } else {
+      // Check if the user has remaining votes to cast
+      const maxVotes = boardItem.maxVotesPerUser;
+      return userVotes < maxVotes;
+    }
+  }
+
+  private modifyVotes(
+    feedbackItem: IFeedbackItemDocument,
+    boardItem: IFeedbackBoardDocument,
+    userId: string,
+    decrement: boolean
+  ): void {
+    const voteChange = decrement ? -1 : 1;
+
+    // Initialize vote collections if needed
+    feedbackItem.voteCollection = feedbackItem.voteCollection || {};
+    boardItem.boardVoteCollection = boardItem.boardVoteCollection || {};
+
+    feedbackItem.voteCollection[userId] = (feedbackItem.voteCollection[userId] || 0) + voteChange;
+    boardItem.boardVoteCollection[userId] = (boardItem.boardVoteCollection[userId] || 0) + voteChange;
+    feedbackItem.upvotes += voteChange;
+  }
+
+  private rollbackVotes(
+    feedbackItem: IFeedbackItemDocument,
+    userId: string,
+    decrement: boolean
+  ): void {
+    const voteChange = decrement ? 1 : -1;
+
+    feedbackItem.voteCollection[userId] = (feedbackItem.voteCollection[userId] || 0) + voteChange;
+    feedbackItem.upvotes += voteChange;
+  }
+
+  public oldUpdateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     const encryptedUserId = encrypt(userId);
