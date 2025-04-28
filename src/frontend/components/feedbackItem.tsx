@@ -663,10 +663,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       </button>
     );
   }
-/*
-                  className="feedback-upvote-count"
-            style={isMainItem && isBoldItem ? { fontWeight: 600 } : { fontWeight: "normal" }} // 600 is a "lighter" bold
-*/
+
   public render(): JSX.Element {
     const workflowState = {
       isCollectPhase: this.props.workflowPhase === WorkflowPhase.Collect,
