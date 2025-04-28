@@ -19,6 +19,7 @@ Changes related to the aggregated votes on grouped items include:
 * Forces refresh of Votes Used when changing boards.
 * Refactored vote calculations and added automated tests for vote methods.
 * Refactored sorting by total votes and created date as reusable method.
+* Refactored flags used for displaying votes on cards when in Act mode or Focus mode.
 
 From [GitHub PR #1171](https://github.com/microsoft/vsts-extension-retrospectives/pull/1171)
 
