@@ -4,7 +4,7 @@
   "description": "Azure DevOps Retrospective Extension",
   "main": "index.tsx",
   "scripts": {
-    "clean": "npx rimraf ./dist ./coverage ./reports ./node_modules/applicationinsights-js/dist/*.map",
+    "clean": "npx rimraf ./dist ./coverage ./reports && npx del-cli ./node_modules/applicationinsights-js/dist/*.map",
     "compile": "npx tailwindcss -i ./css/index.css -o ./css/bundle.css --minify",
     "build:p": "npm run clean && npm run compile && npx webpack --mode=production",
     "lint": "npx eslint **/*.ts*",
@@ -70,6 +70,7 @@
     "compression-webpack-plugin": "11.1.0",
     "crypto-browserify": "3.12.1",
     "css-loader": "7.1.2",
+    "del-cli": "^6.0.0",
     "enzyme": "3.11.0",
     "eslint": "9.22.0",
     "eslint-plugin-react": "7.37.4",
