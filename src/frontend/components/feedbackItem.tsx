@@ -652,8 +652,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         <i className={buttonIconClass} />
         {isUpvote && (
           <span
-            className="feedback-upvote-count"
-            style={isMainItem && isBoldItem ? { fontWeight: 600 } : { fontWeight: "normal" }} // 600 is a "lighter" bold
+            className={`feedback-upvote-count ${isMainItem && isBoldItem ? 'bold' : ''}`}
+{/*            className="feedback-upvote-count"
+            style={isMainItem && isBoldItem ? { fontWeight: 600 } : { fontWeight: "normal" }} // 600 is a "lighter" bold */}
           > {totalVotes.toString()}
           </span>
         )}
@@ -676,6 +677,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isMainCollapsedItem = !isNotGroupedItem && !this.props.groupedItemProps.isGroupExpanded;
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const childrenIds = this.props.groupIds;
+
 
     // Focus Mode Booleans
     const isFocusModalHidden = this.props.isFocusModalHidden; // when false, in focus mode
@@ -869,7 +871,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                         [Your Votes: {votesByUser}]
                       </span>
                     ) : (
-                      <span className="feedback-yourvote-count" style={{ fontWeight: 500 }}>
+                      <span className="feedback-yourvote-count bold">
                         [Your Votes: {groupedVotesByUser}]
                       </span>
                     )}

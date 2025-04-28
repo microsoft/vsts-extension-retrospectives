@@ -123,6 +123,10 @@
             color: var(--text-secondary-color);
             line-height: $feedback_item_action_button_height - 5px;
             margin-left: 5px;
+
+            &.bold {
+              font-weight: 600; // apply a light bold when requested
+            }
           }
         }
 
@@ -151,6 +155,10 @@
 
         .feedback-yourvote-count {
           font-size: 0.85em;
+
+          &.bold {
+            font-weight: 500; // apply lighter bold when requested
+          }
         }
       }
 
