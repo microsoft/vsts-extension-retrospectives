@@ -67,7 +67,7 @@ describe('Feedback Item', () => {
         child.prop("title") === "Vote").
         findWhere((nestedChild) =>
           nestedChild.prop("className") === "feedback-upvote-count");
-      
+
       //expect(upvoteCount.hasClass('bold')).toBe(isMainItem && isBoldItem);  // Ensure bold is applied if expected
       expect(upvoteCount.text()).toEqual(` ${testUpvotes}`);
 
