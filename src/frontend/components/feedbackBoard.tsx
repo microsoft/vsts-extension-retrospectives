@@ -98,7 +98,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       this.initColumns();
       await this.getAllBoardFeedbackItems();
 
-      // DPH Refresh currentVoteCount after board change
+      // Refresh currentVoteCount after board change
       this.updateCurrentVoteCount();
     }
 
@@ -112,7 +112,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     }
   }
 
-  // DPH
   private updateCurrentVoteCount = async () => {
     // Assuming userId is encrypted in props and vote data is available
     const userId = encrypt(this.props.userId);
