@@ -685,14 +685,15 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
     const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
     // missing one condition, when only one item in carousel
-    console.log("*isFocusModalHidden:", isFocusModalHidden);
+    console.log("**mainGroupedItemInFocusMode:", mainGroupedItemInFocusMode);
     console.log("isGroupedCarouselItem:", isGroupedCarouselItem);
     console.log("isMainItem:", isMainItem);
     console.log("workflowState.isActPhaseFocusMode:", workflowState.isActPhaseFocusMode);
-    console.log("*mainGroupedItemInFocusMode:", mainGroupedItemInFocusMode);
-    console.log("isNotGroupedItem:", isNotGroupedItem);
+    console.log("**mainGroupedItemNotInFocusMode:", mainGroupedItemNotInFocusMode);
+    console.log("isGroupedItem:", !isNotGroupedItem);
+    console.log("isMainItem:", isMainItem);
     console.log("this.props.groupCount:", this.props.groupCount);
-    console.log("*mainGroupedItemNotInFocusMode:", mainGroupedItemNotInFocusMode);
+    console.log("isFocusModalHidden:", isFocusModalHidden);
 
     // Vote Count Helpers
     const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
@@ -765,6 +766,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   // Controls the top-level feedback item in a group in focus mode
                   mainGroupedItemInFocusMode && (
                     console.log(`Rendering group button in focus mode for ${groupItemsCount} items with true.`),
+                    console.log('groupItemsCount: ', groupItemsCount),
                     this.renderGroupButton(groupItemsCount, true)
                   )
                 }
@@ -772,6 +774,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   // Controls the top-level feedback item in a group not in focus mode
                   mainGroupedItemNotInFocusMode && (
                     console.log(`Rendering group button not in focus mode for ${groupItemsCount} items with false.`),
+                    console.log('groupItemsCount: ', groupItemsCount),
                     this.renderGroupButton(groupItemsCount, false)
                   )
                 }
