@@ -684,6 +684,15 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isFocusModalHidden = this.props.isFocusModalHidden; // when false, in focus mode
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
     const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
+    // missing one condition, when only one item in carousel
+    console.log("*isFocusModalHidden:", isFocusModalHidden);
+    console.log("isGroupedCarouselItem:", isGroupedCarouselItem);
+    console.log("isMainItem:", isMainItem);
+    console.log("workflowState.isActPhaseFocusMode:", workflowState.isActPhaseFocusMode);
+    console.log("*mainGroupedItemInFocusMode:", mainGroupedItemInFocusMode);
+    console.log("isNotGroupedItem:", isNotGroupedItem);
+    console.log("this.props.groupCount:", this.props.groupCount);
+    console.log("*mainGroupedItemNotInFocusMode:", mainGroupedItemNotInFocusMode);
 
     // Vote Count Helpers
     const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
@@ -753,14 +762,18 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               }}>
               <div className="card-header">
                 {
-                  // Controls the top level feedback item in a group in the focus mode
-                  mainGroupedItemInFocusMode &&
-                  this.renderGroupButton(groupItemsCount, true)
+                  // Controls the top-level feedback item in a group in focus mode
+                  mainGroupedItemInFocusMode && (
+                    console.log(`Rendering group button in focus mode for ${groupItemsCount} items with true.`),
+                    this.renderGroupButton(groupItemsCount, true)
+                  )
                 }
                 {
-                  // Controls the top level feedback item in a group not in the focus mode
-                  mainGroupedItemNotInFocusMode &&
-                  this.renderGroupButton(groupItemsCount, false)
+                  // Controls the top-level feedback item in a group not in focus mode
+                  mainGroupedItemNotInFocusMode && (
+                    console.log(`Rendering group button not in focus mode for ${groupItemsCount} items with false.`),
+                    this.renderGroupButton(groupItemsCount, false)
+                  )
                 }
                 {
                   showVotes && this.props.isInteractable &&
