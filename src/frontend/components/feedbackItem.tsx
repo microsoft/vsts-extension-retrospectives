@@ -652,15 +652,21 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         <i className={buttonIconClass} />
         {isUpvote && (
           <span
-            className="feedback-upvote-count"
-            style={isMainItem && isBoldItem ? { fontWeight: 600 } : { fontWeight: "normal" }} // 600 is a "lighter" bold
+          className={
+            isMainItem && isBoldItem
+              ? "feedback-upvote-count bold"
+              : "feedback-upvote-count"
+          }
           > {totalVotes.toString()}
           </span>
         )}
       </button>
     );
   }
-/*             className={`feedback-upvote-count ${isMainItem && isBoldItem ? 'bold' : ''}`}*/
+/*
+                  className="feedback-upvote-count"
+            style={isMainItem && isBoldItem ? { fontWeight: 600 } : { fontWeight: "normal" }} // 600 is a "lighter" bold
+*/
   public render(): JSX.Element {
     const workflowState = {
       isCollectPhase: this.props.workflowPhase === WorkflowPhase.Collect,
