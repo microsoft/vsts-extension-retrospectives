@@ -56,20 +56,11 @@ describe('Feedback Item', () => {
     voteButtons.forEach((voteNode) => {
       expect(voteNode.html()).toContain(`Current vote count is ${testUpvotes}`);
     });
-    /*
     expect(component.findWhere((child) =>
       child.prop("title") === "Vote").
       findWhere((nestedChild) =>
         nestedChild.prop("className") === "feedback-upvote-count").text()).
       toEqual(` ${testUpvotes}`);
-      */
-      const upvoteCount = component.findWhere((child) =>
-        child.prop("title") === "Vote").
-        findWhere((nestedChild) =>
-          nestedChild.prop("className") === "feedback-upvote-count");
-
-      //expect(upvoteCount.hasClass('bold')).toBe(isMainItem && isBoldItem);  // Ensure bold is applied if expected
-      expect(upvoteCount.text()).toEqual(` ${testUpvotes}`);
 
     // Expect basic values of the Feedback Item to be propagated in multiple areas of the rendered component.
     expect(component.findWhere((child) =>
