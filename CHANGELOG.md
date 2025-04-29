@@ -4,7 +4,25 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.36
 
-This release included an update of the archive functionality to include _restoring_ archived retrospectives, as well as a _refresh_ of the existing retrospective templates.
+This release included functionality to aggregate votes when grouping items with votes, an update of the archive functionality to include _restoring_ archived retrospectives, and a _refresh_ of the existing retrospective templates.
+
+Changes related to the aggregated votes on grouped items include:
+
+* Displays aggregated total votes for grouped items when the parent item is collapsed.
+* Displays unaggregated total votes for individual items when parent item is expanded.
+* Displays aggregated Your Votes for grouped items when the parent item is collapsed.
+* Displays unaggregated Your Votes for individual items when the parent item is expanded.
+* In Focus Mode, displays aggregated total votes for grouped items when parent item is collapsed or expanded.
+* In Act phase and Focus Mode, orders cards by aggregated total votes then by created date.
+* Displays aggregated votes in light bold and unaggregated votes in normal font; reduced font size on Your Votes.
+* Adjusted font size and line spacing for list of added work items; corrected styling rule typo.
+* Forces refresh of Votes Used when changing boards.
+* Refactored vote calculations and added automated tests for vote methods.
+* Refactored sorting by total votes and created date as reusable method.
+* Refactored flags used for displaying votes on cards when in Act mode or Focus mode.
+* Corrected defect when rendering one grouped item in Focus mode without slider.
+
+From [GitHub PR #1171](https://github.com/microsoft/vsts-extension-retrospectives/pull/1171)
 
 Changes related to the archive functionality include:
 

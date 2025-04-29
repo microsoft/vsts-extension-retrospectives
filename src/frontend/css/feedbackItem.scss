@@ -123,6 +123,10 @@
             color: var(--text-secondary-color);
             line-height: $feedback_item_action_button_height - 5px;
             margin-left: 5px;
+
+            &.bold {
+              font-weight: 600; // apply a light bold when requested
+            }
           }
         }
 
@@ -150,7 +154,11 @@
         }
 
         .feedback-yourvote-count {
-          font-size: 1em;
+          font-size: 0.85em;
+
+          &.bold {
+            font-weight: 500; // apply lighter bold when requested
+          }
         }
       }
 
@@ -233,7 +241,8 @@
           .related-feedback-title {
             margin-left: 10px;
             color: var(--text-primary-color);
-
+            line-height: 1.2; // Reduce vertical spacing between lines
+            font-size: 0.95em; // Adjust font size for compactness
             @include max-line-render(2);
           }
         }
@@ -290,7 +299,7 @@
       &:hover {
         .feedbackItem {
           .mainItemCard {
-            border: 2px soliid $main_blue;
+            border: 2px solid $main_blue;
           }
         }
       }

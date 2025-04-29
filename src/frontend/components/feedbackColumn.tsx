@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-
 import { WorkflowPhase } from '../interfaces/workItem';
 import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { itemDataService } from '../dal/itemDataService';
@@ -206,25 +205,30 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   private readonly renderFeedbackItems = () => {
     let columnItems: IColumnItem[] = this.props.columnItems || [];
 
-     // Order by created date with newest first by default
-     columnItems = columnItems.sort((item1, item2) =>
-      (new Date(item2.feedbackItem.createdDate).getTime()) - (new Date(item1.feedbackItem.createdDate).getTime())
-    );
-
-    // Order by number of votes if Act column, retaining default order by created date for tied vote counts
+    // Sort by grouped total votes if Act workflow else sort by created date
     if (this.props.workflowPhase === WorkflowPhase.Act) {
-      columnItems = columnItems.sort((item1, item2) => item2.feedbackItem.upvotes - item1.feedbackItem.upvotes);
+      columnItems = itemDataService.sortItemsByVotesAndDate(columnItems, this.props.columnItems);
+    } else {
+      columnItems = columnItems.sort((item1, item2) =>
+        new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime()
+      );
     }
 
     return columnItems
-      .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)
+      .filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId) // Exclude child items
       .map((columnItem) => {
         const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem, true);
 
         if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
           const childItemsToGroup = this.props.columnItems
-            .filter((childColumnItem) => columnItem.feedbackItem.childFeedbackItemIds.some((childId) => childId === childColumnItem.feedbackItem.id))
-            .map((childColumnItem) => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem, true));
+            .filter((childColumnItem) =>
+              columnItem.feedbackItem.childFeedbackItemIds.some(
+                (childId) => childId === childColumnItem.feedbackItem.id
+              )
+            )
+            .map((childColumnItem) =>
+              FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem, true)
+            );
 
           return (
             <FeedbackItemGroup
@@ -234,17 +238,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
               workflowState={this.props.workflowPhase}
             />
           );
+        } else {
+          return <FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />;
         }
-        else {
-          return (
-            <FeedbackItem
-              key={feedbackItemProps.id}
-              {...feedbackItemProps}
-            />
-          );
-        }
-      });
-  }
+      }
+    );
+  };
 
   public render() {
     return (

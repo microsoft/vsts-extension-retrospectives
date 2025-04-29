@@ -107,6 +107,7 @@ jobs:
           echo "CI_Backend" >> base.txt
           echo "Kanban" >> base.txt
           echo "uncheck" >> base.txt
+          echo "unaggregated" >> base.txt
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'
