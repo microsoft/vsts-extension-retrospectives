@@ -47,7 +47,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         );
       });
   };
-
+/*
   private renderSingleFeedbackCarouselItem = (feedbackColumnProps: FeedbackColumnProps) => {
     return (
       <div className="feedback-carousel-item">
@@ -58,7 +58,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       </div>
     );
   }
-
+*/
   public render() {
     const settings: Settings = {
       dots: true,
@@ -130,17 +130,17 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
               columnItem.feedbackItem.groupIds  = columnItem.feedbackItem.childFeedbackItemIds;
             }
           });
-
+/*
           return <PivotItem
             key={columnProps.columnId}
             headerText={columnProps.columnName}
             className="feedback-carousel-pivot-item"
             {...columnProps}
           >
-{/*            {mainCardCount === 1 &&
+            {mainCardCount === 1 &&
               this.renderSingleFeedbackCarouselItem(columnProps)
-            } */}
-            {mainCardCount >= 1 && // was 2
+            }
+            {mainCardCount >= 2 &&
               // @ts-ignore TS2786
               <Slider {...settings}>
                 {React.Children.map(this.renderFeedbackCarouselItems(columnProps), (child: React.ReactElement<typeof FeedbackItem>) => {
@@ -160,5 +160,41 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
     );
   }
 }
+*/
+return (
+  <Pivot className="feedback-carousel-pivot">
+    {this.props.feedbackColumnPropsList.map((columnProps) => {
+      const mainItems = columnProps.columnItems.filter(
+        (columnItem) => !columnItem.feedbackItem.parentFeedbackItemId
+      );
+      const mainCardCount = mainItems.length;
+
+      // Always call renderFeedbackCarouselItems for consistent item rendering
+      const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
+
+      return (
+        <PivotItem
+          key={columnProps.columnId}
+          headerText={columnProps.columnName}
+          className="feedback-carousel-pivot-item"
+          {...columnProps}
+        >
+          {/* Conditionally include the Slider */}
+          {mainCardCount > 1 ? (
+            <Slider {...settings}>
+              {React.Children.map(feedbackCarouselItems, (child: React.ReactElement<typeof FeedbackItem>) => (
+                <div className="feedback-carousel-item-wrapper" key={child.key}>
+                  {child}
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            feedbackCarouselItems[0] // Render the first (and only) item for single card
+          )}
+        </PivotItem>
+      );
+    })}
+  </Pivot>
+);
 
 export default withAITracking(reactPlugin, FeedbackCarousel);
