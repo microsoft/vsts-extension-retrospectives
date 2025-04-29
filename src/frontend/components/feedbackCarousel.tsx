@@ -48,17 +48,6 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       });
   };
 
-  private renderSingleFeedbackCarouselItem = (feedbackColumnProps: FeedbackColumnProps) => {
-    return (
-      <div className="feedback-carousel-item">
-        <FeedbackItem
-          {...FeedbackColumn.createFeedbackItemProps(feedbackColumnProps, feedbackColumnProps.columnItems.filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId)[0], true)
-          }
-        />
-      </div>
-    );
-  }
-
   public render() {
     const settings: Settings = {
       dots: true,
@@ -145,56 +134,6 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         })}
       </Pivot>
     );
-/*
-    return (
-      <Pivot
-        className="feedback-carousel-pivot">
-        {this.props.feedbackColumnPropsList.map((columnProps) => {
-          const mainCardCount = columnProps.columnItems.filter((columnItem) => !columnItem.feedbackItem.parentFeedbackItemId).length;
-
-          columnProps.columnItems.forEach(columnItem => {
-            // Establish whether an item in the column has children feedback grouped beneath it,
-            // and therefore will be the parent
-            const isGroupedCarouselItem = columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length > 0 : false;
-
-            // Set that property for later
-            columnItem.feedbackItem.isGroupedCarouselItem = columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length > 0 : false;
-
-            if (isGroupedCarouselItem) {
-              // If an item in the column is a parent, set the children ids so we can show data
-              // in the 'Related Feedback' section
-              columnItem.feedbackItem.groupIds  = columnItem.feedbackItem.childFeedbackItemIds;
-            }
-          });
-
-          return <PivotItem
-            key={columnProps.columnId}
-            headerText={columnProps.columnName}
-            className="feedback-carousel-pivot-item"
-            {...columnProps}
-          >
-            {mainCardCount === 1 &&
-              this.renderSingleFeedbackCarouselItem(columnProps)
-            }
-            {mainCardCount >= 2 &&
-              // @ts-ignore TS2786
-              <Slider {...settings}>
-                {React.Children.map(this.renderFeedbackCarouselItems(columnProps), (child: React.ReactElement<typeof FeedbackItem>) => {
-                  return (
-                    <div
-                      className="feedback-carousel-item-wrapper"
-                      key={child.key}>
-                      {child}
-                    </div>
-                  );
-                })}
-              </Slider>
-            }
-          </PivotItem>
-        })}
-      </Pivot>
-    );
-    */
   }
 }
 

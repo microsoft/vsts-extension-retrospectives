@@ -670,7 +670,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       isGroupPhase: this.props.workflowPhase === WorkflowPhase.Group,
       isVotePhase: this.props.workflowPhase === WorkflowPhase.Vote,
       isActPhase: this.props.workflowPhase === WorkflowPhase.Act,
-      isActPhaseFocusMode: this.props.workflowPhase === WorkflowPhase.Act && !this.props.isFocusModalHidden, // not robust
+      isActPhaseFocusMode: this.props.workflowPhase === WorkflowPhase.Act && !this.props.isFocusModalHidden,
     };
 
     // Grouped State Booleans and Children
@@ -684,16 +684,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isFocusModalHidden = this.props.isFocusModalHidden; // for rotating through carousel in focus mode
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
     const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
-    // missing one condition, when only one item in carousel
-    console.log("**mainGroupedItemInFocusMode:", mainGroupedItemInFocusMode);
-    console.log("isGroupedCarouselItem:", isGroupedCarouselItem);
-    console.log("isMainItem:", isMainItem);
-    console.log("workflowState.isActPhaseFocusMode:", workflowState.isActPhaseFocusMode);
-    console.log("**mainGroupedItemNotInFocusMode:", mainGroupedItemNotInFocusMode);
-    console.log("isGroupedItem:", !isNotGroupedItem);
-    console.log("isMainItem:", isMainItem);
-    console.log("this.props.groupCount:", this.props.groupCount);
-    console.log("isFocusModalHidden:", isFocusModalHidden);
 
     // Vote Count Helpers
     const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
@@ -764,19 +754,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               <div className="card-header">
                 {
                   // Controls the top-level feedback item in a group in focus mode
-                  mainGroupedItemInFocusMode && (
-                    console.log(`Rendering group button in focus mode for ${groupItemsCount} items with true.`),
-                    console.log('groupItemsCount: ', groupItemsCount),
-                    this.renderGroupButton(groupItemsCount, true)
-                  )
+                  mainGroupedItemInFocusMode &&
+                  this.renderGroupButton(groupItemsCount, true)
                 }
                 {
                   // Controls the top-level feedback item in a group not in focus mode
-                  mainGroupedItemNotInFocusMode && (
-                    console.log(`Rendering group button not in focus mode for ${groupItemsCount} items with false.`),
-                    console.log('groupItemsCount: ', groupItemsCount),
-                    this.renderGroupButton(groupItemsCount, false)
-                  )
+                  mainGroupedItemNotInFocusMode &&
+                  this.renderGroupButton(groupItemsCount, false)
                 }
                 {
                   showVotes && this.props.isInteractable &&
