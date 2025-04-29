@@ -23,11 +23,11 @@ export interface IFeedbackBoardMetadataFormProps {
   currentBoard: IFeedbackBoardDocument;
   teamId: string;
   placeholderText: string;
-  maxvotesPerUser: number;
+  maxVotesPerUser: number;
   availablePermissionOptions: FeedbackBoardPermissionOption[]
   onFormSubmit: (
     title: string,
-    maxvotesPerUser: number,
+    maxVotesPerUser: number,
     columns: IFeedbackColumn[],
     isIncludeTeamEffectivenessMeasurement: boolean,
     isBoardAnonymous: boolean,
@@ -231,16 +231,16 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       iconClass: 'far fa-angry',
     },
     {
-      friendlyName: 'chalkboard',
-      iconClass: 'fas fa-chalkboard',
+      friendlyName: 'question',
+      iconClass: 'fas fa-question',
     },
     {
       friendlyName: 'comments',
       iconClass: 'far fa-comments',
     },
     {
-      friendlyName: 'book',
-      iconClass: 'fas fa-book',
+      friendlyName: 'exclamation',
+      iconClass: 'fas fa-exclamation',
     },
     {
       friendlyName: 'compass',
@@ -251,18 +251,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       iconClass: 'far fa-eye',
     },
     {
-      friendlyName: 'question',
-      iconClass: 'fas fa-question',
-    },
-    {
-      friendlyName: 'exclamation',
-      iconClass: 'fas fa-exclamation',
-    },
-    {
-      friendlyName: 'rocket',
-      iconClass: 'fas fa-rocket',
-    },
-    {
       friendlyName: 'life-ring',
       iconClass: 'fas fa-life-ring',
     },
@@ -271,13 +259,25 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       iconClass: 'fas fa-anchor',
     },
     {
+      friendlyName: 'balance',
+      iconClass: 'fas fa-scale-unbalanced-flip',
+    },
+    {
+      friendlyName: 'rocket',
+      iconClass: 'fas fa-rocket',
+    },
+    {
+      friendlyName: 'chalkboard',
+      iconClass: 'fas fa-chalkboard',
+    },
+    {
+      friendlyName: 'book',
+      iconClass: 'fas fa-book',
+    },
+    {
       friendlyName: 'celebrate',
       iconClass: 'fas fa-birthday-cake',
     },
-    {
-      friendlyName: 'balance',
-      iconClass: 'fas fa-balance-scale-right',
-    }
   ];
 
   private allAccentColors: { friendlyName: string, colorCode: string }[] = [
@@ -345,7 +345,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 <hr></hr>
                 <div className="board-metadata-form-section-subheader">
                   <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                    Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxvotesPerUser : this.props.currentBoard.maxVotesPerUser}):
+                    Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxVotesPerUser : this.props.currentBoard.maxVotesPerUser}):
                   </label>
                   <TextField
                     className="title-input-container max-vote-counter"
@@ -432,20 +432,23 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     className="title-input-container column-template-dropdown"
                   >
                     <option value="">Select a template</option>
-                    <option value="speedboat">Speedboat</option>
-                    <option value="4ls">4Ls</option>
-                    <option value="1to1">1-to-1</option>
-                    <option value="daki">Drop-Add-Keep-Improve</option>
-                    <option value="mad-sad-glad">Mad-Sad-Glad</option>
-                    <option value="good-bad-ideas">Good-Bad-Ideas</option>
-                    <option value="kalm">Keep-Add-Less-More</option>
+                    <option disabled>─────────────</option>
                     <option value="start-stop-continue">Start-Stop-Continue</option>
-                    <option value="psy-safety">Psychological Safety</option>
+                    <option value="good-improve-ideas-thanks">Good-Improve-Ideas-Thanks</option>
+                    <option value="mad-sad-glad">Mad-Sad-Glad</option>
+                    <option value="4ls">4Ls</option>
+                    <option value="daki">Drop-Add-Keep-Improve</option>
+                    <option value="kalm">Keep-Add-Less-More</option>
                     <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
+                    <option value="1to1">Good-to-Done</option>
+                    <option value="speedboat">Speedboat</option>
+                    <option disabled>─────────────</option>
                     <option value="clarity">Clarity</option>
                     <option value="energy">Energy</option>
+                    <option value="psy-safety">Psychological Safety</option>
                     <option value="wlb">Work-life Balance</option>
-                    <option value="team-confidence">Team Confidence</option>
+                    <option value="confidence">Confidence</option>
+                    <option value="efficiency">Efficiency</option>
                   </select>
                 </div>
                 <List

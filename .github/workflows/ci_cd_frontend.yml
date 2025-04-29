@@ -5,13 +5,19 @@ on:
   pull_request:
     branches:
       - main
+  issue_comment:
+    types:
+      - created
 
 permissions:
   contents: read
+  issues: read
+  pull-requests: read
 
 jobs:
   build:
     name: "Build, Test and Publish"
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/trigger pipeline'))
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -99,6 +105,9 @@ jobs:
           echo "README" >> base.txt
           echo "OpenSSF" >> base.txt
           echo "CI_Backend" >> base.txt
+          echo "Kanban" >> base.txt
+          echo "uncheck" >> base.txt
+          echo "unaggregated" >> base.txt
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'

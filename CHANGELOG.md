@@ -2,7 +2,57 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-_PS: Unfortunately, changelog before v1.0.46 is not available_ 🤦‍♂️
+## v1.92.36
+
+This release included functionality to aggregate votes when grouping items with votes, an update of the archive functionality to include _restoring_ archived retrospectives, and a _refresh_ of the existing retrospective templates.
+
+Changes related to the aggregated votes on grouped items include:
+
+* Displays aggregated total votes for grouped items when the parent item is collapsed.
+* Displays unaggregated total votes for individual items when parent item is expanded.
+* Displays aggregated Your Votes for grouped items when the parent item is collapsed.
+* Displays unaggregated Your Votes for individual items when the parent item is expanded.
+* In Focus Mode, displays aggregated total votes for grouped items when parent item is collapsed or expanded.
+* In Act phase and Focus Mode, orders cards by aggregated total votes then by created date.
+* Displays aggregated votes in light bold and unaggregated votes in normal font; reduced font size on Your Votes.
+* Adjusted font size and line spacing for list of added work items; corrected styling rule typo.
+* Forces refresh of Votes Used when changing boards.
+* Refactored vote calculations and added automated tests for vote methods.
+* Refactored sorting by total votes and created date as reusable method.
+* Refactored flags used for displaying votes on cards when in Act mode or Focus mode.
+* Corrected defect when rendering one grouped item in Focus mode without slider.
+
+From [GitHub PR #1171](https://github.com/microsoft/vsts-extension-retrospectives/pull/1171)
+
+Changes related to the archive functionality include:
+
+* Archived status and date were added to the History tab.
+* Archive functionality can be toggled on and off from the History tab.
+* Archive messaging from the Boards menu was updated to reference the ability to restore the archived board from the History tab.
+* Count of feedback items replaced count of pending work items.
+* Significantly reduced loading time for History tab.
+
+From [GitHub PR #1162](https://github.com/microsoft/vsts-extension-retrospectives/pull/1162)
+
+Changes related to the templates include:
+
+* Moved the standard retrospective templates before those designed to support the team assessment.
+* Reordered retrospective templates with more common templates before less common templates.
+* Reordered team assessment templates to follow same order as team assessment survey.
+* Added the missing Efficiency template to support the team assessments.
+* Included simple context dividers between the types of templates in the dropdown.
+* Renamed 1-to-1 template as Good-to-Done template.
+* Revised Good-Bad-Ideas to Good-Improve-Ideas, since Improve has a better connotation than Bad.
+* Added Thanks to Good-Improve-Ideas to demonstrate incorporating a column for appreciation.
+* Tweaked prompts on Speedboat and Good-to-Done templates.
+* Revised name of Confidence and Efficiency templates to follow consistent pattern with other team assessment templates.
+* Updated team assessment retrospective prompts to follow consistent pattern but with variety.
+* Revised team assessment retrospective prompt on "One action" column to support teams not sprinting.
+* Updated icons used in templates to better align with the varied template column prompts.
+* Updated associated color palate to follow a green, yellow, red pattern for positive, neutral, negative feedback.
+* Reorganized icon selection pane to align similarly themed icons on the same row.
+
+From [GitHub PR #1121](https://github.com/microsoft/vsts-extension-retrospectives/pull/1121)
 
 ## v1.92.35
 
@@ -138,3 +188,5 @@ one of those templates, such as, _Mad-Sad-Glad_, _Start-Stop-Continue_, etc.
 
 * Bazillion tiny fixes, here and there
 * Support for Light, Dark and Custom themes of Azure DevOps
+
+_PS: Changelog before v1.0.46 is not available_ 🤦‍♂️

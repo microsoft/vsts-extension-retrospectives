@@ -4,21 +4,21 @@ import { ActionButton, PrimaryButton, DefaultButton } from "office-ui-fabric-rea
 import { IContextualMenuItem } from "office-ui-fabric-react/lib/ContextualMenu";
 import { Dialog, DialogType, DialogFooter } from "office-ui-fabric-react/lib/Dialog";
 import { DocumentCard, DocumentCardActivity } from "office-ui-fabric-react/lib/DocumentCard";
+import { SearchBox } from "office-ui-fabric-react/lib/SearchBox";
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
+import { WebApiTeam } from "azure-devops-extension-api/Core";
 
 import { WorkflowPhase } from "../interfaces/workItem";
 import ActionItemDisplay from "./actionItemDisplay";
 import EditableDocumentCardTitle from "./editableDocumentCardTitle";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { itemDataService } from "../dal/itemDataService";
-import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { reflectBackendService } from "../dal/reflectBackendService";
-import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { IColumn, IColumnItem } from "./feedbackBoard";
-import { SearchBox } from "office-ui-fabric-react/lib/SearchBox";
 import { FeedbackColumnProps } from "./feedbackColumn";
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 
 export interface IFeedbackItemProps {
@@ -580,20 +580,146 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
+  private renderGroupButton(groupItemsCount: number, isFocusButton: boolean): JSX.Element | null {
+    return (
+      <button
+        className={isFocusButton ? "feedback-expand-group-focus" : "feedback-expand-group"}
+        aria-live="polite"
+        aria-label={
+          this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded
+            ? `Expand Feedback Group button. Group has ${groupItemsCount} items.`
+            : `Collapse Feedback Group button. Group has ${groupItemsCount} items.`
+        }
+        style={!isFocusButton ? { color: this.props.accentColor } : undefined}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (isFocusButton) {
+            this.toggleShowGroupedChildrenTitles();
+          } else {
+            this.props.groupedItemProps.toggleGroupExpand();
+          }
+        }}>
+        <i
+          className={classNames("fa", {
+            "fa-angle-double-down": isFocusButton && this.state.isShowingGroupedChildrenTitles,
+            "fa-angle-double-right": isFocusButton && !this.state.isShowingGroupedChildrenTitles,
+            "fa-chevron-down": !isFocusButton && this.props.groupedItemProps.isGroupExpanded,
+            "fa-chevron-right": !isFocusButton && !this.props.groupedItemProps.isGroupExpanded,
+          })}
+        />
+        &nbsp;
+        {isFocusButton ? `${this.props.groupCount + 1} Items` : `${groupItemsCount} Items`}
+        {isFocusButton && <i className="far fa-comments" />}
+      </button>
+    );
+  }
+
+  private renderVoteActionButton(
+    isMainItem: boolean,
+    isBoldItem: boolean,
+    showVoteButton: boolean,
+    totalVotes: number,
+    isUpvote: boolean
+  ) {
+    const buttonTitle = isUpvote ? "Vote" : "Unvote";
+    const buttonAriaLabel = isUpvote
+      ? `Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`
+      : `Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`;
+    const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
+
+    return (
+      <button
+        title={buttonTitle}
+        aria-live="polite"
+        aria-label={buttonAriaLabel}
+        tabIndex={0}
+        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+        className={classNames(
+          "feedback-action-button",
+          "feedback-add-vote",
+          { voteAnimation: this.state.showVotedAnimation }
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.setState({ showVotedAnimation: true });
+          this.onVote(this.props.id, !isUpvote).then(() => this.props.onVoteCasted());
+        }}
+        onAnimationEnd={() => {
+          this.setState({ showVotedAnimation: false });
+        }}
+      >
+        <i className={buttonIconClass} />
+        {isUpvote && (
+          <span
+          className={
+            isMainItem && isBoldItem
+              ? "feedback-upvote-count bold"
+              : "feedback-upvote-count"
+          }
+          > {totalVotes.toString()}
+          </span>
+        )}
+      </button>
+    );
+  }
+
   public render(): JSX.Element {
-    const showVoteButton = (this.props.workflowPhase === WorkflowPhase.Vote);
-    const showAddActionItem = (this.props.workflowPhase === WorkflowPhase.Act);
-    const showVotes = showVoteButton || showAddActionItem;
-    const isDraggable = this.props.isInteractable && this.props.workflowPhase === WorkflowPhase.Group && !this.state.isMarkedForDeletion;
+    const workflowState = {
+      isCollectPhase: this.props.workflowPhase === WorkflowPhase.Collect,
+      isGroupPhase: this.props.workflowPhase === WorkflowPhase.Group,
+      isVotePhase: this.props.workflowPhase === WorkflowPhase.Vote,
+      isActPhase: this.props.workflowPhase === WorkflowPhase.Act,
+      isActPhaseFocusMode: this.props.workflowPhase === WorkflowPhase.Act && !this.props.isFocusModalHidden,
+    };
+
+    // Grouped State Booleans and Children
     const isNotGroupedItem = !this.props.groupedItemProps;
-    const isMainItem = isNotGroupedItem || this.props.groupedItemProps.isMainItem;
+    const isMainItem = isNotGroupedItem || this.props.groupedItemProps?.isMainItem;
+    const isMainCollapsedItem = !isNotGroupedItem && !this.props.groupedItemProps.isGroupExpanded;
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
-    const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
-    const ariaLabel = isNotGroupedItem ? "Feedback item." : (!isMainItem ? "Feedback group item." : `Feedback group main item. Group has ${groupItemsCount} items.`);
-    const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
-    const curTimerState = this.props.timerState;
     const childrenIds = this.props.groupIds;
-    const isFocusModalHidden = this.props.isFocusModalHidden;
+
+    // Focus Mode Booleans
+    const isFocusModalHidden = this.props.isFocusModalHidden; // for rotating through carousel in focus mode
+    const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
+    const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
+
+    // Vote Count Helpers
+    const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
+    const groupedFeedbackItems = this.props.groupIds.map(id => {
+      const item = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id)?.feedbackItem;
+      return item;
+    }).filter(item => item !== undefined) as IFeedbackItemDocument[];
+    const userId = encrypt(getUserIdentity().id);
+
+    // Vote Count Getters
+    const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
+    const votesByUser = this.state.userVotes; // use the direct method since available
+    const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
+    const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
+
+    let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
+    // In focus mode, does not toggle between grouped and ungrouped vote counts, always displays grouped count
+    if (mainGroupedItemInFocusMode)
+      {totalVotes = groupedVotes}
+
+    // Group, Vote, Act (and Focus) Options
+    const isDraggable = this.props.isInteractable && workflowState.isGroupPhase && !this.state.isMarkedForDeletion;
+    const showVoteButton = workflowState.isVotePhase;
+    const showAddActionItem = workflowState.isActPhase;
+    const showVotes = showVoteButton || showAddActionItem;
+
+    const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
+    const ariaLabel = isNotGroupedItem
+      ? "Feedback item."
+      : (!isMainItem
+        ? "Feedback group item."
+        : `Feedback group main item. Group has ${groupItemsCount} items.`);
+    const curTimerState = this.props.timerState;
+
+    // Universal Flag
+    const hideFeedbackItems = this.props.hideFeedbackItems && (this.props.userIdRef !== getUserIdentity().id);
 
     return (
       <div
@@ -627,89 +753,22 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               }}>
               <div className="card-header">
                 {
-                  isGroupedCarouselItem && isMainItem && showAddActionItem && !isFocusModalHidden &&
-                  <button className="feedback-expand-group-focus"
-                    aria-live="polite"
-                    aria-label={this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded ? "Expand Feedback Group button. Group has " + groupItemsCount + " items." : "Collapse Feedback Group button. Group has " + groupItemsCount + " items."}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      this.toggleShowGroupedChildrenTitles();
-                    }}>
-                    <i className={classNames("fa", {
-                      "fa-angle-double-down": this.state.isShowingGroupedChildrenTitles,
-                      "fa-angle-double-right": !this.state.isShowingGroupedChildrenTitles
-                    })} />&nbsp;
-                    {this.props.groupCount + 1} Items <i className="far fa-comments" />
-                  </button>
+                  // Controls the top-level feedback item in a group in focus mode
+                  mainGroupedItemInFocusMode &&
+                  this.renderGroupButton(groupItemsCount, true)
                 }
                 {
-                  // This controls the top level feedback item in a group in the vote phase and outside the focus mode
-                  !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden &&
-                  <button className="feedback-expand-group"
-                    aria-live="polite"
-                    aria-label={this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded ? "Expand Feedback Group button. Group has " + groupItemsCount + " items." : "Collapse Feedback Group button. Group has " + groupItemsCount + " items."}
-                    style={{ color: this.props.accentColor }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      this.props.groupedItemProps.toggleGroupExpand();
-                    }}>
-                    <i className={classNames("fa", {
-                      "fa-chevron-down": this.props.groupedItemProps.isGroupExpanded,
-                      "fa-chevron-right": !this.props.groupedItemProps.isGroupExpanded
-                    })} />
-                    {groupItemsCount} Items
-                  </button>
+                  // Controls the top-level feedback item in a group not in focus mode
+                  mainGroupedItemNotInFocusMode &&
+                  this.renderGroupButton(groupItemsCount, false)
                 }
-                {showVotes && this.props.isInteractable &&
-                  // Using standard button tag here due to no onAnimationEnd support in fabricUI
-                  <button
-                    title="Vote"
-                    aria-live="polite"
-                    aria-label={`Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-                    tabIndex={0}
-                    disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-                    className={classNames(
-                      "feedback-action-button",
-                      "feedback-add-vote",
-                      { voteAnimation: this.state.showVotedAnimation }
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id).then(() => this.props.onVoteCasted());
-                    }}
-                    onAnimationEnd={() => {
-                      this.setState({ showVotedAnimation: false });
-                    }}>
-                    <i className="fas fa-arrow-circle-up" />
-                    <span className="feedback-upvote-count"> {this.props.upvotes.toString()}</span>
-                  </button>
+                {
+                  showVotes && this.props.isInteractable &&
+                  this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, true) // render voting button
                 }
-                {showVotes && this.props.isInteractable &&
-                  // Using standard button tag here due to no onAnimationEnd support in fabricUI
-                  <button
-                    title="UnVote"
-                    aria-live="polite"
-                    aria-label={`Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`}
-                    tabIndex={0}
-                    disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-                    className={classNames(
-                      "feedback-action-button",
-                      "feedback-add-vote",
-                      { voteAnimation: this.state.showVotedAnimation }
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      this.setState({ showVotedAnimation: true });
-                      this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
-                    }}
-                    onAnimationEnd={() => {
-                      this.setState({ showVotedAnimation: false });
-                    }}>
-                    <i className="fas fa-arrow-circle-down" />
-                  </button>
+                {
+                  showVotes && this.props.isInteractable &&
+                  this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, false) // render unvoting button
                 }
                 {!this.props.newlyCreated && this.props.isInteractable &&
                   <div className="item-actions-menu">
@@ -803,12 +862,20 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     </p>
                   </div>
                 }
-                {(this.props.workflowPhase !== WorkflowPhase.Collect) && (this.props.columnId !== this.props.originalColumnId) &&
+                {(!workflowState.isCollectPhase) && (this.props.columnId !== this.props.originalColumnId) &&
                   <div className="original-column-info">Original Column: <br />{ this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a" }</div>
                 }
                 {showVoteButton && this.props.isInteractable &&
                   <div>
-                    <span className="feedback-yourvote-count">[Your Votes: {this.state.userVotes}]</span>
+                    {isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? (
+                      <span className="feedback-yourvote-count">
+                        [Your Votes: {votesByUser}]
+                      </span>
+                    ) : (
+                      <span className="feedback-yourvote-count bold">
+                        [Your Votes: {groupedVotesByUser}]
+                      </span>
+                    )}
                   </div>
                 }
               </div>

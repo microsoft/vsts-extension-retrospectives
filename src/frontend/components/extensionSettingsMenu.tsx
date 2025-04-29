@@ -46,20 +46,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private readonly getChangelog = (): string[] => {
     return [
-      'Removes duplicates from Permissions and sorts by owner, permission, teams and members.',
-      'Defaults Prime Directive and Anonymous to false and updates settings order.',
-      'Removes All Teams from team dropdown since retrospectives should be safe space for teams to share feedback without concern that members not on team have access to their retrospective board.',
-      'Removed redundant "reflect-hub" tag when adding work item using Act tab.',
-      'Updated Marcus Buckingham hyperlinks in the Energy team assessment tooltip.',
-      'Replaced references to "backlog grooming" with "backlog refinement" in README file.',
-      'Eliminated single word line wraps in team assessment for more compact views.',
-      'Corrected modified date typo in code.',
-      'Replaced undefined Session Date with Created Date in Retrospective Summary.',
-      'Orders cards by Created Date, unless Act column, which orders cards by Votes, then Created Date.',
-      'Added dividers to feedback board context menu for better organization.',
-      'Fixed inconsistent capitalization in feedback board menu.',
-      'Updated Efficiency team assessment tooltip to reference current research.',
-      'Fixed images in Marketplace extension.'
+      'The latest release includes updates to grouped items, archive functionality, and retrospective templates.',
+      'Grouped items now display aggregated total votes and Your Votes for the parent and child items.',
+      'Archive functionality now includes ability to archive and restore an archived retrospective from the History tab.',
+      'Retrospective templates were refreshed with updates to the order, prompts, and icons.',
+      'Refer to the Changelog for a comprehensive listing of the updates included in this release.'
     ];
   }
 
