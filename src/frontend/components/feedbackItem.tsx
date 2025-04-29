@@ -670,7 +670,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       isGroupPhase: this.props.workflowPhase === WorkflowPhase.Group,
       isVotePhase: this.props.workflowPhase === WorkflowPhase.Vote,
       isActPhase: this.props.workflowPhase === WorkflowPhase.Act,
-      isActPhaseFocusMode: this.props.workflowPhase === WorkflowPhase.Act && !this.props.isFocusModalHidden,
+      isActPhaseFocusMode: this.props.workflowPhase === WorkflowPhase.Act && !this.props.isFocusModalHidden, // not robust
     };
 
     // Grouped State Booleans and Children
@@ -681,7 +681,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const childrenIds = this.props.groupIds;
 
     // Focus Mode Booleans
-    const isFocusModalHidden = this.props.isFocusModalHidden; // when false, in focus mode
+    const isFocusModalHidden = this.props.isFocusModalHidden; // for rotating through carousel in focus mode
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
     const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
     // missing one condition, when only one item in carousel
