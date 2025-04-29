@@ -117,10 +117,10 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
             (columnItem) => !columnItem.feedbackItem.parentFeedbackItemId
           );
           const mainCardCount = mainItems.length;
-    
+
           // Always call renderFeedbackCarouselItems for consistent item rendering
           const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
-    
+
           return (
             <PivotItem
               key={columnProps.columnId}
