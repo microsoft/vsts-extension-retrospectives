@@ -1,21 +1,22 @@
 import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
-import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
+import { appInsights } from '../utilities/telemetryClient';
 import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 import { workItemService } from './azureDevOpsWorkItemService';
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { generateUUID } from '../utilities/random';
+import { IColumnItem } from '../../frontend/components/feedbackBoard';
 
 class ItemDataService {
   /**
-   * Create an item with given title and column id in the board.
+   * Create an item with given title and column ID in the board.
    */
   public appendItemToBoard = async (item: IFeedbackItemDocument): Promise<IFeedbackItemDocument> => {
     return await createDocument<IFeedbackItemDocument>(item.boardId, item);
   }
 
   /**
-   * Create an item with given title and column id in the board.
+   * Create an item with given title and column ID in the board.
    */
   public createItemForBoard = async (
     boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
@@ -71,21 +72,33 @@ class ItemDataService {
     let feedbackItems: IFeedbackItemDocument[] = [];
 
     try {
+      // Attempt to fetch feedback items
       feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-      console.error(e);
-      appInsights.trackException(e);
+      // Handle specific case where the collection does not exist
       if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
-        appInsights.trackTrace({ message: TelemetryExceptions.FeedbackItemsNotFoundForBoard, properties: { boardId, e } });
+        console.warn(`No feedback items found for board ${boardId}—expected for new or unused boards.`);
+
+        // Add telemetry for observability
+        appInsights.trackTrace({
+          message: `Feedback items not found for board ${boardId}.`,
+          properties: { boardId, exception: e }
+        });
+
+        return []; // Gracefully return an empty array
       }
+
+      // Log unexpected exceptions
+      console.error(`Unexpected error fetching feedback items for board ${boardId}:`, e);
+      appInsights.trackException(e);
     }
 
-    return feedbackItems;
-  }
+    return feedbackItems; // Return fetched data or an empty array
+  };
 
   /**
-   * Get feedback items in the board matching the specified item ids.
+   * Get feedback items in the board matching the specified item IDs.
    */
   public getFeedbackItemsByIds = async (boardId: string, feedbackItemIds: string[]): Promise<IFeedbackItemDocument[]> => {
     const feedbackitemsForBoard: IFeedbackItemDocument[] = await this.getFeedbackItemsForBoard(boardId);
@@ -163,7 +176,6 @@ class ItemDataService {
   /**
    * Check if the user has voted on this item.
    */
-
   public isVoted = async (boardId: string, userId: string, feedbackItemId: string): Promise<string> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
@@ -179,6 +191,167 @@ class ItemDataService {
     else {
       return feedbackItem.voteCollection[userId].toString();
     }
+  }
+
+  /**
+   * Calculate total votes for a feedback item.
+   */
+  public getVotes(feedbackItem: IFeedbackItemDocument): number {
+    return Object.values(feedbackItem.voteCollection || {}).reduce((sum, votes) => sum + votes, 0);
+  }
+
+  /**
+   * Calculate total votes for a specific user on a feedback item.
+   */
+  public getVotesByUser(feedbackItem: IFeedbackItemDocument, encryptedUserId: string): number {
+    return feedbackItem.voteCollection?.[encryptedUserId] || 0;
+  }
+
+  /**
+   * Calculate total votes for grouped feedback items.
+   */
+  public getVotesForGroupedItems(
+    mainFeedbackItem: IFeedbackItemDocument,
+    groupedFeedbackItems: IFeedbackItemDocument[]
+  ): number {
+    const mainItemVotes = itemDataService.getVotes(mainFeedbackItem);
+    const groupedItemsVotes = groupedFeedbackItems.reduce((sum, item) => {
+      return sum + itemDataService.getVotes(item);
+    }, 0);
+
+    return mainItemVotes + groupedItemsVotes;
+  }
+
+  /**
+   * Calculate total votes for a specific user on a set of grouped feedback items.
+   */
+  public getVotesForGroupedItemsByUser(
+    mainFeedbackItem: IFeedbackItemDocument,
+    groupedFeedbackItems: IFeedbackItemDocument[],
+    encryptedUserId: string
+  ): number {
+    // Calculate votes for the main feedback item using getTotalVotesByUser
+    const mainItemVotesByUser = this.getVotesByUser(mainFeedbackItem, encryptedUserId);
+
+    // Calculate votes for all grouped feedback items using getTotalVotesByUser
+    const groupedItemsVotesByUser = groupedFeedbackItems.reduce((sum, item) => {
+      return sum + this.getVotesByUser(item, encryptedUserId);
+    }, 0);
+
+    // Return the total votes cast by the user
+    return mainItemVotesByUser + groupedItemsVotesByUser;
+  }
+
+  /**
+   * Sort feedback items by total grouped votes then by created date
+   */
+  public sortItemsByVotesAndDate(items: IColumnItem[], allItems: IColumnItem[]): IColumnItem[] {
+    return [...items].sort((a, b) => {
+      // Get child items (grouped items) for both a and b
+      const groupedItemsA = allItems.filter(item => a.feedbackItem.childFeedbackItemIds?.includes(item.feedbackItem.id));
+      const groupedItemsB = allItems.filter(item => b.feedbackItem.childFeedbackItemIds?.includes(item.feedbackItem.id));
+
+      // Calculate total votes using getVotesForGroupedItems
+      const totalVotesA = this.getVotesForGroupedItems(a.feedbackItem, groupedItemsA.map(item => item.feedbackItem));
+      const totalVotesB = this.getVotesForGroupedItems(b.feedbackItem, groupedItemsB.map(item => item.feedbackItem));
+
+      // Primary sort by total votes (descending)
+      if (totalVotesB !== totalVotesA) {
+        return totalVotesB - totalVotesA;
+      }
+
+      // Secondary sort by created date (descending)
+      return new Date(b.feedbackItem.createdDate).getTime() - new Date(a.feedbackItem.createdDate).getTime();
+    });
+  }
+
+  /**
+   * Increment or decrement the vote of the feedback item.
+   */
+  public updateVote = async (
+    boardId: string,
+    teamId: string,
+    userId: string,
+    feedbackItemId: string,
+    decrement: boolean = false
+  ): Promise<IFeedbackItemDocument> => {
+    const encryptedUserId = encrypt(userId);
+
+    // Step 1: Fetch Feedback and Board Items
+    const feedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
+    const boardItem = await this.getBoardItem(teamId, boardId);
+
+    // Early return if either item is not found
+    if (!feedbackItem || !boardItem) {
+      return undefined;
+    }
+
+    // Step 2: Validate Voting Eligibility
+    if (!this.validateVotingEligibility(feedbackItem, boardItem, encryptedUserId, decrement)) {
+      return undefined;
+    }
+
+    // Step 3: Modify Votes
+    this.modifyVotes(feedbackItem, boardItem, encryptedUserId, decrement);
+
+    // Step 4: Update Feedback and Board Items
+    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
+    const updatedBoardItem = await this.updateBoardItem(teamId, boardItem);
+
+    // Handle rollback in case of update failure
+    if (!updatedBoardItem) {
+      this.rollbackVotes(feedbackItem, encryptedUserId, decrement);
+      return await this.updateFeedbackItem(boardId, feedbackItem);
+    }
+
+    return updatedFeedbackItem;
+  };
+
+  private validateVotingEligibility(
+    feedbackItem: IFeedbackItemDocument,
+    boardItem: IFeedbackBoardDocument,
+    userId: string,
+    decrement: boolean
+  ): boolean {
+    const userVotes = boardItem.boardVoteCollection?.[userId] || 0;
+    const itemVotes = feedbackItem.voteCollection?.[userId] || 0;
+
+    if (decrement) {
+      // Check if the user has votes to decrement
+      return userVotes > 0 && itemVotes > 0 && feedbackItem.upvotes > 0;
+    } else {
+      // Check if the user has remaining votes to cast
+      const maxVotes = boardItem.maxVotesPerUser;
+      return userVotes < maxVotes;
+    }
+  }
+
+  private modifyVotes(
+    feedbackItem: IFeedbackItemDocument,
+    boardItem: IFeedbackBoardDocument,
+    userId: string,
+    decrement: boolean
+  ): void {
+    const voteChange = decrement ? -1 : 1;
+
+    // Initialize vote collections if needed
+    feedbackItem.voteCollection = feedbackItem.voteCollection || {};
+    boardItem.boardVoteCollection = boardItem.boardVoteCollection || {};
+
+    feedbackItem.voteCollection[userId] = (feedbackItem.voteCollection[userId] || 0) + voteChange;
+    boardItem.boardVoteCollection[userId] = (boardItem.boardVoteCollection[userId] || 0) + voteChange;
+    feedbackItem.upvotes += voteChange;
+  }
+
+  private rollbackVotes(
+    feedbackItem: IFeedbackItemDocument,
+    userId: string,
+    decrement: boolean
+  ): void {
+    const voteChange = decrement ? 1 : -1;
+
+    feedbackItem.voteCollection[userId] = (feedbackItem.voteCollection[userId] || 0) + voteChange;
+    feedbackItem.upvotes += voteChange;
   }
 
   /**
@@ -225,80 +398,6 @@ class ItemDataService {
     }
 
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
-
-    return updatedFeedbackItem;
-  }
-
-  /**
-   * Increment/Decrement the vote of the feedback item.
-   */
-  public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
-    const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
-
-    const encryptedUserId = encrypt(userId);
-
-    if (!feedbackItem) {
-      return undefined;
-    }
-    const boardItem: IFeedbackBoardDocument = await this.getBoardItem(teamId, boardId);
-
-    if (boardItem == undefined) {
-      return undefined;
-    }
-
-    if (decrement) {
-      if (!boardItem.boardVoteCollection?.[encryptedUserId] ||
-        boardItem.boardVoteCollection[encryptedUserId] <= 0) {
-        return undefined;
-      }
-      if (feedbackItem.upvotes <= 0) {
-        return undefined;
-      } else if (feedbackItem.voteCollection[encryptedUserId] === null || feedbackItem.voteCollection[encryptedUserId] === 0) {
-        return undefined;
-      }
-      else {
-        feedbackItem.voteCollection[encryptedUserId]--;
-        feedbackItem.upvotes--;
-        boardItem.boardVoteCollection[encryptedUserId]--;
-      }
-    } else {
-      if (feedbackItem.voteCollection === undefined) {
-        feedbackItem.voteCollection = {};
-      }
-      if (feedbackItem.voteCollection[encryptedUserId] === undefined || feedbackItem.voteCollection[encryptedUserId] === null) {
-        feedbackItem.voteCollection[encryptedUserId] = 0;
-      }
-      if (boardItem.boardVoteCollection === undefined) {
-        boardItem.boardVoteCollection = {};
-      }
-      if (boardItem.boardVoteCollection[encryptedUserId] === undefined || boardItem.boardVoteCollection[encryptedUserId] === null) {
-        boardItem.boardVoteCollection[encryptedUserId] = 0;
-      }
-      if (boardItem.boardVoteCollection[encryptedUserId] >= boardItem.maxVotesPerUser) {
-        return undefined;
-      }
-
-      boardItem.boardVoteCollection[encryptedUserId]++;
-      feedbackItem.voteCollection[encryptedUserId]++;
-      feedbackItem.upvotes++;
-    }
-
-    const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
-
-    if (!updatedFeedbackItem) {
-      return undefined;
-    }
-
-    const updatedBoardItem = await this.updateBoardItem(teamId, boardItem);
-    if (!updatedBoardItem) {
-      updatedFeedbackItem.voteCollection[encryptedUserId] = decrement ? updatedFeedbackItem.voteCollection[encryptedUserId]++ : updatedFeedbackItem.voteCollection[encryptedUserId]--;
-      updatedFeedbackItem.upvotes = decrement ? updatedFeedbackItem.upvotes++ : updatedFeedbackItem.upvotes--;
-
-      const feedbackItemWithOriginalVotes = await this.updateFeedbackItem(boardId, updatedFeedbackItem);
-      if (feedbackItemWithOriginalVotes) {
-        return feedbackItemWithOriginalVotes;
-      }
-    }
 
     return updatedFeedbackItem;
   }

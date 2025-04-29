@@ -27,7 +27,6 @@ export interface FeedbackBoardProps {
   allWorkItemTypes: WorkItemType[];
   isAnonymous: boolean;
   hideFeedbackItems: boolean;
-
   isCarouselDialogHidden: boolean;
   hideCarouselDialog: () => void;
   userId: string;
@@ -98,6 +97,9 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       });
       this.initColumns();
       await this.getAllBoardFeedbackItems();
+
+      // Refresh currentVoteCount after board change
+      this.updateCurrentVoteCount();
     }
 
     if (prevProps.board.modifiedDate !== this.props.board.modifiedDate) {
@@ -108,6 +110,16 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     if (prevProps.team.id !== this.props.team.id) {
       await this.setDefaultIterationAndAreaPath(this.props.team.id);
     }
+  }
+
+  private updateCurrentVoteCount = async () => {
+    // Assuming userId is encrypted in props and vote data is available
+    const userId = encrypt(this.props.userId);
+    const boardItem = await itemDataService.getBoardItem(this.props.team.id, this.props.board.id);
+    const voteCollection = boardItem?.boardVoteCollection || {};
+    const currentVoteCount = voteCollection[userId]?.toString() || "0";
+
+    this.setState({ currentVoteCount });
   }
 
   public async componentWillUnmount() {
@@ -438,7 +450,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
           dialogContentProps={{
             type: DialogType.close,
             title: "Focus Mode",
-            subText: "Now is the time to focus! Discuss one feedback item at a time and create actionable work items",
+            subText: "Now is the time to focus! Discuss one feedback item at a time and create actionable work items.",
           }}
           modalProps={{
             containerClassName: "retrospectives-carousel-dialog",
