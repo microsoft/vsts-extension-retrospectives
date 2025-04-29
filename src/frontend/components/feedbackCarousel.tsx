@@ -137,9 +137,9 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
             className="feedback-carousel-pivot-item"
             {...columnProps}
           >
-            {mainCardCount === 0 && // was 1
+{/*            {mainCardCount === 1 &&
               this.renderSingleFeedbackCarouselItem(columnProps)
-            }
+            } */}
             {mainCardCount >= 1 && // was 2
               // @ts-ignore TS2786
               <Slider {...settings}>
