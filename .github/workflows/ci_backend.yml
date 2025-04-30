@@ -39,7 +39,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         run: |
-          dotnet restore
+          dotnet restore --use-lock-file
           dotnet build
         name: Build
         working-directory: 'src/backend'
