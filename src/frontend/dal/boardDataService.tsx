@@ -4,6 +4,9 @@ import { WorkflowPhase } from '../interfaces/workItem';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
 import { generateUUID } from '../utilities/random';
 import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
+import { getService } from 'azure-devops-extension-sdk';
+import { CommonServiceIds, IExtensionDataService, IExtensionDataManager } from 'azure-devops-extension-api';
+
 
 class BoardDataService {
   public readonly legacyPositiveColumnId: string = 'whatwentwell';
@@ -155,6 +158,26 @@ class BoardDataService {
   private isBoardPublic = (permissions: IFeedbackBoardDocumentPermissions): boolean => {
     return permissions === undefined || (permissions.Teams.length === 0 && permissions.Members.length === 0);
   }
+
+  public async saveSetting(key: string, value: boolean): Promise<void> {
+      // Get the data service and manager
+      const dataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
+      const dataManager = await dataService.getExtensionDataManager(undefined, "User"); // Pass scopeType as a string
+
+      // Save the value with the provided key
+      await dataManager.setValue(key, value);
+  }
+
+  public async getSetting(key: string): Promise<boolean> {
+    // Get the data service and manager
+    const dataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
+    const dataManager = await dataService.getExtensionDataManager(undefined, "User");
+
+    // Retrieve the value and cast it to a boolean
+    const value = (await dataManager.getValue(key)) as boolean;
+    return value ?? false; // Default to false if value is undefined
+  }
+
 }
 
 export default new BoardDataService();
