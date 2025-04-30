@@ -21,4 +21,4 @@ repos:
   - id: check-yaml
   - id: mixed-line-ending
   - id: pretty-format-json
-    exclude: package\.json|package-lock\.json|devcontainer\.json|\.eslintrc.json|vss-extension-prod\.json|tsconfig\.json|tsconfig.test\.json|appsettings\.json|appsettings\.development\.json
+    exclude: package\.json|package-lock\.json|packages\.lock\.json|devcontainer\.json|\.eslintrc.json|vss-extension-prod\.json|tsconfig\.json|tsconfig.test\.json|appsettings\.json|appsettings\.development\.json
