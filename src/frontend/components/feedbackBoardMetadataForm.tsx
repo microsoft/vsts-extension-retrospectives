@@ -3,6 +3,9 @@ import { PrimaryButton, DefaultButton, IconButton, ActionButton } from 'office-u
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
+// DPH
+import { getService } from 'azure-devops-extension-sdk';
+import { CommonServiceIds, IExtensionDataService } from 'azure-devops-extension-api';
 
 import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn } from '../interfaces/feedback';
@@ -69,11 +72,13 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultTitle: string = '';
     let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => { return { column, markedForDeletion: false } });
     let defaultMaxVotes: number = 5;
+    let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: []};
+
+    // Temporary default values for settings
     let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
-    let defaultDisplayPrimeDirective: boolean = false;
+    let defaultDisplayPrimeDirective: boolean = true; //DPH
     let defaultShowFeedbackAfterCollect: boolean = false;
     let defaultIsAnonymous: boolean = false;
-    let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: []};
 
     if (props.isDuplicatingBoard) {
       defaultTitle = `${this.props.currentBoard.title} - copy`;
@@ -84,7 +89,29 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       defaultShowFeedbackAfterCollect = this.props.currentBoard.shouldShowFeedbackAfterCollect;
       defaultIsAnonymous = this.props.currentBoard.isAnonymous;
       defaultPermissions = this.props.currentBoard.permissions;
-    }
+    } else { // DPH start
+      // DPH, any concerns with async?
+      // Asynchronously fetch saved settings
+      BoardDataService.getSetting("isIncludeTeamEffectivenessMeasurement").then((value) => {
+        defaultIncludeTeamEffectivenessMeasurement = value;
+       this.setState({ isIncludeTeamEffectivenessMeasurement: value });
+      });
+
+      BoardDataService.getSetting("displayPrimeDirective").then((value) => {
+        defaultDisplayPrimeDirective = value;
+        this.setState({ displayPrimeDirective: value });
+      });
+
+      BoardDataService.getSetting("shouldShowFeedbackAfterCollect").then((value) => {
+        defaultShowFeedbackAfterCollect = value;
+        this.setState({ shouldShowFeedbackAfterCollect: value });
+      });
+
+      BoardDataService.getSetting("isBoardAnonymous").then((value) => {
+        defaultIsAnonymous = value;
+        this.setState({ isBoardAnonymous: value });
+      });
+    } // DPH end
 
     this.state = {
       columnCardBeingEdited: undefined,
@@ -120,33 +147,43 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public handleFormSubmit = async (event: any) => {
+  public async handleFormSubmit(event: any) {
     event.preventDefault();
     event.stopPropagation();
 
-    // hit enter with blank or hit enter without changing the value.
-    if (this.state.title.trim() === '') {
-      return;
-    }
+    if (this.state.title.trim() === '') return;
 
     const isBoardNameTaken = await BoardDataService.checkIfBoardNameIsTaken(this.props.teamId, this.state.title);
-
     if (isBoardNameTaken && this.state.initialTitle !== this.state.title) {
-      this.setState({
-        isBoardNameTaken: true,
-      });
-
-      return;
+        this.setState({ isBoardNameTaken: true });
+        return;
     }
+
+    // DPH start
+    try {
+        const settingsToSave = {
+            isIncludeTeamEffectivenessMeasurement: this.state.isIncludeTeamEffectivenessMeasurement,
+            displayPrimeDirective: this.state.displayPrimeDirective,
+            shouldShowFeedbackAfterCollect: this.state.shouldShowFeedbackAfterCollect,
+            isBoardAnonymous: this.state.isBoardAnonymous
+        };
+
+        await Promise.all(Object.entries(settingsToSave).map(([key, value]) => BoardDataService.saveSetting(key, value)));
+    } catch (error) {
+        console.error("Error saving user settings:", error);
+    }
+    // DPH end
+
+    // Proceed with form submission
     this.props.onFormSubmit(
-      this.state.title.trim(),
-      this.state.maxVotesPerUser,
-      this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
-      this.state.isIncludeTeamEffectivenessMeasurement,
-      this.state.isBoardAnonymous,
-      this.state.shouldShowFeedbackAfterCollect,
-      this.state.displayPrimeDirective,
-      this.state.permissions
+        this.state.title.trim(),
+        this.state.maxVotesPerUser,
+        this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
+        this.state.isIncludeTeamEffectivenessMeasurement,
+        this.state.isBoardAnonymous,
+        this.state.shouldShowFeedbackAfterCollect,
+        this.state.displayPrimeDirective,
+        this.state.permissions
     );
   }
 

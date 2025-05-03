@@ -1,3 +1,6 @@
+import { getService } from 'azure-devops-extension-sdk';
+import { CommonServiceIds, IExtensionDataService } from 'azure-devops-extension-api';
+
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { WorkflowPhase } from '../interfaces/workItem';
@@ -113,7 +116,7 @@ class BoardDataService {
 
   public restoreArchivedFeedbackBoard = async (teamId: string, boardId: string) => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
-    const userIdentity = getUserIdentity();
+    const userIdentity = getUserIdentity(); // DPH try without
 
     // Check in case board was deleted by other user after option to update was selected by current user
     if (!board) {
@@ -126,6 +129,27 @@ class BoardDataService {
     board.archivedBy = undefined;
 
     return await this.updateBoard(teamId, board);
+  }
+
+  // DPH add
+  public async saveSetting(key: string, value: boolean): Promise<void> {
+      // Get the data service and manager
+      const dataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
+      const dataManager = await dataService.getExtensionDataManager(undefined, "User"); // Pass scopeType as a string
+
+      // Save the value with the provided key
+      await dataManager.setValue(key, value);
+  }
+
+  // DPH add
+  public async getSetting(key: string): Promise<boolean> {
+    // Get the data service and manager
+    const dataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
+    const dataManager = await dataService.getExtensionDataManager(undefined, "User");
+
+    // Retrieve the value and cast it to a boolean
+    const value = (await dataManager.getValue(key)) as boolean;
+    return value ?? false; // Default to false if value is undefined
   }
 
   public updateBoardMetadata = async (teamId: string, boardId: string, maxVotesPerUser: number, title: string, newColumns: IFeedbackColumn[], permissions: IFeedbackBoardDocumentPermissions): Promise<IFeedbackBoardDocument> => {
