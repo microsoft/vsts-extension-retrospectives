@@ -3,9 +3,6 @@ import { PrimaryButton, DefaultButton, IconButton, ActionButton } from 'office-u
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
-// DPH
-import { getService } from 'azure-devops-extension-sdk';
-import { CommonServiceIds, IExtensionDataService } from 'azure-devops-extension-api';
 
 import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn } from '../interfaces/feedback';

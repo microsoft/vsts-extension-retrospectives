@@ -1,7 +1,8 @@
 import { getService } from 'azure-devops-extension-sdk';
 import { CommonServiceIds, IExtensionDataService } from 'azure-devops-extension-api';
 
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
+// DPH add getValue and setValue
+import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, getValue, setValue } from './dataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
@@ -131,8 +132,8 @@ class BoardDataService {
     return await this.updateBoard(teamId, board);
   }
 
-  // DPH add
-  public async saveSetting(key: string, value: boolean): Promise<void> {
+/*
+  public async DPH_saveSetting(key: string, value: boolean): Promise<void> {
       // Get the data service and manager
       const dataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
       const dataManager = await dataService.getExtensionDataManager(undefined, "User"); // Pass scopeType as a string
@@ -141,8 +142,7 @@ class BoardDataService {
       await dataManager.setValue(key, value);
   }
 
-  // DPH add
-  public async getSetting(key: string): Promise<boolean> {
+  public async DPH_getSetting(key: string): Promise<boolean> {
     // Get the data service and manager
     const dataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
     const dataManager = await dataService.getExtensionDataManager(undefined, "User");
@@ -150,6 +150,18 @@ class BoardDataService {
     // Retrieve the value and cast it to a boolean
     const value = (await dataManager.getValue(key)) as boolean;
     return value ?? false; // Default to false if value is undefined
+  }
+*/
+
+  // DPH add
+  public async saveSetting(key: string, value: boolean): Promise<void> {
+      await setValue(key, value, true); // Use 'true' to make it user-scoped
+  }
+
+  // DPH add
+  public async getSetting(key: string): Promise<boolean> {
+      const value = await getValue<boolean>(key, true);
+      return typeof value === "boolean" ? value : false; // Ensure correct typing
   }
 
   public updateBoardMetadata = async (teamId: string, boardId: string, maxVotesPerUser: number, title: string, newColumns: IFeedbackColumn[], permissions: IFeedbackBoardDocumentPermissions): Promise<IFeedbackBoardDocument> => {
