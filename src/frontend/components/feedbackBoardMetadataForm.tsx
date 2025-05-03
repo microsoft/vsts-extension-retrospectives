@@ -66,10 +66,10 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
-    let defaultTitle: string = '';
-    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => { return { column, markedForDeletion: false } });
-    let defaultMaxVotes: number = 5;
-    let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: []};
+    let defaultTitle = '';
+    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => ({ column, markedForDeletion: false }));
+    let defaultMaxVotes = 5;
+    let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: [] };
 
     // Temporary default values for settings
     let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
@@ -78,60 +78,94 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultIsAnonymous: boolean = false;
 
     if (props.isDuplicatingBoard) {
-      defaultTitle = `${this.props.currentBoard.title} - copy`;
-      defaultColumns = this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } });
-      defaultMaxVotes = this.props.currentBoard.maxVotesPerUser;
-      defaultIncludeTeamEffectivenessMeasurement = this.props.currentBoard.isIncludeTeamEffectivenessMeasurement;
-      defaultDisplayPrimeDirective = this.props.currentBoard.displayPrimeDirective;
-      defaultShowFeedbackAfterCollect = this.props.currentBoard.shouldShowFeedbackAfterCollect;
-      defaultIsAnonymous = this.props.currentBoard.isAnonymous;
-      defaultPermissions = this.props.currentBoard.permissions;
-    } else { // DPH start
-      // DPH, needs refactoring
-      // Asynchronously fetch saved settings
-      BoardDataService.getSetting("isIncludeTeamEffectivenessMeasurement").then((value) => {
-        defaultIncludeTeamEffectivenessMeasurement = value;
-       this.setState({ isIncludeTeamEffectivenessMeasurement: value });
-      });
+        // If duplicating, inherit settings from the current board
+        defaultTitle = `${props.currentBoard.title} - copy`;
+        defaultColumns = props.currentBoard.columns.map(column => ({ column, markedForDeletion: false }));
+        defaultMaxVotes = props.currentBoard.maxVotesPerUser;
+        defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
+        defaultDisplayPrimeDirective = props.currentBoard.displayPrimeDirective;
+        defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
+        defaultIsAnonymous = props.currentBoard.isAnonymous;
+        defaultPermissions = props.currentBoard.permissions;
+    }
 
-      BoardDataService.getSetting("displayPrimeDirective").then((value) => {
-        defaultDisplayPrimeDirective = value;
-        this.setState({ displayPrimeDirective: value });
-      });
-
-      BoardDataService.getSetting("shouldShowFeedbackAfterCollect").then((value) => {
-        defaultShowFeedbackAfterCollect = value;
-        this.setState({ shouldShowFeedbackAfterCollect: value });
-      });
-
-      BoardDataService.getSetting("isBoardAnonymous").then((value) => {
-        defaultIsAnonymous = value;
-        this.setState({ isBoardAnonymous: value });
-      });
-    } // DPH end
-
+    // DPH || props.isDuplicatingBoard
     this.state = {
-      columnCardBeingEdited: undefined,
-      columnCards: this.props.isNewBoardCreation
-        ? defaultColumns
-        : this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } }),
+        columnCardBeingEdited: undefined,
+        columnCards: props.isNewBoardCreation
+            ? defaultColumns
+            : props.currentBoard.columns.map(column => ({ column, markedForDeletion: false })),
+        isIncludeTeamEffectivenessMeasurement: props.isNewBoardCreation || props.isDuplicatingBoard
+            ? defaultIncludeTeamEffectivenessMeasurement
+            : props.currentBoard.isIncludeTeamEffectivenessMeasurement,
+        displayPrimeDirective: props.isNewBoardCreation || props.isDuplicatingBoard
+            ? defaultDisplayPrimeDirective
+            : props.currentBoard.displayPrimeDirective,
+        shouldShowFeedbackAfterCollect: props.isNewBoardCreation || props.isDuplicatingBoard
+            ? defaultShowFeedbackAfterCollect
+            : props.currentBoard.shouldShowFeedbackAfterCollect,
+        isBoardAnonymous: props.isNewBoardCreation || props.isDuplicatingBoard
+            ? defaultIsAnonymous
+            : props.currentBoard.isAnonymous,
+        maxVotesPerUser: props.isNewBoardCreation || props.isDuplicatingBoard
+            ? defaultMaxVotes
+            : props.currentBoard.maxVotesPerUser,
+        isBoardNameTaken: false,
+        isChooseColumnAccentColorDialogHidden: true,
+        isChooseColumnIconDialogHidden: true,
+        isDeleteColumnConfirmationDialogHidden: true,
+        placeholderText: props.placeholderText,
+        selectedAccentColorKey: undefined,
+        selectedIconKey: undefined,
+        initialTitle: props.isNewBoardCreation || props.isDuplicatingBoard
+            ? defaultTitle
+            : props.currentBoard.title,
+        title: props.isNewBoardCreation || props.isDuplicatingBoard
+            ? defaultTitle
+            : props.currentBoard.title,
+        permissions: props.isNewBoardCreation || props.isDuplicatingBoard
+            ? defaultPermissions
+            : props.currentBoard.permissions
+/*
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? defaultIncludeTeamEffectivenessMeasurement : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
       displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
       isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? defaultMaxVotes : this.props.currentBoard.maxVotesPerUser,
-      isBoardNameTaken: false,
-      isChooseColumnAccentColorDialogHidden: true,
-      isChooseColumnIconDialogHidden: true,
-      isDeleteColumnConfirmationDialogHidden: true,
-      placeholderText: this.props.placeholderText,
-      selectedAccentColorKey: undefined,
-      selectedIconKey: undefined,
       initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       permissions: this.props.isNewBoardCreation ? defaultPermissions : this.props.currentBoard.permissions
+*/
     };
   }
+
+  // DPH new
+  async componentDidMount() {
+    try {
+        if (this.props.isNewBoardCreation) {
+            const [
+                includeTeamEffectivenessMeasurement,
+                displayPrimeDirective,
+                showFeedbackAfterCollect,
+                isAnonymous
+            ] = await Promise.all([
+                BoardDataService.getSetting("isIncludeTeamEffectivenessMeasurement"),
+                BoardDataService.getSetting("displayPrimeDirective"),
+                BoardDataService.getSetting("shouldShowFeedbackAfterCollect"),
+                BoardDataService.getSetting("isBoardAnonymous"),
+            ]);
+
+            this.setState({
+                isIncludeTeamEffectivenessMeasurement: includeTeamEffectivenessMeasurement,
+                displayPrimeDirective: displayPrimeDirective,
+                shouldShowFeedbackAfterCollect: showFeedbackAfterCollect,
+                isBoardAnonymous: isAnonymous
+            });
+        }
+    } catch (error) {
+        console.error("Error retrieving user settings:", error);
+    }
+}
 
   private maxColumnCount = 5;
 
