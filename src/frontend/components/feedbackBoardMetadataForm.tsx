@@ -87,7 +87,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       defaultIsAnonymous = this.props.currentBoard.isAnonymous;
       defaultPermissions = this.props.currentBoard.permissions;
     } else { // DPH start
-      // DPH, any concerns with async?
+      // DPH, needs refactoring
       // Asynchronously fetch saved settings
       BoardDataService.getSetting("isIncludeTeamEffectivenessMeasurement").then((value) => {
         defaultIncludeTeamEffectivenessMeasurement = value;
