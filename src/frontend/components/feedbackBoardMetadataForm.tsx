@@ -73,7 +73,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
     // Temporary default values for settings
     let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
-    let defaultDisplayPrimeDirective: boolean = true; //DPH
+    let defaultDisplayPrimeDirective: boolean = false; //DPH, if this works set to default to true and correct test
     let defaultShowFeedbackAfterCollect: boolean = false;
     let defaultIsAnonymous: boolean = false;
 
