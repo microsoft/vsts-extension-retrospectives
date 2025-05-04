@@ -93,23 +93,17 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     this.state = {
         columnCardBeingEdited: undefined,
         columnCards: props.isNewBoardCreation
-            ? defaultColumns
-            : props.currentBoard.columns.map(column => ({ column, markedForDeletion: false })),
-        isIncludeTeamEffectivenessMeasurement: props.isNewBoardCreation || props.isDuplicatingBoard
-            ? defaultIncludeTeamEffectivenessMeasurement
-            : props.currentBoard.isIncludeTeamEffectivenessMeasurement,
-        displayPrimeDirective: props.isNewBoardCreation || props.isDuplicatingBoard
-            ? defaultDisplayPrimeDirective
-            : props.currentBoard.displayPrimeDirective,
-        shouldShowFeedbackAfterCollect: props.isNewBoardCreation || props.isDuplicatingBoard
-            ? defaultShowFeedbackAfterCollect
-            : props.currentBoard.shouldShowFeedbackAfterCollect,
-        isBoardAnonymous: props.isNewBoardCreation || props.isDuplicatingBoard
-            ? defaultIsAnonymous
-            : props.currentBoard.isAnonymous,
-        maxVotesPerUser: props.isNewBoardCreation || props.isDuplicatingBoard
-            ? defaultMaxVotes
-            : props.currentBoard.maxVotesPerUser,
+            ? defaultColumns : props.currentBoard.columns.map(column => ({ column, markedForDeletion: false })),
+        isIncludeTeamEffectivenessMeasurement: props.isNewBoardCreation
+            ? defaultIncludeTeamEffectivenessMeasurement : props.currentBoard.isIncludeTeamEffectivenessMeasurement,
+        displayPrimeDirective: props.isNewBoardCreation
+            ? defaultDisplayPrimeDirective : props.currentBoard.displayPrimeDirective,
+        shouldShowFeedbackAfterCollect: props.isNewBoardCreation
+            ? defaultShowFeedbackAfterCollect : props.currentBoard.shouldShowFeedbackAfterCollect,
+        isBoardAnonymous: props.isNewBoardCreation
+            ? defaultIsAnonymous : props.currentBoard.isAnonymous,
+        maxVotesPerUser: props.isNewBoardCreation
+            ? defaultMaxVotes : props.currentBoard.maxVotesPerUser,
         isBoardNameTaken: false,
         isChooseColumnAccentColorDialogHidden: true,
         isChooseColumnIconDialogHidden: true,
@@ -117,15 +111,12 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         placeholderText: props.placeholderText,
         selectedAccentColorKey: undefined,
         selectedIconKey: undefined,
-        initialTitle: props.isNewBoardCreation || props.isDuplicatingBoard
-            ? defaultTitle
-            : props.currentBoard.title,
-        title: props.isNewBoardCreation || props.isDuplicatingBoard
-            ? defaultTitle
-            : props.currentBoard.title,
-        permissions: props.isNewBoardCreation || props.isDuplicatingBoard
-            ? defaultPermissions
-            : props.currentBoard.permissions
+        initialTitle: props.isNewBoardCreation
+            ? defaultTitle : props.currentBoard.title,
+        title: props.isNewBoardCreation
+            ? defaultTitle : props.currentBoard.title,
+        permissions: props.isNewBoardCreation
+            ? defaultPermissions : props.currentBoard.permissions
 /*
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? defaultIncludeTeamEffectivenessMeasurement : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
       displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
