@@ -294,12 +294,12 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       iconClass: 'fas fa-question',
     },
     {
-      friendlyName: 'comments',
-      iconClass: 'far fa-comments',
-    },
-    {
       friendlyName: 'exclamation',
       iconClass: 'fas fa-exclamation',
+    },
+    {
+      friendlyName: 'comments',
+      iconClass: 'far fa-comments',
     },
     {
       friendlyName: 'compass',
