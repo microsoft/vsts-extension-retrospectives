@@ -3,16 +3,17 @@ import { PrimaryButton, DefaultButton, IconButton, ActionButton } from 'office-u
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
-import BoardDataService from '../dal/boardDataService';
-import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn } from '../interfaces/feedback';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
+import { Pivot, PivotItem } from 'office-ui-fabric-react';
+
+import BoardDataService from '../dal/boardDataService';
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn } from '../interfaces/feedback';
 import classNames from 'classnames'
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
-import { Pivot, PivotItem } from 'office-ui-fabric-react';
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from './feedbackBoardMetadataFormPermissions';
 import { generateUUID } from '../utilities/random';
 
