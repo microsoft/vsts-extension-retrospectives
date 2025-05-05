@@ -63,6 +63,7 @@ export interface IFeedbackColumnCard {
 }
 
 class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
+  private readonly defaultIsAnonymous: boolean = false;
   constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
@@ -75,7 +76,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
     let defaultDisplayPrimeDirective: boolean = false; //DPH, if this works set to default to true and correct test
     let defaultShowFeedbackAfterCollect: boolean = false;
-    let defaultIsAnonymous: boolean = false;
+    //let defaultIsAnonymous: boolean = false;
 
     if (props.isDuplicatingBoard) {
       // If duplicating, inherit settings from the current board
@@ -85,7 +86,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
       defaultDisplayPrimeDirective = props.currentBoard.displayPrimeDirective;
       defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
-      defaultIsAnonymous = props.currentBoard.isAnonymous;
+      //defaultIsAnonymous = props.currentBoard.isAnonymous;
       defaultPermissions = props.currentBoard.permissions;
     }
 
@@ -106,7 +107,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
       isBoardAnonymous: props.isDuplicatingBoard
         ? props.currentBoard.isAnonymous  // Use existing board value for duplication
-        : null,  // New boards will get stored value later
+        : this.defaultIsAnonymous,  // DPH
       //isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? defaultMaxVotes : this.props.currentBoard.maxVotesPerUser,
       initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
@@ -118,16 +119,16 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   // DPH new
   async componentDidMount() {
     if (this.props.isNewBoardCreation) {
-        try {
-            const storedIsAnonymous = await BoardDataService.getSetting("isBoardAnonymous");
-            console.log("Retrieved stored value for isBoardAnonymous:", storedIsAnonymous);
-
-            this.setState({
-                isBoardAnonymous: storedIsAnonymous ?? false
-            });
-        } catch (error) {
-            console.error("Error retrieving user settings:", error);
-        }
+      try {
+        const storedIsAnonymous = await BoardDataService.getSetting("isBoardAnonymous");
+        console.log("Retrieved stored value for isBoardAnonymous:", storedIsAnonymous);
+        this.setState({
+          isBoardAnonymous: storedIsAnonymous != null ? storedIsAnonymous : this.defaultIsAnonymous
+        });
+      } catch (error) {
+        console.warn("No stored value found—defaulting to defaultIsAnonymous.");
+        this.setState({ isBoardAnonymous: this.defaultIsAnonymous });
+      }
     }
   }
 

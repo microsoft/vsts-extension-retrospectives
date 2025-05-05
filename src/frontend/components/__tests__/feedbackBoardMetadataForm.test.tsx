@@ -179,7 +179,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.isAnonymous);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isAnonymous);
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -259,7 +259,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.isAnonymous);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isAnonymous);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
