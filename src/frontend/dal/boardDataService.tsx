@@ -1,6 +1,3 @@
-import { getService } from 'azure-devops-extension-sdk';
-import { CommonServiceIds, IExtensionDataService } from 'azure-devops-extension-api';
-
 // DPH add getValue and setValue
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, getValue, setValue } from './dataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
@@ -131,27 +128,6 @@ class BoardDataService {
 
     return await this.updateBoard(teamId, board);
   }
-
-/*
-  public async DPH_saveSetting(key: string, value: boolean): Promise<void> {
-      // Get the data service and manager
-      const dataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
-      const dataManager = await dataService.getExtensionDataManager(undefined, "User"); // Pass scopeType as a string
-
-      // Save the value with the provided key
-      await dataManager.setValue(key, value);
-  }
-
-  public async DPH_getSetting(key: string): Promise<boolean> {
-    // Get the data service and manager
-    const dataService = await getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
-    const dataManager = await dataService.getExtensionDataManager(undefined, "User");
-
-    // Retrieve the value and cast it to a boolean
-    const value = (await dataManager.getValue(key)) as boolean;
-    return value ?? false; // Default to false if value is undefined
-  }
-*/
 
   // DPH add
   public async saveSetting(key: string, value: boolean): Promise<void> {

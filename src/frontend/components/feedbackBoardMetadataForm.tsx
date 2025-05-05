@@ -63,38 +63,35 @@ export interface IFeedbackColumnCard {
 }
 
 class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
-  private readonly defaultIsAnonymous: boolean = false;
   constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
-    let defaultTitle = '';
-    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => ({ column, markedForDeletion: false }));
-    let defaultMaxVotes = 5;
+    let defaultTitle: string = '';
+    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => { return { column, markedForDeletion: false } });
+    let defaultMaxVotes: number = 5;
     let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: [] };
 
     // Temporary default values for settings
     let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
     let defaultDisplayPrimeDirective: boolean = false; //DPH, if this works set to default to true and correct test
     let defaultShowFeedbackAfterCollect: boolean = false;
-    //let defaultIsAnonymous: boolean = false;
+    let defaultIsAnonymous: boolean = false;
 
     if (props.isDuplicatingBoard) {
-      // If duplicating, inherit settings from the current board
-      defaultTitle = `${props.currentBoard.title} - copy`;
-      defaultColumns = props.currentBoard.columns.map(column => ({ column, markedForDeletion: false }));
-      defaultMaxVotes = props.currentBoard.maxVotesPerUser;
-      defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
-      defaultDisplayPrimeDirective = props.currentBoard.displayPrimeDirective;
-      defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
-      //defaultIsAnonymous = props.currentBoard.isAnonymous;
-      defaultPermissions = props.currentBoard.permissions;
+      defaultTitle = `${this.props.currentBoard.title} - copy`;
+      defaultColumns = this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } });
+      defaultMaxVotes = this.props.currentBoard.maxVotesPerUser;
+      defaultIncludeTeamEffectivenessMeasurement = this.props.currentBoard.isIncludeTeamEffectivenessMeasurement;
+      defaultDisplayPrimeDirective = this.props.currentBoard.displayPrimeDirective;
+      defaultShowFeedbackAfterCollect = this.props.currentBoard.shouldShowFeedbackAfterCollect;
+      defaultIsAnonymous = this.props.currentBoard.isAnonymous;
+      defaultPermissions = this.props.currentBoard.permissions;
     }
 
-    // DPH
     this.state = {
       columnCardBeingEdited: undefined,
-      columnCards: props.isNewBoardCreation
-        ? defaultColumns : props.currentBoard.columns.map(column => ({ column, markedForDeletion: false })),
+      columnCards: this.props.isNewBoardCreation
+        ? defaultColumns : this.props.currentBoard.columns.map(column => ({ column, markedForDeletion: false })),
       isBoardNameTaken: false,
       isChooseColumnAccentColorDialogHidden: true,
       isChooseColumnIconDialogHidden: true,
@@ -105,31 +102,12 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? defaultIncludeTeamEffectivenessMeasurement : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
       displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
-      isBoardAnonymous: props.isDuplicatingBoard
-        ? props.currentBoard.isAnonymous  // Use existing board value for duplication
-        : this.defaultIsAnonymous,  // DPH
-      //isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
+      isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? defaultMaxVotes : this.props.currentBoard.maxVotesPerUser,
       initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       permissions: this.props.isNewBoardCreation ? defaultPermissions : this.props.currentBoard.permissions
     };
-  }
-
-  // DPH new
-  async componentDidMount() {
-    if (this.props.isNewBoardCreation) {
-      try {
-        const storedIsAnonymous = await BoardDataService.getSetting("isBoardAnonymous");
-        console.log("Retrieved stored value for isBoardAnonymous:", storedIsAnonymous);
-        this.setState({
-          isBoardAnonymous: storedIsAnonymous != null ? storedIsAnonymous : this.defaultIsAnonymous
-        });
-      } catch (error) {
-        console.warn("No stored value found—defaulting to defaultIsAnonymous.");
-        this.setState({ isBoardAnonymous: this.defaultIsAnonymous });
-      }
-    }
   }
 
   private maxColumnCount = 5;
@@ -155,19 +133,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         return;
     }
 
-    // DPH start
-    try {
-        const settingsToSave = {
-            isBoardAnonymous: this.state.isBoardAnonymous
-        };
-
-        await Promise.all(Object.entries(settingsToSave).map(([key, value]) => BoardDataService.saveSetting(key, value)));
-    } catch (error) {
-        console.error("Error saving user settings:", error);
-    }
-    // DPH end
-
-    // Proceed with form submission
     this.props.onFormSubmit(
         this.state.title.trim(),
         this.state.maxVotesPerUser,
