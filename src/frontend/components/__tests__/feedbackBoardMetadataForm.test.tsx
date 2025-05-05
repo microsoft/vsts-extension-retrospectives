@@ -89,9 +89,20 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
+      expect(checkbox.prop('checked')).toEqual(false);
+      expect(checkbox.prop('disabled')).toEqual(false);
+  });
+
+  /* DPH
+    it('should properly set display names settings', () => {
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const component = wrapper.children().dive();
+      const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
+
+      expect(checkbox).toBeDefined();
       expect(checkbox.prop('defaultChecked')).toEqual(false);
       expect(checkbox.prop('disabled')).toEqual(false);
-    });
+    }); */
 
     it('should properly set the column list', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
