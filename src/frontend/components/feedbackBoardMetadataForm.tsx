@@ -89,21 +89,21 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         defaultPermissions = props.currentBoard.permissions;
     }
 
-    // DPH || props.isDuplicatingBoard
+    // DPH
     this.state = {
         columnCardBeingEdited: undefined,
         columnCards: props.isNewBoardCreation
             ? defaultColumns : props.currentBoard.columns.map(column => ({ column, markedForDeletion: false })),
-        isIncludeTeamEffectivenessMeasurement: props.isNewBoardCreation
-            ? defaultIncludeTeamEffectivenessMeasurement : props.currentBoard.isIncludeTeamEffectivenessMeasurement,
-        displayPrimeDirective: props.isNewBoardCreation
-            ? defaultDisplayPrimeDirective : props.currentBoard.displayPrimeDirective,
-        shouldShowFeedbackAfterCollect: props.isNewBoardCreation
-            ? defaultShowFeedbackAfterCollect : props.currentBoard.shouldShowFeedbackAfterCollect,
-        isBoardAnonymous: props.isNewBoardCreation
-            ? defaultIsAnonymous : props.currentBoard.isAnonymous,
-        maxVotesPerUser: props.isNewBoardCreation
-            ? defaultMaxVotes : props.currentBoard.maxVotesPerUser,
+        //isIncludeTeamEffectivenessMeasurement: props.isNewBoardCreation
+        //    ? defaultIncludeTeamEffectivenessMeasurement : props.currentBoard.isIncludeTeamEffectivenessMeasurement,
+        //displayPrimeDirective: props.isNewBoardCreation
+        //    ? defaultDisplayPrimeDirective : props.currentBoard.displayPrimeDirective,
+        //shouldShowFeedbackAfterCollect: props.isNewBoardCreation
+        //    ? defaultShowFeedbackAfterCollect : props.currentBoard.shouldShowFeedbackAfterCollect,
+        //isBoardAnonymous: props.isNewBoardCreation
+        //    ? defaultIsAnonymous : props.currentBoard.isAnonymous,
+        //maxVotesPerUser: props.isNewBoardCreation
+        //    ? defaultMaxVotes : props.currentBoard.maxVotesPerUser,
         isBoardNameTaken: false,
         isChooseColumnAccentColorDialogHidden: true,
         isChooseColumnIconDialogHidden: true,
@@ -111,13 +111,10 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         placeholderText: props.placeholderText,
         selectedAccentColorKey: undefined,
         selectedIconKey: undefined,
-        initialTitle: props.isNewBoardCreation
-            ? defaultTitle : props.currentBoard.title,
-        title: props.isNewBoardCreation
-            ? defaultTitle : props.currentBoard.title,
-        permissions: props.isNewBoardCreation
-            ? defaultPermissions : props.currentBoard.permissions
-/*
+        //initialTitle: props.isNewBoardCreation ? defaultTitle : props.currentBoard.title,
+        //title: props.isNewBoardCreation ? defaultTitle : props.currentBoard.title,
+        //permissions: props.isNewBoardCreation ? defaultPermissions : props.currentBoard.permissions
+
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? defaultIncludeTeamEffectivenessMeasurement : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
       displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
@@ -126,7 +123,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       permissions: this.props.isNewBoardCreation ? defaultPermissions : this.props.currentBoard.permissions
-*/
     };
   }
 
@@ -135,28 +131,28 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     try {
         if (this.props.isNewBoardCreation) {
             const [
-                includeTeamEffectivenessMeasurement,
-                displayPrimeDirective,
-                showFeedbackAfterCollect,
+                //includeTeamEffectivenessMeasurement,
+                //displayPrimeDirective,
+                //showFeedbackAfterCollect,
                 isAnonymous
             ] = await Promise.all([
-                BoardDataService.getSetting("isIncludeTeamEffectivenessMeasurement"),
-                BoardDataService.getSetting("displayPrimeDirective"),
-                BoardDataService.getSetting("shouldShowFeedbackAfterCollect"),
+                //BoardDataService.getSetting("isIncludeTeamEffectivenessMeasurement"),
+                //BoardDataService.getSetting("displayPrimeDirective"),
+                //BoardDataService.getSetting("shouldShowFeedbackAfterCollect"),
                 BoardDataService.getSetting("isBoardAnonymous"),
             ]);
 
             this.setState({
-                isIncludeTeamEffectivenessMeasurement: includeTeamEffectivenessMeasurement,
-                displayPrimeDirective: displayPrimeDirective,
-                shouldShowFeedbackAfterCollect: showFeedbackAfterCollect,
+                //isIncludeTeamEffectivenessMeasurement: includeTeamEffectivenessMeasurement,
+                //displayPrimeDirective: displayPrimeDirective,
+                //shouldShowFeedbackAfterCollect: showFeedbackAfterCollect,
                 isBoardAnonymous: isAnonymous
             });
         }
     } catch (error) {
         console.error("Error retrieving user settings:", error);
     }
-}
+  }
 
   private maxColumnCount = 5;
 
@@ -184,9 +180,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     // DPH start
     try {
         const settingsToSave = {
-            isIncludeTeamEffectivenessMeasurement: this.state.isIncludeTeamEffectivenessMeasurement,
-            displayPrimeDirective: this.state.displayPrimeDirective,
-            shouldShowFeedbackAfterCollect: this.state.shouldShowFeedbackAfterCollect,
+            //isIncludeTeamEffectivenessMeasurement: this.state.isIncludeTeamEffectivenessMeasurement,
+            //displayPrimeDirective: this.state.displayPrimeDirective,
+            //shouldShowFeedbackAfterCollect: this.state.shouldShowFeedbackAfterCollect,
             isBoardAnonymous: this.state.isBoardAnonymous
         };
 
