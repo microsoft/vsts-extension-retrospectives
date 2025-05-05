@@ -91,33 +91,22 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
     // DPH
     this.state = {
-        columnCardBeingEdited: undefined,
-        columnCards: props.isNewBoardCreation
-            ? defaultColumns : props.currentBoard.columns.map(column => ({ column, markedForDeletion: false })),
-        //isIncludeTeamEffectivenessMeasurement: props.isNewBoardCreation
-        //    ? defaultIncludeTeamEffectivenessMeasurement : props.currentBoard.isIncludeTeamEffectivenessMeasurement,
-        //displayPrimeDirective: props.isNewBoardCreation
-        //    ? defaultDisplayPrimeDirective : props.currentBoard.displayPrimeDirective,
-        //shouldShowFeedbackAfterCollect: props.isNewBoardCreation
-        //    ? defaultShowFeedbackAfterCollect : props.currentBoard.shouldShowFeedbackAfterCollect,
-        isBoardAnonymous: props.isNewBoardCreation
-            ? defaultIsAnonymous : props.currentBoard.isAnonymous,
-        //maxVotesPerUser: props.isNewBoardCreation
-        //    ? defaultMaxVotes : props.currentBoard.maxVotesPerUser,
-        isBoardNameTaken: false,
-        isChooseColumnAccentColorDialogHidden: true,
-        isChooseColumnIconDialogHidden: true,
-        isDeleteColumnConfirmationDialogHidden: true,
-        placeholderText: props.placeholderText,
-        selectedAccentColorKey: undefined,
-        selectedIconKey: undefined,
-        //initialTitle: props.isNewBoardCreation ? defaultTitle : props.currentBoard.title,
-        //title: props.isNewBoardCreation ? defaultTitle : props.currentBoard.title,
-        //permissions: props.isNewBoardCreation ? defaultPermissions : props.currentBoard.permissions
-
+      columnCardBeingEdited: undefined,
+      columnCards: props.isNewBoardCreation
+        ? defaultColumns : props.currentBoard.columns.map(column => ({ column, markedForDeletion: false })),
+      isBoardNameTaken: false,
+      isChooseColumnAccentColorDialogHidden: true,
+      isChooseColumnIconDialogHidden: true,
+      isDeleteColumnConfirmationDialogHidden: true,
+      placeholderText: props.placeholderText,
+      selectedAccentColorKey: undefined,
+      selectedIconKey: undefined,
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? defaultIncludeTeamEffectivenessMeasurement : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
       displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
+      isBoardAnonymous: props.isDuplicatingBoard 
+        ? props.currentBoard.isAnonymous  // Use existing board value for duplication
+        : null,  // New boards will get stored value later
       //isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? defaultMaxVotes : this.props.currentBoard.maxVotesPerUser,
       initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
@@ -128,17 +117,17 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
   // DPH new
   async componentDidMount() {
-    try {
-        if (this.props.isNewBoardCreation) {
-            const isAnonymous = await BoardDataService.getSetting("isBoardAnonymous");
-            console.log("Retrieved isBoardAnonymous: ", isAnonymous); // Debugging check
+    if (this.props.isNewBoardCreation) {
+        try {
+            const storedIsAnonymous = await BoardDataService.getSetting("isBoardAnonymous");
+            console.log("Retrieved stored value for isBoardAnonymous:", storedIsAnonymous);
 
             this.setState({
-                isBoardAnonymous: isAnonymous ?? false // Ensure fallback value
+                isBoardAnonymous: storedIsAnonymous ?? false
             });
+        } catch (error) {
+            console.error("Error retrieving user settings:", error);
         }
-    } catch (error) {
-        console.error("Error retrieving user settings:", error);
     }
   }
 
@@ -168,9 +157,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     // DPH start
     try {
         const settingsToSave = {
-            //isIncludeTeamEffectivenessMeasurement: this.state.isIncludeTeamEffectivenessMeasurement,
-            //displayPrimeDirective: this.state.displayPrimeDirective,
-            //shouldShowFeedbackAfterCollect: this.state.shouldShowFeedbackAfterCollect,
             isBoardAnonymous: this.state.isBoardAnonymous
         };
 
@@ -444,14 +430,14 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     onChange={this.handleShouldShowFeedbackAfterCollectChange}
                   />
                 </div>
-
+{/* DPH defaultChecked changed to checked */}
                 <div className="board-metadata-form-section-subheader">
                   <Checkbox
                     id="feedback-display-names-checkbox"
                     label="Do not display names in feedback"
                     ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation."
                     boxSide="start"
-                    defaultChecked={this.state.isBoardAnonymous}
+                    checked={this.state.isBoardAnonymous}
                     disabled={!this.props.isNewBoardCreation}
                     onChange={this.handleIsAnonymousCheckboxChange}
                   />
