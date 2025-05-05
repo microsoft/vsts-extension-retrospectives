@@ -130,23 +130,11 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   async componentDidMount() {
     try {
         if (this.props.isNewBoardCreation) {
-            const [
-                //includeTeamEffectivenessMeasurement,
-                //displayPrimeDirective,
-                //showFeedbackAfterCollect,
-                isAnonymous
-            ] = await Promise.all([
-                //BoardDataService.getSetting("isIncludeTeamEffectivenessMeasurement"),
-                //BoardDataService.getSetting("displayPrimeDirective"),
-                //BoardDataService.getSetting("shouldShowFeedbackAfterCollect"),
-                BoardDataService.getSetting("isBoardAnonymous"),
-            ]);
+            const isAnonymous = await BoardDataService.getSetting("isBoardAnonymous");
+            console.log("Retrieved isBoardAnonymous: ", isAnonymous); // Debugging check
 
             this.setState({
-                //isIncludeTeamEffectivenessMeasurement: includeTeamEffectivenessMeasurement,
-                //displayPrimeDirective: displayPrimeDirective,
-                //shouldShowFeedbackAfterCollect: showFeedbackAfterCollect,
-                isBoardAnonymous: isAnonymous
+                isBoardAnonymous: isAnonymous ?? false // Ensure fallback value
             });
         }
     } catch (error) {
