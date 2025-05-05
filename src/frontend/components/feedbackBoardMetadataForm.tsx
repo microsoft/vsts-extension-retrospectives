@@ -6,12 +6,12 @@ import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
 import { Pivot, PivotItem } from 'office-ui-fabric-react';
+import classNames from 'classnames'
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
 
 import BoardDataService from '../dal/boardDataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn } from '../interfaces/feedback';
-import classNames from 'classnames'
 import EditableDocumentCardTitle from './editableDocumentCardTitle';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from './feedbackBoardMetadataFormPermissions';
@@ -78,15 +78,15 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultIsAnonymous: boolean = false;
 
     if (props.isDuplicatingBoard) {
-        // If duplicating, inherit settings from the current board
-        defaultTitle = `${props.currentBoard.title} - copy`;
-        defaultColumns = props.currentBoard.columns.map(column => ({ column, markedForDeletion: false }));
-        defaultMaxVotes = props.currentBoard.maxVotesPerUser;
-        defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
-        defaultDisplayPrimeDirective = props.currentBoard.displayPrimeDirective;
-        defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
-        defaultIsAnonymous = props.currentBoard.isAnonymous;
-        defaultPermissions = props.currentBoard.permissions;
+      // If duplicating, inherit settings from the current board
+      defaultTitle = `${props.currentBoard.title} - copy`;
+      defaultColumns = props.currentBoard.columns.map(column => ({ column, markedForDeletion: false }));
+      defaultMaxVotes = props.currentBoard.maxVotesPerUser;
+      defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
+      defaultDisplayPrimeDirective = props.currentBoard.displayPrimeDirective;
+      defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
+      defaultIsAnonymous = props.currentBoard.isAnonymous;
+      defaultPermissions = props.currentBoard.permissions;
     }
 
     // DPH
@@ -100,8 +100,8 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         //    ? defaultDisplayPrimeDirective : props.currentBoard.displayPrimeDirective,
         //shouldShowFeedbackAfterCollect: props.isNewBoardCreation
         //    ? defaultShowFeedbackAfterCollect : props.currentBoard.shouldShowFeedbackAfterCollect,
-        //isBoardAnonymous: props.isNewBoardCreation
-        //    ? defaultIsAnonymous : props.currentBoard.isAnonymous,
+        isBoardAnonymous: props.isNewBoardCreation
+            ? defaultIsAnonymous : props.currentBoard.isAnonymous,
         //maxVotesPerUser: props.isNewBoardCreation
         //    ? defaultMaxVotes : props.currentBoard.maxVotesPerUser,
         isBoardNameTaken: false,
@@ -118,7 +118,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? defaultIncludeTeamEffectivenessMeasurement : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
       displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
       shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
-      isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
+      //isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
       maxVotesPerUser: this.props.isNewBoardCreation ? defaultMaxVotes : this.props.currentBoard.maxVotesPerUser,
       initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
       title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
