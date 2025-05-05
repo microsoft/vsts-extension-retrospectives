@@ -114,7 +114,7 @@ class BoardDataService {
 
   public restoreArchivedFeedbackBoard = async (teamId: string, boardId: string) => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
-    const userIdentity = getUserIdentity(); // DPH try without
+//    const userIdentity = getUserIdentity(); // DPH try without
 
     // Check in case board was deleted by other user after option to update was selected by current user
     if (!board) {
