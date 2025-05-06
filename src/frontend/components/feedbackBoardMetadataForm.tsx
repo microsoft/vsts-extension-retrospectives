@@ -351,7 +351,12 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 <hr></hr>
                 <div className="board-metadata-form-section-subheader">
                   <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                    Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxVotesPerUser : this.props.currentBoard.maxVotesPerUser}):
+                    {/*Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxVotesPerUser : this.props.currentBoard.maxVotesPerUser}): DPH */}
+                    Max Votes per User (Current: {this.props.isNewBoardCreation
+                      ? this.state.maxVotesPerUser
+                      : this.props.isDuplicatingBoard
+                      ? this.props.currentBoard.maxVotesPerUser
+                      : this.props.currentBoard.maxVotesPerUser}):
                   </label>
                   <TextField
                     className="title-input-container max-vote-counter"
