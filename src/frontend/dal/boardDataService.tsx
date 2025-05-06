@@ -10,21 +10,23 @@ class BoardDataService {
   public readonly legacyPositiveColumnId: string = 'whatwentwell';
   public readonly legacyNegativeColumnId: string = 'whatdidntgowell';
 
+  // DPH reordered
   public createBoardForTeam = async (
     teamId: string,
     title: string,
     maxVotesPerUser: number,
     columns: IFeedbackColumn[],
     isIncludeTeamEffectivenessMeasurement?: boolean,
-    isAnonymous?: boolean,
-    shouldShowFeedbackAfterCollect?: boolean,
     displayPrimeDirective?: boolean,
+    shouldShowFeedbackAfterCollect?: boolean,
+    isAnonymous?: boolean,
     startDate?: Date,
     endDate?: Date,
     permissions?: IFeedbackBoardDocumentPermissions) => {
     const boardId: string = generateUUID();
     const userIdentity = getUserIdentity();
 
+    // DPH reordered
     const board: IFeedbackBoardDocument = {
       activePhase: WorkflowPhase.Collect,
       columns,
@@ -33,10 +35,10 @@ class BoardDataService {
       endDate,
       id: boardId,
       isIncludeTeamEffectivenessMeasurement: isIncludeTeamEffectivenessMeasurement ?? false,
+      displayPrimeDirective: displayPrimeDirective ?? false,
+      shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ?? false,
       isAnonymous: isAnonymous ?? false,
       modifiedDate: new Date(Date.now()),
-      shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ?? false,
-      displayPrimeDirective: displayPrimeDirective ?? false,
       maxVotesPerUser,
       startDate,
       teamId,
