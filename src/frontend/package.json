@@ -53,7 +53,7 @@
     "@eslint/eslintrc": "3.2.0",
     "@eslint/js": "9.20.0",
     "@types/classnames": "2.3.4",
-    "@types/enzyme": "3.10.12",
+    "@types/enzyme": "3.10.19",
     "@types/file-saver": "2.0.7",
     "@types/jest": "29.5.14",
     "@types/jsdom": "21.1.7",
