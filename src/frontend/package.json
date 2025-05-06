@@ -81,7 +81,7 @@
     "jest-junit": "16.0.0",
     "moment-locales-webpack-plugin": "1.2.0",
     "node-jq": "6.0.1",
-    "postcss": "8.4.47",
+    "postcss": "8.5.3",
     "process": "0.11.10",
     "rimraf": "6.0.1",
     "sass": "1.86.3",
