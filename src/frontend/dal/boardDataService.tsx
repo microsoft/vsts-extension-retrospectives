@@ -130,15 +130,15 @@ class BoardDataService {
   }
 
   // DPH add
-  public async saveSetting(key: string, value: boolean): Promise<void> {
-      await setValue(key, value, true); // Use 'true' to make it user-scoped
-  }
+  public async saveSetting<T>(key: string, value: T): Promise<void> {
+    await setValue(key, value, true); // Use 'true' to make it user-scoped
+}
 
   // DPH add
-  public async getSetting(key: string): Promise<boolean> {
-      const value = await getValue<boolean>(key, true);
-      return typeof value === "boolean" ? value : false; // Ensure correct typing
-  }
+  public async getSetting<T>(key: string): Promise<T> {
+    const value = await getValue<T>(key, true);
+    return value !== undefined ? value : (null as T); // Ensures type safety
+  } 
 
   public updateBoardMetadata = async (teamId: string, boardId: string, maxVotesPerUser: number, title: string, newColumns: IFeedbackColumn[], permissions: IFeedbackBoardDocumentPermissions): Promise<IFeedbackBoardDocument> => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);

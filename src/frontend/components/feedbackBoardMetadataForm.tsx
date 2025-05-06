@@ -110,6 +110,14 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     };
   }
 
+  // DPH new
+  async componentDidMount() {
+    const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
+    this.setState({
+        maxVotesPerUser: typeof lastVotes === 'number' ? lastVotes : 5 // Use stored votes or default to 5
+    });
+  }
+
   private maxColumnCount = 5;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -129,19 +137,22 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
     const isBoardNameTaken = await BoardDataService.checkIfBoardNameIsTaken(this.props.teamId, this.state.title);
     if (isBoardNameTaken && this.state.initialTitle !== this.state.title) {
-        this.setState({ isBoardNameTaken: true });
-        return;
+      this.setState({ isBoardNameTaken: true });
+      return;
     }
 
+    // Save the user's selected max votes as their new default for future boards
+    await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser); // DPH
+
     this.props.onFormSubmit(
-        this.state.title.trim(),
-        this.state.maxVotesPerUser,
-        this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
-        this.state.isIncludeTeamEffectivenessMeasurement,
-        this.state.isBoardAnonymous,
-        this.state.shouldShowFeedbackAfterCollect,
-        this.state.displayPrimeDirective,
-        this.state.permissions
+      this.state.title.trim(),
+      this.state.maxVotesPerUser,
+      this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
+      this.state.isIncludeTeamEffectivenessMeasurement,
+      this.state.displayPrimeDirective,
+      this.state.shouldShowFeedbackAfterCollect,
+      this.state.isBoardAnonymous,
+      this.state.permissions
     );
   }
 
