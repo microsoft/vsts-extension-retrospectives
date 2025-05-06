@@ -69,7 +69,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(false); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(true); // DPH was defaultChecked, was false
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
