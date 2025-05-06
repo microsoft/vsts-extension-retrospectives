@@ -1052,9 +1052,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       maxVotesPerUser: number,
       columns: IFeedbackColumn[],
       isIncludeTeamEffectivenessMeasurement: boolean,
-      isBoardAnonymous: boolean,
-      shouldShowFeedbackAfterCollect: boolean,
       displayPrimeDirective: boolean,
+      shouldShowFeedbackAfterCollect: boolean,
+      isBoardAnonymous: boolean,
       permissions: IFeedbackBoardDocumentPermissions
     ) => void,
     onCancel: () => void) => {
