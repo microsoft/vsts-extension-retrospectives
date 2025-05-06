@@ -367,11 +367,11 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                       ? this.props.currentBoard.maxVotesPerUser
                       : this.props.currentBoard.maxVotesPerUser}):
                   </label>
+                  {/* DPH reset min from 3 to 1 */}
                   <TextField
                     className="title-input-container max-vote-counter"
                     id="max-vote-counter"
                     type="number"
-                    {/* DPH reset min from 3 to 1 */}
                     min="1"
                     max="12"
                     value={this.state.maxVotesPerUser?.toString()}
