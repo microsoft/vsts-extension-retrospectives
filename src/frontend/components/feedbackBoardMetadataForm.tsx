@@ -30,9 +30,9 @@ export interface IFeedbackBoardMetadataFormProps {
     maxVotesPerUser: number,
     columns: IFeedbackColumn[],
     isIncludeTeamEffectivenessMeasurement: boolean,
-    displayPrimeDirective: boolean,
-    shouldShowFeedbackAfterCollect: boolean,
     isBoardAnonymous: boolean,
+    shouldShowFeedbackAfterCollect: boolean,
+    displayPrimeDirective: boolean,
     permissions: IFeedbackBoardDocumentPermissions) => void;
   onFormCancel: () => void;
 }
@@ -158,9 +158,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       this.state.maxVotesPerUser,
       this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
       this.state.isIncludeTeamEffectivenessMeasurement,
-      this.state.displayPrimeDirective,
-      this.state.shouldShowFeedbackAfterCollect,
       this.state.isBoardAnonymous,
+      this.state.shouldShowFeedbackAfterCollect,
+      this.state.displayPrimeDirective,
       this.state.permissions
     );
   }
