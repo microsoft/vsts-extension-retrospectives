@@ -123,6 +123,11 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       if (typeof lastAnonymous === 'boolean') {
         this.setState({ isBoardAnonymous: lastAnonymous });
       }
+
+      const lastShowFeedback = await BoardDataService.getSetting<boolean>('lastShowFeedback');
+      if (typeof lastShowFeedback === 'boolean') {
+          this.setState({ shouldShowFeedbackAfterCollect: lastShowFeedback });
+      }
     }
   }
 
@@ -152,6 +157,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     // Save the user's selected max votes as their new default for future boards
     await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser); // DPH
     await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous); // DPH
+    await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect); // DPH
 
     this.props.onFormSubmit(
       this.state.title.trim(),
@@ -410,14 +416,14 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     onChange={this.handleDisplayPrimeDirectiveChange}
                   />
                 </div>
-
+{/* DPH defaultChecked changed to checked */}
                 <div className="board-metadata-form-section-subheader">
                   <Checkbox
                     id="obscure-feedback-checkbox"
                     label="Obscure the feedback of others until after Collect phase"
                     ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation."
                     boxSide="start"
-                    defaultChecked={this.state.shouldShowFeedbackAfterCollect}
+                    checked={this.state.shouldShowFeedbackAfterCollect}
                     disabled={!this.props.isNewBoardCreation}
                     onChange={this.handleShouldShowFeedbackAfterCollectChange}
                   />
