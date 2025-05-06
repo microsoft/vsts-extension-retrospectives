@@ -59,7 +59,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(true);
+      expect(checkbox.prop('checked')).toEqual(true); // DPH was defaultChecked
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -138,7 +138,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement); // DPH was defaultChecked
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -218,7 +218,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement); // DPH was defaultChecked
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 

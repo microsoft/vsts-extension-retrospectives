@@ -120,6 +120,11 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         this.setState({ maxVotesPerUser: lastVotes });
       }
 
+      const lastTeamEffectiveness = await BoardDataService.getSetting<boolean>('lastTeamEffectiveness');
+      if (typeof lastTeamEffectiveness === 'boolean') {
+          this.setState({ isIncludeTeamEffectivenessMeasurement: lastTeamEffectiveness });
+      }
+
       const lastPrimeDirective = await BoardDataService.getSetting<boolean>('lastPrimeDirective');
       if (typeof lastPrimeDirective === 'boolean') {
           this.setState({ displayPrimeDirective: lastPrimeDirective });
@@ -161,6 +166,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     }
 
     // Save the user's selected max votes as their new default for future boards
+    await BoardDataService.saveSetting('lastTeamEffectiveness', this.state.isIncludeTeamEffectivenessMeasurement); // DPH
     await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser); // DPH
     await BoardDataService.saveSetting('lastPrimeDirective', this.state.displayPrimeDirective); // DPH
     await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect); // DPH
@@ -396,13 +402,14 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   <i className="fas fa-exclamation-circle"></i>&nbsp;These settings cannot be modified after board creation.
                 </div>
                 <div className="board-metadata-form-section-subheader">
+{/* DPH defaultChecked changed to checked */}
                   <div className="flex flex-col">
                     <Checkbox
                       id="include-team-assessment-checkbox"
                       label="Include Team Assessment"
                       ariaLabel="Include Team Assessment. This selection cannot be modified after board creation."
                       boxSide="start"
-                      defaultChecked={this.state.isIncludeTeamEffectivenessMeasurement}
+                      checked={this.state.isIncludeTeamEffectivenessMeasurement}
                       disabled={!this.props.isNewBoardCreation}
                       onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange}
                     />
