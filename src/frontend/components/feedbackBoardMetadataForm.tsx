@@ -120,22 +120,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         }
     }
   }
-/*
-  async componentDidMount() {
-    if (this.props.isNewBoardCreation) {
-        const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
-        if (typeof lastVotes === 'number') {
-            this.setState({ maxVotesPerUser: lastVotes });
-        }
-    }
-  }
-*/
-/*
-  async componentDidMount() {
-    const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
-    this.setState({ maxVotesPerUser: typeof lastVotes === 'number' ? lastVotes : 5});
-  }
-*/
+
   private maxColumnCount = 5;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -369,7 +354,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 <hr></hr>
                 <div className="board-metadata-form-section-subheader">
                   <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                    {/*Max Votes per User (Current: {this.props.isNewBoardCreation ? this.props.maxVotesPerUser : this.props.currentBoard.maxVotesPerUser}): DPH */}
+                    {/* DPH */}
                     Max Votes per User (Current: {this.props.isNewBoardCreation
                       ? this.state.maxVotesPerUser
                       : this.props.isDuplicatingBoard
@@ -380,7 +365,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     className="title-input-container max-vote-counter"
                     id="max-vote-counter"
                     type="number"
-                    min="3"
+                    min="1"
                     max="12"
                     value={this.state.maxVotesPerUser?.toString()}
                     onChange={this.handleMaxVotePerUserChange}
