@@ -165,12 +165,14 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       return;
     }
 
-    // Save the user's selected max votes as their new default for future boards
-    await BoardDataService.saveSetting('lastTeamEffectiveness', this.state.isIncludeTeamEffectivenessMeasurement); // DPH
-    await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser); // DPH
-    await BoardDataService.saveSetting('lastPrimeDirective', this.state.displayPrimeDirective); // DPH
-    await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect); // DPH
-    await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous); // DPH
+    // Save user preferences **ONLY IF CREATING A NEW BOARD**
+    if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
+      await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser); // DPH
+      await BoardDataService.saveSetting('lastTeamEffectiveness', this.state.isIncludeTeamEffectivenessMeasurement); // DPH
+      await BoardDataService.saveSetting('lastPrimeDirective', this.state.displayPrimeDirective); // DPH
+      await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect); // DPH
+      await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous); // DPH
+    }
 
     this.props.onFormSubmit(
       this.state.title.trim(),
