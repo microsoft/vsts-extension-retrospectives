@@ -113,11 +113,16 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   // DPH new
   async componentDidMount() {
     if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
-        // Only fetch saved votes for NEW boards that are NOT duplicates
-        const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
-        if (typeof lastVotes === 'number') {
-            this.setState({ maxVotesPerUser: lastVotes });
-        }
+      // Only fetch saved votes and anonymous settings for NEW boards that are NOT duplicates
+      const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
+      if (typeof lastVotes === 'number') {
+        this.setState({ maxVotesPerUser: lastVotes });
+      }
+
+      const lastAnonymous = await BoardDataService.getSetting<boolean>('lastAnonymous');
+      if (typeof lastAnonymous === 'boolean') {
+        this.setState({ isBoardAnonymous: lastAnonymous });
+      }
     }
   }
 
@@ -146,6 +151,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
     // Save the user's selected max votes as their new default for future boards
     await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser); // DPH
+    await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous); // DPH
 
     this.props.onFormSubmit(
       this.state.title.trim(),
@@ -365,6 +371,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     className="title-input-container max-vote-counter"
                     id="max-vote-counter"
                     type="number"
+                    {/* DPH reset min from 3 to 1 */}
                     min="1"
                     max="12"
                     value={this.state.maxVotesPerUser?.toString()}
