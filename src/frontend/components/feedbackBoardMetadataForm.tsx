@@ -112,12 +112,19 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
   // DPH new
   async componentDidMount() {
+    if (this.props.isNewBoardCreation) {
+        const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
+        if (typeof lastVotes === 'number') {
+            this.setState({ maxVotesPerUser: lastVotes });
+        }
+    }
+}
+/*
+  async componentDidMount() {
     const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
-    this.setState({
-        maxVotesPerUser: typeof lastVotes === 'number' ? lastVotes : 5 // Use stored votes or default to 5
-    });
+    this.setState({ maxVotesPerUser: typeof lastVotes === 'number' ? lastVotes : 5});
   }
-
+*/
   private maxColumnCount = 5;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
