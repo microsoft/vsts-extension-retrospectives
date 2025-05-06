@@ -37,17 +37,18 @@ export interface IFeedbackBoardMetadataFormProps {
   onFormCancel: () => void;
 }
 
+// DPH reordered
 interface IFeedbackBoardMetadataFormState {
   initialTitle: string;
   title: string;
   isBoardNameTaken: boolean;
   placeholderText: string;
   columnCards: IFeedbackColumnCard[];
-  isIncludeTeamEffectivenessMeasurement: boolean;
-  isBoardAnonymous: boolean;
-  shouldShowFeedbackAfterCollect: boolean;
-  displayPrimeDirective: boolean;
   maxVotesPerUser: number;
+  isIncludeTeamEffectivenessMeasurement: boolean;
+  displayPrimeDirective: boolean;
+  shouldShowFeedbackAfterCollect: boolean;
+  isBoardAnonymous: boolean;
   isDeleteColumnConfirmationDialogHidden: boolean;
   isChooseColumnIconDialogHidden: boolean;
   isChooseColumnAccentColorDialogHidden: boolean;
@@ -161,9 +162,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
     // Save the user's selected max votes as their new default for future boards
     await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser); // DPH
-    await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous); // DPH
-    await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect); // DPH
     await BoardDataService.saveSetting('lastPrimeDirective', this.state.displayPrimeDirective); // DPH
+    await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect); // DPH
+    await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous); // DPH
 
     this.props.onFormSubmit(
       this.state.title.trim(),
