@@ -112,13 +112,24 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
   // DPH new
   async componentDidMount() {
+    if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
+        // Only fetch saved votes for NEW boards that are NOT duplicates
+        const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
+        if (typeof lastVotes === 'number') {
+            this.setState({ maxVotesPerUser: lastVotes });
+        }
+    }
+  }
+/*
+  async componentDidMount() {
     if (this.props.isNewBoardCreation) {
         const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
         if (typeof lastVotes === 'number') {
             this.setState({ maxVotesPerUser: lastVotes });
         }
     }
-}
+  }
+*/
 /*
   async componentDidMount() {
     const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
