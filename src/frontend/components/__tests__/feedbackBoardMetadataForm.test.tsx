@@ -63,6 +63,16 @@ describe('Board Metadata Form', () => {
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
+    it('should properly set prime directive setting', () => {
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const component = wrapper.children().dive();
+      const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
+
+      expect(checkbox).toBeDefined();
+      expect(checkbox.prop('checked')).toEqual(false); // DPH was defaultChecked
+      expect(checkbox.prop('disabled')).toEqual(false);
+    });
+
     it('should properly set obscure feedback settings', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
       const component = wrapper.children().dive();
@@ -70,16 +80,6 @@ describe('Board Metadata Form', () => {
 
       expect(checkbox).toBeDefined();
       expect(checkbox.prop('checked')).toEqual(false); // DPH was defaultChecked
-      expect(checkbox.prop('disabled')).toEqual(false);
-    });
-
-    it('should properly set prime directive setting', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
-      const component = wrapper.children().dive();
-      const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
-
-      expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(false);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -142,6 +142,16 @@ describe('Board Metadata Form', () => {
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
+    it('should properly set prime directive setting', () => {
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const component = wrapper.children().dive();
+      const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
+
+      expect(checkbox).toBeDefined();
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.displayPrimeDirective); // DPH was defaultChecked
+      expect(checkbox.prop('disabled')).toEqual(true);
+    });
+
     it('should properly set obscure feedback settings', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
       const component = wrapper.children().dive();
@@ -149,16 +159,6 @@ describe('Board Metadata Form', () => {
 
       expect(checkbox).toBeDefined();
       expect(checkbox.prop('checked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect); // DPH was defaultChecked
-      expect(checkbox.prop('disabled')).toEqual(true);
-    });
-
-    it('should properly set prime directive setting', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
-      const component = wrapper.children().dive();
-      const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
-
-      expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.displayPrimeDirective);
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -222,6 +222,16 @@ describe('Board Metadata Form', () => {
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
+    it('should properly set prime directive setting', () => {
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const component = wrapper.children().dive();
+      const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
+
+      expect(checkbox).toBeDefined();
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.displayPrimeDirective); // DPH was defaultChecked
+      expect(checkbox.prop('disabled')).toEqual(false);
+    });
+
     it('should properly set obscure feedback settings', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
       const component = wrapper.children().dive();
@@ -229,16 +239,6 @@ describe('Board Metadata Form', () => {
 
       expect(checkbox).toBeDefined();
       expect(checkbox.prop('checked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect); // DPH was defaultChecked
-      expect(checkbox.prop('disabled')).toEqual(false);
-    });
-
-    it('should properly set prime directive setting', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
-      const component = wrapper.children().dive();
-      const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
-
-      expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.displayPrimeDirective);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 

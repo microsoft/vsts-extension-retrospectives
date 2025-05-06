@@ -119,14 +119,19 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         this.setState({ maxVotesPerUser: lastVotes });
       }
 
-      const lastAnonymous = await BoardDataService.getSetting<boolean>('lastAnonymous');
-      if (typeof lastAnonymous === 'boolean') {
-        this.setState({ isBoardAnonymous: lastAnonymous });
+      const lastPrimeDirective = await BoardDataService.getSetting<boolean>('lastPrimeDirective');
+      if (typeof lastPrimeDirective === 'boolean') {
+          this.setState({ displayPrimeDirective: lastPrimeDirective });
       }
 
       const lastShowFeedback = await BoardDataService.getSetting<boolean>('lastShowFeedback');
       if (typeof lastShowFeedback === 'boolean') {
           this.setState({ shouldShowFeedbackAfterCollect: lastShowFeedback });
+      }
+
+      const lastAnonymous = await BoardDataService.getSetting<boolean>('lastAnonymous');
+      if (typeof lastAnonymous === 'boolean') {
+        this.setState({ isBoardAnonymous: lastAnonymous });
       }
     }
   }
@@ -158,6 +163,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser); // DPH
     await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous); // DPH
     await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect); // DPH
+    await BoardDataService.saveSetting('lastPrimeDirective', this.state.displayPrimeDirective); // DPH
 
     this.props.onFormSubmit(
       this.state.title.trim(),
@@ -404,14 +410,14 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     </div>
                   </div>
                 </div>
-
+{/* DPH defaultChecked changed to checked */}
                 <div className="board-metadata-form-section-subheader">
                   <Checkbox
                     id="display-prime-directive"
                     label="Display 'Retrospective Prime Directive'"
                     ariaLabel="Display 'Retrospective Prime Directive.' This selection cannot be modified after board creation."
                     boxSide="start"
-                    defaultChecked={this.state.displayPrimeDirective}
+                    checked={this.state.displayPrimeDirective}
                     disabled={!this.props.isNewBoardCreation}
                     onChange={this.handleDisplayPrimeDirectiveChange}
                   />
