@@ -66,47 +66,57 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
-    let defaultTitle: string = '';
+    // Define retrospective types
+    // const isNewRetrospective = props.isNewBoardCreation && !props.isDuplicatingBoard;
+    const isCopyRetrospective = props.isNewBoardCreation && props.isDuplicatingBoard;
+    const isEditRetrospective = !props.isNewBoardCreation;
+
+    // Set temporary values used first time user creates a new board
+    let defaultMaxVotes = 5;
+    let defaultIncludeTeamEffectivenessMeasurement = true;
+    let defaultDisplayPrimeDirective = true;
+    let defaultShowFeedbackAfterCollect = false;
+    let defaultIsAnonymous = false;
+    // Set defaults for a new retrospective
     let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => ({ column, markedForDeletion: false }));
-    let defaultMaxVotes: number = 5;
     let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: [] };
 
-    // Temporary default values for settings
-    let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
-    let defaultDisplayPrimeDirective: boolean = true;
-    let defaultShowFeedbackAfterCollect: boolean = false;
-    let defaultIsAnonymous: boolean = false;
-
-    if (props.isDuplicatingBoard) {
-      defaultTitle = `${this.props.currentBoard.title} - copy`;
-      defaultColumns = this.props.currentBoard.columns.map(column => { return { column, markedForDeletion: false } });
-      defaultMaxVotes = this.props.currentBoard.maxVotesPerUser;
-      defaultIncludeTeamEffectivenessMeasurement = this.props.currentBoard.isIncludeTeamEffectivenessMeasurement;
-      defaultDisplayPrimeDirective = this.props.currentBoard.displayPrimeDirective;
-      defaultShowFeedbackAfterCollect = this.props.currentBoard.shouldShowFeedbackAfterCollect;
-      defaultIsAnonymous = this.props.currentBoard.isAnonymous;
-      defaultPermissions = this.props.currentBoard.permissions;
+    // Override shared values for Copy or Edit retrospectives
+    if (isCopyRetrospective || isEditRetrospective) {
+      defaultColumns = props.currentBoard.columns.map(column => ({ column, markedForDeletion: false }));
+      defaultMaxVotes = props.currentBoard.maxVotesPerUser;
+      defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
+      defaultDisplayPrimeDirective = props.currentBoard.displayPrimeDirective;
+      defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
+      defaultIsAnonymous = props.currentBoard.isAnonymous;
+      defaultPermissions = props.currentBoard.permissions;
     }
 
+    // Set default title for copy, edit or new retrospective
+    let defaultTitle = isCopyRetrospective 
+    ? `${props.currentBoard.title} - copy` 
+    : isEditRetrospective 
+        ? props.currentBoard.title 
+        : '';
+
     this.state = {
-      columnCardBeingEdited: undefined,
-      columnCards: this.props.isNewBoardCreation
-        ? defaultColumns : this.props.currentBoard.columns.map(column => ({ column, markedForDeletion: false })),
-      isBoardNameTaken: false,
-      isChooseColumnAccentColorDialogHidden: true,
-      isChooseColumnIconDialogHidden: true,
-      isDeleteColumnConfirmationDialogHidden: true,
-      placeholderText: props.placeholderText,
-      selectedAccentColorKey: undefined,
-      selectedIconKey: undefined,
-      isIncludeTeamEffectivenessMeasurement: this.props.isNewBoardCreation ? defaultIncludeTeamEffectivenessMeasurement : this.props.currentBoard.isIncludeTeamEffectivenessMeasurement,
-      displayPrimeDirective: this.props.isNewBoardCreation ? defaultDisplayPrimeDirective : this.props.currentBoard.displayPrimeDirective,
-      shouldShowFeedbackAfterCollect: this.props.isNewBoardCreation ? defaultShowFeedbackAfterCollect : this.props.currentBoard.shouldShowFeedbackAfterCollect,
-      isBoardAnonymous: this.props.isNewBoardCreation ? defaultIsAnonymous : this.props.currentBoard.isAnonymous,
-      maxVotesPerUser: this.props.isNewBoardCreation ? defaultMaxVotes : this.props.currentBoard.maxVotesPerUser,
-      initialTitle: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
-      title: this.props.isNewBoardCreation ? defaultTitle : this.props.currentBoard.title,
-      permissions: this.props.isNewBoardCreation ? defaultPermissions : this.props.currentBoard.permissions
+        columnCardBeingEdited: undefined,
+        columnCards: defaultColumns,
+        isBoardNameTaken: false,
+        isChooseColumnAccentColorDialogHidden: true,
+        isChooseColumnIconDialogHidden: true,
+        isDeleteColumnConfirmationDialogHidden: true,
+        placeholderText: props.placeholderText,
+        selectedAccentColorKey: undefined,
+        selectedIconKey: undefined,
+        isIncludeTeamEffectivenessMeasurement: defaultIncludeTeamEffectivenessMeasurement,
+        displayPrimeDirective: defaultDisplayPrimeDirective,
+        shouldShowFeedbackAfterCollect: defaultShowFeedbackAfterCollect,
+        isBoardAnonymous: defaultIsAnonymous,
+        maxVotesPerUser: defaultMaxVotes,
+        initialTitle: defaultTitle,
+        title: defaultTitle,
+        permissions: defaultPermissions,
     };
   }
 
