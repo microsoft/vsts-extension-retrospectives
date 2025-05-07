@@ -17,8 +17,6 @@ jest.mock('../dataService', () => ({
   }),
 }));
 
-(createDocument as jest.Mock).mockResolvedValue(mockBoard);
-
 const mockIdentityRef: IdentityRef = {
   id: "user-1",
   displayName: "Test User",
@@ -61,6 +59,8 @@ const mockBoards: IFeedbackBoardDocument[] = [
   { ...mockBoard, id: "board-1", title: "Sprint Planning" },
   { ...mockBoard, id: "board-2", title: "Team Sync" },
 ];
+
+(createDocument as jest.Mock).mockResolvedValue(mockBoard);
 
 describe("BoardDataService - createBoardForTeam", () => {
   it("should create a new board with default values", async () => {
