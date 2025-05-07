@@ -67,7 +67,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     super(props);
 
     let defaultTitle: string = '';
-    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => { return { column, markedForDeletion: false } });
+    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => ({ column, markedForDeletion: false }));
     let defaultMaxVotes: number = 5;
     let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: [] };
 
