@@ -4,20 +4,12 @@ import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../..
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 
 jest.mock('../dataService', () => ({
-  createDocument: jest.fn().mockResolvedValue(mockBoard),
-  deleteDocument: jest.fn().mockResolvedValue(true),
-  readDocument: jest.fn().mockResolvedValue(mockBoard),
-  readDocuments: jest.fn(), // ✅ Ensure Jest recognizes it as a mock
-  updateDocument: jest.fn().mockResolvedValue(mockBoard),
+  createDocument: jest.fn(),
+  deleteDocument: jest.fn(),
+  readDocument: jest.fn(),
+  readDocuments: jest.fn(),
+  updateDocument: jest.fn(),
 }));
-
-/*
-jest.mock('../dataService', () => ({
-  getDataService: jest.fn().mockResolvedValue({
-    createDocument: jest.fn().mockResolvedValue(mockBoard),
-  }),
-}));
-*/
 
 const mockIdentityRef: IdentityRef = {
   id: "user-1",
@@ -64,6 +56,7 @@ const mockBoards: IFeedbackBoardDocument[] = [
 
 describe("BoardDataService - createBoardForTeam", () => {
   it("should create a new board with default values", async () => {
+    (createDocument as jest.Mock).mockResolvedValue(mockBoard); // ✅ Explicitly cast createDocument
     const result = await BoardDataService.createBoardForTeam("team-123", "Sprint Planning", 5, []);
     expect(result).toEqual(mockBoard);
     expect(createDocument).toHaveBeenCalledWith("team-123", expect.any(Object));
@@ -115,6 +108,10 @@ describe("BoardDataService - deleteFeedbackBoard", () => {
 });
 
 describe("BoardDataService - updateBoardMetadata", () => {
+  beforeEach(() => {
+    (readDocument as jest.Mock).mockResolvedValue(mockBoard); // ✅ Explicitly cast readDocument
+    (updateDocument as jest.Mock).mockResolvedValue({ ...mockBoard, title: "New Title", maxVotesPerUser: 10 });
+  });
   it("should update board metadata", async () => {
     const result = await BoardDataService.updateBoardMetadata("team-123", "board-1", 10, "New Title", [], mockPermissions);
     expect(result.title).toBe("New Title");
