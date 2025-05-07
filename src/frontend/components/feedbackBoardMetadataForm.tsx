@@ -157,9 +157,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         BoardDataService.getSetting<boolean>('lastShowFeedback'),
         BoardDataService.getSetting<boolean>('lastAnonymous')
       ];
-  
+
       const [lastVotes, lastTeamEffectiveness, lastPrimeDirective, lastShowFeedback, lastAnonymous] = await Promise.all(settingsToLoad);
-  
+
       this.setState({
         maxVotesPerUser: typeof lastVotes === 'number' ? lastVotes : this.state.maxVotesPerUser,
         isIncludeTeamEffectivenessMeasurement: typeof lastTeamEffectiveness === 'boolean' ? lastTeamEffectiveness : this.state.isIncludeTeamEffectivenessMeasurement,
