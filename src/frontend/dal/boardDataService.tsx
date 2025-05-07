@@ -1,4 +1,3 @@
-// DPH add getValue and setValue
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, getValue, setValue } from './dataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { WorkflowPhase } from '../interfaces/workItem';
@@ -10,7 +9,6 @@ class BoardDataService {
   public readonly legacyPositiveColumnId: string = 'whatwentwell';
   public readonly legacyNegativeColumnId: string = 'whatdidntgowell';
 
-  // DPH reordered
   public createBoardForTeam = async (
     teamId: string,
     title: string,
@@ -26,7 +24,6 @@ class BoardDataService {
     const boardId: string = generateUUID();
     const userIdentity = getUserIdentity();
 
-    // DPH reordered
     const board: IFeedbackBoardDocument = {
       activePhase: WorkflowPhase.Collect,
       columns,
@@ -130,12 +127,10 @@ class BoardDataService {
     return await this.updateBoard(teamId, board);
   }
 
-  // DPH add
   public async saveSetting<T>(key: string, value: T): Promise<void> {
     await setValue(key, value, true); // Use 'true' to make it user-scoped
   }
 
-  // DPH add
   public async getSetting<T>(key: string): Promise<T> {
     const value = await getValue<T>(key, true);
     return value !== undefined ? value : (null as T); // Ensures type safety

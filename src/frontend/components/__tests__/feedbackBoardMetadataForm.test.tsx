@@ -59,7 +59,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(true); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(true);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -69,7 +69,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(true); // DPH was defaultChecked, was false
+      expect(checkbox.prop('checked')).toEqual(true);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -79,7 +79,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(false); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(false);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -89,7 +89,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(false); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(false);
       expect(checkbox.prop('disabled')).toEqual(false);
   });
 
@@ -138,7 +138,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement);
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -148,7 +148,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(testExistingBoard.displayPrimeDirective); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.displayPrimeDirective);
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -158,7 +158,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect);
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -168,7 +168,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isAnonymous); // DPH was defaultChecked?
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isAnonymous);
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -218,7 +218,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -228,7 +228,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(testExistingBoard.displayPrimeDirective); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.displayPrimeDirective);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -238,7 +238,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect); // DPH was defaultChecked
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -248,7 +248,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isAnonymous); // DPH was defaultChecked?
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isAnonymous);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 

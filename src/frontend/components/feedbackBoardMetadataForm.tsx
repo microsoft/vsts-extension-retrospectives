@@ -37,7 +37,6 @@ export interface IFeedbackBoardMetadataFormProps {
   onFormCancel: () => void;
 }
 
-// DPH reordered
 interface IFeedbackBoardMetadataFormState {
   initialTitle: string;
   title: string;
@@ -74,7 +73,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
     // Temporary default values for settings
     let defaultIncludeTeamEffectivenessMeasurement: boolean = true;
-    let defaultDisplayPrimeDirective: boolean = true; // DPH reset to true
+    let defaultDisplayPrimeDirective: boolean = true;
     let defaultShowFeedbackAfterCollect: boolean = false;
     let defaultIsAnonymous: boolean = false;
 
@@ -111,7 +110,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     };
   }
 
-  // DPH new
   async componentDidMount() {
     if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
       // Only fetch saved votes and anonymous settings for NEW boards that are NOT duplicates
@@ -165,13 +163,13 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       return;
     }
 
-    // Save user preferences **ONLY IF CREATING A NEW BOARD**
+    // Save user preferences only if creating new board
     if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
-      await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser); // DPH
-      await BoardDataService.saveSetting('lastTeamEffectiveness', this.state.isIncludeTeamEffectivenessMeasurement); // DPH
-      await BoardDataService.saveSetting('lastPrimeDirective', this.state.displayPrimeDirective); // DPH
-      await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect); // DPH
-      await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous); // DPH
+      await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser);
+      await BoardDataService.saveSetting('lastTeamEffectiveness', this.state.isIncludeTeamEffectivenessMeasurement);
+      await BoardDataService.saveSetting('lastPrimeDirective', this.state.displayPrimeDirective);
+      await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect);
+      await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous);
     }
 
     this.props.onFormSubmit(
@@ -381,14 +379,12 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 <hr></hr>
                 <div className="board-metadata-form-section-subheader">
                   <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                    {/* DPH */}
                     Max Votes per User (Current: {this.props.isNewBoardCreation
                       ? this.state.maxVotesPerUser
                       : this.props.isDuplicatingBoard
                       ? this.props.currentBoard.maxVotesPerUser
                       : this.props.currentBoard.maxVotesPerUser}):
                   </label>
-                  {/* DPH reset min from 3 to 1 */}
                   <TextField
                     className="title-input-container max-vote-counter"
                     id="max-vote-counter"
@@ -404,7 +400,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   <i className="fas fa-exclamation-circle"></i>&nbsp;These settings cannot be modified after board creation.
                 </div>
                 <div className="board-metadata-form-section-subheader">
-{/* DPH defaultChecked changed to checked */}
                   <div className="flex flex-col">
                     <Checkbox
                       id="include-team-assessment-checkbox"
@@ -420,7 +415,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     </div>
                   </div>
                 </div>
-{/* DPH defaultChecked changed to checked */}
                 <div className="board-metadata-form-section-subheader">
                   <Checkbox
                     id="display-prime-directive"
@@ -432,7 +426,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     onChange={this.handleDisplayPrimeDirectiveChange}
                   />
                 </div>
-{/* DPH defaultChecked changed to checked */}
                 <div className="board-metadata-form-section-subheader">
                   <Checkbox
                     id="obscure-feedback-checkbox"
@@ -444,7 +437,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     onChange={this.handleShouldShowFeedbackAfterCollectChange}
                   />
                 </div>
-{/* DPH defaultChecked changed to checked */}
                 <div className="board-metadata-form-section-subheader">
                   <Checkbox
                     id="feedback-display-names-checkbox"
