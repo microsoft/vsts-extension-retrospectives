@@ -4,7 +4,7 @@ import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../..
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 
 jest.mock('../dataService', () => ({
-  createDocument: jest.fn().mockResolvedValue(mockBoard),
+  //createDocument: jest.fn().mockResolvedValue(mockBoard),
   deleteDocument: jest.fn().mockResolvedValue(true),
   readDocument: jest.fn().mockResolvedValue(mockBoard),
   readDocuments: jest.fn(), // ✅ Ensure Jest recognizes it as a mock
@@ -16,6 +16,8 @@ jest.mock('../dataService', () => ({
     createDocument: jest.fn().mockResolvedValue(mockBoard),
   }),
 }));
+
+(createDocument as jest.Mock).mockResolvedValue(mockBoard);
 
 const mockIdentityRef: IdentityRef = {
   id: "user-1",
