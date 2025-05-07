@@ -189,7 +189,7 @@ describe("BoardDataService - restoreArchivedFeedbackBoard", () => {
 
 describe("BoardDataService - saveSetting & getSetting", () => {
   it("should save and retrieve settings correctly", async () => {
-    (setValue as jest.Mock).mockResolvedValue();
+    (setValue as jest.Mock).mockResolvedValue(undefined);
     (getValue as jest.Mock).mockResolvedValue("Test Value");
 
     await BoardDataService.saveSetting("setting-key", "Test Value");
