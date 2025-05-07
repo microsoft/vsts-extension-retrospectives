@@ -126,3 +126,81 @@ describe("BoardDataService - updateBoardMetadata", () => {
     expect(updateDocument).not.toHaveBeenCalled();
   });
 });
+
+describe("BoardDataService - getBoardForTeamById", () => {
+  it("should retrieve a board by its ID", async () => {
+    (readDocument as jest.Mock).mockResolvedValue(mockBoard);
+    const result = await BoardDataService.getBoardForTeamById("team-123", "board-1");
+    expect(result).toEqual(mockBoard);
+  });
+
+  it("should return undefined if board does not exist", async () => {
+    (readDocument as jest.Mock).mockResolvedValue(undefined);
+    const result = await BoardDataService.getBoardForTeamById("team-123", "non-existent-id");
+    expect(result).toBeUndefined();
+  });
+});
+
+describe("BoardDataService - deleteFeedbackBoard", () => {
+  it("should delete the board and all associated items", async () => {
+    (readDocuments as jest.Mock).mockResolvedValue([{ id: "item-1" }, { id: "item-2" }]);
+    await BoardDataService.deleteFeedbackBoard("team-123", "board-1");
+    expect(deleteDocument).toHaveBeenCalledTimes(3); // Two items + board itself.
+  });
+
+  it("should delete board even if there are no items", async () => {
+    (readDocuments as jest.Mock).mockResolvedValue([]);
+    await BoardDataService.deleteFeedbackBoard("team-123", "board-1");
+    expect(deleteDocument).toHaveBeenCalledWith("team-123", "board-1");
+  });
+});
+
+describe("BoardDataService - archiveFeedbackBoard", () => {
+  it("should archive a board with correct metadata", async () => {
+    (readDocument as jest.Mock).mockResolvedValue(mockBoard);
+    (updateDocument as jest.Mock).mockResolvedValue({ ...mockBoard, isArchived: true });
+
+    const result = await BoardDataService.archiveFeedbackBoard("team-123", "board-1");
+    expect(result.isArchived).toBe(true);
+    expect(result.archivedDate).toBeInstanceOf(Date);
+    expect(updateDocument).toHaveBeenCalled();
+  });
+
+  it("should return undefined if board does not exist", async () => {
+    (readDocument as jest.Mock).mockResolvedValue(undefined);
+    const result = await BoardDataService.archiveFeedbackBoard("team-123", "non-existent-id");
+    expect(result).toBeUndefined();
+  });
+});
+
+describe("BoardDataService - restoreArchivedFeedbackBoard", () => {
+  it("should restore an archived board", async () => {
+    (readDocument as jest.Mock).mockResolvedValue({ ...mockBoard, isArchived: true });
+    (updateDocument as jest.Mock).mockResolvedValue(mockBoard);
+
+    const result = await BoardDataService.restoreArchivedFeedbackBoard("team-123", "board-1");
+    expect(result.isArchived).toBe(false);
+    expect(result.archivedDate).toBeUndefined();
+    expect(updateDocument).toHaveBeenCalled();
+  });
+});
+
+describe("BoardDataService - saveSetting & getSetting", () => {
+  it("should save and retrieve settings correctly", async () => {
+    (setValue as jest.Mock).mockResolvedValue();
+    (getValue as jest.Mock).mockResolvedValue("Test Value");
+
+    await BoardDataService.saveSetting("setting-key", "Test Value");
+    const result = await BoardDataService.getSetting("setting-key");
+
+    expect(result).toBe("Test Value");
+    expect(setValue).toHaveBeenCalledWith("setting-key", "Test Value", true);
+    expect(getValue).toHaveBeenCalledWith("setting-key", true);
+  });
+
+  it("should return null for undefined settings", async () => {
+    (getValue as jest.Mock).mockResolvedValue(undefined);
+    const result = await BoardDataService.getSetting("missing-key");
+    expect(result).toBeNull();
+  });
+});
