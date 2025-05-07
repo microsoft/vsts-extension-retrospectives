@@ -4,18 +4,20 @@ import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../..
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 
 jest.mock('../dataService', () => ({
-  //createDocument: jest.fn().mockResolvedValue(mockBoard),
+  createDocument: jest.fn().mockResolvedValue(mockBoard),
   deleteDocument: jest.fn().mockResolvedValue(true),
   readDocument: jest.fn().mockResolvedValue(mockBoard),
   readDocuments: jest.fn(), // ✅ Ensure Jest recognizes it as a mock
   updateDocument: jest.fn().mockResolvedValue(mockBoard),
 }));
 
+/*
 jest.mock('../dataService', () => ({
   getDataService: jest.fn().mockResolvedValue({
     createDocument: jest.fn().mockResolvedValue(mockBoard),
   }),
 }));
+*/
 
 const mockIdentityRef: IdentityRef = {
   id: "user-1",
@@ -59,8 +61,6 @@ const mockBoards: IFeedbackBoardDocument[] = [
   { ...mockBoard, id: "board-1", title: "Sprint Planning" },
   { ...mockBoard, id: "board-2", title: "Team Sync" },
 ];
-
-(createDocument as jest.Mock).mockResolvedValue(mockBoard);
 
 describe("BoardDataService - createBoardForTeam", () => {
   it("should create a new board with default values", async () => {
