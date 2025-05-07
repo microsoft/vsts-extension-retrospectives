@@ -215,45 +215,31 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   }
 
   private handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    this.setState({
-      isIncludeTeamEffectivenessMeasurement: checked,
-    });
+    this.setState({ isIncludeTeamEffectivenessMeasurement: checked });
   }
 
   private handleDisplayPrimeDirectiveChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    this.setState({
-      displayPrimeDirective: checked,
-    });
+    this.setState({ displayPrimeDirective: checked });
   }
 
   private handleShouldShowFeedbackAfterCollectChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    this.setState({
-      shouldShowFeedbackAfterCollect: checked,
-    });
+    this.setState({ shouldShowFeedbackAfterCollect: checked });
   }
 
   private handleIsAnonymousCheckboxChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    this.setState({
-      isBoardAnonymous: checked,
-    });
+    this.setState({ isBoardAnonymous: checked });
   }
 
   private handleMaxVotePerUserChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    this.setState({
-      maxVotesPerUser: Number((event.target as HTMLInputElement | HTMLTextAreaElement)?.value),
-    });
+    this.setState({ maxVotesPerUser: Number((event.target as HTMLInputElement | HTMLTextAreaElement)?.value) });
   }
 
   private showDeleteColumnConfirmationDialog = () => {
-    this.setState({
-      isDeleteColumnConfirmationDialogHidden: false,
-    });
+    this.setState({ isDeleteColumnConfirmationDialogHidden: false });
   }
 
   private hideDeleteColumnConfirmationDialog = () => {
-    this.setState({
-      isDeleteColumnConfirmationDialogHidden: true,
-    });
+    this.setState({ isDeleteColumnConfirmationDialogHidden: true });
   }
 
   private isSaveButtonEnabled = () => {
