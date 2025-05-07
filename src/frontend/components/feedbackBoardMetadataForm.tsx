@@ -93,7 +93,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     }
 
     // Set default title for copy, edit or new retrospective
-    let defaultTitle = isCopyRetrospective ? `${props.currentBoard.title} - copy`
+    const defaultTitle = isCopyRetrospective ? `${props.currentBoard.title} - copy`
       : isEditRetrospective ? props.currentBoard.title
       : '';
 
