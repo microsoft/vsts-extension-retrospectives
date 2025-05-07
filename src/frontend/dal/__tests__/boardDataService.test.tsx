@@ -1,5 +1,5 @@
 import BoardDataService from '../boardDataService';
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from '../dataService';
+import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, setValue, getValue } from '../dataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../../interfaces/feedback';
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 
