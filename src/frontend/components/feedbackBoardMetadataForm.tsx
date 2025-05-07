@@ -117,7 +117,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         permissions: defaultPermissions,
     };
   }
-
+/*
   async componentDidMount() {
     if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
       // Only fetch saved votes and anonymous settings for NEW boards that are NOT duplicates
@@ -145,6 +145,28 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       if (typeof lastAnonymous === 'boolean') {
         this.setState({ isBoardAnonymous: lastAnonymous });
       }
+    }
+  }
+*/
+  async componentDidMount() {
+    if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
+      const settingsToLoad = [
+        BoardDataService.getSetting<number>('lastVotes'),
+        BoardDataService.getSetting<boolean>('lastTeamEffectiveness'),
+        BoardDataService.getSetting<boolean>('lastPrimeDirective'),
+        BoardDataService.getSetting<boolean>('lastShowFeedback'),
+        BoardDataService.getSetting<boolean>('lastAnonymous')
+      ];
+  
+      const [lastVotes, lastTeamEffectiveness, lastPrimeDirective, lastShowFeedback, lastAnonymous] = await Promise.all(settingsToLoad);
+  
+      this.setState({
+        maxVotesPerUser: typeof lastVotes === 'number' ? lastVotes : this.state.maxVotesPerUser,
+        isIncludeTeamEffectivenessMeasurement: typeof lastTeamEffectiveness === 'boolean' ? lastTeamEffectiveness : this.state.isIncludeTeamEffectivenessMeasurement,
+        displayPrimeDirective: typeof lastPrimeDirective === 'boolean' ? lastPrimeDirective : this.state.displayPrimeDirective,
+        shouldShowFeedbackAfterCollect: typeof lastShowFeedback === 'boolean' ? lastShowFeedback : this.state.shouldShowFeedbackAfterCollect,
+        isBoardAnonymous: typeof lastAnonymous === 'boolean' ? lastAnonymous : this.state.isBoardAnonymous
+      });
     }
   }
 
