@@ -9,6 +9,8 @@ jest.mock('../dataService', () => ({
   readDocument: jest.fn(),
   readDocuments: jest.fn(),
   updateDocument: jest.fn(),
+  getValue: jest.fn(),
+  setValue: jest.fn(),
 }));
 
 const mockIdentityRef: IdentityRef = {
