@@ -40,7 +40,7 @@ const mockBoard: IFeedbackBoardDocument = {
   title: "Sprint Planning",
   teamId: "team-123",
   columns: [],
-  createdBy: mockIdentityRef, // ✅ Using full IdentityRef
+  createdBy: mockIdentityRef, // Using full IdentityRef
   createdDate: new Date(),
   modifiedDate: new Date(),
   maxVotesPerUser: 5,
