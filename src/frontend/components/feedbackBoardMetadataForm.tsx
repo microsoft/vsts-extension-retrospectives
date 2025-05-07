@@ -117,38 +117,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         permissions: defaultPermissions,
     };
   }
-/*
+
   async componentDidMount() {
-    if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
-      // Only fetch saved votes and anonymous settings for NEW boards that are NOT duplicates
-      const lastVotes = await BoardDataService.getSetting<number>('lastVotes');
-      if (typeof lastVotes === 'number') {
-        this.setState({ maxVotesPerUser: lastVotes });
-      }
-
-      const lastTeamEffectiveness = await BoardDataService.getSetting<boolean>('lastTeamEffectiveness');
-      if (typeof lastTeamEffectiveness === 'boolean') {
-          this.setState({ isIncludeTeamEffectivenessMeasurement: lastTeamEffectiveness });
-      }
-
-      const lastPrimeDirective = await BoardDataService.getSetting<boolean>('lastPrimeDirective');
-      if (typeof lastPrimeDirective === 'boolean') {
-          this.setState({ displayPrimeDirective: lastPrimeDirective });
-      }
-
-      const lastShowFeedback = await BoardDataService.getSetting<boolean>('lastShowFeedback');
-      if (typeof lastShowFeedback === 'boolean') {
-          this.setState({ shouldShowFeedbackAfterCollect: lastShowFeedback });
-      }
-
-      const lastAnonymous = await BoardDataService.getSetting<boolean>('lastAnonymous');
-      if (typeof lastAnonymous === 'boolean') {
-        this.setState({ isBoardAnonymous: lastAnonymous });
-      }
-    }
-  }
-*/
-  async componentDidMount() {
+    // Only fetch saved votes and anonymous settings for NEW boards that are NOT duplicates
     if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
       const settingsToLoad = [
         BoardDataService.getSetting<number>('lastVotes'),
