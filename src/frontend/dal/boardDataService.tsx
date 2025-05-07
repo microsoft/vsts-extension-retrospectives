@@ -46,7 +46,11 @@ class BoardDataService {
       permissions: permissions
     }
 
-    return await createDocument<IFeedbackBoardDocument>(teamId, board);
+    //return await createDocument<IFeedbackBoardDocument>(teamId, board); // DPH
+    console.log("Creating board:", board);
+    const createdBoard = await createDocument<IFeedbackBoardDocument>(teamId, board);
+    console.log("Created board response:", createdBoard);
+    return createdBoard;
   }
 
   public checkIfBoardNameIsTaken = async (teamId: string, boardName: string) => {

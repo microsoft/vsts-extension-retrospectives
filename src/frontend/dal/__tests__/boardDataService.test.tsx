@@ -11,6 +11,12 @@ jest.mock('../dataService', () => ({
   updateDocument: jest.fn().mockResolvedValue(mockBoard),
 }));
 
+jest.mock('../dataService', () => ({
+  getDataService: jest.fn().mockResolvedValue({
+    createDocument: jest.fn().mockResolvedValue(mockBoard),
+  }),
+}));
+
 const mockIdentityRef: IdentityRef = {
   id: "user-1",
   displayName: "Test User",
@@ -38,8 +44,8 @@ const mockBoard: IFeedbackBoardDocument = {
   createdDate: new Date(),
   modifiedDate: new Date(),
   maxVotesPerUser: 5,
-  isIncludeTeamEffectivenessMeasurement: false,
-  displayPrimeDirective: false,
+  isIncludeTeamEffectivenessMeasurement: true,
+  displayPrimeDirective: true,
   shouldShowFeedbackAfterCollect: false,
   isAnonymous: false,
   activePhase: "Collect",
