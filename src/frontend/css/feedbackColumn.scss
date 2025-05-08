@@ -1,10 +1,10 @@
-﻿@import "_variables.scss";
+﻿@use "_variables.scss";
 
 .feedback-column {
   border-right: 2px solid rgba(var(--palette-neutral-20, 200, 200, 200), 1);
   border-left: 2px solid rgba(var(--palette-neutral-20, 200, 200, 200), 1);
   display: table-cell;
-  height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
+  height: calc(100vh - #{variables.$extension_header_height} - #{variables.$second_level_header_height});
 }
 
 .feedback-column:last-child {
@@ -18,7 +18,7 @@
 .feedback-column-header {
   padding: 10px;
   padding-top: 15px;
-  padding-left: $header_horizontal_spacing;
+  padding-left: variables.$header_horizontal_spacing;
   border-bottom: 3px solid rgba(var(--palette-neutral-20, 200, 200, 200), 1);
 
   .feedback-column-title {
@@ -39,7 +39,7 @@
 
 .feedback-column-content {
   padding: 10px;
-  padding-left: $header_horizontal_spacing;
+  padding-left: variables.$header_horizontal_spacing;
 }
 
 .feedback-items-container {

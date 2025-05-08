@@ -1,16 +1,16 @@
-﻿@import "../_variables.scss";
+﻿@use "../_variables.scss";
 
 .editable-document-card-title {
   height: 100%;
 
   .input-validation-message {
-    font-size: $mobile_font_size_main - 20px;
+    font-size: variables.$mobile_font_size_main - 20px;
   }
 
   .editable-text {
     max-width: 100%;
-    font-size: $mobile_font_size_main;
-    line-height: $mobile_font_size_main + 5px;
+    font-size: variables.$mobile_font_size_main;
+    line-height: variables.$mobile_font_size_main + 5px;
     margin-top: 10px;
   }
 
@@ -21,8 +21,8 @@
     .ms-TextField-wrapper {
       .ms-TextField-fieldGroup {
         .editable-text-input {
-          font-size: $mobile_font_size_main;
-          line-height: $mobile_font_size_main + 5px;
+          font-size: variables.$mobile_font_size_main;
+          line-height: variables.$mobile_font_size_main + 5px;
         }
       }
     }

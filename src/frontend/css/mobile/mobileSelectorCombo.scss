@@ -1,12 +1,16 @@
+mobileFeedbackBoardContainer.@use "mobileFeedbackBoardContainer";
+
+$mobile_team_selector_list_item_height: 90px;
+
 .selector-list-header {
-    height: $mobile_team_selector_list_item_height;
+    height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
     width: 100%;
     padding-left: 15px;
 
   .selector-list-header-text {
       vertical-align: middle;
       text-align: center;
-      line-height: $mobile_team_selector_list_item_height;
+      line-height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
       margin-right: 15px;
       font-size: 40px;
   }
@@ -21,7 +25,7 @@
     overflow: visible;
 
     .selector-list-item {
-      height: $mobile_team_selector_list_item_height;
+      height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
       width: 100%;
       align-items: center;
       font-size: 40px;
@@ -29,13 +33,13 @@
       .selector-list-item-text {
         vertical-align: middle;
         text-align: center;
-        line-height: $mobile_team_selector_list_item_height;
+        line-height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
         margin-right: 15px;
         font-size: 40px;
       }
 
       i {
-        line-height: $mobile_team_selector_list_item_height;
+        line-height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
         font-size: 40px;
       }
     }

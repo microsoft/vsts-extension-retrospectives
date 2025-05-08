@@ -1,4 +1,6 @@
-﻿@import "_variables.scss";
+﻿@use "_variables.scss";
+@use "feedbackBoardContainer";
+@use "mixins";
 
 .related-task-sub-card {
   height: 35px;
@@ -8,7 +10,7 @@
   background-color: var(--background-color);
   color: var(--text-primary-color);
 
-  @include vsts-workitem-colors;
+  @include mixins.vsts-workitem-colors;
 
   .ms-Image-image {
     width: 16px;
@@ -19,7 +21,7 @@
 
     .ms-Button-icon {
       &:hover {
-        color: $azdo_blue;
+        color: variables.$azdo_blue;
       }
     }
   }
@@ -58,7 +60,7 @@
 }
 
 .action-item-selector {
-  @include vsts-workitem-colors;
+  @include mixins.vsts-workitem-colors;
 }
 
 .add-action-item-wrapper {
@@ -102,7 +104,7 @@
         .ms-Button {
           .ms-Button-flexContainer {
             i {
-              color: $azdo_blue;
+              color: variables.$azdo_blue;
               font-size: 12px;
             }
           }
@@ -151,7 +153,7 @@
         }
 
         .add-action-item-list-item-text {
-          line-height: $team_selector_list_item_height;
+          line-height: feedbackBoardContainer.$team_selector_list_item_height;
           margin-right: 15px;
           font-size: 14px;
           font-weight: normal;
@@ -187,7 +189,7 @@
   }
 
   .input-validation-message {
-    color: $bug_red;
+    color: variables.$bug_red;
   }
 
   .work-item-id-input {

@@ -1,4 +1,4 @@
-@import "_variables.scss";
+@use "_variables.scss";
 
 $content-padding: 10px;
 
@@ -6,7 +6,7 @@ $content-padding: 10px;
 
   .board-metadata-form-board-settings {
     padding-top: 20px;
-    border: $border_grey 1px solid;
+    border: variables.$border_grey 1px solid;
     padding: $content-padding;
     margin-bottom: 5px;
 

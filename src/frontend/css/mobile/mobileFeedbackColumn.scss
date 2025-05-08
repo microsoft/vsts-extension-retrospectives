@@ -1,3 +1,5 @@
+@use "../variables";
+
 .feedback-column {
   overflow-x: hidden;
   padding: 0;
@@ -32,7 +34,7 @@
     }
 
     .feedback-column-name {
-      font-size: $mobile_font_size_main;
+      font-size: variables.$mobile_font_size_main;
       margin-top: -5px;
       display: inline-block;
     }
@@ -42,7 +44,7 @@
 
     .create-container {
       width: 100vw;
-      max-width: $mobile_breakpoint;
+      max-width: variables.$mobile_breakpoint;
       flex-wrap: wrap;
       padding-bottom: 30px;
       display: flex;
@@ -53,30 +55,30 @@
       }
 
       .input-validation-message {
-        font-size: $mobile_font_size_main - 20px;
+        font-size: variables.$mobile_font_size_main - 20px;
       }
 
       .feedback-item-form {
         display: flex;
 
         .fa-plus {
-          font-size: $mobile_font_size_main;
+          font-size: variables.$mobile_font_size_main;
         }
       }
 
       .title-input {
         width: 100%;
         height: 90px;
-        font-size: $mobile_font_size_main;
+        font-size: variables.$mobile_font_size_main;
         padding-left: 30px;
       }
 
       .create-button {
         margin-top: 16px;
         margin-bottom: 12px;
-        font-size: $mobile_font_size_main;
+        font-size: variables.$mobile_font_size_main;
         i {
-          font-size: $mobile_font_size_main;
+          font-size: variables.$mobile_font_size_main;
         }
       }
     }

@@ -1,4 +1,4 @@
-@import "_variables.scss";
+@use "_variables.scss";
 
 $feedback_column_card_height: 60px;
 
@@ -7,7 +7,7 @@ $feedback_column_card_height: 60px;
   margin-top: 1em;
 
   hr {
-    border: 0.5px solid $azdo_blue;
+    border: 0.5px solid variables.$azdo_blue;
   }
 
   .board-metadata-form-section-information {
@@ -45,7 +45,7 @@ $feedback_column_card_height: 60px;
   }
 
   .board-metadata-edit-column-settings {
-    border: $border_grey 1px solid;
+    border: variables.$border_grey 1px solid;
     padding: 10px;
   }
 
@@ -70,7 +70,7 @@ $feedback_column_card_height: 60px;
         background-color: var(--background-color);
 
         &:hover {
-          background-color: $azdo_blue;
+          background-color: variables.$azdo_blue;
           color: white;
         }
       }
@@ -96,7 +96,7 @@ $feedback_column_card_height: 60px;
       color: var(--text-primary-color);
 
       &:hover {
-        color: $azdo_blue;
+        color: variables.$azdo_blue;
       }
     }
 
@@ -105,7 +105,7 @@ $feedback_column_card_height: 60px;
       border-color: #aaa;
 
       &:hover {
-        background-color: $azdo_blue;
+        background-color: variables.$azdo_blue;
       }
     }
 
@@ -250,7 +250,7 @@ $feedback_column_card_height: 60px;
   }
 
   .input-validation-message {
-    color: $bug_red;
+    color: variables.$bug_red;
   }
 
   .title-input-container {
