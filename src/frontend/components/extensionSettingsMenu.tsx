@@ -256,15 +256,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             </ul>
             <p>{this.getChangelog().slice(-1)[0]}</p>
           </DialogContent>
-{/*
-          <DialogContent>
-            <ul style={{listStyle: 'initial'}}>
-              {this.getChangelog().map((change, index) => {
-                return <li key={`changelog-item${index}`} style={{marginBottom: '1rem'}}>{change}</li>;
-              })}
-            </ul>
-          </DialogContent>
-*/}
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
             <PrimaryButton className="whats-new-close-button" onClick={this.hideWhatsNewDialog} text="Close" />

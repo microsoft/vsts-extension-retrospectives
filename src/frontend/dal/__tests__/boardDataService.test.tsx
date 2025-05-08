@@ -58,7 +58,7 @@ const mockBoards: IFeedbackBoardDocument[] = [
 
 describe("BoardDataService - createBoardForTeam", () => {
   it("should create a new board with default values", async () => {
-    (createDocument as jest.Mock).mockResolvedValue(mockBoard); // ✅ Explicitly cast createDocument
+    (createDocument as jest.Mock).mockResolvedValue(mockBoard); // Explicitly cast createDocument
     const result = await BoardDataService.createBoardForTeam("team-123", "Sprint Planning", 5, []);
     expect(result).toEqual(mockBoard);
     expect(createDocument).toHaveBeenCalledWith("team-123", expect.any(Object));
@@ -67,7 +67,7 @@ describe("BoardDataService - createBoardForTeam", () => {
 
 describe("BoardDataService - checkIfBoardNameIsTaken", () => {
   beforeEach(() => {
-    (readDocuments as jest.Mock).mockResolvedValue(mockBoards); // ✅ Explicitly cast readDocuments
+    (readDocuments as jest.Mock).mockResolvedValue(mockBoards); // Explicitly cast readDocuments
   });
 
   it("should return true if a board with the same name exists", async () => {
@@ -83,7 +83,7 @@ describe("BoardDataService - checkIfBoardNameIsTaken", () => {
 
 describe("BoardDataService - getBoardsForTeam", () => {
   it("should return all boards for a team", async () => {
-    (readDocuments as jest.Mock).mockResolvedValue(mockBoards); // ✅ Explicitly cast
+    (readDocuments as jest.Mock).mockResolvedValue(mockBoards); // Explicitly cast
     const result = await BoardDataService.getBoardsForTeam("team-123");
     expect(result).toEqual(mockBoards);
   });
@@ -111,7 +111,7 @@ describe("BoardDataService - deleteFeedbackBoard", () => {
 
 describe("BoardDataService - updateBoardMetadata", () => {
   beforeEach(() => {
-    (readDocument as jest.Mock).mockResolvedValue(mockBoard); // ✅ Explicitly cast readDocument
+    (readDocument as jest.Mock).mockResolvedValue(mockBoard); // Explicitly cast readDocument
     (updateDocument as jest.Mock).mockResolvedValue({ ...mockBoard, title: "New Title", maxVotesPerUser: 10 });
   });
   it("should update board metadata", async () => {
@@ -122,7 +122,7 @@ describe("BoardDataService - updateBoardMetadata", () => {
   });
 
   it("should not update metadata if board does not exist", async () => {
-    (readDocument as jest.Mock).mockResolvedValue(undefined); // ✅ Explicitly cast
+    (readDocument as jest.Mock).mockResolvedValue(undefined); // Explicitly cast
     const result = await BoardDataService.updateBoardMetadata("team-123", "board-1", 10, "New Title", [], mockPermissions);
     expect(result).toBeUndefined();
     expect(updateDocument).not.toHaveBeenCalled();
