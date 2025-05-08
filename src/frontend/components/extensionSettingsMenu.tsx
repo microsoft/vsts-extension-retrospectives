@@ -248,13 +248,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
           </DialogBase>
           <DialogContent>
-            <p>{this.getChangelog()[0]}</p> {/* First item without a bullet */}
-            <ul style={{ listStyle: 'initial', paddingLeft: '1rem' }}>
-              {this.getChangelog().slice(1, -1).map((change, index) => (
-                <li key={`changelog-item${index}`} style={{ marginBottom: '1rem' }}>{change}</li>
-              ))}
-            </ul>
-            <p>{this.getChangelog().slice(-1)[0]}</p> {/* Last item without a bullet */}
+          <p style={{ marginBottom: "1.5rem" }}>{this.getChangelog()[0]}</p>
+          <ul style={{ listStyle: "initial", paddingLeft: "1rem" }}>
+          {this.getChangelog().slice(1, -1).map((change, index) => (
+          <li key={`changelog-item${index}`} style={{ marginBottom: "0.5rem" }}>{change}</li>
+          ))}
+          </ul>
+          <p style={{ marginTop: "1rem" }}>{this.getChangelog().slice(-1)[0]}</p>
           </DialogContent>
 {/*
           <DialogContent>
