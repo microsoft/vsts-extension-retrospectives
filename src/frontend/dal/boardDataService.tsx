@@ -1,4 +1,4 @@
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
+import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, getValue, setValue } from './dataService';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
 import { WorkflowPhase } from '../interfaces/workItem';
 import { getUserIdentity } from '../utilities/userIdentityHelper';
@@ -15,9 +15,9 @@ class BoardDataService {
     maxVotesPerUser: number,
     columns: IFeedbackColumn[],
     isIncludeTeamEffectivenessMeasurement?: boolean,
-    isAnonymous?: boolean,
-    shouldShowFeedbackAfterCollect?: boolean,
     displayPrimeDirective?: boolean,
+    shouldShowFeedbackAfterCollect?: boolean,
+    isAnonymous?: boolean,
     startDate?: Date,
     endDate?: Date,
     permissions?: IFeedbackBoardDocumentPermissions) => {
@@ -31,12 +31,12 @@ class BoardDataService {
       createdDate: new Date(Date.now()),
       endDate,
       id: boardId,
+      maxVotesPerUser,
       isIncludeTeamEffectivenessMeasurement: isIncludeTeamEffectivenessMeasurement ?? false,
+      displayPrimeDirective: displayPrimeDirective ?? false,
+      shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ?? false,
       isAnonymous: isAnonymous ?? false,
       modifiedDate: new Date(Date.now()),
-      shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ?? false,
-      displayPrimeDirective: displayPrimeDirective ?? false,
-      maxVotesPerUser,
       startDate,
       teamId,
       title,
@@ -113,7 +113,6 @@ class BoardDataService {
 
   public restoreArchivedFeedbackBoard = async (teamId: string, boardId: string) => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
-    const userIdentity = getUserIdentity();
 
     // Check in case board was deleted by other user after option to update was selected by current user
     if (!board) {
@@ -126,6 +125,15 @@ class BoardDataService {
     board.archivedBy = undefined;
 
     return await this.updateBoard(teamId, board);
+  }
+
+  public async saveSetting<T>(key: string, value: T): Promise<void> {
+    await setValue(key, value, true); // Use 'true' to make it user-scoped
+  }
+
+  public async getSetting<T>(key: string): Promise<T> {
+    const value = await getValue<T>(key, true);
+    return value !== undefined ? value : (null as T); // Ensures type safety
   }
 
   public updateBoardMetadata = async (teamId: string, boardId: string, maxVotesPerUser: number, title: string, newColumns: IFeedbackColumn[], permissions: IFeedbackBoardDocumentPermissions): Promise<IFeedbackBoardDocument> => {

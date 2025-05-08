@@ -59,17 +59,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(true);
-      expect(checkbox.prop('disabled')).toEqual(false);
-    });
-
-    it('should properly set obscure feedback settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
-      const component = wrapper.children().dive();
-      const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
-
-      expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(false);
+      expect(checkbox.prop('checked')).toEqual(true);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -79,7 +69,17 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(false);
+      expect(checkbox.prop('checked')).toEqual(true);
+      expect(checkbox.prop('disabled')).toEqual(false);
+    });
+
+    it('should properly set obscure feedback settings', () => {
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const component = wrapper.children().dive();
+      const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
+
+      expect(checkbox).toBeDefined();
+      expect(checkbox.prop('checked')).toEqual(false);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -89,9 +89,9 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(false);
+      expect(checkbox.prop('checked')).toEqual(false);
       expect(checkbox.prop('disabled')).toEqual(false);
-    });
+  });
 
     it('should properly set the column list', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
@@ -138,17 +138,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement);
-      expect(checkbox.prop('disabled')).toEqual(true);
-    });
-
-    it('should properly set obscure feedback settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
-      const component = wrapper.children().dive();
-      const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
-
-      expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement);
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -158,7 +148,17 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.displayPrimeDirective);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.displayPrimeDirective);
+      expect(checkbox.prop('disabled')).toEqual(true);
+    });
+
+    it('should properly set obscure feedback settings', () => {
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const component = wrapper.children().dive();
+      const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
+
+      expect(checkbox).toBeDefined();
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect);
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -168,7 +168,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.isAnonymous);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isAnonymous);
       expect(checkbox.prop('disabled')).toEqual(true);
     });
 
@@ -218,17 +218,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'include-team-assessment-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement);
-      expect(checkbox.prop('disabled')).toEqual(false);
-    });
-
-    it('should properly set obscure feedback settings', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
-      const component = wrapper.children().dive();
-      const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
-
-      expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isIncludeTeamEffectivenessMeasurement);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -238,7 +228,17 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'display-prime-directive').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.displayPrimeDirective);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.displayPrimeDirective);
+      expect(checkbox.prop('disabled')).toEqual(false);
+    });
+
+    it('should properly set obscure feedback settings', () => {
+      const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const component = wrapper.children().dive();
+      const checkbox = component.findWhere(c => c.prop('id') === 'obscure-feedback-checkbox').find(Checkbox);
+
+      expect(checkbox).toBeDefined();
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.shouldShowFeedbackAfterCollect);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 
@@ -248,7 +248,7 @@ describe('Board Metadata Form', () => {
       const checkbox = component.findWhere(c => c.prop('id') === 'feedback-display-names-checkbox').find(Checkbox);
 
       expect(checkbox).toBeDefined();
-      expect(checkbox.prop('defaultChecked')).toEqual(testExistingBoard.isAnonymous);
+      expect(checkbox.prop('checked')).toEqual(testExistingBoard.isAnonymous);
       expect(checkbox.prop('disabled')).toEqual(false);
     });
 

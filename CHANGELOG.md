@@ -2,7 +2,16 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## v1.92.36
+## v1.92.42
+
+* Implements _sticky_ default settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback.
+* First time board creators will have defaults set to 5 for maximum votes, checked for Team Assessment and Prime Directive, and unchecked for obscure feedback and anonymous feedback.
+* Allows a minimum value of 1 for maximum votes per user.
+* Improved test code coverage by 2%.
+
+From [GitHub PR #1184](https://github.com/microsoft/vsts-extension-retrospectives/pull/1184)
+
+## v1.92.38
 
 This release included functionality to aggregate votes when grouping items with votes, an update of the archive functionality to include _restoring_ archived retrospectives, and a _refresh_ of the existing retrospective templates.
 

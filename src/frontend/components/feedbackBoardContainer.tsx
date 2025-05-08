@@ -943,7 +943,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isRetroSummaryDialogHidden: true });
   }
 
-  private readonly updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+  private readonly updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, displayPrimeDirective: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
     const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
 
     this.updateBoardAndBroadcast(updatedBoard);
@@ -1052,9 +1052,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       maxVotesPerUser: number,
       columns: IFeedbackColumn[],
       isIncludeTeamEffectivenessMeasurement: boolean,
-      isBoardAnonymous: boolean,
-      shouldShowFeedbackAfterCollect: boolean,
       displayPrimeDirective: boolean,
+      shouldShowFeedbackAfterCollect: boolean,
+      isBoardAnonymous: boolean,
       permissions: IFeedbackBoardDocumentPermissions
     ) => void,
     onCancel: () => void) => {
@@ -1334,7 +1334,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 const board = this.state.currentBoard;
 
-                await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.isAnonymous, board.shouldShowFeedbackAfterCollect, board.displayPrimeDirective, board.permissions);
+                await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.displayPrimeDirective, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
 
                 /*
                 TODO (enpolat) : in the future we may need to create feedback items based on the answers of the questions

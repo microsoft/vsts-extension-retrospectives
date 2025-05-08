@@ -46,11 +46,10 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private readonly getChangelog = (): string[] => {
     return [
-      'The latest release includes updates to grouped items, archive functionality, and retrospective templates.',
-      'Grouped items now display aggregated total votes and Your Votes for the parent and child items.',
-      'Archive functionality now includes ability to archive and restore an archived retrospective from the History tab.',
-      'Retrospective templates were refreshed with updates to the order, prompts, and icons.',
-      'Refer to the Changelog for a comprehensive listing of the updates included in this release.'
+      'The latest release includes updates for sticky defaults and maximum votes.',
+      'User settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.',
+      'Maximum votes for user now has a minimum setting of 1.',
+      'Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.'
     ];
   }
 
@@ -107,7 +106,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     for (const dataToProcess of importedData) {
       const team = teams.find(e => e.name === dataToProcess.team.name) ?? defaultTeam;
       const oldBoard = dataToProcess.board;
-      const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.isAnonymous, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.displayPrimeDirective, oldBoard.startDate, oldBoard.endDate);
+      const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.displayPrimeDirective, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.isAnonymous, oldBoard.startDate, oldBoard.endDate);
       for (let yLoop = 0; yLoop < dataToProcess.items.length; yLoop++) {
         const oldItem = dataToProcess.items[yLoop];
         oldItem.boardId = newBoard.id;
@@ -249,11 +248,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
           </DialogBase>
           <DialogContent>
-            <ul style={{listStyle: 'initial'}}>
-              {this.getChangelog().map((change, index) => {
-                return <li key={`changelog-item${index}`} style={{marginBottom: '1rem'}}>{change}</li>;
-              })}
+            <p>{this.getChangelog()[0]}</p>
+            <ul style={{ listStyle: 'initial', paddingLeft: "1rem" }}>
+            {this.getChangelog().slice(1, -1).map((change, index) => (
+            <li key={`changelog-item${index}`}>{change}</li>
+            ))}
             </ul>
+            <p>{this.getChangelog().slice(-1)[0]}</p>
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
