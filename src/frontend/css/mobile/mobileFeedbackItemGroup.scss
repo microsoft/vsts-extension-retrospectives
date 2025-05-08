@@ -1,3 +1,5 @@
+@use "../variables";
+
 .feedback-item-group {
   &.feedback-item-group-expanded {
     .groupedItemCard {
@@ -22,7 +24,7 @@
       .card-header {
 
         .feedback-expand-group {
-          height: $mobile_feedback_item_header_height;
+          height: variables.$mobile_feedback_item_header_height;
           max-width: 225px;
           font-size: 32px;
           line-height: 75px;
@@ -38,13 +40,13 @@
     .groupedItemCard {
 
       .card-header {
-        height: $mobile_feedback_item_header_height;
+        height: variables.$mobile_feedback_item_header_height;
 
         .feedback-action-button {
           height: 65px;
-          min-width: $mobile_feedback_item_action_button_width;
+          min-width: variables.$mobile_feedback_item_action_button_width;
           max-width: 150px;
-          font-size: $mobile_font_size_main;
+          font-size: variables.$mobile_font_size_main;
           margin-right: 12.5px;
           margin-left: 12.5px;
           padding: 1px 7px;
@@ -52,7 +54,7 @@
           .ms-Button-flexContainer {
 
             i {
-              font-size: $mobile_font_size_main;
+              font-size: variables.$mobile_font_size_main;
               line-height: 1.3;
             }
           }

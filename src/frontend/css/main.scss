@@ -1,36 +1,36 @@
-@import "./_variables.scss";
-@import "./_animations.scss";
-@import "./_mixins.scss";
-@import "./editableDocumentCardTitle.scss";
-@import "./feedbackBoardContainer.scss";
-@import "./noFeedbackBoardsView.scss";
-@import "./feedbackBoardMetadataForm.scss";
-@import "./feedbackBoardMetadataFormPermissions.scss";
-@import "./feedbackBoardPreviewEmail.scss";
-@import "./feedbackBoard.scss";
-@import "./feedbackColumn.scss";
-@import "./feedbackItem.scss";
-@import "./feedbackItemGroup.scss";
-@import "./feedbackCarousel.scss";
-@import "./addActionItem.scss";
-@import "./boardSummary.scss";
-@import "./extensionSettingsMenu.scss";
-@import "./contextualMenu.scss";
-@import "./selectorCombo.scss";
-@import "./_mobile.scss";
-@import "./_highContrast.scss";
-@import "./retrospectiveSummary.scss";
+@use "_variables.scss";
+@use "_animations.scss";
+@use "_mixins.scss";
+@use "editableDocumentCardTitle.scss";
+@use "feedbackBoardContainer.scss";
+@use "noFeedbackBoardsView.scss";
+@use "feedbackBoardMetadataForm.scss";
+@use "feedbackBoardMetadataFormPermissions.scss";
+@use "feedbackBoardPreviewEmail.scss";
+@use "feedbackBoard.scss";
+@use "feedbackColumn.scss";
+@use "feedbackItem.scss";
+@use "feedbackItemGroup.scss";
+@use "feedbackCarousel.scss";
+@use "addActionItem.scss";
+@use "boardSummary.scss";
+@use "extensionSettingsMenu.scss";
+@use "contextualMenu.scss";
+@use "selectorCombo.scss";
+@use "_mobile.scss";
+@use "_highContrast.scss";
+@use "retrospectiveSummary.scss";
 
 @import "../node_modules/react-toastify/dist/ReactToastify.css";
 
 body {
   overflow-y: auto;
-  font-family: $default_vsts_font;
+  font-family: variables.$default_vsts_font;
 }
 
 .ms-ContextualMenuButtonsExample {
   display: flex;
-  background-color: $azure_devops_navigator_light_grey;
+  background-color: variables.$azure_devops_navigator_light_grey;
 }
 
 // VSS automatically adds border and boldfaces button text. This doesn't look good with Office Fabric, so we will remove the styling.

@@ -1,4 +1,5 @@
-﻿@import "_variables.scss";
+﻿@use "_variables.scss";
+@use "mixins";
 
 #feedback-board-summary-table-header {
   display: flex;
@@ -10,7 +11,7 @@
   .menu-button {
     margin-left: 5px;
     margin-right: 20px;
-    background-color: $azure_devops_navigator_light_grey;
+    background-color: variables.$azure_devops_navigator_light_grey;
   }
 
   .board-summary-table-title {
@@ -26,7 +27,7 @@
 .board-summary-table-container {
   min-width: 1000px;
   overflow: auto;
-  height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
+  height: calc(100vh - #{variables.$extension_header_height} - #{variables.$second_level_header_height});
 
   th, td {
     border: 1px solid rgba(0,0,0,0.02);
@@ -43,12 +44,12 @@
     width: 100%;
 
     thead {
-      background-color: $azdo_blue;
+      background-color: variables.$azdo_blue;
       color: #fff;
 
       tr {
         th {
-          background-color: $azdo_blue;
+          background-color: variables.$azdo_blue;
           font-weight: 400;
           height: 30px;
           line-height: 30px;
@@ -205,7 +206,7 @@
               font-size: 14px;
             }
 
-            @include vsts-workitem-colors;
+            @include mixins.vsts-workitem-colors;
 
             .work-item-title {
               cursor: pointer;
@@ -234,7 +235,7 @@
 
             .board-summary-card-title {
               font-size: 18px;
-              border-bottom: 3px solid $azdo_blue;
+              border-bottom: 3px solid variables.$azdo_blue;
 
               .ms-DocumentCardTitle {
                 font-weight: 600;

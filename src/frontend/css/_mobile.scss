@@ -1,16 +1,19 @@
+@use "sass:meta";
+@use "variables";
+
 .mobile-mode {
-  @import "./mobile/mobileAddActionItem.scss";
-  @import "./mobile/mobileFeedbackBoard.scss";
-  @import "./mobile/mobileFeedbackBoardContainer.scss";
-  @import "./mobile/mobileFeedbackColumn.scss";
-  @import "./mobile/mobileFeedbackItem.scss";
-  @import "./mobile/mobileFeedbackItemGroup.scss";
-  @import "./mobile/mobileEditableDocumentCardTitle.scss";
-  @import "./mobile/mobileBoardSummary.scss";
-  @import "./mobile/mobileExtensionSettingsMenu.scss";
-  @import "./mobile/mobileContextualMenu.scss";
-  @import "./mobile/mobileSelectorCombo.scss";
-  @import "./mobile/mobileFeedbackBoardMetadataForm.scss";
+  @include meta.load-css("mobile/mobileAddActionItem.scss");
+  @include meta.load-css("mobile/mobileFeedbackBoard.scss");
+  @include meta.load-css("mobile/mobileFeedbackBoardContainer.scss");
+  @include meta.load-css("mobile/mobileFeedbackColumn.scss");
+  @include meta.load-css("mobile/mobileFeedbackItem.scss");
+  @include meta.load-css("mobile/mobileFeedbackItemGroup.scss");
+  @include meta.load-css("mobile/mobileEditableDocumentCardTitle.scss");
+  @include meta.load-css("mobile/mobileBoardSummary.scss");
+  @include meta.load-css("mobile/mobileExtensionSettingsMenu.scss");
+  @include meta.load-css("mobile/mobileContextualMenu.scss");
+  @include meta.load-css("mobile/mobileSelectorCombo.scss");
+  @include meta.load-css("mobile/mobileFeedbackBoardMetadataForm.scss");
 
   .hide-desktop {
     display: initial !important;
@@ -29,11 +32,11 @@
   }
 
   #root {
-    max-width: $mobile_breakpoint;
+    max-width: variables.$mobile_breakpoint;
   }
 
   #vss_1 {
-    font-size: $mobile_font_size;
+    font-size: variables.$mobile_font_size;
     min-height: 50px;
     flex-basis: 100%;
   }

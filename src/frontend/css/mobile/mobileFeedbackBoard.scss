@@ -1,6 +1,8 @@
+@use "../variables";
+
 .feedback-board {
   width: 100vw;
-  max-width: $mobile_breakpoint;
+  max-width: variables.$mobile_breakpoint;
 
   .feedback-columns-container {
     display: table-row-group;
@@ -13,7 +15,7 @@
     -webkit-overflow-scrolling: touch;
 
     // We need this height to be 100% of viewport, less the headers, to allow scrolling in an iFrame on browsers on iOS
-    max-height: calc(100vh - #{$mobile_extension_header_height_with_margin} - #{$mobile_second_level_header_height});
+    max-height: calc(100vh - #{variables.$mobile_extension_header_height_with_margin} - #{variables.$mobile_second_level_header_height});
     overflow-y: scroll;
   }
 }

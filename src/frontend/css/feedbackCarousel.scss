@@ -1,4 +1,4 @@
-@import "_variables.scss";
+@use "_variables.scss";
 
 .feedback-carousel-pivot > div {
   display: flex;
@@ -88,26 +88,26 @@
 .feedback-carousel-item {
   margin-top: 5px;
   margin-bottom: 5px;
-  margin-left: calc((100% - #{$main_item_card_max_width}) / 2);
+  margin-left: calc((100% - #{variables.$main_item_card_max_width}) / 2);
 
   .related-task-sub-card {
-    width: $main_item_card_max_width - 1px;
+    width: variables.$main_item_card_max_width - 1px;
   }
 
   .add-action-item-wrapper {
-    width: $main_item_card_max_width - 1px;
+    width: variables.$main_item_card_max_width - 1px;
   }
 
   .feedback-item {
     .mainItemCard {
-      width: $main_item_card_max_width;
+      width: variables.$main_item_card_max_width;
     }
   }
 
   .feedback-item-group {
     &:not(.feedback-item-group-expanded) {
       .item-cards-stack {
-        width: $main_item_card_max_width - 5px;
+        width: variables.$main_item_card_max_width - 5px;
       }
     }
   }
