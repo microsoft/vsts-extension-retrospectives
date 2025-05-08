@@ -1,3 +1,5 @@
+@use "variables";
+
 $stage_block_width: 90px;
 $team_selector_list_item_height: 32px;
 $team_selector_list_item_width: 450px;
@@ -17,7 +19,7 @@ $team_selector_list_item_width: 450px;
 
 .feedback-board-container {
   display: flex;
-  height: calc(100vh - #{$extension_header_height} - #{$second_level_header_height});
+  height: calc(100vh - #{variables.$extension_header_height} - #{variables.$second_level_header_height});
   overflow-y: auto;
 }
 
@@ -30,7 +32,7 @@ $team_selector_list_item_width: 450px;
 }
 
 .feedback-board-container-header-spacer {
-  background: $azure_devops_navigator_dark_grey;
+  background: variables.$azure_devops_navigator_dark_grey;
   height: 1px;
   z-index: 2;
   width: 100%;
@@ -39,7 +41,7 @@ $team_selector_list_item_width: 450px;
 }
 
 .extension-header-spacer {
-  padding-bottom: $extension_header_height;
+  padding-bottom: variables.$extension_header_height;
 }
 
 .team-filter-container {
@@ -108,7 +110,7 @@ $team_selector_list_item_width: 450px;
     }
 
     &:hover {
-      background-color: $hover_grey;
+      background-color: variables.$hover_grey;
     }
 
     i {
@@ -127,14 +129,14 @@ $team_selector_list_item_width: 450px;
 
 .pivot-container {
   position: fixed;
-  top: $extension_header_height;
+  top: variables.$extension_header_height;
   z-index: 2;
   width: 100%;
   align-items: center;
   justify-content: flex-start;
 
   .ms-Pivot {
-    margin-left: calc(#{$header_horizontal_spacing} - 8px);
+    margin-left: calc(#{variables.$header_horizontal_spacing} - 8px);
   }
 
   .pivot-content-wrapper {
@@ -157,7 +159,7 @@ $team_selector_list_item_width: 450px;
   display: flex;
   height: 24px;
   margin-right: 16px;
-  background: $border_grey;
+  background: variables.$border_grey;
   margin-top: 12px
 }
 
@@ -168,13 +170,13 @@ $team_selector_list_item_width: 450px;
   align-items: center;
   justify-content: flex-start;
   margin-left: 200px;
-  padding-right: $header_horizontal_spacing;
+  padding-right: variables.$header_horizontal_spacing;
   margin-top: -60px;
 
   .menu-button {
     margin-left: 5px;
     margin-right: 20px;
-    background-color: $azure_devops_navigator_light_grey;
+    background-color: variables.$azure_devops_navigator_light_grey;
   }
 
   .board-selector-group {
@@ -382,11 +384,11 @@ $team_selector_list_item_width: 450px;
       }
 
       .effectivemess-measurement-voting-button {
-        color: $azdo_blue !important;
+        color: variables.$azdo_blue !important;
       }
 
       .effectiveness-measurement-tooltip-cell {
-        border-right: $azdo_blue 2px solid;
+        border-right: variables.$azdo_blue 2px solid;
       }
     }
   }
@@ -437,6 +439,6 @@ $team_selector_list_item_width: 450px;
 .prime-directive-close-button,
 .whats-new-close-button,
 .team-effectiveness-submit-button {
-  background-color: $azdo_blue;
+  background-color: variables.$azdo_blue;
   color: white;
 }

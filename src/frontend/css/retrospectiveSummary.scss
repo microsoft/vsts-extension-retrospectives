@@ -1,3 +1,5 @@
+@use "variables";
+
 //
 // Retro Spectives Summary Dialog
 //
@@ -120,7 +122,7 @@
         .assessment-chart-action {
           white-space: nowrap;
           padding: 0px 5px;
-          background-color: $azdo_blue;
+          background-color: variables.$azdo_blue;
         }
       }
 

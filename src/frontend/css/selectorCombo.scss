@@ -1,15 +1,18 @@
+@use "feedbackBoardContainer";
+@use "variables";
+
 .selector-list-header {
   background-color: var(--background-color);
   display: flex;
-  height: $team_selector_list_item_height;
-  width: $team_selector_list_item_width;
+  height: feedbackBoardContainer.$team_selector_list_item_height;
+  width: feedbackBoardContainer.$team_selector_list_item_width;
   padding-left: 10px;
 
   .selector-list-header-text {
     vertical-align: middle;
     text-align: center;
-    line-height: $team_selector_list_item_height;
-    color: $main_blue;
+    line-height: feedbackBoardContainer.$team_selector_list_item_height;
+    color: variables.$main_blue;
     font-weight: 600;
     font-size: 14px;
   }
@@ -21,8 +24,8 @@
 
   .selector-list-item {
     background-color: var(--background-color);
-    height: $team_selector_list_item_height;
-    width: $team_selector_list_item_width;
+    height: feedbackBoardContainer.$team_selector_list_item_height;
+    width: feedbackBoardContainer.$team_selector_list_item_width;
     display: flex;
     cursor: pointer;
     padding-left: 8px;
@@ -36,7 +39,7 @@
 
   .selector-list-item-text {
     vertical-align: middle;
-    line-height: $team_selector_list_item_height;
+    line-height: feedbackBoardContainer.$team_selector_list_item_height;
     margin-right: 15px;
     font-size: 14px;
     font-weight: normal;
@@ -48,14 +51,14 @@
   i {
     vertical-align: middle;
     text-align: center;
-    line-height: $team_selector_list_item_height;
+    line-height: feedbackBoardContainer.$team_selector_list_item_height;
     margin-right: 8px;
     font-size: 16px;
   }
 }
 
 .selector-button {
-  background-color: $hover_grey;
+  background-color: variables.$hover_grey;
   display: flex;
   height: 30px;
   padding-left: 8px;

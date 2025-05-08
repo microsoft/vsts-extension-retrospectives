@@ -1,11 +1,11 @@
-@import "../_variables.scss";
+@use "../_variables.scss";
 $mobile_stage_block_width: 90px;
 $mobile_stage_block_height: 40px;
 $mobile_stage_block_left_margin_width: 10px;
 $mobile_team_selector_list_item_height: 90px;
 
 .feedback-board-container {
-  height: calc(100vh - #{$mobile_extension_header_height_with_margin} - 55px); // 55px is the approximate height of the second-level header on mobile.
+  height: calc(100vh - #{variables.$mobile_extension_header_height_with_margin} - 55px); // 55px is the approximate height of the second-level header on mobile.
   overflow-x: hidden;
 }
 
@@ -120,8 +120,8 @@ $mobile_team_selector_list_item_height: 90px;
   }
 
   .input-validation-message {
-    font-size: $mobile_font_size_main - 20px;
-    color: $bug_red;
+    font-size: variables.$mobile_font_size_main - 20px;
+    color: variables.$bug_red;
   }
 }
 
@@ -131,7 +131,7 @@ $mobile_team_selector_list_item_height: 90px;
   }
 
   .pivot-content-wrapper {
-    top: $mobile_extension_header_height_with_margin;
+    top: variables.$mobile_extension_header_height_with_margin;
   }
 }
 
@@ -139,7 +139,7 @@ $mobile_team_selector_list_item_height: 90px;
   width: 100vw;
   flex-wrap: wrap;
   transform-origin: 0 0;
-  height: $mobile_extension_header_height;
+  height: variables.$mobile_extension_header_height;
   padding-top: 10px;
 
   .extension-title-text {
@@ -157,8 +157,8 @@ $mobile_team_selector_list_item_height: 90px;
 
 .feedback-board-container-header {
   width: 100vw;
-  max-width: $mobile_breakpoint;
-  margin-left: $header_horizontal_spacing;
+  max-width: variables.$mobile_breakpoint;
+  margin-left: variables.$header_horizontal_spacing;
   margin-top: -55px;
 
   .menu-button {
@@ -180,7 +180,7 @@ $mobile_team_selector_list_item_height: 90px;
 
     .retrospective-workflowState {
       height: $mobile_stage_block_height;
-      font-size: $mobile_font_size;
+      font-size: variables.$mobile_font_size;
       width: $mobile_stage_block_width;
       margin-left: $mobile_stage_block_left_margin_width;
 

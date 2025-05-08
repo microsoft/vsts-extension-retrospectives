@@ -7,6 +7,8 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 
 const CompressionPlugin = require('compression-webpack-plugin');
 
+const { codecovWebpackPlugin } = require("@codecov/webpack-plugin");
+
 const BUILD_DIR = path.resolve(__dirname, 'dist');
 const APP_DIR = path.resolve(__dirname, '');
 
@@ -83,7 +85,12 @@ module.exports = (env, argv) => {
       new webpack.DefinePlugin({
         'process.env.BUILD_BUILDNUMBER': JSON.stringify(process.env.BUILD_BUILDNUMBER)
       }),
-      new CompressionPlugin()
+      new CompressionPlugin(),
+      codecovWebpackPlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: "retrospective-extension-webpack-bundle",
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
     ]
   };
 }
