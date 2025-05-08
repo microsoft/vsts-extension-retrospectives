@@ -101,7 +101,7 @@ Please enter the appropriate information:
 
 ![A screenshot showing the dropdown of available templates for the retrospective board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/pick-retrospective-template-lightmode.png)
 
-**Notes:** 
+**Notes:**
 - Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Once the title is provided, the `Save` button is enabled. Save the retrospective using the `Save` button.
 - The system will remember your selection for maximum votes, team assessment, prime directive, obscure feedback, and do not display names when saving and use those setting as your defaults for the next a board you create.
 
