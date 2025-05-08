@@ -85,23 +85,25 @@ If you have created a retrospective before for your selected team, then you can 
 
 ### 4. Choose Your Retrospective Settings
 
-When you select **New Board** or **Create new retrospective** as above, you will see the following dialog:
+When you select **Create Board** or **Create new retrospective** as above, you will see the following dialog:
 
 ![A screenshot showing the modal box that controls the initial settings for creating a retrospective board. The settings include: a text field for title of the retrospective; a number input box for maximum votes per person; a checkbox to include a Team Assessment; a checkbox to obscure the feedback of others during the Collect Phase; a checkbox to include Retrospective Prime Directive; and a section to pick the different columns to include in the retrospective, either customized or loaded from predefined templates.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retro-lightmode.png)
 
 Please enter the appropriate information:
 
 - **Retrospective Title**: Title for the Retrospective.
-- **Max Votes per User**: The maximum number of votes a participant has to use in the "Vote" Phase.
+- **Max Votes per User**: The maximum number of votes a participant has to use in the "Vote" phase.
 - **Include Team Assessment**: Include a Team Assessment link at the top of the board.
-- **Obscure the feedback of others until after Collect phase**: When selected, users cannot see other users input until they have moved to another phase. Other users' feedback will be blurred.
 - **Display 'Retrospective Prime Directive'**: Include a link to the 'Prime Directive' at the top of the board.
+- **Obscure the feedback of others until after Collect phase**: When selected, users cannot see other users input until they have moved to another phase. Other users' feedback will be blurred.
 - **Do not display names in feedback**: When checked, anonymize who creates individual feedback items.
-- **Columns Settings**: You can either Apply from a pre-populated template or individually select and configure columns yourself.
+- **Columns Settings**: You can either apply from a pre-populated template or individually select and configure columns yourself.
 
 ![A screenshot showing the dropdown of available templates for the retrospective board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/pick-retrospective-template-lightmode.png)
 
-**Note:** Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Once the title is provided, the `Save` button is enabled. Save the retrospective using the `Save` button.
+**Notes:** 
+- Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Once the title is provided, the `Save` button is enabled. Save the retrospective using the `Save` button.
+- The system will remember your selection for maximum votes, team assessment, prime directive, obscure feedback, and do not display names when saving and use those setting as your defaults for the next a board you create.
 
 ### ... Or Select Another Retrospective Board
 
