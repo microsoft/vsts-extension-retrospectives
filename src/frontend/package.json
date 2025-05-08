@@ -50,6 +50,7 @@
     "telemetryclient-team-services-extension": "1.0.10"
   },
   "devDependencies": {
+    "@codecov/webpack-plugin": "1.9.0",
     "@eslint/eslintrc": "3.2.0",
     "@eslint/js": "9.20.0",
     "@types/classnames": "2.3.4",
@@ -109,7 +110,12 @@
       "./components/__tests__/setupTests.tsx"
     ],
     "transform": {
-      ".+\\.(js|ts|tsx|jsx)$": ["ts-jest", { "tsconfig": "tsconfig.test.json" }]
+      ".+\\.(js|ts|tsx|jsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.test.json"
+        }
+      ]
     },
     "transformIgnorePatterns": [
       "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)"
