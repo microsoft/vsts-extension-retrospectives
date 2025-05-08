@@ -160,7 +160,11 @@ describe("BoardDataService - deleteFeedbackBoard", () => {
 describe("BoardDataService - archiveFeedbackBoard", () => {
   it("should archive a board with correct metadata", async () => {
     (readDocument as jest.Mock).mockResolvedValue(mockBoard);
-    (updateDocument as jest.Mock).mockResolvedValue({ ...mockBoard, isArchived: true });
+    (updateDocument as jest.Mock).mockResolvedValue({ 
+      ...mockBoard, 
+      isArchived: true, 
+      archivedDate: new Date() // ✅ Ensure it returns a Date
+    });
 
     const result = await BoardDataService.archiveFeedbackBoard("team-123", "board-1");
     expect(result.isArchived).toBe(true);
@@ -178,7 +182,11 @@ describe("BoardDataService - archiveFeedbackBoard", () => {
 describe("BoardDataService - restoreArchivedFeedbackBoard", () => {
   it("should restore an archived board", async () => {
     (readDocument as jest.Mock).mockResolvedValue({ ...mockBoard, isArchived: true });
-    (updateDocument as jest.Mock).mockResolvedValue(mockBoard);
+    (updateDocument as jest.Mock).mockResolvedValue({ 
+      ...mockBoard, 
+      isArchived: false, 
+      archivedDate: undefined // ✅ Ensure it resets properly
+    });
 
     const result = await BoardDataService.restoreArchivedFeedbackBoard("team-123", "board-1");
     expect(result.isArchived).toBe(false);
