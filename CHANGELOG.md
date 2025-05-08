@@ -2,7 +2,7 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## v1.92.41
+## v1.92.42
 
 * Implements _sticky_ default settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback.
 * First time board creators will have defaults set to 5 for maximum votes, checked for Team Assessment and Prime Directive, and unchecked for obscure feedback and anonymous feedback.
