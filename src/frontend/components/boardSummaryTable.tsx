@@ -52,6 +52,7 @@ export interface IBoardSummaryTableItem {
   feedbackItemsCount: number;
   id: string; // Board ID
   teamId: string;
+  trash?: boolean; // DPH delete
 }
 
 export interface IBoardActionItemsData {
@@ -270,7 +271,25 @@ function getTable(
       header: 'Total Work Items',
       footer: defaultFooter,
       size: 110,
-    })
+    }),
+    // DPH delete
+    columnHelper.accessor('trash', {
+      header: '',
+      footer: () => '',
+      cell: (cellContext: CellContext<IBoardSummaryTableItem, unknown>) => {
+        const { isArchived } = cellContext.row.original;
+
+        // Show trash icon whenever isArchived is true (including after toggles)
+        return isArchived ? (
+          <span className="trash-icon">
+            <i className="fas fa-trash-alt"></i>
+          </span>
+        ) : null;
+      },
+      size: 35,
+      enableSorting: false,
+      enableResizing: false
+    }),
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
