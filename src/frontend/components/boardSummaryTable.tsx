@@ -222,7 +222,7 @@ function getTable(
       cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
         return dateFormatter.format(cellContext.row.original.createdDate);
       },
-      size: 110,
+      size: 120,
       sortDescFirst: true
     }),
     columnHelper.accessor('isArchived', {
@@ -259,13 +259,13 @@ function getTable(
         const archivedDate = cellContext.row.original.archivedDate;
         return archivedDate ? dateFormatter.format(archivedDate) : '';
       },
-      size: 110,
+      size: 120,
       sortDescFirst: true
     }),
     columnHelper.accessor('feedbackItemsCount', {
       header: 'Feedback Items',
       footer: defaultFooter,
-      size: 100,
+      size: 90,
     }),
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
@@ -289,7 +289,7 @@ function getTable(
           </div>
         ) : null;
       },
-      size: 90,
+      size: 30,
       enableSorting: false,
       //enableResizing: false
     }),
