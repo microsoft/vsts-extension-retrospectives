@@ -52,7 +52,6 @@ export interface IBoardSummaryTableItem {
   feedbackItemsCount: number;
   id: string; // Board ID
   teamId: string;
-//  trash?: boolean; // DPH delete
 }
 
 export interface IBoardActionItemsData {
