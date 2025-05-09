@@ -1,7 +1,6 @@
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
 import { IWorkItemFormNavigationService, WorkItemTrackingServiceIds } from 'azure-devops-extension-api/WorkItemTracking';
 import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { getService, getUser } from 'azure-devops-extension-sdk';
 import { ActionButton, BaseButton, Button, DefaultButton, IButtonProps, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { Image } from 'office-ui-fabric-react/lib/Image';
 import React from 'react';
@@ -17,6 +16,7 @@ import { IFeedbackItemDocument } from '../interfaces/feedback';
 import { getBoardUrl } from '../utilities/boardUrlHelper';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import ActionItem from './actionItem';
+import { SDKContext } from '../dal/azureDevOpsContextProvider';
 
 export interface ActionItemDisplayProps extends IButtonProps {
   feedbackItemId: string;
@@ -66,11 +66,12 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
   private addActionItemButtonWrapper: HTMLElement | null;
 
   private readonly createAndLinkActionItem = async (workItemTypeName: string) => {
+    const { SDK } = React.useContext(SDKContext);
     const boardUrl = await getBoardUrl(this.props.team.id, this.props.boardId);
-    const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+    const workItemNavSvc = await SDK.getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
 
     // Account for any users who are no longer a part of the org
-    const assignedUser: string | undefined = getUser().name === undefined ? "Former User" : getUser().name;
+    const assignedUser: string | undefined = SDK.getUser().name === undefined ? "Former User" : SDK.getUser().name;
 
     const workItem = await workItemNavSvc.openNewWorkItem(workItemTypeName, {
       'System.AssignedTo': assignedUser,

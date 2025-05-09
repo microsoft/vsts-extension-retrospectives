@@ -1,12 +1,13 @@
+import React from 'react';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import moment from 'moment';
-import { getAppToken } from 'azure-devops-extension-sdk';
 
 import { config } from '../config/config';
 import { decodeJwt } from '../utilities/tokenHelper';
 import { isHostedAzureDevOps } from '../utilities/azureDevOpsContextHelper';
 import { appInsights } from '../utilities/telemetryClient';
 import { IExceptionTelemetry } from '@microsoft/applicationinsights-web';
+import { SDKContext } from './azureDevOpsContextProvider';
 
 const enum ReflectBackendSignals {
   JoinReflectBoardGroup = 'joinReflectBoardGroup',
@@ -81,7 +82,9 @@ class ReflectBackendService {
       return that._appToken;
     }
 
-    return Promise.resolve(getAppToken().then((appToken) => {
+    const { SDK } = React.useContext(SDKContext);
+
+    return Promise.resolve(SDK.getAppToken().then((appToken) => {
       that._appToken = appToken;
 
       const tokenData = decodeJwt(that._appToken);
