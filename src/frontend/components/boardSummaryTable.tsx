@@ -7,7 +7,7 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
-import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { DefaultButton, Dialog, DialogFooter, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { flexRender, useReactTable } from '@tanstack/react-table';
 
 import {
@@ -180,6 +180,17 @@ async function handleArchiveToggle(
   }
 }
 
+const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+const handleTrashClick = (event: React.MouseEvent) => {
+  event.stopPropagation(); // Prevent row expansion on click
+  setIsDeleteDialogOpen(true);
+};
+
+const handleCancelDelete = () => {
+  setIsDeleteDialogOpen(false);
+};
+
 function getTable(
   tableData: IBoardSummaryTableItem[],
   sortingState: SortingState,
@@ -271,7 +282,43 @@ function getTable(
       footer: defaultFooter,
       size: 80,
     }),
-    // DPH delete
+    // DPH delete (not tested)
+    columnHelper.display({
+      id: 'trash',
+      header: () => (
+        <div className="centered-cell">
+          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
+        </div>
+      ),
+      cell: (cellContext) => (
+        <>
+          <div
+            className="centered-cell trash-icon"
+            title="Delete board"
+            onClick={handleTrashClick}
+          >
+            {cellContext.row.original.isArchived && <i className="fas fa-trash-alt"></i>}
+          </div>
+
+          {/* Dialog component */}
+          <Dialog
+            hidden={!isDeleteDialogOpen}
+            onDismiss={handleCancelDelete}
+            dialogContentProps={{
+              title: 'Confirm Deletion',
+              subText: 'The retrospective board and all its feedback will be deleted. This action is permanent and cannot be undone.',
+            }}
+          >
+            <DialogFooter>
+              <DefaultButton onClick={handleCancelDelete} text="Cancel" />
+            </DialogFooter>
+          </Dialog>
+        </>
+      ),
+      size: 45,
+      enableSorting: false,
+    })
+/*
     columnHelper.display({
       id: 'trash',
       header: () => (
@@ -290,7 +337,7 @@ function getTable(
       ),
       size: 45,
       enableSorting: false,
-    })
+    }) */
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
