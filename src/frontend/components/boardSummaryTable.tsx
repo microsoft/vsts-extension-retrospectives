@@ -273,7 +273,6 @@ function getTable(
       size: 80,
     }),
     // DPH delete
-    // NEW COLUMN: Trash Can
     columnHelper.display({
       id: 'trash',
       header: () => (
@@ -295,7 +294,7 @@ function getTable(
       },
       size: 45,
       enableSorting: false,
-    });
+    })
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
