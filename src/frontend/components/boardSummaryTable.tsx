@@ -31,8 +31,7 @@ import {
 export interface IBoardSummaryTableProps {
   teamId: string;
   supportedWorkItemTypes: WorkItemType[];
-  onArchiveToggle: () => void;
-  showDeleteBoardConfirmationDialog: (boardId: string) => void; // ✅ Add delete function
+  onArchiveToggle: () => void; // Notify the parent about archive toggles
 }
 
 export interface IBoardSummaryTableState {
@@ -280,17 +279,14 @@ function getTable(
           <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
         </div>
       ),
-      cell: ({ row }) => (
-        <div
-          className="centered-cell trash-icon"
-          title="Delete board"
-          onClick={(event) => {
-            event.stopPropagation(); // Prevent row expansion
-            props.showDeleteBoardConfirmationDialog(row.original.id); // ✅ Call delete function
-          }}
-        >
-          {row.original.isArchived && <i className="fas fa-trash-alt"></i>}
-        </div>
+        cell: (cellContext) => (
+      <div
+        className="centered-cell trash-icon"
+        title="Delete board"
+        onClick={(event) => event.stopPropagation()} // Prevent row expansion on any click
+      >
+        {cellContext.row.original.isArchived && <i className="fas fa-trash-alt"></i>}
+      </div>
       ),
       size: 45,
       enableSorting: false,
