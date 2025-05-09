@@ -266,6 +266,17 @@
     color: var(--status-warning-text);
     font-weight: 600;
   }
+
+  .trash-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .trash-icon:hover {
+    color: red; /* Highlight red on hover */
+  }
 }
 
 .board-summary-initialization-spinner {
