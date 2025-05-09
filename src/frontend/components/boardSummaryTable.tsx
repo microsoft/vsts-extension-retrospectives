@@ -279,18 +279,15 @@ function getTable(
           <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
         </div>
       ),
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, unknown>) => {
-        const { isArchived } = cellContext.row.original;
-        return isArchived ? (
-          <div
-            className="centered-cell trash-icon"
-            title="Delete board"
-            onClick={(event) => event.stopPropagation()} // Prevent row expansion
-          >
-            <i className="fas fa-trash-alt"></i>
-          </div>
-        ) : null;
-      },
+        cell: (cellContext) => (
+      <div
+        className="centered-cell trash-icon"
+        title="Delete board"
+        onClick={(event) => event.stopPropagation()} // Prevent row expansion on any click
+      >
+        {cellContext.row.original.isArchived && <i className="fas fa-trash-alt"></i>}
+      </div>
+      ),
       size: 45,
       enableSorting: false,
     })
