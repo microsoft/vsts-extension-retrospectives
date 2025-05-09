@@ -284,15 +284,18 @@ function getTable(
       cell: (cellContext: CellContext<IBoardSummaryTableItem, unknown>) => {
         const { isArchived } = cellContext.row.original;
         return isArchived ? (
-          <div className="centered-cell trash-icon" title="Delete board">
+          <div
+            className="centered-cell trash-icon"
+            title="Delete board"
+            onClick={(event) => event.stopPropagation()} // Prevent row expansion
+          >
             <i className="fas fa-trash-alt"></i>
           </div>
         ) : null;
       },
-      size: 40,
+      size: 45,
       enableSorting: false,
-      //enableResizing: false
-    }),
+    });
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
