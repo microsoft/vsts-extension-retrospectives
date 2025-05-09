@@ -294,7 +294,14 @@ function getTable(
     const selectedBoard = cellContext.row.original;
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-    const dialogMessage = `The retrospective board "${selectedBoard.boardName}" with ${selectedBoard.feedbackItemsCount} feedback items will be deleted.\n\nThis action is permanent and cannot be undone.`;
+//    const dialogMessage = `The retrospective board "${selectedBoard.boardName}" with ${selectedBoard.feedbackItemsCount} feedback item(s) will be deleted.\n\nThis action is permanent and cannot be undone.`;
+const dialogMessage = (
+  <>
+    <span>The retrospective board "{selectedBoard.boardName}" with {selectedBoard.feedbackItemsCount} feedback items will be deleted.</span>
+    <br />
+    <span style={{ fontStyle: 'italic' }}>This action is permanent and cannot be undone.</span>
+  </>
+);
 
     const handleTrashClick = (event: React.MouseEvent) => {
       event.stopPropagation(); // Prevent row expansion on click
