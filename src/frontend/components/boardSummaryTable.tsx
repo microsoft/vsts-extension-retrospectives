@@ -140,17 +140,6 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
 });
 
-const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-const handleTrashClick = (event: React.MouseEvent) => {
-  event.stopPropagation(); // Prevent row expansion on click
-  setIsDeleteDialogOpen(true);
-};
-
-const handleCancelDelete = () => {
-  setIsDeleteDialogOpen(false);
-};
-
 async function handleArchiveToggle(
   teamId: string,
   boardId: string,
@@ -201,6 +190,17 @@ function getTable(
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
+  // DPH 3
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleTrashClick = (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent row expansion on click
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+  };
 
   const columns = [
     columnHelper.accessor('id', {
