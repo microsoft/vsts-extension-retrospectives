@@ -222,7 +222,7 @@ function getTable(
       cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
         return dateFormatter.format(cellContext.row.original.createdDate);
       },
-      size: 120,
+      size: 100,
       sortDescFirst: true
     }),
     columnHelper.accessor('isArchived', {
@@ -259,18 +259,18 @@ function getTable(
         const archivedDate = cellContext.row.original.archivedDate;
         return archivedDate ? dateFormatter.format(archivedDate) : '';
       },
-      size: 120,
+      size: 100,
       sortDescFirst: true
     }),
     columnHelper.accessor('feedbackItemsCount', {
       header: 'Feedback Items',
       footer: defaultFooter,
-      size: 90,
+      size: 80,
     }),
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
       footer: defaultFooter,
-      size: 90,
+      size: 80,
     }),
     // DPH delete
     // NEW COLUMN: Trash Can
@@ -289,7 +289,7 @@ function getTable(
           </div>
         ) : null;
       },
-      size: 30,
+      size: 40,
       enableSorting: false,
       //enableResizing: false
     }),
