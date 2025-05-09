@@ -7,7 +7,7 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
-import { DefaultButton, Dialog, DialogFooter, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { DefaultButton, Dialog, DialogFooter, DialogType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { flexRender, useReactTable } from '@tanstack/react-table';
 
 import {
@@ -294,7 +294,7 @@ function getTable(
     const selectedBoard = cellContext.row.original;
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-    const dialogMessage = `The retrospective board "${selectedBoard.boardName}" with ${selectedBoard.feedbackItemsCount} feedback items will be deleted. This action is permanent and cannot be undone.`;
+    const dialogMessage = `The retrospective board "${selectedBoard.boardName}" with ${selectedBoard.feedbackItemsCount} feedback items will be deleted.\n\nThis action is permanent and cannot be undone.`;
 
     const handleTrashClick = (event: React.MouseEvent) => {
       event.stopPropagation(); // Prevent row expansion on click
@@ -318,10 +318,15 @@ function getTable(
               hidden={!isDeleteDialogOpen}
               onDismiss={handleCancelDelete}
               dialogContentProps={{
-                title: 'Confirm Deletion',
+                type: DialogType.close,
+                title: 'Delete Retrospective',
                 subText: dialogMessage,
               }}
-            >
+              modalProps={{
+                isBlocking: true,
+                containerClassName: 'retrospectives-delete-board-confirmation-dialog',
+                className: 'retrospectives-dialog-modal',
+              }}>
               <DialogFooter>
                 <DefaultButton onClick={handleCancelDelete} text="Cancel" />
               </DialogFooter>
