@@ -290,55 +290,48 @@ function getTable(
           <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
         </div>
       ),
-      cell: (cellContext) => (
-        <>
-          <div
-            className="centered-cell trash-icon"
-            title="Delete board"
-            onClick={handleTrashClick}
-          >
-            {cellContext.row.original.isArchived && <i className="fas fa-trash-alt"></i>}
-          </div>
+  cell: (cellContext) => {
+    const selectedBoard = cellContext.row.original;
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-          {/* Dialog component */}
-          <Dialog
-            hidden={!isDeleteDialogOpen}
-            onDismiss={handleCancelDelete}
-            dialogContentProps={{
-              title: 'Confirm Deletion',
-              subText: 'The retrospective board and all its feedback will be deleted. This action is permanent and cannot be undone.',
-            }}
-          >
-            <DialogFooter>
-              <DefaultButton onClick={handleCancelDelete} text="Cancel" />
-            </DialogFooter>
-          </Dialog>
-        </>
-      ),
-      size: 45,
-      enableSorting: false,
-    })
-/*
-    columnHelper.display({
-      id: 'trash',
-      header: () => (
-        <div className="centered-cell">
-          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
+    const dialogMessage = `The retrospective board "${selectedBoard.boardName}" with ${selectedBoard.feedbackItemsCount} feedback items will be deleted. This action is permanent and cannot be undone.`;
+
+    const handleTrashClick = (event: React.MouseEvent) => {
+      event.stopPropagation(); // Prevent row expansion on click
+      setIsDeleteDialogOpen(true);
+    };
+
+    const handleCancelDelete = () => {
+      setIsDeleteDialogOpen(false);
+    };
+
+    return (
+      <>
+        <div
+          className="centered-cell trash-icon"
+          title="Delete board"
+          onClick={handleTrashClick}
+        >
+          {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
         </div>
-      ),
-        cell: (cellContext) => (
-      <div
-        className="centered-cell trash-icon"
-        title="Delete board"
-        onClick={(event) => event.stopPropagation()} // Prevent row expansion on any click
-      >
-        {cellContext.row.original.isArchived && <i className="fas fa-trash-alt"></i>}
-      </div>
-      ),
+            <Dialog
+              hidden={!isDeleteDialogOpen}
+              onDismiss={handleCancelDelete}
+              dialogContentProps={{
+                title: 'Confirm Deletion',
+                subText: dialogMessage,
+              }}
+            >
+              <DialogFooter>
+                <DefaultButton onClick={handleCancelDelete} text="Cancel" />
+              </DialogFooter>
+            </Dialog>
+          </>
+        );
+      },
       size: 45,
       enableSorting: false,
     })
-*/
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
