@@ -1731,6 +1731,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   teamId={this.state.currentTeam.id}
                   supportedWorkItemTypes={this.state.allWorkItemTypes}
                   onArchiveToggle={this.handleArchiveToggle}
+                  showDeleteBoardConfirmationDialog={this.showDeleteBoardConfirmationDialog} // ✅ Pass delete function
                 />
               </div>
             </PivotItem>
