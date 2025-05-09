@@ -249,7 +249,7 @@ function getTable(
           </div>
         );
       },
-      size: 35,
+      size: 30,
       sortDescFirst: true,
     }),
     columnHelper.accessor('archivedDate', {
@@ -270,7 +270,7 @@ function getTable(
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
       footer: defaultFooter,
-      size: 100,
+      size: 90,
     }),
     // DPH delete
     // NEW COLUMN: Trash Can
@@ -289,9 +289,9 @@ function getTable(
           </div>
         ) : null;
       },
-      size: 35,
+      size: 90,
       enableSorting: false,
-      enableResizing: false
+      //enableResizing: false
     }),
   ]
 
