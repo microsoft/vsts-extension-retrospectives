@@ -1914,6 +1914,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </>
           }
         </Dialog>
+{/* DPH
         <Dialog
           hidden={this.state.isTeamBoardDeletedInfoDialogHidden}
           onDismiss={this.hideTeamBoardDeletedInfoDialog}
@@ -1931,6 +1932,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <DefaultButton aria-label="Dismiss Deleted Team Board Dialog" onClick={this.hideTeamBoardDeletedInfoDialog} text="Dismiss" />
           </DialogFooter>
         </Dialog>
+*/}
         <ToastContainer
           transition={Slide}
           closeButton={false}
