@@ -7,7 +7,7 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
-import { DefaultButton, Dialog, DialogFooter, DialogType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { flexRender, useReactTable } from '@tanstack/react-table';
 
 import {
@@ -295,14 +295,6 @@ function getTable(
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 //    const dialogMessage = `The retrospective board "${selectedBoard.boardName}" with ${selectedBoard.feedbackItemsCount} feedback item(s) will be deleted.\n\nThis action is permanent and cannot be undone.`;
-const dialogMessage = (
-  <>
-    <span>The retrospective board "{selectedBoard.boardName}" with {selectedBoard.feedbackItemsCount} feedback items will be deleted.</span>
-    <br />
-    <span style={{ fontStyle: 'italic' }}>This action is permanent and cannot be undone.</span>
-  </>
-);
-
     const handleTrashClick = (event: React.MouseEvent) => {
       event.stopPropagation(); // Prevent row expansion on click
       setIsDeleteDialogOpen(true);
@@ -321,26 +313,33 @@ const dialogMessage = (
         >
           {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
         </div>
-            <Dialog
-              hidden={!isDeleteDialogOpen}
-              onDismiss={handleCancelDelete}
-              dialogContentProps={{
-                type: DialogType.close,
-                title: 'Delete Retrospective',
-                subText: dialogMessage,
-              }}
-              modalProps={{
-                isBlocking: true,
-                containerClassName: 'retrospectives-delete-board-confirmation-dialog',
-                className: 'retrospectives-dialog-modal',
-              }}>
-              <DialogFooter>
-                <DefaultButton onClick={handleCancelDelete} text="Cancel" />
-              </DialogFooter>
-            </Dialog>
-          </>
-        );
-      },
+        <Dialog
+          hidden={!isDeleteDialogOpen}
+          onDismiss={handleCancelDelete}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Delete Retrospective',
+          }}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-delete-board-confirmation-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogContent>
+            <p>
+              The retrospective board "{selectedBoard.boardName}" with {selectedBoard.feedbackItemsCount} feedback items will be deleted.
+            </p>
+            <p style={{ fontStyle: "italic" }}>
+              This action is permanent and cannot be undone.
+            </p>
+          </DialogContent>
+          <DialogFooter>
+            <DefaultButton onClick={handleCancelDelete} text="Cancel" />
+          </DialogFooter>
+        </Dialog>
+      </>
+    );
+    },
       size: 45,
       enableSorting: false,
     })
