@@ -7,8 +7,9 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import BoardSummary from './boardSummary';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
-import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { flexRender, useReactTable } from '@tanstack/react-table';
+import { reflectBackendService } from "../dal/reflectBackendService";
 
 import {
   createColumnHelper,
@@ -190,6 +191,17 @@ function getTable(
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
+  // DPH 3
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleTrashClick = (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent row expansion on click
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+  };
 
   const columns = [
     columnHelper.accessor('id', {
@@ -221,7 +233,7 @@ function getTable(
       cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
         return dateFormatter.format(cellContext.row.original.createdDate);
       },
-      size: 120,
+      size: 100,
       sortDescFirst: true
     }),
     columnHelper.accessor('isArchived', {
@@ -248,7 +260,7 @@ function getTable(
           </div>
         );
       },
-      size: 35,
+      size: 30,
       sortDescFirst: true,
     }),
     columnHelper.accessor('archivedDate', {
@@ -258,18 +270,99 @@ function getTable(
         const archivedDate = cellContext.row.original.archivedDate;
         return archivedDate ? dateFormatter.format(archivedDate) : '';
       },
-      size: 120,
+      size: 100,
       sortDescFirst: true
     }),
     columnHelper.accessor('feedbackItemsCount', {
       header: 'Feedback Items',
       footer: defaultFooter,
-      size: 110,
+      size: 80,
     }),
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
       footer: defaultFooter,
-      size: 110,
+      size: 80,
+    }),
+    // DPH delete
+    columnHelper.display({
+      id: 'trash',
+      header: () => (
+        <div className="centered-cell">
+          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
+        </div>
+      ),
+      cell: (cellContext) => {
+        const selectedBoard = cellContext.row.original;
+        const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+        const handleTrashClick = (event: React.MouseEvent) => {
+          event.stopPropagation(); // Prevent row expansion on click
+          setIsDeleteDialogOpen(true);
+        };
+
+      const handleCancelDelete = () => {
+        setIsDeleteDialogOpen(false);
+      };
+
+      const handleConfirmDelete = async (selectedBoard: IBoardSummaryTableItem) => {
+        try {
+          await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
+          reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
+
+          // Update local state to remove the deleted board from the table
+          setTableData((prevData) => prevData.filter(board => board.id !== selectedBoard.id));
+
+          // Track the event
+          appInsights.trackEvent({
+            name: TelemetryEvents.FeedbackBoardDeleted,
+            properties: { boardId: selectedBoard.id }
+          });
+
+        } catch (error) {
+          console.error("Error deleting board:", error);
+        }
+      };
+
+      return (
+        <>
+          <div
+            className="centered-cell trash-icon"
+            title="Delete board"
+            onClick={handleTrashClick}
+          >
+            {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
+          </div>
+          <Dialog
+            hidden={!isDeleteDialogOpen}
+            onDismiss={handleCancelDelete}
+            dialogContentProps={{
+              type: DialogType.close,
+              title: 'Delete Retrospective',
+            }}
+            modalProps={{
+              isBlocking: true,
+              containerClassName: 'retrospectives-delete-board-confirmation-dialog',
+              className: 'retrospectives-dialog-modal',
+            }}>
+            <DialogContent>
+              <p>
+                The retrospective board &quot;{selectedBoard.boardName}&quot; with {selectedBoard.feedbackItemsCount} feedback items will be deleted.
+              </p>
+              <br />
+              <p style={{ fontStyle: "italic" }}>
+                This action is permanent and cannot be undone.
+              </p>
+            </DialogContent>
+            <DialogFooter>
+              <DefaultButton onClick={handleCancelDelete} text="Cancel" />
+              <PrimaryButton onClick={() => handleConfirmDelete(selectedBoard)} text="Delete" />
+            </DialogFooter>
+          </Dialog>
+        </>
+      );
+    },
+      size: 45,
+      enableSorting: false,
     })
   ]
 
