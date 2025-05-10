@@ -327,7 +327,7 @@ function getTable(
           }}>
           <DialogContent>
             <p>
-              The retrospective board "{selectedBoard.boardName}" with {selectedBoard.feedbackItemsCount} feedback items will be deleted.
+              The retrospective board &quot;{selectedBoard.boardName}&quot; with {selectedBoard.feedbackItemsCount} feedback items will be deleted.
             </p>
             <p style={{ fontStyle: "italic" }}>
               This action is permanent and cannot be undone.
