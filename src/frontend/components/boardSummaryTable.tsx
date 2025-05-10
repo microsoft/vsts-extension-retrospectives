@@ -9,6 +9,7 @@ import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { flexRender, useReactTable } from '@tanstack/react-table';
+import { reflectBackendService } from "../dal/reflectBackendService";
 
 import {
   createColumnHelper,
@@ -306,16 +307,16 @@ function getTable(
       const handleConfirmDelete = async (selectedBoard: IBoardSummaryTableItem) => {
         try {
           await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
-          //reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
+          reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
 
           // Update local state to remove the deleted board from the table
           setTableData((prevData) => prevData.filter(board => board.id !== selectedBoard.id));
 
           // Track the event
-          //appInsights.trackEvent({
-          //  name: TelemetryEvents.FeedbackBoardDeleted,
-          //  properties: { boardId: selectedBoard.id }
-          //});
+          appInsights.trackEvent({
+            name: TelemetryEvents.FeedbackBoardDeleted,
+            properties: { boardId: selectedBoard.id }
+          });
 
         } catch (error) {
           console.error("Error deleting board:", error);
