@@ -192,6 +192,7 @@ function getTable(
   sortingState: SortingState,
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
+  isDataLoaded: boolean, // DPH if remove need to make other changes to expect only 5 arguments
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();

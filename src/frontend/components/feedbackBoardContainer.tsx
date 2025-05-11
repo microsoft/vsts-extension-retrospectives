@@ -1697,7 +1697,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     }}>
                     <DialogFooter>
                       <PrimaryButton onClick={this.deleteCurrentBoard} text="Delete" />
-                      <DefaultButton onClick={this.hideremoConfirmationDialog} text="Cancel" />
+                      <DefaultButton onClick={this.hideDeleteBoardConfirmationDialog} text="Cancel" />
                     </DialogFooter>
                   </Dialog>
                   <Dialog
