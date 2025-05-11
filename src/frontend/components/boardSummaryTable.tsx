@@ -319,7 +319,7 @@ function getTable(
       };
 
       // DPH extend to project admin and org admin later
-      const isAuthorized = selectedBoard.ownerId === currentUser.id;
+      const isAuthorized = false; //selectedBoard.ownerId === currentUser.id;
       // DPH reset to true after test and implement later
 
 // DPH
