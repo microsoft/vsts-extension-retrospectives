@@ -192,7 +192,7 @@ function getTable(
   sortingState: SortingState,
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
-  isDataLoaded: boolean, // DPH if remove need to make other changes to expect only 5 arguments
+  // isDataLoaded: boolean, // DPH if remove then expect only 5 arguments
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
@@ -404,7 +404,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [boardSummaryState.boardsTableItems]);
 
   const table: Table<IBoardSummaryTableItem> =
-    getTable(tableData, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded, setTableData);
+    getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData); // DPH boardSummaryState.isDataLoaded,
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
