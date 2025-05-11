@@ -1,15 +1,17 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { flexRender, useReactTable } from '@tanstack/react-table';
+
+import BoardSummary from './boardSummary';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
-import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
-import BoardSummary from './boardSummary';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
-import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
-import { flexRender, useReactTable } from '@tanstack/react-table';
 import { reflectBackendService } from "../dal/reflectBackendService";
+import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
+import { getUserIdentity } from '../utilities/userIdentityHelper';
 
 import {
   createColumnHelper,
@@ -53,6 +55,7 @@ export interface IBoardSummaryTableItem {
   feedbackItemsCount: number;
   id: string; // Board ID
   teamId: string;
+  ownerId: string; // DPH
 }
 
 export interface IBoardActionItemsData {
@@ -74,6 +77,9 @@ interface BoardSummaryTableBodyProps {
   getTdProps: (cell: Cell<IBoardSummaryTableItem, unknown>) => object;
   boardRowSummary: (row: Row<IBoardSummaryTableItem>) => JSX.Element;
 }
+
+//DPH
+const currentUser = getUserIdentity();
 
 const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ headerGroups, getThProps }) => (
   <thead role="rowgroup">
@@ -186,22 +192,10 @@ function getTable(
   sortingState: SortingState,
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
-  isDataLoaded: boolean,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
-  // DPH 3
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const handleTrashClick = (event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent row expansion on click
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleCancelDelete = () => {
-    setIsDeleteDialogOpen(false);
-  };
 
   const columns = [
     columnHelper.accessor('id', {
@@ -323,12 +317,17 @@ function getTable(
         }
       };
 
+      // DPH extend to project admin and org admin later
+      const isAuthorized = selectedBoard.ownerId === currentUser.id;
+
+// DPH
       return (
         <>
           <div
             className="centered-cell trash-icon"
             title="Delete board"
-            onClick={handleTrashClick}
+            onClick={isAuthorized ? handleTrashClick : undefined}
+            style={{ opacity: isAuthorized ? 1 : 0.5, pointerEvents: isAuthorized ? "auto" : "none" }}
           >
             {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
           </div>
@@ -427,6 +426,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
           feedbackItemsCount: 0,
           id: board.id,
           teamId: board.teamId,
+          ownerId: board.createdBy.id, // DPH
         };
 
         boardsTableItems.push(boardSummaryItem);
