@@ -350,8 +350,8 @@ function getTable(
               </p>
             </DialogContent>
             <DialogFooter>
-              <DefaultButton onClick={handleCancelDelete} text="Cancel" />
               <PrimaryButton onClick={() => handleConfirmDelete(selectedBoard)} text="Delete" />
+              <DefaultButton autoFocus onClick={handleCancelDelete} text="Cancel" />
             </DialogFooter>
           </Dialog>
         </>
