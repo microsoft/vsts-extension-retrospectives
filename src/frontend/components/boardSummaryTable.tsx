@@ -318,17 +318,13 @@ function getTable(
         }
       };
 
-      // DPH refactor to restrict to board owner, project admin, and org admin
-      const isAuthorized = true;
-
 // DPH
       return (
         <>
           <div
             className="centered-cell trash-icon"
             title="Delete board"
-            onClick={isAuthorized ? handleTrashClick : undefined}
-            style={{ opacity: isAuthorized ? 1 : 0.5, pointerEvents: isAuthorized ? "auto" : "none" }}
+            onClick={handleTrashClick}
           >
             {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
           </div>
