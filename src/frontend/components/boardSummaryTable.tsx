@@ -79,7 +79,7 @@ interface BoardSummaryTableBodyProps {
 }
 
 //DPH
-const currentUser = getUserIdentity();
+//const currentUser = getUserIdentity();
 
 const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ headerGroups, getThProps }) => (
   <thead role="rowgroup">
@@ -318,9 +318,8 @@ function getTable(
         }
       };
 
-      // DPH extend to project admin and org admin later
-      const isAuthorized = false; //selectedBoard.ownerId === currentUser.id;
-      // DPH reset to true after test and implement later
+      // DPH refactor to restrict to board owner, project admin, and org admin
+      const isAuthorized = true;
 
 // DPH
       return (
