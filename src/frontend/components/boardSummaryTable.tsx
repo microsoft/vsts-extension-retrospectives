@@ -11,7 +11,7 @@ import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { reflectBackendService } from "../dal/reflectBackendService";
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
-import { getUserIdentity } from '../utilities/userIdentityHelper';
+import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 
 import {
   createColumnHelper,
@@ -79,7 +79,7 @@ interface BoardSummaryTableBodyProps {
 }
 
 //DPH
-//const currentUser = getUserIdentity();
+const currentUserId = encrypt(getUserIdentity().id);
 
 const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ headerGroups, getThProps }) => (
   <thead role="rowgroup">
@@ -310,7 +310,11 @@ function getTable(
           // Track the event
           appInsights.trackEvent({
             name: TelemetryEvents.FeedbackBoardDeleted,
-            properties: { boardId: selectedBoard.id }
+            properties: { 
+              boardId: selectedBoard.id,
+              boardName: selectedBoard.boardName, // Assuming the board object has a 'name' property
+              deletedByUserId: currentUserId, // Ensure you have access to the current user
+            }
           });
 
         } catch (error) {
