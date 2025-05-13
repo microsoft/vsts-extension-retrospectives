@@ -310,7 +310,7 @@ function getTable(
           // Track the event
           appInsights.trackEvent({
             name: TelemetryEvents.FeedbackBoardDeleted,
-            properties: { 
+            properties: {
               boardId: selectedBoard.id,
               boardName: selectedBoard.boardName, // Assuming the board object has a 'name' property
               deletedByUserId: currentUserId, // Ensure you have access to the current user
