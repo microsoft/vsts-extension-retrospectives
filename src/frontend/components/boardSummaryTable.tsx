@@ -78,9 +78,6 @@ interface BoardSummaryTableBodyProps {
   boardRowSummary: (row: Row<IBoardSummaryTableItem>) => JSX.Element;
 }
 
-//DPH
-const currentUserId = encrypt(getUserIdentity().id);
-
 const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ headerGroups, getThProps }) => (
   <thead role="rowgroup">
     {headerGroups.map((headerGroup) => (
@@ -312,8 +309,8 @@ function getTable(
             name: TelemetryEvents.FeedbackBoardDeleted,
             properties: {
               boardId: selectedBoard.id,
-              boardName: selectedBoard.boardName, // Assuming the board object has a 'name' property
-              deletedByUserId: currentUserId, // Ensure you have access to the current user
+              boardName: selectedBoard.boardName,
+              deletedByUserId: encrypt(getUserIdentity().id),
             }
           });
 
