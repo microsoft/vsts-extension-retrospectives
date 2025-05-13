@@ -184,6 +184,67 @@ async function handleArchiveToggle(
   }
 }
 
+// DPH
+// State for delete dialog
+const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+// DPH
+const handleTrashClick = async (  
+  event: React.MouseEvent, 
+  teamId: string, 
+  boardId: string, 
+  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
+) => {
+  event.stopPropagation(); // Prevent row expansion
+
+  try {
+    const boardExists = await BoardDataService.getBoardForTeamById(teamId, boardId);
+    if (!boardExists) {
+      alert("This board was already deleted by another user. Refreshing your view now.");
+      setTableData(prevData => prevData.filter(board => board.id !== boardId)); // Remove from UI
+      return;
+    }
+
+    setIsDeleteDialogOpen(true); // Open confirmation dialog
+  } catch (error) {
+    console.error("Error checking board existence:", error);
+  }
+};
+
+// DPH
+// Handles canceling the delete dialog
+const handleCancelDelete = () => {
+  setIsDeleteDialogOpen(false);
+};
+
+// DPH
+// Handles confirming the board deletion
+const handleConfirmDelete = async (
+  selectedBoard: IBoardSummaryTableItem,
+  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
+) => {
+  try {
+    await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
+    reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
+
+    // Update local state to remove the deleted board from the table
+    setTableData((prevData) => prevData.filter(board => board.id !== selectedBoard.id));
+
+    // Track the event
+    appInsights.trackEvent({
+      name: TelemetryEvents.FeedbackBoardDeleted,
+      properties: {
+        boardId: selectedBoard.id,
+        boardName: selectedBoard.boardName,
+        deletedByUserId: encrypt(getUserIdentity().id),
+      }
+    });
+
+  } catch (error) {
+    console.error("Error deleting board:", error);
+  }
+};
+
 function getTable(
   tableData: IBoardSummaryTableItem[],
   sortingState: SortingState,
@@ -276,6 +337,7 @@ function getTable(
       size: 80,
     }),
     // DPH delete
+
     columnHelper.display({
       id: 'trash',
       header: () => (
@@ -285,6 +347,7 @@ function getTable(
       ),
       cell: (cellContext) => {
         const selectedBoard = cellContext.row.original;
+        /*
         const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
         const handleTrashClick = (event: React.MouseEvent) => {
@@ -318,14 +381,14 @@ function getTable(
           console.error("Error deleting board:", error);
         }
       };
-
+*/
 // DPH
       return (
         <>
           <div
             className="centered-cell trash-icon"
             title="Delete board"
-            onClick={handleTrashClick}
+            onClick={(event) => handleTrashClick(event, selectedBoard.teamId, selectedBoard.id, setTableData)}
           >
             {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
           </div>
@@ -351,7 +414,7 @@ function getTable(
               </p>
             </DialogContent>
             <DialogFooter>
-              <PrimaryButton onClick={() => handleConfirmDelete(selectedBoard)} text="Delete" />
+              <PrimaryButton onClick={() => handleConfirmDelete(selectedBoard, setTableData)} text="Delete" />
               <DefaultButton autoFocus onClick={handleCancelDelete} text="Cancel" />
             </DialogFooter>
           </Dialog>
