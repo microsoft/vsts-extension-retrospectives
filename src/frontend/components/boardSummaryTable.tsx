@@ -189,10 +189,10 @@ async function handleArchiveToggle(
 const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 // DPH
-const handleTrashClick = async (  
-  event: React.MouseEvent, 
-  teamId: string, 
-  boardId: string, 
+const handleTrashClick = async (
+  event: React.MouseEvent,
+  teamId: string,
+  boardId: string,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
 ) => {
   event.stopPropagation(); // Prevent row expansion
