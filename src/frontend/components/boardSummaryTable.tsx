@@ -298,6 +298,38 @@ function getTable(
 
       const handleConfirmDelete = async (selectedBoard: IBoardSummaryTableItem) => {
         try {
+          // Verify if the board still exists
+          const boardExists = tableData.some(board => board.id === selectedBoard.id);
+          if (!boardExists) {
+            alert("This board has already been deleted.");
+            // Update the table data to remove the deleted board
+            setTableData(prevData => prevData.filter(board => board.id !== selectedBoard.id));
+            return;
+          }
+
+          await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
+          reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
+
+          // Update local state to remove the deleted board from the table
+          setTableData(prevData => prevData.filter(board => board.id !== selectedBoard.id));
+
+          // Track the event
+          appInsights.trackEvent({
+            name: TelemetryEvents.FeedbackBoardDeleted,
+            properties: {
+              boardId: selectedBoard.id,
+              boardName: selectedBoard.boardName,
+              deletedByUserId: encrypt(getUserIdentity().id),
+            }
+          });
+
+        } catch (error) {
+          console.error("Error deleting board:", error);
+        }
+      };
+
+      const DPH_handleConfirmDelete = async (selectedBoard: IBoardSummaryTableItem) => {
+        try {
           await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
           reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
 
