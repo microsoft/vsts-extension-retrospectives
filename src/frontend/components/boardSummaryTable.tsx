@@ -191,9 +191,7 @@ function getTable(
   onArchiveToggle: () => void,
   // isDataLoaded: boolean, // DPH if remove then expect only 5 arguments
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>,
-  isDeleteDialogOpen: boolean,
-  setIsDeleteDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
@@ -288,7 +286,7 @@ function getTable(
       ),
       cell: (cellContext) => {
         const selectedBoard = cellContext.row.original;
-        //const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);  DPH
+        const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
         const handleTrashClick = (event: React.MouseEvent) => {
           event.stopPropagation(); // Prevent row expansion on click
@@ -409,15 +407,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   // DPH
   const [refreshKey, setRefreshKey] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); // ✅ Move state to parent component
 
-  const table: Table<IBoardSummaryTableItem> = getTable(
-  tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setRefreshKey,
-  isDeleteDialogOpen, setIsDeleteDialogOpen // ✅ Now passed as props
-);
-
-//  const table: Table<IBoardSummaryTableItem> =
-//   getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setRefreshKey); // DPH boardSummaryState.isDataLoaded,
+  const table: Table<IBoardSummaryTableItem> =
+    getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setRefreshKey); // DPH boardSummaryState.isDataLoaded,
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
