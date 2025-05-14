@@ -316,6 +316,7 @@ function getTable(
 
         } catch (error) {
           console.error("Error deleting board:", error);
+          setIsDeleteDialogOpen(false);
         }
       };
 
