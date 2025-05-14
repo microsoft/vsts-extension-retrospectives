@@ -604,7 +604,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }
 
   useEffect(() => {
-    if(teamId !== props.teamId) {
+    if(teamId !== props.teamId || refreshKey > 0) {
       BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
         setTeamId(props.teamId);
         handleBoardsDocuments(boardDocuments);
