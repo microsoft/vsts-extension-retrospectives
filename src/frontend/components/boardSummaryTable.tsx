@@ -184,9 +184,6 @@ async function handleArchiveToggle(
   }
 }
 
-// DPH
-const [refreshKey, setRefreshKey] = useState(0);
-
 function getTable(
   tableData: IBoardSummaryTableItem[],
   sortingState: SortingState,
@@ -197,6 +194,8 @@ function getTable(
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
+  // DPH
+  const setRefreshKey = useState(0);
 
   const columns = [
     columnHelper.accessor('id', {
