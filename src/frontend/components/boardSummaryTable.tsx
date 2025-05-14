@@ -195,7 +195,7 @@ function getTable(
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
   // DPH
-  const setRefreshKey = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const columns = [
     columnHelper.accessor('id', {
