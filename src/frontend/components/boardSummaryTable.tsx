@@ -144,6 +144,33 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
 });
 
+// DPH
+const reloadBoardHistory = async (
+  teamId: string,
+  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
+) => {
+  try {
+    const updatedBoardData: IFeedbackBoardDocument[] = await BoardDataService.getBoardsForTeam(teamId);
+
+    // Convert `IFeedbackBoardDocument` to `IBoardSummaryTableItem`
+    const formattedData: IBoardSummaryTableItem[] = updatedBoardData.map(board => ({
+      id: board.id,
+      teamId: board.teamId,
+      boardName: board.boardName || "Untitled Board", 
+      pendingWorkItemsCount: board.pendingWorkItemsCount ?? 0,
+      totalWorkItemsCount: board.totalWorkItemsCount ?? 0,
+      feedbackItemsCount: board.feedbackItemsCount ?? 0,
+      ownerId: board.ownerId || "Unknown Owner",
+      isArchived: board.isArchived ?? false,
+      createdDate: board.createdDate ?? new Date(), // ✅ Add `createdDate`
+    }));
+
+    setTableData(formattedData); // Now passing correctly formatted data
+  } catch (error) {
+    console.error("Error reloading board history:", error);
+  }
+};
+
 async function handleArchiveToggle(
   teamId: string,
   boardId: string,
@@ -317,6 +344,8 @@ function getTable(
         } catch (error) {
           console.error("Error deleting board:", error);
           setIsDeleteDialogOpen(false);
+          // Trigger board history reload since board may have been delete
+          reloadBoardHistory(selectedBoard.teamId, setTableData);
         }
       };
 
