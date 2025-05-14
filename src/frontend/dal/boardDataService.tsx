@@ -82,7 +82,7 @@ class BoardDataService {
     return await readDocument<IFeedbackBoardDocument>(teamId, boardId);
   }
 
-  public DPH_deleteFeedbackBoard = async (teamId: string, boardId: string) => {
+  public deleteFeedbackBoard = async (teamId: string, boardId: string) => {
     // Delete all documents in this board's collection.
     const boardItems = await readDocuments<IFeedbackItemDocument>(boardId);
     if (boardItems && boardItems.length) {
@@ -93,25 +93,6 @@ class BoardDataService {
 
     await deleteDocument(teamId, boardId);
   }
-
-public async deleteFeedbackBoard(teamId: string, boardId: string): Promise<boolean> {
-  const board = await this.getBoardForTeamById(teamId, boardId);
-  if (!board) {
-    console.log(`Board ${boardId} was already deleted.`);
-    return false;
-  }
-
-  // Retrieve associated board items
-  const boardItems = await readDocuments<IFeedbackItemDocument>(boardId);
-  if (boardItems.length) {
-    await Promise.all(boardItems.map(item => deleteDocument(boardId, item.id))); // Ensure deletions complete
-  }
-
-  // Delete the board itself
-  await deleteDocument(teamId, boardId);
-
-  return true; // Indicate successful deletion
-}
 
   public archiveFeedbackBoard = async (teamId: string, boardId: string) => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
