@@ -55,7 +55,7 @@ export interface IBoardSummaryTableItem {
   feedbackItemsCount: number;
   id: string; // Board ID
   teamId: string;
-  ownerId: string; // DPH
+  ownerId: string;
 }
 
 export interface IBoardActionItemsData {
@@ -189,7 +189,6 @@ function getTable(
   sortingState: SortingState,
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
-  // isDataLoaded: boolean, // DPH if remove then expect only 5 arguments
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
   setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>
 ): Table<IBoardSummaryTableItem> {
@@ -276,7 +275,6 @@ function getTable(
       footer: defaultFooter,
       size: 80,
     }),
-    // DPH delete
     columnHelper.display({
       id: 'trash',
       header: () => (
@@ -317,14 +315,11 @@ function getTable(
 
         } catch (error) {
           console.error("Error deleting board:", error);
-          // DPH
-          // trigger refresh to resolve issue
           setRefreshKey(true);
           setIsDeleteDialogOpen(false);
         }
       };
 
-// DPH
       return (
         <>
           <div
@@ -405,11 +400,10 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     setTableData(boardSummaryState.boardsTableItems);
   }, [boardSummaryState.boardsTableItems]);
 
-  // DPH
   const [refreshKey, setRefreshKey] = useState(false);
 
   const table: Table<IBoardSummaryTableItem> =
-    getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setRefreshKey); // DPH boardSummaryState.isDataLoaded,
+    getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setRefreshKey);
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
@@ -432,7 +426,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
           feedbackItemsCount: 0,
           id: board.id,
           teamId: board.teamId,
-          ownerId: board.createdBy.id, // DPH
+          ownerId: board.createdBy.id,
         };
 
         boardsTableItems.push(boardSummaryItem);
@@ -602,7 +596,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-readonly': true
     };
   }
-// DPH
+
   useEffect(() => {
   if (teamId !== props.teamId || refreshKey) { // Triggers when teamId changes OR refreshKey is true
     BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
@@ -615,18 +609,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     });
   }
 }, [props.teamId, refreshKey]); // Runs when teamId or refreshKey updates
-/*
-  useEffect(() => {
-    if(teamId !== props.teamId || refreshKey > 0) {
-      BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
-        setTeamId(props.teamId);
-        handleBoardsDocuments(boardDocuments);
-      }).catch(e => {
-        appInsights.trackException(e);
-      })
-    }
-  }, [props.teamId, refreshKey])
-*/
+
   if(boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
