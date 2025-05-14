@@ -191,7 +191,7 @@ function getTable(
   onArchiveToggle: () => void,
   // isDataLoaded: boolean, // DPH if remove then expect only 5 arguments
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setRefreshKey: React.Dispatch<React.SetStateAction<number>>
+  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
@@ -318,8 +318,8 @@ function getTable(
         } catch (error) {
           console.error("Error deleting board:", error);
           // DPH
-          // trigger refresh to flush issue
-          setRefreshKey(prev => prev + 1);
+          // trigger refresh to resolve issue
+          setRefreshKey(true);
           setIsDeleteDialogOpen(false);
         }
       };
@@ -406,7 +406,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [boardSummaryState.boardsTableItems]);
 
   // DPH
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(false);
 
   const table: Table<IBoardSummaryTableItem> =
     getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setRefreshKey); // DPH boardSummaryState.isDataLoaded,
@@ -602,7 +602,20 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       'aria-readonly': true
     };
   }
-
+// DPH
+  useEffect(() => {
+  if (teamId !== props.teamId || refreshKey) { // Triggers when teamId changes OR refreshKey is true
+    BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
+      setTeamId(props.teamId);
+      handleBoardsDocuments(boardDocuments);
+    }).finally(() => {
+      setRefreshKey(false); // Reset refreshKey after fetching
+    }).catch(e => {
+      appInsights.trackException(e);
+    });
+  }
+}, [props.teamId, refreshKey]); // Runs when teamId or refreshKey updates
+/*
   useEffect(() => {
     if(teamId !== props.teamId || refreshKey > 0) {
       BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
@@ -613,7 +626,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       })
     }
   }, [props.teamId, refreshKey])
-
+*/
   if(boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
       size={SpinnerSize.large}
