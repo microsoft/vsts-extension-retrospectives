@@ -80,8 +80,8 @@ export interface FeedbackBoardContainerState {
   isBoardCreationDialogHidden: boolean;
   isBoardDuplicateDialogHidden: boolean;
   isBoardUpdateDialogHidden: boolean;
-  isArchiveBoardConfirmationDialogHidden: boolean;
-  isDeleteBoardConfirmationDialogHidden: boolean;
+//  isArchiveBoardConfirmationDialogHidden: boolean;
+//  isDeleteBoardConfirmationDialogHidden: boolean;
   isMobileBoardActionsDialogHidden: boolean;
   isMobileTeamSelectorDialogHidden: boolean;
   isTeamBoardDeletedInfoDialogHidden: boolean;
@@ -135,8 +135,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isCarouselDialogHidden: true,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
-      isArchiveBoardConfirmationDialogHidden: true,
-      isDeleteBoardConfirmationDialogHidden: true,
+//      isArchiveBoardConfirmationDialogHidden: true,
+//      isDeleteBoardConfirmationDialogHidden: true,
       isDesktop: true,
       isDropIssueInEdgeMessageBarVisible: true,
       isLiveSyncInTfsIssueMessageBarVisible: true,
@@ -973,7 +973,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return this.state.currentBoard.activePhase;
   }
-
+/* DPH
   private readonly showDeleteBoardConfirmationDialog = () => {
     this.setState({ isDeleteBoardConfirmationDialogHidden: false });
   }
@@ -999,7 +999,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       }
     );
   }
-
+*/
   private readonly showBoardUrlCopiedToast = () => {
     toast(`The link to retrospective ${this.state.currentBoard.title} has been copied to your clipboard.`);
   }
@@ -1019,7 +1019,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     this.setState({ isReconnectingToBackendService: false });
   }
-
+/* DPH
   private readonly archiveCurrentBoard = async () => {
     await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
@@ -1034,7 +1034,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.hideDeleteBoardConfirmationDialog();
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardDeleted, properties: { boardId: this.state.currentBoard.id } });
   }
-
+*/
   private readonly copyBoardUrl = async () => {
     const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
     copyToClipboard(boardDeepLinkUrl);
@@ -1191,6 +1191,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       key: 'seperator',
       itemType: ContextualMenuItemType.Divider,
     },
+/* DPH
     {
       key: 'archiveBoard',
       iconProps: { iconName: 'Archive' },
@@ -1204,7 +1205,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       onClick: this.showDeleteBoardConfirmationDialog,
       text: 'Delete retrospective',
       title: 'Delete retrospective',
-    },
+    }, */
   ];
 
   private readonly hideMobileBoardActionsDialog = () => {
@@ -1680,6 +1681,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       userId={this.state.currentUserId}
                     />
                   </div>
+{/* DPH
                   <Dialog
                     hidden={this.state.isDeleteBoardConfirmationDialogHidden}
                     onDismiss={this.hideDeleteBoardConfirmationDialog}
@@ -1722,6 +1724,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
                     </DialogFooter>
                   </Dialog>
+*/}
                 </div>
               }
             </PivotItem>
@@ -1912,6 +1915,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </>
           }
         </Dialog>
+{/* DPH
         <Dialog
           hidden={this.state.isTeamBoardDeletedInfoDialogHidden}
           onDismiss={this.hideTeamBoardDeletedInfoDialog}
@@ -1929,6 +1933,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <DefaultButton aria-label="Dismiss Deleted Team Board Dialog" onClick={this.hideTeamBoardDeletedInfoDialog} text="Dismiss" />
           </DialogFooter>
         </Dialog>
+*/}
         <ToastContainer
           transition={Slide}
           closeButton={false}
