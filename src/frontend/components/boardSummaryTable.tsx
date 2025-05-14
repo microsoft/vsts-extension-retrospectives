@@ -190,12 +190,11 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
   // isDataLoaded: boolean, // DPH if remove then expect only 5 arguments
-  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
+  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
+  setRefreshKey: React.Dispatch<React.SetStateAction<number>>
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
-  // DPH
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const columns = [
     columnHelper.accessor('id', {
@@ -406,8 +405,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     setTableData(boardSummaryState.boardsTableItems);
   }, [boardSummaryState.boardsTableItems]);
 
+  // DPH
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const table: Table<IBoardSummaryTableItem> =
-    getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData); // DPH boardSummaryState.isDataLoaded,
+    getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setRefreshKey); // DPH boardSummaryState.isDataLoaded,
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
