@@ -152,18 +152,17 @@ const reloadBoardHistory = async (
   try {
     const updatedBoardData: IFeedbackBoardDocument[] = await BoardDataService.getBoardsForTeam(teamId);
 
-    // Convert `IFeedbackBoardDocument` to `IBoardSummaryTableItem`
-    const formattedData: IBoardSummaryTableItem[] = updatedBoardData.map(board => ({
-      id: board.id,
-      teamId: board.teamId,
-      boardName: board.boardName || "Untitled Board",
-      pendingWorkItemsCount: board.pendingWorkItemsCount ?? 0,
-      totalWorkItemsCount: board.totalWorkItemsCount ?? 0,
-      feedbackItemsCount: board.feedbackItemsCount ?? 0,
-      ownerId: board.ownerId || "Unknown Owner",
-      isArchived: board.isArchived ?? false,
-      createdDate: board.createdDate ?? new Date(), // ✅ Add `createdDate`
-    }));
+const formattedData: IBoardSummaryTableItem[] = updatedBoardData.map(board => ({
+  id: board.id,
+  teamId: board.teamId,
+  boardName: (board as any).boardName || "Untitled Board", 
+  createdDate: board.createdDate ? new Date(board.createdDate) : new Date(), 
+pendingWorkItemsCount: (board as any).pendingWorkItemsCount ?? 0,
+totalWorkItemsCount: (board as any).totalWorkItemsCount ?? 0,
+feedbackItemsCount: (board as any).feedbackItemsCount ?? 0,
+ownerId: (board as any).ownerId || "Unknown Owner",
+  isArchived: board.isArchived ?? false,
+}));
 
     setTableData(formattedData); // Now passing correctly formatted data
   } catch (error) {
