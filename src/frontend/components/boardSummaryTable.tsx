@@ -313,22 +313,10 @@ function getTable(
               deletedByUserId: encrypt(getUserIdentity().id),
             }
           });
-        }
-        catch (error: unknown) {
-  if (error instanceof Error && 'response' in error && (error.response as { status?: number }).status === 404) {
-    // Board already deleted, just update the table and close the dialog
-    setIsDeleteDialogOpen(false);
-    console.log("Caught the 404.");
-    setTableData(prevData => prevData.filter(board => board.id !== selectedBoard.id));
-  } else {
-    console.error("Error deleting board:", error);
-  }
-}
-/* catch (error) {
+
+        } catch (error) {
           console.error("Error deleting board:", error);
-          BoardDataService.getBoardsForTeam(props.teamId).then(handleBoardsDocuments);
         }
-*/
       };
 
 // DPH
