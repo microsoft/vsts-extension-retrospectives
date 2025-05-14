@@ -296,37 +296,35 @@ function getTable(
         setIsDeleteDialogOpen(false);
       };
 
-      const handleConfirmDelete = async (selectedBoard: IBoardSummaryTableItem) => {
-        try {
-          // Verify if the board still exists
-          const boardExists = tableData.some(board => board.id === selectedBoard.id);
-          if (!boardExists) {
-            alert("This board has already been deleted.");
-            // Update the table data to remove the deleted board
-            setTableData(prevData => prevData.filter(board => board.id !== selectedBoard.id));
-            return;
-          }
+const handleConfirmDelete = async (selectedBoard: IBoardSummaryTableItem) => {
+  try {
+    await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
+    reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
 
-          await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
-          reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
+    // Update local state to remove the deleted board from the table
+    setTableData((prevData) => prevData.filter(board => board.id !== selectedBoard.id));
 
-          // Update local state to remove the deleted board from the table
-          setTableData(prevData => prevData.filter(board => board.id !== selectedBoard.id));
+    // Track the event
+    appInsights.trackEvent({
+      name: TelemetryEvents.FeedbackBoardDeleted,
+      properties: {
+        boardId: selectedBoard.id,
+        boardName: selectedBoard.boardName,
+        deletedByUserId: encrypt(getUserIdentity().id),
+      }
+    });
 
-          // Track the event
-          appInsights.trackEvent({
-            name: TelemetryEvents.FeedbackBoardDeleted,
-            properties: {
-              boardId: selectedBoard.id,
-              boardName: selectedBoard.boardName,
-              deletedByUserId: encrypt(getUserIdentity().id),
-            }
-          });
-
-        } catch (error) {
-          console.error("Error deleting board:", error);
-        }
-      };
+    setIsDeleteDialogOpen(false);
+  } catch (error: any) {
+    if (error.response && error.response.status === 404) {
+      // Board already deleted, just update the table and close the dialog
+      setTableData((prevData) => prevData.filter(board => board.id !== selectedBoard.id));
+      setIsDeleteDialogOpen(false);
+    } else {
+      console.error("Error deleting board:", error);
+    }
+  }
+};
 
       const DPH_handleConfirmDelete = async (selectedBoard: IBoardSummaryTableItem) => {
         try {
