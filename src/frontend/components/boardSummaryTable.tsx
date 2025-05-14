@@ -144,32 +144,6 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
 });
 
-// DPH
-const reloadBoardHistory = async (
-  teamId: string,
-  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
-) => {
-  try {
-    const updatedBoardData: IFeedbackBoardDocument[] = await BoardDataService.getBoardsForTeam(teamId);
-
-const formattedData: IBoardSummaryTableItem[] = updatedBoardData.map(board => ({
-  id: board.id,
-  teamId: board.teamId,
-  boardName: (board as any).boardName || "Untitled Board",
-  createdDate: board.createdDate ? new Date(board.createdDate) : new Date(),
-pendingWorkItemsCount: (board as any).pendingWorkItemsCount ?? 0,
-totalWorkItemsCount: (board as any).totalWorkItemsCount ?? 0,
-feedbackItemsCount: (board as any).feedbackItemsCount ?? 0,
-ownerId: (board as any).ownerId || "Unknown Owner",
-  isArchived: board.isArchived ?? false,
-}));
-
-    setTableData(formattedData); // Now passing correctly formatted data
-  } catch (error) {
-    console.error("Error reloading board history:", error);
-  }
-};
-
 async function handleArchiveToggle(
   teamId: string,
   boardId: string,
@@ -209,6 +183,9 @@ async function handleArchiveToggle(
     console.error('Error while toggling archive state: ', error);
   }
 }
+
+// DPH
+const [refreshKey, setRefreshKey] = useState(0);
 
 function getTable(
   tableData: IBoardSummaryTableItem[],
@@ -342,9 +319,10 @@ function getTable(
 
         } catch (error) {
           console.error("Error deleting board:", error);
+          // DPH
+          // trigger refresh to flush issue
+          setRefreshKey(prev => prev + 1);
           setIsDeleteDialogOpen(false);
-          // Trigger board history reload since board may have been delete
-          reloadBoardHistory(selectedBoard.teamId, setTableData);
         }
       };
 
@@ -633,7 +611,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         appInsights.trackException(e);
       })
     }
-  }, [props.teamId])
+  }, [props.teamId, refreshKey])
 
   if(boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
