@@ -3,7 +3,6 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extensi
 import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { flexRender, useReactTable } from '@tanstack/react-table';
-
 import BoardSummary from './boardSummary';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
