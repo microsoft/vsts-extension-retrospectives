@@ -156,7 +156,7 @@ const reloadBoardHistory = async (
     const formattedData: IBoardSummaryTableItem[] = updatedBoardData.map(board => ({
       id: board.id,
       teamId: board.teamId,
-      boardName: board.boardName || "Untitled Board", 
+      boardName: board.boardName || "Untitled Board",
       pendingWorkItemsCount: board.pendingWorkItemsCount ?? 0,
       totalWorkItemsCount: board.totalWorkItemsCount ?? 0,
       feedbackItemsCount: board.feedbackItemsCount ?? 0,
