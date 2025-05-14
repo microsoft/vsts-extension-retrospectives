@@ -315,8 +315,9 @@ const handleConfirmDelete = async (selectedBoard: IBoardSummaryTableItem) => {
     });
 
     setIsDeleteDialogOpen(false);
-  } catch (error: any) {
-    if (error.response && error.response.status === 404) {
+
+  } catch (error: unknown) {
+  if (error instanceof Error && 'response' in error && (error.response as { status?: number }).status === 404) {
       // Board already deleted, just update the table and close the dialog
       setTableData((prevData) => prevData.filter(board => board.id !== selectedBoard.id));
       setIsDeleteDialogOpen(false);
