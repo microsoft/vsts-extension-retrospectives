@@ -1,3 +1,141 @@
+import React, { useState, useEffect } from 'react';
+import { IFeedbackBoardDocument } from '../interfaces/feedback';
+import BoardDataService from '../dal/boardDataService';
+import { itemDataService } from '../dal/itemDataService';
+import { workItemService } from '../dal/azureDevOpsWorkItemService';
+import { createColumnHelper, getCoreRowModel, type Table } from '@tanstack/table-core';
+import { flexRender, useReactTable } from '@tanstack/react-table';
+
+export interface IBoardSummaryTableItem {
+  boardName: string;
+  createdDate: Date;
+  isArchived?: boolean;
+  archivedDate?: Date;
+  feedbackItemsCount: number;
+  totalWorkItemsCount: number;
+  pendingWorkItemsCount: number;
+  id: string;
+  teamId: string;
+  ownerId: string;
+}
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+
+const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
+
+const columns = [
+  columnHelper.accessor('boardName', { header: 'Retrospective Name', size: 200 }),
+  columnHelper.accessor('createdDate', {
+    header: 'Created Date',
+    cell: (info) => dateFormatter.format(info.getValue()),
+    size: 150,
+  }),
+  columnHelper.accessor('isArchived', {
+    header: 'Archived',
+    cell: (info) => (info.getValue() ? 'Yes' : 'No'),
+    size: 100,
+  }),
+  columnHelper.accessor('archivedDate', {
+    header: 'Archived Date',
+    cell: (info) => info.getValue() ? dateFormatter.format(info.getValue()!) : '-',
+    size: 150,
+  }),
+  columnHelper.accessor('feedbackItemsCount', { header: 'Feedback Items', size: 100 }),
+  columnHelper.accessor('totalWorkItemsCount', { header: 'Total Work Items', size: 100 }),
+  columnHelper.accessor('pendingWorkItemsCount', { header: 'Pending Work Items', size: 100 }),
+];
+
+function BoardSummaryTable({ teamId }: { teamId: string }): JSX.Element {
+  const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  useEffect(() => {
+    BoardDataService.getBoardsForTeam(teamId)
+      .then(async (boardDocuments: IFeedbackBoardDocument[]) => {
+        const boardsTableItems = await Promise.all(
+          boardDocuments.map(async board => {
+            const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board.id);
+
+            const actionableFeedbackItems = feedbackItems.filter(item => item.associatedActionItemIds?.length);
+            const aggregatedWorkItems: any[] = [];
+
+            await Promise.all(actionableFeedbackItems.map(async (item) => {
+              const workItems = await workItemService.getWorkItemsByIds(item.associatedActionItemIds);
+              if (workItems?.length) {
+                aggregatedWorkItems.push(...workItems);
+              }
+            }));
+
+            return {
+              boardName: board.title,
+              createdDate: new Date(board.createdDate),
+              isArchived: board.isArchived ?? false,
+              archivedDate: board.archivedDate ? new Date(board.archivedDate) : null,
+              feedbackItemsCount: feedbackItems.length,
+              totalWorkItemsCount: aggregatedWorkItems.length, // ✅ Preserving original logic
+              pendingWorkItemsCount: aggregatedWorkItems.filter(
+                workItem => !['Completed', 'Removed'].includes(workItem.fields['System.State'])
+              ).length,
+              id: board.id,
+              teamId: board.teamId,
+              ownerId: board.createdBy.id,
+            };
+          })
+        );
+
+        setTableData(boardsTableItems);
+        setIsDataLoaded(true);
+      })
+      .catch(error => console.error("Error loading boards:", error));
+  }, [teamId]);
+
+  if (!isDataLoaded) {
+    return <div>Loading board data...</div>;
+  }
+
+  const table: Table<IBoardSummaryTableItem> = useReactTable({
+    data: tableData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return (
+    <div className="board-summary-table-container">
+      <table>
+        <thead>
+          {table.getHeaderGroups().map(headerGroup => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map(header => (
+                <th key={header.id} style={{ width: header.getSize() }}>
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map(row => (
+            <tr key={row.id}>
+              {row.getVisibleCells().map(cell => (
+                <td key={cell.id} style={{ width: cell.column.getSize() }}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default BoardSummaryTable;
+
+/*
 import React, { Fragment, useEffect, useState } from 'react';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
@@ -636,3 +774,4 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 }
 
 export default withAITracking(reactPlugin, BoardSummaryTable);
+*/
