@@ -290,19 +290,19 @@ function getTable(
         </div>
       ),
       cell: (cellContext) => {
-  const selectedBoard = cellContext.row.original;
-  const isDialogOpen = openDialogBoardId === selectedBoard.id; // Now controlled by parent
+        const selectedBoard = cellContext.row.original;
+        const isDialogOpen = openDialogBoardId === selectedBoard.id; // Now controlled by parent
 
-  return (
-      <div
-        className="centered-cell trash-icon"
-        title="Delete board"
-        onClick={(event) => handleTrashClick(event, selectedBoard.id)}
-      >
-        {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
-      </div>
-  );
-    },
+        return (
+          <div
+            className="centered-cell trash-icon"
+            title="Delete board"
+            onClick={(event) => handleTrashClick(event, selectedBoard.id)}
+          >
+            {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
+          </div>
+        );
+      },
       size: 45,
       enableSorting: false,
     })
@@ -349,7 +349,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const [refreshKey, setRefreshKey] = useState(false);
 
         const handleCancelDelete = () => {
-        setIsDeleteDialogOpen(false);
+        //setIsDeleteDialogOpen(false);
+        setOpenDialogBoardId(null);
       };
 
   const handleConfirmDelete = async () => {
