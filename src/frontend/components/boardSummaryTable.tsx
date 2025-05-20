@@ -359,6 +359,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     if (!openDialogBoardId) return;
 // DPH add debug statements to find where fails
     try {
+      console.log("0: delete board: ", openDialogBoardId);
+      setOpenDialogBoardId(null); // close dialog
       console.log("1: before delete");
       await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
       console.log("2: before broadcast");
@@ -380,9 +382,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     } catch (error) {
       console.error("Error deleting board:", error);
       setRefreshKey(true);
-    } finally {
-      console.log("finally");
-      setOpenDialogBoardId(null); // Ensure cleanup
     }
   };
 
