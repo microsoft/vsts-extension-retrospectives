@@ -357,19 +357,16 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const handleConfirmDelete = async () => {
     if (!openDialogBoardId) return;
-// DPH add debug statements to find where fails
+
     try {
-      console.log("0: delete board: ", openDialogBoardId);
+      console.log("Delete board: ", openDialogBoardId);
       setOpenDialogBoardId(null); // close dialog
-      console.log("1: before delete");
+
       await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
-      console.log("2: before broadcast");
       reflectBackendService.broadcastDeletedBoard(props.teamId, openDialogBoardId);
 
-      console.log ("3: before setTableData");
       setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
-      // DPH maybe force refresh
-      console.log("4: before telemtry")
+
       appInsights.trackEvent({
         name: TelemetryEvents.FeedbackBoardDeleted,
         properties: {
