@@ -359,17 +359,32 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     if (!openDialogBoardId) return;
 
     try {
-      await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
-      reflectBackendService.broadcastDeletedBoard(props.teamId, openDialogBoardId);
+      console.log("Attempting to delete board:", openDialogBoardId);
 
-      setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
+      // Find the board corresponding to openDialogBoardId
+      const selectedBoard = tableData.find(board => board.id === openDialogBoardId);
+      if (!selectedBoard) {
+        console.error("Error: Board not found!");
+        return;
+      }
 
+      await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
+      reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
+
+      // Remove the deleted board from the state
+      setTableData(prevData => prevData.filter(board => board.id !== selectedBoard.id));
+
+      // Force a refresh to ensure UI updates immediately
+      setRefreshKey(prev => !prev);
+
+      // Track the event
       appInsights.trackEvent({
         name: TelemetryEvents.FeedbackBoardDeleted,
         properties: {
-          boardId: openDialogBoardId,
+          boardId: selectedBoard.id,
+          boardName: selectedBoard.boardName,
           deletedByUserId: encrypt(getUserIdentity().id),
-        },
+        }
       });
 
     } catch (error) {
