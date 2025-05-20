@@ -5,6 +5,7 @@ import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { createColumnHelper, getCoreRowModel, type Table } from '@tanstack/table-core';
 import { flexRender, useReactTable } from '@tanstack/react-table';
+import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 
 export interface IBoardSummaryTableProps {
   teamId: string;
