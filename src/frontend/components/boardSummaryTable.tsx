@@ -282,24 +282,6 @@ function getTable(
       footer: defaultFooter,
       size: 80,
     }),
-
-    // Only allow deletion when board is archived
-    return selectedBoard.isArchived ? (
-      <div
-        className="centered-cell trash-icon"
-        title="Delete board"
-        onClick={(event) => handleTrashClick(event, selectedBoard.id)}
-      >
-        <i className="fas fa-trash-alt"></i>
-      </div>
-    ) : (
-      <div className="centered-cell"></div> // Empty div prevents clicks from triggering delete
-    );
-  },
-  size: 45,
-  enableSorting: false,
-});
-
     columnHelper.display({
       id: 'trash',
       header: () => (
