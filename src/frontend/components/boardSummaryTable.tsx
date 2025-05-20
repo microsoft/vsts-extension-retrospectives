@@ -349,6 +349,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [boardSummaryState.boardsTableItems]);
 
   const [refreshKey, setRefreshKey] = useState(false);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const handleCancelDelete = () => {
     //setIsDeleteDialogOpen(false);
