@@ -348,47 +348,47 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const [refreshKey, setRefreshKey] = useState(false);
 
-        const handleCancelDelete = () => {
-        //setIsDeleteDialogOpen(false);
-        setOpenDialogBoardId(null);
-      };
+  const handleCancelDelete = () => {
+    //setIsDeleteDialogOpen(false);
+    setOpenDialogBoardId(null);
+  };
 
   const handleConfirmDelete = async () => {
-  if (!openDialogBoardId) return;
+    if (!openDialogBoardId) return;
 
-  try {
-    await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
-    reflectBackendService.broadcastDeletedBoard(props.teamId, openDialogBoardId);
+    try {
+      await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
+      reflectBackendService.broadcastDeletedBoard(props.teamId, openDialogBoardId);
 
-    setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
+      setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
 
-    appInsights.trackEvent({
-      name: TelemetryEvents.FeedbackBoardDeleted,
-      properties: {
-        boardId: openDialogBoardId,
-        deletedByUserId: encrypt(getUserIdentity().id),
-      },
-    });
+      appInsights.trackEvent({
+        name: TelemetryEvents.FeedbackBoardDeleted,
+        properties: {
+          boardId: openDialogBoardId,
+          deletedByUserId: encrypt(getUserIdentity().id),
+        },
+      });
 
-  } catch (error) {
-    console.error("Error deleting board:", error);
-    setRefreshKey(true);
-  } finally {
-    setOpenDialogBoardId(null); // Ensure cleanup
-  }
-};
+    } catch (error) {
+      console.error("Error deleting board:", error);
+      setRefreshKey(true);
+    } finally {
+      setOpenDialogBoardId(null); // Ensure cleanup
+    }
+  };
 
-const table: Table<IBoardSummaryTableItem> =
-  getTable(
-    tableData,
-    sorting,
-    setSorting,
-    props.onArchiveToggle,
-    setTableData,
-    setRefreshKey,
-    openDialogBoardId, // Pass dialog state
-    setOpenDialogBoardId // Pass state setter
-  );
+  const table: Table<IBoardSummaryTableItem> =
+    getTable(
+      tableData,
+      sorting,
+      setSorting,
+      props.onArchiveToggle,
+      setTableData,
+      setRefreshKey,
+      openDialogBoardId,
+      setOpenDialogBoardId
+    );
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
@@ -583,17 +583,17 @@ const table: Table<IBoardSummaryTableItem> =
   }
 
   useEffect(() => {
-  if (teamId !== props.teamId || refreshKey) { // Triggers when teamId changes OR refreshKey is true
-    BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
-      setTeamId(props.teamId);
-      handleBoardsDocuments(boardDocuments);
-    }).finally(() => {
-      setRefreshKey(false); // Reset refreshKey after fetching
-    }).catch(e => {
-      appInsights.trackException(e);
-    });
-  }
-}, [props.teamId, refreshKey]); // Runs when teamId or refreshKey updates
+    if (teamId !== props.teamId || refreshKey) { // Triggers when teamId changes OR refreshKey is true
+      BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
+        setTeamId(props.teamId);
+        handleBoardsDocuments(boardDocuments);
+      }).finally(() => {
+        setRefreshKey(false); // Reset refreshKey after fetching
+      }).catch(e => {
+        appInsights.trackException(e);
+      });
+    }
+  }, [props.teamId, refreshKey]); // Runs when teamId or refreshKey updates
 
   if(boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
@@ -603,46 +603,53 @@ const table: Table<IBoardSummaryTableItem> =
     />
   }
 
+  const selectedBoardForDelete = tableData.find(board => board.id === openDialogBoardId);
+
   return (
-  <div className="board-summary-table-container">
-    {openDialogBoardId && (
-      <Dialog
-        hidden={!openDialogBoardId}
-        onDismiss={() => setOpenDialogBoardId(null)}
-        dialogContentProps={{
-          type: DialogType.close,
-          title: 'Delete Retrospective',
-        }}
-        modalProps={{
-          isBlocking: true,
-          containerClassName: 'retrospectives-delete-board-confirmation-dialog',
-          className: 'retrospectives-dialog-modal',
-        }}
-      >
-        <DialogContent>
-          <p>The retrospective board will be deleted.</p>
-          <p style={{ fontStyle: "italic" }}>This action is permanent and cannot be undone.</p>
-        </DialogContent>
+    <div className="board-summary-table-container">
+      {openDialogBoardId && (
+        <Dialog
+          hidden={!openDialogBoardId}
+          onDismiss={() => setOpenDialogBoardId(null)}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Delete Retrospective',
+          }}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-delete-board-confirmation-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}
+        >
+            <DialogContent>
+              <p>
+                The retrospective board &quot;{selectedBoardForDelete.boardName}&quot; with {selectedBoardForDelete.feedbackItemsCount} feedback items will be deleted.
+              </p>
+              <br />
+              <p style={{ fontStyle: "italic" }}>
+                This action is permanent and cannot be undone.
+              </p>
+            </DialogContent>
         <DialogFooter>
           <PrimaryButton onClick={handleConfirmDelete} text="Delete" />
           <DefaultButton autoFocus onClick={() => setOpenDialogBoardId(null)} text="Cancel" />
         </DialogFooter>
-      </Dialog>
-    )}
+        </Dialog>
+      )}
 
-    <table>
-      <BoardSummaryTableHeader
-        headerGroups={table.getHeaderGroups()}
-        getThProps={getThProps}
-      />
-      <BoardSummaryTableBody
-        rows={table.getRowModel().rows}
-        getTdProps={getTdProps}
-        boardRowSummary={boardRowSummary}
-      />
-    </table>
-  </div>
-);
+      <table>
+        <BoardSummaryTableHeader
+          headerGroups={table.getHeaderGroups()}
+          getThProps={getThProps}
+        />
+        <BoardSummaryTableBody
+          rows={table.getRowModel().rows}
+          getTdProps={getTdProps}
+          boardRowSummary={boardRowSummary}
+        />
+      </table>
+    </div>
+  );
 }
 
 export default withAITracking(reactPlugin, BoardSummaryTable);
