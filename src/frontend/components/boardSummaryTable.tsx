@@ -357,40 +357,31 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const handleConfirmDelete = async () => {
     if (!openDialogBoardId) return;
-
+// DPH add debug statements to find where fails
     try {
-      console.log("Attempting to delete board:", openDialogBoardId);
+      console.log("1: before delete");
+      await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
+      console.log("2: before broadcast");
+      reflectBackendService.broadcastDeletedBoard(props.teamId, openDialogBoardId);
 
-      // Find the board corresponding to openDialogBoardId
-      const selectedBoard = tableData.find(board => board.id === openDialogBoardId);
-      if (!selectedBoard) {
-        console.error("Error: Board not found!");
-        return;
-      }
-
-      await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
-      reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
-
-      // Remove the deleted board from the state
-      setTableData(prevData => prevData.filter(board => board.id !== selectedBoard.id));
-
-      // Force a refresh to ensure UI updates immediately
-      setRefreshKey(prev => !prev);
-
-      // Track the event
+      console.log ("3: before setTableData");
+      setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
+      // DPH maybe force refresh
+      console.log("4: before telemtry")
       appInsights.trackEvent({
         name: TelemetryEvents.FeedbackBoardDeleted,
         properties: {
-          boardId: selectedBoard.id,
-          boardName: selectedBoard.boardName,
+          boardId: openDialogBoardId,
+          // DPH add board name
           deletedByUserId: encrypt(getUserIdentity().id),
-        }
+        },
       });
 
     } catch (error) {
       console.error("Error deleting board:", error);
       setRefreshKey(true);
     } finally {
+      console.log("finally");
       setOpenDialogBoardId(null); // Ensure cleanup
     }
   };
