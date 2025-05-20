@@ -282,6 +282,24 @@ function getTable(
       footer: defaultFooter,
       size: 80,
     }),
+
+    // Only allow deletion when board is archived
+    return selectedBoard.isArchived ? (
+      <div
+        className="centered-cell trash-icon"
+        title="Delete board"
+        onClick={(event) => handleTrashClick(event, selectedBoard.id)}
+      >
+        <i className="fas fa-trash-alt"></i>
+      </div>
+    ) : (
+      <div className="centered-cell"></div> // Empty div prevents clicks from triggering delete
+    );
+  },
+  size: 45,
+  enableSorting: false,
+});
+
     columnHelper.display({
       id: 'trash',
       header: () => (
@@ -293,14 +311,16 @@ function getTable(
         const selectedBoard = cellContext.row.original;
         const isDialogOpen = openDialogBoardId === selectedBoard.id; // Now controlled by parent
 
-        return (
+        return selectedBoard.isArchived ? (
           <div
             className="centered-cell trash-icon"
             title="Delete board"
             onClick={(event) => handleTrashClick(event, selectedBoard.id)}
           >
-            {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
+            <i className="fas fa-trash-alt"></i>
           </div>
+        ) : (
+          <div className="centered-cell"></div> // Empty div prevents clicks from triggering delete
         );
       },
       size: 45,
