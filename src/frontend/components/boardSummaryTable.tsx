@@ -61,7 +61,7 @@ function BoardSummaryTable({ teamId }: { teamId: string }): JSX.Element {
             const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board.id);
 
             const actionableFeedbackItems = feedbackItems.filter(item => item.associatedActionItemIds?.length);
-            const aggregatedWorkItems: any[] = [];
+            const aggregatedWorkItems: WorkItem[] = [];
 
             await Promise.all(actionableFeedbackItems.map(async (item) => {
               const workItems = await workItemService.getWorkItemsByIds(item.associatedActionItemIds);
