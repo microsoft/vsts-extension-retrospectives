@@ -6,17 +6,40 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { createColumnHelper, getCoreRowModel, type Table } from '@tanstack/table-core';
 import { flexRender, useReactTable } from '@tanstack/react-table';
 
+export interface IBoardSummaryTableProps {
+  teamId: string;
+  supportedWorkItemTypes: WorkItemType[];
+  onArchiveToggle: () => void;
+}
+
+export interface IBoardSummaryTableState {
+  boardsTableItems: IBoardSummaryTableItem[];
+  feedbackBoards: IFeedbackBoardDocument[];
+  isDataLoaded: boolean;
+  actionItemsByBoard: IActionItemsTableItems;
+  allDataLoaded: boolean;
+}
+
 export interface IBoardSummaryTableItem {
   boardName: string;
   createdDate: Date;
   isArchived?: boolean;
   archivedDate?: Date;
-  feedbackItemsCount: number;
-  totalWorkItemsCount: number;
   pendingWorkItemsCount: number;
+  totalWorkItemsCount: number;
+  feedbackItemsCount: number;
   id: string;
   teamId: string;
   ownerId: string;
+}
+
+export interface IBoardActionItemsData {
+  isDataLoaded: boolean;
+  actionItems: WorkItem[];
+}
+
+export interface IActionItemsTableItems {
+  [key: string]: IBoardActionItemsData;
 }
 
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -49,7 +72,8 @@ const columns = [
   columnHelper.accessor('pendingWorkItemsCount', { header: 'Pending Work Items', size: 100 }),
 ];
 
-function BoardSummaryTable({ teamId }: { teamId: string }): JSX.Element {
+function BoardSummaryTable(props: IBoardSummaryTableProps): JSX.Element {
+  const { teamId, supportedWorkItemTypes, onArchiveToggle } = props;
   const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
