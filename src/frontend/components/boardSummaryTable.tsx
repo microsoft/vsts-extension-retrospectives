@@ -190,10 +190,17 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>
+  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>,
+  openDialogBoardId: string | null, // New parameter
+  setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>> // New parameter
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
+
+  const handleTrashClick = (event: React.MouseEvent, boardId: string) => {
+    event.stopPropagation();
+    setOpenDialogBoardId(boardId);
+  };
 
   const columns = [
     columnHelper.accessor('id', {
@@ -283,80 +290,18 @@ function getTable(
         </div>
       ),
       cell: (cellContext) => {
-        const selectedBoard = cellContext.row.original;
-        const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const selectedBoard = cellContext.row.original;
+  const isDialogOpen = openDialogBoardId === selectedBoard.id; // Now controlled by parent
 
-        const handleTrashClick = (event: React.MouseEvent) => {
-          event.stopPropagation(); // Prevent row expansion on click
-          setIsDeleteDialogOpen(true);
-        };
-
-      const handleCancelDelete = () => {
-        setIsDeleteDialogOpen(false);
-      };
-
-      const handleConfirmDelete = async (selectedBoard: IBoardSummaryTableItem) => {
-        try {
-          await BoardDataService.deleteFeedbackBoard(selectedBoard.teamId, selectedBoard.id);
-          reflectBackendService.broadcastDeletedBoard(selectedBoard.teamId, selectedBoard.id);
-
-          // Update local state to remove the deleted board from the table
-          setTableData((prevData) => prevData.filter(board => board.id !== selectedBoard.id));
-
-          // Track the event
-          appInsights.trackEvent({
-            name: TelemetryEvents.FeedbackBoardDeleted,
-            properties: {
-              boardId: selectedBoard.id,
-              boardName: selectedBoard.boardName,
-              deletedByUserId: encrypt(getUserIdentity().id),
-            }
-          });
-
-        } catch (error) {
-          console.error("Error deleting board:", error);
-          setRefreshKey(true);
-          setIsDeleteDialogOpen(false);
-        }
-      };
-
-      return (
-        <>
-          <div
-            className="centered-cell trash-icon"
-            title="Delete board"
-            onClick={handleTrashClick}
-          >
-            {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
-          </div>
-          <Dialog
-            hidden={!isDeleteDialogOpen}
-            onDismiss={handleCancelDelete}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: 'Delete Retrospective',
-            }}
-            modalProps={{
-              isBlocking: true,
-              containerClassName: 'retrospectives-delete-board-confirmation-dialog',
-              className: 'retrospectives-dialog-modal',
-            }}>
-            <DialogContent>
-              <p>
-                The retrospective board &quot;{selectedBoard.boardName}&quot; with {selectedBoard.feedbackItemsCount} feedback items will be deleted.
-              </p>
-              <br />
-              <p style={{ fontStyle: "italic" }}>
-                This action is permanent and cannot be undone.
-              </p>
-            </DialogContent>
-            <DialogFooter>
-              <PrimaryButton onClick={() => handleConfirmDelete(selectedBoard)} text="Delete" />
-              <DefaultButton autoFocus onClick={handleCancelDelete} text="Cancel" />
-            </DialogFooter>
-          </Dialog>
-        </>
-      );
+  return (
+      <div
+        className="centered-cell trash-icon"
+        title="Delete board"
+        onClick={(event) => handleTrashClick(event, selectedBoard.id)}
+      >
+        {selectedBoard.isArchived && <i className="fas fa-trash-alt"></i>}
+      </div>
+  );
     },
       size: 45,
       enableSorting: false,
@@ -385,6 +330,7 @@ function getTable(
 }
 
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
+  const [openDialogBoardId, setOpenDialogBoardId] = useState<string | null>(null);
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
     boardsTableItems: new Array<IBoardSummaryTableItem>(),
@@ -402,8 +348,46 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const [refreshKey, setRefreshKey] = useState(false);
 
-  const table: Table<IBoardSummaryTableItem> =
-    getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setRefreshKey);
+        const handleCancelDelete = () => {
+        setIsDeleteDialogOpen(false);
+      };
+
+  const handleConfirmDelete = async () => {
+  if (!openDialogBoardId) return;
+
+  try {
+    await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
+    reflectBackendService.broadcastDeletedBoard(props.teamId, openDialogBoardId);
+
+    setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
+
+    appInsights.trackEvent({
+      name: TelemetryEvents.FeedbackBoardDeleted,
+      properties: {
+        boardId: openDialogBoardId,
+        deletedByUserId: encrypt(getUserIdentity().id),
+      },
+    });
+
+  } catch (error) {
+    console.error("Error deleting board:", error);
+    setRefreshKey(true);
+  } finally {
+    setOpenDialogBoardId(null); // Ensure cleanup
+  }
+};
+
+const table: Table<IBoardSummaryTableItem> =
+  getTable(
+    tableData,
+    sorting,
+    setSorting,
+    props.onArchiveToggle,
+    setTableData,
+    setRefreshKey,
+    openDialogBoardId, // Pass dialog state
+    setOpenDialogBoardId // Pass state setter
+  );
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
@@ -619,20 +603,45 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }
 
   return (
-    <div className="board-summary-table-container">
-      <table>
-        <BoardSummaryTableHeader
-          headerGroups={table.getHeaderGroups()}
-          getThProps={getThProps}
-        />
-        <BoardSummaryTableBody
-          rows={table.getRowModel().rows}
-          getTdProps={getTdProps}
-          boardRowSummary={boardRowSummary}
-        />
-      </table>
-    </div>
-  );
+  <div className="board-summary-table-container">
+    {openDialogBoardId && (
+      <Dialog
+        hidden={!openDialogBoardId}
+        onDismiss={() => setOpenDialogBoardId(null)}
+        dialogContentProps={{
+          type: DialogType.close,
+          title: 'Delete Retrospective',
+        }}
+        modalProps={{
+          isBlocking: true,
+          containerClassName: 'retrospectives-delete-board-confirmation-dialog',
+          className: 'retrospectives-dialog-modal',
+        }}
+      >
+        <DialogContent>
+          <p>The retrospective board will be deleted.</p>
+          <p style={{ fontStyle: "italic" }}>This action is permanent and cannot be undone.</p>
+        </DialogContent>
+        <DialogFooter>
+          <PrimaryButton onClick={handleConfirmDelete} text="Delete" />
+          <DefaultButton autoFocus onClick={() => setOpenDialogBoardId(null)} text="Cancel" />
+        </DialogFooter>
+      </Dialog>
+    )}
+
+    <table>
+      <BoardSummaryTableHeader
+        headerGroups={table.getHeaderGroups()}
+        getThProps={getThProps}
+      />
+      <BoardSummaryTableBody
+        rows={table.getRowModel().rows}
+        getTdProps={getTdProps}
+        boardRowSummary={boardRowSummary}
+      />
+    </table>
+  </div>
+);
 }
 
 export default withAITracking(reactPlugin, BoardSummaryTable);
