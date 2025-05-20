@@ -367,6 +367,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
       setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
 
+      setExpandedRows(prevExpanded => {
+        const newExpanded = new Set(prevExpanded);
+        newExpanded.delete(openDialogBoardId); // Remove only the deleted row
+        return newExpanded;
+      });
+
       appInsights.trackEvent({
         name: TelemetryEvents.FeedbackBoardDeleted,
         properties: {
