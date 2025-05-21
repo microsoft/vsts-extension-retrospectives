@@ -641,8 +641,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
               </p>
               <br />
               <p>
-                <i className="fas fa-exclamation-triangle" style={{ color: "red", marginRight: "5px" }}></i>
-                <strong style={{ color: "red" }}>Warning:</strong> <em>This action is permanent and cannot be undone.</em>
+                <i className="fas fa-exclamation-triangle" style={{ marginRight: "5px", color: "red" }}></i>
+                <strong>Warning:</strong> <em style={{ color: "red" }}>This action is permanent and cannot be undone.</em>
               </p>
             </DialogContent>
         <DialogFooter>
