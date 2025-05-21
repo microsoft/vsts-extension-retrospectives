@@ -631,12 +631,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         >
             <DialogContent>
               <p>
-                The retrospective board &quot;{selectedBoardForDelete.boardName}&quot; with {selectedBoardForDelete.feedbackItemsCount} feedback items will be deleted.
+                The retrospective board <strong>{selectedBoardForDelete.boardName}</strong> with <strong>{selectedBoardForDelete.feedbackItemsCount}</strong> feedback items will be deleted.
               </p>
               <br />
               <p style={{ fontStyle: "italic", fontWeight: "bold", color: "red" }}>
                 <i className="fas fa-exclamation-triangle" style={{ marginRight: "5px" }}></i>
-                Warning: This action is permanent and cannot be undone.
+                <strong>Warning:</strong> This action is permanent and cannot be undone.
               </p>
             </DialogContent>
         <DialogFooter>
