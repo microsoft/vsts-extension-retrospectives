@@ -1734,6 +1734,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   teamId={this.state.currentTeam.id}
                   supportedWorkItemTypes={this.state.allWorkItemTypes}
                   onArchiveToggle={this.handleArchiveToggle}
+                  expandedRows={this.state.expandedRows} // DPH
+                  setExpandedRows={this.setExpandedRows} // DPH
                 />
               </div>
             </PivotItem>
