@@ -120,8 +120,7 @@ const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({
           }}
           onClick={(event) => {
             const firstCell = event.currentTarget.cells[0]; // Get first column
-            const clickedCell = event.target.closest('td'); // Identify clicked cell
-
+            const clickedCell = (event.target as HTMLElement).closest('td'); // Identify clicked cell
             if (clickedCell !== firstCell) { return; }
             row.toggleExpanded(); // Allow expansion only for the first column
           }}
