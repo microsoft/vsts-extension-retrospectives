@@ -114,11 +114,17 @@ const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({
       <Fragment key={row.id}>
         <tr
           tabIndex={0}
-          aria-label="Board summary row. Click row to expand and view more statistics for this board."
+          aria-label="Board summary row. Click expand row icon to view more statistics for this board."
           onKeyPress={(e: React.KeyboardEvent) => {
             if (e.key === 'Enter') row.toggleExpanded();
           }}
-          onClick={() => row.toggleExpanded()}
+          onClick={(event) => {
+            const firstCell = event.currentTarget.cells[0]; // Get first column
+            const clickedCell = event.target.closest('td'); // Identify clicked cell
+
+            if (clickedCell !== firstCell) { return; }
+            row.toggleExpanded(); // Allow expansion only for the first column
+          }}
         >
           {row.getVisibleCells().map((cell) => (
             <td key={cell.id} {...getTdProps(cell)}>
