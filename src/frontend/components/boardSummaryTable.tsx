@@ -327,7 +327,11 @@ function getTable(
       sorting: sortingState,
       expanded: {}, // DPH
     },
-    onExpandedChange: updater => tableOptions.state.expanded = updater, // DPH
+    onExpandedChange: updater => {
+      tableOptions.state.expanded = typeof updater === 'function'
+        ? updater(tableOptions.state.expanded)
+        : updater;
+    } // DPH
   };
 
   return useReactTable(tableOptions);
