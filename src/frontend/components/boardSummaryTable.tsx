@@ -635,6 +635,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
               </p>
               <br />
               <p style={{ fontStyle: "italic", fontWeight: "bold", color: "red" }}>
+                <i className="fas fa-exclamation-triangle" style={{ marginRight: "5px" }}></i>
                 Warning: This action is permanent and cannot be undone.
               </p>
             </DialogContent>
