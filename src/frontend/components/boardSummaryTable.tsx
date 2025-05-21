@@ -35,6 +35,8 @@ export interface IBoardSummaryTableProps {
   teamId: string;
   supportedWorkItemTypes: WorkItemType[];
   onArchiveToggle: () => void; // Notify the parent about archive toggles
+  expandedRows: Set<string>;
+  setExpandedRows: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 export interface IBoardSummaryTableState {
