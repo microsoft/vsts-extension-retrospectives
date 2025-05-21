@@ -80,7 +80,7 @@ export interface FeedbackBoardContainerState {
   isBoardCreationDialogHidden: boolean;
   isBoardDuplicateDialogHidden: boolean;
   isBoardUpdateDialogHidden: boolean;
-//  isArchiveBoardConfirmationDialogHidden: boolean;
+  isArchiveBoardConfirmationDialogHidden: boolean;
 //  isDeleteBoardConfirmationDialogHidden: boolean;
   isMobileBoardActionsDialogHidden: boolean;
   isMobileTeamSelectorDialogHidden: boolean;
@@ -135,7 +135,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isCarouselDialogHidden: true,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
-//      isArchiveBoardConfirmationDialogHidden: true,
+      isArchiveBoardConfirmationDialogHidden: true,
 //      isDeleteBoardConfirmationDialogHidden: true,
       isDesktop: true,
       isDropIssueInEdgeMessageBarVisible: true,
@@ -983,7 +983,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private readonly hideDeleteBoardConfirmationDialog = () => {
     this.setState({ isDeleteBoardConfirmationDialogHidden: true });
   }
-
+*/
   private readonly showArchiveBoardConfirmationDialog = () => {
     this.setState({ isArchiveBoardConfirmationDialogHidden: false });
   }
@@ -991,7 +991,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private readonly hideArchiveBoardConfirmationDialog = () => {
     this.setState({ isArchiveBoardConfirmationDialogHidden: true });
   }
-
+/* DPH
   private readonly hideTeamBoardDeletedInfoDialog = () => {
     this.setState(
       {
