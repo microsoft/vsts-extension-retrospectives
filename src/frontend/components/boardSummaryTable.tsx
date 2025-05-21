@@ -35,8 +35,6 @@ export interface IBoardSummaryTableProps {
   teamId: string;
   supportedWorkItemTypes: WorkItemType[];
   onArchiveToggle: () => void; // Notify the parent about archive toggles
-  expandedRows: Set<string>;
-  setExpandedRows: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 export interface IBoardSummaryTableState {
@@ -351,7 +349,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [boardSummaryState.boardsTableItems]);
 
   const [refreshKey, setRefreshKey] = useState(false);
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set()); // DPH
 
   const handleCancelDelete = () => {
     //setIsDeleteDialogOpen(false);
@@ -369,13 +366,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       reflectBackendService.broadcastDeletedBoard(props.teamId, openDialogBoardId);
 
       setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
-
-      // DPH
-      setExpandedRows(prevExpanded => {
-        const newExpanded = new Set(prevExpanded);
-        newExpanded.delete(openDialogBoardId); // Remove only the deleted row
-        return newExpanded;
-      });
 
       appInsights.trackEvent({
         name: TelemetryEvents.FeedbackBoardDeleted,

@@ -6,8 +6,6 @@ const baseProps: IBoardSummaryTableProps = {
   teamId: 'team-1',
   supportedWorkItemTypes: [],
   onArchiveToggle: jest.fn(),
-  expandedRows: new Set(), // Mock expanded rows state
-  setExpandedRows: jest.fn(), // Mock function for state update
 };
 
 describe('BoardSummaryTable', () => {
