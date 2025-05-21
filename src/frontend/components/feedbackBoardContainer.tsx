@@ -423,6 +423,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             currentBoard: null,
             isBoardUpdateDialogHidden: true,
             isTeamBoardDeletedInfoDialogHidden: false,
+            isCarouselDialogHidden: true, // DPH
             teamBoardDeletedDialogTitle: 'Retrospective archived or deleted',
             teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been archived or deleted by another user.',
           }
@@ -435,6 +436,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           currentBoard: currentBoard,
           isBoardUpdateDialogHidden: true,
           isTeamBoardDeletedInfoDialogHidden: false,
+          isCarouselDialogHidden: true, // DPH
           teamBoardDeletedDialogTitle: 'Retrospective archived or deleted',
           teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.',
         };
@@ -1019,7 +1021,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     this.setState({ isReconnectingToBackendService: false });
   }
-/* DPH
+
   private readonly archiveCurrentBoard = async () => {
     await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
@@ -1027,14 +1029,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
   }
 
-  private readonly deleteCurrentBoard = async () => {
-    await BoardDataService.deleteFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
-    reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
-    await this.reloadBoardsForCurrentTeam();
-    this.hideDeleteBoardConfirmationDialog();
-    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardDeleted, properties: { boardId: this.state.currentBoard.id } });
-  }
-*/
   private readonly copyBoardUrl = async () => {
     const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
     copyToClipboard(boardDeepLinkUrl);
