@@ -298,7 +298,7 @@ function getTable(
         const selectedBoard = cellContext.row.original;
         const isDialogOpen = openDialogBoardId === selectedBoard.id; // Now controlled by parent
 
-        const ARCHIVE_DELETE_DELAY = 5 * 60 * 1000; // ✅ 5 minutes in milliseconds
+        const ARCHIVE_DELETE_DELAY = 2 * 60 * 1000; // ✅ 2 minutes in milliseconds
 
         return selectedBoard.isArchived && selectedBoard.archivedDate &&
            new Date() >= new Date(selectedBoard.archivedDate.getTime() + ARCHIVE_DELETE_DELAY) ? (
