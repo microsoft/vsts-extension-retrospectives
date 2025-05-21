@@ -362,8 +362,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const handleConfirmDelete = async () => {
     if (!openDialogBoardId) return;
 
+    const deletedBoard = tableData.find(board => board.id === openDialogBoardId);
+    const deletedBoardName = deletedBoard?.boardName || "Unknown Board";
+    const deletedFeedbackCount = deletedBoard?.feedbackItemsCount || 0;
+
     try {
-      console.log("Delete board: ", openDialogBoardId);
+      console.log("Deleting board:", deletedBoardName, "with", deletedFeedbackCount, "feedback items.");
+
       setOpenDialogBoardId(null); // close dialog
 
       await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
@@ -375,7 +380,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         name: TelemetryEvents.FeedbackBoardDeleted,
         properties: {
           boardId: openDialogBoardId,
-          // DPH add board name
+          boardName: deletedBoardName,
+          feedbackItemsCount: deletedFeedbackCount,
           deletedByUserId: encrypt(getUserIdentity().id),
         },
       });
@@ -634,9 +640,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
                 The retrospective board <strong>{selectedBoardForDelete.boardName}</strong> with <strong>{selectedBoardForDelete.feedbackItemsCount}</strong> feedback items will be deleted.
               </p>
               <br />
-              <p style={{ color: "red" }}>
-                <i className="fas fa-exclamation-triangle" style={{ marginRight: "5px" }}></i>
-                <strong>Warning:</strong> <em>This action is permanent and cannot be undone.</em>
+              <p>
+                <i className="fas fa-exclamation-triangle" style={{ color: "red", marginRight: "5px" }}></i>
+                <strong style={{ color: "red" }}>Warning:</strong> <em>This action is permanent and cannot be undone.</em>
               </p>
             </DialogContent>
         <DialogFooter>
