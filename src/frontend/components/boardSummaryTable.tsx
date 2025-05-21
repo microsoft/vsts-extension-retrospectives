@@ -324,9 +324,11 @@ function getTable(
         pageSize: tableData.length,
         pageIndex: 0
       },
-      sorting: sortingState
+      sorting: sortingState,
+      expanded: {}, // DPH
     },
-  }
+    onExpandedChange: updater => table.setExpandedRowModel(updater), // DPH
+  };
 
   return useReactTable(tableOptions);
 }
