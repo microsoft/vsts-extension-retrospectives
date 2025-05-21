@@ -324,15 +324,9 @@ function getTable(
         pageSize: tableData.length,
         pageIndex: 0
       },
-      sorting: sortingState,
-      expanded: {}, // DPH
+      sorting: sortingState
     },
-    onExpandedChange: updater => {
-      tableOptions.state.expanded = typeof updater === 'function'
-        ? updater(tableOptions.state.expanded)
-        : updater;
-    } // DPH
-  };
+  }
 
   return useReactTable(tableOptions);
 }
@@ -357,7 +351,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const [refreshKey, setRefreshKey] = useState(false);
 
   const handleCancelDelete = () => {
-    //setIsDeleteDialogOpen(false);
     setOpenDialogBoardId(null);
   };
 
