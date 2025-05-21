@@ -634,8 +634,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
                 The retrospective board &quot;{selectedBoardForDelete.boardName}&quot; with {selectedBoardForDelete.feedbackItemsCount} feedback items will be deleted.
               </p>
               <br />
-              <p style={{ fontStyle: "italic", fontWeight: "bold" }}>
-                This action is permanent and cannot be undone.
+              <p style={{ fontStyle: "italic", fontWeight: "bold", color: "red" }}>
+                Warning: This action is permanent and cannot be undone.
               </p>
             </DialogContent>
         <DialogFooter>
