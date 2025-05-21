@@ -327,7 +327,7 @@ function getTable(
       sorting: sortingState,
       expanded: {}, // DPH
     },
-    onExpandedChange: updater => table.setExpandedRowModel(updater), // DPH
+    onExpandedChange: updater => setExpandedRows(updater), // DPH
   };
 
   return useReactTable(tableOptions);
