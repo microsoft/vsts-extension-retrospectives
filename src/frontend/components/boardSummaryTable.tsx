@@ -122,7 +122,7 @@ const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({
             const firstCell = event.currentTarget.cells[0]; // Get first column
             const clickedCell = (event.target as HTMLElement).closest('td'); // Identify clicked cell
             if (clickedCell !== firstCell) { return; }
-            row.toggleExpanded(); // Allow expansion only for the first column
+            row.toggleExpanded(); // Allow row expansion when click first column
           }}
         >
           {row.getVisibleCells().map((cell) => (
@@ -634,7 +634,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
                 The retrospective board &quot;{selectedBoardForDelete.boardName}&quot; with {selectedBoardForDelete.feedbackItemsCount} feedback items will be deleted.
               </p>
               <br />
-              <p style={{ fontStyle: "italic" }}>
+              <p style={{ fontStyle: "italic", fontWeight: "bold" }}>
                 This action is permanent and cannot be undone.
               </p>
             </DialogContent>
