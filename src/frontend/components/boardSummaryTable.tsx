@@ -349,7 +349,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [boardSummaryState.boardsTableItems]);
 
   const [refreshKey, setRefreshKey] = useState(false);
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set()); // DPH
 
   const handleCancelDelete = () => {
     //setIsDeleteDialogOpen(false);
@@ -369,12 +369,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
 
       // DPH
-      setExpandedRows(new Set()); // Reset all expanded rows
-      /*setExpandedRows(prevExpanded => {
+      setExpandedRows(prevExpanded => {
         const newExpanded = new Set(prevExpanded);
         newExpanded.delete(openDialogBoardId); // Remove only the deleted row
         return newExpanded;
-      });*/
+      });
 
       appInsights.trackEvent({
         name: TelemetryEvents.FeedbackBoardDeleted,
