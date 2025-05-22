@@ -202,6 +202,35 @@ function getTable(
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
 
+  const ARCHIVE_DELETE_DELAY = 1 * 60 * 1000; // 1-minute delay
+
+  const getTrashIcon = (board) => {
+    // Condition 1: Not Archived
+    if (!board.isArchived) {
+      return <div className="centered-cell"></div>; // No trash can for non-archived boards
+    }
+
+    const archivedTime = new Date(board.archivedDate);
+    const currentTime = new Date();
+    const isPastDelay = currentTime >= new Date(archivedTime.getTime() + ARCHIVE_DELETE_DELAY);
+
+    return isPastDelay ? (
+      // Condition 2: Archived & Past Delay → Show enabled trash can
+      <div
+        className="centered-cell trash-icon"
+        title="Delete board"
+        onClick={(event) => handleTrashClick(event, board.id)}
+      >
+        <i className="fas fa-trash-alt"></i>
+      </div>
+    ) : (
+      // Condition 3: Archived & Not Past Delay → Show disabled trash can (gray + tooltip)
+      <div className="centered-cell trash-icon-disabled" title="Delete will be enabled shortly.">
+        <i className="fas fa-trash-alt" style={{ color: "gray" }}></i>
+      </div>
+    );
+  };
+
   const handleTrashClick = (event: React.MouseEvent, boardId: string) => {
     event.stopPropagation();
     setOpenDialogBoardId(boardId);
@@ -294,6 +323,18 @@ function getTable(
           <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
         </div>
       ),
+      cell: (cellContext) => getTrashIcon(cellContext.row.original), // ✅ Use helper function
+      size: 45,
+      enableSorting: false,
+    });
+    /* DPH
+    columnHelper.display({
+      id: 'trash',
+      header: () => (
+        <div className="centered-cell">
+          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
+        </div>
+      ),
       cell: (cellContext) => {
         const selectedBoard = cellContext.row.original;
         const isDialogOpen = openDialogBoardId === selectedBoard.id; // Now controlled by parent
@@ -316,6 +357,7 @@ function getTable(
       size: 45,
       enableSorting: false,
     })
+      */
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
