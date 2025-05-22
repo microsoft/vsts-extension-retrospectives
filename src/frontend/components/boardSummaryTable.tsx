@@ -326,7 +326,7 @@ function getTable(
       cell: (cellContext) => getTrashIcon(cellContext.row.original), // ✅ Use helper function
       size: 45,
       enableSorting: false,
-    });
+    })
     /* DPH
     columnHelper.display({
       id: 'trash',
