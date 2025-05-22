@@ -1661,11 +1661,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       className: 'retrospectives-dialog-modal',
                     }}>
                     <DialogContent>
-                      The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback items will be archived.
-                      <br /><br />
-                      <FontIcon iconName="LocationDot" /> Archived retrospectives are removed from the board selection list.
+                      <p>The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.</p>
                       <br />
-                      <FontIcon iconName="LocationDot" /> Archived boards and their feedback can be <em>restored</em> on the <strong>History</strong> tab.
+                      <p>Archived retrospectives are removed from the board selection list but remain on the <strong>History</strong> tab where they can be <em>restored</em> with their feedback at any time.</p>
                     </DialogContent>
                     <DialogFooter>
                       <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
