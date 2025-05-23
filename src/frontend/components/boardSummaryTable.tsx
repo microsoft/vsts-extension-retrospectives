@@ -226,7 +226,7 @@ function getTable(
     ) : (
       // Condition 3: Archived & Not Past Delay → Show disabled trash can (gray + tooltip)
       <div className="centered-cell trash-icon-disabled" title="Delete will be enabled after short delay">
-        <i className="fas fa-trash-alt" style={{ color: "#cccccc" }}></i>
+        <i className="fas fa-trash-alt" style={{ color: "#b0b0b0" }}></i>
       </div>
     );
   };
