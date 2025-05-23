@@ -186,6 +186,7 @@ async function handleArchiveToggle(
     onArchiveToggle();
   } catch (error) {
     console.error('Error while toggling archive state: ', error);
+    setRefreshKey(true); // perhaps board deleted by another user
   }
 }
 
@@ -402,7 +403,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
     } catch (error) {
       console.error("Error deleting board:", error);
-      setRefreshKey(true);
+      setRefreshKey(true); // perhaps board deleted by another user
     }
   };
 
