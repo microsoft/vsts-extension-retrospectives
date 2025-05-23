@@ -1007,7 +1007,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     this.hideArchiveBoardConfirmationDialog();
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
-    await this.reloadBoardsForCurrentTeam(); // DPH
+    await this.reloadBoardsForCurrentTeam();
   }
 
   private readonly copyBoardUrl = async () => {
