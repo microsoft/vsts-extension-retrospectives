@@ -225,8 +225,8 @@ function getTable(
       </div>
     ) : (
       // Condition 3: Archived & Not Past Delay → Show disabled trash can (gray + tooltip)
-      <div className="centered-cell trash-icon-disabled" title="Delete will be enabled shortly.">
-        <i className="fas fa-trash-alt" style={{ color: "gray" }}></i>
+      <div className="centered-cell trash-icon-disabled" title="Delete will be enabled after short delay">
+        <i className="fas fa-trash-alt" style={{ color: "#cccccc" }}></i>
       </div>
     );
   };
@@ -320,7 +320,7 @@ function getTable(
       id: 'trash',
       header: () => (
         <div className="centered-cell">
-          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
+          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete enabled for archived boards"></i>
         </div>
       ),
       cell: (cellContext) => getTrashIcon(cellContext.row.original), // ✅ Use helper function
