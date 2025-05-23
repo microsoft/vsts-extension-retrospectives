@@ -204,7 +204,7 @@ function getTable(
 
   const ARCHIVE_DELETE_DELAY = 1 * 60 * 1000; // 1-minute delay
 
-  const getTrashIcon = (board) => {
+  const getTrashIcon = (board: IBoardSummaryTableItem) => {
     // Condition 1: Not Archived
     if (!board.isArchived) {
       return <div className="centered-cell"></div>; // No trash can for non-archived boards
@@ -327,7 +327,7 @@ function getTable(
       size: 45,
       enableSorting: false,
     })
-    /* DPH
+/* DPH
     columnHelper.display({
       id: 'trash',
       header: () => (
@@ -357,7 +357,7 @@ function getTable(
       size: 45,
       enableSorting: false,
     })
-      */
+*/
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
