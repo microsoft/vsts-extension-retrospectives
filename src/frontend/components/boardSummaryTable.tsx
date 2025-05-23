@@ -1,14 +1,17 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { flexRender, useReactTable } from '@tanstack/react-table';
+
+import BoardSummary from './boardSummary';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
-import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
-import BoardSummary from './boardSummary';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reflectBackendService } from "../dal/reflectBackendService";
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
-import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
-import { flexRender, useReactTable } from '@tanstack/react-table';
+import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 
 import {
   createColumnHelper,
@@ -52,6 +55,7 @@ export interface IBoardSummaryTableItem {
   feedbackItemsCount: number;
   id: string; // Board ID
   teamId: string;
+  ownerId: string;
 }
 
 export interface IBoardActionItemsData {
@@ -110,11 +114,16 @@ const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({
       <Fragment key={row.id}>
         <tr
           tabIndex={0}
-          aria-label="Board summary row. Click row to expand and view more statistics for this board."
+          aria-label="Board summary row. Click expand row icon to view more statistics for this board."
           onKeyPress={(e: React.KeyboardEvent) => {
             if (e.key === 'Enter') row.toggleExpanded();
           }}
-          onClick={() => row.toggleExpanded()}
+          onClick={(event) => {
+            const firstCell = event.currentTarget.cells[0]; // Get first column
+            const clickedCell = (event.target as HTMLElement).closest('td'); // Identify clicked cell
+            if (clickedCell !== firstCell) { return; }
+            row.toggleExpanded(); // Allow row expansion when click first column
+          }}
         >
           {row.getVisibleCells().map((cell) => (
             <td key={cell.id} {...getTdProps(cell)}>
@@ -185,11 +194,47 @@ function getTable(
   sortingState: SortingState,
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
-  isDataLoaded: boolean,
-  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>
+  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
+  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>,
+  openDialogBoardId: string | null, // New parameter
+  setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>> // New parameter
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
+
+  const ARCHIVE_DELETE_DELAY = 2 * 60 * 1000; // 2-minute delay
+
+  const getTrashIcon = (board: IBoardSummaryTableItem) => {
+    // Condition 1: Not Archived
+    if (!board.isArchived) {
+      return <div className="centered-cell"></div>; // No trash can for non-archived boards
+    }
+
+    const archivedTime = new Date(board.archivedDate);
+    const currentTime = new Date();
+    const isPastDelay = currentTime >= new Date(archivedTime.getTime() + ARCHIVE_DELETE_DELAY);
+
+    return isPastDelay ? (
+      // Condition 2: Archived & Past Delay → Show enabled trash can
+      <div
+        className="centered-cell trash-icon"
+        title="Delete board"
+        onClick={(event) => handleTrashClick(event, board.id)}
+      >
+        <i className="fas fa-trash-alt"></i>
+      </div>
+    ) : (
+      // Condition 3: Archived & Not Past Delay → Show disabled trash can (gray + tooltip)
+      <div className="centered-cell trash-icon-disabled" title="Delete will be enabled after short delay">
+        <i className="fas fa-trash-alt" style={{ color: "#b0b0b0" }}></i>
+      </div>
+    );
+  };
+
+  const handleTrashClick = (event: React.MouseEvent, boardId: string) => {
+    event.stopPropagation();
+    setOpenDialogBoardId(boardId);
+  };
 
   const columns = [
     columnHelper.accessor('id', {
@@ -221,7 +266,7 @@ function getTable(
       cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
         return dateFormatter.format(cellContext.row.original.createdDate);
       },
-      size: 120,
+      size: 100,
       sortDescFirst: true
     }),
     columnHelper.accessor('isArchived', {
@@ -248,7 +293,7 @@ function getTable(
           </div>
         );
       },
-      size: 35,
+      size: 30,
       sortDescFirst: true,
     }),
     columnHelper.accessor('archivedDate', {
@@ -258,18 +303,29 @@ function getTable(
         const archivedDate = cellContext.row.original.archivedDate;
         return archivedDate ? dateFormatter.format(archivedDate) : '';
       },
-      size: 120,
+      size: 100,
       sortDescFirst: true
     }),
     columnHelper.accessor('feedbackItemsCount', {
       header: 'Feedback Items',
       footer: defaultFooter,
-      size: 110,
+      size: 80,
     }),
     columnHelper.accessor('totalWorkItemsCount', {
       header: 'Total Work Items',
       footer: defaultFooter,
-      size: 110,
+      size: 80,
+    }),
+    columnHelper.display({
+      id: 'trash',
+      header: () => (
+        <div className="centered-cell">
+          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete only enabled for archived boards"></i>
+        </div>
+      ),
+      cell: (cellContext) => getTrashIcon(cellContext.row.original),
+      size: 45,
+      enableSorting: false,
     })
   ]
 
@@ -295,6 +351,7 @@ function getTable(
 }
 
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
+  const [openDialogBoardId, setOpenDialogBoardId] = useState<string | null>(null);
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
     boardsTableItems: new Array<IBoardSummaryTableItem>(),
@@ -310,8 +367,56 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     setTableData(boardSummaryState.boardsTableItems);
   }, [boardSummaryState.boardsTableItems]);
 
+  const [refreshKey, setRefreshKey] = useState(false);
+
+  const handleCancelDelete = () => {
+    setOpenDialogBoardId(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!openDialogBoardId) return;
+
+    const deletedBoard = tableData.find(board => board.id === openDialogBoardId);
+    const deletedBoardName = deletedBoard?.boardName || "Unknown Board";
+    const deletedFeedbackCount = deletedBoard?.feedbackItemsCount || 0;
+
+    try {
+      console.log("Deleting board:", deletedBoardName, "with", deletedFeedbackCount, "feedback items.");
+
+      setOpenDialogBoardId(null); // close dialog
+
+      await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
+      reflectBackendService.broadcastDeletedBoard(props.teamId, openDialogBoardId);
+
+      setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
+
+      appInsights.trackEvent({
+        name: TelemetryEvents.FeedbackBoardDeleted,
+        properties: {
+          boardId: openDialogBoardId,
+          boardName: deletedBoardName,
+          feedbackItemsCount: deletedFeedbackCount,
+          deletedByUserId: encrypt(getUserIdentity().id),
+        },
+      });
+
+    } catch (error) {
+      console.error("Error deleting board:", error);
+      setRefreshKey(true);
+    }
+  };
+
   const table: Table<IBoardSummaryTableItem> =
-    getTable(tableData, sorting, setSorting, props.onArchiveToggle, boardSummaryState.isDataLoaded, setTableData);
+    getTable(
+      tableData,
+      sorting,
+      setSorting,
+      props.onArchiveToggle,
+      setTableData,
+      setRefreshKey,
+      openDialogBoardId,
+      setOpenDialogBoardId
+    );
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
@@ -334,6 +439,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
           feedbackItemsCount: 0,
           id: board.id,
           teamId: board.teamId,
+          ownerId: board.createdBy.id,
         };
 
         boardsTableItems.push(boardSummaryItem);
@@ -505,15 +611,17 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }
 
   useEffect(() => {
-    if(teamId !== props.teamId) {
+    if (teamId !== props.teamId || refreshKey) { // Triggers when teamId changes OR refreshKey is true
       BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
         setTeamId(props.teamId);
         handleBoardsDocuments(boardDocuments);
+      }).finally(() => {
+        setRefreshKey(false); // Reset refreshKey after fetching
       }).catch(e => {
         appInsights.trackException(e);
-      })
+      });
     }
-  }, [props.teamId])
+  }, [props.teamId, refreshKey]); // Runs when teamId or refreshKey updates
 
   if(boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner"
@@ -523,8 +631,41 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     />
   }
 
+  const selectedBoardForDelete = tableData.find(board => board.id === openDialogBoardId);
+
   return (
     <div className="board-summary-table-container">
+      {openDialogBoardId && (
+        <Dialog
+          hidden={!openDialogBoardId}
+          onDismiss={() => setOpenDialogBoardId(null)}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Delete Retrospective',
+          }}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'retrospectives-delete-board-confirmation-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}
+        >
+            <DialogContent>
+              <p>
+                The retrospective board <strong>{selectedBoardForDelete.boardName}</strong> with <strong>{selectedBoardForDelete.feedbackItemsCount}</strong> feedback items will be deleted.
+              </p>
+              <br />
+              <p style={{ color: "red" }}>
+                <i className="fas fa-exclamation-triangle" style={{ marginRight: "5px" }}></i>
+                <strong>Warning:</strong> <em>This action is permanent and cannot be undone.</em>
+              </p>
+            </DialogContent>
+        <DialogFooter>
+          <PrimaryButton onClick={handleConfirmDelete} text="Delete" />
+          <DefaultButton autoFocus onClick={() => setOpenDialogBoardId(null)} text="Cancel" />
+        </DialogFooter>
+        </Dialog>
+      )}
+
       <table>
         <BoardSummaryTableHeader
           headerGroups={table.getHeaderGroups()}
