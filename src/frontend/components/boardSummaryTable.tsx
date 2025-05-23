@@ -154,7 +154,7 @@ async function handleArchiveToggle(
   boardId: string,
   toggleIsArchived: boolean,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  onArchiveToggle: () => void
+  onArchiveToggle: () => void,
   setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
   try {
