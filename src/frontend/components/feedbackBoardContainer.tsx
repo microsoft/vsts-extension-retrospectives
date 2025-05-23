@@ -102,7 +102,7 @@ export interface FeedbackBoardContainerState {
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   /**
-   * Members of the all teams that the current user access to. This may not be all the team
+   * Members of all teams that the current user access to. This may not be all the team
    * members within the organization.
    */
   allMembers: TeamMember[];
@@ -1007,6 +1007,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     this.hideArchiveBoardConfirmationDialog();
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
+    await this.reloadBoardsForCurrentTeam(); // DPH
   }
 
   private readonly copyBoardUrl = async () => {
@@ -1657,7 +1658,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     modalProps={{
                       isBlocking: true,
                       containerClassName: '.retrospectives-archive-board-confirmation-dialog',
-                      // DPH 'team-archive-dialog',
                       className: 'retrospectives-dialog-modal',
                     }}>
                     <DialogContent>

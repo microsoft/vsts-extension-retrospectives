@@ -320,44 +320,13 @@ function getTable(
       id: 'trash',
       header: () => (
         <div className="centered-cell">
-          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete enabled for archived boards"></i>
+          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete only enabled for archived boards"></i>
         </div>
       ),
-      cell: (cellContext) => getTrashIcon(cellContext.row.original), // ✅ Use helper function
+      cell: (cellContext) => getTrashIcon(cellContext.row.original),
       size: 45,
       enableSorting: false,
     })
-/* DPH
-    columnHelper.display({
-      id: 'trash',
-      header: () => (
-        <div className="centered-cell">
-          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete board"></i>
-        </div>
-      ),
-      cell: (cellContext) => {
-        const selectedBoard = cellContext.row.original;
-        const isDialogOpen = openDialogBoardId === selectedBoard.id; // Now controlled by parent
-
-        const ARCHIVE_DELETE_DELAY = 1 * 60 * 1000; // ✅ 1 minutes in milliseconds
-
-        return selectedBoard.isArchived && selectedBoard.archivedDate &&
-           new Date() >= new Date(selectedBoard.archivedDate.getTime() + ARCHIVE_DELETE_DELAY) ? (
-          <div
-            className="centered-cell trash-icon"
-            title="Delete board"
-            onClick={(event) => handleTrashClick(event, selectedBoard.id)}
-          >
-            <i className="fas fa-trash-alt"></i>
-          </div>
-        ) : (
-          <div className="centered-cell"></div> // Empty div prevents clicks from triggering delete
-        );
-      },
-      size: 45,
-      enableSorting: false,
-    })
-*/
   ]
 
   const tableOptions: TableOptions<IBoardSummaryTableItem> = {
