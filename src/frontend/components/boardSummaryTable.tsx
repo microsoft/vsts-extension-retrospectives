@@ -154,8 +154,7 @@ async function handleArchiveToggle(
   boardId: string,
   toggleIsArchived: boolean,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  onArchiveToggle: () => void,
-  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>,
+  onArchiveToggle: () => void
 ) {
   try {
     if (toggleIsArchived) {
@@ -187,7 +186,6 @@ async function handleArchiveToggle(
     onArchiveToggle();
   } catch (error) {
     console.error('Error while toggling archive state: ', error);
-    setRefreshKey(true); // perhaps board deleted by another user
   }
 }
 
@@ -289,7 +287,7 @@ function getTable(
             checked={!!isArchived} // Ensure boolean value
             onChange={(event) => {
               const toggleIsArchived = event.target.checked;
-              handleArchiveToggle(teamId, boardId, toggleIsArchived, setTableData, onArchiveToggle, setRefreshKey);
+              handleArchiveToggle(teamId, boardId, toggleIsArchived, setTableData, onArchiveToggle);
             }}
           />
           </div>
@@ -404,7 +402,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
     } catch (error) {
       console.error("Error deleting board:", error);
-      setRefreshKey(true); // perhaps board deleted by another user
+      setRefreshKey(true);
     }
   };
 
