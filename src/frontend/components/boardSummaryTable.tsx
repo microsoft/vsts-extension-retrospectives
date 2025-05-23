@@ -155,6 +155,7 @@ async function handleArchiveToggle(
   toggleIsArchived: boolean,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
   onArchiveToggle: () => void
+  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
   try {
     if (toggleIsArchived) {
@@ -288,7 +289,7 @@ function getTable(
             checked={!!isArchived} // Ensure boolean value
             onChange={(event) => {
               const toggleIsArchived = event.target.checked;
-              handleArchiveToggle(teamId, boardId, toggleIsArchived, setTableData, onArchiveToggle);
+              handleArchiveToggle(teamId, boardId, toggleIsArchived, setTableData, onArchiveToggle, setRefreshKey);
             }}
           />
           </div>
