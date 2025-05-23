@@ -202,7 +202,7 @@ function getTable(
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
 
-  const ARCHIVE_DELETE_DELAY = 1 * 60 * 1000; // 1-minute delay
+  const ARCHIVE_DELETE_DELAY = 2 * 60 * 1000; // 2-minute delay
 
   const getTrashIcon = (board: IBoardSummaryTableItem) => {
     // Condition 1: Not Archived
