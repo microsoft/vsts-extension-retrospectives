@@ -102,7 +102,7 @@ export interface FeedbackBoardContainerState {
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   /**
-   * Members of all teams that the current user access to. This may not be all the team
+   * Members of all the teams that the current user access to. This may not be all the team
    * members within the organization.
    */
   allMembers: TeamMember[];
