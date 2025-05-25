@@ -297,6 +297,14 @@
   }
 }
 
+.warning-text {
+  color: red;
+}
+
+.warning-text i {
+  margin-right: 5px;
+}
+
 .board-summary-initialization-spinner {
   position: absolute;
   top: 50%;
