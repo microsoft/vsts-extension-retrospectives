@@ -211,6 +211,7 @@ function TrashIcon({
     <div
       className="centered-cell trash-icon"
       title="Delete board"
+      aria-label="Delete board"
       onClick={onClick}
     >
       <i className="fas fa-trash-alt"></i>
@@ -219,6 +220,7 @@ function TrashIcon({
     <div
       className="centered-cell trash-icon-disabled"
       title="Try archive before delete"
+      aria-label="Try archive before delete"
     >
       <i className="fas fa-trash-alt"></i>
     </div>
@@ -327,7 +329,9 @@ function getTable(
       id: 'trash',
       header: () => (
         <div className="centered-cell trash-icon-header">
-          <i className="fas fa-trash-alt" title="Delete only enabled for archived boards"></i>
+          <i className="fas fa-trash-alt"
+            title="Delete only enabled for archived boards"
+            aria-label="Delete only enabled for archived boards"></i>
         </div>
       ),
       cell: (cellContext) => (
