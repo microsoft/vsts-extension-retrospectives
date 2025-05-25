@@ -269,7 +269,7 @@
 
   .trash-icon-header {
     color: white;
-    cursor: default;
+    cursor: pointer;
 
     i {
       color: inherit;
@@ -289,7 +289,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
+    cursor: default;
   }
 
   .trash-icon:hover {

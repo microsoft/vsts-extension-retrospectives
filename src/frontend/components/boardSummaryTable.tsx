@@ -341,7 +341,7 @@ function getTable(
         />
       ),
       size: 45,
-      enableSorting: false,
+      enableSorting: true,
     })
   ]
 
