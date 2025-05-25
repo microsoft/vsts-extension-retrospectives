@@ -267,6 +267,24 @@
     font-weight: 600;
   }
 
+  .trash-icon-header {
+    color: white;
+    cursor: default;
+
+    i {
+      color: inherit;
+    }
+  }
+
+  .trash-icon-disabled {
+    color: #b0b0b0;
+    cursor: not-allowed;
+
+    i {
+      color: inherit;
+    }
+  }
+
   .trash-icon {
     display: flex;
     justify-content: center;

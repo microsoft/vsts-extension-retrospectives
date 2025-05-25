@@ -9,7 +9,7 @@ import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
 import { itemDataService } from '../dal/itemDataService';
 import { workItemService } from '../dal/azureDevOpsWorkItemService';
-import { reflectBackendService } from "../dal/reflectBackendService";
+import { reflectBackendService } from '../dal/reflectBackendService';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 
@@ -189,6 +189,43 @@ async function handleArchiveToggle(
   }
 }
 
+const ARCHIVE_DELETE_DELAY = 2 * 60 * 1000; // 2 minutes
+
+function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
+  if (!board.isArchived || !board.archivedDate) return false;
+  const now = new Date().getTime();
+  const archivedAt = new Date(board.archivedDate).getTime();
+  return now >= archivedAt + ARCHIVE_DELETE_DELAY;
+}
+
+function TrashIcon({
+  board,
+  onClick,
+}: {
+  board: IBoardSummaryTableItem;
+  onClick: (event: React.MouseEvent) => void;
+}) {
+  if (!board.isArchived) return <div className="centered-cell" />;
+
+  return isTrashEnabled(board) ? (
+    <div
+      className="centered-cell trash-icon"
+      title="Delete board"
+      onClick={onClick}
+    >
+      <i className="fas fa-trash-alt"></i>
+    </div>
+  ) : (
+    <div
+      className="centered-cell trash-icon-disabled"
+      title="Try archive before delete"
+      aria-disabled="true"
+    >
+      <i className="fas fa-trash-alt"></i>
+    </div>
+  );
+}
+
 function getTable(
   tableData: IBoardSummaryTableItem[],
   sortingState: SortingState,
@@ -201,35 +238,6 @@ function getTable(
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
-
-  const ARCHIVE_DELETE_DELAY = 2 * 60 * 1000; // 2-minute delay
-
-  const getTrashIcon = (board: IBoardSummaryTableItem) => {
-    // Condition 1: Not Archived
-    if (!board.isArchived) {
-      return <div className="centered-cell"></div>; // No trash can for non-archived boards
-    }
-
-    const archivedTime = new Date(board.archivedDate);
-    const currentTime = new Date();
-    const isPastDelay = currentTime >= new Date(archivedTime.getTime() + ARCHIVE_DELETE_DELAY);
-
-    return isPastDelay ? (
-      // Condition 2: Archived & Past Delay → Show enabled trash can
-      <div
-        className="centered-cell trash-icon"
-        title="Delete board"
-        onClick={(event) => handleTrashClick(event, board.id)}
-      >
-        <i className="fas fa-trash-alt"></i>
-      </div>
-    ) : (
-      // Condition 3: Archived & Not Past Delay → Show disabled trash can (gray + tooltip)
-      <div className="centered-cell trash-icon-disabled" title="Delete will be enabled after short delay">
-        <i className="fas fa-trash-alt" style={{ color: "#b0b0b0" }}></i>
-      </div>
-    );
-  };
 
   const handleTrashClick = (event: React.MouseEvent, boardId: string) => {
     event.stopPropagation();
@@ -319,11 +327,19 @@ function getTable(
     columnHelper.display({
       id: 'trash',
       header: () => (
-        <div className="centered-cell">
-          <i className="fas fa-trash-alt" style={{ color: 'white' }} title="Delete only enabled for archived boards"></i>
+        <div className="centered-cell trash-icon-header">
+          <i className="fas fa-trash-alt" title="Delete only enabled for archived boards"></i>
         </div>
       ),
-      cell: (cellContext) => getTrashIcon(cellContext.row.original),
+      cell: (cellContext) => (
+        <TrashIcon
+          board={cellContext.row.original}
+          onClick={(event) => {
+            event.stopPropagation();
+            setOpenDialogBoardId(cellContext.row.original.id);
+          }}
+        />
+      ),
       size: 45,
       enableSorting: false,
     })
