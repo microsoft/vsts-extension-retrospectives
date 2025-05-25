@@ -219,7 +219,6 @@ function TrashIcon({
     <div
       className="centered-cell trash-icon-disabled"
       title="Try archive before delete"
-      aria-disabled="true"
     >
       <i className="fas fa-trash-alt"></i>
     </div>
@@ -341,7 +340,6 @@ function getTable(
         />
       ),
       size: 45,
-      enableSorting: true,
     })
   ]
 
