@@ -1657,7 +1657,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     }}
                     modalProps={{
                       isBlocking: true,
-                      containerClassName: '.retrospectives-archive-board-confirmation-dialog',
+                      containerClassName: 'retrospectives-archive-board-confirmation-dialog',
                       className: 'retrospectives-dialog-modal',
                     }}>
                     <DialogContent>
