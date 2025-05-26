@@ -365,11 +365,9 @@
 .retrospectives-remove-feedback-item-from-group-dialog,
 .retrospectives-delete-board-confirmation-dialog,
 .retrospectives-delete-feedback-item-dialog {
-  .ms-Dialog-main {
-    background-color: var(--background-color);
-    max-width: 600px;
-    width: 90%;
-  }
+  background-color: var(--background-color);
+  max-width: 500px;
+  width: 90%;
 
   .ms-Dialog-title,
   .ms-Dialog-subText {
