@@ -4,6 +4,7 @@ import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, Primary
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { flexRender, useReactTable } from '@tanstack/react-table';
 
+import DeleteBoardDialog from './deleteBoardDialog';
 import BoardSummary from './boardSummary';
 import { IFeedbackBoardDocument } from '../interfaces/feedback';
 import BoardDataService from '../dal/boardDataService';
@@ -653,37 +654,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   return (
     <div className="board-summary-table-container">
-      {openDialogBoardId && (
-        <Dialog
-          hidden={!openDialogBoardId}
-          onDismiss={() => setOpenDialogBoardId(null)}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: 'Delete Retrospective',
-          }}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: 'retrospectives-delete-board-confirmation-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}
-        >
-            <DialogContent>
-              <p>
-                The retrospective board <strong>{selectedBoardForDelete.boardName}</strong> with <strong>{selectedBoardForDelete.feedbackItemsCount}</strong> feedback items will be deleted.
-              </p>
-              <br />
-              <p className="warning-text">
-                <i className="fas fa-exclamation-triangle"></i>
-                <strong>Warning:</strong> <em>This action is permanent and cannot be undone.</em>
-              </p>
-            </DialogContent>
-        <DialogFooter>
-          <PrimaryButton onClick={handleConfirmDelete} text="Delete" />
-          <DefaultButton autoFocus onClick={() => setOpenDialogBoardId(null)} text="Cancel" />
-        </DialogFooter>
-        </Dialog>
-      )}
-
+      <DeleteBoardDialog
+        board={selectedBoardForDelete}
+        hidden={!openDialogBoardId}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setOpenDialogBoardId(null)}
+      />
       <table>
         <BoardSummaryTableHeader
           headerGroups={table.getHeaderGroups()}
