@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { DefaultButton, Dialog, DialogContent, DialogFooter, DialogType, PrimaryButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { flexRender, useReactTable } from '@tanstack/react-table';
 
