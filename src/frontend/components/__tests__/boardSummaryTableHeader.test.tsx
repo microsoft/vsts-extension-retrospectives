@@ -16,7 +16,7 @@ const mockHeader: Header<any, unknown> = {
   },
   getContext: () => ({}),
   getResizeHandler: jest.fn(),
-} as unknown as Header<any, unknown>; 
+} as unknown as Header<any, unknown>;
 
 const mockHeaderGroup: HeaderGroup<any> = {
   id: 'header-group-1',
