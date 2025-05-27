@@ -1,8 +1,8 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { WorkItem, WorkItemType, WorkItemStateColor } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 import { DefaultButton, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { flexRender, useReactTable } from '@tanstack/react-table';
+import { useReactTable } from '@tanstack/react-table';
 
 import DeleteBoardDialog from './deleteBoardDialog';
 import BoardSummary from './boardSummary';
@@ -13,6 +13,8 @@ import { workItemService } from '../dal/azureDevOpsWorkItemService';
 import { reflectBackendService } from '../dal/reflectBackendService';
 import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetryClient';
 import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
+import BoardSummaryTableHeader from './boardSummaryTableHeader';
+import BoardSummaryTableBody from './boardSummaryTableBody';
 
 import {
   createColumnHelper,
@@ -23,7 +25,6 @@ import {
   type CellContext,
   type Header,
   type HeaderContext,
-  type HeaderGroup,
   type OnChangeFn,
   type Row,
   type SortDirection,
@@ -67,82 +68,6 @@ export interface IBoardActionItemsData {
 export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
-
-interface BoardSummaryTableHeaderProps {
-  headerGroups: HeaderGroup<IBoardSummaryTableItem>[];
-  getThProps: (header: Header<IBoardSummaryTableItem, unknown>) => object;
-}
-
-interface BoardSummaryTableBodyProps {
-  rows: Row<IBoardSummaryTableItem>[];
-  getTdProps: (cell: Cell<IBoardSummaryTableItem, unknown>) => object;
-  boardRowSummary: (row: Row<IBoardSummaryTableItem>) => JSX.Element;
-}
-
-const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ headerGroups, getThProps }) => (
-  <thead role="rowgroup">
-    {headerGroups.map((headerGroup) => (
-      <tr key={headerGroup.id} role="row">
-        {headerGroup.headers.map((header) => (
-          <th {...getThProps(header)}>
-            {header.isPlaceholder
-              ? null
-              : flexRender(header.column.columnDef.header, header.getContext())}
-            <div
-              {...{
-                onMouseDown: header.getResizeHandler(),
-                onTouchStart: header.getResizeHandler(),
-                className: `
-                  ${header.column.getCanResize() ? 'resizer' : ''}
-                  ${header.column.getIsResizing() ? 'isResizing' : ''}
-                `,
-              }}
-            />
-          </th>
-        ))}
-      </tr>
-    ))}
-  </thead>
-);
-
-const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({
-  rows,
-  getTdProps,
-  boardRowSummary,
-}) => (
-  <tbody>
-    {rows.map((row) => (
-      <Fragment key={row.id}>
-        <tr
-          tabIndex={0}
-          aria-label="Board summary row. Click expand row icon to view more statistics for this board."
-          onKeyPress={(e: React.KeyboardEvent) => {
-            if (e.key === 'Enter') row.toggleExpanded();
-          }}
-          onClick={(event) => {
-            const firstCell = event.currentTarget.cells[0]; // Get first column
-            const clickedCell = (event.target as HTMLElement).closest('td'); // Identify clicked cell
-            if (clickedCell !== firstCell) { return; }
-            row.toggleExpanded(); // Allow row expansion when click first column
-          }}
-        >
-          {row.getVisibleCells().map((cell) => (
-            <td key={cell.id} {...getTdProps(cell)}>
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </td>
-          ))}
-        </tr>
-        {row.getIsExpanded() && (
-          <tr>
-            <td colSpan={row.getVisibleCells().length}>
-              {boardRowSummary(row)}
-            </td>
-          </tr>
-        )}
-      </Fragment>
-    ))}
-  </tbody>
-);
 
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
@@ -234,17 +159,10 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>,
-  openDialogBoardId: string | null, // New parameter
   setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>> // New parameter
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
-
-  const handleTrashClick = (event: React.MouseEvent, boardId: string) => {
-    event.stopPropagation();
-    setOpenDialogBoardId(boardId);
-  };
 
   const columns = [
     columnHelper.accessor('id', {
@@ -388,10 +306,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const [refreshKey, setRefreshKey] = useState(false);
 
-  const handleCancelDelete = () => {
-    setOpenDialogBoardId(null);
-  };
-
   const handleConfirmDelete = async () => {
     if (!openDialogBoardId) return;
 
@@ -432,8 +346,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       setSorting,
       props.onArchiveToggle,
       setTableData,
-      setRefreshKey,
-      openDialogBoardId,
       setOpenDialogBoardId
     );
 
