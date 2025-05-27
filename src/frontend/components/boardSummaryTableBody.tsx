@@ -5,11 +5,41 @@ import type { IBoardSummaryTableItem } from './boardSummaryTable';
 
 interface BoardSummaryTableBodyProps {
   rows: Row<IBoardSummaryTableItem>[];
-  getTdProps: (cell: Cell<IBoardSummaryTableItem, unknown>) => object;
   boardRowSummary: (row: Row<IBoardSummaryTableItem>) => JSX.Element;
 }
 
-const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({ rows, getTdProps, boardRowSummary }) => (
+const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
+  const hasPendingItems = cell.row.original.pendingWorkItemsCount > 0;
+  const columnId = cell.column.id as keyof IBoardSummaryTableItem | undefined;
+  const cellValue = cell.row.original[columnId];
+
+  const ariaLabel = columnId && cellValue ? `${columnId} ${cellValue}` : '';
+
+  let workItemsClass = "";
+  switch (columnId) {
+    case "totalWorkItemsCount":
+    case "feedbackItemsCount":
+      workItemsClass = "workItemsCount total-work-item-count";
+      break;
+    case "pendingWorkItemsCount":
+      workItemsClass = "workItemsCount";
+      if (hasPendingItems) {
+        workItemsClass += " pending-action-item-count";
+      }
+      break;
+    default:
+      workItemsClass = "";
+      break;
+  }
+
+  return {
+    className: `${workItemsClass}`,
+    "aria-label": ariaLabel,
+    "aria-readonly": true,
+  };
+};
+
+const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({ rows, boardRowSummary }) => (
   <tbody>
     {rows.map((row) => (
       <Fragment key={row.id}>

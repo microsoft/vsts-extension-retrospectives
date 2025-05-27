@@ -21,13 +21,10 @@ import {
   getCoreRowModel,
   getExpandedRowModel,
   getSortedRowModel,
-  type Cell,
   type CellContext,
-  type Header,
   type HeaderContext,
   type OnChangeFn,
   type Row,
-  type SortDirection,
   type SortingState,
   type Table,
   type TableOptions
@@ -314,7 +311,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     const deletedFeedbackCount = deletedBoard?.feedbackItemsCount || 0;
 
     try {
-      console.log("Deleting board:", deletedBoardName, "with", deletedFeedbackCount, "feedback items.");
+      console.log("Deleting board: ", deletedBoardName, " with ", deletedFeedbackCount, " feedback items.");
 
       setOpenDialogBoardId(null); // close dialog
 
@@ -483,64 +480,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     />
   }
 
-  const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
-    const sortDirection: false | SortDirection = header.column.getIsSorted();
-    let sortClassName: string = "";
-    let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
-    if (sortDirection === "asc") {
-      sortClassName = sortDirection;
-      ariaSort = "ascending";
-    } else if (sortDirection === "desc") {
-      sortClassName = sortDirection;
-      ariaSort = "descending";
-    }
-
-    return {
-      key: header.id,
-      role: "columnheader",
-      'aria-sort': ariaSort,
-      style: {
-        minWidth: header.getSize(),
-        width: header.getSize()
-      },
-      className: sortClassName,
-      onClick: header.column.getToggleSortingHandler()
-    }
-  }
-
-  const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
-    const hasPendingItems: boolean = cell?.row?.original?.pendingWorkItemsCount > 0;
-    const columnId: keyof IBoardSummaryTableItem | undefined = cell?.column?.id as keyof IBoardSummaryTableItem | undefined;
-    const cellValue = (cell?.row?.original && columnId && cell.row.original[columnId]) ? cell.row.original[columnId] : null;
-
-    const ariaLabel = (columnId && cellValue) ? columnId + ' ' + cellValue : '';
-
-    let workItemsClass;
-    switch (columnId) {
-      case 'totalWorkItemsCount':
-        workItemsClass = 'workItemsCount total-work-item-count';
-        break;
-      case 'feedbackItemsCount':
-        workItemsClass = 'workItemsCount total-work-item-count';
-        break;
-      case 'pendingWorkItemsCount':
-        workItemsClass = 'workItemsCount';
-        if (hasPendingItems) {
-          workItemsClass += " pending-action-item-count";
-        }
-        break;
-      default:
-        workItemsClass = '';
-        break;
-    }
-
-    return {
-      className: `${workItemsClass}`,
-      'aria-label': ariaLabel,
-      'aria-readonly': true
-    };
-  }
-
   useEffect(() => {
     if (teamId !== props.teamId || refreshKey) { // Triggers when teamId changes OR refreshKey is true
       BoardDataService.getBoardsForTeam(props.teamId).then((boardDocuments: IFeedbackBoardDocument[]) => {
@@ -575,11 +514,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       <table>
         <BoardSummaryTableHeader
           headerGroups={table.getHeaderGroups()}
-          getThProps={getThProps}
         />
         <BoardSummaryTableBody
           rows={table.getRowModel().rows}
-          getTdProps={getTdProps}
           boardRowSummary={boardRowSummary}
         />
       </table>
