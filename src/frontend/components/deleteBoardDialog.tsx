@@ -7,7 +7,6 @@ import {
   PrimaryButton
 } from 'office-ui-fabric-react';
 import { IBoardSummaryTableItem } from './boardSummaryTable';
-import { IFeedbackBoardDocument } from '../interfaces/feedback';
 
 interface DeleteBoardDialogProps {
   board: IBoardSummaryTableItem | undefined;
