@@ -3,25 +3,26 @@ import { shallow } from 'enzyme';
 import BoardSummaryTableHeader from '../boardSummaryTableHeader';
 import type { Header, HeaderGroup } from '@tanstack/table-core';
 
+const mockHeader: Header<any, unknown> = {
+  id: 'column-1',
+  isPlaceholder: false,
+  column: {
+    columnDef: { header: 'Board Name' },
+    getIsSorted: () => 'asc',
+    getSize: () => 150,
+    getCanResize: () => true,
+    getIsResizing: () => false,
+    getToggleSortingHandler: jest.fn(),
+  },
+  getContext: () => ({}),
+  getResizeHandler: jest.fn(),
+} as unknown as Header<any, unknown>; 
+
 const mockHeaderGroup: HeaderGroup<any> = {
   id: 'header-group-1',
-  headers: [
-    {
-      id: 'column-1',
-      isPlaceholder: false,
-      column: {
-        columnDef: { header: 'Board Name' },
-        getIsSorted: () => 'asc',
-        getSize: () => 150,
-        getCanResize: () => true,
-        getIsResizing: () => false,
-        getToggleSortingHandler: jest.fn(),
-      },
-      getContext: () => ({}),
-      getResizeHandler: jest.fn(),
-    } as Header<any, unknown>,
-  ],
-} as HeaderGroup<any>;
+  depth: 0,
+  headers: [mockHeader],
+};
 
 describe('BoardSummaryTableHeader', () => {
   it('renders table headers correctly', () => {
