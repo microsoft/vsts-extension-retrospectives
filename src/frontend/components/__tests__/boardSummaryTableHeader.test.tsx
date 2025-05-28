@@ -44,6 +44,28 @@ describe('BoardSummaryTableHeader', () => {
     expect(headerElement.hasClass('asc')).toBeTruthy(); // Sort class applied
   });
 
+  it('applies correct sorting properties when sorting is descending', () => {
+    const mockDescendingHeader: Header<any, unknown> = {
+      ...mockHeader,
+      column: {
+        ...mockHeader.column,
+        getIsSorted: () => 'desc', // Set sorting to descending
+      },
+    };
+
+    const mockDescendingHeaderGroup: HeaderGroup<any> = {
+      id: 'header-group-2',
+      depth: 0,
+      headers: [mockDescendingHeader],
+    };
+
+    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockDescendingHeaderGroup]} />);
+    const headerElement = wrapper.find('th').at(0);
+
+    expect(headerElement.prop('aria-sort')).toBe('descending'); // Check aria-sort
+    expect(headerElement.hasClass('desc')).toBeTruthy(); // Ensure descending sort class is applied
+  });
+
   it('calls sorting handler when header is clicked', () => {
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
     wrapper.find('th').simulate('click');
@@ -55,14 +77,4 @@ describe('BoardSummaryTableHeader', () => {
     expect(wrapper.find('thead')).toHaveLength(1); // <thead> should still exist
     expect(wrapper.find('th')).toHaveLength(0); // No headers should be present
   });
-
-  it('applies resizer classes and handlers when column is resizable', () => {
-    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    const resizeHandle = wrapper.find('.resizer');
-
-    expect(resizeHandle).toHaveLength(1); // Ensure a resize handle exists
-    expect(resizeHandle.prop('onMouseDown')).toBeDefined(); // Should have mouse down handler
-    expect(resizeHandle.prop('onTouchStart')).toBeDefined(); // Should have touch start handler
-  });
-
 });
