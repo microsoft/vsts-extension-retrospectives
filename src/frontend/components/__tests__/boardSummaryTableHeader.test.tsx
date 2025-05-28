@@ -81,9 +81,11 @@ describe('BoardSummaryTableHeader', () => {
   it('applies resizer classes and handlers when column is resizable', () => {
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
     //const resizeHandle = wrapper.find('.resizer');
-    const resizeHandle = wrapper.find('div.resizer'); // ✅ Ensure we target the correct element
+    //const resizeHandle = wrapper.find('div.resizer'); // ✅ Ensure we target the correct element
+const resizeHandle = wrapper.find('th').find('div.resizer'); // ✅ First target the parent `th`
 
-console.log(wrapper.html()); // ✅ Inspect if `.resizer` exists in output
+console.log("Help me!");
+console.log('DEBUG: Resizer HTML:', wrapper.debug());
 
     expect(resizeHandle).toHaveLength(1); // Ensure a resize handle exists
     expect(resizeHandle.prop('onMouseDown')).toBeDefined(); // Should have mouse down handler
