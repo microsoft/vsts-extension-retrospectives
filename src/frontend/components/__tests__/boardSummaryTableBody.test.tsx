@@ -55,14 +55,14 @@ const createMockRow = ({
 
 describe('BoardSummaryTableBody', () => {
   it('renders rows and their cells', () => {
-    const cell1 = createMockCell('totalWorkItemsCount', 10);
-    const cell2 = createMockCell('pendingWorkItemsCount', 5);
+    const cell1 = createMockCell('totalWorkItemsCount', 2);
+    const cell2 = createMockCell('pendingWorkItemsCount', 1);
     const row = createMockRow({
       visibleCells: [cell1, cell2],
       original: {
-        totalWorkItemsCount: 10,
-        pendingWorkItemsCount: 5,
-        feedbackItemsCount: 2,
+        totalWorkItemsCount: 2,
+        pendingWorkItemsCount: 1,
+        feedbackItemsCount: 10,
       } as IBoardSummaryTableItem,
     });
 
@@ -72,11 +72,11 @@ describe('BoardSummaryTableBody', () => {
   });
 
   it('applies correct classes and ARIA attributes to <td>', () => {
-    const cell = createMockCell('pendingWorkItemsCount', 5);
+    const cell = createMockCell('pendingWorkItemsCount', 2);
     const row = createMockRow({
       visibleCells: [cell],
       original: {
-        pendingWorkItemsCount: 5,
+        pendingWorkItemsCount: 2,
       } as IBoardSummaryTableItem,
     });
 
@@ -88,12 +88,12 @@ describe('BoardSummaryTableBody', () => {
 
   it('expands row when first cell is clicked', () => {
     const toggleExpanded = jest.fn();
-    const cell = createMockCell('totalWorkItemsCount', 10);
+    const cell = createMockCell('totalWorkItemsCount', 2);
     const row = createMockRow({
       visibleCells: [cell],
       toggleExpanded,
       original: {
-        totalWorkItemsCount: 10,
+        totalWorkItemsCount: 2,
         pendingWorkItemsCount: 0,
       } as IBoardSummaryTableItem,
     });
@@ -140,40 +140,53 @@ describe('BoardSummaryTableBody', () => {
   });
 
   it('renders boardRowSummary when row is expanded', () => {
-    const row = {
-      id: 'row1',
-      getIsExpanded: () => true,
-      toggleExpanded: jest.fn(),
-      original: {
-        id: 'board1',
-        boardName: 'Board A',
-        totalWorkItemsCount: 10,
-        feedbackItemsCount: 2,
-        pendingWorkItemsCount: 1,
-        createdDate: new Date(),
-        teamId: 'team1',
-        ownerId: 'owner1',
-      } as IBoardSummaryTableItem,
-    } as Partial<Row<IBoardSummaryTableItem>> as Row<IBoardSummaryTableItem>;
+  // Mock row with full original data including required properties
+  const row = {
+    id: 'row1',
+    getIsExpanded: () => true,
+    toggleExpanded: jest.fn(),
+    original: {
+      id: 'board1',
+      boardName: 'Board A',
+      totalWorkItemsCount: 2,
+      feedbackItemsCount: 10,
+      pendingWorkItemsCount: 1,
+      createdDate: new Date(),
+      teamId: 'team1',
+      ownerId: 'owner1',
+    } as IBoardSummaryTableItem,
+  } as Partial<Row<IBoardSummaryTableItem>> as Row<IBoardSummaryTableItem>;
 
-    const mockCells = [
-      createMockCell('boardName', 'Board A'),
-      createMockCell('totalWorkItemsCount', 10),
-    ];
+  // Create mock cells without the row property yet
+  const mockCells = [
+    createMockCell('boardName', 'Board A'),
+    createMockCell('totalWorkItemsCount', 2),
+  ];
 
-    (row as any).getVisibleCells = () => mockCells;
-
-    const mockSummary = jest.fn(() => <div>Mock summary</div>);
-
-    const wrapper = mount(
-      <table>
-        <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
-      </table>
-    );
-
-    expect(wrapper.text()).toContain('Mock summary');
-    expect(wrapper.find('td').last().prop('colSpan')).toBe(mockCells.length);
+  // Assign the row object to each cell's 'row' property to avoid undefined 'original'
+  mockCells.forEach(cell => {
+    (cell as any).row = row;
   });
+
+  // Add getVisibleCells method to the row to return the mock cells
+  (row as any).getVisibleCells = () => mockCells;
+
+  // Mock boardRowSummary component
+  const mockSummary = jest.fn(() => <div>Mock summary</div>);
+
+  // Mount BoardSummaryTableBody inside a table (needed for <tr> to render correctly)
+  const wrapper = mount(
+    <table>
+      <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
+    </table>
+  );
+
+  // Assert that the summary content is rendered
+  expect(wrapper.text()).toContain('Mock summary');
+
+  // Assert the summary row's cell spans the full number of visible cells
+  expect(wrapper.find('td').last().prop('colSpan')).toBe(mockCells.length);
+});
 
   it('renders nothing when rows is empty', () => {
     const wrapper = shallow(<BoardSummaryTableBody rows={[]} boardRowSummary={mockSummary} />);
