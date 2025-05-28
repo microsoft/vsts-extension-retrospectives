@@ -36,7 +36,7 @@ const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
 const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ headerGroups }) => (
   <thead role="rowgroup">
     {headerGroups.map((headerGroup) => (
-      <tr key={headerGroup.id} role="row">
+      <tr key={header.id} key={headerGroup.id} role="row">
         {headerGroup.headers.map((header) => (
           <th {...getThProps(header)}>
             {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
