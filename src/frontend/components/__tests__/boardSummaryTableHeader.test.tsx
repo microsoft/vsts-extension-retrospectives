@@ -10,7 +10,7 @@ const mockHeader: Header<any, unknown> = {
   headerGroup: {} as HeaderGroup<any>, // Required for proper typing
   colSpan: 1, // Ensures it's structurally sound
   getSize: () => 150,
-  getResizeHandler: jest.fn(),
+  getResizeHandler: () => jest.fn(),
   column: {
     columnDef: { header: 'Board Name' },
     getIsSorted: () => 'asc',
@@ -76,5 +76,39 @@ describe('BoardSummaryTableHeader', () => {
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[]} />);
     expect(wrapper.find('thead')).toHaveLength(1); // <thead> should still exist
     expect(wrapper.find('th')).toHaveLength(0); // No headers should be present
+  });
+
+  it('renders header content and resizer with correct classes', () => {
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
+    const th = wrapper.find('th').at(0);
+
+    // Header content
+    expect(th.text()).toContain('Board Name');
+
+    // Resizer div
+    const resizerDiv = th.find('div').at(0);
+    expect(resizerDiv.exists()).toBe(true);
+    expect(resizerDiv.hasClass('resizer')).toBe(true);
+    expect(resizerDiv.hasClass('isResizing')).toBe(true);
+  });
+
+  it('calls resize handler on mouse down and touch start', () => {
+    const resizeHandler = jest.fn();
+    const resizableHeader: Header<any, unknown> = {
+      ...mockHeader,
+      getResizeHandler: () => resizeHandler,
+    };
+    const resizableHeaderGroup: HeaderGroup<any> = {
+      ...mockHeaderGroup,
+      headers: [resizableHeader],
+    };
+
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />);
+    const resizerDiv = wrapper.find('div').at(0);
+
+    resizerDiv.simulate('mouseDown');
+    resizerDiv.simulate('touchStart');
+
+    expect(resizeHandler).toHaveBeenCalledTimes(2);
   });
 });
