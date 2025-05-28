@@ -3,6 +3,8 @@ import { shallow, mount } from 'enzyme';
 import BoardSummaryTableHeader from '../boardSummaryTableHeader';
 import type { Header, HeaderGroup } from '@tanstack/table-core';
 
+const resizeHandler = jest.fn();
+
 const mockHeader: Header<any, unknown> = {
   id: 'column-1',
   isPlaceholder: false,
@@ -10,7 +12,7 @@ const mockHeader: Header<any, unknown> = {
   headerGroup: {} as HeaderGroup<any>, // Required for proper typing
   colSpan: 1, // Ensures it's structurally sound
   getSize: () => 150,
-  getResizeHandler: () => jest.fn(),
+  getResizeHandler: () => resizeHandler,
   column: {
     columnDef: { header: 'Board Name' },
     getIsSorted: () => 'asc',
@@ -105,6 +107,24 @@ describe('BoardSummaryTableHeader', () => {
 
     const wrapper = mount(<BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />);
     const resizerDiv = wrapper.find('div').at(0);
+
+    resizerDiv.simulate('mouseDown');
+    resizerDiv.simulate('touchStart');
+
+    expect(resizeHandler).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders header content using flexRender', () => {
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
+    expect(wrapper.find('th').text()).toContain('Board Name');
+  });
+
+  it('renders resizer div with correct class and triggers resize handlers', () => {
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
+    const resizerDiv = wrapper.find('div').at(0);
+
+    expect(resizerDiv.hasClass('resizer')).toBe(true);
+    expect(resizerDiv.hasClass('isResizing')).toBe(true);
 
     resizerDiv.simulate('mouseDown');
     resizerDiv.simulate('touchStart');
