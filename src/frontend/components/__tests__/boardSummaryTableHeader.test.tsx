@@ -121,6 +121,48 @@ describe('BoardSummaryTableHeader', () => {
     const th = wrapper.find('th').at(0);
 
     // Placeholder header should have no children content (render null)
-    expect(th.children().first().isEmptyRender()).toBe(true);
+    expect(th.text()).toBe('');
+  });
+
+  it('does not apply resizer class when getCanResize returns false', () => {
+    const headerWithoutResize = {
+      ...mockHeader,
+      column: {
+        ...mockHeader.column,
+        getCanResize: () => false,
+        getIsResizing: () => true,  // keep true here to isolate testing
+      },
+    };
+    const headerGroup = {
+      ...mockHeaderGroup,
+      headers: [headerWithoutResize],
+    };
+
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[headerGroup]} />);
+    const resizerDiv = wrapper.find('th').at(0).find('div').at(0);
+
+    expect(resizerDiv.hasClass('resizer')).toBe(false);
+    expect(resizerDiv.hasClass('isResizing')).toBe(true);
+  });
+
+  it('does not apply isResizing class when getIsResizing returns false', () => {
+    const headerWithoutIsResizing = {
+      ...mockHeader,
+      column: {
+        ...mockHeader.column,
+        getCanResize: () => true,
+        getIsResizing: () => false,
+      },
+    };
+    const headerGroup = {
+      ...mockHeaderGroup,
+      headers: [headerWithoutIsResizing],
+    };
+
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[headerGroup]} />);
+    const resizerDiv = wrapper.find('th').at(0).find('div').at(0);
+
+    expect(resizerDiv.hasClass('resizer')).toBe(true);
+    expect(resizerDiv.hasClass('isResizing')).toBe(false);
   });
 });
