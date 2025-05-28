@@ -16,7 +16,7 @@ const mockHeader: Header<any, unknown> = {
     getCanResize: () => true,
     getIsResizing: () => true,
     getToggleSortingHandler: jest.fn(),
-    getResizeHandler: jest.fn(),
+    getResizeHandler: () => jest.fn(),
   },
   getContext: () => ({}),
   getLeafHeaders: (): Header<any, unknown>[] => [],
