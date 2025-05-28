@@ -145,16 +145,20 @@ describe('BoardSummaryTableBody', () => {
       getIsExpanded: () => true,
       toggleExpanded: jest.fn(),
       original: {
+        id: 'board1',
         boardName: 'Board A',
         totalWorkItemsCount: 10,
         feedbackItemsCount: 2,
         pendingWorkItemsCount: 1,
-      },
+        createdDate: new Date(),
+        teamId: 'team1',
+        ownerId: 'owner1',
+      } as IBoardSummaryTableItem,
     } as Partial<Row<IBoardSummaryTableItem>> as Row<IBoardSummaryTableItem>;
 
     const mockCells = [
-      createMockCell('boardName', 'Board A', row),
-      createMockCell('totalWorkItemsCount', 10, row),
+      createMockCell('boardName', 'Board A'),
+      createMockCell('totalWorkItemsCount', 10),
     ];
 
     (row as any).getVisibleCells = () => mockCells;
