@@ -121,6 +121,6 @@ describe('BoardSummaryTableHeader', () => {
     const th = wrapper.find('th').at(0);
 
     // Placeholder header should have no children content (render null)
-    expect(th.children()).toHaveLength(0);
+    expect(th.children().first().isEmptyRender()).toBe(true);
   });
 });
