@@ -9,12 +9,12 @@ const mockHeader: Header<any, unknown> = {
   id: 'column-1',
   isPlaceholder: false,
   depth: 1,
-  headerGroup: {} as HeaderGroup<any>, // Required for proper typing
-  colSpan: 1, // Ensures it's structurally sound
+  headerGroup: {} as HeaderGroup<any>,
+  colSpan: 1,
   getSize: () => 150,
   getResizeHandler: () => resizeHandler,
   column: {
-    columnDef: { header: 'Board Name' },
+    columnDef: { header: () => <span>Board Name</span> },
     getIsSorted: () => 'asc',
     getCanResize: () => true,
     getIsResizing: () => true,
@@ -31,6 +31,10 @@ const mockHeaderGroup: HeaderGroup<any> = {
 };
 
 describe('BoardSummaryTableHeader', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders table headers correctly', () => {
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
     expect(wrapper.find('thead')).toHaveLength(1);
@@ -42,8 +46,8 @@ describe('BoardSummaryTableHeader', () => {
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
     const headerElement = wrapper.find('th').at(0);
 
-    expect(headerElement.prop('aria-sort')).toBe('ascending'); // Sorting direction
-    expect(headerElement.hasClass('asc')).toBeTruthy(); // Sort class applied
+    expect(headerElement.prop('aria-sort')).toBe('ascending');
+    expect(headerElement.hasClass('asc')).toBeTruthy();
   });
 
   it('applies correct sorting properties when sorting is descending', () => {
@@ -51,7 +55,7 @@ describe('BoardSummaryTableHeader', () => {
       ...mockHeader,
       column: {
         ...mockHeader.column,
-        getIsSorted: () => 'desc', // Set sorting to descending
+        getIsSorted: () => 'desc',
       },
     };
 
@@ -64,8 +68,8 @@ describe('BoardSummaryTableHeader', () => {
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockDescendingHeaderGroup]} />);
     const headerElement = wrapper.find('th').at(0);
 
-    expect(headerElement.prop('aria-sort')).toBe('descending'); // Check aria-sort
-    expect(headerElement.hasClass('desc')).toBeTruthy(); // Ensure descending sort class is applied
+    expect(headerElement.prop('aria-sort')).toBe('descending');
+    expect(headerElement.hasClass('desc')).toBeTruthy();
   });
 
   it('calls sorting handler when header is clicked', () => {
@@ -76,8 +80,8 @@ describe('BoardSummaryTableHeader', () => {
 
   it('renders empty <thead> when no headers exist', () => {
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[]} />);
-    expect(wrapper.find('thead')).toHaveLength(1); // <thead> should still exist
-    expect(wrapper.find('th')).toHaveLength(0); // No headers should be present
+    expect(wrapper.find('thead')).toHaveLength(1);
+    expect(wrapper.find('th')).toHaveLength(0);
   });
 
   it('renders header content and resizer with correct classes', () => {
@@ -87,48 +91,36 @@ describe('BoardSummaryTableHeader', () => {
     // Header content
     expect(th.text()).toContain('Board Name');
 
-    // Resizer div
-    const resizerDiv = th.find('div').at(0);
+    // Resizer div (select by class to avoid ambiguity)
+    const resizerDiv = th.find('div.resizer');
     expect(resizerDiv.exists()).toBe(true);
     expect(resizerDiv.hasClass('resizer')).toBe(true);
     expect(resizerDiv.hasClass('isResizing')).toBe(true);
   });
 
   it('calls resize handler on mouse down and touch start', () => {
-    const resizeHandler = jest.fn();
-    const resizableHeader: Header<any, unknown> = {
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
+    const resizerDiv = wrapper.find('div.resizer');
+
+    resizerDiv.simulate('mouseDown');
+    resizerDiv.simulate('touchStart');
+
+    expect(resizeHandler).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders null content when header is placeholder', () => {
+    const placeholderHeader = {
       ...mockHeader,
-      getResizeHandler: () => resizeHandler,
+      isPlaceholder: true,
     };
-    const resizableHeaderGroup: HeaderGroup<any> = {
+    const placeholderGroup = {
       ...mockHeaderGroup,
-      headers: [resizableHeader],
+      headers: [placeholderHeader],
     };
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[placeholderGroup]} />);
+    const th = wrapper.find('th').at(0);
 
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />);
-    const resizerDiv = wrapper.find('div').at(0);
-
-    resizerDiv.simulate('mouseDown');
-    resizerDiv.simulate('touchStart');
-
-    expect(resizeHandler).toHaveBeenCalledTimes(2);
-  });
-
-  it('renders header content using flexRender', () => {
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    expect(wrapper.find('th').text()).toContain('Board Name');
-  });
-
-  it('renders resizer div with correct class and triggers resize handlers', () => {
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    const resizerDiv = wrapper.find('div').at(0);
-
-    expect(resizerDiv.hasClass('resizer')).toBe(true);
-    expect(resizerDiv.hasClass('isResizing')).toBe(true);
-
-    resizerDiv.simulate('mouseDown');
-    resizerDiv.simulate('touchStart');
-
-    expect(resizeHandler).toHaveBeenCalledTimes(2);
+    // Placeholder header should have no children content (render null)
+    expect(th.children()).toHaveLength(0);
   });
 });
