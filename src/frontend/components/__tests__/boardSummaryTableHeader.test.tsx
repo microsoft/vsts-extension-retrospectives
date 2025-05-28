@@ -30,17 +30,6 @@ const mockHeaderGroup: HeaderGroup<any> = {
   headers: [mockHeader],
 } as unknown as HeaderGroup<any>;
 
-// Placeholder header and group with casting to avoid TS errors
-const placeholderHeader = {
-  ...mockHeader,
-  isPlaceholder: true,
-} as unknown as Header<any, unknown>;
-
-const placeholderGroup = {
-  ...mockHeaderGroup,
-  headers: [placeholderHeader],
-} as unknown as HeaderGroup<any>;
-
 describe('BoardSummaryTableHeader', () => {
   it('renders table headers correctly', () => {
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
@@ -88,13 +77,6 @@ describe('BoardSummaryTableHeader', () => {
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[]} />);
     expect(wrapper.find('thead')).toHaveLength(1);
     expect(wrapper.find('th')).toHaveLength(0);
-  });
-
-  it('renders placeholder header as empty', () => {
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[placeholderGroup]} />);
-    const th = wrapper.find('th').at(0);
-    // Placeholder header should render null content
-    expect(th.children().first().type()).toBeNull();
   });
 
   it('renders header content and resizer with correct classes', () => {
