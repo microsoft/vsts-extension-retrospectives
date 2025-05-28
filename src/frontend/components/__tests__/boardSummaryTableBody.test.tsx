@@ -60,9 +60,9 @@ describe('BoardSummaryTableBody', () => {
     const row = createMockRow({
       visibleCells: [cell1, cell2],
       original: {
+        feedbackItemsCount: 10,
         totalWorkItemsCount: 2,
         pendingWorkItemsCount: 1,
-        feedbackItemsCount: 10,
       } as IBoardSummaryTableItem,
     });
 
@@ -83,7 +83,7 @@ describe('BoardSummaryTableBody', () => {
     const wrapper = mount(<BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />);
     const td = wrapper.find('td').at(0);
     expect(td.prop('className')).toContain('pending-action-item-count');
-    expect(td.prop('aria-label')).toMatch(/pendingWorkItemsCount 5/);
+    expect(td.prop('aria-label')).toMatch(/pendingWorkItemsCount 2/);
   });
 
   it('expands row when first cell is clicked', () => {
@@ -113,7 +113,7 @@ describe('BoardSummaryTableBody', () => {
 
   it('does not expand row when a cell other than the first is clicked', () => {
     const toggleExpanded = jest.fn();
-    const cells = [createMockCell('totalWorkItemsCount', 10), createMockCell('pendingWorkItemsCount', 5)];
+    const cells = [createMockCell('totalWorkItemsCount', 2), createMockCell('pendingWorkItemsCount', 1)];
     const row = createMockRow({ visibleCells: cells, toggleExpanded });
 
     const wrapper = mount(<BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />);
@@ -148,8 +148,8 @@ describe('BoardSummaryTableBody', () => {
     original: {
       id: 'board1',
       boardName: 'Board A',
-      totalWorkItemsCount: 2,
       feedbackItemsCount: 10,
+      totalWorkItemsCount: 2,
       pendingWorkItemsCount: 1,
       createdDate: new Date(),
       teamId: 'team1',
