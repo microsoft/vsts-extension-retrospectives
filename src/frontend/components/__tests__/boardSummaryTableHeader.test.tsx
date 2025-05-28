@@ -10,13 +10,13 @@ const mockHeader: Header<any, unknown> = {
   headerGroup: {} as HeaderGroup<any>, // Required for proper typing
   colSpan: 1, // Ensures it's structurally sound
   getSize: () => 150,
+  getResizeHandler: jest.fn(),
   column: {
     columnDef: { header: 'Board Name' },
     getIsSorted: () => 'asc',
     getCanResize: () => true,
     getIsResizing: () => true,
     getToggleSortingHandler: jest.fn(),
-    getResizeHandler: () => jest.fn(),
   },
   getContext: () => ({}),
   getLeafHeaders: (): Header<any, unknown>[] => [],
@@ -79,14 +79,15 @@ describe('BoardSummaryTableHeader', () => {
   });
 
   it('applies resizer classes and handlers when column is resizable', () => {
-    //const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
     const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    const resizeHandle = wrapper.find('.resizer');
-    //const resizeHandle = wrapper.find('div.resizer'); // ✅ Ensure we target the correct element
-    //const resizeHandle = wrapper.find('th').find('div.resizer'); // ✅ First target the parent `th`
 
-    expect(resizeHandle).toHaveLength(1); // Ensure a resize handle exists
-    expect(resizeHandle.prop('onMouseDown')).toBeDefined(); // Should have mouse down handler
-    expect(resizeHandle.prop('onTouchStart')).toBeDefined(); // Should have touch start handler
+    const resizeHandle = wrapper.find('.resizer');
+    expect(resizeHandle.exists()).toBe(true); // ✅ Ensure `.resizer` is present
+
+    expect(typeof resizeHandle.prop('onMouseDown')).toBe('function'); // ✅ Validate handler type
+    expect(typeof resizeHandle.prop('onTouchStart')).toBe('function'); // ✅ Same check for touch
+
+    resizeHandle.simulate('mousedown');
+    expect(mockHeader.getResizeHandler).toHaveBeenCalled(); // ✅ Confirm event execution
   });
 });
