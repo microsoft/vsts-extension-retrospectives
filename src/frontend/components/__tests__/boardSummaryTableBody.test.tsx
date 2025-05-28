@@ -140,19 +140,35 @@ describe('BoardSummaryTableBody', () => {
   });
 
   it('renders boardRowSummary when row is expanded', () => {
-    const cell = createMockCell('totalWorkItemsCount', 10);
-    const row = createMockRow({
-      visibleCells: [cell],
-      isExpanded: true,
+    const row = {
+      id: 'row1',
+      getIsExpanded: () => true,
+      toggleExpanded: jest.fn(),
       original: {
+        boardName: 'Board A',
         totalWorkItemsCount: 10,
-        pendingWorkItemsCount: 0,
-      } as IBoardSummaryTableItem,
-    });
+        feedbackItemsCount: 2,
+        pendingWorkItemsCount: 1,
+      },
+    } as Partial<Row<IBoardSummaryTableItem>> as Row<IBoardSummaryTableItem>;
 
-    const wrapper = mount(<BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />);
+    const mockCells = [
+      createMockCell('boardName', 'Board A', row),
+      createMockCell('totalWorkItemsCount', 10, row),
+    ];
+
+    (row as any).getVisibleCells = () => mockCells;
+
+    const mockSummary = jest.fn(() => <div>Mock summary</div>);
+
+    const wrapper = mount(
+      <table>
+        <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
+      </table>
+    );
+
     expect(wrapper.text()).toContain('Mock summary');
-    expect(wrapper.find('td').last().prop('colSpan')).toBe(1);
+    expect(wrapper.find('td').last().prop('colSpan')).toBe(mockCells.length);
   });
 
   it('renders nothing when rows is empty', () => {
