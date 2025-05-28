@@ -9,10 +9,10 @@ import { reflectBackendService } from '../../dal/reflectBackendService';
 import { workItemService } from '../../dal/azureDevOpsWorkItemService';
 import { IFeedbackBoardDocument } from '../../interfaces/feedback';
 
-jest.mock('../../services/boardDataService');
-jest.mock('../../services/workItemService');
-jest.mock('../../services/itemDataService');
-jest.mock('../../services/reflectBackendService');
+jest.mock('../../dal/boardDataService');
+jest.mock('../../dal/azureDevOpsWorkItemService');
+jest.mock('../../dal/itemDataService');
+jest.mock('../../dal/reflectBackendService');
 
 const mockedIdentity: IdentityRef = {
   directoryAlias: 'test.user',
