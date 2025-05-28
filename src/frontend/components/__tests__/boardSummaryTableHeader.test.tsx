@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import BoardSummaryTableHeader from '../boardSummaryTableHeader';
 import type { Header, HeaderGroup } from '@tanstack/table-core';
 
@@ -9,16 +9,16 @@ const mockHeader: Header<any, unknown> = {
   depth: 1,
   headerGroup: {} as HeaderGroup<any>, // Required for proper typing
   colSpan: 1, // Ensures it's structurally sound
-  getSize: () => 150, // ✅ Move `getSize` here instead of inside `column`
+  getSize: () => 150,
   column: {
     columnDef: { header: 'Board Name' },
     getIsSorted: () => 'asc',
     getCanResize: () => true,
-    getIsResizing: () => false,
+    getIsResizing: () => true,
     getToggleSortingHandler: jest.fn(),
+    getResizeHandler: jest.fn(),
   },
   getContext: () => ({}),
-  getResizeHandler: jest.fn(),
   getLeafHeaders: (): Header<any, unknown>[] => [],
 } as unknown as Header<any, unknown>;
 
@@ -79,13 +79,11 @@ describe('BoardSummaryTableHeader', () => {
   });
 
   it('applies resizer classes and handlers when column is resizable', () => {
-    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    //const resizeHandle = wrapper.find('.resizer');
+    //const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
+    const resizeHandle = wrapper.find('.resizer');
     //const resizeHandle = wrapper.find('div.resizer'); // ✅ Ensure we target the correct element
-const resizeHandle = wrapper.find('th').find('div.resizer'); // ✅ First target the parent `th`
-
-console.log("Help me!");
-console.log('DEBUG: Resizer HTML:', wrapper.debug());
+    //const resizeHandle = wrapper.find('th').find('div.resizer'); // ✅ First target the parent `th`
 
     expect(resizeHandle).toHaveLength(1); // Ensure a resize handle exists
     expect(resizeHandle.prop('onMouseDown')).toBeDefined(); // Should have mouse down handler
