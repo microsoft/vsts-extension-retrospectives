@@ -77,4 +77,16 @@ describe('BoardSummaryTableHeader', () => {
     expect(wrapper.find('thead')).toHaveLength(1); // <thead> should still exist
     expect(wrapper.find('th')).toHaveLength(0); // No headers should be present
   });
+
+  it('applies resizer classes and handlers when column is resizable', () => {
+    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
+    //const resizeHandle = wrapper.find('.resizer');
+    const resizeHandle = wrapper.find('div.resizer'); // ✅ Ensure we target the correct element
+
+console.log(wrapper.html()); // ✅ Inspect if `.resizer` exists in output
+
+    expect(resizeHandle).toHaveLength(1); // Ensure a resize handle exists
+    expect(resizeHandle.prop('onMouseDown')).toBeDefined(); // Should have mouse down handler
+    expect(resizeHandle.prop('onTouchStart')).toBeDefined(); // Should have touch start handler
+  });
 });
