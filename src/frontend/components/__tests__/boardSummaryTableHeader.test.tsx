@@ -49,4 +49,20 @@ describe('BoardSummaryTableHeader', () => {
     wrapper.find('th').simulate('click');
     expect(mockHeaderGroup.headers[0].column.getToggleSortingHandler).toHaveBeenCalled();
   });
+
+  it('renders empty <thead> when no headers exist', () => {
+    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[]} />);
+    expect(wrapper.find('thead')).toHaveLength(1); // <thead> should still exist
+    expect(wrapper.find('th')).toHaveLength(0); // No headers should be present
+  });
+
+  it('applies resizer classes and handlers when column is resizable', () => {
+    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
+    const resizeHandle = wrapper.find('.resizer');
+
+    expect(resizeHandle).toHaveLength(1); // Ensure a resize handle exists
+    expect(resizeHandle.prop('onMouseDown')).toBeDefined(); // Should have mouse down handler
+    expect(resizeHandle.prop('onTouchStart')).toBeDefined(); // Should have touch start handler
+  });
+
 });
