@@ -6,16 +6,20 @@ import type { Header, HeaderGroup } from '@tanstack/table-core';
 const mockHeader: Header<any, unknown> = {
   id: 'column-1',
   isPlaceholder: false,
+  depth: 1,
+  headerGroup: {} as HeaderGroup<any>, // Required for proper typing
+  colSpan: 1, // Ensures it's structurally sound
+  getSize: () => 150, // ✅ Move `getSize` here instead of inside `column`
   column: {
     columnDef: { header: 'Board Name' },
     getIsSorted: () => 'asc',
-    getSize: () => 150,
     getCanResize: () => true,
     getIsResizing: () => false,
     getToggleSortingHandler: jest.fn(),
   },
   getContext: () => ({}),
   getResizeHandler: jest.fn(),
+  getLeafHeaders: (): Header<any, unknown>[] => [],
 } as unknown as Header<any, unknown>;
 
 const mockHeaderGroup: HeaderGroup<any> = {
