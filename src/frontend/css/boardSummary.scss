@@ -59,11 +59,11 @@
           z-index: 1;
 
           .resizer {
-            position: absolute;
+            position: relative; // was absolute
             right: 0;
             top: 0;
             height: 100%;
-            width: 5px;
+            width: 8px;
             cursor: col-resize;
             user-select: none;
             touch-action: none;

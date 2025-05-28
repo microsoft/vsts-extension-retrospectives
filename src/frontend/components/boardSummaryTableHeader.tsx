@@ -38,7 +38,7 @@ const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ heade
     {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id} role="row">
         {headerGroup.headers.map((header) => (
-          <th {...getThProps(header)}>
+          <th key={header.id} {...getThProps(header)}>
             {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
             <div
               {...{
