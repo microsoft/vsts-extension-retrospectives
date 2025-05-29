@@ -329,7 +329,7 @@ To _restore_ an archived retrospective, uncheck the box in the Archived column. 
 
 To _delete_ an archived retrospective, wait for two minutes after archiving, then click the trash icon to _permanently_ delete the retrospective.  The delay between archiving and deleting was added to encourage users to try the archive functionality before deleting, since the delete action cannot be undone and, in most cases, archiving will be sufficient.  Deleting will take effect immediately for all users.
 
-### 10. Best Practices
+## Best Practices
 
 ### Plan for a Team Assessment Retrospective
 
