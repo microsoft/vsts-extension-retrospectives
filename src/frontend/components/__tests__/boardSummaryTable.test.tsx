@@ -26,7 +26,6 @@ jest.mock('../../dal/itemDataService', () => ({
   getFeedbackItemsForBoard: jest.fn().mockResolvedValue([]),
 }));
 
-// mock other modules similarly
 jest.mock('../../dal/boardDataService', () => ({
   getBoardsForTeam: jest.fn(),
   deleteFeedbackBoard: jest.fn(),
@@ -149,48 +148,48 @@ describe('TrashIcon', () => {
     };
 
     const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
-    
+
     expect(wrapper.find('.trash-icon').exists()).toBe(true);
   });
 
   it('should render disabled trash icon when board is not deletable yet', () => {
-  const board = {
-    boardName: 'Sample Board',
-    createdDate: new Date(),
-    isArchived: true,
-    archivedDate: new Date(Date.now() - 1 * 60 * 1000), // Archived 1 min ago
-    pendingWorkItemsCount: 0,
-    totalWorkItemsCount: 0,
-    feedbackItemsCount: 0,
-    id: 'board-1',
-    teamId: 'team-1',
-    ownerId: 'user-1',
-  };
+    const board = {
+      boardName: 'Sample Board',
+      createdDate: new Date(),
+      isArchived: true,
+      archivedDate: new Date(Date.now() - 1 * 60 * 1000), // Archived 1 min ago
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+      feedbackItemsCount: 0,
+      id: 'board-1',
+      teamId: 'team-1',
+      ownerId: 'user-1',
+    };
 
-  const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
-  
-  expect(wrapper.find('.trash-icon-disabled').exists()).toBe(true);
-});
+    const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
 
-it('should not render trash icon when board is not archived', () => {
-  const board = {
-    boardName: 'Sample Board',
-    createdDate: new Date(),
-    isArchived: false,
-    archivedDate: undefined as Date | undefined,
-    pendingWorkItemsCount: 0,
-    totalWorkItemsCount: 0,
-    feedbackItemsCount: 0,
-    id: 'board-1',
-    teamId: 'team-1',
-    ownerId: 'user-1',
-  };
+    expect(wrapper.find('.trash-icon-disabled').exists()).toBe(true);
+  });
 
-  const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
-  
-  expect(wrapper.find('.trash-icon').exists()).toBe(false);
-  expect(wrapper.find('.trash-icon-disabled').exists()).toBe(false);
-});
+  it('should not render trash icon when board is not archived', () => {
+    const board = {
+      boardName: 'Sample Board',
+      createdDate: new Date(),
+      isArchived: false,
+      archivedDate: undefined as Date | undefined,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+      feedbackItemsCount: 0,
+      id: 'board-1',
+      teamId: 'team-1',
+      ownerId: 'user-1',
+    };
+
+    const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
+
+    expect(wrapper.find('.trash-icon').exists()).toBe(false);
+    expect(wrapper.find('.trash-icon-disabled').exists()).toBe(false);
+  });
 });
 
 describe('handleArchiveToggle', () => {
