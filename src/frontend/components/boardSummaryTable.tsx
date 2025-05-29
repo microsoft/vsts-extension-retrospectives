@@ -72,7 +72,7 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
 });
 
-async function handleArchiveToggle(
+export async function handleArchiveToggle(
   teamId: string,
   boardId: string,
   toggleIsArchived: boolean,
@@ -114,14 +114,14 @@ async function handleArchiveToggle(
 
 const ARCHIVE_DELETE_DELAY = 2 * 60 * 1000; // 2 minutes
 
-function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
+export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
   if (!board.isArchived || !board.archivedDate) return false;
   const now = new Date().getTime();
   const archivedAt = new Date(board.archivedDate).getTime();
   return now >= archivedAt + ARCHIVE_DELETE_DELAY;
 }
 
-function TrashIcon({
+export function TrashIcon({
   board,
   onClick,
 }: {
