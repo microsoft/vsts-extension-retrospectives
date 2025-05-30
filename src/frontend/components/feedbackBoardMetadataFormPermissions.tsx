@@ -145,7 +145,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }
 
   useEffect(() => {
-    logProjectAdminStatus();
+    //logProjectAdminStatus();
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
     emitChangeEvent();
