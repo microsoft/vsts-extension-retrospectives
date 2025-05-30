@@ -63,7 +63,7 @@
             right: 0;
             top: 0;
             height: 100%;
-            width: 5px;
+            width: 6px;
             cursor: col-resize;
             user-select: none;
             touch-action: none;
@@ -266,6 +266,43 @@
     color: var(--status-warning-text);
     font-weight: 600;
   }
+
+  .trash-icon-header {
+    color: white;
+    cursor: pointer;
+
+    i {
+      color: inherit;
+    }
+  }
+
+  .trash-icon-disabled {
+    color: #b0b0b0;
+    cursor: not-allowed;
+
+    i {
+      color: inherit;
+    }
+  }
+
+  .trash-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: default;
+  }
+
+  .trash-icon:hover {
+    color: red; /* Highlight red on hover */
+  }
+}
+
+.warning-text {
+  color: red;
+}
+
+.warning-text i {
+  margin-right: 5px;
 }
 
 .board-summary-initialization-spinner {

@@ -4,12 +4,19 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.42
 
+* Moves functionality to delete Retrospectives boards from the Board menu to the History table.
+* Only enables delete functionality for archived boards.
+* More clearly warns that deleting a board is permanent and cannot be undone.
+
+From [GitHub PR #1193](https://github.com/microsoft/vsts-extension-retrospectives/pull/1193)
+
 * Implements _sticky_ default settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback.
 * First time board creators will have defaults set to 5 for maximum votes, checked for Team Assessment and Prime Directive, and unchecked for obscure feedback and anonymous feedback.
 * Allows a minimum value of 1 for maximum votes per user.
-* Improved test code coverage by 2%.
 
 From [GitHub PR #1184](https://github.com/microsoft/vsts-extension-retrospectives/pull/1184)
+
+* Improved test code coverage by ~4%.
 
 ## v1.92.38
 
