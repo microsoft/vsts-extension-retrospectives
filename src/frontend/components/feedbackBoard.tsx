@@ -17,6 +17,9 @@ import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { encrypt } from "../utilities/userIdentityHelper";
 
+import { useEffect } from "react";
+import { logProjectAdminStatus } from "../utilities/userIdentityHelper";
+
 export interface FeedbackBoardProps {
   displayBoard: boolean;
   exceptionCode?: ExceptionCode;
@@ -56,6 +59,15 @@ export interface FeedbackBoardState {
   defaultActionItemAreaPath: string;
   currentVoteCount: string;
 }
+
+// DPH
+export const FeedbackBoardPage = () => {
+  useEffect(() => {
+    logProjectAdminStatus();
+  }, []);
+
+  return <div>{/* ... */}</div>;
+};
 
 class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
   constructor(props: FeedbackBoardProps) {
