@@ -23,6 +23,7 @@ export interface FeedbackBoardPermissionOption {
   hasPermission?: boolean;
   type: 'team' | 'member';
   thumbnailUrl?: string;
+  isTeamAdmin?: boolean;
 }
 
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
@@ -208,6 +209,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                     </div>
                     <div className="content-badge">
                       {isBoardOwner && <span aria-label="Board owner badge">{'Owner'}</span>}
+                      {option.isTeamAdmin && <span aria-label="Team admin badge">{'Admin'}</span>}
                     </div>
                   </td>
                 </tr>

@@ -1077,6 +1077,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         uniqueName: member.identity.uniqueName,
         thumbnailUrl: member.identity.imageUrl,
         type: 'member',
+        isTeamAdmin: member.isTeamAdmin,
       })
     }
 
