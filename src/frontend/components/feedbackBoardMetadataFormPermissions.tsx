@@ -4,6 +4,7 @@ import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../interfaces/feedback';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
+import { isCurrentUserProjectAdmin } from "../utilities/userIdentityHelper";
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
   board: IFeedbackBoardDocument;
@@ -142,6 +143,11 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
     return null;
   }
+
+  // DPH
+isCurrentUserProjectAdmin().then(isAdmin => {
+  console.log(`User is ${isAdmin ? "" : "not "}a project admin.`);
+});
 
   useEffect(() => {
     setSelectAllState();
