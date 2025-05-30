@@ -2,7 +2,7 @@ import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 import { IUserContext, getUser } from 'azure-devops-extension-sdk';
 
 import * as SDK from "azure-devops-extension-sdk";
-import { getClient, CommonServiceIds, IProjectPageService } from "azure-devops-extension-api";
+import { CommonServiceIds, IProjectPageService } from "azure-devops-extension-api";
 
 let userIdentity: IdentityRef;
 
@@ -42,6 +42,21 @@ export const decrypt = (id: string): string => {
 }
 
 /**
+ * Type for group objects returned by Azure DevOps Graph API.
+ */
+interface GraphGroup {
+  displayName: string;
+  descriptor: string;
+}
+
+/**
+ * Type for member objects returned by Azure DevOps Graph API.
+ */
+interface GraphMember {
+  descriptor: string;
+}
+
+/**
  * Helper to call Azure DevOps REST API with the current session's token.
  */
 async function callAzureDevOpsApi(url: string) {
@@ -66,10 +81,10 @@ export async function isCurrentUserProjectAdmin(): Promise<boolean> {
   const project = await projectService.getProject();
   if (!project) throw new Error("Project context not found");
 
-  // Get org URL (by stripping after project name)
+  // Get org URL (by extracting up to project name)
   // Example: https://dev.azure.com/orgName/projectName/_apps/hub
-  const orgUrlMatch = window.location.origin + window.location.pathname.match(/^\/[^\/]+\/?/)[0];
-  const orgUrl = orgUrlMatch.endsWith("/") ? orgUrlMatch : orgUrlMatch + "/";
+  const pathParts = window.location.pathname.split("/").filter(Boolean);
+  const orgUrl = `${window.location.origin}/${pathParts[0]}/${pathParts[1]}/`;
 
   // 1. Get project descriptor
   const descriptorUrl = `${orgUrl}_apis/graph/descriptors/${project.id}?api-version=7.1-preview.1`;
@@ -78,13 +93,13 @@ export async function isCurrentUserProjectAdmin(): Promise<boolean> {
 
   // 2. List groups in this project
   const groupsUrl = `${orgUrl}_apis/graph/groups?scopeDescriptor=${projectDescriptor}&api-version=7.1-preview.1`;
-  const groupsData = await callAzureDevOpsApi(groupsUrl);
-  const adminGroup = groupsData.value.find((g: any) => g.displayName === "Project Administrators");
+  const groupsData: { value: GraphGroup[] } = await callAzureDevOpsApi(groupsUrl);
+  const adminGroup = groupsData.value.find((g: GraphGroup) => g.displayName === "Project Administrators");
   if (!adminGroup) return false;
 
   // 3. List members of the Project Administrators group
   const membersUrl = `${orgUrl}_apis/graph/memberships/${adminGroup.descriptor}/members?api-version=7.1-preview.1`;
-  const membersData = await callAzureDevOpsApi(membersUrl);
+  const membersData: { value: GraphMember[] } = await callAzureDevOpsApi(membersUrl);
 
   // 4. Get current user descriptor
   const user = SDK.getUser();
@@ -93,5 +108,13 @@ export async function isCurrentUserProjectAdmin(): Promise<boolean> {
   const userDescriptor = userDescriptorData.value;
 
   // 5. Check if user is a member
-  return membersData.value.some((m: any) => m.descriptor === userDescriptor);
+  return membersData.value.some((m: GraphMember) => m.descriptor === userDescriptor);
+}
+
+/**
+ * Example: Log whether the current user is a project admin.
+ */
+export async function logProjectAdminStatus() {
+  const isAdmin = await isCurrentUserProjectAdmin();
+  console.log(`User is ${isAdmin ? "" : "not "}a project admin.`);
 }
