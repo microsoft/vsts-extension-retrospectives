@@ -632,9 +632,17 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       for (const members of values) {
         allTeamMembers.push(...members);
       }
-      // remove duplicate members
-      const uniqueTeamMembers = Array.from(
-      new Map(allTeamMembers.map(member => [member.identity.id, member])).values());
+      // Deduplicate, favoring any isTeamAdmin instance
+      const memberGroups = new Map<string, TeamMember[]>();
+      for (const member of allTeamMembers) {
+        const memberArray = memberGroups.get(member.identity.id) || [];
+        memberArray.push(member);
+        memberGroups.set(member.identity.id, memberArray);
+      }
+      const uniqueTeamMembers = Array.from(memberGroups.values()).map(members => {
+        const admin = members.find(m => m.isTeamAdmin);
+        return admin || members[0];
+      });
 
       this.setState({
         allMembers: uniqueTeamMembers,
