@@ -90,6 +90,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   }
 
   public async componentDidMount() {
+    logProjectAdminStatus();
     this.initColumns();
     await this.getAllBoardFeedbackItems();
     this.setDefaultIterationAndAreaPath(this.props.team.id);
