@@ -47,14 +47,7 @@ class AzureDevOpsCoreService {
   try {
     const members = await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, 0);
 
-    // Debugging: log each member's displayName and isTeamAdmin property
-    console.log(
-      "Team members retrieved:",
-      members.map(m => ({
-        displayName: m.displayName,
-        isTeamAdmin: (m as any).isTeamAdmin // cast in case it's not typed
-      }))
-    );
+    console.log("Raw team members response:", members);
 
     return members;
   } catch (error) {
