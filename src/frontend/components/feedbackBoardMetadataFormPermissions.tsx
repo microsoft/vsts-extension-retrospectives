@@ -144,12 +144,8 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     return null;
   }
 
-// Only call in browser, not in tests
-if (typeof window !== "undefined" && process.env.NODE_ENV !== "test") {
-  logProjectAdminStatus();
-}
-
   useEffect(() => {
+    logProjectAdminStatus();
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
     emitChangeEvent();

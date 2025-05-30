@@ -5,15 +5,6 @@ import FeedbackBoardMetadataForm, { IFeedbackBoardMetadataFormProps, IFeedbackCo
 import { testColumns, testExistingBoard, testTeamId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
 import { Checkbox, List, TextField } from 'office-ui-fabric-react';
 
-// At the top of your test file, before importing the code that uses SDK:
-jest.mock("azure-devops-extension-sdk", () => ({
-  // If you use other SDK methods, mock them here too
-  ready: jest.fn(() => Promise.resolve()),
-  getService: jest.fn(),
-  getUser: jest.fn(),
-  getAccessToken: jest.fn(() => Promise.resolve("FAKE_TOKEN")),
-}));
-
 const mockedProps: IFeedbackBoardMetadataFormProps = {
   isNewBoardCreation: true,
   isDuplicatingBoard: false,
