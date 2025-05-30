@@ -35,14 +35,33 @@ class AzureDevOpsCoreService {
    * @param projectId The project id.
    * @param teamId The team id.
    */
-  public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
+  /*public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
     try {
       return await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, 0);
     }
     catch {
       return null;
     }
+  }*/
+  public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
+  try {
+    const members = await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, 0);
+
+    // Debugging: log each member's displayName and isTeamAdmin property
+    console.log(
+      "Team members retrieved:",
+      members.map(m => ({
+        displayName: m.displayName,
+        isTeamAdmin: (m as any).isTeamAdmin // cast in case it's not typed
+      }))
+    );
+
+    return members;
+  } catch (error) {
+    console.error("Error fetching team members:", error);
+    return null;
   }
+}
 
   /**
    * Gets all the teams for the current project id.
