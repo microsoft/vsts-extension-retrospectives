@@ -60,15 +60,6 @@ export interface FeedbackBoardState {
   currentVoteCount: string;
 }
 
-// DPH
-export const FeedbackBoardPage = () => {
-  useEffect(() => {
-    logProjectAdminStatus();
-  }, []);
-
-  return <div>{/* ... */}</div>;
-};
-
 class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
   constructor(props: FeedbackBoardProps) {
     super(props);
@@ -90,7 +81,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   }
 
   public async componentDidMount() {
-    logProjectAdminStatus();
     this.initColumns();
     await this.getAllBoardFeedbackItems();
     this.setDefaultIterationAndAreaPath(this.props.team.id);
@@ -402,6 +392,9 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       });
     }
   }
+    handleLogAdminStatus = () => {
+    logProjectAdminStatus();
+  };
 
   public render() {
     if (!this.props.displayBoard) {
@@ -448,6 +441,12 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
     return (
       <div className="feedback-board">
+                {/* Example: Button at the top right */}
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+          <button onClick={this.handleLogAdminStatus}>
+            Check Project Admin Status
+          </button>
+        </div>
         {this.props.workflowPhase === WorkflowPhase.Vote &&
           <div className="feedback-maxvotes-per-user">
             <label>Votes Used: {this.state.currentVoteCount} / {this.props.board?.maxVotesPerUser?.toString()}</label>
