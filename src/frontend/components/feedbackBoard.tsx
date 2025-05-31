@@ -17,9 +17,6 @@ import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { encrypt } from "../utilities/userIdentityHelper";
 
-import { useEffect } from "react";
-import { logProjectAdminStatus } from "../utilities/userIdentityHelper";
-
 export interface FeedbackBoardProps {
   displayBoard: boolean;
   exceptionCode?: ExceptionCode;
@@ -392,9 +389,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       });
     }
   }
-    handleLogAdminStatus = () => {
-    logProjectAdminStatus();
-  };
 
   public render() {
     if (!this.props.displayBoard) {
@@ -441,12 +435,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
     return (
       <div className="feedback-board">
-                {/* Example: Button at the top right */}
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
-          <button onClick={this.handleLogAdminStatus}>
-            Check Project Admin Status
-          </button>
-        </div>
         {this.props.workflowPhase === WorkflowPhase.Vote &&
           <div className="feedback-maxvotes-per-user">
             <label>Votes Used: {this.state.currentVoteCount} / {this.props.board?.maxVotesPerUser?.toString()}</label>

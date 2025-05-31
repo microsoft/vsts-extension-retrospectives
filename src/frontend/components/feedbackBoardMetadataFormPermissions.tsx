@@ -4,7 +4,6 @@ import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../interfaces/feedback';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
-import { logProjectAdminStatus } from "../utilities/userIdentityHelper";
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
   board: IFeedbackBoardDocument;
@@ -145,7 +144,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }
 
   useEffect(() => {
-    //logProjectAdminStatus();
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
     emitChangeEvent();
