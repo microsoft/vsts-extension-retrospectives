@@ -23,6 +23,7 @@ export interface FeedbackBoardPermissionOption {
   hasPermission?: boolean;
   type: 'team' | 'member';
   thumbnailUrl?: string;
+  isTeamAdmin?: boolean;
 }
 
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
@@ -185,6 +186,17 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           <tbody>
             {filteredPermissionOptions.map((option) => {
               const isBoardOwner: boolean = option.id === props.board?.createdBy?.id;
+                  // Debug output for each option row
+    console.log('Permission row:', {
+      id: option.id,
+      name: option.name,
+      uniqueName: option.uniqueName,
+      isTeamAdmin: option.isTeamAdmin,
+      isBoardOwner,
+      teamPermissions,
+      memberPermissions,
+      checked: isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)
+    });
               return (
                 <tr key={option.id} className="option-row">
                   <td>
@@ -205,9 +217,11 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                     <div className="content-text flex flex-col flex-nowrap text-left">
                       <span aria-label="Team or member name">{option.name}</span>
                       <span aria-label="Team or member unique name" className="content-sub-text">{option.uniqueName}</span>
+                      <span>{option.isTeamAdmin}</span>
                     </div>
                     <div className="content-badge">
                       {isBoardOwner && <span aria-label="Board owner badge">{'Owner'}</span>}
+                      {option.isTeamAdmin && <span aria-label="Team admin badge">{'Admin'}</span>}
                     </div>
                   </td>
                 </tr>
