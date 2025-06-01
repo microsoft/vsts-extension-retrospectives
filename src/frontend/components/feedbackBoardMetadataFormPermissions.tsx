@@ -9,7 +9,7 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
   board: IFeedbackBoardDocument;
   permissions: IFeedbackBoardDocumentPermissions;
   permissionOptions: FeedbackBoardPermissionOption[];
-  currentUserId: string; // New prop
+  currentUserId: string;
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
 }
 
@@ -53,6 +53,8 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }
 
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
+    if (!canEditPermissions) return; // Block unauthorized changes
+
     let permissionList: string[] = option.type === 'team'
       ? teamPermissions ?? []
       : memberPermissions ?? [];
