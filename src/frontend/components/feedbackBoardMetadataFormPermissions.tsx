@@ -250,8 +250,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           </tbody>
         </table>
       </div>
-      <PermissionEditWarning />
+
     </section>
+      <PermissionEditWarning />
   </div>;
 }
 
