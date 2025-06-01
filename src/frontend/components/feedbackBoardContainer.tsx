@@ -1109,6 +1109,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           maxVotesPerUser={this.state.maxVotesPerUser}
           placeholderText={placeholderText}
           availablePermissionOptions={permissionOptions}
+          currentUserId={this.state.currentUserId}
           onFormSubmit={onSubmit}
           onFormCancel={onCancel} />
       </Dialog>);
