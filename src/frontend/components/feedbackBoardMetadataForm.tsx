@@ -24,7 +24,8 @@ export interface IFeedbackBoardMetadataFormProps {
   teamId: string;
   placeholderText: string;
   maxVotesPerUser: number;
-  availablePermissionOptions: FeedbackBoardPermissionOption[]
+  availablePermissionOptions: FeedbackBoardPermissionOption[];
+  currentUserId: string;
   onFormSubmit: (
     title: string,
     maxVotesPerUser: number,
@@ -708,6 +709,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               board={this.props.currentBoard}
               permissions={this.state.permissions}
               permissionOptions={this.props.availablePermissionOptions}
+              currentUserId={this.props.currentUserId} 
               onPermissionChanged={(s: FeedbackBoardPermissionState) => this.setState({ permissions: s.permissions })}
             />
           </PivotItem>
