@@ -171,7 +171,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     return null;
   };
 
-
   useEffect(() => {
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
@@ -181,7 +180,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   return <div className="board-metadata-form board-metadata-form-permissions">
     <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
       <PublicWarningBanner />
-      <PermissionEditWarning />
 
       <div className="search-bar">
         <TextField
@@ -252,6 +250,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           </tbody>
         </table>
       </div>
+      <PermissionEditWarning />
     </section>
   </div>;
 }
