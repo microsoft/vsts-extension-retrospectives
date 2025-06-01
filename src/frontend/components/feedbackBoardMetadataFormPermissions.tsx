@@ -107,8 +107,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       })
       .sort((a, b) => {
         // Step 1: Ensure the board owner appears first
-        const isAOwner = a.id === props.board?.createdBy?.id;
-        const isBOwner = b.id === props.board?.createdBy?.id;
+        const boardOwnerId = props.isNewBoardCreation ? props.currentUserId : props.board?.createdBy?.id;
+        const isAOwner = a.id === boardOwnerId;
+        const isBOwner = b.id === boardOwnerId;
         if (isAOwner && !isBOwner) return -1;
         if (!isAOwner && isBOwner) return 1;
         // Step 2: Sort by hasPermission (true before false)
