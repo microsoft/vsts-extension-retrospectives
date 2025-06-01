@@ -186,17 +186,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           <tbody>
             {filteredPermissionOptions.map((option) => {
               const isBoardOwner: boolean = option.id === props.board?.createdBy?.id;
-                  // Debug output for each option row
-    console.log('Permission row:', {
-      id: option.id,
-      name: option.name,
-      uniqueName: option.uniqueName,
-      isTeamAdmin: option.isTeamAdmin,
-      isBoardOwner,
-      teamPermissions,
-      memberPermissions,
-      checked: isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)
-    });
               return (
                 <tr key={option.id} className="option-row">
                   <td>

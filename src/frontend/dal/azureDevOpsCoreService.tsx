@@ -35,26 +35,14 @@ class AzureDevOpsCoreService {
    * @param projectId The project id.
    * @param teamId The team id.
    */
-  /*public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
+  public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
     try {
       return await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, 0);
     }
     catch {
       return null;
     }
-  }*/
-  public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
-  try {
-    const members = await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, 0);
-
-    console.log("Raw team members response:", members);
-
-    return members;
-  } catch (error) {
-    console.error("Error fetching team members:", error);
-    return null;
   }
-}
 
   /**
    * Gets all the teams for the current project id.
