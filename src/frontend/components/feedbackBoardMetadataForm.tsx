@@ -68,7 +68,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     super(props);
 
     // Define retrospective types
-    // const isNewRetrospective = props.isNewBoardCreation && !props.isDuplicatingBoard;
+    //const isNewRetrospective = props.isNewBoardCreation && !props.isDuplicatingBoard;
     const isCopyRetrospective = props.isNewBoardCreation && props.isDuplicatingBoard;
     const isEditRetrospective = !props.isNewBoardCreation;
 
@@ -710,6 +710,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               permissions={this.state.permissions}
               permissionOptions={this.props.availablePermissionOptions}
               currentUserId={this.props.currentUserId}
+              isNewBoardCreation={this.props.isNewBoardCreation}
               onPermissionChanged={(s: FeedbackBoardPermissionState) => this.setState({ permissions: s.permissions })}
             />
           </PivotItem>

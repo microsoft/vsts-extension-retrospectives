@@ -10,6 +10,7 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
   permissions: IFeedbackBoardDocumentPermissions;
   permissionOptions: FeedbackBoardPermissionOption[];
   currentUserId: string;
+  isNewBoardCreation: boolean;
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
 }
 
@@ -34,13 +35,17 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
-  const isBoardOwner = props.board?.createdBy?.id === props.currentUserId;
+  const isBoardOwner = props.isNewBoardCreation
+  ? props.currentUserId === props.currentUserId // Current user is always the owner for new boards
+  : props.board.createdBy?.id === props.currentUserId; // Use `createdBy` for existing boards
   const isTeamAdmin = props.permissionOptions.some(
     (option) => option.id === props.currentUserId && option.isTeamAdmin
   );
   const canEditPermissions = isBoardOwner || isTeamAdmin;
 
   const handleSelectAllClicked = (checked: boolean) => {
+    if (!canEditPermissions) return; // Block unauthorized users from selecting/unselecting all
+
     if(checked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === 'team' && !teamPermissions.includes(o.id)).map(o => o.id)]);
       setMemberPermissions([...memberPermissions, ...filteredPermissionOptions.filter(o => o.type === 'member' && !memberPermissions.includes(o.id)).map(o => o.id)]);
