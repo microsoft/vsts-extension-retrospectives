@@ -12,6 +12,7 @@ const mockedProps: IFeedbackBoardMetadataFormPermissionsProps = {
     Members: []
   },
   permissionOptions: [],
+  currentUserId: testUserId,
   onPermissionChanged: jest.fn()
 };
 
