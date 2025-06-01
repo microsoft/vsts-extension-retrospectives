@@ -364,8 +364,37 @@ describe('Board Metadata Form Permissions', () => {
     });
 
     it('should display permission restriction warning for non-owners', () => {
-      // Test implementation here
+      const differentUserIdentityRef: IdentityRef = {
+        ...mockIdentityRef, // Copy all existing properties
+        id: 'owner456', // Change ID to represent a different user
+        displayName: 'Board Owner', // Update display name
+        uniqueName: 'owner456@domain.com',
+      };
+
+      const anotherMockBoard: IFeedbackBoardDocument = {
+        ...mockBoard,
+        createdBy: differentUserIdentityRef,
+      };
+
+      const mockPermissionOptions: FeedbackBoardPermissionOption[] = [
+        { id: 'user123', name: 'Current User', uniqueName: 'currentuser@domain.com', type: "member", isTeamAdmin: false }
+      ];
+
+      const props: IFeedbackBoardMetadataFormPermissionsProps = {
+        ...mockedProps,
+        board: anotherMockBoard, // Use structured board object
+        currentUserId: 'user123', // Not the board owner
+        isNewBoardCreation: false, // Editing an existing board
+        permissionOptions: mockPermissionOptions, // Correctly typed permission options
+      };
+
+      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const component = wrapper.children().dive();
+
+      // Validate the restriction warning appears for non-owner users
+      expect(component.findWhere(c => c.text().includes('Only the Board Owner or Team Admin can edit permissions'))).toHaveLength(1);
     });
+
   });
 
 });
