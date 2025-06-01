@@ -35,9 +35,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
-  const isBoardOwner = props.isNewBoardCreation
-  ? props.currentUserId === props.currentUserId // Current user is always the owner for new boards
-  : props.board.createdBy?.id === props.currentUserId; // Use `createdBy` for existing boards
+  const isBoardOwner = props.board?.createdBy?.id === props.currentUserId;
   const isTeamAdmin = props.permissionOptions.some(
     (option) => option.id === props.currentUserId && option.isTeamAdmin
   );
@@ -202,7 +200,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           </thead>
           <tbody>
             {filteredPermissionOptions.map((option) => {
-              const isBoardOwner: boolean = option.id === props.board?.createdBy?.id;
+              const isBoardOwner: boolean = props.isNewBoardCreation
+                ? option.id === props.currentUserId // New board: Current user is the proposed owner
+                : option.id === props.board?.createdBy?.id; // Existing board: Use saved owner
               return (
                 <tr key={option.id} className="option-row">
                   <td>
