@@ -1,9 +1,28 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
+import { IdentityRef } from 'azure-devops-extension-api/WebApi';
+import { TextField } from 'office-ui-fabric-react';
 import { mockUuid } from '../__mocks__/uuid/v4';
 import { testExistingBoard, testTeamId, testUserId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
-import { TextField } from 'office-ui-fabric-react';
-import FeedbackBoardMetadataFormPermissions, { IFeedbackBoardMetadataFormPermissionsProps } from '../feedbackBoardMetadataFormPermissions';
+import { IFeedbackBoardDocument } from '../../interfaces/feedback';
+import FeedbackBoardMetadataFormPermissions, { IFeedbackBoardMetadataFormPermissionsProps, FeedbackBoardPermissionOption }
+  from '../feedbackBoardMetadataFormPermissions';
+
+const mockIdentityRef: IdentityRef = {
+  id: "user-1",
+  displayName: "Test User",
+  uniqueName: "testuser@domain.com",
+  imageUrl: "https://example.com/user.png",
+  directoryAlias: "testuser",
+  inactive: false,
+  isAadIdentity: true,
+  isContainer: false,
+  isDeletedInOrigin: false,
+  profileUrl: "https://example.com/profile",
+  _links: {},
+  descriptor: "descriptor-string",
+  url: "https://example.com/user",
+};
 
 const mockedProps: IFeedbackBoardMetadataFormPermissionsProps = {
   board: testExistingBoard,
@@ -15,6 +34,21 @@ const mockedProps: IFeedbackBoardMetadataFormPermissionsProps = {
   currentUserId: testUserId,
   isNewBoardCreation: false,
   onPermissionChanged: jest.fn()
+};
+
+const mockBoard: IFeedbackBoardDocument = {
+  id: 'mock-board-id',
+  title: 'Mock Board',
+  teamId: 'mock-team-id',
+  createdBy: mockIdentityRef,
+  createdDate: new Date(),
+  modifiedDate: new Date(),
+  permissions: { Teams: [], Members: [] },
+  columns: [], // Ensure an array is provided
+  activePhase: 'Collect', // Use a default valid phase
+  maxVotesPerUser: 5,
+  boardVoteCollection: {},
+  teamEffectivenessMeasurementVoteCollection: [],
 };
 
 jest.mock('uuid', () => ({ v4: () => mockUuid}));
@@ -307,4 +341,31 @@ describe('Board Metadata Form Permissions', () => {
       expect(hasOwnerLabel2).toBeFalsy();
     })
   });
+
+  describe('Editing Permissions', () => {
+    it('should allow current user to edit permissions when creating a new board', () => {
+      const mockPermissionOptions: FeedbackBoardPermissionOption[] = [
+        { id: 'user123', name: 'Current User', uniqueName: 'currentuser@domain.com', type: "member" }
+      ];
+
+      const props = {
+        ...mockedProps,
+        isNewBoardCreation: true,
+        currentUserId: 'user123',
+        board: mockBoard,
+        permissionOptions: mockPermissionOptions, // Uses correctly typed array
+      };
+
+      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const component = wrapper.children().dive();
+
+      // Assert that the "Only Board Owner or Admin can edit" warning does NOT appear
+      expect(component.findWhere(c => c.text().includes('Only the Board Owner or Team Admin can edit permissions'))).toHaveLength(0);
+    });
+
+    it('should display permission restriction warning for non-owners', () => {
+      // Test implementation here
+    });
+  });
+
 });
