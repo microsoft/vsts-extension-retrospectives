@@ -9,6 +9,7 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
   board: IFeedbackBoardDocument;
   permissions: IFeedbackBoardDocumentPermissions;
   permissionOptions: FeedbackBoardPermissionOption[];
+  currentUserId: string; // New prop
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
 }
 
@@ -32,6 +33,12 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
+
+  const isBoardOwner = props.board?.createdBy?.id === props.currentUserId;
+  const isTeamAdmin = props.permissionOptions.some(
+    (option) => option.id === props.currentUserId && option.isTeamAdmin
+  );
+  const canEditPermissions = isBoardOwner || isTeamAdmin;
 
   const handleSelectAllClicked = (checked: boolean) => {
     if(checked) {
@@ -117,13 +124,15 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const emitChangeEvent = () => {
-    props.onPermissionChanged({
-      permissions: {
-        Teams: teamPermissions,
-        Members: memberPermissions
-      }
-    })
-  }
+    if (canEditPermissions) {
+      props.onPermissionChanged({
+        permissions: {
+          Teams: teamPermissions,
+          Members: memberPermissions,
+        },
+      });
+    }
+  };
 
   const PermissionImage = (props: {option: FeedbackBoardPermissionOption}) => {
     if (props.option.type === 'team') {
@@ -172,8 +181,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                 <Checkbox
                   className="my-2"
                   id="select-all-permission-options-visible"
-                  ariaLabel="Select all permission options that are visible in the permission option list."
+                  ariaLabel="Add permission to every team or member in the table."
                   boxSide="start"
+                  disabled={!canEditPermissions}
                   checked={selectAllChecked}
                   onChange={(_, checked) => handleSelectAllClicked(checked)}
                 />
