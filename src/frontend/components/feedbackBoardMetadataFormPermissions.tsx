@@ -35,7 +35,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
-  const isBoardOwner = props.board?.createdBy?.id === props.currentUserId;
+  const isBoardOwner = props.isNewBoardCreation || props.board?.createdBy?.id === props.currentUserId;
   const isTeamAdmin = props.permissionOptions.some(
     (option) => option.id === props.currentUserId && option.isTeamAdmin
   );
