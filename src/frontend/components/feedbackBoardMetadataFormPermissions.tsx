@@ -159,11 +159,11 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }
 
   // DPH temporarily suppress warning to prove test passes or fails
-const PermissionEditWarning = (): JSX.Element | null => {
-  return null; // ✅ This ensures no warning appears
-};
+//const PermissionEditWarning = (): JSX.Element | null => {
+//  return null; // ✅ This ensures no warning appears
+//};
 
-/*  const PermissionEditWarning = () => {
+  const PermissionEditWarning = () => {
     if (!canEditPermissions) {
       return (
         <div className="board-metadata-form-section-information">
@@ -172,7 +172,7 @@ const PermissionEditWarning = (): JSX.Element | null => {
       );
     }
     return null;
-  }; */
+  };
 
   useEffect(() => {
     setSelectAllState();
