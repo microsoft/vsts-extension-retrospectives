@@ -225,7 +225,8 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                       boxSide="start"
                       disabled={isBoardOwner}
                       checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
-                      onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
+    indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} // Set indeterminate only if no permissions exist
+                    onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
                     />
                   </td>
                   <td className="cell-content flex flex-row flex-nowrap">
