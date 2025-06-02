@@ -159,7 +159,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }
 
   const PermissionEditWarning = () => {
-    if (!canEditPermissions) {
+    if (canEditPermissions) { // force the warning when it shouldn't to confirm test will fail.
       return (
         <div className="board-metadata-form-section-information">
             <i className="fas fa-exclamation-circle" aria-label="Permission restriction warning"></i>&nbsp;Only the Board Owner or a Team Admin can edit permissions.
