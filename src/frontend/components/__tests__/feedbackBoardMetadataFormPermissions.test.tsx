@@ -392,7 +392,7 @@ describe('Board Metadata Form Permissions', () => {
       const component = wrapper.children().dive();
 
       // Validate the restriction warning appears for non-owner users
-      expect(component.findWhere(c => c.text().includes('Only the Board Owner or Team Admin can edit permissions.'))).toHaveLength(1);
+      expect(component.text()).toContain('Only the Board Owner or a Team Admin can edit permissions.');
     });
 
   });
