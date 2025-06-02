@@ -158,11 +158,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     return null;
   }
 
-  // DPH temporarily suppress warning to prove test passes or fails
-//const PermissionEditWarning = (): JSX.Element | null => {
-//  return null; // ✅ This ensures no warning appears
-//};
-
   const PermissionEditWarning = () => {
     if (!canEditPermissions) {
       return (

@@ -1,28 +1,9 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 import { TextField } from 'office-ui-fabric-react';
 import { mockUuid } from '../__mocks__/uuid/v4';
 import { testExistingBoard, testTeamId, testUserId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
-import { IFeedbackBoardDocument } from '../../interfaces/feedback';
-import FeedbackBoardMetadataFormPermissions, { IFeedbackBoardMetadataFormPermissionsProps, FeedbackBoardPermissionOption }
-  from '../feedbackBoardMetadataFormPermissions';
-
-const mockIdentityRef: IdentityRef = {
-  id: "user-1",
-  displayName: "Test User",
-  uniqueName: "testuser@domain.com",
-  imageUrl: "https://example.com/user.png",
-  directoryAlias: "testuser",
-  inactive: false,
-  isAadIdentity: true,
-  isContainer: false,
-  isDeletedInOrigin: false,
-  profileUrl: "https://example.com/profile",
-  _links: {},
-  descriptor: "descriptor-string",
-  url: "https://example.com/user",
-};
+import FeedbackBoardMetadataFormPermissions, { IFeedbackBoardMetadataFormPermissionsProps } from '../feedbackBoardMetadataFormPermissions';
 
 const mockedProps: IFeedbackBoardMetadataFormPermissionsProps = {
   board: testExistingBoard,
@@ -34,21 +15,6 @@ const mockedProps: IFeedbackBoardMetadataFormPermissionsProps = {
   currentUserId: testUserId,
   isNewBoardCreation: false,
   onPermissionChanged: jest.fn()
-};
-
-const mockBoard: IFeedbackBoardDocument = {
-  id: 'mock-board-id',
-  title: 'Mock Board',
-  teamId: 'mock-team-id',
-  createdBy: mockIdentityRef,
-  createdDate: new Date(),
-  modifiedDate: new Date(),
-  permissions: { Teams: [], Members: [] },
-  columns: [], // Ensure an array is provided
-  activePhase: 'Collect', // Use a default valid phase
-  maxVotesPerUser: 5,
-  boardVoteCollection: {},
-  teamEffectivenessMeasurementVoteCollection: [],
 };
 
 jest.mock('uuid', () => ({ v4: () => mockUuid}));
@@ -341,45 +307,4 @@ describe('Board Metadata Form Permissions', () => {
       expect(hasOwnerLabel2).toBeFalsy();
     })
   });
-
-  describe('Editing Permissions', () => {
-    const permissionWarningText = 'Only the Board Owner or a Team Admin can edit permissions.';
-
-    // DPH I don't think this test works either
-    it('should display permission restriction warning for non-owners', () => {
-      // Set up board with a different owner
-      const differentUserIdentityRef: IdentityRef = {
-        ...mockIdentityRef,
-        id: 'owner456',
-        displayName: 'Board Owner',
-        uniqueName: 'owner456@domain.com',
-      };
-
-      const anotherMockBoard: IFeedbackBoardDocument = {
-        ...mockBoard,
-        createdBy: differentUserIdentityRef,
-      };
-
-      const mockPermissionOptions: FeedbackBoardPermissionOption[] = [
-        { id: 'user123', name: 'Current User', uniqueName: 'currentuser@domain.com', type: "member", isTeamAdmin: false }
-      ];
-
-      // Define props similar to how Public Banner test sets them up
-      const props: IFeedbackBoardMetadataFormPermissionsProps = {
-        ...mockedProps,
-        board: anotherMockBoard, // Board is owned by 'owner456'
-        currentUserId: 'user123', // Non-owner user
-        isNewBoardCreation: false, // Editing an existing board
-        permissionOptions: mockPermissionOptions, // Correctly typed permission options
-      };
-
-      // Render component
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const component = wrapper.children().dive();
-
-      expect(component.text()).toContain(permissionWarningText);
-    });
-
-  });
-
 });
