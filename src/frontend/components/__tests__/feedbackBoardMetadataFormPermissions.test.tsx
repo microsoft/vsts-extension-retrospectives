@@ -377,7 +377,7 @@ describe('Board Metadata Form Permissions', () => {
       const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
       const component = wrapper.children().dive();
 
-      expect(component.find('[aria-label="Permission restriction warning"]').exists()).toBeTruthy();
+      expect(component.text()).toContain(permissionWarningText);
     });
 
   });
