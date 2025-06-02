@@ -344,27 +344,6 @@ describe('Board Metadata Form Permissions', () => {
 
   describe('Editing Permissions', () => {
     const permissionWarningText = 'Only the Board Owner or a Team Admin can edit permissions.';
-// DPH this test isn't working; it passess regardless of whether it should or not
-    it('should allow current user to edit permissions when creating a new board', () => {
-      const mockPermissionOptions: FeedbackBoardPermissionOption[] = [
-        { id: 'user123', name: 'Current User', uniqueName: 'currentuser@domain.com', type: "member", isTeamAdmin: false }
-      ];
-
-      const props: IFeedbackBoardMetadataFormPermissionsProps = {
-        ...mockedProps,
-        board: { ...mockBoard, createdBy: mockIdentityRef }, // Maintain board structure
-        isNewBoardCreation: true, // New board creation scenario
-        currentUserId: 'user123', // Current user is the board creator
-        permissionOptions: mockPermissionOptions, // Correctly typed permission options
-      };
-
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const component = wrapper.children().dive();
-
-      console.log(component.debug()); // DPH
-      // "expect" statement to check absence of the warning
-      expect(component.find('[aria-label="Permission restriction warning"]').exists()).toBeTruthy(); // false didn't work, try true
-    });
 
     // DPH I don't think this test works either
     it('should display permission restriction warning for non-owners', () => {

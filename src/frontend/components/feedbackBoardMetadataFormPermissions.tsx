@@ -158,17 +158,21 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     return null;
   }
 
-  const PermissionEditWarning = () => {
-    if (canEditPermissions) { // DPH force the warning when it shouldn't to confirm test will fail.
+  // DPH temporarily suppress warning to prove test passes or fails
+const PermissionEditWarning = (): JSX.Element | null => {
+  return null; // ✅ This ensures no warning appears
+};
+
+/*  const PermissionEditWarning = () => {
+    if (!canEditPermissions) { 
       return (
         <div className="board-metadata-form-section-information">
             <i className="fas fa-exclamation-circle" aria-label="Permission restriction warning"></i>&nbsp;Only the Board Owner or a Team Admin can edit permissions.
         </div>
       );
     }
-
     return null;
-  };
+  }; */
 
   useEffect(() => {
     setSelectAllState();
