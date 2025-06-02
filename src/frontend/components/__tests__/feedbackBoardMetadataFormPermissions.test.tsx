@@ -362,7 +362,7 @@ describe('Board Metadata Form Permissions', () => {
     const component = wrapper.children().dive();
 
     // Improved "expect" statement to check absence of the warning
-    expect(component.find('[aria-label="Permission restriction warning"]').text()).toContain(permissionWarningText);
+    expect(component.find('[aria-label="Permission restriction warning"]').exists()).toBeFalsy();
   });
 
 /*
