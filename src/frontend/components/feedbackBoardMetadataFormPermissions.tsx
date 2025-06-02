@@ -162,8 +162,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     if (!canEditPermissions) {
       return (
         <div className="board-metadata-form-section-information">
-            <i className="fas fa-exclamation-circle" aria-label="Permission restriction warning"></i>&nbsp;
-            Only the Board Owner or a Team Admin can edit permissions.
+            <i className="fas fa-exclamation-circle" aria-label="Permission restriction warning"></i>&nbsp;Only the Board Owner or a Team Admin can edit permissions.
         </div>
       );
     }
