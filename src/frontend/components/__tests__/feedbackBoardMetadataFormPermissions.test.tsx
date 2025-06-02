@@ -377,9 +377,8 @@ describe('Board Metadata Form Permissions', () => {
       const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
       const component = wrapper.children().dive();
 
-      // Follow similar approach to the Public Banner test
-      const element = component.findWhere(c => c.text() === permissionWarningText);
-      expect(element).toBeDefined();
+expect(component.find('[aria-label="Permission restriction warning"]').exists()).toBeTruthy();
+
     });
 
   });
