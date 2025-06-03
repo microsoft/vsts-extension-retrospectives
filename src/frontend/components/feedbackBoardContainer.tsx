@@ -112,6 +112,19 @@ export interface FeedbackBoardContainerState {
   questionIdForDiscussAndActBoardUpdate: number;
 }
 
+function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
+  const memberGroups = new Map<string, TeamMember[]>();
+  for (const member of allTeamMembers) {
+    const memberArray = memberGroups.get(member.identity.id) || [];
+    memberArray.push(member);
+    memberGroups.set(member.identity.id, memberArray);
+  }
+  return Array.from(memberGroups.values()).map(members => {
+    const admin = members.find(m => m.isTeamAdmin);
+    return admin || members[0];
+  });
+}
+
 class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
   constructor(props: FeedbackBoardContainerProps) {
     super(props);
@@ -307,7 +320,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }));
   }
 
-  private readonly  handleResolutionChange = () => {
+  private readonly handleResolutionChange = () => {
     const isDesktop = window.innerWidth >= MobileWidthBreakpoint;
 
     if (this.state.isAutoResizeEnabled && this.state.isDesktop != isDesktop) {
@@ -632,17 +645,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       for (const members of values) {
         allTeamMembers.push(...members);
       }
-      // Deduplicate, favoring any isTeamAdmin instance
-      const memberGroups = new Map<string, TeamMember[]>();
-      for (const member of allTeamMembers) {
-        const memberArray = memberGroups.get(member.identity.id) || [];
-        memberArray.push(member);
-        memberGroups.set(member.identity.id, memberArray);
-      }
-      const uniqueTeamMembers = Array.from(memberGroups.values()).map(members => {
-        const admin = members.find(m => m.isTeamAdmin);
-        return admin || members[0];
-      });
+      // Use the helper function
+      const uniqueTeamMembers = deduplicateTeamMembers(allTeamMembers);
 
       this.setState({
         allMembers: uniqueTeamMembers,
