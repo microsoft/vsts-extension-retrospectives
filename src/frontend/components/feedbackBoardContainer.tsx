@@ -112,7 +112,7 @@ export interface FeedbackBoardContainerState {
   questionIdForDiscussAndActBoardUpdate: number;
 }
 
-function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
+export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
   const memberGroups = new Map<string, TeamMember[]>();
   for (const member of allTeamMembers) {
     const memberArray = memberGroups.get(member.identity.id) || [];
