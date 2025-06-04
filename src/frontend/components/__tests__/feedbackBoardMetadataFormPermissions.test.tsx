@@ -707,4 +707,38 @@ describe('Select Permissions', () => {
     expect(lastCall.permissions.Members).not.toContain('user-1');
     expect(lastCall.permissions.Teams).not.toContain('team-1');
   });
+  
+  describe('Board Owner Row Rendering', () => {
+    it('should show the current user as board owner when creating a new board or copying a board (isNewBoardCreation: true)', () => {
+      const props = makeProps({
+        isNewBoardCreation: true,
+        currentUserId: 'user-1',
+        // board.createdBy is still user-2, but should not matter
+        board: { ...mockedProps.board, createdBy: { ...mockedProps.board.createdBy, id: 'user-2' } }
+      });
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const ownerRow = wrapper.find('tr.option-row').filterWhere(row => row.text().includes('Owner'));
+      expect(ownerRow.text()).toContain('user1');
+      expect(ownerRow.find('[aria-label="Board owner badge"]').exists()).toBe(true);
+    });
+
+    it('should show the board.createdBy as board owner when editing an existing board (isNewBoardCreation: false)', () => {
+      const props = makeProps({
+        isNewBoardCreation: false,
+        currentUserId: 'user-1',
+        board: { ...mockedProps.board, createdBy: { ...mockedProps.board.createdBy, id: 'user-2' } }
+      });
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      // Find the row with the Owner badge
+      const ownerRow = wrapper.find('tr.option-row').filterWhere(row =>
+        row.find('[aria-label="Board owner badge"]').exists()
+      );
+      expect(ownerRow).toHaveLength(1);
+      expect(ownerRow.text()).toContain('user2');
+      // Owner badge should exist
+      expect(ownerRow.find('[aria-label="Board owner badge"]').exists()).toBe(true);
+      // Admin badge should also exist if user2 is admin
+      //expect(ownerRow.find('[aria-label="Team admin badge"]').exists()).toBe(true);
+    });
+  });
 });
