@@ -3,7 +3,8 @@ import { mount, shallow } from 'enzyme';
 import { TextField } from 'office-ui-fabric-react';
 import { mockUuid } from '../__mocks__/uuid/v4';
 import { testExistingBoard, testTeamId, testUserId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
-import FeedbackBoardMetadataFormPermissions, { IFeedbackBoardMetadataFormPermissionsProps } from '../feedbackBoardMetadataFormPermissions';
+import FeedbackBoardMetadataFormPermissions from '../feedbackBoardMetadataFormPermissions';
+import { FeedbackBoardPermissionOption, IFeedbackBoardMetadataFormPermissionsProps } from '../feedbackBoardMetadataFormPermissions';
 
 const mockedProps: IFeedbackBoardMetadataFormPermissionsProps = {
   board: testExistingBoard,
@@ -16,6 +17,74 @@ const mockedProps: IFeedbackBoardMetadataFormPermissionsProps = {
   isNewBoardCreation: false,
   onPermissionChanged: jest.fn()
 };
+
+const mockIdentityRef = {
+  id: 'some-id',
+  directoryAlias: '',
+  imageUrl: '',
+  inactive: false,
+  isAadIdentity: false,
+  isContainer: false,
+  isDeletedInOrigin: false,
+  profileUrl: '',
+  uniqueName: '',
+  displayName: '',
+  url: '',
+  descriptor: '',
+  _links: {}
+};
+
+const teamOption: FeedbackBoardPermissionOption = {
+  id: 'team-1',
+  name: 'Team 1',
+  uniqueName: 'team1',
+  type: 'team',
+  thumbnailUrl: ''
+};
+
+const ownerOption: FeedbackBoardPermissionOption = {
+  id: 'user-1',
+  name: 'Board Owner',
+  uniqueName: 'user1',
+  type: 'member',
+  thumbnailUrl: ''
+};
+
+const adminOption: FeedbackBoardPermissionOption = {
+  id: 'user-2',
+  name: 'Team Admin',
+  uniqueName: 'user2',
+  type: 'member',
+  thumbnailUrl: '',
+  isTeamAdmin: true
+};
+
+const memberOption: FeedbackBoardPermissionOption = {
+  id: 'user-3',
+  name: 'Team Member',
+  uniqueName: 'user3',
+  type: 'member',
+  thumbnailUrl: ''
+};
+
+const allOptions = [teamOption, ownerOption, adminOption, memberOption];
+
+function makeProps(overrides: Partial<IFeedbackBoardMetadataFormPermissionsProps> = {}): IFeedbackBoardMetadataFormPermissionsProps {
+  return {
+    ...mockedProps,
+    board: {
+      ...mockedProps.board,
+      createdBy: { ...mockedProps.board.createdBy, id: 'user-1' }, // default owner
+      ...(overrides.board || {})
+    },
+    permissionOptions: allOptions,
+    onPermissionChanged: jest.fn(),
+    isNewBoardCreation: false,
+    currentUserId: 'user-1',
+    permissions: { Teams: [], Members: [] },
+    ...overrides
+  };
+}
 
 jest.mock('uuid', () => ({ v4: () => mockUuid}));
 
@@ -38,11 +107,12 @@ describe('Board Metadata Form Permissions', () => {
     const publicBannerText: string = 'This board is visible to every member in the project.';
 
     it('should show when there are not team or member permissions', () => {
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...mockedProps} />);
-      const component = wrapper.children().dive();
-      const element = component.findWhere(c => c.text() === publicBannerText);
-
-      expect(element).toBeDefined();
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...mockedProps} />);
+      const elements = wrapper.find('.board-metadata-form-section-information');
+      const banner = elements.filterWhere(e =>
+        e.text().includes(publicBannerText)
+      );
+      expect(banner.exists()).toBe(true);
     });
 
     it('should hide when there are team permissions', () => {
@@ -53,12 +123,13 @@ describe('Board Metadata Form Permissions', () => {
           Members: [] as string[]
         }
       };
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const component = wrapper.children().dive();
-      const element = component.findWhere(c => c.text() === publicBannerText);
-
-      expect(element).toHaveLength(0);
-    })
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const elements = wrapper.find('.board-metadata-form-section-information');
+      const banner = elements.filterWhere(e =>
+        e.text().includes(publicBannerText)
+      );
+      expect(banner.exists()).toBe(false);
+    });
 
     it('should hide when there are member permissions', () => {
       const props = {
@@ -68,12 +139,93 @@ describe('Board Metadata Form Permissions', () => {
           Members: [testUserId]
         }
       };
-      const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const component = wrapper.children().dive();
-      const element = component.findWhere(c => c.text() === publicBannerText);
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const elements = wrapper.find('.board-metadata-form-section-information');
+      const banner = elements.filterWhere(e =>
+        e.text().includes(publicBannerText)
+      );
+      expect(banner.exists()).toBe(false);
+    });
+  });
 
-      expect(element).toHaveLength(0);
-    })
+  describe('Permission Edit Warning', () => {
+    const permissionEditWarningText = 'Only the Board Owner or a Team Admin can edit permissions.';
+
+    it('should show when user is neither board owner nor team admin', () => {
+      const props = {
+        ...mockedProps,
+        isNewBoardCreation: false,
+        board: { ...mockedProps.board, createdBy: { ...mockIdentityRef, id: 'someone-else' } },
+        currentUserId: 'not-owner-or-admin',
+        permissionOptions: [
+          {
+            id: 'not-owner-or-admin',
+            name: 'User',
+            uniqueName: 'User',
+            type: 'member', // literal type
+            thumbnailUrl: ''
+          } as FeedbackBoardPermissionOption // <-- Explicitly cast here
+        ]
+      };
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const elements = wrapper.find('.board-metadata-form-section-information');
+      const warning = elements.filterWhere(e =>
+        e.text().includes(permissionEditWarningText)
+      );
+      expect(warning.exists()).toBe(true);
+    });
+
+    it('should hide when user is board owner', () => {
+      const props = {
+        ...mockedProps,
+        isNewBoardCreation: false,
+        board: {
+          ...mockedProps.board,
+          createdBy: { ...mockIdentityRef, id: mockedProps.currentUserId } // Use full IdentityRef
+        },
+        currentUserId: mockedProps.currentUserId,
+        permissionOptions: [
+          {
+            id: mockedProps.currentUserId,
+            name: 'Owner',
+            uniqueName: 'Owner',
+            type: 'member',
+            thumbnailUrl: ''
+          } as FeedbackBoardPermissionOption
+        ]
+      };
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const elements = wrapper.find('.board-metadata-form-section-information');
+      const warning = elements.filterWhere(e =>
+        e.text().includes(permissionEditWarningText)
+      );
+      expect(warning.exists()).toBe(false);
+    });
+
+    it('should hide when user is a team admin', () => {
+      const props = {
+        ...mockedProps,
+        isNewBoardCreation: false,
+        board: { ...mockedProps.board, createdBy: { ...mockIdentityRef, id: 'someone-else' } },
+        currentUserId: 'team-admin-id',
+        permissionOptions: [
+          {
+            id: 'team-admin-id',
+            name: 'Admin',
+            uniqueName: 'Admin',
+            type: 'member', // or 'team' if your logic expects team admins as teams
+            thumbnailUrl: '',
+            isTeamAdmin: true
+          } as FeedbackBoardPermissionOption
+        ]
+      };
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const elements = wrapper.find('.board-metadata-form-section-information');
+      const warning = elements.filterWhere(e =>
+        e.text().includes(permissionEditWarningText)
+      );
+      expect(warning.exists()).toBe(false);
+    });
   });
 
   describe('Permission Table', () => {
@@ -515,5 +667,44 @@ describe('Board Metadata Form Permissions', () => {
       wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: true } });
       expect(onPermissionChanged).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('Select Permissions', () => {
+  it('should grant permission to all when select all is clicked and saved', async () => {
+    const onPermissionChanged = jest.fn();
+    const props = makeProps({ onPermissionChanged, currentUserId: 'user-1', isNewBoardCreation: true, board: { ...mockedProps.board, createdBy: { ...mockedProps.board.createdBy, id: 'user-3' } } });
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+    wrapper.find('input#select-all-permission-options-visible').simulate('change', { target: { checked: true } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+    expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
+    expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-1', 'user-2', 'user-3']));
+  });
+
+  it('should grant permission to the selected team and the board owner only when team is selected and saved', async () => {
+    const onPermissionChanged = jest.fn();
+    const props = makeProps({ onPermissionChanged });
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+    wrapper.find('input#permission-option-team-1').simulate('change', { target: { checked: true } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+    expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
+    expect(lastCall.permissions.Members).not.toContain('user-1');
+    expect(lastCall.permissions.Members).not.toContain('user-2');
+    expect(lastCall.permissions.Members).not.toContain('user-3');
+  });
+
+  it('should grant permission to the selected users only when their checkboxes are selected and saved', async () => {
+    const onPermissionChanged = jest.fn();
+    const props = makeProps({ onPermissionChanged });
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+    wrapper.find('input#permission-option-user-2').simulate('change', { target: { checked: true } });
+    wrapper.find('input#permission-option-user-3').simulate('change', { target: { checked: true } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+    expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-2', 'user-3']));
+    expect(lastCall.permissions.Members).not.toContain('user-1');
+    expect(lastCall.permissions.Teams).not.toContain('team-1');
   });
 });
