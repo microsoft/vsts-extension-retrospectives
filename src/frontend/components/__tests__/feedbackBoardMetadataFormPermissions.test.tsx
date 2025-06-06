@@ -86,7 +86,7 @@ function makeProps(overrides: Partial<IFeedbackBoardMetadataFormPermissionsProps
   };
 }
 
-jest.mock('uuid', () => ({ v4: () => mockUuid}));
+jest.mock('uuid', () => ({ v4: () => mockUuid }));
 
 describe('Board Metadata Form Permissions', () => {
 
@@ -532,7 +532,7 @@ describe('Board Metadata Form Permissions', () => {
             thumbnailUrl: ''
             // isTeamAdmin is missing
           },
-                    {
+          {
             id: '2',
             name: 'Brady',
             uniqueName: 'User 2',
@@ -558,46 +558,46 @@ describe('Board Metadata Form Permissions', () => {
     });
 
     it('should display correct admin badges for users who are team admins on different teams', () => {
-  const props: IFeedbackBoardMetadataFormPermissionsProps = {
-    ...mockedProps,
-    board: {
-      ...mockedProps.board,
-      createdBy: { ...mockedProps.board.createdBy, id: 'owner-id' }
-    },
-    currentUserId: 'owner-id',
-    permissions: { Teams: ['team-1', 'team-2'], Members: ['user-1', 'user-2'] },
-    permissionOptions: [
-      // Teams
-      { id: 'team-1', name: 'Team 1', uniqueName: 'team1', type: 'team' },
-      { id: 'team-2', name: 'Team 2', uniqueName: 'team2', type: 'team' },
-      // Users (members)
-      { id: 'user-1', name: 'User 1', uniqueName: 'user1', type: 'member', isTeamAdmin: true },  // Admin on Team 1
-      { id: 'user-2', name: 'User 2', uniqueName: 'user2', type: 'member', isTeamAdmin: true }   // Admin on Team 2
-    ],
-    isNewBoardCreation: false,
-    onPermissionChanged: jest.fn()
-  };
+      const props: IFeedbackBoardMetadataFormPermissionsProps = {
+        ...mockedProps,
+        board: {
+          ...mockedProps.board,
+          createdBy: { ...mockedProps.board.createdBy, id: 'owner-id' }
+        },
+        currentUserId: 'owner-id',
+        permissions: { Teams: ['team-1', 'team-2'], Members: ['user-1', 'user-2'] },
+        permissionOptions: [
+          // Teams
+          { id: 'team-1', name: 'Team 1', uniqueName: 'team1', type: 'team' },
+          { id: 'team-2', name: 'Team 2', uniqueName: 'team2', type: 'team' },
+          // Users (members)
+          { id: 'user-1', name: 'User 1', uniqueName: 'user1', type: 'member', isTeamAdmin: true },  // Admin on Team 1
+          { id: 'user-2', name: 'User 2', uniqueName: 'user2', type: 'member', isTeamAdmin: true }   // Admin on Team 2
+        ],
+        isNewBoardCreation: false,
+        onPermissionChanged: jest.fn()
+      };
 
-  const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-  const tableRows = wrapper.find('tbody').find('tr');
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const tableRows = wrapper.find('tbody').find('tr');
 
-  // Should have 4 rows: Team 1, Team 2, User 1, User 2
-  expect(tableRows).toHaveLength(4);
+      // Should have 4 rows: Team 1, Team 2, User 1, User 2
+      expect(tableRows).toHaveLength(4);
 
-  // Find rows by name
-  const team1Row = tableRows.filterWhere(row => row.text().includes('Team 1'));
-  const team2Row = tableRows.filterWhere(row => row.text().includes('Team 2'));
-  const user1Row = tableRows.filterWhere(row => row.text().includes('User 1'));
-  const user2Row = tableRows.filterWhere(row => row.text().includes('User 2'));
+      // Find rows by name
+      const team1Row = tableRows.filterWhere(row => row.text().includes('Team 1'));
+      const team2Row = tableRows.filterWhere(row => row.text().includes('Team 2'));
+      const user1Row = tableRows.filterWhere(row => row.text().includes('User 1'));
+      const user2Row = tableRows.filterWhere(row => row.text().includes('User 2'));
 
-  // User 1 should have Admin badge
-  expect(user1Row.find('span').last().text()).toBe('Admin');
-  // User 2 should have Admin badge
-  expect(user2Row.find('span').last().text()).toBe('Admin');
-  // Teams should not have Admin badge
-  expect(team1Row.find('span').last().text()).not.toBe('Admin');
-  expect(team2Row.find('span').last().text()).not.toBe('Admin');
-});
+      // User 1 should have Admin badge
+      expect(user1Row.find('span').last().text()).toBe('Admin');
+      // User 2 should have Admin badge
+      expect(user2Row.find('span').last().text()).toBe('Admin');
+      // Teams should not have Admin badge
+      expect(team1Row.find('span').last().text()).not.toBe('Admin');
+      expect(team2Row.find('span').last().text()).not.toBe('Admin');
+    });
   });
 
   describe('Editing Permissions', () => {
@@ -643,7 +643,7 @@ describe('Board Metadata Form Permissions', () => {
       const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
       // Simulate checking the permission checkbox
       wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: true } });
-     expect(onPermissionChanged).toHaveBeenCalled();
+      expect(onPermissionChanged).toHaveBeenCalled();
     })
 
     it('should NOT allow a user who is neither board owner nor team admin to change permissions', () => {
@@ -707,7 +707,7 @@ describe('Select Permissions', () => {
     expect(lastCall.permissions.Members).not.toContain('user-1');
     expect(lastCall.permissions.Teams).not.toContain('team-1');
   });
-  
+
   describe('Board Owner Row Rendering', () => {
     it('should show the current user as board owner when creating a new board or copying a board (isNewBoardCreation: true)', () => {
       const props = makeProps({
