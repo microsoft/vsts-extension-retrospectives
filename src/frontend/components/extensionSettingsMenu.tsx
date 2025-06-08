@@ -223,8 +223,9 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   }
 
   // Function to check if the window is maximized
+  // include small buffer to handle scrollbars
   checkIfWindowMaximized = () => {
-    return window.innerWidth === screen.width && window.innerHeight === screen.height;
+    return window.innerWidth > screen.width - 10;
   };
 
   handleResize = () => {
@@ -258,9 +259,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         >
           <span className="ms-Button-icon"><i className="fas fa-handshake-angle"></i></span>&nbsp;
           {isWindowMaximized && (
-            <>
-              &nbsp;<span className="ms-Button-label">Prime Directive</span>
-            </>
+            <span className="ms-Button-label">Prime Directive</span>
           )}
         </DefaultButton>
         <Dialog
@@ -302,7 +301,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
           {isWindowMaximized && (
             <>
-              &nbsp;<span className="ms-Button-label">What&apos;s New</span>
+              <span className="ms-Button-label">What&apos;s New</span>
             </>
           )}
         </DefaultButton>
