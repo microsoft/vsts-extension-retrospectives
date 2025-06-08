@@ -496,7 +496,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         this.setState({ currentTeam: defaultTeam });
       }
 
-      const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, false, { Members: [], Teams: [] });
+      const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, { Members: [], Teams: [] });
 
       parent.location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id);
     }
