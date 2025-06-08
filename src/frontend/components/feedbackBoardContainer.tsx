@@ -1386,7 +1386,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         <DefaultButton
                           className="contextual-menu-button hide-mobile"
                           aria-label="Board Actions Menu"
-                          title="Board actions"
+                          title="Board Actions"
                           menuProps={{
                             className: "board-actions-menu",
                             items: this.boardActionContexualMenuItems,

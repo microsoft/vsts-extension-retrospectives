@@ -172,15 +172,15 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       key: 'exportData',
       iconProps: { iconName: 'CloudDownload' },
       onClick: this.exportData,
-      text: 'Export Data',
-      title: 'Export Data',
+      text: 'Export data',
+      title: 'Export data',
     },
     {
       key: 'importData',
       iconProps: { iconName: 'CloudUpload' },
       onClick: this.importData,
-      text: 'Import Data',
-      title: 'Import Data',
+      text: 'Import data',
+      title: 'Import data',
     },
     {
       key: 'clearVisitHistory',
@@ -193,24 +193,24 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       key: 'switchToDesktop',
       iconProps: { iconName: 'TVMonitor' },
       onClick: this.props.onScreenViewModeChanged,
-      text: 'Switch to Desktop View',
-      title: 'Switch to Desktop View',
+      text: 'Switch to desktop view',
+      title: 'Switch to desktop view',
       className: 'hide-desktop',
     },
     {
       key: 'switchToMobile',
       iconProps: { iconName: 'CellPhone' },
       onClick: this.props.onScreenViewModeChanged,
-      text: 'Switch to Mobile View',
-      title: 'Switch to Mobile View',
+      text: 'Switch to mobile view',
+      title: 'Switch to mobile view',
       className: 'hide-mobile'
     },
     {
       key: 'contactUs',
       iconProps: { iconName: 'ChatInviteFriend' },
       onClick: this.onContactUsClicked,
-      text: 'Contact Us',
-      title: 'Contact Us'
+      text: 'Contact us',
+      title: 'Contact us'
     },
   ];
 
@@ -222,14 +222,14 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     window.removeEventListener("resize", this.handleResize);
   }
 
-  // Function to check if the window is maximized
-  // include small buffer to handle scrollbars
+  // Function to check if the window is maximized (90% threshold)
   checkIfWindowMaximized = () => {
-    return window.outerWidth >= screen.width;
+    return window.outerWidth >= screen.availWidth * 0.9;
   };
 
   handleResize = () => {
     console.log("screenWidth:", screen.width);
+    console.log("screenAvailWidth",screen.availWidth);
     console.log("innerWidth:", window.innerWidth);
     console.log("outerWidth:", window.outerWidth);
     this.setState({
