@@ -20,6 +20,7 @@ interface IExtensionSettingsMenuState {
   isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
+  isWindowMaximized: boolean;
 }
 
 interface IExtensionSettingsMenuProps {
@@ -42,7 +43,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       isMobileExtensionSettingsDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
       isWhatsNewDialogHidden: true,
-      isGetHelpDialogHidden: true
+      isGetHelpDialogHidden: true,
+      isWindowMaximized: this.checkIfWindowMaximized(),
     };
   }
 
@@ -212,7 +214,28 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     },
   ];
 
+  componentDidMount() {
+    window.addEventListener("resize", this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.handleResize);
+  }
+
+  // Function to check if the window is maximized
+  checkIfWindowMaximized = () => {
+    return window.innerWidth === screen.width && window.innerHeight === screen.height;
+  };
+
+  handleResize = () => {
+    this.setState({
+      isWindowMaximized: this.checkIfWindowMaximized(),
+    });
+  };
+
   public render() {
+    const { isWindowMaximized } = this.state;
+
     return (
       <div className="extension-settings-menu">
         <DefaultButton
@@ -233,7 +256,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           onClick={this.showPrimeDirectiveDialog}
         >
           <span className="ms-Button-icon"><i className="fas fa-handshake-angle"></i></span>&nbsp;
-          <span className="ms-Button-label">Prime Directive</span>
+          {isWindowMaximized && (
+            <>
+              &nbsp;<span className="ms-Button-label">Prime Directive</span>
+            </>
+          )}
         </DefaultButton>
         <Dialog
           hidden={this.state.isPrimeDirectiveDialogHidden}
@@ -272,7 +299,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           onClick={this.showWhatsNewDialog}
         >
           <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
-          <span className="ms-Button-label">What&apos;s New</span>
+          {isWindowMaximized && (
+            <>
+              &nbsp;<span className="ms-Button-label">What&apos;s New</span>
+            </>
+          )}
         </DefaultButton>
         <DefaultButton
           className="contextual-menu-button"
@@ -281,7 +312,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           onClick={() => this.setState({ isGetHelpDialogHidden: false })}
         >
           <span className="ms-Button-icon"><i className="fa fa-question-circle"></i></span>&nbsp;
-          <span className="ms-Button-label">Get Help</span>
+          {isWindowMaximized && (
+            <>
+              &nbsp;<span className="ms-Button-label">Get Help</span>
+            </>
+          )}
         </DefaultButton>
         <Dialog
           hidden={this.state.isWhatsNewDialogHidden}
