@@ -228,10 +228,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   };
 
   handleResize = () => {
-    console.log("screenWidth:", screen.width);
-    console.log("screenAvailWidth:", screen.availWidth);
-    console.log("innerWidth:", window.innerWidth);
-    console.log("outerWidth:", window.outerWidth);
     this.setState({
       isWindowMaximized: this.checkIfWindowMaximized(),
     });
@@ -242,14 +238,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
     return (
       <div className="extension-settings-menu">
-        <p>Window is {isWindowMaximized ? "Maximized" : "Not Maximized"}</p>
         <DefaultButton
           className="contextual-menu-button hide-mobile"
-          aria-label="User Settings Menu"
-          title="User Settings Menu"
+          aria-label="Extended Menu Options"
+          title="Extended Menu Options"
           menuProps={{
             items: this.extensionSettingsMenuItem,
-            className: "user-settings-menu",
+            className: "extended-menu-options",
           }}
         >
           <span className="ms-Button-icon"><i className="fas fa-bars"></i></span>
