@@ -229,7 +229,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   handleResize = () => {
     console.log("screenWidth:", screen.width);
-    console.log("screenAvailWidth",screen.availWidth);
+    console.log("screenAvailWidth:", screen.availWidth);
     console.log("innerWidth:", window.innerWidth);
     console.log("outerWidth:", window.outerWidth);
     this.setState({
