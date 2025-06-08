@@ -17,6 +17,7 @@ import { WebApiTeam } from 'azure-devops-extension-api/Core';
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
   isMobileExtensionSettingsDialogHidden: boolean;
+  isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
 }
@@ -39,6 +40,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.state = {
       isClearVisitHistoryDialogHidden: true,
       isMobileExtensionSettingsDialogHidden: true,
+      isPrimeDirectiveDialogHidden: true,
       isWhatsNewDialogHidden: true,
       isGetHelpDialogHidden: true
     };
@@ -151,6 +153,16 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/issues', '_blank');
   }
 
+  // Handler to show Prime Directive dialog
+  showPrimeDirectiveDialog = () => {
+    this.setState({ isPrimeDirectiveDialogHidden: false });
+  };
+
+  // Handler to hide Prime Directive dialog
+  hidePrimeDirectiveDialog = () => {
+    this.setState({ isPrimeDirectiveDialogHidden: true });
+  };
+
   // If an action needs to be hidden on desktop or mobile view, use the item's className property
   // with .hide-mobile or .hide-desktop
   private readonly extensionSettingsMenuItem: IContextualMenuItem[] = [
@@ -214,6 +226,47 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         >
           <span className="ms-Button-icon"><i className="fas fa-bars"></i></span>
         </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button"
+          aria-label="Prime Directive"
+          title="Prime Directive"
+          onClick={this.showPrimeDirectiveDialog}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-handshake-angle"></i></span>&nbsp;
+          <span className="ms-Button-label">Prime Directive</span>
+        </DefaultButton>
+        <Dialog
+          hidden={this.state.isPrimeDirectiveDialogHidden}
+          onDismiss={this.hidePrimeDirectiveDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: "The Prime Directive",
+          }}
+          minWidth={600}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: "prime-directive-dialog",
+            className: "retrospectives-dialog-modal",
+          }}
+        >
+          <DialogContent>
+            <p>
+              The purpose of the Prime Directive is to assure that a retrospective has the right culture to make it a positive and result-oriented event. It makes a retrospective become an effective team gathering to learn and find solutions to improve the way of working.
+            </p>
+            <p>
+              <strong>
+                "Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand."
+              </strong>
+            </p>
+            <p><em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em></p>
+          </DialogContent>
+          <DialogFooter>
+            <DefaultButton onClick={() => {
+              window.open("https://retrospectivewiki.org/index.php?title=The_Prime_Directive", "_blank");
+            }} text="Open Retrospective Wiki Page" />
+            <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="prime-directive-close-button" />
+          </DialogFooter>
+        </Dialog>
         <DefaultButton
           className="contextual-menu-button"
           aria-label="What's New"
