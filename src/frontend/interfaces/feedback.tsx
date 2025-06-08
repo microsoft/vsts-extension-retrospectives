@@ -25,7 +25,6 @@ export interface IFeedbackBoardDocument {
   isIncludeTeamEffectivenessMeasurement?: boolean;
   isAnonymous?: boolean;
   shouldShowFeedbackAfterCollect?: boolean;
-  displayPrimeDirective?: boolean;
   maxVotesPerUser: number;
   boardVoteCollection: { [voter: string]: number };
   teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[];

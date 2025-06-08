@@ -30,7 +30,6 @@ export interface IFeedbackBoardMetadataFormProps {
     maxVotesPerUser: number,
     columns: IFeedbackColumn[],
     isIncludeTeamEffectivenessMeasurement: boolean,
-    displayPrimeDirective: boolean,
     shouldShowFeedbackAfterCollect: boolean,
     isBoardAnonymous: boolean,
     permissions: IFeedbackBoardDocumentPermissions) => void;
@@ -45,7 +44,6 @@ interface IFeedbackBoardMetadataFormState {
   columnCards: IFeedbackColumnCard[];
   maxVotesPerUser: number;
   isIncludeTeamEffectivenessMeasurement: boolean;
-  displayPrimeDirective: boolean;
   shouldShowFeedbackAfterCollect: boolean;
   isBoardAnonymous: boolean;
   isDeleteColumnConfirmationDialogHidden: boolean;
@@ -74,7 +72,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     // Set temporary values used first time user creates a new board
     let defaultMaxVotes = 5;
     let defaultIncludeTeamEffectivenessMeasurement = true;
-    let defaultDisplayPrimeDirective = true;
     let defaultShowFeedbackAfterCollect = false;
     let defaultIsAnonymous = false;
     // Set defaults for a new retrospective
@@ -86,7 +83,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       defaultColumns = props.currentBoard.columns.map(column => ({ column, markedForDeletion: false }));
       defaultMaxVotes = props.currentBoard.maxVotesPerUser;
       defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
-      defaultDisplayPrimeDirective = props.currentBoard.displayPrimeDirective;
       defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
       defaultIsAnonymous = props.currentBoard.isAnonymous;
       defaultPermissions = props.currentBoard.permissions;
@@ -108,7 +104,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         selectedAccentColorKey: undefined,
         selectedIconKey: undefined,
         isIncludeTeamEffectivenessMeasurement: defaultIncludeTeamEffectivenessMeasurement,
-        displayPrimeDirective: defaultDisplayPrimeDirective,
         shouldShowFeedbackAfterCollect: defaultShowFeedbackAfterCollect,
         isBoardAnonymous: defaultIsAnonymous,
         maxVotesPerUser: defaultMaxVotes,
@@ -124,17 +119,15 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       const settingsToLoad = [
         BoardDataService.getSetting<number>('lastVotes'),
         BoardDataService.getSetting<boolean>('lastTeamEffectiveness'),
-        BoardDataService.getSetting<boolean>('lastPrimeDirective'),
         BoardDataService.getSetting<boolean>('lastShowFeedback'),
         BoardDataService.getSetting<boolean>('lastAnonymous')
       ];
 
-      const [lastVotes, lastTeamEffectiveness, lastPrimeDirective, lastShowFeedback, lastAnonymous] = await Promise.all(settingsToLoad);
+      const [lastVotes, lastTeamEffectiveness, lastShowFeedback, lastAnonymous] = await Promise.all(settingsToLoad);
 
       this.setState({
         maxVotesPerUser: typeof lastVotes === 'number' ? lastVotes : this.state.maxVotesPerUser,
         isIncludeTeamEffectivenessMeasurement: typeof lastTeamEffectiveness === 'boolean' ? lastTeamEffectiveness : this.state.isIncludeTeamEffectivenessMeasurement,
-        displayPrimeDirective: typeof lastPrimeDirective === 'boolean' ? lastPrimeDirective : this.state.displayPrimeDirective,
         shouldShowFeedbackAfterCollect: typeof lastShowFeedback === 'boolean' ? lastShowFeedback : this.state.shouldShowFeedbackAfterCollect,
         isBoardAnonymous: typeof lastAnonymous === 'boolean' ? lastAnonymous : this.state.isBoardAnonymous
       });
@@ -168,7 +161,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
       await BoardDataService.saveSetting('lastVotes', this.state.maxVotesPerUser);
       await BoardDataService.saveSetting('lastTeamEffectiveness', this.state.isIncludeTeamEffectivenessMeasurement);
-      await BoardDataService.saveSetting('lastPrimeDirective', this.state.displayPrimeDirective);
       await BoardDataService.saveSetting('lastShowFeedback', this.state.shouldShowFeedbackAfterCollect);
       await BoardDataService.saveSetting('lastAnonymous', this.state.isBoardAnonymous);
     }
@@ -178,7 +170,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
       this.state.maxVotesPerUser,
       this.state.columnCards.filter((columnCard) => !columnCard.markedForDeletion).map((columnCard) => columnCard.column),
       this.state.isIncludeTeamEffectivenessMeasurement,
-      this.state.displayPrimeDirective,
       this.state.shouldShowFeedbackAfterCollect,
       this.state.isBoardAnonymous,
       this.state.permissions
@@ -187,10 +178,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
   private handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({ isIncludeTeamEffectivenessMeasurement: checked });
-  }
-
-  private handleDisplayPrimeDirectiveChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    this.setState({ displayPrimeDirective: checked });
   }
 
   private handleShouldShowFeedbackAfterCollectChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
@@ -401,17 +388,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                       Note: All responses for team assessment are stored anonymously.
                     </div>
                   </div>
-                </div>
-                <div className="board-metadata-form-section-subheader">
-                  <Checkbox
-                    id="display-prime-directive"
-                    label="Display 'Retrospective Prime Directive'"
-                    ariaLabel="Display 'Retrospective Prime Directive.' This selection cannot be modified after board creation."
-                    boxSide="start"
-                    checked={this.state.displayPrimeDirective}
-                    disabled={!this.props.isNewBoardCreation}
-                    onChange={this.handleDisplayPrimeDirectiveChange}
-                  />
                 </div>
                 <div className="board-metadata-form-section-subheader">
                   <Checkbox

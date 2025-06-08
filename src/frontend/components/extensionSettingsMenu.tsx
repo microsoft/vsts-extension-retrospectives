@@ -108,7 +108,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     for (const dataToProcess of importedData) {
       const team = teams.find(e => e.name === dataToProcess.team.name) ?? defaultTeam;
       const oldBoard = dataToProcess.board;
-      const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.displayPrimeDirective, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.isAnonymous, oldBoard.startDate, oldBoard.endDate);
+      const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.isAnonymous, oldBoard.startDate, oldBoard.endDate);
       for (let yLoop = 0; yLoop < dataToProcess.items.length; yLoop++) {
         const oldItem = dataToProcess.items[yLoop];
         oldItem.boardId = newBoard.id;
@@ -250,19 +250,17 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
         >
           <DialogContent>
-            <p>
-              The purpose of the Prime Directive is to assure that a retrospective has the right culture to make it a positive and result-oriented event. It makes a retrospective become an effective team gathering to learn and find solutions to improve the way of working.
-            </p>
-            <p>
+            The purpose of the Prime Directive is to assure that a retrospective has the right culture to make it a positive and result-oriented event. It makes a retrospective become an effective team gathering to learn and find solutions to improve the way of working.
+            <br></br>
               <strong>
                 &quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;
               </strong>
-            </p>
-            <p><em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em></p>
+            <br></br>
+            <em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={() => {
-              window.open("https://retrospectivewiki.org/index.php?title=The_Prime_Directive", "_blank");
+              window.open("https://retrospectivewiki.org/", "_blank");
             }} text="Open Retrospective Wiki Page" />
             <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="prime-directive-close-button" />
           </DialogFooter>

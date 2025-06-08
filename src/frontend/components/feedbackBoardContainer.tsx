@@ -90,7 +90,6 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogTitle: string;
   isCarouselDialogHidden: boolean;
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
-  isPrimeDirectiveDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
   isDesktop: boolean;
@@ -134,7 +133,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
-      isPrimeDirectiveDialogHidden: true,
       isArchiveBoardConfirmationDialogHidden: true,
       isDeleteBoardConfirmationDialogHidden: true,
       isDesktop: true,
@@ -837,7 +835,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
-  private readonly createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, displayPrimeDirective: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+  private readonly createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
     const createdBoard = await BoardDataService.createBoardForTeam(this.state.currentTeam.id,
       title,
       maxVotesPerUser,
@@ -845,7 +843,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isIncludeTeamEffectivenessMeasurement,
       isBoardAnonymous,
       shouldShowFeedbackAfterCollect,
-      displayPrimeDirective,
       undefined, // Start Date
       undefined, // End Date
       permissions);
@@ -943,7 +940,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isRetroSummaryDialogHidden: true });
   }
 
-  private readonly updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, displayPrimeDirective: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+  private readonly updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
     const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
 
     this.updateBoardAndBroadcast(updatedBoard);
@@ -1052,7 +1049,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       maxVotesPerUser: number,
       columns: IFeedbackColumn[],
       isIncludeTeamEffectivenessMeasurement: boolean,
-      displayPrimeDirective: boolean,
       shouldShowFeedbackAfterCollect: boolean,
       isBoardAnonymous: boolean,
       permissions: IFeedbackBoardDocumentPermissions
@@ -1334,7 +1330,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 const board = this.state.currentBoard;
 
-                await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.displayPrimeDirective, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
+                await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
 
                 /*
                 TODO (enpolat) : in the future we may need to create feedback items based on the answers of the questions
@@ -1432,53 +1428,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </div>
                     </div>
                     <div className="feedback-workflow-wrapper">
-                      {this.state.currentBoard.displayPrimeDirective &&
-                        <div className="prime-directive-dialog-section">
-                          <Dialog
-                            hidden={this.state.isPrimeDirectiveDialogHidden}
-                            onDismiss={() => { this.setState({ isPrimeDirectiveDialogHidden: true }); }}
-                            dialogContentProps={{
-                              type: DialogType.close,
-                              title: 'The Prime Directive',
-                            }}
-                            minWidth={600}
-                            modalProps={{
-                              isBlocking: true,
-                              containerClassName: 'prime-directive-dialog',
-                              className: 'retrospectives-dialog-modal',
-                            }}>
-                            <DialogContent>
-                              The purpose of the Prime Directive is to assure that a retrospective has the right culture to make it a positive and result oriented event. It makes a retrospective become an effective team gathering to learn and find solutions to improve the way of working.
-                              <br /><br />
-                              <strong>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</strong>
-                              <br /><br />
-                              <em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
-                            </DialogContent>
-                            <DialogFooter>
-                              <DefaultButton onClick={() => {
-                                window.open('https://retrospectivewiki.org/index.php?title=The_Prime_Directive', '_blank');
-                              }}
-                                text="Open Retrospective Wiki Page" />
-                              <PrimaryButton onClick={() => {
-                                this.setState({ isPrimeDirectiveDialogHidden: true });
-                              }}
-                                text="Close"
-                                className="prime-directive-close-button" />
-                            </DialogFooter>
-                          </Dialog>
-                          <TooltipHost
-                            hostClassName="toggle-carousel-button-tooltip-wrapper"
-                            content="Prime Directive"
-                            calloutProps={{ gapSpace: 0 }}>
-                            <ActionButton
-                              className="toggle-carousel-button"
-                              text="Prime Directive"
-                              iconProps={{ iconName: 'BookAnswers' }}
-                              onClick={() => { this.setState({ isPrimeDirectiveDialogHidden: false }); }}>
-                            </ActionButton>
-                          </TooltipHost>
-                        </div>
-                      }
                       {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement &&
                         <div className="team-effectiveness-dialog-section">
                           <Dialog
