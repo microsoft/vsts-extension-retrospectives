@@ -255,7 +255,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             </p>
             <p>
               <strong>
-                "Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand."
+                &quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;
               </strong>
             </p>
             <p><em>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em></p>
