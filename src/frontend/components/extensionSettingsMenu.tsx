@@ -225,10 +225,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   // Function to check if the window is maximized
   // include small buffer to handle scrollbars
   checkIfWindowMaximized = () => {
-    return window.innerWidth > screen.width - 10;
+    return window.outerWidth >= screen.width;
   };
 
   handleResize = () => {
+    console.log("screenWidth:", screen.width);
+    console.log("innerWidth:", window.innerWidth);
+    console.log("outerWidth:", window.outerWidth);
     this.setState({
       isWindowMaximized: this.checkIfWindowMaximized(),
     });
