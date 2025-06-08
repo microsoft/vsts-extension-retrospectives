@@ -238,6 +238,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
     return (
       <div className="extension-settings-menu">
+        <p>Window is {isWindowMaximized ? "Maximized" : "Not Maximized"}</p>
         <DefaultButton
           className="contextual-menu-button hide-mobile"
           aria-label="User Settings Menu"
