@@ -26,7 +26,7 @@
   background-color: var(--callout-background-color);
   max-height: 300px;
   margin-top: -10px;
-  overflow-y: auto; /* Keep scrolling but avoid double scrollbars */
+  overflow-y: hidden; /* remove scrollbars */
 
   button.ms-ContextualMenu-link {
     color: var(--text-primary-color);
@@ -39,9 +39,9 @@
 }
 
 /* Ensure parent container does not force extra scrolling */
-.parent-container {
-  overflow: hidden; /* Prevent unnecessary scrollbars */
-}
+//.parent-container {
+//  overflow: hidden; /* Prevent unnecessary scrollbars */
+//}
 
 .whatsnew-dialog, .gethelp-dialog {
   background-color: var(--background-color);
