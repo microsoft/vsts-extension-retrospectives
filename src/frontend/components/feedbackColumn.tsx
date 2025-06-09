@@ -254,7 +254,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         onDragOver={this.dragFeedbackItemOverColumn}>
         <div className="feedback-column-header">
           <div className="feedback-column-title"
-            aria-label={this.props.columnName}>
+            aria-label={`${this.props.columnName} (${this.props.columnItems.length} feedback items)`}>
             <i className={classNames(this.props.iconClass, 'feedback-column-icon')} />
             <h2 className="feedback-column-name">
               {this.props.columnName}
