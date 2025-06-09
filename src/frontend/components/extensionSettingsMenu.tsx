@@ -50,7 +50,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private readonly getChangelog = (): string[] => {
     return [
-      'The latest release includes updates for sticky defaults and maximum votes.',
+      'The latest release includes updates for deleting boards and sticky defaults.',
+      'Functionality to delete boards was moved from the Board menu to the History table and is only enabled for archived boards.',
       'User settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.',
       'Maximum votes for user now has a minimum setting of 1.',
       'Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.'

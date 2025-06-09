@@ -81,7 +81,7 @@ Create a new retrospective using the 'Create Board' button. If this is your firs
 
 If you have created a retrospective before for your selected team, then you can select "Create a new retrospective" from the navigation drop down.
 
-![A screenshot of the top navigation in the Retrospective tool, where the 'Board Actions' menu has been opened. The first option in the dropdown is the 'Create New Retrospective.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retrospective-dropdown.png)
+![A screenshot of the top navigation in the Retrospective tool, where the 'Board Actions' menu has been opened. The first option in the dropdown is the 'Create new retrospective.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/menu-dropdown-create-new-retrospective.png)
 
 ### 4. Choose Your Retrospective Settings
 
@@ -99,7 +99,7 @@ Please enter the appropriate information:
 - **Do not display names in feedback**: When checked, anonymize who creates individual feedback items.
 - **Columns Settings**: You can either apply from a pre-populated template or individually select and configure columns yourself.
 
-![A screenshot showing the dropdown of available templates for the retrospective board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/pick-retrospective-template-lightmode.png)
+![A screenshot showing the dropdown of available templates for the retrospective board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/select-a-template.png)
 
 **Notes:**
 
@@ -116,7 +116,7 @@ Once you have created the retrospective board and you want to select a retrospec
 
 Once you create a new retrospective, you can share a link to it to all participants. Users can then access that link even from their mobile browsers to participate in the retrospective. The extension offers real time synchronization, so all users will see the most up-to-date information without having to refresh the page.
 
-![A screenshot of the dropdown from the Board Actions Menu. The option for 'Copy Retrospective Link' is darkened as though the mouse is hovering over it](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/copy-retro-link.png)
+![A screenshot of the dropdown from the Board Actions Menu. The option for 'Copy retrospective link' is highlighted as the fourth menu option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/menu-dropdown-copy-retrospective-link.png)
 
 ### 6. Phases of the Standard Retrospective
 
@@ -215,7 +215,7 @@ improvement.
   the largest opportunities for improvement based on each team members' responses to the team assessment.
   - Section 7.1 below outlines the Six Steps in a Team Assessment Retrospective
 
-### 7.1 The Six Steps to a Team Assessment Retrospective
+### The Six Steps to a Team Assessment Retrospective
 
 #### Setup
 
@@ -242,8 +242,7 @@ discovered will be assumed to be process problems, not people problems.
 In this phase each team member clicks on the Team Assessment and anonymously answers all questions
 and hits "submit". It is critical that you remind everyone that all feedback is anonymous and confidential.
 
-Throughout this phase you will periodically check the retrospective summary.
-![Image of how to check the retrospective summary](https://user-images.githubusercontent.com/114175122/205405705-105ec68b-412e-465a-b192-6b3231688383.png)
+Throughout this phase you will periodically check the retrospective summary (illustrated in section 8).
 
 If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage
 everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't
@@ -299,8 +298,7 @@ Follow the steps above to assign actions as work items in Azure DevOps. Note: We
 
  The Retrospective Summary dialog is accessible from the "Board Actions" menu in the top navigation.
 
-![A screenshot that shows the Board Actions menu, where the "Show Retrospective
-Summary" is highlighted as though the mouse is hovering.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/show-retro-summary.png)
+![A screenshot that shows the Board Actions menu, where the "Show retrospective summary" is highlighted as the seventh menu option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/menu-dropdown-show-retrospective-summary.png)
 
 Once there, there is a summary of the Retrospective. This includes:
 
@@ -317,19 +315,19 @@ If there is a team assessment, then a charted summary will show the vote breakdo
 
 ### 9. Board History
 
-The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, showing the count of feedback items and action items, and supports archiving or restoring archived retrospectives.
+The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, showing the count of feedback items and action items, and supports archiving or restoring archived retrospectives, as well as permanently deleting archived retrospectives.
 
-![History tab showing table with 6 columns and 5 rows. Columns include: Retrospective Name, Created Date, Archived, Archived Date, Feedback Items, and Total Work Items. Rows include: 4th Retrospective, 3rd Retrospective, Lean Coffee (archived), 2nd Retrospective, and 1st Retrospective.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-with-archive.png)
+![History tab showing table with 7 columns and 5 rows. Columns include: Retrospective Name, Created Date, Archived, Archived Date, Feedback Items, Total Work Items, and Trash icon. Rows include: 4th Retrospective, 3rd Retrospective, Lean Coffee (archived with delete option active), 2nd Retrospective, and 1st Retrospective.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-with-archive-and-debug.png)
 
 Selecting a retrospective expands the row to reveal more details, including a count of action items by status and a detailed list of each action item.
 
 ![Expanded retrospective view showing a summary of feedback and work item counts on the left and a work item table on the right with columns: Title, State, Type, Last Updated, Assigned To, and Priority.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-row-expanded.png)
 
-To _archive_ a retrospective, check the box in the Archived column. The retrospective will no longer appear in the Board selection dropdown, though all data remains preserved.
+To _archive_ a retrospective, check the box in the Archived column. The retrospective will no longer appear in the Board selection dropdown, though all data remains preserved Archiving will take effect immediately for the user performing the action, while other users will see the change only after reloading the Retrospective boards.
 
-To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective will reappear in the Board selection dropdown.
+To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective will reappear in the Board selection dropdown. Restoring will take effect immediately for the user performing the action, while other users will see the change only after reloading the Retrospective boards.
 
-> **Note:** Archiving takes effect immediately for the user who performs the action. Other users see the change after reloading the Retrospectives boards.
+To _delete_ an archived retrospective, wait for two minutes after archiving, then click the trash icon to _permanently_ delete the retrospective.  The delay between archiving and deleting was added to encourage users to try the archive functionality before deleting, since the delete action cannot be undone and, in most cases, archiving will be sufficient.  Deleting will take effect immediately for all users.
 
 ## Best Practices
 
