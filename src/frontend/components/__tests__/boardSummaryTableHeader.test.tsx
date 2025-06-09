@@ -141,4 +141,87 @@ describe('BoardSummaryTableHeader', () => {
 
     expect(resizeFn).toHaveBeenCalledTimes(2);
   });
+
+  it('renders placeholder header without content', () => {
+    const placeholderHeader = {
+      ...mockHeader,
+      isPlaceholder: true,
+    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+
+    const placeholderHeaderGroup = {
+      ...mockHeaderGroup,
+      headers: [placeholderHeader],
+    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[placeholderHeaderGroup]} />);
+    const th = wrapper.find('th').at(0);
+
+    expect(th.text()).not.toContain('Board Name');
+    expect(th.find('span')).toHaveLength(0);
+  });
+
+  it('renders resizer div without resizer class when column cannot resize', () => {
+    const nonResizableHeader = {
+      ...mockHeader,
+      column: {
+        ...mockHeader.column,
+        getCanResize: () => false,
+        getIsResizing: () => false,
+      },
+    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+
+    const nonResizableHeaderGroup = {
+      ...mockHeaderGroup,
+      headers: [nonResizableHeader],
+    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[nonResizableHeaderGroup]} />);
+    const resizerDiv = wrapper.find('div').at(0);
+
+    expect(resizerDiv.hasClass('resizer')).toBe(false);
+    expect(resizerDiv.hasClass('isResizing')).toBe(false);
+  });
+
+  it('renders resizer div with resizer class but without isResizing class when column can resize but is not currently resizing', () => {
+    const resizableNotResizingHeader = {
+      ...mockHeader,
+      column: {
+        ...mockHeader.column,
+        getCanResize: () => true,
+        getIsResizing: () => false,
+      },
+    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+
+    const resizableNotResizingHeaderGroup = {
+      ...mockHeaderGroup,
+      headers: [resizableNotResizingHeader],
+    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+
+    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[resizableNotResizingHeaderGroup]} />);
+    const resizerDiv = wrapper.find('div').at(0);
+
+    expect(resizerDiv.hasClass('resizer')).toBe(true);
+    expect(resizerDiv.hasClass('isResizing')).toBe(false);
+  });
+
+  it('applies correct sorting properties when no sorting is applied', () => {
+    const unsortedHeader = {
+      ...mockHeader,
+      column: {
+        ...mockHeader.column,
+        getIsSorted: () => false,
+      },
+    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+
+    const unsortedHeaderGroup = {
+      ...mockHeaderGroup,
+      headers: [unsortedHeader],
+    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+
+    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[unsortedHeaderGroup]} />);
+    const headerElement = wrapper.find('th').at(0);
+
+    expect(headerElement.prop('aria-sort')).toBe('none');
+    expect(headerElement.prop('className')).toBe('');
+  });
 });
