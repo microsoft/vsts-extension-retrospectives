@@ -9,6 +9,8 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
   board: IFeedbackBoardDocument;
   permissions: IFeedbackBoardDocumentPermissions;
   permissionOptions: FeedbackBoardPermissionOption[];
+  currentUserId: string;
+  isNewBoardCreation: boolean;
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
 }
 
@@ -23,6 +25,7 @@ export interface FeedbackBoardPermissionOption {
   hasPermission?: boolean;
   type: 'team' | 'member';
   thumbnailUrl?: string;
+  isTeamAdmin?: boolean;
 }
 
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
@@ -32,7 +35,15 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
+  const isBoardOwner = props.isNewBoardCreation || props.board?.createdBy?.id === props.currentUserId;
+  const isTeamAdmin = props.permissionOptions.some(
+    (option) => option.id === props.currentUserId && option.isTeamAdmin
+  );
+  const canEditPermissions = isBoardOwner || isTeamAdmin;
+
   const handleSelectAllClicked = (checked: boolean) => {
+    if (!canEditPermissions) return; // Block unauthorized users from selecting/unselecting all
+
     if(checked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === 'team' && !teamPermissions.includes(o.id)).map(o => o.id)]);
       setMemberPermissions([...memberPermissions, ...filteredPermissionOptions.filter(o => o.type === 'member' && !memberPermissions.includes(o.id)).map(o => o.id)]);
@@ -45,6 +56,8 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }
 
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
+    if (!canEditPermissions) return; // Block unauthorized changes
+
     let permissionList: string[] = option.type === 'team'
       ? teamPermissions ?? []
       : memberPermissions ?? [];
@@ -94,8 +107,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       })
       .sort((a, b) => {
         // Step 1: Ensure the board owner appears first
-        const isAOwner = a.id === props.board?.createdBy?.id;
-        const isBOwner = b.id === props.board?.createdBy?.id;
+        const boardOwnerId = props.isNewBoardCreation ? props.currentUserId : props.board?.createdBy?.id;
+        const isAOwner = a.id === boardOwnerId;
+        const isBOwner = b.id === boardOwnerId;
         if (isAOwner && !isBOwner) return -1;
         if (!isAOwner && isBOwner) return 1;
         // Step 2: Sort by hasPermission (true before false)
@@ -116,13 +130,15 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const emitChangeEvent = () => {
-    props.onPermissionChanged({
-      permissions: {
-        Teams: teamPermissions,
-        Members: memberPermissions
-      }
-    })
-  }
+    if (canEditPermissions) {
+      props.onPermissionChanged({
+        permissions: {
+          Teams: teamPermissions,
+          Members: memberPermissions,
+        },
+      });
+    }
+  };
 
   const PermissionImage = (props: {option: FeedbackBoardPermissionOption}) => {
     if (props.option.type === 'team') {
@@ -141,6 +157,17 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
     return null;
   }
+
+  const PermissionEditWarning = () => {
+    if (!canEditPermissions) {
+      return (
+        <div className="board-metadata-form-section-information">
+            <i className="fas fa-exclamation-circle" aria-label="Permission restriction warning"></i>&nbsp;Only the Board Owner or a Team Admin can edit permissions.
+        </div>
+      );
+    }
+    return null;
+  };
 
   useEffect(() => {
     setSelectAllState();
@@ -171,8 +198,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                 <Checkbox
                   className="my-2"
                   id="select-all-permission-options-visible"
-                  ariaLabel="Select all permission options that are visible in the permission option list."
+                  ariaLabel="Add permission to every team or member in the table."
                   boxSide="start"
+                  disabled={!canEditPermissions}
                   checked={selectAllChecked}
                   onChange={(_, checked) => handleSelectAllClicked(checked)}
                 />
@@ -184,7 +212,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           </thead>
           <tbody>
             {filteredPermissionOptions.map((option) => {
-              const isBoardOwner: boolean = option.id === props.board?.createdBy?.id;
+              const isBoardOwner: boolean = props.isNewBoardCreation
+                ? option.id === props.currentUserId // New board: Current user is the proposed owner
+                : option.id === props.board?.createdBy?.id; // Existing board: Use saved owner
               return (
                 <tr key={option.id} className="option-row">
                   <td>
@@ -195,7 +225,8 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                       boxSide="start"
                       disabled={isBoardOwner}
                       checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
-                      onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
+    indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} // Set indeterminate only if no permissions exist
+                    onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
                     />
                   </td>
                   <td className="cell-content flex flex-row flex-nowrap">
@@ -205,9 +236,11 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                     <div className="content-text flex flex-col flex-nowrap text-left">
                       <span aria-label="Team or member name">{option.name}</span>
                       <span aria-label="Team or member unique name" className="content-sub-text">{option.uniqueName}</span>
+                      <span>{option.isTeamAdmin}</span>
                     </div>
                     <div className="content-badge">
                       {isBoardOwner && <span aria-label="Board owner badge">{'Owner'}</span>}
+                      {option.isTeamAdmin && <span aria-label="Team admin badge">{'Admin'}</span>}
                     </div>
                   </td>
                 </tr>
@@ -216,7 +249,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           </tbody>
         </table>
       </div>
+
     </section>
+      <PermissionEditWarning />
   </div>;
 }
 

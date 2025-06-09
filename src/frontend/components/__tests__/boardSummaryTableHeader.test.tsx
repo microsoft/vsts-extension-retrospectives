@@ -2,14 +2,15 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import BoardSummaryTableHeader from '../boardSummaryTableHeader';
 import type { Header, HeaderGroup } from '@tanstack/table-core';
+import type { IBoardSummaryTableItem } from '../boardSummaryTable';
 
 const resizeHandler = jest.fn();
 
-const mockHeader: Header<any, unknown> = {
+const mockHeader: Header<IBoardSummaryTableItem, unknown> = {
   id: 'column-1',
   isPlaceholder: false,
   depth: 1,
-  headerGroup: {} as HeaderGroup<any>, // dummy for typing
+  headerGroup: {} as HeaderGroup<IBoardSummaryTableItem>,
   colSpan: 1,
   getSize: () => 150,
   getResizeHandler: () => resizeHandler,
@@ -21,14 +22,14 @@ const mockHeader: Header<any, unknown> = {
     getToggleSortingHandler: jest.fn(),
   },
   getContext: () => ({}),
-  getLeafHeaders: (): Header<any, unknown>[] => [],
-} as unknown as Header<any, unknown>;
+  getLeafHeaders: (): Header<IBoardSummaryTableItem, unknown>[] => [],
+} as unknown as Header<IBoardSummaryTableItem, unknown>;
 
-const mockHeaderGroup: HeaderGroup<any> = {
+const mockHeaderGroup: HeaderGroup<IBoardSummaryTableItem> = {
   id: 'header-group-1',
   depth: 0,
   headers: [mockHeader],
-} as unknown as HeaderGroup<any>;
+} as unknown as HeaderGroup<IBoardSummaryTableItem>;
 
 describe('BoardSummaryTableHeader', () => {
   it('renders table headers correctly', () => {
@@ -53,12 +54,12 @@ describe('BoardSummaryTableHeader', () => {
         ...mockHeader.column,
         getIsSorted: () => 'desc',
       },
-    } as unknown as Header<any, unknown>;
+    } as unknown as Header<IBoardSummaryTableItem, unknown>;
 
     const mockDescendingHeaderGroup = {
       ...mockHeaderGroup,
       headers: [mockDescendingHeader],
-    } as unknown as HeaderGroup<any>;
+    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
 
     const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockDescendingHeaderGroup]} />);
     const headerElement = wrapper.find('th').at(0);
@@ -96,12 +97,12 @@ describe('BoardSummaryTableHeader', () => {
     const resizableHeader = {
       ...mockHeader,
       getResizeHandler: () => resizeFn,
-    } as unknown as Header<any, unknown>;
+    } as unknown as Header<IBoardSummaryTableItem, unknown>;
 
     const resizableHeaderGroup = {
       ...mockHeaderGroup,
       headers: [resizableHeader],
-    } as unknown as HeaderGroup<any>;
+    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
 
     const wrapper = mount(<BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />);
     const resizerDiv = wrapper.find('div').at(0);
@@ -122,12 +123,12 @@ describe('BoardSummaryTableHeader', () => {
     const resizableHeader = {
       ...mockHeader,
       getResizeHandler: () => resizeFn,
-    } as unknown as Header<any, unknown>;
+    } as unknown as Header<IBoardSummaryTableItem, unknown>;
 
     const resizableHeaderGroup = {
       ...mockHeaderGroup,
       headers: [resizableHeader],
-    } as unknown as HeaderGroup<any>;
+    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
 
     const wrapper = mount(<BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />);
     const resizerDiv = wrapper.find('div').at(0);
