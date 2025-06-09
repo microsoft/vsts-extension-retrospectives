@@ -17,7 +17,6 @@
 }
 
 .ms-ContextualMenu-Callout {
-  overflow: hidden !important;
   .ms-Callout-main {
     background-color: var(--callout-background-color);
   }
@@ -27,7 +26,7 @@
   background-color: var(--callout-background-color);
   max-height: 300px;
   margin-top: -10px;
-  overflow-y: hidden; /* Remove scrollbars */
+  overflow-y: hidden; /* Remove scrollbar */
 }
 
 .extended-options-menu button.ms-ContextualMenu-link {
