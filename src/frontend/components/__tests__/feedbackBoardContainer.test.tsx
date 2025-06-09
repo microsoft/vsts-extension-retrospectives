@@ -1,7 +1,9 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { mocked } from 'jest-mock';
+import { TeamMember } from 'azure-devops-extension-api/WebApi';
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from '../feedbackBoardContainer';
+import { deduplicateTeamMembers } from '../feedbackBoardContainer';
 
 const getTeamIterationsMock = () => {
   return [
@@ -58,5 +60,63 @@ describe('Feedback Board Container ', () => {
     expect(wrapper.children().dive().html()).toBe(
       '<div class="ms-Spinner initialization-spinner root-53"><div class="ms-Spinner-circle ms-Spinner--large circle-54">' +
       '</div><div class="ms-Spinner-label label-55">Loading...</div></div>');
+  });
+});
+
+const baseIdentity = {
+  directoryAlias: '',
+  inactive: false,
+  isAadIdentity: false,
+  isContainer: false,
+  isDeletedInOrigin: false,
+  isMru: false,
+  mail: '',
+  mailNickname: '',
+  originDirectory: '',
+  originId: '',
+  subjectDescriptor: '',
+  id: '',
+  displayName: '',
+  uniqueName: '',
+  imageUrl: '',
+  profileUrl: '',
+  _links: {},
+  descriptor: '',
+  url: ''
+};
+
+describe('deduplicateTeamMembers', () => {
+  it('deduplicates users and favors admin status per user', () => {
+    const team1Members: TeamMember[] = [
+      {
+        identity: { ...baseIdentity, id: 'user-1', displayName: 'User 1', uniqueName: 'user1', imageUrl: '' },
+        isTeamAdmin: true
+      },
+      {
+        identity: { ...baseIdentity, id: 'user-2', displayName: 'User 2', uniqueName: 'user2', imageUrl: '' },
+        isTeamAdmin: false
+      }
+    ];
+    const team2Members: TeamMember[] = [
+      {
+        identity: { ...baseIdentity, id: 'user-1', displayName: 'User 1', uniqueName: 'user1', imageUrl: '' },
+        isTeamAdmin: false
+      },
+      {
+        identity: { ...baseIdentity, id: 'user-2', displayName: 'User 2', uniqueName: 'user2', imageUrl: '' },
+        isTeamAdmin: true
+      }
+    ];
+
+    const deduped = deduplicateTeamMembers([...team1Members, ...team2Members]);
+    expect(deduped).toHaveLength(2);
+
+    // User 1 should be admin
+    const user1 = deduped.find(m => m.identity.id === 'user-1');
+    expect(user1?.isTeamAdmin).toBe(true);
+
+    // User 2 should be admin
+    const user2 = deduped.find(m => m.identity.id === 'user-2');
+    expect(user2?.isTeamAdmin).toBe(true);
   });
 });
