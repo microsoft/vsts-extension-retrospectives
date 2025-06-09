@@ -1127,8 +1127,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       className: 'hide-mobile',
       iconProps: { iconName: 'Copy' },
       onClick: this.showBoardDuplicateDialog,
-      text: 'Create a copy of retrospective',
-      title: 'Create a copy of retrospective',
+      text: 'Create copy of retrospective',
+      title: 'Create copy of retrospective',
     },
     {
       key: 'editBoard',
@@ -1709,7 +1709,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           true,
           this.state.isBoardDuplicateDialogHidden,
           this.hideBoardDuplicateDialog,
-          'Create a copy of retrospective',
+          'Create copy of retrospective',
           '',
           this.createBoard,
           this.hideBoardDuplicateDialog)}
