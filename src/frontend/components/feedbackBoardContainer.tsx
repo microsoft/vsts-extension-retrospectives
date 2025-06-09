@@ -81,7 +81,6 @@ export interface FeedbackBoardContainerState {
   isBoardDuplicateDialogHidden: boolean;
   isBoardUpdateDialogHidden: boolean;
   isArchiveBoardConfirmationDialogHidden: boolean;
-  isDeleteBoardConfirmationDialogHidden: boolean;
   isMobileBoardActionsDialogHidden: boolean;
   isMobileTeamSelectorDialogHidden: boolean;
   isTeamBoardDeletedInfoDialogHidden: boolean;
@@ -103,7 +102,7 @@ export interface FeedbackBoardContainerState {
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   /**
-   * Members of the all teams that the current user access to. This may not be all the team
+   * Members of all the teams that the current user access to. This may not be all the team
    * members within the organization.
    */
   allMembers: TeamMember[];
@@ -136,7 +135,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
       isArchiveBoardConfirmationDialogHidden: true,
-      isDeleteBoardConfirmationDialogHidden: true,
       isDesktop: true,
       isDropIssueInEdgeMessageBarVisible: true,
       isLiveSyncInTfsIssueMessageBarVisible: true,
@@ -423,6 +421,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             currentBoard: null,
             isBoardUpdateDialogHidden: true,
             isTeamBoardDeletedInfoDialogHidden: false,
+            isCarouselDialogHidden: true,
             teamBoardDeletedDialogTitle: 'Retrospective archived or deleted',
             teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been archived or deleted by another user.',
           }
@@ -435,6 +434,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           currentBoard: currentBoard,
           isBoardUpdateDialogHidden: true,
           isTeamBoardDeletedInfoDialogHidden: false,
+          isCarouselDialogHidden: true,
           teamBoardDeletedDialogTitle: 'Retrospective archived or deleted',
           teamBoardDeletedDialogMessage: 'The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.',
         };
@@ -974,30 +974,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return this.state.currentBoard.activePhase;
   }
 
-  private readonly showDeleteBoardConfirmationDialog = () => {
-    this.setState({ isDeleteBoardConfirmationDialogHidden: false });
-  }
-
-  private readonly hideDeleteBoardConfirmationDialog = () => {
-    this.setState({ isDeleteBoardConfirmationDialogHidden: true });
-  }
-
   private readonly showArchiveBoardConfirmationDialog = () => {
     this.setState({ isArchiveBoardConfirmationDialogHidden: false });
   }
 
   private readonly hideArchiveBoardConfirmationDialog = () => {
     this.setState({ isArchiveBoardConfirmationDialogHidden: true });
-  }
-
-  private readonly hideTeamBoardDeletedInfoDialog = () => {
-    this.setState(
-      {
-        isTeamBoardDeletedInfoDialogHidden: true,
-        teamBoardDeletedDialogTitle: '',
-        teamBoardDeletedDialogMessage: '',
-      }
-    );
   }
 
   private readonly showBoardUrlCopiedToast = () => {
@@ -1025,14 +1007,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     this.hideArchiveBoardConfirmationDialog();
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
-  }
-
-  private readonly deleteCurrentBoard = async () => {
-    await BoardDataService.deleteFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
-    reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     await this.reloadBoardsForCurrentTeam();
-    this.hideDeleteBoardConfirmationDialog();
-    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardDeleted, properties: { boardId: this.state.currentBoard.id } });
   }
 
   private readonly copyBoardUrl = async () => {
@@ -1197,13 +1172,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       onClick: this.showArchiveBoardConfirmationDialog,
       text: 'Archive retrospective',
       title: 'Archive retrospective',
-    },
-    {
-      key: 'deleteBoard',
-      iconProps: { iconName: 'Delete' },
-      onClick: this.showDeleteBoardConfirmationDialog,
-      text: 'Delete retrospective',
-      title: 'Delete retrospective',
     },
   ];
 
@@ -1681,24 +1649,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     />
                   </div>
                   <Dialog
-                    hidden={this.state.isDeleteBoardConfirmationDialogHidden}
-                    onDismiss={this.hideDeleteBoardConfirmationDialog}
-                    dialogContentProps={{
-                      type: DialogType.close,
-                      title: 'Delete Retrospective',
-                      subText: `Are you sure you want to delete the retrospective '${this.state.currentBoard.title}' and all of its feedback items?`,
-                    }}
-                    modalProps={{
-                      isBlocking: true,
-                      containerClassName: 'retrospectives-delete-board-confirmation-dialog',
-                      className: 'retrospectives-dialog-modal',
-                    }}>
-                    <DialogFooter>
-                      <PrimaryButton onClick={this.deleteCurrentBoard} text="Delete" />
-                      <DefaultButton onClick={this.hideDeleteBoardConfirmationDialog} text="Cancel" />
-                    </DialogFooter>
-                  </Dialog>
-                  <Dialog
                     hidden={this.state.isArchiveBoardConfirmationDialogHidden}
                     onDismiss={this.hideArchiveBoardConfirmationDialog}
                     dialogContentProps={{
@@ -1707,15 +1657,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     }}
                     modalProps={{
                       isBlocking: true,
-                      containerClassName: 'team-archive-dialog',
+                      containerClassName: 'retrospectives-archive-board-confirmation-dialog',
                       className: 'retrospectives-dialog-modal',
                     }}>
                     <DialogContent>
-                      Are you sure you want to archive `<i>{this.state.currentBoard.title}</i>` retrospective board and its feedback?
-                      <br /><br />
-                      <FontIcon iconName="LocationDot" /> <i>Archived retrospectives are removed from the board selection list.</i>
+                      <p>The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.</p>
                       <br />
-                      <FontIcon iconName="LocationDot" /> <i>However, boards and their feedback can be</i> restored <i>via the</i> `History` <i>tab.</i>
+                      <p><em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.</p>
                     </DialogContent>
                     <DialogFooter>
                       <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
@@ -1911,23 +1859,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               }
             </>
           }
-        </Dialog>
-        <Dialog
-          hidden={this.state.isTeamBoardDeletedInfoDialogHidden}
-          onDismiss={this.hideTeamBoardDeletedInfoDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: this.state.teamBoardDeletedDialogTitle,
-            subText: this.state.teamBoardDeletedDialogMessage,
-          }}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: 'retrospectives-board-deleted-info-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}>
-          <DialogFooter>
-            <DefaultButton aria-label="Dismiss Deleted Team Board Dialog" onClick={this.hideTeamBoardDeletedInfoDialog} text="Dismiss" />
-          </DialogFooter>
         </Dialog>
         <ToastContainer
           transition={Slide}
