@@ -239,17 +239,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     return (
       <div className="extension-settings-menu">
         <DefaultButton
-          className="contextual-menu-button hide-mobile"
-          aria-label="Extended Menu Options"
-          title="Extended Menu Options"
-          menuProps={{
-            items: this.extensionSettingsMenuItem,
-            className: "extended-menu-options",
-          }}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-bars"></i></span>
-        </DefaultButton>
-        <DefaultButton
           className="contextual-menu-button"
           aria-label="Prime Directive"
           title="Prime Directive"
@@ -260,6 +249,40 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <span className="ms-Button-label">Prime Directive</span>
           )}
         </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button"
+          aria-label="What's New"
+          title="What's New"
+          onClick={this.showWhatsNewDialog}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
+          {isWindowMaximized && (
+            <span className="ms-Button-label">What&apos;s New</span>
+          )}
+        </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button"
+          aria-label="Get Help"
+          title="Get Help"
+          onClick={() => this.setState({ isGetHelpDialogHidden: false })}
+        >
+          <span className="ms-Button-icon"><i className="fa fa-question-circle"></i></span>&nbsp;
+          {isWindowMaximized && (
+            <span className="ms-Button-label">Get Help</span>
+          )}
+        </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button hide-mobile"
+          aria-label="Extended Menu"
+          title="Extended Menu"
+          menuProps={{
+            items: this.extensionSettingsMenuItem,
+            className: "extended-options-menu",
+          }}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-bars"></i></span>
+        </DefaultButton>
+
         <Dialog
           hidden={this.state.isPrimeDirectiveDialogHidden}
           onDismiss={this.hidePrimeDirectiveDialog}
@@ -290,32 +313,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="prime-directive-close-button" />
           </DialogFooter>
         </Dialog>
-        <DefaultButton
-          className="contextual-menu-button"
-          aria-label="What's New"
-          title="What's New"
-          onClick={this.showWhatsNewDialog}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
-          {isWindowMaximized && (
-            <>
-              <span className="ms-Button-label">What&apos;s New</span>
-            </>
-          )}
-        </DefaultButton>
-        <DefaultButton
-          className="contextual-menu-button"
-          aria-label="Get Help"
-          title="Get Help"
-          onClick={() => this.setState({ isGetHelpDialogHidden: false })}
-        >
-          <span className="ms-Button-icon"><i className="fa fa-question-circle"></i></span>&nbsp;
-          {isWindowMaximized && (
-            <>
-              &nbsp;<span className="ms-Button-label">Get Help</span>
-            </>
-          )}
-        </DefaultButton>
+
         <Dialog
           hidden={this.state.isWhatsNewDialogHidden}
           onDismiss={this.hideWhatsNewDialog}
@@ -328,9 +326,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             isBlocking: true,
             containerClassName: 'whatsnew-dialog',
           }}>
-          <DialogBase>
-
-          </DialogBase>
           <DialogContent>
             <p>{this.getChangelog()[0]}</p>
             <ul style={{ listStyle: 'initial', paddingLeft: "1rem" }}>
@@ -345,6 +340,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <PrimaryButton className="whats-new-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
           </DialogFooter>
         </Dialog>
+
         <Dialog
           hidden={this.state.isGetHelpDialogHidden}
           onDismiss={() => { this.setState({ isGetHelpDialogHidden: true }); }}
@@ -377,6 +373,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
               className="prime-directive-close-button" />
           </DialogFooter>
         </Dialog>
+
         <Dialog
           hidden={this.state.isMobileExtensionSettingsDialogHidden}
           onDismiss={this.hideMobileExtensionSettingsMenuDialog}
