@@ -1,4 +1,4 @@
 .extension-settings-menu {
   margin-top: 5px;
-  overflow: hidden; /* Prevent unnecessary scrollbars */
+  overflow-y: hidden !important; /* Prevent unnecessary scrollbars */
 }
