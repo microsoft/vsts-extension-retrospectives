@@ -17,6 +17,7 @@
 }
 
 .ms-ContextualMenu-Callout {
+  overflow: hidden !important;
   .ms-Callout-main {
     background-color: var(--callout-background-color);
   }
@@ -37,11 +38,6 @@
 .extended-options-menu button.ms-ContextualMenu-link:hover {
   background-color: var(--border-subtle-color); /* Matches the other menu */
   color: var(--text-primary-color);
-}
-
-/* Ensure parent container does not force extra scrolling */
-.parent-container {
-  overflow: hidden; /* Prevent unnecessary scrollbars */
 }
 
 .whatsnew-dialog, .gethelp-dialog {
