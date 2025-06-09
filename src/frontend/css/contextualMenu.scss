@@ -24,9 +24,9 @@
 
 .extended-options-menu {
   background-color: var(--callout-background-color);
-  height: 155px;
+  max-height: 300px;
   margin-top: -10px;
-  overflow-y: auto;
+  overflow-y: auto; /* Keep scrolling but avoid double scrollbars */
 
   button.ms-ContextualMenu-link {
     color: var(--text-primary-color);
@@ -36,6 +36,11 @@
       color: var(--text-primary-color);
     }
   }
+}
+
+/* Ensure parent container does not force extra scrolling */
+.parent-container {
+  overflow: hidden; /* Prevent unnecessary scrollbars */
 }
 
 .whatsnew-dialog, .gethelp-dialog {
