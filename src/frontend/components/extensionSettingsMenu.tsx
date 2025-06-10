@@ -211,14 +211,18 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     {
       key: 'exportData',
       iconProps: { iconName: 'CloudDownload' },
-      onClick: this.exportData,
+      onClick: (ev, item) => {
+        this.exportData().catch(console.error); // Ensures async function runs without breaking `onClick`
+      },
       text: 'Export data',
       title: 'Export data',
     },
     {
       key: 'importData',
       iconProps: { iconName: 'CloudUpload' },
-      onClick: this.importData,
+      onClick: (ev, item) => {
+        this.importData().catch(console.error); // Ensures async function runs without breaking `onClick`
+      },
       text: 'Import data',
       title: 'Import data',
     },
@@ -435,7 +439,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
                   aria-label={exportImportDataMenu.text}
                   onClick={() => {
                     this.hideMobileExportImportDataMenuDialog();
-                    exportImportDataMenu.onClick();
+                    exportImportDataMenu.onClick?.(undefined, undefined); // Ensure correct function execution
                   }}
                   text={exportImportDataMenu.text}
                   title={exportImportDataMenu.title}
