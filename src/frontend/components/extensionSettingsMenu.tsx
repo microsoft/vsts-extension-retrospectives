@@ -148,6 +148,10 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
+  private readonly hideMobileExportImportDataMenuDialog = () => {
+    this.setState({ isMobileExtensionSettingsDialogHidden: true });
+  }
+
   private readonly onChangeLogClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md', '_blank');
   }
@@ -169,20 +173,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   // If an action needs to be hidden on desktop or mobile view, use the item's className property
   // with .hide-mobile or .hide-desktop
   private readonly extensionSettingsMenuItem: IContextualMenuItem[] = [
-    {
-      key: 'exportData',
-      iconProps: { iconName: 'CloudDownload' },
-      onClick: this.exportData,
-      text: 'Export data',
-      title: 'Export data',
-    },
-    {
-      key: 'importData',
-      iconProps: { iconName: 'CloudUpload' },
-      onClick: this.importData,
-      text: 'Import data',
-      title: 'Import data',
-    },
     {
       key: 'clearVisitHistory',
       iconProps: { iconName: 'RemoveEvent' },
@@ -206,12 +196,31 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       title: 'Switch to mobile view',
       className: 'hide-mobile'
     },
-    {
+        {
       key: 'contactUs',
       iconProps: { iconName: 'ChatInviteFriend' },
       onClick: this.onContactUsClicked,
       text: 'Contact us',
       title: 'Contact us'
+    },
+  ];
+
+  // If an action needs to be hidden on desktop or mobile view, use the item's className property
+  // with .hide-mobile or .hide-desktop
+  private readonly exportImportDataMenu: IContextualMenuItem[] = [
+    {
+      key: 'exportData',
+      iconProps: { iconName: 'CloudDownload' },
+      onClick: this.exportData,
+      text: 'Export data',
+      title: 'Export data',
+    },
+    {
+      key: 'importData',
+      iconProps: { iconName: 'CloudUpload' },
+      onClick: this.importData,
+      text: 'Import data',
+      title: 'Import data',
     },
   ];
 
@@ -251,6 +260,28 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           )}
         </DefaultButton>
         <DefaultButton
+          className="contextual-menu-button hide-mobile"
+          aria-label="User Settings"
+          title="User Settings"
+          menuProps={{
+            items: this.extensionSettingsMenuItem,
+            className: "extended-options-menu",
+          }}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-cog"></i></span>
+        </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button hide-mobile"
+          aria-label="Export Import"
+          title="Export Import"
+          menuProps={{
+            items: this.exportImportDataMenu,
+            className: "extended-options-menu",
+          }}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-cloud"></i></span>
+        </DefaultButton>
+        <DefaultButton
           className="contextual-menu-button"
           aria-label="What's New"
           title="What's New"
@@ -271,17 +302,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           {isWindowMaximized && (
             <span className="ms-Button-label">Get Help</span>
           )}
-        </DefaultButton>
-        <DefaultButton
-          className="contextual-menu-button hide-mobile"
-          aria-label="Extended Menu"
-          title="Extended Menu"
-          menuProps={{
-            items: this.extensionSettingsMenuItem,
-            className: "extended-options-menu",
-          }}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-bars"></i></span>
         </DefaultButton>
 
         <Dialog
@@ -384,7 +404,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
           }}
         >
-          <div className="mobile-contextual-menu-list">
+          <div className="mobile-contextual-menu-list-1">
             {
               this.extensionSettingsMenuItem.map((extensionSettingsMenuItem) =>
                 <ActionButton
@@ -401,6 +421,27 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
                 >
                   <span className="ms-Button-icon"><i className={"fa-solid fa-" + extensionSettingsMenuItem.iconProps.iconName}></i></span>&nbsp;
                   <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span>
+                </ActionButton>
+              )
+            }
+          </div>
+          <div className="mobile-contextual-menu-list-2">
+            {
+              this.exportImportDataMenu.map((exportImportDataMenu) =>
+                <ActionButton
+                  key={exportImportDataMenu.key}
+                  iconProps={exportImportDataMenu.iconProps}
+                  className={exportImportDataMenu.className}
+                  aria-label={exportImportDataMenu.text}
+                  onClick={() => {
+                    this.hideMobileExportImportDataMenuDialog();
+                    exportImportDataMenu.onClick();
+                  }}
+                  text={exportImportDataMenu.text}
+                  title={exportImportDataMenu.title}
+                >
+                  <span className="ms-Button-icon"><i className={"fa-solid fa-" + exportImportDataMenu.iconProps.iconName}></i></span>&nbsp;
+                  <span className="ms-Button-label">{exportImportDataMenu.text}</span>
                 </ActionButton>
               )
             }
