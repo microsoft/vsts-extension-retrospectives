@@ -87,7 +87,7 @@ describe('Random', () => {
 
     // Version 4 UUID should have '4' as the first character of the third group
     expect(parts[2].charAt(0)).toBe('4');
-    
+
     // Variant bits should be 8, 9, A, or B (binary 10xx)
     const variantChar = parts[3].charAt(0).toLowerCase();
     expect(['8', '9', 'a', 'b']).toContain(variantChar);
