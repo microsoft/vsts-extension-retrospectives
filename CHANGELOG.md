@@ -4,6 +4,11 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.42
 
+* Identifies Team Admin, in addition to Board Owner, in Permission table.
+* Only the Board Owner or a Team Admin can edit permissions to access the retrospective board.
+
+From [GitHub PR #1206](https://github.com/microsoft/vsts-extension-retrospectives/pull/1206)
+
 * Moves functionality to delete Retrospectives boards from the Board menu to the History table.
 * Only enables delete functionality for archived boards.
 * More clearly warns that deleting a board is permanent and cannot be undone.
@@ -16,7 +21,7 @@ From [GitHub PR #1193](https://github.com/microsoft/vsts-extension-retrospective
 
 From [GitHub PR #1184](https://github.com/microsoft/vsts-extension-retrospectives/pull/1184)
 
-* Improved test code coverage by ~4%.
+* Improved test code coverage by ~5%.
 
 ## v1.92.38
 
