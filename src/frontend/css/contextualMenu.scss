@@ -24,9 +24,9 @@
 
 .extended-options-menu {
   background-color: var(--callout-background-color);
-  max-height: 300px;
+  max-height: none !important;
   margin-top: -10px;
-  overflow-y: hidden; /* Remove scrollbar */
+  overflow: visible !important;
 }
 
 .extended-options-menu button.ms-ContextualMenu-link {
