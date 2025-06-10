@@ -21,7 +21,7 @@ module.exports = (env, argv) => {
     output: {
       path: BUILD_DIR,
       publicPath: './',
-      filename: mode === 'production' ? '[name].[contenthash].js' : './reflect-bundle.js',
+      filename: './reflect-bundle.js',
       chunkFilename: mode === 'production' ? '[name].[contenthash].chunk.js' : '[name].chunk.js',
       clean: true,
     },
@@ -63,6 +63,8 @@ module.exports = (env, argv) => {
     },
     optimization: {
       minimize: true,
+      usedExports: true,
+      sideEffects: false,
       splitChunks: false,
       runtimeChunk: false,
     },
