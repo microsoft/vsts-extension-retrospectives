@@ -21,7 +21,8 @@ module.exports = (env, argv) => {
     output: {
       path: BUILD_DIR,
       publicPath: './',
-      filename: './reflect-bundle.js',
+      filename: mode === 'production' ? '[name].[contenthash].js' : './reflect-bundle.js',
+      chunkFilename: mode === 'production' ? '[name].[contenthash].chunk.js' : '[name].chunk.js',
       clean: true,
     },
     resolve: {
@@ -62,16 +63,50 @@ module.exports = (env, argv) => {
     },
     optimization: {
       minimize: true,
-      splitChunks: false,
-      runtimeChunk: false,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+            priority: 10,
+            reuseExistingChunk: true,
+          },
+          fabric: {
+            test: /[\\/]node_modules[\\/](office-ui-fabric-react)[\\/]/,
+            name: 'fabric',
+            chunks: 'all',
+            priority: 20,
+            reuseExistingChunk: true,
+          },
+          azure: {
+            test: /[\\/]node_modules[\\/](azure-devops-)[\\/]/,
+            name: 'azure',
+            chunks: 'all',
+            priority: 20,
+            reuseExistingChunk: true,
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            priority: 5,
+            reuseExistingChunk: true,
+          },
+        },
+      },
+      runtimeChunk: 'single',
     },
     performance: {
       hints: 'warning',
-      maxAssetSize: 2100000, // 2.15 Mb
-      maxEntrypointSize: 2100000, // 2.15 Mb
+      maxAssetSize: 1600000, // 1.6 MB
+      maxEntrypointSize: 1600000, // 1.6 MB
     },
     plugins: [
-      new MomentLocalesPlugin(),
+      new MomentLocalesPlugin({
+        localesToKeep: [], // Keep only default (English) locale
+      }),
       new ESLintPlugin(),
       new Dotenv({
         systemvars: true

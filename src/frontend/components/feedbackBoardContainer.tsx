@@ -43,7 +43,6 @@ import { getColumnsByTemplateId } from '../utilities/boardColumnsHelper';
 import { FeedbackBoardPermissionOption } from './feedbackBoardMetadataFormPermissions';
 import { CommonServiceIds, IHostNavigationService } from 'azure-devops-extension-api/Common/CommonServices';
 import { getService } from 'azure-devops-extension-sdk';
-import { FontIcon } from 'office-ui-fabric-react';
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
