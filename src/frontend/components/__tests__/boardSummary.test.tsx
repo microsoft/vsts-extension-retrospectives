@@ -307,7 +307,7 @@ describe('Board Summary', () => {
     expect(titleColumn.onColumnClick).toBeDefined();
 
     const mockEvent = {} as React.MouseEvent<HTMLElement>;
-    
+
     expect(() => titleColumn.onColumnClick(mockEvent, titleColumn)).not.toThrow();
 
     wrapper.update();
@@ -317,7 +317,7 @@ describe('Board Summary', () => {
 
     expect(updatedItems).toBeDefined();
     expect(updatedItems.length).toBe(items.length);
-    
+
     expect(updatedItems.every((item: { title: string }) => item.title !== undefined)).toBe(true);
   });
 
