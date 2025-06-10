@@ -18,6 +18,11 @@
   }
 }
 
+.ms-ContextualMenu-list {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
 .ms-ContextualMenu-Callout {
   .ms-Callout-main {
     background-color: var(--callout-background-color);
@@ -27,7 +32,7 @@
 .extended-options-menu {
   background-color: var(--callout-background-color);
   max-height: none !important;
-  margin-top: -10px;
+  margin-top: 0px; // -10px
   overflow: visible !important;
 }
 
