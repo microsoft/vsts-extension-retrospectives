@@ -270,10 +270,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           menuProps={{
             items: this.extensionSettingsMenuItem,
             className: "extended-options-menu",
-            calloutProps: {
-              doNotLayer: true, // Prevents layering issues
-              styles: { root: { overflow: 'visible' } } // Ensures no forced scrolling
-            }
           }}
         >
           <span className="ms-Button-icon"><i className="fas fa-cog"></i></span>

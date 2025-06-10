@@ -4,8 +4,6 @@
   background-color: inherit;
   padding: 0px 4px;
   border: none;
-  position: static !important;
-  overflow: visible !important;
   color: rgba(var(--palette-neutral-80), 1);
 
   i[data-icon-name="ChevronDown"] {
@@ -18,11 +16,6 @@
   }
 }
 
-.ms-ContextualMenu-list {
-  max-height: none !important;
-  overflow: visible !important;
-}
-
 .ms-ContextualMenu-Callout {
   .ms-Callout-main {
     background-color: var(--callout-background-color);
@@ -31,9 +24,7 @@
 
 .extended-options-menu {
   background-color: var(--callout-background-color);
-  max-height: none !important;
-  margin-top: 0px; // -10px
-  overflow: visible !important;
+  max-height: none;
 }
 
 .extended-options-menu button.ms-ContextualMenu-link {
