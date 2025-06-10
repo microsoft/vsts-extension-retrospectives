@@ -85,7 +85,7 @@
     "postcss": "8.5.4",
     "process": "0.11.10",
     "rimraf": "6.0.1",
-    "sass": "1.86.3",
+    "sass": "1.89.2",
     "sass-loader": "16.0.5",
     "stream-browserify": "3.0.0",
     "style-loader": "4.0.0",
