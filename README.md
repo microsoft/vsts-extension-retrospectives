@@ -317,7 +317,7 @@ If there is a team assessment, then a charted summary will show the vote breakdo
 
 The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, showing the count of feedback items and action items, and supports archiving or restoring archived retrospectives, as well as permanently deleting archived retrospectives.
 
-![History tab showing table with 7 columns and 5 rows. Columns include: Retrospective Name, Created Date, Archived, Archived Date, Feedback Items, Total Work Items, and Trash icon. Rows include: 4th Retrospective, 3rd Retrospective, Lean Coffee (archived with delete option active), 2nd Retrospective, and 1st Retrospective.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-with-archive-and-debug.png)
+![History tab showing table with 7 columns and 5 rows. Columns include: Retrospective Name, Created Date, Archived, Archived Date, Feedback Items, Total Work Items, and Trash icon. Rows include: 4th Retrospective, 3rd Retrospective, Lean Coffee (archived with delete option active), 2nd Retrospective, and 1st Retrospective.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-with-archive-and-delete.png)
 
 Selecting a retrospective expands the row to reveal more details, including a count of action items by status and a detailed list of each action item.
 
