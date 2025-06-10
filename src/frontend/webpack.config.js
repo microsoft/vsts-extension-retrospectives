@@ -63,40 +63,8 @@ module.exports = (env, argv) => {
     },
     optimization: {
       minimize: true,
-      splitChunks: {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-            reuseExistingChunk: true,
-          },
-          fabric: {
-            test: /[\\/]node_modules[\\/](office-ui-fabric-react)[\\/]/,
-            name: 'fabric',
-            chunks: 'all',
-            priority: 20,
-            reuseExistingChunk: true,
-          },
-          azure: {
-            test: /[\\/]node_modules[\\/](azure-devops-)[\\/]/,
-            name: 'azure',
-            chunks: 'all',
-            priority: 20,
-            reuseExistingChunk: true,
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            priority: 5,
-            reuseExistingChunk: true,
-          },
-        },
-      },
-      runtimeChunk: 'single',
+      splitChunks: false,
+      runtimeChunk: false,
     },
     performance: {
       hints: 'warning',
