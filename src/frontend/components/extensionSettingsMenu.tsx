@@ -293,7 +293,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         >
           <span className="ms-Button-icon"><i className="fas fa-cloud"></i></span>&nbsp;
           {isWindowMaximized && (
-            <span className="ms-Button-label">Export Import</span>
+            <span className="ms-Button-label">Data</span>
           )}
         </DefaultButton>
         <DefaultButton
@@ -307,7 +307,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         >
           <span className="ms-Button-icon"><i className="fas fa-question-circle"></i></span>&nbsp;
           {isWindowMaximized && (
-            <span className="ms-Button-label">Get Help</span>
+            <span className="ms-Button-label">Help</span>
           )}
         </DefaultButton>
         <DefaultButton
@@ -321,7 +321,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         >
           <span className="ms-Button-icon"><i className="fas fa-cog"></i></span>&nbsp;
           {isWindowMaximized && (
-            <span className="ms-Button-label">User Settings</span>
+            <span className="ms-Button-label">Settings</span>
           )}
         </DefaultButton>
 
