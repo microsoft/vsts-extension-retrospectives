@@ -196,13 +196,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       title: 'Switch to mobile view',
       className: 'hide-mobile'
     },
-        {
-      key: 'contactUs',
-      iconProps: { iconName: 'ChatInviteFriend' },
-      onClick: this.onContactUsClicked,
-      text: 'Contact us',
-      title: 'Contact us'
-    },
   ];
 
   // If an action needs to be hidden on desktop or mobile view, use the item's className property
