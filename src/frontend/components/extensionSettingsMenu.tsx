@@ -228,6 +228,32 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     },
   ];
 
+  // If an action needs to be hidden on desktop or mobile view, use the item's className property
+  // with .hide-mobile or .hide-desktop
+  private readonly helpMenu: IContextualMenuItem[] = [
+    {
+      key: 'whatsNew',
+      iconProps: { iconName: 'Megaphone' },
+      onClick: this.showWhatsNewDialog,
+      text: 'What&apos;s New',
+      title: 'What&apos;s New',
+    },
+    {
+      key: 'getHelp',
+      iconProps: { iconName: 'BookAnswers' },
+      onClick: () => this.setState({ isGetHelpDialogHidden: false }),
+      text: 'Get help',
+      title: 'Get help',
+    },
+    {
+      key: 'contactUs',
+      iconProps: { iconName: 'ChatInviteFriend' },
+      onClick: this.onContactUsClicked,
+      text: 'Contact us',
+      title: 'Contact us',
+    },
+  ];
+
   componentDidMount() {
     window.addEventListener("resize", this.handleResize);
   }
@@ -284,6 +310,17 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
         >
           <span className="ms-Button-icon"><i className="fas fa-cloud"></i></span>
+        </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button hide-mobile"
+          aria-label="Help"
+          title="Help"
+          menuProps={{
+            items: this.helpMenu,
+            className: "extended-options-menu",
+          }}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-questions-circle"></i></span>
         </DefaultButton>
         <DefaultButton
           className="contextual-menu-button"
