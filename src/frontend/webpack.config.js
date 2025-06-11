@@ -21,7 +21,6 @@ module.exports = (env, argv) => {
       path: BUILD_DIR,
       publicPath: './',
       filename: './reflect-bundle.js',
-      chunkFilename: mode === 'production' ? '[name].[contenthash].chunk.js' : '[name].chunk.js',
       clean: true,
     },
     resolve: {
