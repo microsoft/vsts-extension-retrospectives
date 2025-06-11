@@ -5,7 +5,7 @@ import Dialog, { DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dia
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { DocumentCardType, DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
-import { Pivot, PivotItem } from 'office-ui-fabric-react';
+import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import classNames from 'classnames'
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 

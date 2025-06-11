@@ -61,16 +61,20 @@ module.exports = (env, argv) => {
     },
     optimization: {
       minimize: true,
+      usedExports: true,
+      sideEffects: false,
       splitChunks: false,
       runtimeChunk: false,
     },
     performance: {
       hints: 'warning',
-      maxAssetSize: 2100000, // 2.15 Mb
-      maxEntrypointSize: 2100000, // 2.15 Mb
+      maxAssetSize: 1600000, // 1.6 MB
+      maxEntrypointSize: 1600000, // 1.6 MB
     },
     plugins: [
-      new MomentLocalesPlugin(),
+      new MomentLocalesPlugin({
+        localesToKeep: [], // Keep only default (English) locale
+      }),
       new ESLintPlugin(),
       new webpack.ProvidePlugin({
         process: 'process/browser',
