@@ -322,28 +322,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         >
           <span className="ms-Button-icon"><i className="fas fa-question-circle"></i></span>
         </DefaultButton>
-        <DefaultButton
-          className="contextual-menu-button"
-          aria-label="What's New"
-          title="What's New"
-          onClick={this.showWhatsNewDialog}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
-          {isWindowMaximized && (
-            <span className="ms-Button-label">What&apos;s New</span>
-          )}
-        </DefaultButton>
-        <DefaultButton
-          className="contextual-menu-button"
-          aria-label="Get Help"
-          title="Get Help"
-          onClick={() => this.setState({ isGetHelpDialogHidden: false })}
-        >
-          <span className="ms-Button-icon"><i className="fa fa-question-circle"></i></span>&nbsp;
-          {isWindowMaximized && (
-            <span className="ms-Button-label">Get Help</span>
-          )}
-        </DefaultButton>
 
         <Dialog
           hidden={this.state.isPrimeDirectiveDialogHidden}
