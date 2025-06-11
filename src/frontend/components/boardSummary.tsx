@@ -49,13 +49,13 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
     const actionItemsTableColumns: IColumn[] = [
       {
         ariaLabel: 'Work item type icon',
+        key: 'icon',
+        name: 'Work Item Icon',
         fieldName: 'icon',
         isIconOnly: true,
         isResizable: false,
-        key: 'icon',
-        maxWidth: 16,
         minWidth: 16,
-        name: 'Work Item Icon',
+        maxWidth: 16,
         onRender: ({ icon, type }: IActionItemsTableProps) => {
           return <Image
             src={icon.url}
@@ -65,13 +65,15 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         }
       },
       {
-        ariaLabel: 'Work item title.',
+        ariaLabel: 'Work item title',
+        key: 'title',
+        name: 'Title',
         fieldName: 'title',
         isResizable: true,
-        key: 'title',
+        isSorted: false,
+        isSortedDescending: false,
         maxWidth: 350,
         minWidth: 100,
-        name: 'Title',
         onColumnClick: this.onColumnClick,
         onRender: ({ id, title, onActionItemClick }: IActionItemsTableProps) => {
           return <button
@@ -84,33 +86,39 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         }
       },
       {
+        ariaLabel: 'Work item state',
         key: 'state',
         name: 'State',
         fieldName: 'state',
+        isResizable: true,
+        isSorted: false,
+        isSortedDescending: false,
         minWidth: 50,
         maxWidth: 100,
-        isResizable: true,
-        ariaLabel: 'Work item state.',
         onColumnClick: this.onColumnClick,
       },
       {
+        ariaLabel: 'Work item type',
         key: 'type',
         name: 'Type',
         fieldName: 'type',
+        isResizable: true,
+        isSorted: false,
+        isSortedDescending: false,
         minWidth: 50,
         maxWidth: 100,
-        isResizable: true,
-        ariaLabel: 'Work item type.',
         onColumnClick: this.onColumnClick,
       },
       {
+        ariaLabel: 'Work item changed date',
         key: 'changedDate',
         name: 'Last Updated',
         fieldName: 'changedDate',
+        isResizable: true,
+        isSorted: false,
+        isSortedDescending: false,
         minWidth: 100,
         maxWidth: 150,
-        isResizable: true,
-        ariaLabel: 'Work item changed date.',
         onRender: ({ changedDate }: IActionItemsTableProps) => {
           const changedDateAsDate = new Date(changedDate);
           return <div
@@ -123,23 +131,27 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         onColumnClick: this.onColumnClick,
       },
       {
+        ariaLabel: 'Work item assigned to',
         key: 'assignedTo',
         name: 'Assigned To',
         fieldName: 'assignedTo',
+        isResizable: true,
+        isSorted: false,
+        isSortedDescending: false,
         minWidth: 100,
         maxWidth: 400,
-        isResizable: true,
-        ariaLabel: 'Work item assigned to.',
         onColumnClick: this.onColumnClick,
       },
       {
+        ariaLabel: 'Work item priority',
         key: 'priority',
         name: 'Priority',
         fieldName: 'priority',
+        isResizable: true,
+        isSorted: false,
+        isSortedDescending: false,
         minWidth: 50,
         maxWidth: 50,
-        isResizable: true,
-        ariaLabel: 'Work item priority.',
         onColumnClick: this.onColumnClick,
       },
     ];
@@ -199,13 +211,18 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
     const currColumn: IColumn = newTableColumns.filter((currCol: IColumn) => {
       return column.key === currCol.key;
     })[0];
+
     newTableColumns.forEach((newCol: IColumn) => {
       if (newCol === currColumn) {
-        currColumn.isSortedDescending = !currColumn.isSortedDescending;
+        if (currColumn.isSorted) {
+          currColumn.isSortedDescending = !currColumn.isSortedDescending;
+        } else {
+          currColumn.isSortedDescending = false;
+        }
         currColumn.isSorted = true;
       } else {
         newCol.isSorted = false;
-        newCol.isSortedDescending = true;
+        newCol.isSortedDescending = false;
       }
     });
 
