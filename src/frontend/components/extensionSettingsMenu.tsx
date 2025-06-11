@@ -235,8 +235,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       key: 'whatsNew',
       iconProps: { iconName: 'Megaphone' },
       onClick: this.showWhatsNewDialog,
-      text: 'What&apos;s New',
-      title: 'What&apos;s New',
+      text: "What's New",
+      title: "What's New",
     },
     {
       key: 'getHelp',
@@ -320,7 +320,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: "extended-options-menu",
           }}
         >
-          <span className="ms-Button-icon"><i className="fas fa-questions-circle"></i></span>
+          <span className="ms-Button-icon"><i className="fas fa-question-circle"></i></span>
         </DefaultButton>
         <DefaultButton
           className="contextual-menu-button"
