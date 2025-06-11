@@ -298,20 +298,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         </DefaultButton>
         <DefaultButton
           className="contextual-menu-button hide-mobile"
-          aria-label="User Settings"
-          title="User Settings"
-          menuProps={{
-            items: this.extensionSettingsMenuItem,
-            className: "extended-options-menu",
-          }}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-cog"></i></span>&nbsp;
-          {isWindowMaximized && (
-            <span className="ms-Button-label">User Settings</span>
-          )}
-        </DefaultButton>
-        <DefaultButton
-          className="contextual-menu-button hide-mobile"
           aria-label="Help"
           title="Help"
           menuProps={{
@@ -322,6 +308,20 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <span className="ms-Button-icon"><i className="fas fa-question-circle"></i></span>&nbsp;
           {isWindowMaximized && (
             <span className="ms-Button-label">Get Help</span>
+          )}
+        </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button hide-mobile"
+          aria-label="User Settings"
+          title="User Settings"
+          menuProps={{
+            items: this.extensionSettingsMenuItem,
+            className: "extended-options-menu",
+          }}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-cog"></i></span>&nbsp;
+          {isWindowMaximized && (
+            <span className="ms-Button-label">User Settings</span>
           )}
         </DefaultButton>
 
