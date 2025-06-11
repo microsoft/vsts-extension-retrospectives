@@ -232,11 +232,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       title: "What's New",
     },
     {
-      key: 'getHelp',
+      key: 'userGuide',
       iconProps: { iconName: 'BookAnswers' },
       onClick: () => this.setState({ isGetHelpDialogHidden: false }),
-      text: 'Get help',
-      title: 'Get help',
+      text: 'User guide',
+      title: 'User guide',
     },
     {
       key: 'contactUs',
@@ -277,9 +277,23 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           title="Prime Directive"
           onClick={this.showPrimeDirectiveDialog}
         >
-          <span className="ms-Button-icon"><i className="fas fa-handshake-angle"></i></span>&nbsp;
+          <span className="ms-Button-icon"><i className="fas fa-user-shield"></i></span>&nbsp;
           {isWindowMaximized && (
             <span className="ms-Button-label">Prime Directive</span>
+          )}
+        </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button hide-mobile"
+          aria-label="Export Import"
+          title="Export Import"
+          menuProps={{
+            items: this.exportImportDataMenu,
+            className: "extended-options-menu",
+          }}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-cloud"></i></span>&nbsp;
+          {isWindowMaximized && (
+            <span className="ms-Button-label">Export Import</span>
           )}
         </DefaultButton>
         <DefaultButton
@@ -291,18 +305,10 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: "extended-options-menu",
           }}
         >
-          <span className="ms-Button-icon"><i className="fas fa-cog"></i></span>
-        </DefaultButton>
-        <DefaultButton
-          className="contextual-menu-button hide-mobile"
-          aria-label="Export Import"
-          title="Export Import"
-          menuProps={{
-            items: this.exportImportDataMenu,
-            className: "extended-options-menu",
-          }}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-cloud"></i></span>
+          <span className="ms-Button-icon"><i className="fas fa-cog"></i></span>&nbsp;
+          {isWindowMaximized && (
+            <span className="ms-Button-label">User Settings</span>
+          )}
         </DefaultButton>
         <DefaultButton
           className="contextual-menu-button hide-mobile"
@@ -313,7 +319,10 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: "extended-options-menu",
           }}
         >
-          <span className="ms-Button-icon"><i className="fas fa-question-circle"></i></span>
+          <span className="ms-Button-icon"><i className="fas fa-question-circle"></i></span>&nbsp;
+          {isWindowMaximized && (
+            <span className="ms-Button-label">Get Help</span>
+          )}
         </DefaultButton>
 
         <Dialog
