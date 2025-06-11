@@ -1,6 +1,5 @@
 ﻿const webpack = require('webpack');
 const path = require('path');
-const Dotenv = require('dotenv-webpack');
 
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
@@ -73,17 +72,14 @@ module.exports = (env, argv) => {
     plugins: [
       new MomentLocalesPlugin(),
       new ESLintPlugin(),
-      new Dotenv({
-        systemvars: true
-      }),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
       new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(mode)
-      }),
-      new webpack.DefinePlugin({
-        'process.env.BUILD_BUILDNUMBER': JSON.stringify(process.env.BUILD_BUILDNUMBER)
+        'process.env.NODE_ENV': JSON.stringify(mode),
+        'process.env.BUILD_BUILDNUMBER': JSON.stringify(process.env.BUILD_BUILDNUMBER),
+        'process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY': JSON.stringify(process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY),
+        'process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL': JSON.stringify(process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL)
       }),
       new CompressionPlugin(),
       codecovWebpackPlugin({
