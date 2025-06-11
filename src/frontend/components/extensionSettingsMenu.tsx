@@ -228,8 +228,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       key: 'whatsNew',
       iconProps: { iconName: 'Megaphone' },
       onClick: this.showWhatsNewDialog,
-      text: "What's New",
-      title: "What's New",
+      text: "What's new",
+      title: "What's new",
     },
     {
       key: 'userGuide',
@@ -277,7 +277,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           title="Prime Directive"
           onClick={this.showPrimeDirectiveDialog}
         >
-          <span className="ms-Button-icon"><i className="fas fa-user-shield"></i></span>&nbsp;
+          <span className="ms-Button-icon"><i className="fas fa-shield-halved"></i></span>&nbsp;
           {isWindowMaximized && (
             <span className="ms-Button-label">Prime Directive</span>
           )}
