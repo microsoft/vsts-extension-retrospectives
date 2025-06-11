@@ -6,11 +6,11 @@
   "scripts": {
     "clean": "npx rimraf ./dist ./coverage ./reports && npx del-cli ./node_modules/applicationinsights-js/dist/*.map",
     "compile": "npx tailwindcss -i ./css/index.css -o ./css/bundle.css --minify",
-    "build:p": "npm run clean && npm run compile && npx webpack --mode=production",
+    "build": "npm run clean && npm run compile && npx webpack --mode=production",
     "lint": "npx eslint **/*.ts*",
-    "pack:d": "npm run build:p && npx tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
+    "pack:d": "npm run build && npx tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
     "pack:test": "npm run compile && npx webpack --mode=production && npx tfx extension create --manifests vss-extension-prod.json --output-path ./dist/testing",
-    "pack:p": "npm run build:p && npx tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
+    "pack:p": "npm run build && npx tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
     "publish:d": "npm run pack:d && npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
     "publish:p": "npm run pack:p && npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix",
     "start:dev": "npm run compile && npx webpack-dev-server --mode development",
@@ -26,15 +26,14 @@
   "author": "Microsoft",
   "license": "ISC",
   "dependencies": {
-    "@microsoft/applicationinsights-react-js": "17.3.5",
-    "@microsoft/applicationinsights-web": "3.3.6",
+    "@microsoft/applicationinsights-react-js": "17.3.6",
+    "@microsoft/applicationinsights-web": "3.3.8",
     "@microsoft/signalr": "8.0.7",
     "@tanstack/react-table": "8.20.5",
-    "azure-devops-extension-api": "1.152.0",
+    "azure-devops-extension-api": "4.254.0",
     "azure-devops-extension-sdk": "2.0.11",
     "classnames": "2.5.1",
     "copy-to-clipboard": "3.3.3",
-    "dotenv-webpack": "8.1.0",
     "enzyme-to-json": "3.6.2",
     "file-saver": "2.0.5",
     "jest-environment-jsdom": "29.7.0",
@@ -103,7 +102,10 @@
   "overrides": {
     "cross-spawn": "7.0.6",
     "execa": "9.5.2",
-    "clipboardy": "4.0.0"
+    "clipboardy": "4.0.0",
+    "@microsoft/applicationinsights-core-js": "3.3.6",
+    "@microsoft/applicationinsights-common": "3.3.6",
+    "@microsoft/applicationinsights-analytics-js": "3.3.6"
   },
   "jest": {
     "testPathIgnorePatterns": [
