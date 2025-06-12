@@ -266,7 +266,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     return (
       <div className="extension-settings-menu">
         <DefaultButton
-          className="contextual-menu-button"
+          className="contextual-menu-button hide-mobile"
           aria-label="Prime Directive"
           title="Prime Directive"
           onClick={this.showPrimeDirectiveDialog}
@@ -314,7 +314,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
         >
           <span className="ms-Button-icon"><i className="fas fa-cog"></i></span>&nbsp;
-          {isWindowMaximized && (
+          {isWindowMaximized && this.props.isDesktop && (
             <span className="ms-Button-label">Settings</span>
           )}
         </DefaultButton>
