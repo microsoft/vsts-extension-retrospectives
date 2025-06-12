@@ -273,7 +273,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         >
           <span className="ms-Button-icon"><i className="fas fa-shield-halved"></i></span>&nbsp;
           {isWindowMaximized && (
-            <span className="ms-Button-label">Prime Directive</span>
+            <span className="ms-Button-label">Directive</span>
           )}
         </DefaultButton>
         <DefaultButton
