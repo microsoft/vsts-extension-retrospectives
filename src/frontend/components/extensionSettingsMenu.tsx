@@ -309,7 +309,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           aria-label="User Settings"
           title="User Settings"
           menuProps={{
-            items: this.extensionSettingsMenuItem,
+            items: this.extensionSettingsMenuItem(),
             className: "extended-options-menu",
           }}
         >
@@ -421,7 +421,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         >
           <div className="mobile-contextual-menu-list-1">
             {
-              this.extensionSettingsMenuItem.map((extensionSettingsMenuItem) =>
+              this.extensionSettingsMenuItem().map((extensionSettingsMenuItem) =>
                 <ActionButton
                   key={extensionSettingsMenuItem.key}
                   iconProps={extensionSettingsMenuItem.iconProps}
