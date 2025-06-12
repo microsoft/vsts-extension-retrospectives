@@ -346,7 +346,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={() => {
               window.open("https://retrospectivewiki.org/", "_blank");
             }} text="Open Retrospective Wiki Page" />
-            <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="prime-directive-close-button" />
+            <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
 
@@ -374,7 +374,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
-            <PrimaryButton className="whats-new-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
+            <PrimaryButton className="extension-menu-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
           </DialogFooter>
         </Dialog>
 
@@ -407,7 +407,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
               this.setState({ isGetHelpDialogHidden: true });
             }}
               text="Close"
-              className="prime-directive-close-button" />
+              className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
 
