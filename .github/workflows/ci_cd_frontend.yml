@@ -9,6 +9,10 @@ on:
     types:
       - created
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   issues: read
@@ -159,7 +163,7 @@ jobs:
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          npm run build:p
+          npm run build
           npm run pack:d
 
       - if: steps.changes.outputs.src == 'true'

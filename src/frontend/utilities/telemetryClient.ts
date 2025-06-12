@@ -1,5 +1,6 @@
 import { ReactPlugin } from '@microsoft/applicationinsights-react-js';
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+import { ITelemetryPlugin } from '@microsoft/applicationinsights-core-js';
 import { createBrowserHistory } from "history";
 import { config as environment } from '../config/config';
 
@@ -8,7 +9,7 @@ const reactPlugin = new ReactPlugin();
 const appInsights = new ApplicationInsights({
   config: {
     instrumentationKey: environment.AppInsightsInstrumentKey,
-    extensions: [reactPlugin],
+    extensions: [reactPlugin as ITelemetryPlugin],
     loggingLevelConsole: 2,
     loggingLevelTelemetry: 2,
     extensionConfig: {

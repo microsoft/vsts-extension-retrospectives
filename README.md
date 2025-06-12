@@ -105,20 +105,21 @@ Please enter the appropriate information:
 
 - Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Once the title is provided, the `Save` button is enabled. Save the retrospective using the `Save` button.
 - The system will remember your selection for maximum votes, team assessment, prime directive, obscure feedback, and do not display names when saving and use those setting as your defaults for the next a board you create.
+- The **Permission** tab allows the board owner or team admin to restrict access to the retrospective board by team or by individual. By default the retrospective board is accessible to everyone in the project.
 
-### ... Or Select Another Retrospective Board
+### 5. Select An Existing Retrospective Board
 
 Once you have created the retrospective board and you want to select a retrospective board different from the currently displayed board, click on the retrospective board name and select the desired one. You can use the search box to find the appropriate retrospective boards if you have a large number of boards.
 
 ![A screenshot showing the dropdown for searching available retrospective boards after they've been created. The current Retrospective Board is "Retrospective for Sprint 8" and the selection for "Retrospective for Sprint 7" is darkened as though hovered.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/retro-board-dropdown.png)
 
-### 5. Share the Link to the Retrospective
+### 6. Share the Link to the Retrospective
 
 Once you create a new retrospective, you can share a link to it to all participants. Users can then access that link even from their mobile browsers to participate in the retrospective. The extension offers real time synchronization, so all users will see the most up-to-date information without having to refresh the page.
 
 ![A screenshot of the dropdown from the Board Actions Menu. The option for 'Copy retrospective link' is highlighted as the fourth menu option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/menu-dropdown-copy-retrospective-link.png)
 
-### 6. Phases of the Standard Retrospective
+### 7. Phases of the Standard Retrospective
 
 The number of columns in each retrospective is determined by the selection made when making the new board. Regardless of the template, they still follow the same sequence of phases.
 
@@ -144,7 +145,7 @@ Once feedback from all users is collected, move on to the next phase of **Group*
 
 #### Group
 
-In this phase, any similar feedback can be grouped together beneath a "header" or champion item. If you feel 2 feedback items are similar, drag one onto another to group them together. Dragging any item onto a group, will add items to that group.
+In this phase, any similar feedback can be grouped together beneath a "header" or champion item. If you feel two feedback items are similar, drag one onto another to group them together. Dragging any item onto a group, will add items to that group.
 
 ![A screenshot that shows a piece of feedback being dragged on top of another due to their similarity. The item being dragged is semi-transparent.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/group-feedback-by-dragging.png)
 
@@ -178,7 +179,7 @@ This will open up the standard Azure DevOps work item creation form. Enter the w
 
 ![A screenshot that shows a feedback item in the 'Act Phase'. On the example feedback items, the button for 'Add Action Item,' an ellipsis, has been pressed to reveal a selection of options. The user has the option to create a number of different Azure Dev Ops items, like adding a bug, a user story, and others. In this case, the item that is darkened as though hovered by a mouse is the 'User Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
-### 7. Optional: The Team Assessment
+### 8. Optional: The Team Assessment
 
 You can optionally include a "Team Assessment" that anonymously collects feedback from participants.
 To get the feedback form, you can click on the "Team Assessment" link at the top of the board.
@@ -213,7 +214,6 @@ improvement.
 - Through a Team Assessment Retrospective
   - A Team Assessment Retrospective is a new approach to retrospectives allowing teams to identify
   the largest opportunities for improvement based on each team members' responses to the team assessment.
-  - Section 7.1 below outlines the Six Steps in a Team Assessment Retrospective
 
 ### The Six Steps to a Team Assessment Retrospective
 
@@ -242,7 +242,7 @@ discovered will be assumed to be process problems, not people problems.
 In this phase each team member clicks on the Team Assessment and anonymously answers all questions
 and hits "submit". It is critical that you remind everyone that all feedback is anonymous and confidential.
 
-Throughout this phase you will periodically check the retrospective summary (illustrated in section 8).
+Throughout this phase you will periodically check the retrospective summary (illustrated in then next section).
 
 If the majority of the team hasn't responded to the assessment, close the summary dialog and encourage
 everyone to participate, reminding them that if their voice isn't expressed in the assessment it can't
@@ -291,12 +291,11 @@ least voted upon.
 
 #### Act
 
-Follow the steps above to assign actions as work items in Azure DevOps. Note: We recommend only selecting
- 1-2 actions per sprint to ensure completion prior to the next sprint.
+Follow the steps above to assign actions as work items in Azure DevOps. Note: We recommend only selecting 1-2 actions per sprint to ensure completion prior to the next sprint.
 
-### 8. Retrospective Summary
+### 9. Retrospective Summary
 
- The Retrospective Summary dialog is accessible from the "Board Actions" menu in the top navigation.
+The Retrospective Summary dialog is accessible from the "Board Actions" menu in the top navigation.
 
 ![A screenshot that shows the Board Actions menu, where the "Show retrospective summary" is highlighted as the seventh menu option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/menu-dropdown-show-retrospective-summary.png)
 
@@ -313,11 +312,11 @@ Once there, there is a summary of the Retrospective. This includes:
 
 If there is a team assessment, then a charted summary will show the vote breakdown by favorability, along with an average score.
 
-### 9. Board History
+### 10. Board History
 
 The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, showing the count of feedback items and action items, and supports archiving or restoring archived retrospectives, as well as permanently deleting archived retrospectives.
 
-![History tab showing table with 7 columns and 5 rows. Columns include: Retrospective Name, Created Date, Archived, Archived Date, Feedback Items, Total Work Items, and Trash icon. Rows include: 4th Retrospective, 3rd Retrospective, Lean Coffee (archived with delete option active), 2nd Retrospective, and 1st Retrospective.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-with-archive-and-debug.png)
+![History tab showing table with 7 columns and 5 rows. Columns include: Retrospective Name, Created Date, Archived, Archived Date, Feedback Items, Total Work Items, and Trash icon. Rows include: 4th Retrospective, 3rd Retrospective, Lean Coffee (archived with delete option active), 2nd Retrospective, and 1st Retrospective.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-view-with-archive-and-delete.png)
 
 Selecting a retrospective expands the row to reveal more details, including a count of action items by status and a detailed list of each action item.
 
