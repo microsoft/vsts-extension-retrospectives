@@ -170,37 +170,32 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isPrimeDirectiveDialogHidden: true });
   };
 
-  // If an action needs to be hidden on desktop or mobile view, use the item's className property
-  // with .hide-mobile or .hide-desktop
-  private readonly extensionSettingsMenuItem: IContextualMenuItem[] = [
-    {
-      key: 'clearVisitHistory',
-      iconProps: { iconName: 'RemoveEvent' },
-      onClick: this.showClearVisitHistoryDialog,
-      text: 'Clear visit history',
-      title: 'Clear visit history',
-      className: 'hide-mobile',
-    },
-    {
-      key: 'switchToDesktop',
-      iconProps: { iconName: 'TVMonitor' },
-      onClick: () => this.props.onScreenViewModeChanged(true),
-      text: 'Switch to desktop view',
-      title: 'Switch to desktop view',
-      className: 'hide-desktop',
-    },
-    {
-      key: 'switchToMobile',
-      iconProps: { iconName: 'CellPhone' },
-      onClick: () => this.props.onScreenViewModeChanged(false),
-      text: 'Switch to mobile view',
-      title: 'Switch to mobile view',
-      className: 'hide-mobile',
-    },
-  ];
+  private extensionSettingsMenuItem(): IContextualMenuItem[] {
+    return [
+      this.props.isDesktop && {
+        key: 'clearVisitHistory',
+        iconProps: { iconName: 'RemoveEvent' },
+        onClick: this.showClearVisitHistoryDialog,
+        text: 'Clear visit history',
+        title: 'Clear visit history',
+      },
+      !this.props.isDesktop && {
+        key: 'switchToDesktop',
+        iconProps: { iconName: 'TVMonitor' },
+        onClick: () => this.props.onScreenViewModeChanged(true),
+        text: 'Switch to desktop view',
+        title: 'Switch to desktop view',
+      },
+      this.props.isDesktop && {
+        key: 'switchToMobile',
+        iconProps: { iconName: 'CellPhone' },
+        onClick: () => this.props.onScreenViewModeChanged(false),
+        text: 'Switch to mobile view',
+        title: 'Switch to mobile view',
+      },
+    ].filter(Boolean) as IContextualMenuItem[];
+  }
 
-  // If an action needs to be hidden on desktop or mobile view, use the item's className property
-  // with .hide-mobile or .hide-desktop
   private readonly exportImportDataMenu: IContextualMenuItem[] = [
     {
       key: 'exportData',
@@ -222,8 +217,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     },
   ];
 
-  // If an action needs to be hidden on desktop or mobile view, use the item's className property
-  // with .hide-mobile or .hide-desktop
   private readonly helpMenu: IContextualMenuItem[] = [
     {
       key: 'whatsNew',
