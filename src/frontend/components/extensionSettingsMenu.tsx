@@ -415,7 +415,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
               className="prime-directive-close-button" />
           </DialogFooter>
         </Dialog>
-
         <Dialog
           hidden={this.state.isMobileExtensionSettingsDialogHidden}
           onDismiss={this.hideMobileExtensionSettingsMenuDialog}
