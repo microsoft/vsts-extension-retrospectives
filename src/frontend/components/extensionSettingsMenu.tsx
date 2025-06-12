@@ -326,7 +326,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             type: DialogType.close,
             title: "The Prime Directive",
           }}
-          minWidth={600}
+          minWidth={500}
           modalProps={{
             isBlocking: true,
             containerClassName: "prime-directive-dialog",
@@ -357,10 +357,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             type: DialogType.close,
             title: 'What\'s New'
           }}
-          minWidth={450}
+          minWidth={500}
           modalProps={{
             isBlocking: true,
             containerClassName: 'whatsnew-dialog',
+            className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
             <p>{this.getChangelog()[0]}</p>
@@ -384,7 +385,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             type: DialogType.close,
             title: 'Retrospectives',
           }}
-          minWidth={600}
+          minWidth={500}
           modalProps={{
             isBlocking: true,
             containerClassName: 'gethelp-dialog',
