@@ -24,7 +24,7 @@ interface IExtensionSettingsMenuState {
 }
 
 interface IExtensionSettingsMenuProps {
-  onScreenViewModeChanged: () => void;
+  onScreenViewModeChanged: (isDesktop: boolean) => void;
   isDesktop: boolean;
 }
 
@@ -179,11 +179,12 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       onClick: this.showClearVisitHistoryDialog,
       text: 'Clear visit history',
       title: 'Clear visit history',
+      className: 'hide-mobile',
     },
     {
       key: 'switchToDesktop',
       iconProps: { iconName: 'TVMonitor' },
-      onClick: this.props.onScreenViewModeChanged,
+      onClick: () => this.props.onScreenViewModeChanged(true),
       text: 'Switch to desktop view',
       title: 'Switch to desktop view',
       className: 'hide-desktop',
@@ -191,10 +192,10 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     {
       key: 'switchToMobile',
       iconProps: { iconName: 'CellPhone' },
-      onClick: this.props.onScreenViewModeChanged,
+      onClick: () => this.props.onScreenViewModeChanged(false),
       text: 'Switch to mobile view',
       title: 'Switch to mobile view',
-      className: 'hide-mobile'
+      className: 'hide-mobile',
     },
   ];
 
@@ -311,7 +312,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           )}
         </DefaultButton>
         <DefaultButton
-          className="contextual-menu-button hide-mobile"
+          className="contextual-menu-button"
           aria-label="User Settings"
           title="User Settings"
           menuProps={{

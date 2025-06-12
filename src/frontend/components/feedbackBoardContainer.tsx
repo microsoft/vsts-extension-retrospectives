@@ -308,6 +308,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
+  private readonly setScreenViewMode = (isDesktop: boolean) => {
+    this.setState({
+      isAutoResizeEnabled: false,
+      isDesktop,
+    });
+  };
+
   private readonly toggleAndFixResolution = () => {
     this.setState((prevState) => ({
       isAutoResizeEnabled: false,
@@ -1343,7 +1350,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <div style={{ flexGrow: 1 }}></div>
           <ExtensionSettingsMenu
             isDesktop={this.state.isDesktop}
-            onScreenViewModeChanged={this.toggleAndFixResolution}
+            onScreenViewModeChanged={this.setScreenViewMode}
           />
         </div>
         <div className="flex w-full items-center justify-start">
