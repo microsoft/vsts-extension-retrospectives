@@ -387,7 +387,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           minWidth={600}
           modalProps={{
             isBlocking: true,
-            containerClassName: 'prime-directive-dialog',
+            containerClassName: 'gethelp-dialog',
             className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
