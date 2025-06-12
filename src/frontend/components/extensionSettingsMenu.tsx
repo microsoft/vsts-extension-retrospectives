@@ -388,7 +388,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           modalProps={{
             isBlocking: true,
             containerClassName: 'prime-directive-dialog',
-            className: 'gethelp-dialog',
+            className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
             The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.

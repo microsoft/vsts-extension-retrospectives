@@ -1,5 +1,9 @@
 .extension-settings-menu {
   .contextual-menu-button {
     margin-right: auto;
+
+    .ms-Button-label {
+      font-size: 0.85em;
+    }
   }
 }
