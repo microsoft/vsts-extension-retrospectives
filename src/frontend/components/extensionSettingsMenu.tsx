@@ -479,7 +479,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             title: 'Clear Visit History',
             subText: 'This extension maintains records of the teams and boards you visited. ' +
               'Clearing visit history means that the next time you use the extension, ' +
-              'you will not be automatically directed to the your last visited board.',
+              'you will not be automatically directed to your last visited board.',
           }}
           minWidth={450}
           modalProps={{

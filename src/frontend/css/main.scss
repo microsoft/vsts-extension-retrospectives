@@ -55,4 +55,7 @@ button:focus:not(.ms-Button) {
   .hide-desktop {
     display: none !important;
   }
+  .hide-mobile {
+    display: initial !important;
+  }
 }
