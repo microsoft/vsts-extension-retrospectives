@@ -1288,6 +1288,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
+      <div className={this.state.isDesktop ? "desktop-mode" : "mobile-mode"}>
       <div className="retrospective-feedback-board-container">
         <div className="flex items-center px-2 py-2">
           <Dialog
@@ -1829,6 +1830,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           toastClassName="retrospective-notification-toast"
           bodyClassName="retrospective-notification-toast-body"
           progressClassName="retrospective-notification-toast-progress-bar" />
+      </div>
       </div>
     );
   }
