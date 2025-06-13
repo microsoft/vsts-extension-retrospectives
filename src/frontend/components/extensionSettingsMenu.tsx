@@ -419,6 +419,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
         >
           {/*DPH*/}
+          {/*DPH*/}
           <DialogFooter>
             <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
           </DialogFooter>
