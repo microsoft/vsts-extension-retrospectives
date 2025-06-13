@@ -35,13 +35,18 @@ $mobile_team_selector_list_item_height: 90px;
 
 .retrospectives-dialog-modal {
   .ms-Dialog-main {
-    width: 90%;
     min-width: auto;
     max-width: none;
     position: absolute;
     top: 2%;
     max-height: 85%;
-    background: red;
+
+    .ms-Dialog-title {
+      margin-bottom: 10px;
+    }
+    .ms-Dialog-subText {
+      margin-top: 0;
+    }
 
     .ms-TextField-fieldGroup {
       height: 90px;
