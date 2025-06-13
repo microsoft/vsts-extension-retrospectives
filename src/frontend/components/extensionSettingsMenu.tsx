@@ -439,27 +439,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
               )
             }
           </div>
-          <div className="mobile-contextual-menu-list-2">
-            {
-              this.exportImportDataMenu.map((exportImportDataMenu) =>
-                <ActionButton
-                  key={exportImportDataMenu.key}
-                  iconProps={exportImportDataMenu.iconProps}
-                  className={exportImportDataMenu.className}
-                  aria-label={exportImportDataMenu.text}
-                  onClick={() => {
-                    this.hideMobileExportImportDataMenuDialog();
-                    exportImportDataMenu.onClick?.(undefined, undefined); // Ensure correct function execution
-                  }}
-                  text={exportImportDataMenu.text}
-                  title={exportImportDataMenu.title}
-                >
-                  <span className="ms-Button-icon"><i className={"fa-solid fa-" + exportImportDataMenu.iconProps.iconName}></i></span>&nbsp;
-                  <span className="ms-Button-label">{exportImportDataMenu.text}</span>
-                </ActionButton>
-              )
-            }
-          </div>
+
           <DialogFooter>
             <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
           </DialogFooter>
