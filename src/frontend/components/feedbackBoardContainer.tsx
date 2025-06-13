@@ -1474,7 +1474,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             </DialogFooter>
                           </Dialog>
                           <TooltipHost
-                            hostClassName="toggle-carousel-button-tooltip-wrapper"
+                            hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile"
                             content="Team Assessment"
                             calloutProps={{ gapSpace: 0 }}>
                             <ActionButton
