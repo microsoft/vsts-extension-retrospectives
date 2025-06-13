@@ -418,28 +418,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
           }}
         >
-          <div className="mobile-contextual-menu-list-1">
-            {
-              this.extensionSettingsMenuItem().map((extensionSettingsMenuItem) =>
-                <ActionButton
-                  key={extensionSettingsMenuItem.key}
-                  iconProps={extensionSettingsMenuItem.iconProps}
-                  className={extensionSettingsMenuItem.className}
-                  aria-label={extensionSettingsMenuItem.text}
-                  onClick={() => {
-                    this.hideMobileExtensionSettingsMenuDialog();
-                    extensionSettingsMenuItem.onClick();
-                  }}
-                  text={extensionSettingsMenuItem.text}
-                  title={extensionSettingsMenuItem.title}
-                >
-                  <span className="ms-Button-icon"><i className={"fa-solid fa-" + extensionSettingsMenuItem.iconProps.iconName}></i></span>&nbsp;
-                  <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span>
-                </ActionButton>
-              )
-            }
-          </div>
-
+          {/*DPH*/}
           <DialogFooter>
             <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
           </DialogFooter>
