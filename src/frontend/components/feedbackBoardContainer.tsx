@@ -315,13 +315,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   };
 
-  private readonly toggleAndFixResolution = () => {
-    this.setState((prevState) => ({
-      isAutoResizeEnabled: false,
-      isDesktop: !prevState.isDesktop,
-    }));
-  }
-
   private readonly handleResolutionChange = () => {
     const isDesktop = window.innerWidth >= MobileWidthBreakpoint;
 
