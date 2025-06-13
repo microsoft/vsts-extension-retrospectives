@@ -171,13 +171,13 @@ $mobile_team_selector_list_item_height: 90px;
 
   .board-selector-group {
     min-width: 0;
-    max-width: 240px;
+    max-width: 300px;
     width: 100%;
     transform-origin: 0 0;
     margin-left: 4rem;
 
     .board-selector {
-      width: 200 px;
+      display: flex;
     }
 
     .board-actions-menu {
