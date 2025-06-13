@@ -1636,15 +1636,17 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 </div>
               }
             </PivotItem>
-            <PivotItem headerText="History">
-              <div className="pivot-content-wrapper hide-mobile">
-                <BoardSummaryTable
-                  teamId={this.state.currentTeam.id}
-                  supportedWorkItemTypes={this.state.allWorkItemTypes}
-                  onArchiveToggle={this.handleArchiveToggle}
-                />
-              </div>
-            </PivotItem>
+            {this.state.isDesktop && (
+              <PivotItem headerText="History">
+                <div className="pivot-content-wrapper">
+                  <BoardSummaryTable
+                    teamId={this.state.currentTeam.id}
+                    supportedWorkItemTypes={this.state.allWorkItemTypes}
+                    onArchiveToggle={this.handleArchiveToggle}
+                  />
+                </div>
+              </PivotItem>
+            )}
           </Pivot>
         </div>
         {this.state.isTeamDataLoaded &&
