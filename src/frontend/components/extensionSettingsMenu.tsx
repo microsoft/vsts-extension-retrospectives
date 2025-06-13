@@ -148,10 +148,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
-  private readonly hideMobileExportImportDataMenuDialog = () => {
-    this.setState({ isMobileExtensionSettingsDialogHidden: true });
-  }
-
   private readonly onChangeLogClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md', '_blank');
   }
@@ -418,8 +414,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
           }}
         >
-          {/*DPH*/}
-          {/*DPH*/}
           <DialogFooter>
             <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
           </DialogFooter>
