@@ -1352,7 +1352,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible &&
                 <div className="pivot-content-wrapper">
                   <div className="feedback-board-container-header">
-                    <div className="vertical-tab-separator" />
+                    <div className="vertical-tab-separator hide-mobile" />
                     <div className="board-selector-group">
                       <div className="board-selector">
                         <SelectorCombo<IFeedbackBoardDocument>
