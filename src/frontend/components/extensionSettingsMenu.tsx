@@ -309,7 +309,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: "extended-options-menu",
           }}
         >
-          <span className="ms-Button-icon"><i className="fas fa-cog"></i></span>&nbsp;
+          <span className="ms-Button-icon"><i className="fas fa-user-gear"></i></span>&nbsp;
           {isWindowMaximized && this.props.isDesktop && (
             <span className="ms-Button-label">Settings</span>
           )}
