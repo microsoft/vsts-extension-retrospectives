@@ -1637,7 +1637,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               }
             </PivotItem>
             <PivotItem headerText="History">
-              <div className="pivot-content-wrapper">
+              <div className="pivot-content-wrapper hide-mobile">
                 <BoardSummaryTable
                   teamId={this.state.currentTeam.id}
                   supportedWorkItemTypes={this.state.allWorkItemTypes}
