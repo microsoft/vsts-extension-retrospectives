@@ -394,9 +394,9 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <DialogContent>
             The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.
             <br /><br />
-            The Team Assessment addition to the retrospective guides teams through a set of questions that highlight strengths and opportunities. Teams can then utilize specific retrospective templates to identify the top opportunities for improvement.
+            The Retrospective Extension and supporting Team Assessment are valuable tools for running effective retrospectives.
             <br /><br />
-            Research from the <a href="https://services.google.com/fh/files/misc/state-of-devops-2018.pdf" target="_blank" rel="noreferrer">2018 State of DevOps</a> report indicates that elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a <a href="https://journals.sagepub.com/doi/full/10.1177/0018720812448394" target="_blank" rel="noreferrer">2013 meta-analysis on teams</a> indicates that teams that effectively debrief are 20-25% more effective.
+            Get more information in the Readme file, which includes instructions for getting started, using the Retrospective extension and Team Assessment tool, as well as best practices for running effective retrospectives.
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={() => {
