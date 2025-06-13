@@ -155,8 +155,13 @@ $mobile_team_selector_list_item_height: 90px;
 }
 
 .feedback-board-container-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
   width: 100vw;
   max-width: variables.$mobile_breakpoint;
+  overflow-x: auto;
+  gap: 0.5rem;
   margin-left: variables.$header_horizontal_spacing;
   margin-top: -55px;
 
