@@ -334,7 +334,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
         >
           <DialogContent>
-            <p>The purpose of the Prime Directive is to set the stage for respectful and constructive retrospectives.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</p>
+            <p>The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</p>
             <p style={{ marginTop: "1rem", fontWeight: "bold" }}>
               &quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;
             </p>
@@ -364,13 +364,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
-            <p>{this.getChangelog()[0]}</p>
+            <p style={{ marginBottom: '1.5em' }}>{this.getChangelog()[0]}</p>
             <ul style={{ listStyle: 'initial', paddingLeft: "1rem" }}>
             {this.getChangelog().slice(1, -1).map((change, index) => (
             <li key={`changelog-item${index}`}>{change}</li>
             ))}
             </ul>
-            <p>{this.getChangelog().slice(-1)[0]}</p>
+            <p style={{ marginTop: '1.5em' }}>{this.getChangelog().slice(-1)[0]}</p>
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
