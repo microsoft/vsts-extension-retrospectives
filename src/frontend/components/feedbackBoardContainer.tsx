@@ -1287,18 +1287,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
-    const renderBoardSelector = () => (
-      <SelectorCombo<IFeedbackBoardDocument>
-        className="board-selector"
-        currentValue={this.state.currentBoard}
-        iconName="table-columns"
-        nameGetter={(feedbackBoard) => feedbackBoard.title}
-        selectorList={boardSelectorList}
-        selectorListItemOnClick={this.changeSelectedBoard}
-        title="Retrospective Board"
-      />
-    );
-
     return (
       <div className={this.state.isDesktop ? "desktop-mode" : "mobile-mode"}>
       <div className="retrospective-feedback-board-container">
@@ -1358,20 +1346,24 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             onScreenViewModeChanged={this.setScreenViewMode}
           />
         </div>
-        {/* Mobile: render board selector above the tabs, always visible in mobile */}
-        <div className="board-selector-group hide-desktop">
-          {renderBoardSelector()}
-        </div>
         <div className="flex w-full items-center justify-start">
           <Pivot onLinkClick={this.handlePivotClick}>
             <PivotItem headerText="Board">
               {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible &&
                 <div className="pivot-content-wrapper">
                   <div className="feedback-board-container-header">
-                    <div className="vertical-tab-separator hide-mobile" />
-                                {this.state.isDesktop && (
-                    <div className="board-selector-group hide-mobile">
-                      {renderBoardSelector()}
+                    <div className="vertical-tab-separator" />
+                    <div className="board-selector-group">
+                      <div className="board-selector">
+                        <SelectorCombo<IFeedbackBoardDocument>
+                          className="board-selector"
+                          currentValue={this.state.currentBoard}
+                          iconName="table-columns"
+                          nameGetter={(feedbackBoard) => feedbackBoard.title}
+                          selectorList={boardSelectorList}
+                          selectorListItemOnClick={this.changeSelectedBoard}
+                          title={"Retrospective Board"} />
+                      </div>
                       <div className="board-actions-menu">
                         <DefaultButton
                           className="contextual-menu-button hide-mobile"
@@ -1417,7 +1409,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </Dialog>
                       </div>
                     </div>
-                                )}
                     <div className="feedback-workflow-wrapper">
                       {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement &&
                         <div className="team-effectiveness-dialog-section">
