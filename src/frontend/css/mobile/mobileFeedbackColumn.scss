@@ -27,6 +27,7 @@
       padding-top: 3px;
       padding-right: 20px;
       display: inline-block;
+      font-size: 40 px;
 
       i {
         font-size: 40px;
@@ -80,17 +81,6 @@
         i {
           font-size: variables.$mobile_font_size_main;
         }
-      }
-    }
-  }
-}
-
-/* Add this at the bottom for mobile-specific icon sizing */
-@media (max-width: variables.$mobile_breakpoint) {
-  .feedback-column-header {
-    .feedback-column-title {
-      .feedback-column-icon {
-        font-size: 40px; // Choose your desired mobile size
       }
     }
   }
