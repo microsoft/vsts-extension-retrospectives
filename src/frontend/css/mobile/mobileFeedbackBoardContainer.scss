@@ -44,9 +44,9 @@ $mobile_team_selector_list_item_height: 90px;
     .ms-Dialog-title {
       margin-bottom: 0px;
     }
-    .ms-Dialog-subText {
-      margin-top: 0px;
-    }
+.ms-Dialog-content p:first-child {
+  margin-top: 0;
+}
 
     .ms-TextField-fieldGroup {
       height: 90px;
