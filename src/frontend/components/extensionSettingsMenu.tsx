@@ -345,7 +345,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <DialogFooter>
             <DefaultButton onClick={() => {
               window.open("https://retrospectivewiki.org/", "_blank");
-            }} text="Open Retrospective Wiki Page" />
+            }} text="Open Retrospective Wiki" />
             <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
@@ -392,11 +392,9 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
-            The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.
+            The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.  The Retrospective extension and Team Assessment feature are valuable tools supporting that process.
             <br /><br />
-            The Retrospective Extension and supporting Team Assessment are valuable tools for running effective retrospectives.
-            <br /><br />
-            Get more information in the Readme file, which includes instructions for getting started, using the Retrospective extension and Team Assessment tool, as well as best practices for running effective retrospectives.
+            Get more information in the Readme file, which includes instructions for getting started, using the Retrospective extension and Team Assessment feature, as well as best practices for running effective retrospectives.
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={() => {
