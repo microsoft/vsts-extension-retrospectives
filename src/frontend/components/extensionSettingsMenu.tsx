@@ -364,13 +364,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
-            <p style={{ marginBottom: '1.5em' }}>{this.getChangelog()[0]}</p>
+            <p style={{ marginBottom: '1.25em' }}>{this.getChangelog()[0]}</p>
             <ul style={{ listStyle: 'initial', paddingLeft: "1rem" }}>
             {this.getChangelog().slice(1, -1).map((change, index) => (
             <li key={`changelog-item${index}`}>{change}</li>
             ))}
             </ul>
-            <p style={{ marginTop: '1.5em' }}>{this.getChangelog().slice(-1)[0]}</p>
+            <p style={{ marginTop: '1.25em' }}>{this.getChangelog().slice(-1)[0]}</p>
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
