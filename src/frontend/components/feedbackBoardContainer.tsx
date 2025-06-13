@@ -1346,7 +1346,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             onScreenViewModeChanged={this.setScreenViewMode}
           />
         </div>
-        // Mobile: render board selector above the tabs, always visible in mobile
+        {/* Mobile: render board selector above the tabs, always visible in mobile */}
 {!this.state.isDesktop && (
   <div className="mobile-board-selector">
     <SelectorCombo<IFeedbackBoardDocument>
