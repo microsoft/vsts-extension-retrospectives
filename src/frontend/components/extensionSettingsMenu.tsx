@@ -469,7 +469,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={this.hideClearVisitHistoryDialog} text="Cancel" />
           </DialogFooter>
         </Dialog>
-{/*
+
         <Dialog
           hidden={this.state.isMobileExtensionSettingsDialogHidden}
           onDismiss={this.hideMobileExtensionSettingsMenuDialog}
@@ -479,12 +479,12 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
           }}
         >
-          {console.log("MobileExtensionSettingsDialog rendered")}
+          {/* This section required for mobile support using F12 mode.*/}
           <DialogFooter>
             <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
           </DialogFooter>
         </Dialog>
-*/}
+
         <ToastContainer
           transition={Slide}
           closeButton={false}
