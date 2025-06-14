@@ -411,8 +411,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
-            <p>We're looking for contributors!</p>
-            <p>We’ll continue maintaining the Retrospective Extension, but with limited time for new features, we need help to make it even better. Join us if you’re interested! 🙌</p>
+            <p>We are looking for contributors!</p>
+            <p>We will continue maintaining the Retrospective Extension, but with limited time for new features, we need help to make it even better. Join us if you are interested! 🙌</p>
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={this.onContributingClicked} text="Contributing guidelines" />
