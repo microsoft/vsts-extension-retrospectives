@@ -354,7 +354,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         >
           <DialogContent>
             <p>The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</p>
-            <p style={{ marginTop: "1rem", fontWeight: "bold" }}>
+            <p style={{ fontWeight: "bold", marginTop: "1rem" }}>
               &quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;
             </p>
             <p style={{ fontStyle: "italic", marginTop: "1rem" }}>
@@ -392,7 +392,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <p style={{ marginTop: '1.25em' }}>{this.getChangelog().slice(-1)[0]}</p>
           </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
+            <DefaultButton onClick={this.onChangeLogClicked} text="Open change logs" />
             <PrimaryButton className="extension-menu-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
           </DialogFooter>
         </Dialog>
@@ -411,11 +411,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
-            <p>We are looking for contributors!</p>
-            <p>We will continue maintaining the Retrospective Extension, but with limited time for new features, we need help to make it even better. Join us if you are interested! 🙌</p>
+            We are looking for contributors!<br /><br />
+            We will continue maintaining the Retrospective Extension, but with limited time for new features, we need help to make it even better.  Join us if you are interested! 🙌
           </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={this.onContributingClicked} text="Contributing guidelines" />
+            <DefaultButton onClick={this.onContributingClicked} text="Open contributing guidelines" />
             <PrimaryButton className="extension-menu-close-button" onClick={this.hidePleaseJoinUsDialog} text="Close" />
           </DialogFooter>
         </Dialog>
@@ -442,7 +442,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={() => {
               window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank', 'noreferrer');
             }}
-              text="Get more information" />
+              text="Open user guide" />
             <PrimaryButton onClick={() => {
               this.setState({ isGetHelpDialogHidden: true });
             }}
