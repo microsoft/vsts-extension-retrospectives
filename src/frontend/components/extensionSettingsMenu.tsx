@@ -353,13 +353,9 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
         >
           <DialogContent>
-            <p>The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</p>
-            <p style={{ fontWeight: "bold", marginTop: "1rem" }}>
-              &quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;
-            </p>
-            <p style={{ fontStyle: "italic", marginTop: "1rem" }}>
-              --Norm Kerth, Project Retrospectives: A Handbook for Team Review
-            </p>
+            The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.<br /><br />
+            <b>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</b><br /><br />
+            <i>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</i>
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={() => {
@@ -393,31 +389,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Open change log" />
-            <PrimaryButton className="extension-menu-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
-          </DialogFooter>
-        </Dialog>
-
-        <Dialog
-          hidden={this.state.isPleaseJoinUsDialogHidden}
-          onDismiss={this.hidePleaseJoinUsDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: 'Volunteer'
-          }}
-          minWidth={600}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: 'volunteer-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}>
-          <DialogContent>
-            Help us make the Retrospective Extension even better!<br /><br />
-            While we will continue to maintain the extension to meet Microsoft&apos;s high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.<br /><br />
-            Want to contribute? Join us and become part of our community! 🙋
-          </DialogContent>
-          <DialogFooter>
-            <DefaultButton onClick={this.onContributingClicked} text="Open contributing guidelines" />
-            <PrimaryButton className="extension-menu-close-button" onClick={this.hidePleaseJoinUsDialog} text="Close" />
+            <PrimaryButton onClick={this.hideWhatsNewDialog} text="Close" className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
 
@@ -444,27 +416,37 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
               window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank', 'noreferrer');
             }}
               text="Open user guide" />
-            <PrimaryButton onClick={() => {
-              this.setState({ isGetHelpDialogHidden: true });
-            }}
+            <PrimaryButton 
+              onClick={() => { this.setState({ isGetHelpDialogHidden: true });}}
               text="Close"
               className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
 
         <Dialog
-          hidden={this.state.isMobileExtensionSettingsDialogHidden}
-          onDismiss={this.hideMobileExtensionSettingsMenuDialog}
-          modalProps={{
-            isBlocking: false,
-            containerClassName: 'ms-dialogMainOverride',
-            className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
+          hidden={this.state.isPleaseJoinUsDialogHidden}
+          onDismiss={this.hidePleaseJoinUsDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Volunteer'
           }}
-        >
+          minWidth={600}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'volunteer-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogContent>
+            Help us make the Retrospective Extension even better!<br /><br />
+            While we will continue to maintain the extension to meet Microsoft&apos;s high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.<br /><br />
+            Want to contribute? Join us and become part of our community! 🙋
+          </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
+            <DefaultButton onClick={this.onContributingClicked} text="Open contributing guidelines" />
+            <PrimaryButton onClick={this.hidePleaseJoinUsDialog} text="Close" className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
+
         <Dialog
           hidden={this.state.isClearVisitHistoryDialogHidden}
           onDismiss={this.hideClearVisitHistoryDialog}
@@ -486,6 +468,21 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={this.hideClearVisitHistoryDialog} text="Cancel" />
           </DialogFooter>
         </Dialog>
+{/* Does this code do anything?
+        <Dialog
+          hidden={this.state.isMobileExtensionSettingsDialogHidden}
+          onDismiss={this.hideMobileExtensionSettingsMenuDialog}
+          modalProps={{
+            isBlocking: false,
+            containerClassName: 'ms-dialogMainOverride',
+            className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
+          }}
+        >
+          <DialogFooter>
+            <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
+          </DialogFooter>
+        </Dialog>
+*/}
         <ToastContainer
           transition={Slide}
           closeButton={false}
