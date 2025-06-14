@@ -20,7 +20,7 @@ interface IExtensionSettingsMenuState {
   isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
-  isWindowMaximized: boolean;
+  isWindowWide: boolean;
 }
 
 interface IExtensionSettingsMenuProps {
@@ -44,7 +44,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       isPrimeDirectiveDialogHidden: true,
       isWhatsNewDialogHidden: true,
       isGetHelpDialogHidden: true,
-      isWindowMaximized: this.checkIfWindowMaximized(),
+      isWindowWide: this.checkIfWindowWideOrTall(),
     };
   }
 
@@ -245,19 +245,21 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     window.removeEventListener("resize", this.handleResize);
   }
 
-  // Function to check if the window is maximized (90% threshold)
-  checkIfWindowMaximized = () => {
-    return window.outerWidth >= screen.availWidth * 0.9;
-  };
+  // Function to check if the window is maximized (90% threshold) or vertical
+checkIfWindowWideOrTall = () => {
+  const isWide = window.outerWidth >= screen.availWidth * 0.9;
+  const isTallerThanWide = window.outerHeight > window.outerWidth;
+  return isWide || isTallerThanWide;
+};
 
   handleResize = () => {
     this.setState({
-      isWindowMaximized: this.checkIfWindowMaximized(),
+      isWindowWide: this.checkIfWindowWideOrTall(),
     });
   };
 
   public render() {
-    const { isWindowMaximized } = this.state;
+    const { isWindowWide } = this.state;
 
     return (
       <div className="extension-settings-menu">
@@ -268,7 +270,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           onClick={this.showPrimeDirectiveDialog}
         >
           <span className="ms-Button-icon"><i className="fas fa-shield-halved"></i></span>&nbsp;
-          {isWindowMaximized && (
+          {isWindowWide && (
             <span className="ms-Button-label">Directive</span>
           )}
         </DefaultButton>
@@ -282,7 +284,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
         >
           <span className="ms-Button-icon"><i className="fas fa-cloud"></i></span>&nbsp;
-          {isWindowMaximized && (
+          {isWindowWide && (
             <span className="ms-Button-label">Data</span>
           )}
         </DefaultButton>
@@ -296,7 +298,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
         >
           <span className="ms-Button-icon"><i className="fas fa-question-circle"></i></span>&nbsp;
-          {isWindowMaximized && (
+          {isWindowWide && (
             <span className="ms-Button-label">Help</span>
           )}
         </DefaultButton>
@@ -310,7 +312,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
         >
           <span className="ms-Button-icon"><i className="fas fa-user-gear"></i></span>&nbsp;
-          {isWindowMaximized && this.props.isDesktop && (
+          {isWindowWide && this.props.isDesktop && (
             <span className="ms-Button-label">Settings</span>
           )}
         </DefaultButton>

@@ -10,18 +10,18 @@ $column_items_distribution_breakpoint: 2000px;
 $main_item_card_max_width: 320px;
 $feedback_item_action_button_height: 30px;
 $feedback_item_action_button_width: 30px;
-$feedback_item_header_height: $feedback_item_action_button_height + 5;
+$feedback_item_header_height: $feedback_item_action_button_height + 5px;
 
 // mobile-specific
 $mobile_breakpoint: 1024px;
 $mobile_smallest: 764px;
-$mobile_font_size: 26px;
+$mobile_font_size: 24px;
 $mobile_extension_header_height: 65px;
 $mobile_extension_header_height_with_margin: $mobile_extension_header_height + 10px;
 $mobile_second_level_header_height: 55px;
-$mobile_feedback_item_action_button_height: 60px;
+$mobile_feedback_item_action_button_height: 45px;
 $mobile_feedback_item_action_button_width: 60px;
-$mobile_feedback_item_header_height: $mobile_feedback_item_action_button_height + 15;
+$mobile_feedback_item_header_height: $mobile_feedback_item_action_button_height + 10px;
 $mobile_font_size_main: 36px;
 
 // colors
