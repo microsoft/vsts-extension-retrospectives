@@ -1,6 +1,6 @@
 import React from 'react';
-import { PrimaryButton, DefaultButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
-import { Dialog, DialogBase, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
+import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { ViewMode } from '../config/constants';
@@ -417,7 +417,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={this.onGetHelpClicked} text="Open user guide" />
-            <PrimaryButton 
+            <PrimaryButton
               onClick={() => { this.setState({ isGetHelpDialogHidden: true });}}
               text="Close"
               className="extension-menu-close-button" />
