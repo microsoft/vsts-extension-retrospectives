@@ -479,6 +479,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
           }}
         >
+          {console.log("MobileExtensionSettingsDialog rendered")}
           <DialogFooter>
             <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
           </DialogFooter>
