@@ -249,7 +249,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   checkIfWindowWideOrTall = () => {
     const isWide = window.outerWidth >= screen.availWidth * 0.9;
     const isTallerThanWide = window.innerHeight > window.innerWidth;
-    return isWide || isTallerThanWide;
+    return isWide && !isTallerThanWide;
   };
 
   handleResize = () => {
