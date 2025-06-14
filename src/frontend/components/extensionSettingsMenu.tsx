@@ -125,6 +125,27 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     }
   };
 
+  componentDidMount() {
+    window.addEventListener("resize", this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.handleResize);
+  }
+
+  // Function to check if the window is maximized (90% threshold) or vertical
+  checkIfWindowWideOrTall = () => {
+    const isWide = window.outerWidth >= screen.availWidth * 0.9;
+    const isTallerThanWide = window.innerHeight > window.innerWidth;
+    return isWide && !isTallerThanWide;
+  };
+
+  handleResize = () => {
+    this.setState({
+      isWindowWide: this.checkIfWindowWideOrTall(),
+    });
+  };
+
   private readonly clearVisitHistory = async () => {
     await userDataService.clearVisits();
     this.hideClearVisitHistoryDialog();
@@ -137,6 +158,14 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   private readonly hideClearVisitHistoryDialog = () => {
     this.setState({ isClearVisitHistoryDialogHidden: true });
   }
+
+  private readonly showPrimeDirectiveDialog = () => {
+    this.setState({ isPrimeDirectiveDialogHidden: false });
+  };
+
+  private readonly hidePrimeDirectiveDialog = () => {
+    this.setState({ isPrimeDirectiveDialogHidden: true });
+  };
 
   private readonly showWhatsNewDialog = () => {
     this.setState({ isWhatsNewDialogHidden: false });
@@ -158,8 +187,16 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
+  private readonly onRetrospectiveWikiClicked = () => {
+    window.open('https://retrospectivewiki.org/', '_blank');
+  }
+
   private readonly onChangeLogClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md', '_blank');
+  }
+
+  private readonly onGetHelpClicked = () => {
+    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank', 'noreferrer');
   }
 
   private readonly onContributingClicked = () => {
@@ -168,42 +205,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private readonly onContactUsClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/issues', '_blank');
-  }
-
-  // Handler to show Prime Directive dialog
-  showPrimeDirectiveDialog = () => {
-    this.setState({ isPrimeDirectiveDialogHidden: false });
-  };
-
-  // Handler to hide Prime Directive dialog
-  hidePrimeDirectiveDialog = () => {
-    this.setState({ isPrimeDirectiveDialogHidden: true });
-  };
-
-  private extensionSettingsMenuItem(): IContextualMenuItem[] {
-    return [
-      this.props.isDesktop && {
-        key: 'clearVisitHistory',
-        iconProps: { iconName: 'RemoveEvent' },
-        onClick: this.showClearVisitHistoryDialog,
-        text: 'Clear visit history',
-        title: 'Clear visit history',
-      },
-      !this.props.isDesktop && {
-        key: 'switchToDesktop',
-        iconProps: { iconName: 'TVMonitor' },
-        onClick: () => this.props.onScreenViewModeChanged(true),
-        text: 'Switch to desktop view',
-        title: 'Switch to desktop view',
-      },
-      this.props.isDesktop && {
-        key: 'switchToMobile',
-        iconProps: { iconName: 'CellPhone' },
-        onClick: () => this.props.onScreenViewModeChanged(false),
-        text: 'Switch to mobile view',
-        title: 'Switch to mobile view',
-      },
-    ].filter(Boolean) as IContextualMenuItem[];
   }
 
   private readonly exportImportDataMenu: IContextualMenuItem[] = [
@@ -258,26 +259,31 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     },
   ];
 
-  componentDidMount() {
-    window.addEventListener("resize", this.handleResize);
+    private extensionSettingsMenuItem(): IContextualMenuItem[] {
+    return [
+      this.props.isDesktop && {
+        key: 'clearVisitHistory',
+        iconProps: { iconName: 'RemoveEvent' },
+        onClick: this.showClearVisitHistoryDialog,
+        text: 'Clear visit history',
+        title: 'Clear visit history',
+      },
+      !this.props.isDesktop && {
+        key: 'switchToDesktop',
+        iconProps: { iconName: 'TVMonitor' },
+        onClick: () => this.props.onScreenViewModeChanged(true),
+        text: 'Switch to desktop view',
+        title: 'Switch to desktop view',
+      },
+      this.props.isDesktop && {
+        key: 'switchToMobile',
+        iconProps: { iconName: 'CellPhone' },
+        onClick: () => this.props.onScreenViewModeChanged(false),
+        text: 'Switch to mobile view',
+        title: 'Switch to mobile view',
+      },
+    ].filter(Boolean) as IContextualMenuItem[];
   }
-
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.handleResize);
-  }
-
-  // Function to check if the window is maximized (90% threshold) or vertical
-  checkIfWindowWideOrTall = () => {
-    const isWide = window.outerWidth >= screen.availWidth * 0.9;
-    const isTallerThanWide = window.innerHeight > window.innerWidth;
-    return isWide && !isTallerThanWide;
-  };
-
-  handleResize = () => {
-    this.setState({
-      isWindowWide: this.checkIfWindowWideOrTall(),
-    });
-  };
 
   public render() {
     const { isWindowWide } = this.state;
@@ -358,9 +364,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <i>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</i>
           </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={() => {
-              window.open("https://retrospectivewiki.org/", "_blank");
-            }} text="Open Retrospective Wiki" />
+            <DefaultButton onClick={this.onRetrospectiveWikiClicked} text="Open Retrospective Wiki" />
             <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
@@ -412,10 +416,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.
           </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={() => {
-              window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank', 'noreferrer');
-            }}
-              text="Open user guide" />
+            <DefaultButton onClick={this.onGetHelpClicked} text="Open user guide" />
             <PrimaryButton 
               onClick={() => { this.setState({ isGetHelpDialogHidden: true });}}
               text="Close"
@@ -468,7 +469,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={this.hideClearVisitHistoryDialog} text="Cancel" />
           </DialogFooter>
         </Dialog>
-{/* Does this code do anything?
+
         <Dialog
           hidden={this.state.isMobileExtensionSettingsDialogHidden}
           onDismiss={this.hideMobileExtensionSettingsMenuDialog}
@@ -482,7 +483,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
           </DialogFooter>
         </Dialog>
-*/}
+
         <ToastContainer
           transition={Slide}
           closeButton={false}
