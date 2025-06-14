@@ -392,7 +392,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <p style={{ marginTop: '1.25em' }}>{this.getChangelog().slice(-1)[0]}</p>
           </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={this.onChangeLogClicked} text="Open change logs" />
+            <DefaultButton onClick={this.onChangeLogClicked} text="Open change log" />
             <PrimaryButton className="extension-menu-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
           </DialogFooter>
         </Dialog>
@@ -411,8 +411,9 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
-            We are looking for contributors!<br /><br />
-            We will continue maintaining the Retrospective Extension, but with limited time for new features, we need help to make it even better.  Join us if you are interested! 🙌
+            Help us make the Retrospective Extension even better!<br /><br />
+            While we will continue to maintain the extension to meet Microsoft&apos;s high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.<br /><br />
+            Want to contribute? Join us and become part of our community! 🙋
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={this.onContributingClicked} text="Open contributing guidelines" />
@@ -436,7 +437,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <DialogContent>
             The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.  The Retrospective extension and Team Assessment feature are valuable tools supporting that process.
             <br /><br />
-            Get more information in the Readme file, which includes instructions for getting started, using the Retrospective extension and Team Assessment feature, as well as best practices for running effective retrospectives.
+            For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.
           </DialogContent>
           <DialogFooter>
             <DefaultButton onClick={() => {
