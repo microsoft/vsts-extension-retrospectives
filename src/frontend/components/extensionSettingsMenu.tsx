@@ -20,6 +20,7 @@ interface IExtensionSettingsMenuState {
   isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
+  isPleaseJoinUsDialogHidden: boolean;
   isWindowWide: boolean;
 }
 
@@ -44,6 +45,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       isPrimeDirectiveDialogHidden: true,
       isWhatsNewDialogHidden: true,
       isGetHelpDialogHidden: true,
+      isPleaseJoinUsDialogHidden: true,
       isWindowWide: this.checkIfWindowWideOrTall(),
     };
   }
@@ -144,12 +146,24 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isWhatsNewDialogHidden: true });
   }
 
+    private readonly showPleaseJoinUsDialog = () => {
+    this.setState({ isPleaseJoinUsDialogHidden: false });
+  }
+
+  private readonly hidePleaseJoinUsDialog = () => {
+    this.setState({ isPleaseJoinUsDialogHidden: true });
+  }
+
   private readonly hideMobileExtensionSettingsMenuDialog = () => {
     this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
   private readonly onChangeLogClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md', '_blank');
+  }
+
+  private readonly onContributingClicked = () => {
+    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md', '_blank');
   }
 
   private readonly onContactUsClicked = () => {
@@ -227,6 +241,13 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       onClick: () => this.setState({ isGetHelpDialogHidden: false }),
       text: 'User guide',
       title: 'User guide',
+    },
+    {
+      key: 'volunteer',
+      iconProps: { iconName: 'Teamwork' },
+      onClick: this.showPleaseJoinUsDialog,
+      text: 'Volunteer',
+      title: 'Volunteer',
     },
     {
       key: 'contactUs',
@@ -373,6 +394,29 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <DialogFooter>
             <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
             <PrimaryButton className="extension-menu-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
+          </DialogFooter>
+        </Dialog>
+
+        <Dialog
+          hidden={this.state.isPleaseJoinUsDialogHidden}
+          onDismiss={this.hidePleaseJoinUsDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Volunteer'
+          }}
+          minWidth={600}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'volunteer-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogContent>
+            <p>We're looking for contributors!</p>
+            <p>We’ll continue maintaining the Retrospective Extension, but with limited time for new features, we need help to make it even better. Join us if you’re interested! 🙌</p>
+          </DialogContent>
+          <DialogFooter>
+            <DefaultButton onClick={this.onContributingClicked} text="Contributing guidelines" />
+            <PrimaryButton className="extension-menu-close-button" onClick={this.hidePleaseJoinUsDialog} text="Close" />
           </DialogFooter>
         </Dialog>
 
