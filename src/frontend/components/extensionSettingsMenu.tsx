@@ -246,11 +246,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   }
 
   // Function to check if the window is maximized (90% threshold) or vertical
-checkIfWindowWideOrTall = () => {
-  const isWide = window.outerWidth >= screen.availWidth * 0.9;
-  const isTallerThanWide = window.outerHeight > window.outerWidth;
-  return isWide || isTallerThanWide;
-};
+  checkIfWindowWideOrTall = () => {
+    const isWide = window.outerWidth >= screen.availWidth * 0.9;
+    const isTallerThanWide = window.innerHeight > window.innerWidth;
+    return isWide || isTallerThanWide;
+  };
 
   handleResize = () => {
     this.setState({
