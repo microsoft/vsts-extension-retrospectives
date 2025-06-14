@@ -26,8 +26,8 @@
 
 ## Background
 
-Retrospectives is an Azure DevOps extension. Visit
-[this link](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) to
+Retrospectives is an Azure DevOps extension. Visit the
+[Azure DevOps Extension overview](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) to
 learn more about developing extensions. The Retrospectives Azure DevOps
 extension frontend is implemented in React using Typescript, and the backend is
 implemented in C#. The project follows a single branch source control strategy.
