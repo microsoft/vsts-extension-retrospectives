@@ -383,7 +383,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
                 <li key={`changelog-item${index}`}>{change}</li>
               ))}
             </ul>
-            <br /><br />
+            <br />
             {this.getChangelog().slice(-1)[0]}
           </DialogContent>
           <DialogFooter>
