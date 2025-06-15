@@ -54,7 +54,7 @@ const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
   hideMobile = true,
   showLabel,
 }) => {
-  const buttonClass = `contextual-menu-button${hideMobile ? '' : ' hide-mobile'}`;
+  const buttonClass = `contextual-menu-button${hideMobile ? ' hide-mobile' : ''}`;
 
   return (
     <DefaultButton
