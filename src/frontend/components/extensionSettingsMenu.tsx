@@ -40,9 +40,8 @@ interface ContextualMenuButtonProps {
   label: string;
   onClick?: () => void;
   menuProps?: IContextualMenuProps;
-  isWindowWide: boolean;
-  isDesktop?: boolean;
-  hideWhenMobile?: boolean;
+  hideMobile?: boolean;
+  showLabel:boolean;
 }
 
 const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
@@ -52,11 +51,10 @@ const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
   label,
   onClick,
   menuProps,
-  isWindowWide,
-  isDesktop = true,
-  hideWhenMobile = true,
+  hideMobile = true,
+  showLabel,
 }) => {
-  const buttonClass = `contextual-menu-button${hideWhenMobile ? '' : ' hide-mobile'}`;
+  const buttonClass = `contextual-menu-button${hideMobile ? '' : ' hide-mobile'}`;
 
   return (
     <DefaultButton
@@ -70,7 +68,7 @@ const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
         <i className={iconClass}></i>
       </span>
       &nbsp;
-      {(isWindowWide && isDesktop) && (
+      {showLabel && (
         <span className="ms-Button-label">{label}</span>
       )}
     </DefaultButton>
@@ -333,7 +331,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           iconClass="fas fa-shield-halved"
           label="Directive"
           onClick={this.showPrimeDirectiveDialog}
-          isWindowWide={isWindowWide}
+          showLabel={isWindowWide}
         />
         <ContextualMenuButton
           ariaLabel="Export Import"
@@ -344,7 +342,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             items: this.exportImportDataMenu,
             className: "extended-options-menu",
           }}
-          isWindowWide={isWindowWide}
+          showLabel={isWindowWide}
         />
         <ContextualMenuButton
           ariaLabel="Help"
@@ -355,7 +353,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             items: this.helpMenu,
             className: "extended-options-menu",
           }}
-          isWindowWide={isWindowWide}
+          showLabel={isWindowWide}
         />
         <ContextualMenuButton
           ariaLabel="User Settings"
@@ -366,9 +364,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             items: this.extensionSettingsMenuItem(),
             className: "extended-options-menu",
           }}
-          isWindowWide={isWindowWide}
-          isDesktop={this.props.isDesktop}
-          hideWhenMobile={false}
+          hideMobile={false}
+          showLabel={isWindowWide && this.props.isDesktop}
         />
 
         <Dialog
