@@ -2,7 +2,7 @@ import React from 'react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { userDataService } from '../dal/userDataService';
-import { IContextualMenuItem, IContextualMenuProps } from 'office-ui-fabric-react/lib/ContextualMenu';
+import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import boardDataService from '../dal/boardDataService';
@@ -39,7 +39,7 @@ interface ContextualMenuButtonProps {
   iconClass: string;
   label: string;
   onClick?: () => void;
-  menuProps?: IContextualMenuProps;
+  menuItems?: IContextualMenuItem[];
   hideMobile?: boolean;
   showLabel:boolean;
 }
@@ -50,11 +50,17 @@ const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
   iconClass,
   label,
   onClick,
-  menuProps,
+  menuItems,
   hideMobile = true,
   showLabel,
 }) => {
   const buttonClass = `contextual-menu-button${hideMobile ? ' hide-mobile' : ''}`;
+  const menuProps = menuItems
+  ? {
+      items: menuItems,
+      className: 'extended-options-menu',
+    }
+  : undefined;
 
   return (
     <DefaultButton
@@ -338,10 +344,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           title="Export Import"
           iconClass="fas fa-cloud"
           label="Data"
-          menuProps={{
-            items: this.exportImportDataMenu,
-            className: "extended-options-menu",
-          }}
+          menuItems={this.exportImportDataMenu}
           showLabel={isWindowWide}
         />
         <ContextualMenuButton
@@ -349,10 +352,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           title="Help"
           iconClass="fas fa-question-circle"
           label="Help"
-          menuProps={{
-            items: this.helpMenu,
-            className: "extended-options-menu",
-          }}
+          menuItems={this.helpMenu}
           showLabel={isWindowWide}
         />
         <ContextualMenuButton
@@ -360,10 +360,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           title="User Settings"
           iconClass="fas fa-user-gear"
           label="Settings"
-          menuProps={{
-            items: this.extensionSettingsMenuItem(),
-            className: "extended-options-menu",
-          }}
+          menuItems={this.extensionSettingsMenuItem()}
           hideMobile={false}
           showLabel={isWindowWide && this.props.isDesktop}
         />
