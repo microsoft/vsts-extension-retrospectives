@@ -3,7 +3,6 @@ import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button'
 import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
-import { ViewMode } from '../config/constants';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import boardDataService from '../dal/boardDataService';
@@ -16,7 +15,7 @@ import { WebApiTeam } from 'azure-devops-extension-api/Core';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
-  isMobileExtensionSettingsDialogHidden: boolean;
+  //isMobileExtensionSettingsDialogHidden: boolean;
   isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
@@ -41,7 +40,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
     this.state = {
       isClearVisitHistoryDialogHidden: true,
-      isMobileExtensionSettingsDialogHidden: true,
+      //isMobileExtensionSettingsDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
       isWhatsNewDialogHidden: true,
       isGetHelpDialogHidden: true,
@@ -181,10 +180,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
   private readonly hidePleaseJoinUsDialog = () => {
     this.setState({ isPleaseJoinUsDialogHidden: true });
-  }
-
-  private readonly hideMobileExtensionSettingsMenuDialog = () => {
-    this.setState({ isMobileExtensionSettingsDialogHidden: true });
   }
 
   private readonly onRetrospectiveWikiClicked = () => {
@@ -469,21 +464,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={this.hideClearVisitHistoryDialog} text="Cancel" />
           </DialogFooter>
         </Dialog>
-{/* This section required for mobile support using F12 mode.
-        <Dialog
-          hidden={this.state.isMobileExtensionSettingsDialogHidden}
-          onDismiss={this.hideMobileExtensionSettingsMenuDialog}
-          modalProps={{
-            isBlocking: false,
-            containerClassName: 'ms-dialogMainOverride',
-            className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
-          }}
-        >
-          <DialogFooter>
-            <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
-          </DialogFooter>
-        </Dialog>
-*/}
+
         <ToastContainer
           transition={Slide}
           closeButton={false}
