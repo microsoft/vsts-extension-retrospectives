@@ -342,35 +342,29 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
           isWindowWide={isWindowWide}
         />
-
-        <DefaultButton
-          className="contextual-menu-button hide-mobile"
-          aria-label="Help"
+        <ContextualMenuButton
+          ariaLabel="Help"
           title="Help"
+          iconClass="fas fa-question-circle"
+          label="Help"
           menuProps={{
             items: this.helpMenu,
             className: "extended-options-menu",
           }}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-question-circle"></i></span>&nbsp;
-          {isWindowWide && (
-            <span className="ms-Button-label">Help</span>
-          )}
-        </DefaultButton>
-        <DefaultButton
-          className="contextual-menu-button"
-          aria-label="User Settings"
+          isWindowWide={isWindowWide}
+        />
+        <ContextualMenuButton
+          ariaLabel="User Settings"
           title="User Settings"
+          iconClass="fas fa-user-gear"
+          label="Settings"
           menuProps={{
             items: this.extensionSettingsMenuItem(),
             className: "extended-options-menu",
           }}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-user-gear"></i></span>&nbsp;
-          {isWindowWide && this.props.isDesktop && (
-            <span className="ms-Button-label">Settings</span>
-          )}
-        </DefaultButton>
+          isWindowWide={isWindowWide}
+          isDesktop={this.props.isDesktop}
+        />
 
         <Dialog
           hidden={this.state.isPrimeDirectiveDialogHidden}
