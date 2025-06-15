@@ -1,9 +1,8 @@
 import React from 'react';
-import { PrimaryButton, DefaultButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
-import { Dialog, DialogBase, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
+import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
-import { ViewMode } from '../config/constants';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import boardDataService from '../dal/boardDataService';
@@ -16,13 +15,15 @@ import { WebApiTeam } from 'azure-devops-extension-api/Core';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
-  isMobileExtensionSettingsDialogHidden: boolean;
+  isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
+  isPleaseJoinUsDialogHidden: boolean;
+  isWindowWide: boolean;
 }
 
 interface IExtensionSettingsMenuProps {
-  onScreenViewModeChanged: () => void;
+  onScreenViewModeChanged: (isDesktop: boolean) => void;
   isDesktop: boolean;
 }
 
@@ -38,9 +39,11 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
     this.state = {
       isClearVisitHistoryDialogHidden: true,
-      isMobileExtensionSettingsDialogHidden: true,
+      isPrimeDirectiveDialogHidden: true,
       isWhatsNewDialogHidden: true,
-      isGetHelpDialogHidden: true
+      isGetHelpDialogHidden: true,
+      isPleaseJoinUsDialogHidden: true,
+      isWindowWide: this.checkIfWindowWideOrTall(),
     };
   }
 
@@ -107,7 +110,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     for (const dataToProcess of importedData) {
       const team = teams.find(e => e.name === dataToProcess.team.name) ?? defaultTeam;
       const oldBoard = dataToProcess.board;
-      const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.displayPrimeDirective, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.isAnonymous, oldBoard.startDate, oldBoard.endDate);
+      const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.isAnonymous, oldBoard.startDate, oldBoard.endDate);
       for (let yLoop = 0; yLoop < dataToProcess.items.length; yLoop++) {
         const oldItem = dataToProcess.items[yLoop];
         oldItem.boardId = newBoard.id;
@@ -117,6 +120,27 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
         toast.update(toastId, { render: `Importing data... (${newBoard.title} to ${team.name} is done)` });
       }
     }
+  };
+
+  componentDidMount() {
+    window.addEventListener("resize", this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.handleResize);
+  }
+
+  // Function to check if the window is maximized (90% threshold) or vertical
+  checkIfWindowWideOrTall = () => {
+    const isWide = window.outerWidth >= screen.availWidth * 0.9;
+    const isTallerThanWide = window.innerHeight > window.innerWidth;
+    return isWide && !isTallerThanWide;
+  };
+
+  handleResize = () => {
+    this.setState({
+      isWindowWide: this.checkIfWindowWideOrTall(),
+    });
   };
 
   private readonly clearVisitHistory = async () => {
@@ -132,6 +156,14 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isClearVisitHistoryDialogHidden: true });
   }
 
+  private readonly showPrimeDirectiveDialog = () => {
+    this.setState({ isPrimeDirectiveDialogHidden: false });
+  };
+
+  private readonly hidePrimeDirectiveDialog = () => {
+    this.setState({ isPrimeDirectiveDialogHidden: true });
+  };
+
   private readonly showWhatsNewDialog = () => {
     this.setState({ isWhatsNewDialogHidden: false });
   }
@@ -140,99 +172,196 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isWhatsNewDialogHidden: true });
   }
 
-  private readonly hideMobileExtensionSettingsMenuDialog = () => {
-    this.setState({ isMobileExtensionSettingsDialogHidden: true });
+    private readonly showPleaseJoinUsDialog = () => {
+    this.setState({ isPleaseJoinUsDialogHidden: false });
+  }
+
+  private readonly hidePleaseJoinUsDialog = () => {
+    this.setState({ isPleaseJoinUsDialogHidden: true });
+  }
+
+  private readonly onRetrospectiveWikiClicked = () => {
+    window.open('https://retrospectivewiki.org/', '_blank');
   }
 
   private readonly onChangeLogClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md', '_blank');
   }
 
+  private readonly onGetHelpClicked = () => {
+    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank', 'noreferrer');
+  }
+
+  private readonly onContributingClicked = () => {
+    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md', '_blank');
+  }
+
   private readonly onContactUsClicked = () => {
     window.open('https://github.com/microsoft/vsts-extension-retrospectives/issues', '_blank');
   }
 
-  // If an action needs to be hidden on desktop or mobile view, use the item's className property
-  // with .hide-mobile or .hide-desktop
-  private readonly extensionSettingsMenuItem: IContextualMenuItem[] = [
+  private readonly exportImportDataMenu: IContextualMenuItem[] = [
     {
       key: 'exportData',
       iconProps: { iconName: 'CloudDownload' },
-      onClick: this.exportData,
-      text: 'Export Data',
-      title: 'Export Data',
+      onClick: (ev, item) => {
+        this.exportData().catch(console.error); // Ensures async function runs without breaking `onClick`
+      },
+      text: 'Export data',
+      title: 'Export data',
     },
     {
       key: 'importData',
       iconProps: { iconName: 'CloudUpload' },
-      onClick: this.importData,
-      text: 'Import Data',
-      title: 'Import Data',
+      onClick: (ev, item) => {
+        this.importData().catch(console.error); // Ensures async function runs without breaking `onClick`
+      },
+      text: 'Import data',
+      title: 'Import data',
+    },
+  ];
+
+  private readonly helpMenu: IContextualMenuItem[] = [
+    {
+      key: 'whatsNew',
+      iconProps: { iconName: 'Megaphone' },
+      onClick: this.showWhatsNewDialog,
+      text: "What's new",
+      title: "What's new",
     },
     {
-      key: 'clearVisitHistory',
-      iconProps: { iconName: 'RemoveEvent' },
-      onClick: this.showClearVisitHistoryDialog,
-      text: 'Clear visit history',
-      title: 'Clear visit history',
+      key: 'userGuide',
+      iconProps: { iconName: 'BookAnswers' },
+      onClick: () => this.setState({ isGetHelpDialogHidden: false }),
+      text: 'User guide',
+      title: 'User guide',
     },
     {
-      key: 'switchToDesktop',
-      iconProps: { iconName: 'TVMonitor' },
-      onClick: this.props.onScreenViewModeChanged,
-      text: 'Switch to Desktop View',
-      title: 'Switch to Desktop View',
-      className: 'hide-desktop',
-    },
-    {
-      key: 'switchToMobile',
-      iconProps: { iconName: 'CellPhone' },
-      onClick: this.props.onScreenViewModeChanged,
-      text: 'Switch to Mobile View',
-      title: 'Switch to Mobile View',
-      className: 'hide-mobile'
+      key: 'volunteer',
+      iconProps: { iconName: 'Teamwork' },
+      onClick: this.showPleaseJoinUsDialog,
+      text: 'Volunteer',
+      title: 'Volunteer',
     },
     {
       key: 'contactUs',
       iconProps: { iconName: 'ChatInviteFriend' },
       onClick: this.onContactUsClicked,
-      text: 'Contact Us',
-      title: 'Contact Us'
+      text: 'Contact us',
+      title: 'Contact us',
     },
   ];
 
+    private extensionSettingsMenuItem(): IContextualMenuItem[] {
+    return [
+      this.props.isDesktop && {
+        key: 'clearVisitHistory',
+        iconProps: { iconName: 'RemoveEvent' },
+        onClick: this.showClearVisitHistoryDialog,
+        text: 'Clear visit history',
+        title: 'Clear visit history',
+      },
+      !this.props.isDesktop && {
+        key: 'switchToDesktop',
+        iconProps: { iconName: 'TVMonitor' },
+        onClick: () => this.props.onScreenViewModeChanged(true),
+        text: 'Switch to desktop view',
+        title: 'Switch to desktop view',
+      },
+      this.props.isDesktop && {
+        key: 'switchToMobile',
+        iconProps: { iconName: 'CellPhone' },
+        onClick: () => this.props.onScreenViewModeChanged(false),
+        text: 'Switch to mobile view',
+        title: 'Switch to mobile view',
+      },
+    ].filter(Boolean) as IContextualMenuItem[];
+  }
+
   public render() {
+    const { isWindowWide } = this.state;
+
     return (
       <div className="extension-settings-menu">
         <DefaultButton
           className="contextual-menu-button hide-mobile"
-          aria-label="User Settings Menu"
-          title="User Settings Menu"
+          aria-label="Prime Directive"
+          title="Prime Directive"
+          onClick={this.showPrimeDirectiveDialog}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-shield-halved"></i></span>&nbsp;
+          {isWindowWide && (
+            <span className="ms-Button-label">Directive</span>
+          )}
+        </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button hide-mobile"
+          aria-label="Export Import"
+          title="Export Import"
           menuProps={{
-            items: this.extensionSettingsMenuItem,
-            className: "user-settings-menu",
+            items: this.exportImportDataMenu,
+            className: "extended-options-menu",
           }}
         >
-          <span className="ms-Button-icon"><i className="fas fa-bars"></i></span>
+          <span className="ms-Button-icon"><i className="fas fa-cloud"></i></span>&nbsp;
+          {isWindowWide && (
+            <span className="ms-Button-label">Data</span>
+          )}
+        </DefaultButton>
+        <DefaultButton
+          className="contextual-menu-button hide-mobile"
+          aria-label="Help"
+          title="Help"
+          menuProps={{
+            items: this.helpMenu,
+            className: "extended-options-menu",
+          }}
+        >
+          <span className="ms-Button-icon"><i className="fas fa-question-circle"></i></span>&nbsp;
+          {isWindowWide && (
+            <span className="ms-Button-label">Help</span>
+          )}
         </DefaultButton>
         <DefaultButton
           className="contextual-menu-button"
-          aria-label="What's New"
-          title="What's New"
-          onClick={this.showWhatsNewDialog}
+          aria-label="User Settings"
+          title="User Settings"
+          menuProps={{
+            items: this.extensionSettingsMenuItem(),
+            className: "extended-options-menu",
+          }}
         >
-          <span className="ms-Button-icon"><i className="fas fa-certificate"></i></span>&nbsp;
-          <span className="ms-Button-label">What&apos;s New</span>
+          <span className="ms-Button-icon"><i className="fas fa-user-gear"></i></span>&nbsp;
+          {isWindowWide && this.props.isDesktop && (
+            <span className="ms-Button-label">Settings</span>
+          )}
         </DefaultButton>
-        <DefaultButton
-          className="contextual-menu-button"
-          aria-label="Get Help"
-          title="Get Help"
-          onClick={() => this.setState({ isGetHelpDialogHidden: false })}
+
+        <Dialog
+          hidden={this.state.isPrimeDirectiveDialogHidden}
+          onDismiss={this.hidePrimeDirectiveDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: "The Prime Directive",
+          }}
+          minWidth={600}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: "prime-directive-dialog",
+            className: "retrospectives-dialog-modal",
+          }}
         >
-          <span className="ms-Button-icon"><i className="fa fa-question-circle"></i></span>&nbsp;
-          <span className="ms-Button-label">Get Help</span>
-        </DefaultButton>
+          <DialogContent>
+            The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.<br /><br />
+            <b>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</b><br /><br />
+            <i>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</i>
+          </DialogContent>
+          <DialogFooter>
+            <DefaultButton onClick={this.onRetrospectiveWikiClicked} text="Open Retrospective Wiki" />
+            <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="extension-menu-close-button" />
+          </DialogFooter>
+        </Dialog>
+
         <Dialog
           hidden={this.state.isWhatsNewDialogHidden}
           onDismiss={this.hideWhatsNewDialog}
@@ -240,94 +369,80 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             type: DialogType.close,
             title: 'What\'s New'
           }}
-          minWidth={450}
+          minWidth={600}
           modalProps={{
             isBlocking: true,
             containerClassName: 'whatsnew-dialog',
+            className: 'retrospectives-dialog-modal',
           }}>
-          <DialogBase>
-
-          </DialogBase>
           <DialogContent>
-            <p>{this.getChangelog()[0]}</p>
-            <ul style={{ listStyle: 'initial', paddingLeft: "1rem" }}>
-            {this.getChangelog().slice(1, -1).map((change, index) => (
-            <li key={`changelog-item${index}`}>{change}</li>
-            ))}
+            {this.getChangelog()[0]}
+            <br /><br />
+            <ul className="changelog-list">
+              {this.getChangelog().slice(1, -1).map((change, index) => (
+                <li key={`changelog-item${index}`}>{change}</li>
+              ))}
             </ul>
-            <p>{this.getChangelog().slice(-1)[0]}</p>
+            <br />
+            {this.getChangelog().slice(-1)[0]}
           </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={this.onChangeLogClicked} text="Changelog" />
-            <PrimaryButton className="whats-new-close-button" onClick={this.hideWhatsNewDialog} text="Close" />
+            <DefaultButton onClick={this.onChangeLogClicked} text="Open change log" />
+            <PrimaryButton onClick={this.hideWhatsNewDialog} text="Close" className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
+
         <Dialog
           hidden={this.state.isGetHelpDialogHidden}
           onDismiss={() => { this.setState({ isGetHelpDialogHidden: true }); }}
           dialogContentProps={{
             type: DialogType.close,
-            title: 'Retrospectives',
+            title: 'Retrospectives User Guide',
           }}
           minWidth={600}
           modalProps={{
             isBlocking: true,
-            containerClassName: 'prime-directive-dialog',
-            className: 'gethelp-dialog',
+            containerClassName: 'gethelp-dialog',
+            className: 'retrospectives-dialog-modal',
           }}>
           <DialogContent>
-            The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.
+            The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.  The Retrospective extension and Team Assessment feature are valuable tools supporting that process.
             <br /><br />
-            The Team Assessment addition to the retrospective guides teams through a set of questions that highlight strengths and opportunities. Teams can then utilize specific retrospective templates to identify the top opportunities for improvement.
-            <br /><br />
-            Research from the <a href="https://services.google.com/fh/files/misc/state-of-devops-2018.pdf" target="_blank" rel="noreferrer">2018 State of DevOps</a> report indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a <a href="https://journals.sagepub.com/doi/full/10.1177/0018720812448394" target="_blank" rel="noreferrer">2013 meta-analysis on teams</a> indicates that teams that effectively debrief are 20-25% more effective.
+            For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.
           </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={() => {
-              window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank', 'noreferrer');
-            }}
-              text="Get more information" />
-            <PrimaryButton onClick={() => {
-              this.setState({ isGetHelpDialogHidden: true });
-            }}
+            <DefaultButton onClick={this.onGetHelpClicked} text="Open user guide" />
+            <PrimaryButton
+              onClick={() => { this.setState({ isGetHelpDialogHidden: true });}}
               text="Close"
-              className="prime-directive-close-button" />
+              className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
+
         <Dialog
-          hidden={this.state.isMobileExtensionSettingsDialogHidden}
-          onDismiss={this.hideMobileExtensionSettingsMenuDialog}
-          modalProps={{
-            isBlocking: false,
-            containerClassName: 'ms-dialogMainOverride',
-            className: `retrospectives-dialog-modal ${this.props.isDesktop ? ViewMode.Desktop : ViewMode.Mobile}`,
+          hidden={this.state.isPleaseJoinUsDialogHidden}
+          onDismiss={this.hidePleaseJoinUsDialog}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: 'Volunteer'
           }}
-        >
-          <div className="mobile-contextual-menu-list">
-            {
-              this.extensionSettingsMenuItem.map((extensionSettingsMenuItem) =>
-                <ActionButton
-                  key={extensionSettingsMenuItem.key}
-                  iconProps={extensionSettingsMenuItem.iconProps}
-                  className={extensionSettingsMenuItem.className}
-                  aria-label={extensionSettingsMenuItem.text}
-                  onClick={() => {
-                    this.hideMobileExtensionSettingsMenuDialog();
-                    extensionSettingsMenuItem.onClick();
-                  }}
-                  text={extensionSettingsMenuItem.text}
-                  title={extensionSettingsMenuItem.title}
-                >
-                  <span className="ms-Button-icon"><i className={"fa-solid fa-" + extensionSettingsMenuItem.iconProps.iconName}></i></span>&nbsp;
-                  <span className="ms-Button-label">{extensionSettingsMenuItem.text}</span>
-                </ActionButton>
-              )
-            }
-          </div>
+          minWidth={600}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: 'volunteer-dialog',
+            className: 'retrospectives-dialog-modal',
+          }}>
+          <DialogContent>
+            Help us make the Retrospective Extension even better!<br /><br />
+            While we will continue to maintain the extension to meet Microsoft&apos;s high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.<br /><br />
+            Want to contribute? Join us and become part of our community! 🙋
+          </DialogContent>
           <DialogFooter>
-            <DefaultButton onClick={this.hideMobileExtensionSettingsMenuDialog} text="Close" />
+            <DefaultButton onClick={this.onContributingClicked} text="Open contributing guidelines" />
+            <PrimaryButton onClick={this.hidePleaseJoinUsDialog} text="Close" className="extension-menu-close-button" />
           </DialogFooter>
         </Dialog>
+
         <Dialog
           hidden={this.state.isClearVisitHistoryDialogHidden}
           onDismiss={this.hideClearVisitHistoryDialog}
@@ -336,7 +451,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             title: 'Clear Visit History',
             subText: 'This extension maintains records of the teams and boards you visited. ' +
               'Clearing visit history means that the next time you use the extension, ' +
-              'you will not be automatically directed to the your last visited board.',
+              'you will not be automatically directed to your last visited board.',
           }}
           minWidth={450}
           modalProps={{
@@ -349,6 +464,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             <DefaultButton onClick={this.hideClearVisitHistoryDialog} text="Cancel" />
           </DialogFooter>
         </Dialog>
+
         <ToastContainer
           transition={Slide}
           closeButton={false}
