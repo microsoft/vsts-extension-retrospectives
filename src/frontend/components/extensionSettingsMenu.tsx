@@ -15,7 +15,6 @@ import { WebApiTeam } from 'azure-devops-extension-api/Core';
 
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
-  //isMobileExtensionSettingsDialogHidden: boolean;
   isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
@@ -40,7 +39,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
     this.state = {
       isClearVisitHistoryDialogHidden: true,
-      //isMobileExtensionSettingsDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
       isWhatsNewDialogHidden: true,
       isGetHelpDialogHidden: true,
