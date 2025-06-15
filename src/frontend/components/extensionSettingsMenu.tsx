@@ -42,7 +42,7 @@ interface ContextualMenuButtonProps {
   menuProps?: IContextualMenuProps;
   isWindowWide: boolean;
   isDesktop?: boolean;
-  alwaysShowLabel?: boolean;
+  hideWhenMobile?: boolean;
 }
 
 const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
@@ -54,24 +54,28 @@ const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
   menuProps,
   isWindowWide,
   isDesktop = true,
-  alwaysShowLabel = false,
-}) => (
-  <DefaultButton
-    className="contextual-menu-button hide-mobile"
-    aria-label={ariaLabel}
-    title={title}
-    onClick={onClick}
-    menuProps={menuProps}
-  >
-    <span className="ms-Button-icon">
-      <i className={iconClass}></i>
-    </span>
-    &nbsp;
-    {(alwaysShowLabel || (isWindowWide && isDesktop)) && (
-      <span className="ms-Button-label">{label}</span>
-    )}
-  </DefaultButton>
-);
+  hideWhenMobile = false,
+}) => {
+  const buttonClass = `contextual-menu-button${hideWhenMobile ? '' : ' hide-mobile'}`;
+
+  return (
+    <DefaultButton
+      className={buttonClass}
+      aria-label={ariaLabel}
+      title={title}
+      onClick={onClick}
+      menuProps={menuProps}
+    >
+      <span className="ms-Button-icon">
+        <i className={iconClass}></i>
+      </span>
+      &nbsp;
+      {(isWindowWide && isDesktop) && (
+        <span className="ms-Button-label">{label}</span>
+      )}
+    </DefaultButton>
+  );
+};
 
 class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
   constructor(props: IExtensionSettingsMenuProps) {
@@ -364,7 +368,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
           isWindowWide={isWindowWide}
           isDesktop={this.props.isDesktop}
-          alwaysShowLabel={true}
+          alwaysShowIcon={true}
         />
 
         <Dialog
