@@ -339,7 +339,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
             items: this.exportImportDataMenu,
             className: "extended-options-menu",
           }}
-        >
+         >
           <span className="ms-Button-icon"><i className="fas fa-cloud"></i></span>&nbsp;
           {isWindowWide && (
             <span className="ms-Button-label">Data</span>
