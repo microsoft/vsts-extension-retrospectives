@@ -378,7 +378,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <DialogContent>
             {this.getChangelog()[0]}
             <br /><br />
-            <ul style={{ listStyle: 'initial' }}>
+            <ul className="changelog-list">
               {this.getChangelog().slice(1, -1).map((change, index) => (
                 <li key={`changelog-item${index}`}>{change}</li>
               ))}
