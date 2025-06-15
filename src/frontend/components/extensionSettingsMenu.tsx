@@ -33,6 +33,46 @@ interface IExportImportDataSchema {
   items: IFeedbackItemDocument[]
 }
 
+interface ContextualMenuButtonProps {
+  ariaLabel: string;
+  title: string;
+  iconClass: string;
+  label: string;
+  onClick?: () => void;
+  menuProps?: any;
+  isWindowWide: boolean;
+  isDesktop?: boolean;
+  alwaysShowLabel?: boolean;
+}
+
+const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
+  ariaLabel,
+  title,
+  iconClass,
+  label,
+  onClick,
+  menuProps,
+  isWindowWide,
+  isDesktop = true,
+  alwaysShowLabel = false,
+}) => (
+  <DefaultButton
+    className="contextual-menu-button hide-mobile"
+    aria-label={ariaLabel}
+    title={title}
+    onClick={onClick}
+    menuProps={menuProps}
+  >
+    <span className="ms-Button-icon">
+      <i className={iconClass}></i>
+    </span>
+    &nbsp;
+    {(alwaysShowLabel || (isWindowWide && isDesktop)) && (
+      <span className="ms-Button-label">{label}</span>
+    )}
+  </DefaultButton>
+);
+
 class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
   constructor(props: IExtensionSettingsMenuProps) {
     super(props);
@@ -283,17 +323,14 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
 
     return (
       <div className="extension-settings-menu">
-        <DefaultButton
-          className="contextual-menu-button hide-mobile"
-          aria-label="Prime Directive"
+        <ContextualMenuButton
+          ariaLabel="Prime Directive"
           title="Prime Directive"
+          iconClass="fas fa-shield-halved"
+          label="Directive"
           onClick={this.showPrimeDirectiveDialog}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-shield-halved"></i></span>&nbsp;
-          {isWindowWide && (
-            <span className="ms-Button-label">Directive</span>
-          )}
-        </DefaultButton>
+          isWindowWide={isWindowWide}
+        />
         <DefaultButton
           className="contextual-menu-button hide-mobile"
           aria-label="Export Import"
