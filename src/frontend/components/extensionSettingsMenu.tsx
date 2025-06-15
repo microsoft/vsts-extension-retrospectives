@@ -81,6 +81,47 @@ const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
   );
 };
 
+interface ExtensionDialogProps {
+  hidden: boolean;
+  onDismiss: () => void;
+  title: string;
+  children: React.ReactNode;
+  footerButtons: React.ReactNode;
+  minWidth?: number;
+  containerClassName: string;
+  subText?: string;
+}
+
+const ExtensionDialog: React.FC<ExtensionDialogProps> = ({
+  hidden,
+  onDismiss,
+  title,
+  children,
+  footerButtons,
+  minWidth = 600,
+  containerClassName,
+  subText,
+}) => (
+  <Dialog
+    hidden={hidden}
+    onDismiss={onDismiss}
+    dialogContentProps={{
+      type: DialogType.close,
+      title,
+      subText,
+    }}
+    minWidth={minWidth}
+    modalProps={{
+      isBlocking: true,
+      containerClassName,
+      className: "retrospectives-dialog-modal",
+    }}
+  >
+    <DialogContent>{children}</DialogContent>
+    <DialogFooter>{footerButtons}</DialogFooter>
+  </Dialog>
+);
+
 class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
   constructor(props: IExtensionSettingsMenuProps) {
     super(props);
@@ -348,8 +389,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           showLabel={isWindowWide}
         />
         <ContextualMenuButton
-          ariaLabel="Help"
-          title="Help"
+          ariaLabel="Retrospective Help"
+          title="Retrospective Help"
           iconClass="fas fa-question-circle"
           label="Help"
           menuItems={this.helpMenu}
@@ -365,30 +406,24 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           showLabel={isWindowWide && this.props.isDesktop}
         />
 
-        <Dialog
+        <ExtensionDialog
           hidden={this.state.isPrimeDirectiveDialogHidden}
           onDismiss={this.hidePrimeDirectiveDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: "The Prime Directive",
-          }}
-          minWidth={600}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: "prime-directive-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
+          title="The Prime Directive"
+          containerClassName="prime-directive-dialog"
+          footerButtons={
+            <>
+              <DefaultButton onClick={this.onRetrospectiveWikiClicked} text="Open Retrospective Wiki" />
+              <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="extension-menu-close-button" />
+            </>
+          }
         >
-          <DialogContent>
-            The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.<br /><br />
-            <b>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</b><br /><br />
-            <i>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</i>
-          </DialogContent>
-          <DialogFooter>
-            <DefaultButton onClick={this.onRetrospectiveWikiClicked} text="Open Retrospective Wiki" />
-            <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="extension-menu-close-button" />
-          </DialogFooter>
-        </Dialog>
+          The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.
+          <br /><br />
+          <b>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</b>
+          <br /><br />
+          <i>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</i>
+        </ExtensionDialog>
 
         <Dialog
           hidden={this.state.isWhatsNewDialogHidden}
