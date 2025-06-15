@@ -364,6 +364,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
           isWindowWide={isWindowWide}
           isDesktop={this.props.isDesktop}
+          alwaysShowLabel={true}
         />
 
         <Dialog
