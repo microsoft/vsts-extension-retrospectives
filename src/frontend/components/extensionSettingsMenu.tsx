@@ -2,7 +2,7 @@ import React from 'react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { userDataService } from '../dal/userDataService';
-import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
+import { IContextualMenuItem, IContextualMenuProps } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
 import boardDataService from '../dal/boardDataService';
@@ -39,7 +39,7 @@ interface ContextualMenuButtonProps {
   iconClass: string;
   label: string;
   onClick?: () => void;
-  menuProps?: any;
+  menuProps?: IContextualMenuProps;
   isWindowWide: boolean;
   isDesktop?: boolean;
   alwaysShowLabel?: boolean;
