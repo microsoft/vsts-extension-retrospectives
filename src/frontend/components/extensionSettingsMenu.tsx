@@ -331,20 +331,18 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           onClick={this.showPrimeDirectiveDialog}
           isWindowWide={isWindowWide}
         />
-        <DefaultButton
-          className="contextual-menu-button hide-mobile"
-          aria-label="Export Import"
+        <ContextualMenuButton
+          ariaLabel="Export Import"
           title="Export Import"
+          iconClass="fas fa-cloud"
+          label="Data"
           menuProps={{
             items: this.exportImportDataMenu,
             className: "extended-options-menu",
           }}
-        >
-          <span className="ms-Button-icon"><i className="fas fa-cloud"></i></span>&nbsp;
-          {isWindowWide && (
-            <span className="ms-Button-label">Data</span>
-          )}
-        </DefaultButton>
+          isWindowWide={isWindowWide}
+        />
+
         <DefaultButton
           className="contextual-menu-button hide-mobile"
           aria-label="Help"
