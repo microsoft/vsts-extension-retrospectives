@@ -54,7 +54,7 @@ const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
   menuProps,
   isWindowWide,
   isDesktop = true,
-  hideWhenMobile = false,
+  hideWhenMobile = true,
 }) => {
   const buttonClass = `contextual-menu-button${hideWhenMobile ? '' : ' hide-mobile'}`;
 
@@ -368,7 +368,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           }}
           isWindowWide={isWindowWide}
           isDesktop={this.props.isDesktop}
-          alwaysShowIcon={true}
+          hideWhenMobile={false}
         />
 
         <Dialog
