@@ -472,27 +472,18 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           Want to contribute? Join us and become part of our community! 🙋
         </ExtensionDialog>
 
-        <Dialog
+        <ExtensionDialog
           hidden={this.state.isClearVisitHistoryDialogHidden}
           onDismiss={this.hideClearVisitHistoryDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: 'Clear Visit History',
-            subText: 'This extension maintains records of the teams and boards you visited. ' +
-              'Clearing visit history means that the next time you use the extension, ' +
-              'you will not be automatically directed to your last visited board.',
-          }}
+          title="Clear Visit History"
+          onDefaultClick={this.clearVisitHistory}
+          defaultButtonText="Clear my visit history"
+          primaryButtonText="Cancel"
           minWidth={450}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: 'retrospectives-visit-history-cleared-info-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}>
-          <DialogFooter>
-            <PrimaryButton onClick={this.clearVisitHistory} text="Clear my visit history" />
-            <DefaultButton onClick={this.hideClearVisitHistoryDialog} text="Cancel" />
-          </DialogFooter>
-        </Dialog>
+          containerClassName="retrospectives-visit-history-cleared-info-dialog"
+        >
+          This extension maintains records of the teams and boards you visited.  Clearing visit history means that the next time you use the extension, you will not be automatically directed to your last visited board.
+        </ExtensionDialog>
 
         <ToastContainer
           transition={Slide}
