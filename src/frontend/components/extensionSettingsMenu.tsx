@@ -457,30 +457,20 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <br /><br />
           For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.
         </ExtensionDialog>
-
-        <Dialog
+        <ExtensionDialog
           hidden={this.state.isPleaseJoinUsDialogHidden}
           onDismiss={this.hidePleaseJoinUsDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: 'Volunteer'
-          }}
-          minWidth={600}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: 'volunteer-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}>
-          <DialogContent>
-            Help us make the Retrospective Extension even better!<br /><br />
-            While we will continue to maintain the extension to meet Microsoft&apos;s high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.<br /><br />
-            Want to contribute? Join us and become part of our community! 🙋
-          </DialogContent>
-          <DialogFooter>
-            <DefaultButton onClick={this.onContributingClicked} text="Open contributing guidelines" />
-            <PrimaryButton onClick={this.hidePleaseJoinUsDialog} text="Close" className="extension-menu-close-button" />
-          </DialogFooter>
-        </Dialog>
+          title="Volunteer"
+          onDefaultClick={this.onContributingClicked}
+          defaultButtonText="Open contributing guidelines"
+          containerClassName="volunteer-dialog"
+        >
+          Help us make the Retrospective Extension even better!
+          <br /><br />
+          While we will continue to maintain the extension to meet Microsoft&apos;s high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.
+          <br /><br />
+          Want to contribute? Join us and become part of our community! 🙋
+        </ExtensionDialog>
 
         <Dialog
           hidden={this.state.isClearVisitHistoryDialogHidden}
