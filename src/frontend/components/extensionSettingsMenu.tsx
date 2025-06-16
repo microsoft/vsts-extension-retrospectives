@@ -86,7 +86,9 @@ interface ExtensionDialogProps {
   onDismiss: () => void;
   title: string;
   children: React.ReactNode;
-  footerButtons: React.ReactNode;
+  onDefaultClick: () => void;
+  defaultButtonText: string;
+  primaryButtonText?: string;
   minWidth?: number;
   containerClassName: string;
   subText?: string;
@@ -97,7 +99,9 @@ const ExtensionDialog: React.FC<ExtensionDialogProps> = ({
   onDismiss,
   title,
   children,
-  footerButtons,
+  onDefaultClick,
+  defaultButtonText,
+  primaryButtonText = "Close",
   minWidth = 600,
   containerClassName,
   subText,
@@ -118,7 +122,10 @@ const ExtensionDialog: React.FC<ExtensionDialogProps> = ({
     }}
   >
     <DialogContent>{children}</DialogContent>
-    <DialogFooter>{footerButtons}</DialogFooter>
+    <DialogFooter>
+      <DefaultButton onClick={onDefaultClick} text={defaultButtonText} />
+      <PrimaryButton onClick={onDismiss} text={primaryButtonText} className="extension-menu-close-button" />
+    </DialogFooter>
   </Dialog>
 );
 
@@ -410,13 +417,9 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           hidden={this.state.isPrimeDirectiveDialogHidden}
           onDismiss={this.hidePrimeDirectiveDialog}
           title="The Prime Directive"
+          onDefaultClick={this.onRetrospectiveWikiClicked}
+          defaultButtonText="Open Retrospective Wiki"
           containerClassName="prime-directive-dialog"
-          footerButtons={
-            <>
-              <DefaultButton onClick={this.onRetrospectiveWikiClicked} text="Open Retrospective Wiki" />
-              <PrimaryButton onClick={this.hidePrimeDirectiveDialog} text="Close" className="extension-menu-close-button" />
-            </>
-          }
         >
           The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.
           <br /><br />
