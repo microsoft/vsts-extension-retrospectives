@@ -124,7 +124,11 @@ const ExtensionDialog: React.FC<ExtensionDialogProps> = ({
     <DialogContent>{children}</DialogContent>
     <DialogFooter>
       <DefaultButton onClick={onDefaultClick} text={defaultButtonText} />
-      <PrimaryButton onClick={onDismiss} text={primaryButtonText} className="extension-menu-close-button" />
+      <PrimaryButton
+        onClick={onDismiss}
+        text={primaryButtonText}
+        className={primaryButtonText === "Close" ? "extension-menu-close-button" : undefined}
+      />
     </DialogFooter>
   </Dialog>
 );
@@ -152,6 +156,27 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       'Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.'
     ];
   }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.handleResize);
+  }
+
+  // Function to check if the window is maximized (90% threshold) or vertical
+  checkIfWindowWideOrTall = () => {
+    const isWide = window.outerWidth >= screen.availWidth * 0.9;
+    const isTallerThanWide = window.innerHeight > window.innerWidth;
+    return isWide && !isTallerThanWide;
+  };
+
+  handleResize = () => {
+    this.setState({
+      isWindowWide: this.checkIfWindowWideOrTall(),
+    });
+  };
 
   private readonly exportData = async () => {
     const toastId = toast('Processing boards...');
@@ -218,27 +243,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     }
   };
 
-  componentDidMount() {
-    window.addEventListener("resize", this.handleResize);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.handleResize);
-  }
-
-  // Function to check if the window is maximized (90% threshold) or vertical
-  checkIfWindowWideOrTall = () => {
-    const isWide = window.outerWidth >= screen.availWidth * 0.9;
-    const isTallerThanWide = window.innerHeight > window.innerWidth;
-    return isWide && !isTallerThanWide;
-  };
-
-  handleResize = () => {
-    this.setState({
-      isWindowWide: this.checkIfWindowWideOrTall(),
-    });
-  };
-
   private readonly clearVisitHistory = async () => {
     await userDataService.clearVisits();
     this.hideClearVisitHistoryDialog();
@@ -268,7 +272,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     this.setState({ isWhatsNewDialogHidden: true });
   }
 
-    private readonly showPleaseJoinUsDialog = () => {
+  private readonly showPleaseJoinUsDialog = () => {
     this.setState({ isPleaseJoinUsDialogHidden: false });
   }
 
@@ -317,7 +321,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
     },
   ];
 
-  private readonly helpMenu: IContextualMenuItem[] = [
+  private readonly retroHelpMenu: IContextualMenuItem[] = [
     {
       key: 'whatsNew',
       iconProps: { iconName: 'Megaphone' },
@@ -400,7 +404,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           title="Retrospective Help"
           iconClass="fas fa-question-circle"
           label="Help"
-          menuItems={this.helpMenu}
+          menuItems={this.retroHelpMenu}
           showLabel={isWindowWide}
         />
         <ContextualMenuButton
@@ -471,7 +475,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <br /><br />
           Want to contribute? Join us and become part of our community! 🙋
         </ExtensionDialog>
-
         <ExtensionDialog
           hidden={this.state.isClearVisitHistoryDialogHidden}
           onDismiss={this.hideClearVisitHistoryDialog}
@@ -480,7 +483,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           defaultButtonText="Clear my visit history"
           primaryButtonText="Cancel"
           minWidth={450}
-          containerClassName="retrospectives-visit-history-cleared-info-dialog"
+          containerClassName="visit-history-dialog"
         >
           This extension maintains records of the teams and boards you visited.  Clearing visit history means that the next time you use the extension, you will not be automatically directed to your last visited board.
         </ExtensionDialog>

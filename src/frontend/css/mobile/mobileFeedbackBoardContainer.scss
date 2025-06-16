@@ -77,8 +77,7 @@ $mobile_team_selector_list_item_height: 90px;
     &.retrospectives-board-metadata-dialog,
     &.retrospectives-board-deleted-info-dialog,
     &.retrospectives-unlink-feedback-item-confirmation-dialog,
-    &.retrospectives-delete-board-confirmation-dialog,
-    &.retrospectives-visit-history-cleared-info-dialog {
+    &.retrospectives-delete-board-confirmation-dialog {
       .ms-Dialog-title {
         font-size: 40px;
       }
