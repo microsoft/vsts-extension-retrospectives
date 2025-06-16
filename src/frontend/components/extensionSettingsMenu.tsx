@@ -445,33 +445,18 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <br />
           {this.getChangelog().slice(-1)[0]}
         </ExtensionDialog>
-
-        <Dialog
+        <ExtensionDialog
           hidden={this.state.isGetHelpDialogHidden}
           onDismiss={() => { this.setState({ isGetHelpDialogHidden: true }); }}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: 'Retrospectives User Guide',
-          }}
-          minWidth={600}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: 'gethelp-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}>
-          <DialogContent>
-            The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.  The Retrospective extension and Team Assessment feature are valuable tools supporting that process.
-            <br /><br />
-            For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.
-          </DialogContent>
-          <DialogFooter>
-            <DefaultButton onClick={this.onGetHelpClicked} text="Open user guide" />
-            <PrimaryButton
-              onClick={() => { this.setState({ isGetHelpDialogHidden: true });}}
-              text="Close"
-              className="extension-menu-close-button" />
-          </DialogFooter>
-        </Dialog>
+          title="Retrospectives User Guide"
+          onDefaultClick={this.onGetHelpClicked}
+          defaultButtonText="Open user guide"
+          containerClassName="gethelp-dialog"
+        >
+          The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.  The Retrospective extension and Team Assessment feature are valuable tools supporting that process.
+          <br /><br />
+          For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.
+        </ExtensionDialog>
 
         <Dialog
           hidden={this.state.isPleaseJoinUsDialogHidden}
