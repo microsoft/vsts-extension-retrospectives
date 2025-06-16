@@ -427,36 +427,24 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           <br /><br />
           <i>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</i>
         </ExtensionDialog>
-
-        <Dialog
+        <ExtensionDialog
           hidden={this.state.isWhatsNewDialogHidden}
           onDismiss={this.hideWhatsNewDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: 'What\'s New'
-          }}
-          minWidth={600}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: 'whatsnew-dialog',
-            className: 'retrospectives-dialog-modal',
-          }}>
-          <DialogContent>
-            {this.getChangelog()[0]}
-            <br /><br />
-            <ul className="changelog-list">
-              {this.getChangelog().slice(1, -1).map((change, index) => (
-                <li key={`changelog-item${index}`}>{change}</li>
-              ))}
-            </ul>
-            <br />
-            {this.getChangelog().slice(-1)[0]}
-          </DialogContent>
-          <DialogFooter>
-            <DefaultButton onClick={this.onChangeLogClicked} text="Open change log" />
-            <PrimaryButton onClick={this.hideWhatsNewDialog} text="Close" className="extension-menu-close-button" />
-          </DialogFooter>
-        </Dialog>
+          title="What's New"
+          onDefaultClick={this.onChangeLogClicked}
+          defaultButtonText="Open change log"
+          containerClassName="whatsnew-dialog"
+        >
+          {this.getChangelog()[0]}
+          <br /><br />
+          <ul className="changelog-list">
+            {this.getChangelog().slice(1, -1).map((change, index) => (
+              <li key={`changelog-item${index}`}>{change}</li>
+            ))}
+          </ul>
+          <br />
+          {this.getChangelog().slice(-1)[0]}
+        </ExtensionDialog>
 
         <Dialog
           hidden={this.state.isGetHelpDialogHidden}
