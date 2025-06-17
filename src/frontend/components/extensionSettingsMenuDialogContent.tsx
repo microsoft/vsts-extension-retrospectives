@@ -4,18 +4,15 @@ interface ContentItem {
   content: string;
   bullet?: boolean; // defaults to false
   style?: 'normal' | 'bold' | 'italic'; // defaults to 'normal'
-  space?: 'none' | 'before' | 'after'; // defaults to 'none'
 }
 
 export const PRIME_DIRECTIVE_CONTENT: ContentItem[] = [
   {
-    content: 'The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.',
-    space: 'after'
+    content: 'The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.'
   },
   {
     content: '“Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.”',
-    style: 'bold',
-    space: 'after'
+    style: 'bold'
   },
   {
     content: '--Norm Kerth, Project Retrospectives: A Handbook for Team Review',
@@ -25,8 +22,7 @@ export const PRIME_DIRECTIVE_CONTENT: ContentItem[] = [
 
 export const CHANGELOG_CONTENT: ContentItem[] = [
   {
-    content: 'The latest release includes updates for setting permissions, deleting boards, and sticky defaults.',
-    space: 'after'
+    content: 'The latest release includes updates for setting permissions, deleting boards, and sticky defaults.'
   },
   {
     bullet: true,
@@ -41,15 +37,13 @@ export const CHANGELOG_CONTENT: ContentItem[] = [
     content: 'User settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.',
   },
   {
-    content: 'Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.',
-    space: 'before'
+    content: 'Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.'
   },
 ];
 
 export const RETRO_HELP_CONTENT: ContentItem[] = [
   {
-    content: 'The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.  The Retrospective extension and Team Assessment feature are valuable tools supporting that process.',
-    space: 'after'
+    content: 'The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.  The Retrospective extension and Team Assessment feature are valuable tools supporting that process.'
   },
   {
     content: 'For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.',
@@ -58,12 +52,10 @@ export const RETRO_HELP_CONTENT: ContentItem[] = [
 
 export const VOLUNTEER_CONTENT: ContentItem[] = [
   {
-    content: 'Help us make the Retrospective Extension even better!',
-    space: 'after'
+    content: 'Help us make the Retrospective Extension even better!'
   },
   {
-    content: "While we will continue to maintain the extension to meet Microsoft's high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.",
-    space: 'after'
+    content: "While we will continue to maintain the extension to meet Microsoft's high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience."
   },
   {
     content: 'Want to contribute? Join us and become part of our community! 🙋',
@@ -86,10 +78,17 @@ export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] =>
     return text;
   };
 
-  const flushBullets = (key: string) => {
+  const flushBullets = (key: string, addTopSpace?: boolean, addBottomSpace?: boolean) => {
     if (bullets.length) {
       elements.push(
-        <ul key={key} className="menu-item-dialog-list">
+        <ul
+          key={key}
+          className="menu-item-dialog-list"
+          style={{
+            marginTop: addTopSpace ? '1rem' : undefined,
+            marginBottom: addBottomSpace ? '1rem' : undefined,
+          }}
+        >
           {bullets.map((bullet, i) => (
             <li key={`${key}-li-${i}`}>{bullet.content}</li>
           ))}
@@ -100,23 +99,29 @@ export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] =>
   };
 
   contentArray.forEach((item, index) => {
+    const next = contentArray[index + 1];
+    const prev = contentArray[index - 1];
+
     if (item.bullet) {
       bullets.push(item);
+
+      const isLast = index === contentArray.length - 1;
+      const nextIsParagraph = next && !next.bullet;
+
+      if (isLast || nextIsParagraph) {
+        flushBullets(`ul-${index}`, prev && !prev.bullet, true);
+      }
     } else {
-      flushBullets(`ul-${index}`);
+      flushBullets(`ul-${index}`, prev && prev.bullet, false);
 
-      const marginTop = item.space === 'before' ? '1rem' : undefined;
-      const marginBottom = item.space === 'after' ? '1rem' : undefined;
-
+      const marginBottom = next?.bullet ? undefined : '1rem';
       elements.push(
-        <div key={`p-${index}`} style={{ marginTop, marginBottom }}>
+        <div key={`p-${index}`} style={{ marginBottom }}>
           {applyFontStyle(item.content, item.style || 'normal')}
         </div>
       );
     }
   });
-
-  flushBullets('ul-final');
 
   return elements;
 };
