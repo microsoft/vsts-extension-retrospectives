@@ -1,5 +1,13 @@
 import React from 'react';
 
+export const RETRO_URLS = {
+  retrospectivewiki: 'https://retrospectivewiki.org/',
+  changelog: 'https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md',
+  readme: 'https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md',
+  contributing: 'https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md',
+  issues: 'https://github.com/microsoft/vsts-extension-retrospectives/issues',
+} as const;
+
 interface ContentItem {
   content: string;
   bullet?: boolean; // defaults to false

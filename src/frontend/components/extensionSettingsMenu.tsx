@@ -14,6 +14,7 @@ import { Slide, toast, ToastContainer } from 'react-toastify';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
 
 import {
+  RETRO_URLS,
   PRIME_DIRECTIVE_CONTENT,
   CHANGELOG_CONTENT,
   RETRO_HELP_CONTENT,
@@ -280,23 +281,23 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
   }
 
   private readonly onRetrospectiveWikiClicked = () => {
-    window.open('https://retrospectivewiki.org/', '_blank');
+    window.open(RETRO_URLS.retrospectivewiki, '_blank');
   }
 
   private readonly onChangeLogClicked = () => {
-    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md', '_blank');
+    window.open(RETRO_URLS.changelog, '_blank');
   }
 
   private readonly onGetHelpClicked = () => {
-    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md', '_blank', 'noreferrer');
+    window.open(RETRO_URLS.readme, '_blank', 'noreferrer');
   }
 
   private readonly onContributingClicked = () => {
-    window.open('https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md', '_blank');
+    window.open(RETRO_URLS.contributing, '_blank');
   }
 
   private readonly onContactUsClicked = () => {
-    window.open('https://github.com/microsoft/vsts-extension-retrospectives/issues', '_blank');
+    window.open(RETRO_URLS.issues, '_blank');
   }
 
   private readonly exportImportDataMenu: IContextualMenuItem[] = [
