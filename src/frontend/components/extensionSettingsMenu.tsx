@@ -13,6 +13,15 @@ import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/fee
 import { Slide, toast, ToastContainer } from 'react-toastify';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
 
+import {
+  PRIME_DIRECTIVE_CONTENT,
+  CHANGELOG_CONTENT,
+  RETRO_HELP_CONTENT,
+  VOLUNTEER_CONTENT,
+  CLEAR_VISIT_HISTORY_CONTENT,
+  renderContent,
+} from './extensionSettingsMenuDialogContent';
+
 interface IExtensionSettingsMenuState {
   isClearVisitHistoryDialogHidden: boolean;
   isPrimeDirectiveDialogHidden: boolean;
@@ -145,16 +154,6 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
       isPleaseJoinUsDialogHidden: true,
       isWindowWide: this.checkIfWindowWideOrTall(),
     };
-  }
-
-  private readonly getChangelog = (): string[] => {
-    return [
-      'The latest release includes updates for setting permissions, deleting boards, and sticky defaults.',
-      'Ability to set permissions for accessing the retrospective board now restricted to the board owner or a team admin.',
-      'Functionality to delete boards was moved from the Board menu to the History table and is only enabled for archived boards.',
-      'User settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.',
-      'Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.'
-    ];
   }
 
   componentDidMount() {
@@ -425,11 +424,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           defaultButtonText="Open Retrospective Wiki"
           containerClassName="prime-directive-dialog"
         >
-          The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective.  By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.
-          <br /><br />
-          <b>&quot;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&quot;</b>
-          <br /><br />
-          <i>--Norm Kerth, Project Retrospectives: A Handbook for Team Review</i>
+          {renderContent(PRIME_DIRECTIVE_CONTENT)}
         </ExtensionDialog>
         <ExtensionDialog
           hidden={this.state.isWhatsNewDialogHidden}
@@ -439,15 +434,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           defaultButtonText="Open change log"
           containerClassName="whatsnew-dialog"
         >
-          {this.getChangelog()[0]}
-          <br /><br />
-          <ul className="changelog-list">
-            {this.getChangelog().slice(1, -1).map((change, index) => (
-              <li key={`changelog-item${index}`}>{change}</li>
-            ))}
-          </ul>
-          <br />
-          {this.getChangelog().slice(-1)[0]}
+          {renderContent(CHANGELOG_CONTENT)}
         </ExtensionDialog>
         <ExtensionDialog
           hidden={this.state.isGetHelpDialogHidden}
@@ -455,11 +442,9 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           title="Retrospectives User Guide"
           onDefaultClick={this.onGetHelpClicked}
           defaultButtonText="Open user guide"
-          containerClassName="gethelp-dialog"
+          containerClassName="retro-help-dialog"
         >
-          The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.  The Retrospective extension and Team Assessment feature are valuable tools supporting that process.
-          <br /><br />
-          For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.
+          {renderContent(RETRO_HELP_CONTENT)}
         </ExtensionDialog>
         <ExtensionDialog
           hidden={this.state.isPleaseJoinUsDialogHidden}
@@ -469,11 +454,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           defaultButtonText="Open contributing guidelines"
           containerClassName="volunteer-dialog"
         >
-          Help us make the Retrospective Extension even better!
-          <br /><br />
-          While we will continue to maintain the extension to meet Microsoft&apos;s high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.
-          <br /><br />
-          Want to contribute? Join us and become part of our community! 🙋
+          {renderContent(VOLUNTEER_CONTENT)}
         </ExtensionDialog>
         <ExtensionDialog
           hidden={this.state.isClearVisitHistoryDialogHidden}
@@ -485,7 +466,7 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           minWidth={450}
           containerClassName="visit-history-dialog"
         >
-          This extension maintains records of the teams and boards you visited.  Clearing visit history means that the next time you use the extension, you will not be automatically directed to your last visited board.
+          {renderContent(CLEAR_VISIT_HISTORY_CONTENT)}
         </ExtensionDialog>
 
         <ToastContainer
@@ -494,7 +475,8 @@ class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps,
           className="retrospective-notification-toast-container"
           toastClassName="retrospective-notification-toast"
           bodyClassName="retrospective-notification-toast-body"
-          progressClassName="retrospective-notification-toast-progress-bar" />
+          progressClassName="retrospective-notification-toast-progress-bar"
+        />
       </div>
     );
   }
