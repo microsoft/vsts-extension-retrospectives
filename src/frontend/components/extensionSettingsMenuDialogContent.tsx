@@ -76,7 +76,6 @@ export const CLEAR_VISIT_HISTORY_CONTENT: ContentItem[] = [
   },
 ];
 
-
 export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] => {
   const bullets: ContentItem[] = [];
   const elements: React.ReactNode[] = [];
