@@ -143,7 +143,7 @@ const ExtensionDialog: React.FC<ExtensionDialogProps> = ({
   </Dialog>
 );
 
-class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
+export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
   constructor(props: IExtensionSettingsMenuProps) {
     super(props);
 
