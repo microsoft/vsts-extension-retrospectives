@@ -86,45 +86,61 @@ export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] =>
     return text;
   };
 
-  const flushBullets = (key: string, addTopSpace?: boolean, addBottomSpace?: boolean) => {
-    if (bullets.length) {
-      elements.push(
-        <ul
-          key={key}
-          className="menu-item-dialog-list"
-          style={{
-            marginTop: addTopSpace ? '1rem' : undefined,
-            marginBottom: addBottomSpace ? '1rem' : undefined,
-          }}
-        >
-          {bullets.map((bullet, i) => (
-            <li key={`${key}-li-${i}`}>{bullet.content}</li>
-          ))}
-        </ul>
-      );
-      bullets.length = 0;
-    }
+  const flushBullets = (
+    key: string,
+    addTopSpace: boolean,
+    addBottomSpace: boolean
+  ) => {
+    if (!bullets.length) return;
+
+    elements.push(
+      <ul
+        key={key}
+        className="menu-item-dialog-list"
+        style={{
+          marginTop: addTopSpace ? '1rem' : undefined,
+          marginBottom: addBottomSpace ? '1rem' : undefined,
+        }}
+      >
+        {bullets.map((bullet, i) => (
+          <li key={`${key}-li-${i}`}>{bullet.content}</li>
+        ))}
+      </ul>
+    );
+    bullets.length = 0;
   };
 
   contentArray.forEach((item, index) => {
-    const next = contentArray[index + 1];
     const prev = contentArray[index - 1];
+    const next = contentArray[index + 1];
+    const isFirst = index === 0;
+    const isLast = index === contentArray.length - 1;
 
     if (item.bullet) {
       bullets.push(item);
 
-      const isLast = index === contentArray.length - 1;
       const nextIsParagraph = next && !next.bullet;
-
-      if (isLast || nextIsParagraph) {
-        flushBullets(`ul-${index}`, prev && !prev.bullet, true);
+      const isLastBullet = isLast || nextIsParagraph;
+      if (isLastBullet) {
+        const addTop = !isFirst && (!prev || !prev.bullet);
+        const addBottom = !isLast && (!next || !next.bullet);
+        flushBullets(`ul-${index}`, addTop, addBottom);
       }
     } else {
-      flushBullets(`ul-${index}`, prev && prev.bullet, false);
+      flushBullets(`ul-${index}`, false, false);
 
-      const marginBottom = next?.bullet ? undefined : '1rem';
+      const prevIsBulletGroup = prev && prev.bullet;
+      const nextIsParagraph = next && !next.bullet;
+      const addBottom = !isLast && nextIsParagraph;
+
       elements.push(
-        <div key={`p-${index}`} style={{ marginBottom }}>
+        <div
+          key={`p-${index}`}
+          style={{
+            marginTop: !isFirst && (!prev || prev.bullet) ? '1rem' : undefined,
+            marginBottom: addBottom ? '1rem' : undefined,
+          }}
+        >
           {applyFontStyle(item.content, item.style || 'normal')}
         </div>
       );
