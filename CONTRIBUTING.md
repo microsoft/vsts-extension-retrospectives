@@ -1,18 +1,12 @@
 # Contributing
 
-> ## TL;DR
->
-> _We're looking for contributors!_
->
-> _We’ll continue maintaining the Retrospective Extension, but with limited time for new features, we need help to make it even better. Join us if you’re interested! 🙌_
->
-> ## Summary Announcement
->
+## Summary Announcement
+
 > Hi everyone!
 >
-> Maintaining the `Retrospective Extension for Azure DevOps` has been a passion project we’ve worked on in our personal time. While we’ll continue to handle security updates and occasional feature improvements when we can, our available time has become more limited. To take this project to the next level, we’d love to invite contributors to join and help make it even better for the community.
+> Maintaining the `Retrospective Extension for Azure DevOps` has been a passion project we’ve pursued in our personal time. While we’ll continue to handle security updates and occasional feature improvements when we can, our available time is limited. To help take the project to the next level, we’d love to invite contributors to join us in making it even better for the community.
 >
-> If you're interested in contributing, please check out the repo and the [Contributing Guideline](./CONTRIBUTING.md)! Together, we can ensure the project thrives. 🚀
+> If you're interested in contributing, please check out the repo and the [Contributing Guideline](./CONTRIBUTING.md)! Together, we can ensure the project continues to thrive! 🚀
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/microsoft/vsts-extension-retrospectives/badge)](https://scorecard.dev/viewer/?uri=github.com/microsoft/vsts-extension-retrospectives)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9514/badge)](https://www.bestpractices.dev/projects/9514)
