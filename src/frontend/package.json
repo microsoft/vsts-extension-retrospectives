@@ -26,8 +26,9 @@
   "author": "Microsoft",
   "license": "ISC",
   "dependencies": {
-    "@microsoft/applicationinsights-react-js": "17.3.6",
-    "@microsoft/applicationinsights-web": "3.3.8",
+    "@microsoft/applicationinsights-clickanalytics-js": "3.3.8",
+    "@microsoft/applicationinsights-react-js": "17.3.5",
+    "@microsoft/applicationinsights-web": "3.3.6",
     "@microsoft/signalr": "8.0.7",
     "@tanstack/react-table": "8.20.5",
     "azure-devops-extension-api": "4.254.0",
@@ -70,7 +71,7 @@
     "compression-webpack-plugin": "11.1.0",
     "crypto-browserify": "3.12.1",
     "css-loader": "7.1.2",
-    "del-cli": "^6.0.0",
+    "del-cli": "6.0.0",
     "enzyme": "3.11.0",
     "eslint": "9.25.1",
     "eslint-plugin-react": "7.37.4",
@@ -102,10 +103,7 @@
   "overrides": {
     "cross-spawn": "7.0.6",
     "execa": "9.5.2",
-    "clipboardy": "4.0.0",
-    "@microsoft/applicationinsights-core-js": "3.3.6",
-    "@microsoft/applicationinsights-common": "3.3.6",
-    "@microsoft/applicationinsights-analytics-js": "3.3.6"
+    "clipboardy": "4.0.0"
   },
   "jest": {
     "testPathIgnorePatterns": [

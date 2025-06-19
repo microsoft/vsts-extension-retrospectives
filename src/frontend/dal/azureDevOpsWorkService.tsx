@@ -34,8 +34,7 @@ class WorkService {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (e: any) {
-      console.error(e);
-      appInsights.trackException(e);
+      appInsights.trackException({ exception: e, properties: { teamId } });
       if (e.serverError?.typeKey === 'CurrentIterationDoesNotExistException') {
         appInsights.trackTrace({ message: TelemetryExceptions.CurrentTeamIterationNotFound, properties: { teamId, e } });
       }
@@ -63,8 +62,7 @@ class WorkService {
       teamFieldValues = await this._httpWorkClient.getTeamFieldValues(teamContext);
     }
     catch (e) {
-      appInsights.trackException(e);
-      console.error('An exception occurred while trying to get the team field values: ', e);
+      appInsights.trackException({ exception: e, properties: { teamId } });
     }
 
     return teamFieldValues;

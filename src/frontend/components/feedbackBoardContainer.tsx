@@ -186,7 +186,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       const isBackendServiceConnected = await reflectBackendService.startConnection();
       this.setState({ isBackendServiceConnected });
     } catch (error) {
-      console.error({ m: "isBackendServiceConnected", error });
+      appInsights.trackException({
+        exception: error,
+        properties: {
+          action: 'connect',
+        },
+      });
     }
 
     try {
@@ -198,19 +203,34 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true, });
     } catch (error) {
-      console.error({ m: "initializedTeamAndBoardState", error });
+      appInsights.trackException({
+        exception: error,
+        properties: {
+          action: 'initializeTeamAndBoardState',
+        },
+      });
     }
 
     try {
       await this.setSupportedWorkItemTypesForProject();
     } catch (error) {
-      console.error({ m: "setSupportedWorkItemTypesForProject", error });
+      appInsights.trackException({
+        exception: error,
+        properties: {
+          action: 'setSupportedWorkItemTypesForProject',
+        },
+      });
     }
 
     try {
       await this.updateFeedbackItemsAndContributors(initialCurrentTeam, initialCurrentBoard);
     } catch (error) {
-      console.error({ m: "updateFeedbackItemsAndContributors", error });
+      appInsights.trackException({
+        exception: error,
+        properties: {
+          action: 'updateFeedbackItemsAndContributors',
+        },
+      });
     }
 
     try {
@@ -218,7 +238,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b, 0) : 0 });
     } catch (error) {
-      console.error({ m: "votes", error });
+      appInsights.trackException({
+        exception: error,
+        properties: {
+          action: 'votes',
+        },
+      });
     }
 
     try {
@@ -236,8 +261,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
     }
     catch (e) {
-      console.error(e);
-      appInsights.trackException(e);
+      appInsights.trackException({
+        exception: e,
+        properties: {
+          action: 'catchError',
+        },
+      });
     }
 
     this.setState({ isAppInitialized: true });

@@ -48,9 +48,8 @@ class ReflectBackendService {
         .build();
       this._connectionAvailable = false;
 
-      this._signalRConnection.onclose((error) => {
+      this._signalRConnection.onclose(() => {
         this._connectionAvailable = false;
-        console.error("SignalR closed with an error of: ", error);
       });
     }
   }
@@ -68,8 +67,7 @@ class ReflectBackendService {
       this._connectionAvailable = true;
     }
     catch (error) {
-      console.error('Error when trying to start signalR connection: ', error);
-      console.debug('Unable to establish signalR connection, live syncing will be affected.');
+      console.debug(`Error when trying to start signalR connection: ${error}. Unable to establish signalR connection, live syncing will be affected.`);
       this._connectionAvailable = false;
     }
 

@@ -41,7 +41,7 @@ const getTeamFieldValuesMock = () => {
     })]
 };
 
-jest.mock('../feedbackBoardMetadataForm', () => { return mocked({});});
+jest.mock('../feedbackBoardMetadataForm', () => { return mocked({}); });
 jest.mock('azure-devops-extension-api/Work/WorkClient', () => {
   return {
     getTeamIterations: getTeamIterationsMock,

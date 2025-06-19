@@ -40,17 +40,15 @@ export async function readDocuments<T>(
         properties: { collectionName }
       });
       if (throwCollectionDoesNotExistException) {
-        throw e; // Rethrow only if explicitly required
+        throw e;
       }
-      return []; // Fallback to an empty array
+      return [];
     }
 
-    // Log unexpected errors as exceptions
-    console.error(e);
     appInsights.trackException(e);
-    data = []; // Fallback for other exceptions
+    data = [];
   }
-  return data; // Return the fetched data or fallback value
+  return data;
 }
 
 /**
@@ -65,8 +63,7 @@ export async function readDocument<T>(collectionName: string, id: string, isPriv
   try {
     data = await dataService.getDocument(collectionName, id, isPrivate ? { scopeType: 'User' } : undefined);
   } catch (e) {
-    appInsights.trackException(e);
-    console.error('An exception occurred while trying to read the document: ', e);
+    appInsights.trackException({ exception: e, properties: { collectionName, id } });
     data = undefined;
   }
 
@@ -100,7 +97,6 @@ export async function updateDocument<T>(collectionName: string, data: T, isPriva
     updatedData = await dataService.updateDocument(collectionName, data, isPrivate ? { scopeType: 'User' } : undefined);
   } catch (e) {
     appInsights.trackException(e);
-    console.error('An exception occurred while trying to update the document: ', e);
     updatedData = undefined;
   }
 
@@ -126,7 +122,6 @@ export async function setValue<T>(id: string, data: T, isPrivate?: boolean): Pro
     return dataService.setValue(id, data, isPrivate ? { scopeType: 'User' } : undefined);
   } catch (e) {
     appInsights.trackException(e);
-    console.error('An exception occurred while trying to read the value: ', e);
     updatedData = undefined;
   }
 
@@ -144,7 +139,6 @@ export async function getValue<T>(id: string, isPrivate?: boolean): Promise<T> {
     data = await dataService.getValue<T>(id, isPrivate ? { scopeType: 'User' } : undefined);
   } catch (e) {
     appInsights.trackException(e);
-    console.error('An exception occurred while trying to read the value: ', e);
     data = undefined;
   }
 
