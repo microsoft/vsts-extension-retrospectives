@@ -166,8 +166,9 @@ describe('ExtensionSettingsMenu dialog dismisses', () => {
     dialog.prop('onDismiss')?.();
     expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
   });
-});
 */
+});
+
 describe('ExtensionSettingsMenu dialog default actions', () => {
   const getWrapper = (): ShallowWrapper<Props, State> =>
     shallow(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
