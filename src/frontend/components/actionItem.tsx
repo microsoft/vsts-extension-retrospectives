@@ -44,7 +44,7 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
   }
 
   componentDidMount() {
-    if(this.props.shouldFocus && this.openWorkItemButton) {
+    if (this.props.shouldFocus && this.openWorkItemButton) {
       this.openWorkItemButton.focus();
     }
   }
@@ -52,16 +52,19 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
   public openWorkItemButton: HTMLElement;
 
   private readonly getWorkItemTypeIconProps = (workItemType: WorkItemType): IDocumentCardPreviewProps => {
+    const typeName = workItemType?.name || 'Unknown';
+    const iconUrl = workItemType?.icon?.url || '';
+
     return {
       previewImages: [
         {
           previewIconContainerClass: 'work-item-type-icon-container',
           width: 36,
           previewIconProps: {
-            ariaLabel: `icon for work item type ${workItemType.name}`,
+            ariaLabel: `icon for work item type ${typeName}`,
             imageProps: {
-              src: workItemType.icon.url,
-              alt: `icon for work item type ${workItemType.name}`,
+              src: iconUrl,
+              alt: `icon for work item type ${typeName}`,
             }
           }
         }
@@ -140,7 +143,7 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
     const iconProps: IDocumentCardPreviewProps = this.getWorkItemTypeIconProps(workItemType);
 
     // Explicitly cast, since the returned contract contains states, but the interface defined does not
-    const workItemStates: WorkItemStateColor[] = workItemType.states ? workItemType.states : null;
+    const workItemStates: WorkItemStateColor[] = workItemType?.states ? workItemType.states : null;
     const workItemState: WorkItemStateColor = workItemStates ? workItemStates.find(wisc => wisc.name === this.props.actionItem.fields['System.State']) : null;
     const resolvedBorderRight: string = workItemState && (workItemState.category === 'Completed' || workItemState.category === 'Resolved') ? 'resolved-border-right' : '';
 
@@ -198,7 +201,7 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
               <PrimaryButton onClick={(e) => {
                 e && e.stopPropagation();
                 this.onConfirmUnlinkWorkItem(this.props.actionItem.id)
-                }} text="Remove" />
+              }} text="Remove" />
               <DefaultButton onClick={this.hideUnlinkWorkItemConfirmationDialog} text="Cancel" />
             </DialogFooter>
           </Dialog>
