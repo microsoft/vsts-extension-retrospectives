@@ -129,9 +129,7 @@ export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] =>
     } else {
       flushBullets(`ul-${index}`, false, false);
 
-      const prevIsBulletGroup = prev && prev.bullet;
-      const nextIsParagraph = next && !next.bullet;
-      const addBottom = !isLast && nextIsParagraph;
+      const addBottom = !isLast && next && next.bullet;
 
       elements.push(
         <div
