@@ -116,8 +116,9 @@ describe('ExtensionSettingsMenu dialog toggles', () => {
     clearItem?.onClick?.();
     expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(false);
   });
-});
 */
+});
+
 describe('ExtensionSettingsMenu dialog dismisses', () => {
   const getWrapper = (): ShallowWrapper<Props, State> =>
     shallow(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
@@ -175,9 +176,10 @@ describe('ExtensionSettingsMenu dialog default actions', () => {
 
   let openSpy: jest.SpyInstance;
 
-  beforeEach(() => {
-    openSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
-  });
+beforeEach((): void => {
+  openSpy = jest.spyOn(window, 'open').mockImplementation((): Window | null => null);
+});
+
 
   afterEach(() => {
     openSpy.mockRestore();
