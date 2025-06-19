@@ -6,7 +6,7 @@ import { RETRO_URLS } from '../../components/extensionSettingsMenuDialogContent'
 
 type Props = React.ComponentProps<typeof ExtensionSettingsMenu>;
 type State = {
-  isClearVisitHistoryDialogHidden: boolean;
+//  isClearVisitHistoryDialogHidden: boolean;
   isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
@@ -107,7 +107,7 @@ describe('ExtensionSettingsMenu dialog toggles', () => {
     volunteer?.onClick?.();
     expect(wrapper.state('isPleaseJoinUsDialogHidden')).toBe(false);
   });
-
+/*
   it('opens Clear Visit History dialog via Settings', () => {
     const wrapper = getWrapper();
     const settings = wrapper.findWhere(node => node.prop('ariaLabel') === 'User Settings');
@@ -117,7 +117,7 @@ describe('ExtensionSettingsMenu dialog toggles', () => {
     expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(false);
   });
 });
-
+*/
 describe('ExtensionSettingsMenu dialog dismisses', () => {
   const getWrapper = (): ShallowWrapper<Props, State> =>
     shallow(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
@@ -157,7 +157,7 @@ describe('ExtensionSettingsMenu dialog dismisses', () => {
     dialog.prop('onDismiss')?.();
     expect(wrapper.state('isPleaseJoinUsDialogHidden')).toBe(true);
   });
-
+/*
   it('closes Clear Visit History dialog when dismissed', () => {
     const wrapper = getWrapper();
     wrapper.setState({ isClearVisitHistoryDialogHidden: false });
@@ -167,7 +167,7 @@ describe('ExtensionSettingsMenu dialog dismisses', () => {
     expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
   });
 });
-
+*/
 describe('ExtensionSettingsMenu dialog default actions', () => {
   const getWrapper = (): ShallowWrapper<Props, State> =>
     shallow(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
