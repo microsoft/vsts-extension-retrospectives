@@ -10,7 +10,7 @@ import { workItemService } from '../../dal/azureDevOpsWorkItemService';
 import { IFeedbackItemDocument } from '../../interfaces/feedback';
 import { WorkItemType, WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
 
-const mockOnUpdateActionItem = jest.fn(() => {});
+const mockOnUpdateActionItem = jest.fn(() => { });
 
 const defaultTestProps: ActionItemProps = {
   feedbackItemId: "101",
@@ -160,7 +160,7 @@ describe('UI-level integration tests for ActionItem', () => {
     wrapper.setState({ isUnlinkWorkItemConfirmationDialogHidden: false });
     wrapper.update();
     const removeBtn = wrapper.find(PrimaryButton).filterWhere(b => b.prop('text') === 'Remove');
-    removeBtn.simulate('click', { stopPropagation: () => {}, preventDefault: () => {} });
+    removeBtn.simulate('click', { stopPropagation: () => { }, preventDefault: () => { } });
     // Wait for promises to resolve (flush microtasks)
     await Promise.resolve();
     await Promise.resolve();
@@ -176,7 +176,7 @@ describe('Accessibility and edge case tests for ActionItem', () => {
     const spy = jest.fn();
     // @ts-expect-error: override private for test
     instance.onActionItemClick = spy;
-    detailsDiv.simulate('keyPress', { key: 'Enter', stopPropagation: () => {} });
+    detailsDiv.simulate('keyPress', { key: 'Enter', stopPropagation: () => { } });
     expect(spy).toHaveBeenCalledWith(defaultTestProps.actionItem.id);
   });
 
@@ -185,7 +185,7 @@ describe('Accessibility and edge case tests for ActionItem', () => {
     wrapper.setState({ isUnlinkWorkItemConfirmationDialogHidden: false });
     wrapper.update();
     const cancelBtn = wrapper.find(DefaultButton).filterWhere(b => b.prop('text') === 'Cancel');
-    cancelBtn.simulate('click', { stopPropagation: () => {}, preventDefault: () => {} });
+    cancelBtn.simulate('click', { stopPropagation: () => { }, preventDefault: () => { } });
     expect(wrapper.find(Dialog)).toHaveLength(0);
   });
 
@@ -211,10 +211,10 @@ describe('Private method coverage tests', () => {
   it('showUnlinkWorkItemConfirmationDialog sets state correctly', () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
-    
+
     // @ts-expect-error: accessing private method for test
     instance.showUnlinkWorkItemConfirmationDialog();
-    
+
     expect(wrapper.state('isUnlinkWorkItemConfirmationDialogHidden')).toBe(false);
   });
 
@@ -222,10 +222,10 @@ describe('Private method coverage tests', () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     wrapper.setState({ isUnlinkWorkItemConfirmationDialogHidden: false });
     const instance = wrapper.instance() as ActionItem;
-    
+
     // @ts-expect-error: accessing private method for test
     instance.hideUnlinkWorkItemConfirmationDialog();
-    
+
     expect(wrapper.state('isUnlinkWorkItemConfirmationDialogHidden')).toBe(true);
   });
 
@@ -233,12 +233,12 @@ describe('Private method coverage tests', () => {
     jest.spyOn(itemDataService, 'removeAssociatedActionItem').mockResolvedValue({} as IFeedbackItemDocument);
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
-    
+
     wrapper.setState({ isUnlinkWorkItemConfirmationDialogHidden: false });
-    
+
     // @ts-expect-error: accessing private method for test
     await instance.onConfirmUnlinkWorkItem(defaultTestProps.actionItem.id);
-    
+
     expect(defaultTestProps.onUpdateActionItem).toHaveBeenCalled();
     expect(wrapper.state('isUnlinkWorkItemConfirmationDialogHidden')).toBe(true);
   });
@@ -254,15 +254,15 @@ describe('Private method coverage tests', () => {
       url: "test"
     } as WorkItem;
     jest.spyOn(workItemService, 'getWorkItemsByIds').mockResolvedValue([mockUpdatedWorkItem]);
-    
+
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
-    
+
     wrapper.setState({ linkedWorkItem: { id: 123 } });
-    
+
     // @ts-expect-error: accessing private method for test
     await instance.updateLinkedItem(123);
-    
+
     expect(wrapper.state('linkedWorkItem')).toEqual(mockUpdatedWorkItem);
   });
 
@@ -277,16 +277,16 @@ describe('Private method coverage tests', () => {
       url: "test"
     } as WorkItem;
     jest.spyOn(workItemService, 'getWorkItemsByIds').mockResolvedValue([mockUpdatedWorkItem]);
-    
+
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
     const originalLinkedItem = { id: 123 };
-    
+
     wrapper.setState({ linkedWorkItem: originalLinkedItem });
-    
+
     // @ts-expect-error: accessing private method for test
     await instance.updateLinkedItem(456);
-    
+
     expect(wrapper.state('linkedWorkItem')).toEqual(originalLinkedItem);
   });
 
@@ -294,15 +294,15 @@ describe('Private method coverage tests', () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
     const spy = jest.fn();
-    
+
     // @ts-expect-error: override private method for test
     instance.showUnlinkWorkItem = spy;
-    
+
     const event = { key: 'Enter', preventDefault: jest.fn(), stopPropagation: jest.fn() };
-    
+
     // @ts-expect-error: accessing private method for test
     instance.handleKeyPressSelectorButton(event);
-    
+
     expect(spy).toHaveBeenCalledWith(event);
   });
 
@@ -310,30 +310,30 @@ describe('Private method coverage tests', () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
     const spy = jest.fn();
-    
+
     // @ts-expect-error: override private method for test
     instance.showUnlinkWorkItem = spy;
-    
+
     const event = { key: 'Space', preventDefault: jest.fn(), stopPropagation: jest.fn() };
-    
+
     // @ts-expect-error: accessing private method for test
     instance.handleKeyPressSelectorButton(event);
-    
+
     expect(spy).not.toHaveBeenCalled();
   });
 
   it('showUnlinkWorkItem prevents default and stops propagation', () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
-    
+
     const event = {
       preventDefault: jest.fn(),
       stopPropagation: jest.fn()
     };
-    
+
     // @ts-expect-error: accessing private method for test
     instance.showUnlinkWorkItem(event);
-    
+
     expect(event.preventDefault).toHaveBeenCalled();
     expect(event.stopPropagation).toHaveBeenCalled();
     expect(wrapper.state('isUnlinkWorkItemConfirmationDialogHidden')).toBe(false);
@@ -343,15 +343,15 @@ describe('Private method coverage tests', () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
     const spy = jest.fn();
-    
+
     // @ts-expect-error: override private method for test
     instance.onActionItemClick = spy;
-    
+
     const event = { stopPropagation: jest.fn() };
-    
+
     // @ts-expect-error: accessing private method for test
     instance.showWorkItemForm(event);
-    
+
     expect(event.stopPropagation).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(defaultTestProps.actionItem.id);
   });
@@ -360,13 +360,13 @@ describe('Private method coverage tests', () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
     const spy = jest.fn();
-    
+
     // @ts-expect-error: override private method for test
     instance.onActionItemClick = spy;
-    
+
     // @ts-expect-error: accessing private method for test
     instance.showWorkItemForm(null);
-    
+
     expect(spy).toHaveBeenCalledWith(defaultTestProps.actionItem.id);
   });
 });
