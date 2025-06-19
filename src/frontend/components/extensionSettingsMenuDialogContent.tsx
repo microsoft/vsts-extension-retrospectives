@@ -116,7 +116,7 @@ export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] =>
     const isFirst = index === 0;
     const isLast = index === contentArray.length - 1;
 
-    if (item.bullet) {
+    if (item.bullet) { // prepare lines with bullets
       bullets.push(item);
 
       const nextIsParagraph = next && !next.bullet;
@@ -126,10 +126,10 @@ export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] =>
         const addBottom = !isLast && (!next || !next.bullet);
         flushBullets(`ul-${index}`, addTop, addBottom);
       }
-    } else {
+    } else { // prepare lines without bullets
       flushBullets(`ul-${index}`, false, false);
 
-      const addBottom = !isLast && next && next.bullet;
+      const addBottom = !isLast;
 
       elements.push(
         <div
