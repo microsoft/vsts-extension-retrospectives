@@ -186,11 +186,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       const isBackendServiceConnected = await reflectBackendService.startConnection();
       this.setState({ isBackendServiceConnected });
     } catch (error) {
-      appInsights.trackException({
-        exception: error,
-        properties: {
-          action: 'connect',
-        },
+      appInsights.trackException(error, {
+        action: 'connect',
       });
     }
 
@@ -203,33 +200,24 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true, });
     } catch (error) {
-      appInsights.trackException({
-        exception: error,
-        properties: {
-          action: 'initializeTeamAndBoardState',
-        },
+      appInsights.trackException(error, {
+        action: 'initializeTeamAndBoardState',
       });
     }
 
     try {
       await this.setSupportedWorkItemTypesForProject();
     } catch (error) {
-      appInsights.trackException({
-        exception: error,
-        properties: {
-          action: 'setSupportedWorkItemTypesForProject',
-        },
+      appInsights.trackException(error, {
+        action: 'setSupportedWorkItemTypesForProject',
       });
     }
 
     try {
       await this.updateFeedbackItemsAndContributors(initialCurrentTeam, initialCurrentBoard);
     } catch (error) {
-      appInsights.trackException({
-        exception: error,
-        properties: {
-          action: 'updateFeedbackItemsAndContributors',
-        },
+      appInsights.trackException(error, {
+        action: 'updateFeedbackItemsAndContributors',
       });
     }
 
@@ -238,11 +226,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       this.setState({ castedVoteCount: (votes !== null && votes.length > 0) ? votes.reduce((a, b) => a + b, 0) : 0 });
     } catch (error) {
-      appInsights.trackException({
-        exception: error,
-        properties: {
-          action: 'votes',
-        },
+      appInsights.trackException(error, {
+        action: 'votes',
       });
     }
 
@@ -261,11 +246,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
     }
     catch (e) {
-      appInsights.trackException({
-        exception: e,
-        properties: {
-          action: 'catchError',
-        },
+      appInsights.trackException(e, {
+        action: 'catchError',
       });
     }
 

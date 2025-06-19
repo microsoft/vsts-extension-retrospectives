@@ -109,13 +109,10 @@ export async function handleArchiveToggle(
 
     onArchiveToggle();
   } catch (error) {
-    appInsights.trackException({
-      exception: error,
-      properties: {
-        boardId,
-        teamId,
-        action: toggleIsArchived ? 'archive' : 'restore'
-      }
+    appInsights.trackException(error, {
+      boardId,
+      teamId,
+      action: toggleIsArchived ? 'archive' : 'restore'
     });
   }
 }
@@ -339,14 +336,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       });
 
     } catch (error) {
-      appInsights.trackException({
-        exception: error,
-        properties: {
-          boardId: openDialogBoardId,
-          boardName: deletedBoardName,
-          feedbackItemsCount: deletedFeedbackCount,
-          action: 'delete',
-        },
+      appInsights.trackException(error, {
+        boardId: openDialogBoardId,
+        boardName: deletedBoardName,
+        feedbackItemsCount: deletedFeedbackCount,
+        action: 'delete',
       });
       setRefreshKey(true);
     }

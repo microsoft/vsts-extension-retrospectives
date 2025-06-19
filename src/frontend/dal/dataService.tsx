@@ -63,7 +63,7 @@ export async function readDocument<T>(collectionName: string, id: string, isPriv
   try {
     data = await dataService.getDocument(collectionName, id, isPrivate ? { scopeType: 'User' } : undefined);
   } catch (e) {
-    appInsights.trackException({ exception: e, properties: { collectionName, id } });
+    appInsights.trackException(e, { collectionName, id });
     data = undefined;
   }
 

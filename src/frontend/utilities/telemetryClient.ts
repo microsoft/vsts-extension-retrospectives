@@ -1,23 +1,18 @@
 import { createBrowserHistory } from "history";
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
-import { ITelemetryPlugin } from '@microsoft/applicationinsights-core-js';
 import { ReactPlugin } from '@microsoft/applicationinsights-react-js';
-import { ClickAnalyticsPlugin } from '@microsoft/applicationinsights-clickanalytics-js';
 import { config as environment } from '../config/config';
 
 const browserHistory = createBrowserHistory();
 const reactPlugin = new ReactPlugin();
-const clickPluginInstance = new ClickAnalyticsPlugin();
-const clickPluginConfig = { autoCapture: true };
 const appInsights = new ApplicationInsights({
   config: {
     instrumentationKey: environment.AppInsightsInstrumentKey,
-    extensions: [reactPlugin as ITelemetryPlugin, clickPluginInstance],
+    extensions: [reactPlugin],
     loggingLevelConsole: 2,
     loggingLevelTelemetry: 2,
     extensionConfig: {
-      [reactPlugin.identifier]: { history: browserHistory },
-      [clickPluginInstance.identifier]: clickPluginConfig
+      [reactPlugin.identifier]: { history: browserHistory }
     }
   }
 });

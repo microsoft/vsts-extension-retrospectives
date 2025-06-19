@@ -62,7 +62,7 @@ class WorkService {
       teamFieldValues = await this._httpWorkClient.getTeamFieldValues(teamContext);
     }
     catch (e) {
-      appInsights.trackException({ exception: e, properties: { teamId } });
+      appInsights.trackException(e, { teamId });
     }
 
     return teamFieldValues;
