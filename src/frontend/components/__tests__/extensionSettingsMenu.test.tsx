@@ -224,6 +224,8 @@ beforeEach((): void => {
     const contactItem = menuItems.find((i: IContextualMenuItem) => i.key === 'contactUs');
     contactItem?.onClick?.();
     expect(openSpy).toHaveBeenCalledWith(RETRO_URLS.issues, '_blank');
+  });
+});
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
