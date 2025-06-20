@@ -1,7 +1,7 @@
 import React from 'react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
-import { userDataService } from '../dal/userDataService';
+//import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
@@ -20,6 +20,7 @@ import {
   RETRO_HELP_CONTENT,
   VOLUNTEER_CONTENT,
   //CLEAR_VISIT_HISTORY_CONTENT,
+  WhatsNewHtml,
   renderContent,
 } from './extensionSettingsMenuDialogContent';
 
@@ -435,7 +436,7 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
           defaultButtonText="Open change log"
           containerClassName="whatsnew-dialog"
         >
-          {renderContent(CHANGELOG_CONTENT)}
+          <WhatsNewHtml />
         </ExtensionDialog>
         <ExtensionDialog
           hidden={this.state.isGetHelpDialogHidden}
