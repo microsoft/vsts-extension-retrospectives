@@ -28,6 +28,18 @@ export const PRIME_DIRECTIVE_CONTENT: ContentItem[] = [
   },
 ];
 
+export const WhatsNewHtml = () => (
+  <>
+    <p>The latest release includes updates for setting permissions, deleting boards, and sticky defaults.</p>
+    <ul>
+      <li>Ability to set permissions for accessing the retrospective board now restricted to the board owner or a team admin.</li>
+      <li>Functionality to delete boards was moved from the Board menu to the History table and is only enabled for archived boards.</li>
+      <li>User settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.</li>
+    </ul>
+    <p>Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.</p>
+  </>
+);
+
 export const CHANGELOG_CONTENT: ContentItem[] = [
   {
     content: 'The latest release includes updates for setting permissions, deleting boards, and sticky defaults.'
