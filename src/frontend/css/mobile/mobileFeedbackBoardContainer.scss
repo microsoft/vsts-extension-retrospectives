@@ -35,7 +35,6 @@ $mobile_team_selector_list_item_height: 90px;
 
 .retrospectives-dialog-modal {
   .ms-Dialog-main {
-    width: 90%;
     min-width: auto;
     max-width: none;
     position: absolute;
@@ -78,8 +77,7 @@ $mobile_team_selector_list_item_height: 90px;
     &.retrospectives-board-metadata-dialog,
     &.retrospectives-board-deleted-info-dialog,
     &.retrospectives-unlink-feedback-item-confirmation-dialog,
-    &.retrospectives-delete-board-confirmation-dialog,
-    &.retrospectives-visit-history-cleared-info-dialog {
+    &.retrospectives-delete-board-confirmation-dialog {
       .ms-Dialog-title {
         font-size: 40px;
       }
@@ -156,8 +154,13 @@ $mobile_team_selector_list_item_height: 90px;
 }
 
 .feedback-board-container-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
   width: 100vw;
   max-width: variables.$mobile_breakpoint;
+  overflow-x: auto;
+  gap: 1rem;
   margin-left: variables.$header_horizontal_spacing;
   margin-top: -55px;
 
@@ -166,8 +169,15 @@ $mobile_team_selector_list_item_height: 90px;
   }
 
   .board-selector-group {
-    min-width: 330px;
+    min-width: 0;
+    max-width: 300px;
+    width: 100%;
     transform-origin: 0 0;
+    margin-left: 4rem;
+
+    .board-selector {
+      display: flex;
+    }
 
     .board-actions-menu {
       margin-bottom: 0px;
