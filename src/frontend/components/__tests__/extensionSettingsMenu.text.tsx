@@ -45,7 +45,7 @@ describe('ExtensionSettingsMenu', () => {
     const wrapper = getWrapper();
     expect(wrapper.exists()).toBe(true);
   });
-/* These tests used to work...
+/* These tests used to work...*/
   it('shows labels when isWindowWide is true', () => {
     const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
     wrapper.setState({ isWindowWide: true });
@@ -58,7 +58,7 @@ describe('ExtensionSettingsMenu', () => {
     const labels = wrapper.find('.ms-Button-label');
     expect(labels.length).toBe(0);
   });
-*/
+
   it('renders only the "Switch to desktop view" option when isDesktop is false', () => {
     const props = {
       onScreenViewModeChanged: jest.fn(),
