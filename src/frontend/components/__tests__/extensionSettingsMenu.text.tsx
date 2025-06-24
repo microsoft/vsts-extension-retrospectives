@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { configure, mount, shallow, ShallowWrapper } from 'enzyme';
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+//import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 //import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 //import { Dialog, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
@@ -23,7 +23,7 @@ type State = {
   isWindowWide: boolean;
 };
 
-configure({ adapter: new Adapter() });
+//configure({ adapter: new Adapter() });
 
 describe('ExtensionSettingsMenu', () => {
   const onScreenViewModeChangedMock = jest.fn();
