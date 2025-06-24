@@ -1,0 +1,8 @@
+{
+  "printWidth": 5000,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSpacing": true,
+  "arrowParens": "avoid",
+  "quoteProps": "consistent"
+}
