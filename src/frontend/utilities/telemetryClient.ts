@@ -1,7 +1,6 @@
-import { ReactPlugin } from '@microsoft/applicationinsights-react-js';
-import { ApplicationInsights } from '@microsoft/applicationinsights-web';
-import { ITelemetryPlugin } from '@microsoft/applicationinsights-core-js';
 import { createBrowserHistory } from "history";
+import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+import { ReactPlugin } from '@microsoft/applicationinsights-react-js';
 import { config as environment } from '../config/config';
 
 const browserHistory = createBrowserHistory();
@@ -9,7 +8,7 @@ const reactPlugin = new ReactPlugin();
 const appInsights = new ApplicationInsights({
   config: {
     instrumentationKey: environment.AppInsightsInstrumentKey,
-    extensions: [reactPlugin as ITelemetryPlugin],
+    extensions: [reactPlugin],
     loggingLevelConsole: 2,
     loggingLevelTelemetry: 2,
     extensionConfig: {
@@ -18,6 +17,7 @@ const appInsights = new ApplicationInsights({
   }
 });
 appInsights.loadAppInsights();
+appInsights.trackPageView();
 
 export const TelemetryExceptions = {
   BoardsNotFoundForTeam: 'Feedback boards not found for team',
@@ -48,17 +48,5 @@ export const TelemetryEvents = {
   ExtensionLaunched: 'Extension launched',
   FeedbackItemCarouselLaunched: 'Feedback item carousel launched',
 };
-
-const updatedConsoleError = ((oldErrorFunction) => {
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    error: function (message?: any, ...optionalParams: any[]) {
-      oldErrorFunction(message, optionalParams);
-      appInsights.trackException({ error: { message: message, name: "console.error" } });
-    },
-  };
-})(window.console.error);
-
-window.console.error = updatedConsoleError.error;
 
 export { reactPlugin, appInsights };

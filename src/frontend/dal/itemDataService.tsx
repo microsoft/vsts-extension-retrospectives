@@ -76,25 +76,21 @@ class ItemDataService {
       feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-      // Handle specific case where the collection does not exist
       if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
         console.warn(`No feedback items found for board ${boardId}—expected for new or unused boards.`);
 
-        // Add telemetry for observability
         appInsights.trackTrace({
           message: `Feedback items not found for board ${boardId}.`,
           properties: { boardId, exception: e }
         });
 
-        return []; // Gracefully return an empty array
+        return [];
       }
 
-      // Log unexpected exceptions
-      console.error(`Unexpected error fetching feedback items for board ${boardId}:`, e);
-      appInsights.trackException(e);
+      appInsights.trackException(e, { boardId });
     }
 
-    return feedbackItems; // Return fetched data or an empty array
+    return feedbackItems;
   };
 
   /**
