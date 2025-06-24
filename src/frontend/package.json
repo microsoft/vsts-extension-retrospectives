@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@codecov/webpack-plugin": "1.9.0",
-    "@eslint/eslintrc": "3.2.0",
+    "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.20.0",
     "@types/classnames": "2.3.4",
     "@types/enzyme": "3.10.12",
