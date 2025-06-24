@@ -69,13 +69,7 @@ export const VOLUNTEER_CONTENT: ContentItem[] = [
     content: 'Want to contribute? Join us and become part of our community! 🙋',
   },
 ];
-/*
-export const CLEAR_VISIT_HISTORY_CONTENT: ContentItem[] = [
-  {
-    content: 'This extension maintains records of the teams and boards you visited.  Clearing visit history means that the next time you use the extension, you will not be automatically directed to your last visited board.',
-  },
-];
-*/
+
 export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] => {
   const bullets: ContentItem[] = [];
   const elements: React.ReactNode[] = [];

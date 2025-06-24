@@ -19,12 +19,10 @@ import {
   CHANGELOG_CONTENT,
   RETRO_HELP_CONTENT,
   VOLUNTEER_CONTENT,
-  //CLEAR_VISIT_HISTORY_CONTENT,
   renderContent,
 } from './extensionSettingsMenuDialogContent';
 
 interface IExtensionSettingsMenuState {
-  //isClearVisitHistoryDialogHidden: boolean;
   isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
@@ -148,7 +146,6 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
     super(props);
 
     this.state = {
-      // isClearVisitHistoryDialogHidden: true,
       isPrimeDirectiveDialogHidden: true,
       isWhatsNewDialogHidden: true,
       isGetHelpDialogHidden: true,
@@ -242,20 +239,7 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
       }
     }
   };
-/*
-  private readonly clearVisitHistory = async () => {
-    await userDataService.clearVisits();
-    this.hideClearVisitHistoryDialog();
-  }
 
-  private readonly showClearVisitHistoryDialog = () => {
-    this.setState({ isClearVisitHistoryDialogHidden: false });
-  }
-
-  private readonly hideClearVisitHistoryDialog = () => {
-    this.setState({ isClearVisitHistoryDialogHidden: true });
-  }
-*/
   private readonly showPrimeDirectiveDialog = () => {
     this.setState({ isPrimeDirectiveDialogHidden: false });
   };
@@ -354,13 +338,6 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
 
     private extensionSettingsMenuItem(): IContextualMenuItem[] {
     return [
-/*      this.props.isDesktop && {
-        key: 'clearVisitHistory',
-        iconProps: { iconName: 'RemoveEvent' },
-        onClick: this.showClearVisitHistoryDialog,
-        text: 'Clear visit history',
-        title: 'Clear visit history',
-      },*/
       !this.props.isDesktop && {
         key: 'switchToDesktop',
         iconProps: { iconName: 'TVMonitor' },
@@ -457,20 +434,7 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
         >
           {renderContent(VOLUNTEER_CONTENT)}
         </ExtensionDialog>
-{/*
-        <ExtensionDialog
-          hidden={this.state.isClearVisitHistoryDialogHidden}
-          onDismiss={this.hideClearVisitHistoryDialog}
-          title="Clear Visit History"
-          onDefaultClick={this.clearVisitHistory}
-          defaultButtonText="Clear my visit history"
-          primaryButtonText="Cancel"
-          minWidth={450}
-          containerClassName="visit-history-dialog"
-        >
-          {renderContent(CLEAR_VISIT_HISTORY_CONTENT)}
-        </ExtensionDialog>
-*/}
+
         <ToastContainer
           transition={Slide}
           closeButton={false}
