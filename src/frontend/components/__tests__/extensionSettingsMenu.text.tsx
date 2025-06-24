@@ -160,32 +160,50 @@ describe('ExtensionSettingsMenu', () => {
 });
 
 describe('ExtensionSettingsMenu - isWindowWide behavior', () => {
-  const originalCreateElement = document.createElement;
+  let originalOffsetWidth: number;
 
-  beforeEach(() => {
-    // Direct reassignment avoids the "Cannot redefine" error
-    document.createElement = originalCreateElement;
+  beforeAll(() => {
+    // Save the original descriptor
+    originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth')?.value;
   });
 
-  afterEach(() => {
-    // Reapply the mock if needed globally for other tests
-    document.createElement = jest.fn(() => ({
-      setAttribute: jest.fn(),
-      click: jest.fn(),
-    })) as unknown as typeof document.createElement;
+  afterAll(() => {
+    // Restore the original offsetWidth (cleanup)
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: originalOffsetWidth,
+    });
   });
 
   it('shows labels when isWindowWide is true', () => {
+    // Pretend the window is wide
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      get() {
+        return 1000;
+      },
+    });
+
     const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
     wrapper.setState({ isWindowWide: true });
-    wrapper.update(); // Make sure the render reflects the state
+    wrapper.update();
+
     expect(wrapper.find('.ms-Button-label').length).toBeGreaterThan(0);
   });
 
   it('does not show labels when isWindowWide is false', () => {
+    // Pretend the window is narrow
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      get() {
+        return 300;
+      },
+    });
+
     const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
     wrapper.setState({ isWindowWide: false });
-    wrapper.update(); // Ensure re-render
+    wrapper.update();
+
     expect(wrapper.find('.ms-Button-label').length).toBe(0);
   });
 });
