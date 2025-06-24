@@ -159,30 +159,35 @@ describe('ExtensionSettingsMenu', () => {
   });
 });
 
-describe('ExtensionSettingsMenu - isWindowWide behavior', () => {
-  let originalOffsetWidth: number;
+describe('ExtensionSettingsMenu - isWindowWide logic', () => {
+  const originalInnerWidth = window.innerWidth;
+  const originalInnerHeight = window.innerHeight;
 
-  beforeAll(() => {
-    // Save the original descriptor
-    originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth')?.value;
+  const setWindowSize = (width: number, height: number) => {
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: width,
+    });
+
+    Object.defineProperty(window, 'innerHeight', {
+      writable: true,
+      configurable: true,
+      value: height,
+    });
+
+    // Fire a resize event in case your component listens to it
+    window.dispatchEvent(new Event('resize'));
+  };
+
+  afterEach(() => {
+    // Restore original window dimensions
+    setWindowSize(originalInnerWidth, originalInnerHeight);
   });
 
-  afterAll(() => {
-    // Restore the original offsetWidth (cleanup)
-    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
-      configurable: true,
-      value: originalOffsetWidth,
-    });
-  });
-
-  it('shows labels when isWindowWide is true', () => {
-    // Pretend the window is wide
-    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
-      configurable: true,
-      get() {
-        return 1000;
-      },
-    });
+  it('treats window as wide if width >= 90% of max width', () => {
+    // Set a wide window
+    setWindowSize(1800, 800); // assume max width is 2000 => 90% = 1800
 
     const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
     wrapper.setState({ isWindowWide: true });
@@ -191,14 +196,9 @@ describe('ExtensionSettingsMenu - isWindowWide behavior', () => {
     expect(wrapper.find('.ms-Button-label').length).toBeGreaterThan(0);
   });
 
-  it('does not show labels when isWindowWide is false', () => {
-    // Pretend the window is narrow
-    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
-      configurable: true,
-      get() {
-        return 300;
-      },
-    });
+  it('treats window as narrow if height > width', () => {
+    // Set a tall window
+    setWindowSize(600, 800);
 
     const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
     wrapper.setState({ isWindowWide: false });
