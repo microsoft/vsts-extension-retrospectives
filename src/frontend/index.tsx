@@ -1,5 +1,4 @@
 import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
-
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 import { init as sdkInit } from 'azure-devops-extension-sdk';

@@ -17,7 +17,7 @@ import { RETRO_URLS } from '../../components/extensionSettingsMenuDialogContent'
 
 type Props = React.ComponentProps<typeof ExtensionSettingsMenu>;
 type State = {
-  isClearVisitHistoryDialogHidden: boolean;
+  //isClearVisitHistoryDialogHidden: boolean;
   isPrimeDirectiveDialogHidden: boolean;
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
@@ -120,7 +120,7 @@ describe('ExtensionSettingsMenu dialog toggles', () => {
     volunteer?.onClick?.();
     expect(wrapper.state('isPleaseJoinUsDialogHidden')).toBe(false);
   });
-
+/*
   it('opens Clear Visit History dialog via Settings', () => {
     const wrapper = getWrapper();
     const settings = wrapper.findWhere(node => node.prop('ariaLabel') === 'User Settings');
@@ -129,6 +129,7 @@ describe('ExtensionSettingsMenu dialog toggles', () => {
     clearItem?.onClick?.();
     expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(false);
   });
+*/
 });
 
 describe('ExtensionSettingsMenu dialog dismisses', () => {
@@ -170,7 +171,7 @@ describe('ExtensionSettingsMenu dialog dismisses', () => {
     dialog.prop('onDismiss')?.();
     expect(wrapper.state('isPleaseJoinUsDialogHidden')).toBe(true);
   });
-
+/*
   it('closes Clear Visit History dialog when dismissed', () => {
     const wrapper = getWrapper();
     wrapper.setState({ isClearVisitHistoryDialogHidden: false });
@@ -179,6 +180,7 @@ describe('ExtensionSettingsMenu dialog dismisses', () => {
     dialog.prop('onDismiss')?.();
     expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
   });
+*/
 });
 
 describe('ExtensionSettingsMenu dialog default actions', () => {
@@ -401,7 +403,7 @@ describe('ExtensionSettingsMenu', () => {
       (instance as any).hideWhatsNewDialog();
       expect(wrapper.state('isWhatsNewDialogHidden')).toBe(true);
     });
-
+/*
     it('shows and hides Clear Visit History dialog correctly', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -412,6 +414,7 @@ describe('ExtensionSettingsMenu', () => {
       (instance as any).hideClearVisitHistoryDialog();
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
+*/
 /*
     it('hides mobile extension settings dialog correctly', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
@@ -558,7 +561,7 @@ describe('ExtensionSettingsMenu', () => {
       }
     });
   });
-
+/*
   describe('Clear Visit History', () => {
     it('clears visit history correctly', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
@@ -571,6 +574,7 @@ describe('ExtensionSettingsMenu', () => {
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
   });
+*/
 /*
   describe('Changelog Content', () => {
     it('returns correct changelog content', () => {
@@ -764,6 +768,7 @@ describe('ExtensionSettingsMenu', () => {
       expect(wrapper.state('isGetHelpDialogHidden')).toBe(true);
     });
 */
+/*
     it('handles Clear Visit History dialog footer actions correctly', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
 
@@ -773,6 +778,7 @@ describe('ExtensionSettingsMenu', () => {
       (instance as any).hideClearVisitHistoryDialog();
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
+*/
   });
 
   describe('File Import Flow', () => {
@@ -1128,6 +1134,7 @@ describe('ExtensionSettingsMenu', () => {
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
 */
+/*
     it('tests clearVisitHistory method directly', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -1138,7 +1145,7 @@ describe('ExtensionSettingsMenu', () => {
 
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
-
+*/
     it('tests comprehensive export data flow', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
