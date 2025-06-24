@@ -160,26 +160,32 @@ describe('ExtensionSettingsMenu', () => {
 });
 
 describe('ExtensionSettingsMenu - isWindowWide behavior', () => {
+  const originalCreateElement = document.createElement;
+
   beforeEach(() => {
-    // Restore the real createElement temporarily
-    Object.defineProperty(document, 'createElement', {
-      configurable: true,
-      writable: true,
-      value: realCreateElement,
-    });
+    // Direct reassignment avoids the "Cannot redefine" error
+    document.createElement = originalCreateElement;
+  });
+
+  afterEach(() => {
+    // Reapply the mock if needed globally for other tests
+    document.createElement = jest.fn(() => ({
+      setAttribute: jest.fn(),
+      click: jest.fn(),
+    })) as unknown as typeof document.createElement;
   });
 
   it('shows labels when isWindowWide is true', () => {
     const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
     wrapper.setState({ isWindowWide: true });
-    wrapper.update(); // force re-render
+    wrapper.update(); // Make sure the render reflects the state
     expect(wrapper.find('.ms-Button-label').length).toBeGreaterThan(0);
   });
 
   it('does not show labels when isWindowWide is false', () => {
     const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
     wrapper.setState({ isWindowWide: false });
-    wrapper.update(); // force re-render
+    wrapper.update(); // Ensure re-render
     expect(wrapper.find('.ms-Button-label').length).toBe(0);
   });
 });
