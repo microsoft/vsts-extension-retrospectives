@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { configure, mount, shallow, ShallowWrapper } from 'enzyme';
-//import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 //import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 //import { Dialog, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
@@ -23,7 +23,101 @@ type State = {
   isWindowWide: boolean;
 };
 
-//configure({ adapter: new Adapter() });
+configure({ adapter: new Adapter() });
+
+jest.mock('../../dal/userDataService', () => ({
+  userDataService: {
+    clearVisits: jest.fn().mockResolvedValue(undefined)
+  }
+}));
+
+jest.mock('../../dal/boardDataService', () => ({
+  default: {
+    getBoardsForTeam: jest.fn().mockResolvedValue([
+      { id: 'board1', title: 'Test Board 1' },
+      { id: 'board2', title: 'Test Board 2' }
+    ]),
+    createBoardForTeam: jest.fn().mockResolvedValue({ id: 'newBoard', title: 'New Board' })
+  },
+  boardDataService: {
+    getBoardsForTeam: jest.fn().mockResolvedValue([
+      { id: 'board1', title: 'Test Board 1' },
+      { id: 'board2', title: 'Test Board 2' }
+    ]),
+    createBoardForTeam: jest.fn().mockResolvedValue({ id: 'newBoard', title: 'New Board' })
+  }
+}));
+
+jest.mock('../../dal/azureDevOpsCoreService', () => ({
+  azureDevOpsCoreService: {
+    getAllTeams: jest.fn().mockResolvedValue([
+      { id: 'team1', name: 'Team 1' },
+      { id: 'team2', name: 'Team 2' }
+    ]),
+    getDefaultTeam: jest.fn().mockResolvedValue({ id: 'defaultTeam', name: 'Default Team' })
+  }
+}));
+
+jest.mock('../../utilities/servicesHelper', () => ({
+  getProjectId: jest.fn().mockResolvedValue('test-project-id')
+}));
+
+jest.mock('../../dal/itemDataService', () => ({
+  itemDataService: {
+    getFeedbackItemsForBoard: jest.fn().mockResolvedValue([
+      { id: 'item1', title: 'Test Item 1', boardId: 'board1' },
+      { id: 'item2', title: 'Test Item 2', boardId: 'board1' }
+    ]),
+    appendItemToBoard: jest.fn().mockResolvedValue(undefined)
+  }
+}));
+
+jest.mock('react-toastify', () => ({
+  toast: Object.assign(jest.fn().mockReturnValue('toast-id'), {
+    update: jest.fn()
+  }),
+  ToastContainer: () => <div data-testid="toast-container" />,
+  Slide: {}
+}));
+
+jest.mock('../../utilities/telemetryClient', () => ({
+  reactPlugin: {}
+}));
+
+jest.mock('@microsoft/applicationinsights-react-js', () => ({
+  withAITracking: (plugin: unknown, component: unknown) => component
+}));
+
+const mockWindowOpen = jest.fn();
+const mockCreateElement = jest.fn();
+const mockAppendChild = jest.fn();
+const mockRemoveChild = jest.fn();
+const mockClick = jest.fn();
+const mockCreateObjectURL = jest.fn();
+
+Object.defineProperty(window, 'open', { writable: true, value: mockWindowOpen });
+Object.defineProperty(document, 'createElement', { writable: true, value: mockCreateElement });
+Object.defineProperty(document.body, 'appendChild', { writable: true, value: mockAppendChild });
+Object.defineProperty(document.body, 'removeChild', { writable: true, value: mockRemoveChild });
+Object.defineProperty(window.URL, 'createObjectURL', { writable: true, value: mockCreateObjectURL });
+
+const mockFileReader = {
+  readAsText: jest.fn(),
+  onload: null as ((event: ProgressEvent<FileReader>) => void) | null,
+  result: ''
+};
+
+Object.defineProperty(global, 'FileReader', {
+  writable: true,
+  value: jest.fn(() => mockFileReader)
+});
+
+Object.defineProperty(global, 'Blob', {
+  writable: true,
+  value: jest.fn()
+});
+
+type ExtensionSettingsMenuInstance = InstanceType<typeof ExtensionSettingsMenu>;
 
 describe('ExtensionSettingsMenu', () => {
   const onScreenViewModeChangedMock = jest.fn();
@@ -216,100 +310,6 @@ beforeEach((): void => {
     expect(openSpy).toHaveBeenCalledWith(RETRO_URLS.issues, '_blank');
   });
 });
-
-jest.mock('../../dal/userDataService', () => ({
-  userDataService: {
-    clearVisits: jest.fn().mockResolvedValue(undefined)
-  }
-}));
-
-jest.mock('../../dal/boardDataService', () => ({
-  default: {
-    getBoardsForTeam: jest.fn().mockResolvedValue([
-      { id: 'board1', title: 'Test Board 1' },
-      { id: 'board2', title: 'Test Board 2' }
-    ]),
-    createBoardForTeam: jest.fn().mockResolvedValue({ id: 'newBoard', title: 'New Board' })
-  },
-  boardDataService: {
-    getBoardsForTeam: jest.fn().mockResolvedValue([
-      { id: 'board1', title: 'Test Board 1' },
-      { id: 'board2', title: 'Test Board 2' }
-    ]),
-    createBoardForTeam: jest.fn().mockResolvedValue({ id: 'newBoard', title: 'New Board' })
-  }
-}));
-
-jest.mock('../../dal/azureDevOpsCoreService', () => ({
-  azureDevOpsCoreService: {
-    getAllTeams: jest.fn().mockResolvedValue([
-      { id: 'team1', name: 'Team 1' },
-      { id: 'team2', name: 'Team 2' }
-    ]),
-    getDefaultTeam: jest.fn().mockResolvedValue({ id: 'defaultTeam', name: 'Default Team' })
-  }
-}));
-
-jest.mock('../../utilities/servicesHelper', () => ({
-  getProjectId: jest.fn().mockResolvedValue('test-project-id')
-}));
-
-jest.mock('../../dal/itemDataService', () => ({
-  itemDataService: {
-    getFeedbackItemsForBoard: jest.fn().mockResolvedValue([
-      { id: 'item1', title: 'Test Item 1', boardId: 'board1' },
-      { id: 'item2', title: 'Test Item 2', boardId: 'board1' }
-    ]),
-    appendItemToBoard: jest.fn().mockResolvedValue(undefined)
-  }
-}));
-
-jest.mock('react-toastify', () => ({
-  toast: Object.assign(jest.fn().mockReturnValue('toast-id'), {
-    update: jest.fn()
-  }),
-  ToastContainer: () => <div data-testid="toast-container" />,
-  Slide: {}
-}));
-
-jest.mock('../../utilities/telemetryClient', () => ({
-  reactPlugin: {}
-}));
-
-jest.mock('@microsoft/applicationinsights-react-js', () => ({
-  withAITracking: (plugin: unknown, component: unknown) => component
-}));
-
-const mockWindowOpen = jest.fn();
-const mockCreateElement = jest.fn();
-const mockAppendChild = jest.fn();
-const mockRemoveChild = jest.fn();
-const mockClick = jest.fn();
-const mockCreateObjectURL = jest.fn();
-
-Object.defineProperty(window, 'open', { writable: true, value: mockWindowOpen });
-Object.defineProperty(document, 'createElement', { writable: true, value: mockCreateElement });
-Object.defineProperty(document.body, 'appendChild', { writable: true, value: mockAppendChild });
-Object.defineProperty(document.body, 'removeChild', { writable: true, value: mockRemoveChild });
-Object.defineProperty(window.URL, 'createObjectURL', { writable: true, value: mockCreateObjectURL });
-
-const mockFileReader = {
-  readAsText: jest.fn(),
-  onload: null as ((event: ProgressEvent<FileReader>) => void) | null,
-  result: ''
-};
-
-Object.defineProperty(global, 'FileReader', {
-  writable: true,
-  value: jest.fn(() => mockFileReader)
-});
-
-Object.defineProperty(global, 'Blob', {
-  writable: true,
-  value: jest.fn()
-});
-
-type ExtensionSettingsMenuInstance = InstanceType<typeof ExtensionSettingsMenu>;
 
 describe('ExtensionSettingsMenu', () => {
   const defaultProps = {
