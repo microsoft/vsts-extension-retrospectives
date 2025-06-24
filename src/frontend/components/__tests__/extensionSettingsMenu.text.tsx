@@ -23,6 +23,8 @@ type State = {
   isWindowWide: boolean;
 };
 
+const realCreateElement = document.createElement;
+
 configure({ adapter: new Adapter() });
 
 jest.mock('../../dal/userDataService', () => ({
@@ -97,8 +99,8 @@ const mockCreateObjectURL = jest.fn();
 
 Object.defineProperty(window, 'open', { writable: true, value: mockWindowOpen });
 Object.defineProperty(document, 'createElement', { writable: true, value: mockCreateElement });
-//Object.defineProperty(document.body, 'appendChild', { writable: true, value: mockAppendChild });
-//Object.defineProperty(document.body, 'removeChild', { writable: true, value: mockRemoveChild });
+Object.defineProperty(document.body, 'appendChild', { writable: true, value: mockAppendChild });
+Object.defineProperty(document.body, 'removeChild', { writable: true, value: mockRemoveChild });
 Object.defineProperty(window.URL, 'createObjectURL', { writable: true, value: mockCreateObjectURL });
 
 const mockFileReader = {
@@ -138,19 +140,6 @@ describe('ExtensionSettingsMenu', () => {
     const wrapper = getWrapper();
     expect(wrapper.exists()).toBe(true);
   });
-/* These tests used to work...*/
-  it('shows labels when isWindowWide is true', () => {
-    const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
-    wrapper.setState({ isWindowWide: true });
-    expect(wrapper.find('.ms-Button-label').length).toBeGreaterThan(0);
-  });
-
-  it('does not show labels when isWindowWide is false', () => {
-    const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
-    wrapper.setState({ isWindowWide: false });
-    const labels = wrapper.find('.ms-Button-label');
-    expect(labels.length).toBe(0);
-  });
 
   it('renders only the "Switch to desktop view" option when isDesktop is false', () => {
     const props = {
@@ -167,6 +156,31 @@ describe('ExtensionSettingsMenu', () => {
 
     expect(menuItems).toHaveLength(1);
     expect(menuItems?.[0].key).toBe('switchToDesktop');
+  });
+});
+
+describe('ExtensionSettingsMenu - isWindowWide behavior', () => {
+  beforeEach(() => {
+    // Restore the real createElement temporarily
+    Object.defineProperty(document, 'createElement', {
+      configurable: true,
+      writable: true,
+      value: realCreateElement,
+    });
+  });
+
+  it('shows labels when isWindowWide is true', () => {
+    const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
+    wrapper.setState({ isWindowWide: true });
+    wrapper.update(); // force re-render
+    expect(wrapper.find('.ms-Button-label').length).toBeGreaterThan(0);
+  });
+
+  it('does not show labels when isWindowWide is false', () => {
+    const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
+    wrapper.setState({ isWindowWide: false });
+    wrapper.update(); // force re-render
+    expect(wrapper.find('.ms-Button-label').length).toBe(0);
   });
 });
 
