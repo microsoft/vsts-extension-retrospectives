@@ -96,9 +96,9 @@ const mockClick = jest.fn();
 const mockCreateObjectURL = jest.fn();
 
 Object.defineProperty(window, 'open', { writable: true, value: mockWindowOpen });
-Object.defineProperty(document, 'createElement', { writable: true, value: mockCreateElement });
-Object.defineProperty(document.body, 'appendChild', { writable: true, value: mockAppendChild });
-Object.defineProperty(document.body, 'removeChild', { writable: true, value: mockRemoveChild });
+//Object.defineProperty(document, 'createElement', { writable: true, value: mockCreateElement });
+//Object.defineProperty(document.body, 'appendChild', { writable: true, value: mockAppendChild });
+//Object.defineProperty(document.body, 'removeChild', { writable: true, value: mockRemoveChild });
 Object.defineProperty(window.URL, 'createObjectURL', { writable: true, value: mockCreateObjectURL });
 
 const mockFileReader = {
