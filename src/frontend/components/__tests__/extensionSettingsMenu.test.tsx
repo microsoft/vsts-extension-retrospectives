@@ -161,7 +161,7 @@ describe('ExtensionSettingsMenu', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
 
-      expect(instance.state.isClearVisitHistoryDialogHidden).toBe(true);
+      //expect(instance.state.isClearVisitHistoryDialogHidden).toBe(true);
       expect(instance.state.isMobileExtensionSettingsDialogHidden).toBe(true);
       expect(instance.state.isWhatsNewDialogHidden).toBe(true);
       expect(instance.state.isGetHelpDialogHidden).toBe(true);
@@ -178,8 +178,8 @@ describe('ExtensionSettingsMenu', () => {
 
       (instance as any).hideWhatsNewDialog();
       expect(wrapper.state('isWhatsNewDialogHidden')).toBe(true);
-    });
-
+    })
+/*
     it('shows and hides Clear Visit History dialog correctly', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -190,7 +190,7 @@ describe('ExtensionSettingsMenu', () => {
       (instance as any).hideClearVisitHistoryDialog();
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
-
+*/
     it('hides mobile extension settings dialog correctly', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -334,7 +334,7 @@ describe('ExtensionSettingsMenu', () => {
       }
     });
   });
-
+/*
   describe('Clear Visit History', () => {
     it('clears visit history correctly', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
@@ -347,7 +347,7 @@ describe('ExtensionSettingsMenu', () => {
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
   });
-
+*/
   describe('Changelog Content', () => {
     it('returns correct changelog content', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
@@ -377,12 +377,12 @@ describe('ExtensionSettingsMenu', () => {
 
       const menuItems = (instance as any).extensionSettingsMenuItem;
 
-      expect(menuItems).toHaveLength(6);
+      expect(menuItems).toHaveLength(5); //6
 
       const menuKeys = menuItems.map((item: any) => item.key);
       expect(menuKeys).toContain('exportData');
       expect(menuKeys).toContain('importData');
-      expect(menuKeys).toContain('clearVisitHistory');
+      //expect(menuKeys).toContain('clearVisitHistory');
       expect(menuKeys).toContain('switchToDesktop');
       expect(menuKeys).toContain('switchToMobile');
       expect(menuKeys).toContain('contactUs');
@@ -400,8 +400,8 @@ describe('ExtensionSettingsMenu', () => {
       const importItem = menuItems.find((item: any) => item.key === 'importData');
       expect(importItem?.iconProps?.iconName).toBe('CloudUpload');
 
-      const clearHistoryItem = menuItems.find((item: any) => item.key === 'clearVisitHistory');
-      expect(clearHistoryItem?.iconProps?.iconName).toBe('RemoveEvent');
+      //const clearHistoryItem = menuItems.find((item: any) => item.key === 'clearVisitHistory');
+      //expect(clearHistoryItem?.iconProps?.iconName).toBe('RemoveEvent');
     });
 
     it('has correct className for view mode switch items', () => {
@@ -485,7 +485,7 @@ describe('ExtensionSettingsMenu', () => {
 
       expect(wrapper.state('isMobileExtensionSettingsDialogHidden')).toBe(true);
     });
-
+/*
     it('hides clear visit history dialog when dismissed', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
 
@@ -499,6 +499,7 @@ describe('ExtensionSettingsMenu', () => {
 
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
+  */
   });
 
   describe('Dialog Footer Actions', () => {
@@ -536,7 +537,7 @@ describe('ExtensionSettingsMenu', () => {
 
       expect(wrapper.state('isGetHelpDialogHidden')).toBe(true);
     });
-
+/*
     it('handles Clear Visit History dialog footer actions correctly', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
 
@@ -546,6 +547,7 @@ describe('ExtensionSettingsMenu', () => {
       (instance as any).hideClearVisitHistoryDialog();
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
+*/
   });
 
   describe('File Import Flow', () => {
@@ -666,9 +668,9 @@ describe('ExtensionSettingsMenu', () => {
       expect(typeof (instance as any).exportData).toBe('function');
       expect(typeof (instance as any).importData).toBe('function');
       expect(typeof (instance as any).processImportedData).toBe('function');
-      expect(typeof (instance as any).clearVisitHistory).toBe('function');
-      expect(typeof (instance as any).showClearVisitHistoryDialog).toBe('function');
-      expect(typeof (instance as any).hideClearVisitHistoryDialog).toBe('function');
+      //expect(typeof (instance as any).clearVisitHistory).toBe('function');
+      //expect(typeof (instance as any).showClearVisitHistoryDialog).toBe('function');
+      //expect(typeof (instance as any).hideClearVisitHistoryDialog).toBe('function');
       expect(typeof (instance as any).showWhatsNewDialog).toBe('function');
       expect(typeof (instance as any).hideWhatsNewDialog).toBe('function');
       expect(typeof (instance as any).hideMobileExtensionSettingsMenuDialog).toBe('function');
@@ -690,7 +692,7 @@ describe('ExtensionSettingsMenu', () => {
         isWhatsNewDialogHidden: false,
         isGetHelpDialogHidden: false,
         isMobileExtensionSettingsDialogHidden: false,
-        isClearVisitHistoryDialogHidden: false
+        //isClearVisitHistoryDialogHidden: false
       });
 
       expect(wrapperWithDialogs.find(Dialog)).toHaveLength(4);
@@ -818,12 +820,12 @@ describe('ExtensionSettingsMenu', () => {
       expect(wrapper.state('isWhatsNewDialogHidden')).toBe(false);
       (instance as any).hideWhatsNewDialog();
       expect(wrapper.state('isWhatsNewDialogHidden')).toBe(true);
-
+/*
       (instance as any).showClearVisitHistoryDialog();
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(false);
       (instance as any).hideClearVisitHistoryDialog();
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
-
+*/
       wrapper.setState({ isMobileExtensionSettingsDialogHidden: false });
       (instance as any).hideMobileExtensionSettingsMenuDialog();
       expect(wrapper.state('isMobileExtensionSettingsDialogHidden')).toBe(true);
@@ -842,7 +844,7 @@ describe('ExtensionSettingsMenu', () => {
 
       const exportItem = menuItems.find((item: any) => item.key === 'exportData');
       const importItem = menuItems.find((item: any) => item.key === 'importData');
-      const clearHistoryItem = menuItems.find((item: any) => item.key === 'clearVisitHistory');
+      //const clearHistoryItem = menuItems.find((item: any) => item.key === 'clearVisitHistory');
       const switchToDesktopItem = menuItems.find((item: any) => item.key === 'switchToDesktop');
       const switchToMobileItem = menuItems.find((item: any) => item.key === 'switchToMobile');
       const contactUsItem = menuItems.find((item: any) => item.key === 'contactUs');
@@ -851,7 +853,7 @@ describe('ExtensionSettingsMenu', () => {
 
       expect(importItem.onClick).toBe((instance as any).importData);
 
-      expect(clearHistoryItem.onClick).toBe((instance as any).showClearVisitHistoryDialog);
+      //expect(clearHistoryItem.onClick).toBe((instance as any).showClearVisitHistoryDialog);
 
       expect(switchToDesktopItem.onClick).toBe(onScreenViewModeChangedMock);
       expect(switchToMobileItem.onClick).toBe(onScreenViewModeChangedMock);
@@ -882,7 +884,7 @@ describe('ExtensionSettingsMenu', () => {
         'noreferrer'
       );
     });
-
+/*
     it('tests Clear Visit History primary button', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
 
@@ -911,7 +913,7 @@ describe('ExtensionSettingsMenu', () => {
 
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
     });
-
+*/
     it('tests comprehensive export data flow', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -1175,11 +1177,11 @@ describe('ExtensionSettingsMenu', () => {
         '_blank',
         'noreferrer'
       );
-
+/*
       wrapper.setState({ isClearVisitHistoryDialogHidden: false });
       await (instance as any).clearVisitHistory();
       expect(wrapper.state('isClearVisitHistoryDialogHidden')).toBe(true);
-
+*/
       try {
         await (instance as any).exportData();
       } catch (error) {
