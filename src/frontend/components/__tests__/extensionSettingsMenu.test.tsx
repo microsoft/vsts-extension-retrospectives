@@ -1321,3 +1321,48 @@ describe('ExtensionSettingsMenu', () => {
   });
   */
 });
+
+describe("ExtensionSettingsMenu - window resizing", () => {
+  const originalOuterWidth = window.outerWidth;
+  const originalInnerWidth = window.innerWidth;
+  const originalInnerHeight = window.innerHeight;
+
+  beforeEach(() => {
+    Object.defineProperty(window, "outerWidth", { writable: true, configurable: true, value: 1200 });
+    Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 1200 });
+    Object.defineProperty(window, "innerHeight", { writable: true, configurable: true, value: 800 });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, "outerWidth", { writable: true, configurable: true, value: originalOuterWidth });
+    Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: originalInnerWidth });
+    Object.defineProperty(window, "innerHeight", { writable: true, configurable: true, value: originalInnerHeight });
+  });
+
+  it("updates isWindowWide correctly on resize (wide)", () => {
+    const wrapper = shallow(
+      <ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />
+    );
+    // Change window size
+    Object.defineProperty(window, "outerWidth", { writable: true, configurable: true, value: 2000 });
+    Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 1800 });
+    Object.defineProperty(window, "innerHeight", { writable: true, configurable: true, value: 900 });
+    // Simulate the resize event
+    window.dispatchEvent(new Event("resize"));
+    // Force Enzyme to re-render with updated state
+    wrapper.update();
+    expect(wrapper.state("isWindowWide")).toBe(true);
+  });
+
+  it("updates isWindowWide correctly on resize (tall/portrait)", () => {
+    const wrapper = shallow(
+      <ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />
+    );
+    // Change window size for portrait mode
+    Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 600 });
+    Object.defineProperty(window, "innerHeight", { writable: true, configurable: true, value: 1200 });
+    window.dispatchEvent(new Event("resize"));
+    wrapper.update();
+    expect(wrapper.state("isWindowWide")).toBe(false);
+  });
+});
