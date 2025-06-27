@@ -1354,7 +1354,7 @@ describe("ExtensionSettingsMenu - window resizing", () => {
     expect(wrapper.state("isWindowWide")).toBe(true);
   });
 
-  it("updates isWindowWide correctly on resize (tall/portrait)", () => {
+  it("updates isWindowWide correctly on resize (tall or portrait)", () => {
     const wrapper = shallow(
       <ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />
     );
