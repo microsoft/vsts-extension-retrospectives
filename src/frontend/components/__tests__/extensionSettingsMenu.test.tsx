@@ -12,9 +12,9 @@ import ExtensionSettingsMenu from '../extensionSettingsMenu';
 import { ContextualMenuButton } from '../extensionSettingsMenu';
 //import { ViewMode } from '../../config/constants';
 //import { getProjectId } from '../../utilities/servicesHelper';
-//import { azureDevOpsCoreService } from '../../dal/azureDevOpsCoreService';
-//import boardDataService from '../../dal/boardDataService';
-//import { itemDataService } from '../../dal/itemDataService';
+import { azureDevOpsCoreService } from '../../dal/azureDevOpsCoreService';
+import boardDataService from '../../dal/boardDataService';
+import { itemDataService } from '../../dal/itemDataService';
 import { RETRO_URLS } from '../../components/extensionSettingsMenuDialogContent';
 
 type Props = React.ComponentProps<typeof ExtensionSettingsMenu>;
@@ -93,6 +93,14 @@ jest.mock('../../utilities/telemetryClient', () => ({
 
 jest.mock('@microsoft/applicationinsights-react-js', () => ({
   withAITracking: (plugin: unknown, component: unknown) => component
+}));
+
+jest.mock('../../dal/boardDataService', () => ({
+  __esModule: true,
+  default: {
+    createBoardForTeam: jest.fn(),
+    getBoardsForTeam: jest.fn()
+  }
 }));
 
 const mockWindowOpen = jest.fn();
@@ -323,46 +331,7 @@ describe('ExtensionSettingsMenu', () => {
     });
     mockCreateObjectURL.mockReturnValue('blob:mock-url');
   });
-/*
-  describe('Rendering', () => {
-    it('renders correctly with default props', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
 
-      expect(wrapper.find('.extension-settings-menu')).toHaveLength(1);
-      expect(wrapper.find(DefaultButton).length).toBeGreaterThanOrEqual(3);
-      expect(wrapper.find(Dialog)).toHaveLength(4);
-      expect(wrapper.find(ToastContainer)).toHaveLength(1);
-    });
-
-    it('renders with mobile view when isDesktop is false', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} isDesktop={false} />);
-
-      const mobileDialog = wrapper.find(Dialog).at(2);
-      const modalProps = mobileDialog.prop('modalProps');
-      expect(modalProps?.className).toContain(ViewMode.Mobile);
-    });
-
-    it('renders with desktop view when isDesktop is true', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} isDesktop={true} />);
-
-      const mobileDialog = wrapper.find(Dialog).at(2);
-      const modalProps = mobileDialog.prop('modalProps');
-      expect(modalProps?.className).toContain(ViewMode.Desktop);
-    });
-  });
-*/
-/*
-  describe('State Management', () => {
-    it('initializes with correct default state', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      expect(instance.state.isMobileExtensionSettingsDialogHidden).toBe(true);
-      expect(instance.state.isWhatsNewDialogHidden).toBe(true);
-      expect(instance.state.isGetHelpDialogHidden).toBe(true);
-    });
-  });
-*/
   describe('Dialog Management', () => {
     it('shows and hides What\'s New dialog correctly', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
@@ -374,44 +343,9 @@ describe('ExtensionSettingsMenu', () => {
       (instance as any).hideWhatsNewDialog();
       expect(wrapper.state('isWhatsNewDialogHidden')).toBe(true);
     });
-/*
-    it('hides mobile extension settings dialog correctly', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      wrapper.setState({ isMobileExtensionSettingsDialogHidden: false });
-
-      (instance as any).hideMobileExtensionSettingsMenuDialog();
-      expect(wrapper.state('isMobileExtensionSettingsDialogHidden')).toBe(true);
-    });
-
-    it('shows Get Help dialog when button is clicked', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-
-      const getHelpButton = wrapper.find(DefaultButton).at(2);
-      getHelpButton.simulate('click');
-
-      expect(wrapper.state('isGetHelpDialogHidden')).toBe(false);
-    });
-*/
   });
 
   describe('Button Interactions', () => {
-/*
-    it('calls onScreenViewModeChanged when switch view mode menu item is clicked', () => {
-      const onScreenViewModeChangedMock = jest.fn();
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} onScreenViewModeChanged={onScreenViewModeChangedMock} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      const menuItems = (instance as any).extensionSettingsMenuItem;
-      const switchToMobileItem = menuItems.find((item: any) => item.key === 'switchToMobile');
-
-      if (switchToMobileItem?.onClick) {
-        switchToMobileItem.onClick();
-      }
-      expect(onScreenViewModeChangedMock).toHaveBeenCalled();
-    });
-*/
     it('opens changelog URL when changelog button is clicked', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -540,145 +474,7 @@ describe('ExtensionSettingsMenu', () => {
       }
     });
   });
-/*
-  describe('Changelog Content', () => {
-    it('returns correct changelog content', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
 
-      const changelog = (instance as any).getChangelog();
-
-      expect(changelog).toHaveLength(5);
-      expect(changelog[0]).toContain('The latest release includes updates');
-      expect(changelog[4]).toContain('Refer to the Changelog');
-    });
-
-    it('renders changelog content in What\'s New dialog', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-
-      wrapper.setState({ isWhatsNewDialogHidden: false });
-
-      const whatsNewDialog = wrapper.find(Dialog).at(0);
-      expect(whatsNewDialog.prop('hidden')).toBe(false);
-    });
-  });
-*/
-/*
-  describe('Menu Items', () => {
-    it('has correct menu items structure', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      const menuItems = (instance as any).extensionSettingsMenuItem;
-
-      expect(menuItems).toHaveLength(6);
-
-      const menuKeys = menuItems.map((item: any) => item.key);
-      expect(menuKeys).toContain('exportData');
-      expect(menuKeys).toContain('importData');
-      expect(menuKeys).toContain('switchToDesktop');
-      expect(menuKeys).toContain('switchToMobile');
-      expect(menuKeys).toContain('contactUs');
-    });
-
-    it('has correct icon props for menu items', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      const menuItems = (instance as any).extensionSettingsMenuItem;
-
-      const exportItem = menuItems.find((item: any) => item.key === 'exportData');
-      expect(exportItem?.iconProps?.iconName).toBe('CloudDownload');
-
-      const importItem = menuItems.find((item: any) => item.key === 'importData');
-      expect(importItem?.iconProps?.iconName).toBe('CloudUpload');
-    });
-
-    it('has correct className for view mode switch items', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      const menuItems = (instance as any).extensionSettingsMenuItem;
-
-      const desktopItem = menuItems.find((item: any) => item.key === 'switchToDesktop');
-      expect(desktopItem?.className).toBe('hide-desktop');
-
-      const mobileItem = menuItems.find((item: any) => item.key === 'switchToMobile');
-      expect(mobileItem?.className).toBe('hide-mobile');
-    });
-  });
-*/
-/*
-  describe('Mobile Dialog', () => {
-    it('renders mobile dialog with correct action buttons', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-
-      wrapper.setState({ isMobileExtensionSettingsDialogHidden: false });
-
-      const mobileDialog = wrapper.find(Dialog).at(2);
-      expect(mobileDialog.prop('hidden')).toBe(false);
-
-      expect(mobileDialog.exists()).toBe(true);
-    });
-
-    it('closes mobile dialog and executes menu item action when action button is clicked', () => {
-      const onScreenViewModeChangedMock = jest.fn();
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} onScreenViewModeChanged={onScreenViewModeChangedMock} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      wrapper.setState({ isMobileExtensionSettingsDialogHidden: false });
-
-      (instance as any).hideMobileExtensionSettingsMenuDialog();
-
-      expect(wrapper.state('isMobileExtensionSettingsDialogHidden')).toBe(true);
-    });
-  });
-*/
-/*
-  describe('Dialog Dismissal', () => {
-    it('hides What\'s New dialog when dismissed', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-
-      wrapper.setState({ isWhatsNewDialogHidden: false });
-
-      const whatsNewDialog = wrapper.find(Dialog).at(0);
-      const onDismiss = whatsNewDialog.prop('onDismiss');
-      if (onDismiss) {
-        onDismiss();
-      }
-
-      expect(wrapper.state('isWhatsNewDialogHidden')).toBe(true);
-    });
-
-    it('hides Get Help dialog when dismissed', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-
-      wrapper.setState({ isGetHelpDialogHidden: false });
-
-      const getHelpDialog = wrapper.find(Dialog).at(1);
-      const onDismiss = getHelpDialog.prop('onDismiss');
-      if (onDismiss) {
-        onDismiss();
-      }
-
-      expect(wrapper.state('isGetHelpDialogHidden')).toBe(true);
-    });
-
-    it('hides mobile settings dialog when dismissed', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-
-      wrapper.setState({ isMobileExtensionSettingsDialogHidden: false });
-
-      const mobileDialog = wrapper.find(Dialog).at(2);
-      const onDismiss = mobileDialog.prop('onDismiss');
-      if (onDismiss) {
-        onDismiss();
-      }
-
-      expect(wrapper.state('isMobileExtensionSettingsDialogHidden')).toBe(true);
-    });
-  });
-*/
   describe('Dialog Footer Actions', () => {
     it('handles What\'s New dialog footer actions correctly', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
@@ -695,26 +491,6 @@ describe('ExtensionSettingsMenu', () => {
       (instance as any).hideWhatsNewDialog();
       expect(wrapper.state('isWhatsNewDialogHidden')).toBe(true);
     });
-/*
-    it('handles Get Help dialog footer actions correctly', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-
-      wrapper.setState({ isGetHelpDialogHidden: false });
-
-      const getHelpDialog = wrapper.find(Dialog).at(1);
-      const dialogFooter = getHelpDialog.find(DialogFooter);
-      expect(dialogFooter).toHaveLength(1);
-
-      wrapper.setState({ isGetHelpDialogHidden: false });
-
-      const hideMethod = getHelpDialog.prop('onDismiss');
-      if (hideMethod) {
-        hideMethod();
-      }
-
-      expect(wrapper.state('isGetHelpDialogHidden')).toBe(true);
-    });
-*/
   });
 
   describe('File Import Flow', () => {
@@ -805,62 +581,7 @@ describe('ExtensionSettingsMenu', () => {
         expect(error).toBeTruthy();
       }
     });
-/*
-    it('tests all remaining uncovered lines with direct method calls', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
 
-      const changelog = (instance as any).getChangelog();
-      expect(changelog).toBeInstanceOf(Array);
-      expect(changelog.length).toBeGreaterThan(0);
-
-      (instance as any).onChangeLogClicked();
-      expect(mockWindowOpen).toHaveBeenCalledWith(
-        'https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md',
-        '_blank'
-      );
-
-      (instance as any).onContactUsClicked();
-      expect(mockWindowOpen).toHaveBeenCalledWith(
-        'https://github.com/microsoft/vsts-extension-retrospectives/issues',
-        '_blank'
-      );
-    });
-
-    it('covers all public and private methods for 100% coverage', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      expect(typeof (instance as any).getChangelog).toBe('function');
-      expect(typeof (instance as any).exportData).toBe('function');
-      expect(typeof (instance as any).importData).toBe('function');
-      expect(typeof (instance as any).processImportedData).toBe('function');
-      expect(typeof (instance as any).showWhatsNewDialog).toBe('function');
-      expect(typeof (instance as any).hideWhatsNewDialog).toBe('function');
-      expect(typeof (instance as any).hideMobileExtensionSettingsMenuDialog).toBe('function');
-      expect(typeof (instance as any).onChangeLogClicked).toBe('function');
-      expect(typeof (instance as any).onContactUsClicked).toBe('function');
-      expect((instance as any).extensionSettingsMenuItem).toBeDefined();
-      expect(Array.isArray((instance as any).extensionSettingsMenuItem)).toBe(true);
-    });
-
-    it('tests render method with all conditional paths', () => {
-      const desktopWrapper = shallow(<ExtensionSettingsMenu {...defaultProps} isDesktop={true} />);
-      expect(desktopWrapper.exists()).toBe(true);
-
-      const mobileWrapper = shallow(<ExtensionSettingsMenu {...defaultProps} isDesktop={false} />);
-      expect(mobileWrapper.exists()).toBe(true);
-
-      const wrapperWithDialogs = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      wrapperWithDialogs.setState({
-        isWhatsNewDialogHidden: false,
-        isGetHelpDialogHidden: false,
-        isMobileExtensionSettingsDialogHidden: false,
-      });
-
-      expect(wrapperWithDialogs.find(Dialog)).toHaveLength(4);
-    });
-*/
     it('tests data export method with service calls', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -1033,25 +754,6 @@ expect(showPrimeDirectiveDialogMock).toHaveBeenCalled();
   window.open = originalWindowOpen;
 });
 
-/*
-    it('tests Get Help dialog button actions', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-
-      wrapper.setState({ isGetHelpDialogHidden: false });
-
-      const getHelpDialog = wrapper.find(Dialog).at(1);
-      const dialogFooter = getHelpDialog.find(DialogFooter);
-      const getMoreInfoButton = dialogFooter.find(DefaultButton);
-
-      getMoreInfoButton.simulate('click');
-
-      expect(mockWindowOpen).toHaveBeenCalledWith(
-        'https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md',
-        '_blank',
-        'noreferrer'
-      );
-    });
-*/
     it('tests comprehensive export data flow', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -1166,186 +868,6 @@ expect(showPrimeDirectiveDialogMock).toHaveBeenCalled();
       processSpy.mockRestore();
     });
   });
-/*
-  describe('Full Coverage Tests', () => {
-    it('achieves 100% line coverage by executing all code paths', async () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      try {
-        const originalExportData = (instance as any).exportData;
-        (instance as any).exportData = async function () {
-          const projectId = await getProjectId();
-          const exportedData: any[] = [];
-          const toastId = toast('Exporting data...');
-
-          try {
-            const teams = await azureDevOpsCoreService.getAllTeams(projectId, true);
-
-            for (const team of teams) {
-              const boards = await boardDataService.getBoardsForTeam(team.id);
-              for (const board of boards) {
-                const items = await itemDataService.getFeedbackItemsForBoard(board.id);
-                exportedData.push({ team, board, items });
-                toast.update(toastId, { render: `Processing boards... (${board.title} is done)` });
-              }
-            }
-
-            const content = [JSON.stringify(exportedData)];
-            const blob = new Blob(content, { type: "text/plain;charset=utf-8" });
-            const a = document.createElement("a");
-            a.download = "Retrospective_Export.json";
-            a.href = window.URL.createObjectURL(blob);
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          } catch (error) {
-            expect(error).toBeTruthy();
-          }
-        };
-
-        await (instance as any).exportData();
-        (instance as any).exportData = originalExportData;
-        expect(true).toBe(true);
-      } catch (error) {
-        expect(error).toBeTruthy();
-      }
-
-      try {
-        const originalImportData = (instance as any).importData;
-        (instance as any).importData = async function () {
-
-          const input = document.createElement("input");
-          input.setAttribute("type", "file");
-
-          input.addEventListener('change', () => {
-
-            const reader = new FileReader();
-            reader.onload = (event: ProgressEvent<FileReader>) => {
-              try {
-                const importedData = JSON.parse(event.target?.result?.toString() || '[]');
-                this.processImportedData(importedData);
-              } catch (error) {
-                expect(error).toBeTruthy();
-              }
-            };
-
-            if (input.files && input.files[0]) {
-              reader.readAsText(input.files[0]);
-            }
-          }, false);
-
-          document.body.appendChild(input);
-          input.click();
-          document.body.removeChild(input);
-          return false;
-        };
-
-        await (instance as any).importData();
-        (instance as any).importData = originalImportData;
-        expect(true).toBe(true);
-      } catch (error) {
-        expect(error).toBeTruthy();
-      }
-
-      try {
-        const mockData = [
-          {
-            team: { id: 'team1', name: 'Team 1' },
-            board: {
-              id: 'board1',
-              title: 'Test Board',
-              maxVotesPerUser: 5,
-              columns: [] as any[],
-              isIncludeTeamEffectivenessMeasurement: false,
-              displayPrimeDirective: false,
-              shouldShowFeedbackAfterCollect: false,
-              isAnonymous: false,
-              startDate: new Date(),
-              endDate: new Date()
-            },
-            items: [
-              { id: 'item1', title: 'Item 1', boardId: 'board1' },
-              { id: 'item2', title: 'Item 2', boardId: 'board1' }
-            ]
-          }
-        ];
-
-        const originalProcessImportedData = (instance as any).processImportedData;
-        (instance as any).processImportedData = async function (importedData: any[]) {
-          const projectId = await getProjectId();
-          const teams = await azureDevOpsCoreService.getAllTeams(projectId, true);
-          const defaultTeam = await azureDevOpsCoreService.getDefaultTeam(projectId);
-
-          const toastId = toast('Importing data...');
-
-          for (const dataToProcess of importedData) {
-            const team = teams.find((e: any) => e.name === dataToProcess.team.name) ?? defaultTeam;
-            const oldBoard = dataToProcess.board;
-            const newBoard = await boardDataService.createBoardForTeam(
-              team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns,
-              oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.displayPrimeDirective,
-              oldBoard.shouldShowFeedbackAfterCollect, oldBoard.isAnonymous,
-              oldBoard.startDate, oldBoard.endDate
-            );
-
-            for (let yLoop = 0; yLoop < dataToProcess.items.length; yLoop++) {
-              const oldItem = dataToProcess.items[yLoop];
-              oldItem.boardId = newBoard.id;
-              await itemDataService.appendItemToBoard(oldItem);
-              toast.update(toastId, { render: `Importing data... (${newBoard.title} to ${team.name} is done)` });
-            }
-          }
-        };
-
-        await (instance as any).processImportedData(mockData);
-        (instance as any).processImportedData = originalProcessImportedData;
-        expect(true).toBe(true);
-      } catch (error) {
-        expect(error).toBeTruthy();
-      }
-
-      wrapper.setState({ isGetHelpDialogHidden: false });
-      const getHelpDialog = wrapper.find(Dialog).at(1);
-      const getMoreInfoButton = getHelpDialog.find(DialogFooter).find(DefaultButton);
-      getMoreInfoButton.simulate('click');
-
-      expect(mockWindowOpen).toHaveBeenCalledWith(
-        'https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md',
-        '_blank',
-        'noreferrer'
-      );
-
-      try {
-        await (instance as any).exportData();
-      } catch (error) {
-        expect(error).toBeTruthy();
-      }
-
-      try {
-        await (instance as any).importData();
-      } catch (error) {
-        expect(error).toBeTruthy();
-      }
-
-      try {
-        const mockData = [{
-          team: { id: 'team1', name: 'Team 1' },
-          board: {
-            id: 'board1', title: 'Test Board', maxVotesPerUser: 5,
-            columns: [] as any[], isIncludeTeamEffectivenessMeasurement: false,
-            displayPrimeDirective: false, shouldShowFeedbackAfterCollect: false,
-            isAnonymous: false, startDate: new Date(), endDate: new Date()
-          },
-          items: [{ id: 'item1', title: 'Item 1', boardId: 'board1' }]
-        }];
-        await (instance as any).processImportedData(mockData);
-      } catch (error) {
-        expect(error).toBeTruthy();
-      }
-    });
-  });
-  */
 });
 
 describe("ExtensionSettingsMenu - label rendering on window resize", () => {
@@ -1429,5 +951,75 @@ describe("ExtensionSettingsMenu - mobile/desktop switch", () => {
     expect(switchToDesktopItem).toBeDefined();
     switchToDesktopItem.onClick();
     expect(onScreenViewModeChanged).toHaveBeenCalledWith(true);
+  });
+});
+
+describe('lifecycle', () => {
+  const defaultProps = {
+    isDesktop: false,
+    onScreenViewModeChanged: jest.fn(),
+  };
+
+  it('removes window resize event listener on unmount', () => {
+    const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+    const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
+    wrapper.unmount();
+    expect(removeEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));
+    removeEventListenerSpy.mockRestore();
+  });
+});
+
+describe('processImportedData', () => {
+  beforeEach(() => {
+    // Ensure all service methods are jest.fn() mocks (your jest.mock at top does this)
+    (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([
+      { id: 'team1', name: 'Team 1' }
+    ]);
+    (azureDevOpsCoreService.getDefaultTeam as jest.Mock).mockResolvedValue({ id: 'team1', name: 'Team 1' });
+    (boardDataService.createBoardForTeam as jest.Mock).mockResolvedValue({ id: 'newBoard', title: 'New Board' });
+    (itemDataService.appendItemToBoard as jest.Mock).mockResolvedValue(undefined);
+  });
+
+  it('imports boards and items for each dataToProcess', async () => {
+    const wrapper = shallow(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
+    const instance = wrapper.instance() as any;
+
+    const mockImportedData = [
+      {
+        team: { id: 'team1', name: 'Team 1' },
+        board: {
+          id: 'board1',
+          title: 'Imported Board',
+          maxVotesPerUser: 10,
+          columns: [] as any[],
+          isIncludeTeamEffectivenessMeasurement: false,
+          displayPrimeDirective: false,
+          shouldShowFeedbackAfterCollect: false,
+          isAnonymous: false,
+          startDate: new Date(),
+          endDate: new Date()
+        },
+        items: [
+          { id: 'item1', title: 'Imported Item', boardId: 'board1' }
+        ]
+      }
+    ];
+
+    await instance.processImportedData(mockImportedData);
+
+    expect(boardDataService.createBoardForTeam).toHaveBeenCalledWith(
+      'team1',
+      'Imported Board',
+      10,
+      [],
+      false,
+      false,
+      false,
+      expect.any(Date),
+      expect.any(Date)
+    );
+    expect(itemDataService.appendItemToBoard).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'item1', title: 'Imported Item', boardId: 'newBoard' })
+    );
   });
 });
