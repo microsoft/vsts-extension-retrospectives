@@ -67,7 +67,7 @@
     "@typescript-eslint/eslint-plugin": "8.24.0",
     "@typescript-eslint/parser": "8.24.0",
     "@wojtekmaj/enzyme-adapter-react-17": "0.6.7",
-    "cheerio": "1.0.0-rc.12",
+    "cheerio": "1.1.0",
     "compression-webpack-plugin": "11.1.0",
     "crypto-browserify": "3.12.1",
     "css-loader": "7.1.2",
@@ -128,7 +128,9 @@
     ],
     "moduleNameMapper": {
       "office-ui-fabric-react/lib/(.*)$": "office-ui-fabric-react/lib-commonjs/$1",
-      ".+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx"
+      ".+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx",
+      "^cheerio$": "<rootDir>/components/__mocks__/cheerio.js",
+      "^cheerio/lib/utils$": "<rootDir>/components/__mocks__/cheerio-utils.js"
     },
     "preset": "ts-jest/presets/js-with-babel",
     "resetMocks": true,
