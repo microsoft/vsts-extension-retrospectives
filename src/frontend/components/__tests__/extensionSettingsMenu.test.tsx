@@ -493,45 +493,45 @@ describe('ExtensionSettingsMenu', () => {
   describe('Comprehensive Flows & Coverage', () => {
     const defaultProps = { onScreenViewModeChanged: jest.fn(), isDesktop: true };
 
-it('calls actual exportData/importData/processImportedData to hit real code paths', async () => {
-  (boardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([
-    { id: 'board1', title: 'Test Board 1' },
-    { id: 'board2', title: 'Test Board 2' }
-  ]);
-  (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([
-    { id: 'team1', name: 'Team 1' },
-    { id: 'team2', name: 'Team 2' }
-  ]);
-  (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([
-    { id: 'item1', title: 'Test Item 1', boardId: 'board1' },
-    { id: 'item2', title: 'Test Item 2', boardId: 'board1' }
-  ]);
-  (boardDataService.createBoardForTeam as jest.Mock).mockResolvedValue({ id: 'newBoard', title: 'New Board' });
-  (itemDataService.appendItemToBoard as jest.Mock).mockResolvedValue(undefined);
+    it('calls actual exportData, importData, processImportedData to hit real code paths', async () => {
+      (boardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([
+        { id: 'board1', title: 'Test Board 1' },
+        { id: 'board2', title: 'Test Board 2' }
+      ]);
+      (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([
+        { id: 'team1', name: 'Team 1' },
+        { id: 'team2', name: 'Team 2' }
+      ]);
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([
+        { id: 'item1', title: 'Test Item 1', boardId: 'board1' },
+        { id: 'item2', title: 'Test Item 2', boardId: 'board1' }
+      ]);
+      (boardDataService.createBoardForTeam as jest.Mock).mockResolvedValue({ id: 'newBoard', title: 'New Board' });
+      (itemDataService.appendItemToBoard as jest.Mock).mockResolvedValue(undefined);
 
-  const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-  const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
+      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
+      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
 
-  await expect((instance as any).exportData()).resolves.not.toThrow();
-  await expect((instance as any).importData()).resolves.toBe(false);
-  const mockData = [{
-    team: { id: 'team1', name: 'Team 1' },
-    board: {
-      id: 'board1',
-      title: 'Test Board',
-      maxVotesPerUser: 5,
-      columns: [] as any[],
-      isIncludeTeamEffectivenessMeasurement: false,
-      displayPrimeDirective: false,
-      shouldShowFeedbackAfterCollect: false,
-      isAnonymous: false,
-      startDate: new Date(),
-      endDate: new Date()
-    },
-    items: [{ id: 'item1', title: 'Item 1', boardId: 'board1' }]
-  }];
-  await expect((instance as any).processImportedData(mockData)).resolves.not.toThrow();
-});
+      await expect((instance as any).exportData()).resolves.not.toThrow();
+      await expect((instance as any).importData()).resolves.toBe(false);
+      const mockData = [{
+        team: { id: 'team1', name: 'Team 1' },
+        board: {
+          id: 'board1',
+          title: 'Test Board',
+          maxVotesPerUser: 5,
+          columns: [] as any[],
+          isIncludeTeamEffectivenessMeasurement: false,
+          displayPrimeDirective: false,
+          shouldShowFeedbackAfterCollect: false,
+          isAnonymous: false,
+          startDate: new Date(),
+          endDate: new Date()
+        },
+        items: [{ id: 'item1', title: 'Item 1', boardId: 'board1' }]
+      }];
+      await expect((instance as any).processImportedData(mockData)).resolves.not.toThrow();
+    });
 
     it('tests data export method with service calls', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
@@ -779,7 +779,7 @@ it('calls actual exportData/importData/processImportedData to hit real code path
       expect(wrapper.find(".ms-Button-label").length).toBeGreaterThan(0);
     });
 
-    it("hides labels when window is portrait/tall", () => {
+    it("hides labels when window is portrait or tall", () => {
       const wrapper = mount(
         <ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />
       );
