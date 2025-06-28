@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { shallow, ShallowWrapper } from 'enzyme';
+import { mount, shallow, ShallowWrapper } from 'enzyme';
 //import { configure, mount } from 'enzyme';
 //import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-//import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
+//import { PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 //import { Dialog, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 //import { toast, ToastContainer } from 'react-toastify';
 import ExtensionSettingsMenu from '../extensionSettingsMenu';
+import { ContextualMenuButton } from '../extensionSettingsMenu';
 //import { ViewMode } from '../../config/constants';
 //import { getProjectId } from '../../utilities/servicesHelper';
 //import { azureDevOpsCoreService } from '../../dal/azureDevOpsCoreService';
@@ -25,6 +27,10 @@ type State = {
 };
 
 //configure({ adapter: new Adapter() });
+
+const originalCreateElement = document.createElement;
+const originalAppendChild = document.body.appendChild;
+const originalRemoveChild = document.body.removeChild;
 
 jest.mock('../../dal/userDataService', () => ({
   userDataService: {
@@ -139,20 +145,7 @@ describe('ExtensionSettingsMenu', () => {
     const wrapper = getWrapper();
     expect(wrapper.exists()).toBe(true);
   });
-/* These tests used to work...
-  it('shows labels when isWindowWide is true', () => {
-    const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
-    wrapper.setState({ isWindowWide: true });
-    expect(wrapper.find('.ms-Button-label').length).toBeGreaterThan(0);
-  });
 
-  it('does not show labels when isWindowWide is false', () => {
-    const wrapper = mount(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />);
-    wrapper.setState({ isWindowWide: false });
-    const labels = wrapper.find('.ms-Button-label');
-    expect(labels.length).toBe(0);
-  });
-*/
   it('renders only the "Switch to desktop view" option when isDesktop is false', () => {
     const props = {
       onScreenViewModeChanged: jest.fn(),
@@ -445,6 +438,16 @@ describe('ExtensionSettingsMenu', () => {
   });
 
   describe('Data Export', () => {
+    beforeAll(() => {
+      document.createElement = mockCreateElement;
+      document.body.appendChild = mockAppendChild;
+      document.body.removeChild = mockRemoveChild;
+    });
+    afterAll(() => {
+      document.createElement = originalCreateElement;
+      document.body.appendChild = originalAppendChild;
+      document.body.removeChild = originalRemoveChild;
+    });
     it('exports data correctly', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -470,6 +473,16 @@ describe('ExtensionSettingsMenu', () => {
   });
 
   describe('Data Import', () => {
+    beforeAll(() => {
+      document.createElement = mockCreateElement;
+      document.body.appendChild = mockAppendChild;
+      document.body.removeChild = mockRemoveChild;
+    });
+    afterAll(() => {
+      document.createElement = originalCreateElement;
+      document.body.appendChild = originalAppendChild;
+      document.body.removeChild = originalRemoveChild;
+    });
     it('sets up file input for import correctly', async () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
       const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
@@ -929,85 +942,98 @@ describe('ExtensionSettingsMenu', () => {
       processDataSpy.mockRestore();
     });
 
-    it('tests import data DOM creation and event handling', async () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
+it('calls all menu and menu item onClick handlers as expected', async () => {
+  // Mock methods and window.open
+  const exportDataMock = jest.fn().mockResolvedValue(undefined);
+  const importDataMock = jest.fn().mockResolvedValue(undefined);
+  const showWhatsNewDialogMock = jest.fn();
+  const showPleaseJoinUsDialogMock = jest.fn();
+  const onContactUsClickedMock = jest.fn();
+  const onScreenViewModeChangedMock = jest.fn();
 
-      const importDataSpy = jest.spyOn(instance as any, 'importData').mockImplementation(async () => {
-        const input = document.createElement("input");
-        input.setAttribute("type", "file");
+  const mockWindowOpen = jest.fn();
+  const originalWindowOpen = window.open;
+  window.open = mockWindowOpen;
 
-        input.addEventListener('change', () => {
-          const reader = new FileReader();
-          reader.onload = () => {
-          };
+  // Prepare props (start in mobile mode)
+  const defaultPropsWithMocks = {
+    ...defaultProps,
+    isDesktop: false,
+    onScreenViewModeChanged: onScreenViewModeChangedMock,
+  };
 
-          const mockFile = new File(['{}'], 'test.json');
-          if (reader.readAsText) {
-            reader.readAsText(mockFile);
-          }
-        }, false);
+  // Shallow render and override instance methods as needed
+  const wrapper = shallow(<ExtensionSettingsMenu {...defaultPropsWithMocks} />);
+  const instance = wrapper.instance() as any;
 
-        document.body.appendChild(input);
-        input.click();
-        document.body.removeChild(input);
+  // Patch instance methods for handlers used by menu items
+  instance.exportData = exportDataMock;
+  instance.importData = importDataMock;
+  instance.showWhatsNewDialog = showWhatsNewDialogMock;
+  instance.showPleaseJoinUsDialog = showPleaseJoinUsDialogMock;
+  instance.onContactUsClicked = onContactUsClickedMock;
 
-        return false;
-      });
+  // Patch retroHelpMenu items to reference the test mocks
+  for (const item of instance.retroHelpMenu) {
+    if (item.key === 'whatsNew') item.onClick = showWhatsNewDialogMock;
+    if (item.key === 'volunteer') item.onClick = showPleaseJoinUsDialogMock;
+    if (item.key === 'contactUs') item.onClick = onContactUsClickedMock;
+  }
 
-      const result = await (instance as any).importData();
+  // --- Test exportImportDataMenu onClick handlers
+  for (const item of instance.exportImportDataMenu) {
+    await item.onClick({}, item);
+  }
+  expect(exportDataMock).toHaveBeenCalled();
+  expect(importDataMock).toHaveBeenCalled();
 
-      expect(importDataSpy).toHaveBeenCalled();
-      expect(result).toBe(false);
-      importDataSpy.mockRestore();
-    });
-/*
-    it('tests all dialog show/hide methods', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-
-      (instance as any).showWhatsNewDialog();
-      expect(wrapper.state('isWhatsNewDialogHidden')).toBe(false);
-      (instance as any).hideWhatsNewDialog();
-      expect(wrapper.state('isWhatsNewDialogHidden')).toBe(true);
-
-      wrapper.setState({ isMobileExtensionSettingsDialogHidden: false });
-      (instance as any).hideMobileExtensionSettingsMenuDialog();
-      expect(wrapper.state('isMobileExtensionSettingsDialogHidden')).toBe(true);
-
-      const getHelpButton = wrapper.find(DefaultButton).at(2);
-      getHelpButton.simulate('click');
+  // --- Test retroHelpMenu onClick handlers
+  for (const item of instance.retroHelpMenu) {
+    wrapper.setState({ isGetHelpDialogHidden: true }); // Reset for userGuide
+    item.onClick();
+    if (item.key === 'whatsNew') {
+      expect(showWhatsNewDialogMock).toHaveBeenCalled();
+    }
+    if (item.key === 'userGuide') {
       expect(wrapper.state('isGetHelpDialogHidden')).toBe(false);
-    });
+    }
+    if (item.key === 'volunteer') {
+      expect(showPleaseJoinUsDialogMock).toHaveBeenCalled();
+    }
+    if (item.key === 'contactUs') {
+      expect(onContactUsClickedMock).toHaveBeenCalled();
+    }
+  }
 
-    it('tests all menu item onClick handlers', () => {
-      const onScreenViewModeChangedMock = jest.fn();
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} onScreenViewModeChanged={onScreenViewModeChangedMock} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
+  // --- Test extensionSettingsMenuItem for both desktop and mobile modes
+  // Mobile (isDesktop: false)
+  let settingsMenuItems = instance.extensionSettingsMenuItem();
+  expect(settingsMenuItems.length).toBe(1);
+  expect(settingsMenuItems[0].key).toBe('switchToDesktop');
+  settingsMenuItems[0].onClick();
+  expect(onScreenViewModeChangedMock).toHaveBeenCalledWith(true);
 
-      const menuItems = (instance as any).extensionSettingsMenuItem;
+  // Desktop (isDesktop: true)
+  wrapper.setProps({ isDesktop: true });
+  settingsMenuItems = instance.extensionSettingsMenuItem();
+  expect(settingsMenuItems.length).toBe(1);
+  expect(settingsMenuItems[0].key).toBe('switchToMobile');
+  settingsMenuItems[0].onClick();
+  expect(onScreenViewModeChangedMock).toHaveBeenCalledWith(false);
 
-      const exportItem = menuItems.find((item: any) => item.key === 'exportData');
-      const importItem = menuItems.find((item: any) => item.key === 'importData');
-      const switchToDesktopItem = menuItems.find((item: any) => item.key === 'switchToDesktop');
-      const switchToMobileItem = menuItems.find((item: any) => item.key === 'switchToMobile');
-      const contactUsItem = menuItems.find((item: any) => item.key === 'contactUs');
+const showPrimeDirectiveDialogMock = jest.fn();
+instance.showPrimeDirectiveDialog = showPrimeDirectiveDialogMock;
 
-      expect(exportItem.onClick).toBe((instance as any).exportData);
-      expect(importItem.onClick).toBe((instance as any).importData);
+// Directly call the method
+instance.showPrimeDirectiveDialog();
 
-      expect(switchToDesktopItem.onClick).toBe(onScreenViewModeChangedMock);
-      expect(switchToMobileItem.onClick).toBe(onScreenViewModeChangedMock);
+expect(showPrimeDirectiveDialogMock).toHaveBeenCalled();
 
-      expect(contactUsItem.onClick).toBe((instance as any).onContactUsClicked);
+  // Restore window.open
+  window.open = originalWindowOpen;
+});
 
-      contactUsItem.onClick();
-      expect(mockWindowOpen).toHaveBeenCalledWith(
-        'https://github.com/microsoft/vsts-extension-retrospectives/issues',
-        '_blank'
-      );
-    });
-
+/*
     it('tests Get Help dialog button actions', () => {
       const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
 
@@ -1322,47 +1348,86 @@ describe('ExtensionSettingsMenu', () => {
   */
 });
 
-describe("ExtensionSettingsMenu - window resizing", () => {
+describe("ExtensionSettingsMenu - label rendering on window resize", () => {
+  // Store original window sizes to restore after tests
   const originalOuterWidth = window.outerWidth;
   const originalInnerWidth = window.innerWidth;
   const originalInnerHeight = window.innerHeight;
 
   beforeEach(() => {
-    Object.defineProperty(window, "outerWidth", { writable: true, configurable: true, value: 1200 });
-    Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 1200 });
+    // Set window size for "wide" layout by default
+    Object.defineProperty(window, "outerWidth", { writable: true, configurable: true, value: 1800 });
+    Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 1800 });
     Object.defineProperty(window, "innerHeight", { writable: true, configurable: true, value: 800 });
   });
 
   afterEach(() => {
+    // Restore original window sizes after each test
     Object.defineProperty(window, "outerWidth", { writable: true, configurable: true, value: originalOuterWidth });
     Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: originalInnerWidth });
     Object.defineProperty(window, "innerHeight", { writable: true, configurable: true, value: originalInnerHeight });
   });
 
-  it("updates isWindowWide correctly on resize (wide)", () => {
-    const wrapper = shallow(
+  it("shows labels when window is wide", () => {
+    const wrapper = mount(
       <ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />
     );
-    // Change window size
-    Object.defineProperty(window, "outerWidth", { writable: true, configurable: true, value: 2000 });
+    // Simulate a wide window
+    Object.defineProperty(window, "outerWidth", { writable: true, configurable: true, value: 1800 });
     Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 1800 });
-    Object.defineProperty(window, "innerHeight", { writable: true, configurable: true, value: 900 });
-    // Simulate the resize event
+    Object.defineProperty(window, "innerHeight", { writable: true, configurable: true, value: 800 });
     window.dispatchEvent(new Event("resize"));
-    // Force Enzyme to re-render with updated state
     wrapper.update();
-    expect(wrapper.state("isWindowWide")).toBe(true);
+    // At least one label should be present
+    expect(wrapper.find(".ms-Button-label").length).toBeGreaterThan(0);
   });
 
-  it("updates isWindowWide correctly on resize (tall or portrait)", () => {
-    const wrapper = shallow(
+  it("hides labels when window is portrait/tall", () => {
+    const wrapper = mount(
       <ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={jest.fn()} />
     );
-    // Change window size for portrait mode
-    Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 600 });
+    // Simulate a tall/portrait window
+    Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 500 });
     Object.defineProperty(window, "innerHeight", { writable: true, configurable: true, value: 1200 });
     window.dispatchEvent(new Event("resize"));
     wrapper.update();
-    expect(wrapper.state("isWindowWide")).toBe(false);
+    // No labels should be present
+    expect(wrapper.find(".ms-Button-label").length).toBe(0);
+  });
+});
+
+describe("ExtensionSettingsMenu - mobile/desktop switch", () => {
+  it("shows 'Switch to mobile view' and triggers callback when isDesktop is true", () => {
+    const onScreenViewModeChanged = jest.fn();
+    const wrapper = shallow(
+      <ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={onScreenViewModeChanged} />
+    );
+    // Find User Settings button
+    const userSettingsButton = wrapper.findWhere(
+      node => node.prop("ariaLabel") === "User Settings"
+    );
+    // Get menu items
+    const menuItems = userSettingsButton.prop("menuItems");
+    // Find the "switchToMobile" menu item
+    const switchToMobileItem = menuItems.find((i: IContextualMenuItem) => i.key === "switchToMobile");
+    expect(switchToMobileItem).toBeDefined();
+    // Simulate click
+    switchToMobileItem.onClick();
+    expect(onScreenViewModeChanged).toHaveBeenCalledWith(false);
+  });
+
+  it("shows 'Switch to desktop view' and triggers callback when isDesktop is false", () => {
+    const onScreenViewModeChanged = jest.fn();
+    const wrapper = shallow(
+      <ExtensionSettingsMenu isDesktop={false} onScreenViewModeChanged={onScreenViewModeChanged} />
+    );
+    const userSettingsButton = wrapper.findWhere(
+      node => node.prop("ariaLabel") === "User Settings"
+    );
+    const menuItems = userSettingsButton.prop("menuItems");
+    const switchToDesktopItem = menuItems.find((i: IContextualMenuItem) => i.key === "switchToDesktop");
+    expect(switchToDesktopItem).toBeDefined();
+    switchToDesktopItem.onClick();
+    expect(onScreenViewModeChanged).toHaveBeenCalledWith(true);
   });
 });

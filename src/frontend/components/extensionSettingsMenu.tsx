@@ -52,7 +52,7 @@ interface ContextualMenuButtonProps {
   showLabel:boolean;
 }
 
-const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
+export const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
   ariaLabel,
   title,
   iconClass,
