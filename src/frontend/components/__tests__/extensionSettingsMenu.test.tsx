@@ -1,17 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { mount, shallow, ShallowWrapper } from 'enzyme';
-//import { configure, mount } from 'enzyme';
-//import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-//import { PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
-//import { Dialog, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
-//import { toast, ToastContainer } from 'react-toastify';
 import ExtensionSettingsMenu from '../extensionSettingsMenu';
 import { ContextualMenuButton } from '../extensionSettingsMenu';
-//import { ViewMode } from '../../config/constants';
-//import { getProjectId } from '../../utilities/servicesHelper';
 import { azureDevOpsCoreService } from '../../dal/azureDevOpsCoreService';
 import boardDataService from '../../dal/boardDataService';
 import { itemDataService } from '../../dal/itemDataService';
@@ -25,8 +18,6 @@ type State = {
   isPleaseJoinUsDialogHidden: boolean;
   isWindowWide: boolean;
 };
-
-//configure({ adapter: new Adapter() });
 
 const originalCreateElement = document.createElement;
 const originalAppendChild = document.body.appendChild;
