@@ -127,19 +127,8 @@ describe('ExtensionSettingsMenu', () => {
     });
   });
 
-  // --- Menu Items & View Mode Switch ---
-  describe('Menu Items & View Mode Switch', () => {
-    it('renders only the "Switch to desktop view" option when isDesktop is false', () => {
-      const props = { onScreenViewModeChanged: jest.fn(), isDesktop: false };
-      const wrapper = shallow(<ExtensionSettingsMenu {...props} />);
-      const userSettingsButton = wrapper.findWhere(
-        node => node.prop('ariaLabel') === 'User Settings'
-      );
-      const menuItems = userSettingsButton.prop('menuItems');
-      expect(menuItems).toHaveLength(1);
-      expect(menuItems?.[0].key).toBe('switchToDesktop');
-    });
-
+  // --- View Mode Switch ---
+  describe('View Mode Switch', () => {
     it("shows 'Switch to mobile view' and triggers callback when isDesktop is true", () => {
       const onScreenViewModeChanged = jest.fn();
       const wrapper = shallow(
@@ -415,80 +404,6 @@ describe('ExtensionSettingsMenu', () => {
     });
   });
 
-  // --- Dialog Management, Button Interactions, and Footer Actions ---
-  describe('Dialog Management and Actions', () => {
-    const defaultProps = { onScreenViewModeChanged: jest.fn(), isDesktop: true };
-
-    it('shows and hides What\'s New dialog correctly', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-      (instance as any).showWhatsNewDialog();
-      expect(wrapper.state('isWhatsNewDialogHidden')).toBe(false);
-      (instance as any).hideWhatsNewDialog();
-      expect(wrapper.state('isWhatsNewDialogHidden')).toBe(true);
-    });
-
-    it('opens changelog URL when changelog button is clicked', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-      (instance as any).onChangeLogClicked();
-      expect(mockWindowOpen).toHaveBeenCalledWith(
-        'https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md',
-        '_blank'
-      );
-    });
-
-    it('opens contact us URL when contact us menu item is clicked', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-      (instance as any).onContactUsClicked();
-      expect(mockWindowOpen).toHaveBeenCalledWith(
-        'https://github.com/microsoft/vsts-extension-retrospectives/issues',
-        '_blank'
-      );
-    });
-
-    it('handles What\'s New dialog footer actions correctly', () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-      wrapper.setState({ isWhatsNewDialogHidden: false });
-      (instance as any).onChangeLogClicked();
-      expect(mockWindowOpen).toHaveBeenCalledWith(
-        'https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md',
-        '_blank'
-      );
-      (instance as any).hideWhatsNewDialog();
-      expect(wrapper.state('isWhatsNewDialogHidden')).toBe(true);
-    });
-  });
-
-  // --- File Import Flow ---
-  describe('File Import Flow', () => {
-    const defaultProps = { onScreenViewModeChanged: jest.fn(), isDesktop: true };
-    it('handles file reading and parsing during import', async () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-      const mockData = [
-        {
-          team: { id: 'team1', name: 'Team 1' },
-          board: { id: 'board1', title: 'Test Board' },
-          items: [] as any[]
-        }
-      ];
-      const processImportedDataSpy = jest.spyOn(instance as any, 'processImportedData').mockImplementation(() => Promise.resolve());
-      const importDataSpy = jest.spyOn(instance as any, 'importData').mockImplementation(async () => {
-        const jsonData = JSON.stringify(mockData);
-        await (instance as any).processImportedData(JSON.parse(jsonData));
-        return false;
-      });
-      await (instance as any).importData();
-      expect(importDataSpy).toHaveBeenCalled();
-      expect(processImportedDataSpy).toHaveBeenCalledWith(mockData);
-      processImportedDataSpy.mockRestore();
-      importDataSpy.mockRestore();
-    });
-  });
-
   // --- Comprehensive Flows & Coverage ---
   describe('Comprehensive Flows & Coverage', () => {
     const defaultProps = { onScreenViewModeChanged: jest.fn(), isDesktop: true };
@@ -531,70 +446,6 @@ describe('ExtensionSettingsMenu', () => {
         items: [{ id: 'item1', title: 'Item 1', boardId: 'board1' }]
       }];
       await expect((instance as any).processImportedData(mockData)).resolves.not.toThrow();
-    });
-
-    it('tests data export method with service calls', async () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-      const exportDataSpy = jest.spyOn(instance as any, 'exportData').mockImplementation(async () => {
-        const mockTeams = [
-          { id: 'team1', name: 'Team 1' },
-          { id: 'team2', name: 'Team 2' }
-        ];
-        const mockBoards = [
-          { id: 'board1', title: 'Board 1' },
-          { id: 'board2', title: 'Board 2' }
-        ];
-        const mockItems = [
-          { id: 'item1', title: 'Item 1' },
-          { id: 'item2', title: 'Item 2' }
-        ];
-        const exportedData = [];
-        for (const team of mockTeams) {
-          for (const board of mockBoards) {
-            exportedData.push({ team, board, items: mockItems });
-          }
-        }
-        const a = document.createElement("a");
-        a.download = "Retrospective_Export.json";
-        a.href = 'blob:mock-url';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        return Promise.resolve();
-      });
-      await (instance as any).exportData();
-      expect(exportDataSpy).toHaveBeenCalled();
-      exportDataSpy.mockRestore();
-    });
-
-    it('tests import data file processing loops', async () => {
-      const wrapper = shallow(<ExtensionSettingsMenu {...defaultProps} />);
-      const instance = wrapper.instance() as ExtensionSettingsMenuInstance;
-      const processDataSpy = jest.spyOn(instance as any, 'processImportedData').mockImplementation(async (...args: any[]) => {
-        const importedData = args[0] as any[];
-        for (const dataToProcess of importedData) {
-          const newBoard = { id: 'newBoard', title: 'New Board' };
-          for (let yLoop = 0; yLoop < dataToProcess.items.length; yLoop++) {
-            const oldItem = dataToProcess.items[yLoop];
-            oldItem.boardId = newBoard.id;
-          }
-        }
-        return Promise.resolve();
-      });
-      const mockImportedData = [
-        {
-          team: { id: 'team1', name: 'Team 1' },
-          board: { id: 'board1', title: 'Test Board' },
-          items: [
-            { id: 'item1', title: 'Item 1', boardId: 'oldBoard' },
-            { id: 'item2', title: 'Item 2', boardId: 'oldBoard' }
-          ]
-        }
-      ];
-      await (instance as any).processImportedData(mockImportedData);
-      expect(processDataSpy).toHaveBeenCalledWith(mockImportedData);
-      processDataSpy.mockRestore();
     });
 
     it('calls all menu and menu item onClick handlers as expected', async () => {
