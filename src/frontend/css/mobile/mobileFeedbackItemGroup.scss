@@ -25,7 +25,8 @@
 
         .feedback-expand-group {
           height: variables.$mobile_feedback_item_header_height;
-          max-width: 225px;
+          min-width: variables.$mobile_feedback_item_action_button_width;
+          max-width: 200px;
           font-size: 32px;
           line-height: 75px;
           margin-left: 16px;
@@ -45,7 +46,7 @@
         .feedback-action-button {
           height: 65px;
           min-width: variables.$mobile_feedback_item_action_button_width;
-          max-width: 150px;
+          max-width: 200px;
           font-size: variables.$mobile_font_size_main;
           margin-right: 12.5px;
           margin-left: 12.5px;
