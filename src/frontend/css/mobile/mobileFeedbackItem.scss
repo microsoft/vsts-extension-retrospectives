@@ -1,4 +1,4 @@
-@use "../_variables.scss";
+@use "../_variables.scss" as variables;
 
 .feedbackItem {
   flex-basis: 100%;
@@ -13,7 +13,7 @@
     background: #fff;
     box-shadow: none;
     padding: 12px 8px;
-    font-size: _variables.$mobile_font_size_main;
+    font-size: variables.$mobile_font_size_main;
 
     .card-header,
     .item-actions-menu,
