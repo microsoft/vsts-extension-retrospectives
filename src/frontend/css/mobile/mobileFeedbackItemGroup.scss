@@ -2,19 +2,15 @@
 
 .feedbackItem,
 .feedback-item-group,           // So it hits grouped containers too
-.feedback-expand-group, // experiment
 .feedbackItemGroupGroupedItem { // In case this class is used
   flex-basis: 100%;
-              min-width: variables.$mobile_feedback_item_action_button_width;
-          max-width: 200px;
+
   // Target ALL card variants:
   .mainItemCard,
   .groupedItemCard,
   .feedbackItemGroupGroupedItem {
-    //min-width: calc(100vw - 45px);
-    //max-width: calc(100vw - 45px);
-    //          min-width: variables.$mobile_feedback_item_action_button_width;
-    //      max-width: 200px;
+    min-width: calc(100vw - 45px);
+    max-width: calc(100vw - 45px);
     border: none;
     background: #fff;
     box-shadow: none;
