@@ -15,7 +15,7 @@
     background: #fff;
     box-shadow: none;
     padding: 12px 8px;
-    font-size: variables.$mobile_font_size;
+    font-size: variables.$mobile_font_size_main;
 
     .card-header,
     .item-actions-menu,
@@ -25,12 +25,12 @@
     }
 
     .card-content {
-      font-size: 1.1em;
-      padding: 0;
-      margin: 0;
+      font-size: variables.$mobile_font_size;
+      //padding: 0;
+      //margin: 0;
     }
     .card-id {
-      font-size: 2em;
+      font-size: variables.$mobile_font_size;
     }
     .ms-DocumentCardActivity, .anonymous-created-date {
       display: none;
