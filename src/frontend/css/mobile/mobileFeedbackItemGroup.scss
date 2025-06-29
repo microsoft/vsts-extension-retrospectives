@@ -1,39 +1,52 @@
 @use "../_variables.scss" as variables;
 
-.feedbackItem,
-.feedback-item-group,           // So it hits grouped containers too
-.feedbackItemGroupGroupedItem { // In case this class is used
-  flex-basis: 100%;
+// Applies to the group container, but most styling is handled by feedbackItem.scss above
+.feedback-item-group {
+  // Ensure full width and reset margin for the group container on mobile
+  margin: 0 0 12px 0;
+  min-width: 0;
 
-  // Target ALL card variants:
-  .mainItemCard,
-  .groupedItemCard,
-  .feedbackItemGroupGroupedItem {
-    min-width: calc(100vw - 45px);
-    max-width: calc(100vw - 45px);
-    border: none;
-    background: #fff;
-    box-shadow: none;
-    padding: 12px 8px;
-    font-size: variables.$mobile_font_size_main;
+  .item-cards {
+    flex-direction: column;
+    width: 100%;
 
-    .card-header,
-    .item-actions-menu,
-    .card-action-timer,
-    .group-child-feedback-stack {
+    // Ensure all FeedbackItems inside a group are styled as cards
+    .feedbackItem {
+      .mainItemCard,
+      .groupedItemCard,
+      .feedbackItemGroupGroupedItem {
+        min-width: calc(100vw - 45px);
+        max-width: calc(100vw - 45px);
+        border: none;
+        background: #fff;
+        box-shadow: none;
+        padding: 12px 8px;
+        font-size: variables.$mobile_font_size_main;
+
+        .card-header,
+        .item-actions-menu,
+        .card-action-timer,
+        .group-child-feedback-stack {
+          display: none !important;
+        }
+
+        .card-content {
+          font-size: 1.1em;
+          padding: 0;
+          margin: 0;
+        }
+        .card-id {
+          font-size: 2em;
+        }
+        .ms-DocumentCardActivity, .anonymous-created-date {
+          display: none;
+        }
+      }
+    }
+
+    // Hide the stack visualization on mobile
+    .item-cards-stack {
       display: none !important;
-    }
-
-    .card-content {
-      font-size: 1.1em;
-      padding: 0;
-      margin: 0;
-    }
-    .card-id {
-      font-size: 2em;
-    }
-    .ms-DocumentCardActivity, .anonymous-created-date {
-      display: none;
     }
   }
 }

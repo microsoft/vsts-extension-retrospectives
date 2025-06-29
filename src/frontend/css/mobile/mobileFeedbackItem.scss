@@ -3,8 +3,37 @@
 .feedbackItem {
   flex-basis: 100%;
 
-  // Unified card style for all card types
-  .mainItemCard,
+  // Applies to all feedback items (ungrouped and grouped) for mobile
+  .mainItemCard {
+    min-width: calc(100vw - 45px);
+    max-width: calc(100vw - 45px);
+    border: none;
+    background: #fff;
+    box-shadow: none;
+    padding: 12px 8px;
+    font-size: variables.$mobile_font_size_main;
+
+    .card-header,
+    .item-actions-menu,
+    .card-action-timer,
+    .group-child-feedback-stack {
+      display: none !important;
+    }
+
+    .card-content {
+      font-size: 1.1em;
+      padding: 0;
+      margin: 0;
+    }
+    .card-id {
+      font-size: 2em;
+    }
+    .ms-DocumentCardActivity, .anonymous-created-date {
+      display: none;
+    }
+  }
+
+  // Optional: If FeedbackItem ever renders .groupedItemCard or .feedbackItemGroupGroupedItem, style those too.
   .groupedItemCard,
   .feedbackItemGroupGroupedItem {
     min-width: calc(100vw - 45px);
