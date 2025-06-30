@@ -134,11 +134,14 @@
   }
 }
 
+.item-cards {
+.feedbackItemGroupItem.feedbackItemGroupGroupedItem {
 .document-card-wrapper {
-.feedbackItemGroupItem.feedbackItemGroupGroupedItem,
 .ms-DocumentCard.groupedItemCard {
   border: none !important;
   box-shadow: none !important;
   outline: none !important;
+}
+}
 }
 }
