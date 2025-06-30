@@ -112,7 +112,6 @@
 
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
-  .feedbackItemGroupItem,
   .feedbackItemGroupGroupedItem {
     transform: scale(0.95);
 
@@ -130,4 +129,10 @@
       }
     }
   }
+}
+
+.feedbackItemGroupItem .feedbackItemGroupGroupedItem {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
