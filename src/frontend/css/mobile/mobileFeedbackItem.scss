@@ -31,9 +31,7 @@
         height: variables.$mobile_feedback_item_header_height;
 
         // Group expand/collapse and count should remain visible
-        //.feedback-expand-group {
-        // Style as needed if you want to visually emphasize the group count/expand
-        //}
+        //.feedback-expand-group { not used at this time }
 
         .feedback-action-button {
           height: variables.$mobile_extension_header_height;
@@ -117,6 +115,7 @@
       min-width: calc(100vw - 45px);
       max-width: calc(100vw - 45px);
       border: none;
+      box-shadow: none;
       background-color: rgba(var(--palette-neutral-10), 1);
 
       .card-integral-part {
