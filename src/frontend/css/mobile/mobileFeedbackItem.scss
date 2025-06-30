@@ -112,6 +112,9 @@
 
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
+  border: none;
+  box-shadow: none; 
+
   .feedbackItemGroupGroupedItem {
     transform: scale(0.95);
 
@@ -131,7 +134,7 @@
   }
 }
 
-.ms-DocumentCard .groupedItemCard  {
+.ms-DocumentCard.groupedItemCard {
   border: none !important;
   box-shadow: none !important;
   outline: none !important;
