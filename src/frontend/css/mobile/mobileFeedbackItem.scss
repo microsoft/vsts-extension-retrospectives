@@ -147,3 +147,11 @@
 }
 }
 }
+
+.ms-DocumentCard.groupedItemCard::before,
+.ms-DocumentCard.groupedItemCard::after {
+  border: none !important;
+  box-shadow: none !important;
+  content: none !important;
+  background: none !important;
+}
