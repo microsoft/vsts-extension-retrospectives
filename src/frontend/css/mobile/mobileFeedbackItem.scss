@@ -112,11 +112,8 @@
 
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
-  border: none;
-  box-shadow: none;
-
   .feedbackItemGroupGroupedItem {
-    transform: scale(0.99);
+    transform: scale(0.95);
 
     .groupedItemCard {
       min-width: calc(100vw - 45px);
@@ -132,26 +129,4 @@
       }
     }
   }
-}
-
-.feedback-item-group.feedback-item-group-expanded {
-.item-cards {
-.feedbackItemGroupItem.feedbackItemGroupGroupedItem {
-.document-card-wrapper {
-.ms-DocumentCard.groupedItemCard {
-  border: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-}
-}
-}
-}
-}
-
-.ms-DocumentCard.groupedItemCard::before,
-.ms-DocumentCard.groupedItemCard::after {
-  border: none !important;
-  box-shadow: none !important;
-  content: none !important;
-  background: none !important;
 }
