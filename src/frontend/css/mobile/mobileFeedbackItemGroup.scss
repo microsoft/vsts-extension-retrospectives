@@ -37,3 +37,21 @@
     }
   }
 }
+
+  &.feedback-item-group-expanded {
+    .feedbackItemGroupGroupedItem {
+      transform: scale(0.95);
+
+      .groupedItemCard {
+        @extend .mainItemCard;
+        margin-top: 0px;
+        background-color: rgba(var(--palette-neutral-10), 1);
+
+        .card-integral-part {
+          border-left-width: 10px;
+          border-left-style: solid;
+          background-color: var(--background-color);
+        }
+      }
+    }
+  }
