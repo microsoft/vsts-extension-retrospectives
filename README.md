@@ -1,19 +1,5 @@
 # Retrospective Extension for Azure DevOps
 
-> ## TL;DR
->
-> _We're looking for contributors!_
->
-> _We’ll continue maintaining the Retrospective Extension, but with limited time for new features, we need help to make it even better. Join us if you’re interested! 🙌_
->
-> ## Summary Announcement
->
-> Hi everyone!
->
-> Maintaining the `Retrospective Extension for Azure DevOps` has been a passion project we’ve worked on in our personal time. While we’ll continue to handle security updates and occasional feature improvements when we can, our available time has become more limited. To take this project to the next level, we’d love to invite contributors to join and help make it even better for the community.
->
-> If you're interested in contributing, please check out the repo and the [Contributing Guideline](./CONTRIBUTING.md)! Together, we can ensure the project thrives. 🚀
-
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/microsoft/vsts-extension-retrospectives/badge)](https://scorecard.dev/viewer/?uri=github.com/microsoft/vsts-extension-retrospectives)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9514/badge)](https://www.bestpractices.dev/projects/9514)
 [![CodeCov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
@@ -24,7 +10,7 @@ Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform 
 
 Retrospectives are an important practice in becoming an effective team, allowing the team to gather feedback and continuously improve based on the feedback.
 
-Research from the [2018 State of DevOps report](https://services.google.com/fh/files/misc/state-of-devops-2018.pdf) indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a [2013 meta-analysis on teams](https://journals.sagepub.com/doi/full/10.1177/0018720812448394) indicates that teams that effectively debrief/conduct retrospectives are 20-25% more effective.
+Research from the [2018 State of DevOps report](https://services.google.com/fh/files/misc/state-of-devops-2018.pdf) indicates that elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a [2013 meta-analysis on teams](https://journals.sagepub.com/doi/full/10.1177/0018720812448394) indicates that teams that effectively debrief/conduct retrospectives are 20-25% more effective.
 
 Teams often use external retrospective tools, white boards with Post-its, OneNote, etc. to conduct retrospectives. The data then needs to be collated, and any actionable items need to be created in your Azure DevOps pipeline.
 
