@@ -2,8 +2,9 @@
 
 // Unified mobile styles for feedback cards (grouped and ungrouped)
 .feedbackItem,
-.feedback-item-group,           // For grouped containers
-.feedbackItemGroupGroupedItem { // For grouped child items if used
+.feedback-item-group,
+.feedbackItemGroupItem,
+.feedbackItemGroupGroupedItem {
   flex-basis: 100%;
 
   &.hideFeedbackItem .card-content {
@@ -14,6 +15,7 @@
   // All card variants
   .mainItemCard,
   .groupedItemCard,
+  .feedbackItemGroupItem,
   .feedbackItemGroupGroupedItem {
     min-width: calc(100vw - 45px);
     max-width: calc(100vw - 45px);
@@ -32,8 +34,7 @@
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
-          border: none;
-          box-shadow: none;
+          font-size: variables.$mobile_font_size_mini;
         }
 
         .feedback-action-button {
@@ -111,10 +112,8 @@
 
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
-  .feedbackItemGroupItem, .feedbackItemGroupGroupedItem {
+  .feedbackItemGroupGroupedItem {
     transform: scale(0.95);
-    border: none;
-    box-shadow: none;
 
     .groupedItemCard {
       min-width: calc(100vw - 45px);
