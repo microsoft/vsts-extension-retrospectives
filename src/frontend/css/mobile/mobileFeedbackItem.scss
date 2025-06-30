@@ -44,7 +44,7 @@
 
           i {
             height: variables.$mobile_extension_header_height;
-            line-height: 1.3;
+            line-height: 1.2;
             font-size: variables.$mobile_font_size_main;
           }
         }
@@ -59,7 +59,7 @@
           .feedback-upvote-count {
             margin-left: 10px;
             font-size: variables.$mobile_font_size_main;
-            line-height: 1.3;
+            line-height: 1.2;
           }
         }
 
@@ -73,8 +73,8 @@
             i {
               height: 65px;
               width: 45px;
-              line-height: 1.3;
-              font-size: 50px;
+              line-height: 1.2;
+              font-size: variables.$mobile_font_size_main;
               margin-right: 7px;
             }
           }
@@ -110,6 +110,8 @@
 .feedback-item-group.feedback-item-group-expanded {
   .feedbackItemGroupGroupedItem {
     transform: scale(0.95);
+    border: none;
+    box-shadow: none;
 
     .groupedItemCard {
       min-width: calc(100vw - 45px);
@@ -119,6 +121,8 @@
       background-color: rgba(var(--palette-neutral-10), 1);
 
       .card-integral-part {
+        border: none;
+        box-shadow: none;
         border-left-width: 8px;
         border-left-style: solid;
         background-color: var(--background-color);
