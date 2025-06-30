@@ -69,7 +69,7 @@
       }
       .card-content {
         .feedback-yourvote-count {
-          font-size: 2em;
+          font-size: variables.$mobile_font_size_main;
         }
         .card-action-timer {
           button {
@@ -81,7 +81,7 @@
       }
 
       .card-id {
-        font-size: variables.$mobile_font_size;
+        font-size: variables.$mobile_font_size_main;
       }
 
       .ms-DocumentCardActivity, .anonymous-created-date {
