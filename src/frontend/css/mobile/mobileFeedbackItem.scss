@@ -31,7 +31,10 @@
         height: variables.$mobile_feedback_item_header_height;
 
         // Group expand/collapse and count should remain visible
-        //.feedback-expand-group { not used at this time }
+        .feedback-expand-group {
+          border: none;
+          box-shadow: none;
+        }
 
         .feedback-action-button {
           height: variables.$mobile_extension_header_height;
@@ -108,7 +111,7 @@
 
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
-  .feedbackItemGroupGroupedItem {
+  .feedbackItemGroupItem, .feedbackItemGroupGroupedItem {
     transform: scale(0.95);
     border: none;
     box-shadow: none;
@@ -121,8 +124,6 @@
       background-color: rgba(var(--palette-neutral-10), 1);
 
       .card-integral-part {
-        border: none;
-        box-shadow: none;
         border-left-width: 8px;
         border-left-style: solid;
         background-color: var(--background-color);
