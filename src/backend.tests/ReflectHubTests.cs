@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using CollaborationStateService.Configuration;
 using static ReflectBackend.ReflectBackendSignals;
+using System.Threading.Tasks;
 
 namespace RetrospectiveExtension.Backend.Tests
 {
@@ -16,7 +17,7 @@ namespace RetrospectiveExtension.Backend.Tests
         private IOptions<AppInsightsSettings> _appInsightsOptions = Options.Create(new AppInsightsSettings() { InstrumentationKey = "" });
 
         [Fact]
-        public async void BroadcastDeletedBoardTest()
+        public async Task BroadcastDeletedBoardTest()
         {
             using (var hub = new ReflectHub(_logger, _appInsightsOptions))
             {
@@ -40,7 +41,7 @@ namespace RetrospectiveExtension.Backend.Tests
         }
 
         [Fact]
-        public async void BroadcastNewBoardTest()
+        public async Task BroadcastNewBoardTest()
         {
             using (var hub = new ReflectHub(_logger, _appInsightsOptions))
             {
@@ -63,7 +64,7 @@ namespace RetrospectiveExtension.Backend.Tests
         }
 
         [Fact]
-        public async void BroadcastUpdatedBoardTest()
+        public async Task BroadcastUpdatedBoardTest()
         {
             using (var hub = new ReflectHub(_logger, _appInsightsOptions))
             {
@@ -86,7 +87,7 @@ namespace RetrospectiveExtension.Backend.Tests
         }
 
         [Fact]
-        public async void BroadcastDeletedItemTest()
+        public async Task BroadcastDeletedItemTest()
         {
             using (var hub = new ReflectHub(_logger, _appInsightsOptions))
             {
@@ -110,7 +111,7 @@ namespace RetrospectiveExtension.Backend.Tests
         }
 
         [Fact]
-        public async void BroadcastNewItemTest()
+        public async Task BroadcastNewItemTest()
         {
             using (var hub = new ReflectHub(_logger, _appInsightsOptions))
             {
@@ -134,7 +135,7 @@ namespace RetrospectiveExtension.Backend.Tests
         }
 
         [Fact]
-        public async void BroadcastUpdatedItem()
+        public async Task BroadcastUpdatedItem()
         {
             using (var hub = new ReflectHub(_logger, _appInsightsOptions))
             {
@@ -158,7 +159,7 @@ namespace RetrospectiveExtension.Backend.Tests
         }
 
         [Fact]
-        public async void JoinReflectBoardGroupTest()
+        public async Task JoinReflectBoardGroupTest()
         {
             using (var hub = new ReflectHub(_logger, _appInsightsOptions))
             {
@@ -177,7 +178,7 @@ namespace RetrospectiveExtension.Backend.Tests
         }
 
         [Fact]
-        public async void LeaveReflectBoardGroupTest()
+        public async Task LeaveReflectBoardGroupTest()
         {
             using (var hub = new ReflectHub(_logger, _appInsightsOptions))
             {
