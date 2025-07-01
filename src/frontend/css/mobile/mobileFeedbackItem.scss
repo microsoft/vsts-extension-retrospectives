@@ -35,7 +35,7 @@
 
       .card-header {
         // Reduce header height
-        height: 20px; // CHANGED: was variables.$mobile_second_level_header_height
+        height: 16px; // CHANGED: was variables.$mobile_second_level_header_height
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
@@ -49,7 +49,7 @@
           margin-right: 10px; // CHANGED: was 15px
           margin-left: 10px;  // CHANGED: was 15px
           margin-top: 2px;   // CHANGED: was 5px
-          padding: 1px 5px;    // CHANGED: was 1px 7px
+          padding: 2px 5px;    // CHANGED: was 1px 7px
 
           i {
             height: 22px; // CHANGED: was variables.$mobile_extension_header_height
@@ -118,7 +118,7 @@
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
   .feedbackItemGroupGroupedItem {
-    transform: scale(0.95);
+    transform: scale(0.98);
 
     .groupedItemCard {
       min-width: calc(100vw - 45px);
