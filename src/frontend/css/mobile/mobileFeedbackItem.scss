@@ -35,7 +35,7 @@
 
       .card-header {
         // Reduce header height
-        height: 16px; // CHANGED: was variables.$mobile_second_level_header_height
+        height: 12px; // CHANGED: was variables.$mobile_second_level_header_height
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
@@ -97,7 +97,7 @@
         .card-action-timer {
           button {
             width: 33%;
-            min-height: 12px; // CHANGED: was 15px
+            min-height: 10px; // CHANGED: was 15px
             font-size: variables.$mobile_font_size;
           }
         }
