@@ -118,7 +118,7 @@
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
   .feedbackItemGroupGroupedItem {
-    transform: scale(0.85);
+    transform: scale(0.95);
 
     .groupedItemCard {
       min-width: calc(100vw - 45px);
@@ -128,7 +128,7 @@
       background-color: rgba(var(--palette-neutral-10), 1);
 
       .card-integral-part {
-        border-left-width: 8px; // CHANGED: was 8px
+        border-left-width: 8px;
         border-left-style: solid;
         background-color: var(--background-color);
       }
