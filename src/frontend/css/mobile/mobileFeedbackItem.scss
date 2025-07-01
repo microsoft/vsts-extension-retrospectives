@@ -7,11 +7,8 @@
 .feedbackItemGroupGroupedItem {
   flex-basis: 100%;
 
-  // Reduce space between cards
-  margin-bottom: 8px; // ADDED: adjust as needed (try 4px for even less)
-
   &.hideFeedbackItem .card-content {
-    filter: blur(5px);
+    filter: blur(15px);
     pointer-events: none;
   }
 
@@ -25,17 +22,15 @@
     border: none;
     background: #fff;
     box-shadow: none;
-    // Reduce padding for less header/content space
-    padding: 2px 4px; // CHANGED: was 5px 5px
+    padding: 12px 8px;
     font-size: variables.$mobile_font_size_main;
 
     .card-integral-part {
-      border-left-width: 8px; // CHANGED: was 10px (thinner border)
+      border-left-width: 10px;
       border-left-style: solid;
 
       .card-header {
-        // Reduce header height
-        height: 28px; // CHANGED: was variables.$mobile_second_level_header_height
+        height: variables.$mobile_feedback_item_header_height;
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
@@ -43,17 +38,17 @@
         }
 
         .feedback-action-button {
-          height: 24px; // CHANGED: was variables.$mobile_second_level_header_height
+          height: variables.$mobile_extension_header_height;
           min-width: variables.$mobile_feedback_item_action_button_width;
-          max-width: 120px; // CHANGED: was 200px
-          margin-right: 6px; // CHANGED: was 15px
-          margin-left: 6px;  // CHANGED: was 15px
-          margin-top: 2px;   // CHANGED: was 5px
-          padding: 0 4px;    // CHANGED: was 1px 7px
+          max-width: 200px;
+          margin-right: 15px;
+          margin-left: 15px;
+          margin-top: 10px;
+          padding: 1px 7px;
 
           i {
-            height: 20px; // CHANGED: was variables.$mobile_extension_header_height
-            line-height: 1.1;
+            height: variables.$mobile_extension_header_height;
+            line-height: 1.2;
             font-size: variables.$mobile_font_size_main;
           }
         }
@@ -66,25 +61,25 @@
           }
 
           .feedback-upvote-count {
-            margin-left: 4px; // CHANGED: was 10px
+            margin-left: 10px;
             font-size: variables.$mobile_font_size_main;
-            line-height: 1.1;
+            line-height: 1.2;
           }
         }
 
         .item-actions-menu {
-          padding: 2px 4px 0 0; // CHANGED: was 5px 10px 0 0
+          padding: 15px 15px 0 0;
 
           .contextual-menu-button {
-            height: 24px; // CHANGED: was variables.$mobile_second_level_header_height
-            width: 32px;  // CHANGED: was 45px
+            height: 60px;
+            width: 45px;
 
             i {
-              height: 20px; // CHANGED: was variables.$mobile_extension_header_height
-              width: 32px;  // CHANGED: was 45px
-              line-height: 1.1;
+              height: 65px;
+              width: 45px;
+              line-height: 1.2;
               font-size: variables.$mobile_font_size_main;
-              margin-right: 4px; // CHANGED: was 7px
+              margin-right: 7px;
             }
           }
         }
@@ -97,7 +92,7 @@
         .card-action-timer {
           button {
             width: 33%;
-            min-height: 12px; // CHANGED: was 15px
+            min-height: 45px;
             font-size: variables.$mobile_font_size;
           }
         }
@@ -128,7 +123,7 @@
       background-color: rgba(var(--palette-neutral-10), 1);
 
       .card-integral-part {
-        border-left-width: 6px; // CHANGED: was 8px
+        border-left-width: 8px;
         border-left-style: solid;
         background-color: var(--background-color);
       }
