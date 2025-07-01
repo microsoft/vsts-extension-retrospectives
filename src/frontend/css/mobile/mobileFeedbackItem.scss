@@ -119,7 +119,8 @@ box-shadow: none;
 
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
-  .feedbackItemGroupGroupedItem {
+  .item-cards {
+  .feedbackItemGroupItem.feedbackItemGroupGroupedItem {
     transform: scale(0.99);
 
     .groupedItemCard {
@@ -143,4 +144,5 @@ box-shadow: none;
       }
     }
   }
+}
 }
