@@ -8,7 +8,7 @@
   flex-basis: 100%;
 
   // Reduce space between cards
-  margin-bottom: 4px; // ADDED: adjust as needed (try 4px for even less)
+  margin-bottom: 2px; // ADDED: adjust as needed (try 4px for even less)
 
   &.hideFeedbackItem .card-content {
     filter: blur(5px);
