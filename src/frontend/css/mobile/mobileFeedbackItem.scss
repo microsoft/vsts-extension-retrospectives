@@ -22,7 +22,7 @@
     border: none;
     background: #fff;
     box-shadow: none;
-    padding: 12px 8px;
+    padding: 5px 5px;
     font-size: variables.$mobile_font_size_main;
 
     .card-integral-part {
@@ -68,7 +68,7 @@
         }
 
         .item-actions-menu {
-          padding: 15px 15px 0 0;
+          padding: 10px 15px 0 0;
 
           .contextual-menu-button {
             height: variables.$mobile_second_level_header_height;
@@ -92,7 +92,7 @@
         .card-action-timer {
           button {
             width: 33%;
-            min-height: 45px;
+            min-height: 30px;
             font-size: variables.$mobile_font_size;
           }
         }
