@@ -12,6 +12,13 @@
     pointer-events: none;
   }
 
+  .document-card-wrapper {
+.ms-DocumentCard {
+border: none;
+box-shadow: none;
+}
+}
+
   // All card variants
   .mainItemCard,
   .groupedItemCard,
@@ -122,6 +129,13 @@
       box-shadow: none;
       background-color: rgba(var(--palette-neutral-10), 1);
 
+        .document-card-wrapper {
+.ms-DocumentCard {
+border: none;
+box-shadow: none;
+}
+}
+
       .card-integral-part {
         border-left-width: 8px;
         border-left-style: solid;
@@ -129,4 +143,10 @@
       }
     }
   }
+}
+
+.document-card-wrapper {
+.ms-DocumentCard {
+border: none;
+}
 }
