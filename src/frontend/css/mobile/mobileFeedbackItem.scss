@@ -13,7 +13,7 @@
   }
 
   .document-card-wrapper {
-.ms-DocumentCard {
+.ms-DocumentCard.groupedItemCard{
 border: none;
 box-shadow: none;
 }
@@ -120,7 +120,7 @@ box-shadow: none;
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
   .feedbackItemGroupGroupedItem {
-    transform: scale(0.95);
+    transform: scale(0.99);
 
     .groupedItemCard {
       min-width: calc(100vw - 45px);
@@ -130,7 +130,7 @@ box-shadow: none;
       background-color: rgba(var(--palette-neutral-10), 1);
 
         .document-card-wrapper {
-.ms-DocumentCard {
+.ms-DocumentCard.groupedItemCard{
 border: none;
 box-shadow: none;
 }
