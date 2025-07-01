@@ -71,11 +71,11 @@
           padding: 15px 15px 0 0;
 
           .contextual-menu-button {
-            height: $mobile_second_level_header_height;
+            height: variables.$mobile_second_level_header_height;
             width: 45px;
 
             i {
-              height: $mobile_extension_header_height;
+              height: variables.$mobile_extension_header_height;
               width: 45px;
               line-height: 1.2;
               font-size: variables.$mobile_font_size_main;
