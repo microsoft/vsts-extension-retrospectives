@@ -1,5 +1,5 @@
 @use "sass:meta";
-@use "variables";
+@use "_variables.scss";
 
 .mobile-mode {
   @include meta.load-css("mobile/mobileAddActionItem.scss");
