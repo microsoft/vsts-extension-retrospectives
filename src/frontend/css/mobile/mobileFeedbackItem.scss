@@ -30,7 +30,7 @@
     font-size: variables.$mobile_font_size_main;
 
     .card-integral-part {
-      border-left-width: 10px; // CHANGED: was 10px (thinner border)
+      border-left-width: 10px;
       border-left-style: solid;
 
       .card-header {
@@ -39,7 +39,7 @@
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
-          font-size: variables.$mobile_font_size_mini;
+          font-size: 16px; // CHANGED: was variables.$mobile_font_size_mini;
         }
 
         .feedback-action-button {
@@ -118,7 +118,7 @@
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
   .feedbackItemGroupGroupedItem {
-    transform: scale(0.98);
+    transform: scale(0.9);
 
     .groupedItemCard {
       min-width: calc(100vw - 45px);
