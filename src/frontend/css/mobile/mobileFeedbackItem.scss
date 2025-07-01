@@ -123,18 +123,18 @@ box-shadow: none;
   .feedbackItemGroupItem.feedbackItemGroupGroupedItem {
     transform: scale(0.99);
 
+            .document-card-wrapper {
+.ms-DocumentCard.groupedItemCard{
+border: none;
+box-shadow: none;
+}
+
     .groupedItemCard {
       min-width: calc(100vw - 45px);
       max-width: calc(100vw - 45px);
       border: none;
       box-shadow: none;
       background-color: rgba(var(--palette-neutral-10), 1);
-
-        .document-card-wrapper {
-.ms-DocumentCard.groupedItemCard{
-border: none;
-box-shadow: none;
-}
 }
 
       .card-integral-part {
