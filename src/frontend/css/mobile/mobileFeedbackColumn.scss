@@ -15,13 +15,13 @@
   }
 
   .feedback-column-title {
-    padding: 24px 32px 10px 28px;
+    padding: 20px 28px 10px 28px;
     cursor: pointer;
     background-color: #f8f8f8;
     margin: 0;
     border-bottom: 1px solid #eaeaea;
     border-top: 1px solid #eaeaea;
-    height: 85px;
+    height: 80px;
 
     .feedback-column-icon {
       padding-top: 3px;
@@ -47,7 +47,7 @@
       width: 100vw;
       max-width: variables.$mobile_breakpoint;
       flex-wrap: wrap;
-      padding-bottom: 30px;
+      padding-bottom: 20px;
       display: flex;
       transform-origin: 0 0;
 

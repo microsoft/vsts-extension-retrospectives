@@ -43,7 +43,7 @@
           max-width: 200px;
           margin-right: 15px;
           margin-left: 15px;
-          margin-top: 7.5px;
+          margin-top: 5px;
           padding: 1px 7px;
 
           i {
@@ -68,7 +68,7 @@
         }
 
         .item-actions-menu {
-          padding: 10px 15px 0 0;
+          padding: 5px 15px 0 0;
 
           .contextual-menu-button {
             height: variables.$mobile_second_level_header_height;
@@ -92,7 +92,7 @@
         .card-action-timer {
           button {
             width: 33%;
-            min-height: 30px;
+            min-height: 20px;
             font-size: variables.$mobile_font_size;
           }
         }
