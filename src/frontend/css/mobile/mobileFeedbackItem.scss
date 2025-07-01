@@ -12,13 +12,6 @@
     pointer-events: none;
   }
 
-  .document-card-wrapper {
-.ms-DocumentCard.groupedItemCard{
-border: none;
-box-shadow: none;
-}
-}
-
   // All card variants
   .mainItemCard,
   .groupedItemCard,
@@ -119,15 +112,8 @@ box-shadow: none;
 
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
-  .item-cards {
-  .feedbackItemGroupItem.feedbackItemGroupGroupedItem {
-    transform: scale(0.99);
-
-            .document-card-wrapper {
-.ms-DocumentCard.groupedItemCard{
-border: none;
-box-shadow: none;
-}
+  .feedbackItemGroupGroupedItem {
+    transform: scale(0.95);
 
     .groupedItemCard {
       min-width: calc(100vw - 45px);
@@ -135,7 +121,6 @@ box-shadow: none;
       border: none;
       box-shadow: none;
       background-color: rgba(var(--palette-neutral-10), 1);
-}
 
       .card-integral-part {
         border-left-width: 8px;
@@ -144,5 +129,4 @@ box-shadow: none;
       }
     }
   }
-}
 }
