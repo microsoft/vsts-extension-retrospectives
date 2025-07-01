@@ -5,7 +5,7 @@ $mobile_stage_block_left_margin_width: 10px;
 $mobile_team_selector_list_item_height: 90px;
 
 .feedback-board-container {
-  height: calc(100vh - #{variables.$mobile_extension_header_height_with_margin} - 55px); // 55px is the approximate height of the second-level header on mobile.
+  height: calc(100vh - #{variables.$mobile_extension_header_height_with_margin} - variables.$mobile_second_level_header_height);
   overflow-x: hidden;
 }
 
@@ -42,7 +42,7 @@ $mobile_team_selector_list_item_height: 90px;
     max-height: 85%;
 
     .ms-TextField-fieldGroup {
-      height: 80px;
+      height: 70px;
       align-items: center;
       font-size: 20px;
 
@@ -69,7 +69,7 @@ $mobile_team_selector_list_item_height: 90px;
 
     &.selector {
       .ms-Dialog-title {
-        height: 45px;
+        height: 40px;
       }
     }
 
