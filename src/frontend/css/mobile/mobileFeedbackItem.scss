@@ -35,8 +35,7 @@
 
       .card-header {
         // Reduce header height
-        height: 24px; // CHANGED: was variables.$mobile_second_level_header_height
-        margin-bottom: 2px;
+        height: variables.$mobile_font_size_mini + 2px; // CHANGED: was variables.$mobile_second_level_header_height
         line-height: 1.1;
         font-size: variables.$mobile_font_size_mini;
 
@@ -96,6 +95,8 @@
 
       .card-content {
         .feedback-yourvote-count {
+          height: variables.$mobile_font_size_main + 2px;
+          line-height: 1.1;
           font-size: variables.$mobile_font_size_main;
         }
         .card-action-timer {
