@@ -22,9 +22,7 @@
   .feedbackItemGroupGroupedItem {
     min-width: calc(100vw - 45px);
     max-width: calc(100vw - 45px);
-    border: none;
     background: #fff;
-    box-shadow: none;
     // Reduce padding for less header/content space
     padding: 2px 4px; // CHANGED: was 5px 5px
     font-size: variables.$mobile_font_size_large;
@@ -43,7 +41,7 @@
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
-          height: variables.$mobile_font_size_small = 2px;
+          height: variables.$mobile_font_size_small + 2px;
           font-size: variables.$mobile_font_size_small;
         }
 
