@@ -35,7 +35,10 @@
 
       .card-header {
         // Reduce header height
-        height: 12px; // CHANGED: was variables.$mobile_second_level_header_height
+        height: 24px; // CHANGED: was variables.$mobile_second_level_header_height
+        margin-bottom: 2px;
+        line-height: 1.1;
+        font-size: variables.$mobile_font_size_mini;
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
