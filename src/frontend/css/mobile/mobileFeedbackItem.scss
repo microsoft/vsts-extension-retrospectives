@@ -1,11 +1,16 @@
 @use "../_variables.scss";
 
+.feedback-items-container {
+  row-gap: 0 !important;
+  align-content: flex-start !important;
+}
+
 // Unified mobile styles for feedback cards (grouped and ungrouped)
 .feedbackItem,
 .feedback-item-group,
 .feedbackItemGroupItem,
 .feedbackItemGroupGroupedItem {
-  flex-basis: 100%;
+  flex-basis: auto;
 
   // Reduce space between cards
   margin-bottom: 2px; // ADDED: adjust as needed (try 4px for even less)
