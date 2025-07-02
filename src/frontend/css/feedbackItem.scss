@@ -30,7 +30,7 @@
     position: relative;
   }
 
-  .mainItemCard {
+  .main-item-card {
     width: 250px; // For a uniform size
     background-color: var(--background-color);
     border-top: 1px solid rgb(96, 94, 92);
@@ -299,7 +299,7 @@
       &:active,
       &:hover {
         .feedbackItem {
-          .mainItemCard {
+          .main-item-card {
             border: 2px solid variables.$main_blue;
           }
         }
@@ -309,7 +309,7 @@
         margin: 0;
         width: 100%;
 
-        .mainItemCard {
+        .main-item-card {
           min-width: 100%;
 
           .card-header {

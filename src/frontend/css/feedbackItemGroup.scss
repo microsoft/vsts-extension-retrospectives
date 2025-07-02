@@ -8,7 +8,7 @@
     display: flex;
     flex-direction: column;
 
-    .feedbackItemGroupItem {
+    .feedback-item-group-item {
       &.removeFeedbackItem {
         .ms-DocumentCard {
           animation: fadeOutToRed 1000ms ease-in 1 forwards;
@@ -20,7 +20,7 @@
       display: none;
     }
 
-    .mainItemCard {
+    .main-item-card {
       z-index: 1;
 
       .card-header {
@@ -49,11 +49,11 @@
   }
 
   &.feedback-item-group-expanded {
-    .feedbackItemGroupGroupedItem {
+    .feedback-item-group-grouped-item {
       transform: scale(0.95);
 
-      .groupedItemCard {
-        @extend .mainItemCard;
+      .grouped-item-card {
+        @extend .main-item-card;
         margin-top: 0px;
         background-color: rgba(var(--palette-neutral-10), 1);
 

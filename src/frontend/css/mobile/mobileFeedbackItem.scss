@@ -3,8 +3,8 @@
 // Unified mobile styles for feedback cards (grouped and ungrouped)
 .feedbackItem,
 .feedback-item-group,
-.feedbackItemGroupItem,
-.feedbackItemGroupGroupedItem {
+.feedback-item-group-item,
+.feedback-item-group-grouped-item {
   flex-basis: 100%;
 
   // Reduce space between cards
@@ -16,10 +16,10 @@
   }
 
   // All card variants
-  .mainItemCard,
-  .groupedItemCard,
-  .feedbackItemGroupItem,
-  .feedbackItemGroupGroupedItem {
+  .main-item-card,
+  .grouped-item-card,
+  .feedback-item-group-item,
+  .feedback-item-group-grouped-item {
     min-width: calc(100vw - 45px);
     max-width: calc(100vw - 45px);
     background: #fff;
@@ -30,7 +30,6 @@
     .card-integral-part {
       border-left-width: 10px; // CHANGED: was 10px (thinner border)
       border-left-style: solid;
-      height: 120px;
       line-height: 1.1;
 
       .card-header {
@@ -122,10 +121,10 @@
 
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
-  .feedbackItemGroupGroupedItem {
+  .feedback-item-group-grouped-item {
     transform: scale(0.96);
 
-    .groupedItemCard {
+    .grouped-item-card {
       min-width: calc(100vw - 45px);
       max-width: calc(100vw - 45px);
       border: none;
