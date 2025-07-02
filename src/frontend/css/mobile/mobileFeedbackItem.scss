@@ -39,6 +39,7 @@
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
+          height: 24px;
           font-size: variables.$mobile_font_size_mini;
         }
 
