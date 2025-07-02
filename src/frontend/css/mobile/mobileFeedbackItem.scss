@@ -3,8 +3,8 @@
 // Unified mobile styles for feedback cards (grouped and ungrouped)
 .feedbackItem,
 .feedback-item-group,
-.feedback-item-group-item,
-.feedback-item-group-grouped-item {
+.feedbackItemGroupItem,
+.feedbackItemGroupGroupedItem {
   flex-basis: 100%;
 
   // Reduce space between cards
@@ -16,13 +16,15 @@
   }
 
   // All card variants
-  .main-item-card,
-  .grouped-item-card,
-  .feedback-item-group-item,
-  .feedback-item-group-grouped-item {
+  .mainItemCard,
+  .groupedItemCard,
+  .feedbackItemGroupItem,
+  .feedbackItemGroupGroupedItem {
     min-width: calc(100vw - 45px);
     max-width: calc(100vw - 45px);
+    border: none;
     background: #fff;
+    box-shadow: none;
     // Reduce padding for less header/content space
     padding: 2px 4px; // CHANGED: was 5px 5px
     font-size: variables.$mobile_font_size_large;
@@ -40,7 +42,7 @@
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
-          height: variables.$mobile_font_size_small + 2px;
+          height: variables.$mobile_font_size_small - 2px;
           font-size: variables.$mobile_font_size_small;
         }
 
@@ -121,10 +123,10 @@
 
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
-  .feedback-item-group-grouped-item {
+  .feedbackItemGroupGroupedItem {
     transform: scale(0.96);
 
-    .grouped-item-card {
+    .groupedItemCard {
       min-width: calc(100vw - 45px);
       max-width: calc(100vw - 45px);
       border: none;

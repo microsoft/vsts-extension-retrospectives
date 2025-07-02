@@ -729,8 +729,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         aria-label={ariaLabel}
         className={classNames({
           feedbackItem: isNotGroupedItem,
-          feedback-item-group-item: !isNotGroupedItem,
-          feedback-item-group-grouped-item: !isNotGroupedItem && !isMainItem,
+          feedbackItemGroupItem: !isNotGroupedItem,
+          feedbackItemGroupGroupedItem: !isNotGroupedItem && !isMainItem,
           newFeedbackItem: this.props.showAddedAnimation,
           removeFeedbackItem: this.state.isMarkedForDeletion,
           hideFeedbackItem: hideFeedbackItems,
@@ -743,8 +743,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         onAnimationEnd={this.onAnimationEnd}>
         <div className="document-card-wrapper">
           <DocumentCard className={classNames({
-            main-item-card: isMainItem,
-            grouped-item-card: !isMainItem,
+            mainItemCard: isMainItem,
+            groupedItemCard: !isMainItem,
           })}>
             <div
               className="card-integral-part"
