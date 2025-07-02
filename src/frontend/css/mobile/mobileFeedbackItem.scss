@@ -1,10 +1,5 @@
 @use "../_variables.scss";
 
-.feedback-items-container {
-  row-gap: 0 !important;
-  align-content: flex-start !important;
-}
-
 // Unified mobile styles for feedback cards (grouped and ungrouped)
 .feedbackItem,
 .feedback-item-group,
@@ -40,12 +35,14 @@
       line-height: 1.1;
       height: auto;
       min-height: 180px;
+       outline: 2px solid red;
 
       .card-header {
         // Reduce header height
         height: variables.$mobile_font_size_small + 2px; // CHANGED: was variables.$mobile_second_level_header_height
         line-height: 1.1;
         font-size: variables.$mobile_font_size_small;
+        outline: 2px solid blue;
 
         // Group expand/collapse and count should remain visible
         .feedback-expand-group {
