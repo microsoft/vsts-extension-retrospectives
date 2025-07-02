@@ -35,7 +35,7 @@
     }
 
     .feedback-column-name {
-      font-size: variables.$mobile_font_size_main;
+      font-size: variables.$mobile_font_size_large;
       margin-top: -5px;
       display: inline-block;
     }
@@ -56,21 +56,21 @@
       }
 
       .input-validation-message {
-        font-size: variables.$mobile_font_size_main - 20px;
+        font-size: variables.$mobile_font_size_large - 20px;
       }
 
       .feedback-item-form {
         display: flex;
 
         .fa-plus {
-          font-size: variables.$mobile_font_size_main;
+          font-size: variables.$mobile_font_size_large;
         }
       }
 
       .title-input {
         width: 100%;
         height: 75px;
-        font-size: variables.$mobile_font_size_main;
+        font-size: variables.$mobile_font_size_large;
         padding-left: 30px;
       }
 
