@@ -1,8 +1,8 @@
 @use "../_variables.scss";
 
-.mainItemCard, 
-.mainItemCard > *, 
-.mainItemCard > * > *, 
+.mainItemCard,
+.mainItemCard > *,
+.mainItemCard > * > *,
 .mainItemCard > * > * > * {
   margin: 0 !important;
   padding: 0 !important;
