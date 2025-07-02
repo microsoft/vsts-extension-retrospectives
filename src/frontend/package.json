@@ -50,7 +50,7 @@
     "telemetryclient-team-services-extension": "1.0.10"
   },
   "devDependencies": {
-    "@codecov/webpack-plugin": "1.9.0",
+    "@codecov/webpack-plugin": "1.9.1",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.20.0",
     "@tailwindcss/postcss": "4.1.11",
