@@ -1,8 +1,13 @@
 @use "../_variables.scss";
 
-.mainItemCard {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
+.mainItemCard, 
+.mainItemCard > *, 
+.mainItemCard > * > *, 
+.mainItemCard > * > * > * {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-top-width: 0 !important;
+  border-bottom-width: 0 !important;
 }
 
 // Unified mobile styles for feedback cards (grouped and ungrouped)
