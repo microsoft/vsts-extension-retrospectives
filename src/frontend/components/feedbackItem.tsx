@@ -863,7 +863,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </div>
                 }
                 {(!workflowState.isCollectPhase) && (this.props.columnId !== this.props.originalColumnId) &&
-                  <div className="original-column-info">Original Column: <br />{ this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a" }</div>
+                  <div className="original-column-info hide-mobile">Original Column: <br />{ this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a" }</div>
                 }
                 {showVoteButton && this.props.isInteractable &&
                   <div>
