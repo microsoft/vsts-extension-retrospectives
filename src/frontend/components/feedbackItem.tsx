@@ -827,7 +827,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </div>}
               </div>
               <div className="card-content">
-                <div id="actionTimer" className="card-action-timer">
+                <div id="actionTimer" className="card-action-timer hide-mobile">
                   {showAddActionItem &&
                     <button
                       title="Timer"
@@ -916,7 +916,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                           {childCard.feedbackItem.title}
                         </span>
                         {(this.props.columnId !== originalColumn?.columnProperties?.id) &&
-                          <div className="original-column-info">Original Column: <br />{originalColumn.columnProperties.title}</div>
+                          <div className="original-column-info hide-mobile">Original Column: <br />{originalColumn.columnProperties.title}</div>
                         }
                     </li>
                   })}

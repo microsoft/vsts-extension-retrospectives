@@ -2,7 +2,7 @@
 
 // Unified mobile styles for feedback cards (grouped and ungrouped)
 .feedback-item-group,
-.feedback-item-group.feedback-item-group-expanded,
+//.feedback-item-group.feedback-item-group-expanded,
 .feedbackItem,
 .feedbackItemGroupItem,
 .feedbackItemGroupItem.feedbackItemGroupGroupedItem {
@@ -45,14 +45,6 @@
         line-height: 1.1;
         font-size: variables.$mobile_font_size_small;
         outline: 2px solid blue;
-
-                .feedback-action-button {
-
-          i {
-            line-height: variables.$feedback_item_action_button_height - 5px;
-            color: var(--text-secondary-color);
-            font-size: 14px;
-          }
 
         .feedback-action-button {
           height: variables.$mobile_feedback_item_action_button_height;
@@ -102,13 +94,11 @@
       } // end .card-header
 
       .card-content {
-        .feedback-yourvote-count {
-          font-size: variables.$mobile_font_size;
-        }
+        font-size: variables.$mobile_font_size;
       }
 
       .card-id {
-        font-size: variables.$mobile_font_size;
+        font-size: variables.$mobile_font_size_small;
       }
 
       .ms-DocumentCardActivity,
@@ -118,10 +108,11 @@
     } // end .card-integral-part
   } // end card variant
 }
-/*
+
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
-  .feedbackItemGroupGroupedItem {
+  //.feedbackItemGroupGroupedItem {
+  .item-cards {
     transform: scale(0.96);
 
     .groupedItemCard {
@@ -139,4 +130,3 @@
     }
   }
 }
-*/
