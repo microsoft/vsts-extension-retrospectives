@@ -9,7 +9,7 @@
   flex-basis: auto;
 
   // Reduce space between cards
-  margin-bottom: 2px; // ADDED: adjust as needed (try 4px for even less)
+  margin-bottom: 2px;
 
   &.hideFeedbackItem .card-content {
     filter: blur(5px);
@@ -30,8 +30,7 @@
     max-width: calc(100vw - 45px);
     border: none;
     background: #fff;
-    // Reduce padding for less header/content space
-    padding: 2px 4px; // CHANGED: was 5px 5px
+    padding: 2px 4px;
     font-size: variables.$mobile_font_size_large;
 
     .card-integral-part {
@@ -56,7 +55,6 @@
         // Group expand/collapse and count should remain visible
         .feedback-expand-group,
         .feedback-expand-group-focus {
-          height: variables.$mobile_feedback_item_header_height;
           font-size: variables.$mobile_font_size_small - 4px;
         }
 
@@ -70,7 +68,6 @@
           .feedback-upvote-count {
             margin-left: 8px;
             font-size: variables.$mobile_font_size;
-            line-height: 1.1;
           }
         }
 
@@ -108,12 +105,10 @@
       min-width: calc(100vw - 45px);
       max-width: calc(100vw - 45px);
       border: none;
-      //background-color: rgba(var(--palette-neutral-10), 1);
 
       .card-integral-part {
         border-left-width: 8px;
         border-left-style: solid;
-        //background-color: var(--background-color);
       }
     }
   }
