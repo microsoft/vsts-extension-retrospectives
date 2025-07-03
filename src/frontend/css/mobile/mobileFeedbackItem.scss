@@ -16,8 +16,9 @@
     pointer-events: none;
   }
 
-  //.document-card-wrapper {
-  //}
+  .document-card-wrapper {
+    position: relative;
+  }
 
   // All card variants
   .mainItemCard,
@@ -29,44 +30,51 @@
     max-width: calc(100vw - 45px);
     border: none;
     background: #fff;
-    box-shadow: none;
     // Reduce padding for less header/content space
     padding: 2px 4px; // CHANGED: was 5px 5px
     font-size: variables.$mobile_font_size_large;
 
     .card-integral-part {
-      border-left-width: 10px; // CHANGED: was 10px (thinner border)
+      border-left-width: 10px;
       border-left-style: solid;
-      line-height: 1.1;
       outline: 2px solid red;
 
       .card-header {
         // Reduce header height
-        height: variables.$mobile_font_size_small + 2px; // CHANGED: was variables.$mobile_second_level_header_height
+        height: variables.$mobile_feedback_item_header_height;
         line-height: 1.1;
         font-size: variables.$mobile_font_size_small;
         outline: 2px solid blue;
 
+                .feedback-action-button {
+
+          i {
+            line-height: variables.$feedback_item_action_button_height - 5px;
+            color: var(--text-secondary-color);
+            font-size: 14px;
+          }
+
+        .feedback-action-button {
+          height: variables.$mobile_feedback_item_action_button_height;
+          min-width: variables.$mobile_feedback_item_action_button_width;
+          max-width: 200px;
+          margin: 2px 4px;
+          padding: 2px 4px;
+
+          i {
+            line-height: variables.$mobile_feedback_item_action_button_height - 4px;
+            font-size: variables.$mobile_font_size_small - 4px;
+          }
+        }
+
         // Group expand/collapse and count should remain visible
         .feedback-expand-group,
         .feedback-expand-group-focus {
-          height: variables.$mobile_font_size_small + 2px;
-          font-size: variables.$mobile_font_size_small;
-        }
-
-        .feedback-action-button {
-          height: 20px; // CHANGED: was variables.$mobile_second_level_header_height
-          min-width: variables.$mobile_feedback_item_action_button_width;
-          max-width: 200px; // CHANGED: was 200px
-          margin-right: 10px; // CHANGED: was 15px
-          margin-left: 10px; // CHANGED: was 15px
-          margin-top: 2px; // CHANGED: was 5px
-          padding: 2px 5px; // CHANGED: was 1px 7px
-
+          height: variables.$mobile_feedback_item_header_height;
+          line-height: variables.$mobile_feedback_item_header_height;
+          font-size: variables.$mobile_font_size_small - 4px;
           i {
-            height: 22px; // CHANGED: was variables.$mobile_extension_header_height
-            line-height: 1.1;
-            font-size: variables.$mobile_font_size_large;
+            width: 50px;
           }
         }
 
@@ -85,35 +93,17 @@
         }
 
         .item-actions-menu {
-          padding: 2px 4px 0 0; // CHANGED: was 5px 10px 0 0
+          padding: 2px 2px 0 0;
 
           .contextual-menu-button {
-            height: 20px; // CHANGED: was variables.$mobile_second_level_header_height
-            width: 40px; // CHANGED: was 45px
-
-            i {
-              height: 22px; // CHANGED: was variables.$mobile_extension_header_height
-              width: 40px; // CHANGED: was 45px
-              line-height: 1.1;
-              font-size: variables.$mobile_font_size_large;
-              margin-right: 5px; // CHANGED: was 7px
-            }
+            width: 40px;
           }
         }
       } // end .card-header
 
       .card-content {
         .feedback-yourvote-count {
-          height: variables.$mobile_font_size_large + 2px;
-          line-height: 1.1;
-          font-size: variables.$mobile_font_size_large;
-        }
-        .card-action-timer {
-          button {
-            width: 33%;
-            min-height: 10px; // CHANGED: was 15px
-            font-size: variables.$mobile_font_size;
-          }
+          font-size: variables.$mobile_font_size;
         }
       }
 
