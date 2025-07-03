@@ -112,7 +112,7 @@
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
   .feedbackItemGroupGroupedItem {
-    transform: scale(1);
+    transform: scale(0.96);
 
     .groupedItemCard {
       min-width: calc(100vw - 45px);
