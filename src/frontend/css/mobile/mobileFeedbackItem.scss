@@ -1,10 +1,11 @@
 @use "../_variables.scss";
 
 // Unified mobile styles for feedback cards (grouped and ungrouped)
-.feedbackItem,
 .feedback-item-group,
+.feedback-item-group.feedback-item-group-expanded,
+.feedbackItem,
 .feedbackItemGroupItem,
-.feedbackItemGroupGroupedItem {
+.feedbackItemGroupItem.feedbackItemGroupGroupedItem {
   flex-basis: auto;
 
   // Reduce space between cards
@@ -15,11 +16,13 @@
     pointer-events: none;
   }
 
+  .document-card-wrapper {
   // All card variants
   .mainItemCard,
   .groupedItemCard,
-  .feedbackItemGroupItem,
-  .feedbackItemGroupGroupedItem {
+  //.feedbackItemGroupItem,
+  //.feedbackItemGroupGroupedItem 
+  {
     min-width: calc(100vw - 45px);
     max-width: calc(100vw - 45px);
     border: none;
@@ -122,7 +125,8 @@
     } // end .card-integral-part
   } // end card variant
 }
-
+}
+/*
 // Expanded group state for grouped cards
 .feedback-item-group.feedback-item-group-expanded {
   .feedbackItemGroupGroupedItem {
@@ -143,3 +147,4 @@
     }
   }
 }
+*/
