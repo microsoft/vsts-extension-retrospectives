@@ -16,7 +16,9 @@
     pointer-events: none;
   }
 
-  .document-card-wrapper {
+  //.document-card-wrapper {
+  //}
+
   // All card variants
   .mainItemCard,
   .groupedItemCard
@@ -46,7 +48,8 @@
         outline: 2px solid blue;
 
         // Group expand/collapse and count should remain visible
-        .feedback-expand-group {
+        .feedback-expand-group,
+        .feedback-expand-group-focus {
           height: variables.$mobile_font_size_small + 2px;
           font-size: variables.$mobile_font_size_small;
         }
@@ -124,7 +127,6 @@
       }
     } // end .card-integral-part
   } // end card variant
-}
 }
 /*
 // Expanded group state for grouped cards

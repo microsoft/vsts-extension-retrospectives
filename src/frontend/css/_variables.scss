@@ -21,8 +21,9 @@ $mobile_font_size_large: 32px;
 $mobile_extension_header_height: 40px;
 $mobile_extension_header_height_with_margin: $mobile_extension_header_height + 10px;
 $mobile_second_level_header_height: 20px;
-$mobile_feedback_item_action_button_width: 55px;
-$mobile_feedback_item_header_height: 25px;
+$mobile_feedback_item_action_button_height: 20px;
+$mobile_feedback_item_action_button_width: 50px;
+$mobile_feedback_item_header_height: $mobile_feedback_item_action_button_height + 5px;
 
 // colors
 $azure_devops_navigator_light_grey: #f4f4f4;
