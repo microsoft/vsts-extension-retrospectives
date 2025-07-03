@@ -78,7 +78,7 @@
           }
 
           .feedback-upvote-count {
-            margin-left: 8px; // CHANGED: was 10px
+            margin-left: 8px;
             font-size: variables.$mobile_font_size;
             line-height: 1.1;
           }
@@ -120,12 +120,12 @@
       max-width: calc(100vw - 45px);
       border: none;
       box-shadow: none;
-      background-color: rgba(var(--palette-neutral-10), 1);
+      //background-color: rgba(var(--palette-neutral-10), 1);
 
       .card-integral-part {
         border-left-width: 8px;
         border-left-style: solid;
-        background-color: var(--background-color);
+        //background-color: var(--background-color);
       }
     }
   }
