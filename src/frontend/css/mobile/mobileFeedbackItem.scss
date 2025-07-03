@@ -55,7 +55,7 @@
         // Group expand/collapse and count should remain visible
         .feedback-expand-group,
         .feedback-expand-group-focus {
-          font-size: variables.$mobile_font_size_small - 4px;
+          font-size: variables.$mobile_font_size_small; //-4px
         }
 
         .feedback-add-vote {
@@ -67,16 +67,16 @@
 
           .feedback-upvote-count {
             margin-left: 8px;
-            font-size: variables.$mobile_font_size;
+            font-size: variables.$mobile_font_size_small;
           }
         }
 
         .item-actions-menu {
           padding: 2px 2px 0 0;
 
-          .contextual-menu-button {
-            width: 40px;
-          }
+          //.contextual-menu-button {
+          //  width: 40px;
+          //}
         }
       } // end .card-header
 
