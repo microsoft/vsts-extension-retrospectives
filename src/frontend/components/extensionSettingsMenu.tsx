@@ -12,6 +12,8 @@ import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
 import { Slide, toast, ToastContainer } from 'react-toastify';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
+import { DialogMarkdown } from './extensionSettingsDialogMarkdown';
+import { whatIsNewMarkdown } from '../assets/whatIsNew';
 
 import {
   RETRO_URLS,
@@ -412,7 +414,7 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
           defaultButtonText="Open change log"
           containerClassName="whatsnew-dialog"
         >
-          {renderContent(CHANGELOG_CONTENT)}
+        <DialogMarkdown markdown={whatIsNewMarkdown} />
         </ExtensionDialog>
         <ExtensionDialog
           hidden={this.state.isGetHelpDialogHidden}
