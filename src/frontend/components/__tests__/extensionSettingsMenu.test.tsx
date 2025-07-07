@@ -271,7 +271,7 @@ describe('ExtensionSettingsMenu', () => {
       wrapper.setState({ isGetHelpDialogHidden: false });
       const dialog = wrapper.findWhere(n => n.prop('title') === 'Retrospectives User Guide');
       dialog.prop('onDefaultClick')?.();
-      expect(openSpy).toHaveBeenCalledWith(RETRO_URLS.readme, '_blank', 'noreferrer');
+      expect(openSpy).toHaveBeenCalledWith(RETRO_URLS.readme, '_blank');
     });
 
     it('opens contributing guide from Volunteer dialog', () => {

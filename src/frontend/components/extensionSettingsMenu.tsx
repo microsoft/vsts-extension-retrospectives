@@ -273,7 +273,7 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
   }
 
   private readonly onGetHelpClicked = () => {
-    window.open(RETRO_URLS.readme, '_blank', 'noreferrer');
+    window.open(RETRO_URLS.readme, '_blank');
   }
 
   private readonly onContributingClicked = () => {
