@@ -4,6 +4,20 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.42
 
+* Refactored the Retrospective Extension settings menu to more closely mirror the ADO menus format.
+* Moved the Prime Directive option from the Retrospective Board to the Retrospective menu options.
+* Updated dialog text for Prime Directive and User Guide (renamed from Get Help).
+* Added Volunteer menu option which displays the CONTRIBUTING markdown file.
+* Moved volunteering information from the README markdown file to the CONTRIBUTING markdown file.
+* Dropped option to clear visit history which resulted in defaulting user to last board created instead of last board visited on the next visit (often the same board).
+* Updated keywords and icons for menu options, and modified menu options to follow consistent capitalization.
+* Added dynamic toggling between icon with text and just icon depending on screen size and orientation.
+* Enabled the switch to mobile view and switch to desktop view options which were not functional.
+* Addressed numerous issues with the mobile view, including limiting mobile to core functionality and improving the layout for easier viewing.
+* Removed redundant automated tests for extension menu settings while maintaining same test code coverage.
+
+From [GitHub PR #1234](https://github.com/microsoft/vsts-extension-retrospectives/pull/1234)
+
 * Identifies Team Admin, in addition to Board Owner, in Permission table.
 * Only the Board Owner or a Team Admin can edit permissions to access the retrospective board.
 
@@ -21,7 +35,22 @@ From [GitHub PR #1193](https://github.com/microsoft/vsts-extension-retrospective
 
 From [GitHub PR #1184](https://github.com/microsoft/vsts-extension-retrospectives/pull/1184)
 
-* Improved test code coverage by ~5%.
+* Improved test code coverage by more than 15% as part of above pull requests, plus the following pull requests:
+
+From [GitHub PR #1212](https://github.com/microsoft/vsts-extension-retrospectives/pull/1212)
+From [GitHub PR #1213](https://github.com/microsoft/vsts-extension-retrospectives/pull/1213)
+From [GitHub PR #1214](https://github.com/microsoft/vsts-extension-retrospectives/pull/1214)
+From [GitHub PR #1222](https://github.com/microsoft/vsts-extension-retrospectives/pull/1222)
+From [GitHub PR #1227](https://github.com/microsoft/vsts-extension-retrospectives/pull/1227)
+From [GitHub PR #1231](https://github.com/microsoft/vsts-extension-retrospectives/pull/1231)
+From [GitHub PR #1237](https://github.com/microsoft/vsts-extension-retrospectives/pull/1237)
+From [GitHub PR #1238](https://github.com/microsoft/vsts-extension-retrospectives/pull/1238)
+From [GitHub PR #1241](https://github.com/microsoft/vsts-extension-retrospectives/pull/1241)
+From [GitHub PR #1242](https://github.com/microsoft/vsts-extension-retrospectives/pull/1242)
+From [GitHub PR #1243](https://github.com/microsoft/vsts-extension-retrospectives/pull/1243)
+From [GitHub PR #1255](https://github.com/microsoft/vsts-extension-retrospectives/pull/1255)
+
+* Additional 12 pull requests covering pipelines, performance, formatting, accessibility, and other maintenance.
 
 ## v1.92.38
 

@@ -30,11 +30,19 @@ export const PRIME_DIRECTIVE_CONTENT: ContentItem[] = [
 
 export const CHANGELOG_CONTENT: ContentItem[] = [
   {
-    content: 'The latest release includes updates for setting permissions, deleting boards, and sticky defaults.'
+    content: 'The latest release includes redesign of menu options, enabling mobile view, role-based permission setting, redesign of deleting boards, implementation of sticky defaults, improved test code coverage, plus additional maintenance.'
   },
   {
     bullet: true,
-    content: 'Ability to set permissions for accessing the retrospective board now restricted to the board owner or a team admin.',
+    content: 'Extension settings menu was redesigned to more closely mirror the ADO settings menu, while moving Prime Directive and adding Volunteer options.',
+  },
+  {
+    bullet: true,
+    content: 'Switch to mobile view with only core functionality and improved viewing on mobile devices was enabled.',
+  },
+  {
+    bullet: true,
+    content: 'Ability to set permissions for accessing the retrospective board is now restricted to the board owner or a team admin.',
   },
   {
     bullet: true,
@@ -42,7 +50,11 @@ export const CHANGELOG_CONTENT: ContentItem[] = [
   },
   {
     bullet: true,
-    content: 'User settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.',
+    content: 'User settings for maximum votes, Team Assessment, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.',
+  },
+  {
+    bullet: true,
+    content: 'Test code coverage was increased by more than 15% and completed a dozen maintenance activities.',
   },
   {
     content: 'Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.'
