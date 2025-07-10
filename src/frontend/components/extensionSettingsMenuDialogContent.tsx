@@ -30,15 +30,15 @@ export const PRIME_DIRECTIVE_CONTENT: ContentItem[] = [
 
 export const CHANGELOG_CONTENT: ContentItem[] = [
   {
-    content: 'The latest release includes redesign of menu options, enabling mobile view, role-based permission setting, redesign of deleting boards, implementation of sticky defaults, improved test code coverage, plus additional maintenance.'
+    content: 'The latest release includes redesign of menu options, enabling mobile view, role-based permission setting, redesign of deleting boards, and implementation of sticky defaults.'
   },
   {
     bullet: true,
-    content: 'Extension settings menu was redesigned to more closely mirror the ADO settings menu, while moving Prime Directive and adding Volunteer options.',
+    content: 'Extension settings menu was redesigned to mirror the ADO settings menu, while moving Prime Directive and adding Volunteer options.',
   },
   {
     bullet: true,
-    content: 'Switch to mobile view with only core functionality and improved viewing on mobile devices was enabled.',
+    content: 'Switch to mobile view was enabled with only core functionality and improved viewing on mobile devices.',
   },
   {
     bullet: true,
@@ -51,10 +51,6 @@ export const CHANGELOG_CONTENT: ContentItem[] = [
   {
     bullet: true,
     content: 'User settings for maximum votes, Team Assessment, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.',
-  },
-  {
-    bullet: true,
-    content: 'Test code coverage was increased by more than 15% and completed a dozen maintenance activities.',
   },
   {
     content: 'Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.'
