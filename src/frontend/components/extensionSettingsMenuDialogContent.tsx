@@ -40,35 +40,6 @@ export const PRIME_DIRECTIVE_CONTENT: ContentItem[] = [
   },
 ];
 
-export const CHANGELOG_CONTENT: ContentItem[] = [
-  {
-    content: 'The latest release includes redesign of menu options, enabling mobile view, role-based permission setting, redesign of deleting boards, and implementation of sticky defaults.'
-  },
-  {
-    bullet: true,
-    content: 'Extension settings menu was redesigned to mirror the ADO settings menu, while moving Prime Directive and adding Volunteer options.',
-  },
-  {
-    bullet: true,
-    content: 'Switch to mobile view was enabled with only core functionality and improved viewing on mobile devices.',
-  },
-  {
-    bullet: true,
-    content: 'Ability to set permissions for accessing the retrospective board is now restricted to the board owner or a team admin.',
-  },
-  {
-    bullet: true,
-    content: 'Functionality to delete boards was moved from the Board menu to the History table and is only enabled for archived boards.',
-  },
-  {
-    bullet: true,
-    content: 'User settings for maximum votes, Team Assessment, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.',
-  },
-  {
-    content: 'Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.'
-  },
-];
-
 export const RETRO_HELP_CONTENT: ContentItem[] = [
   {
     content: 'The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback.  The Retrospective extension and Team Assessment feature are valuable tools supporting that process.'
