@@ -62,6 +62,10 @@ jest.mock('../../utilities/telemetryClient', () => ({ reactPlugin: {} }));
 jest.mock('@microsoft/applicationinsights-react-js', () => ({
   withAITracking: (plugin: unknown, component: unknown) => component
 }));
+jest.mock('react-markdown', () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+}));
 jest.mock('../../dal/boardDataService', () => ({
   __esModule: true,
   default: {
