@@ -1,7 +1,7 @@
 import React from 'react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
-import { userDataService } from '../dal/userDataService';
+//import { userDataService } from '../dal/userDataService';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../utilities/telemetryClient';
@@ -12,6 +12,7 @@ import { itemDataService } from '../dal/itemDataService';
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
 import { Slide, toast, ToastContainer } from 'react-toastify';
 import { WebApiTeam } from 'azure-devops-extension-api/Core';
+import ReactMarkdown from 'react-markdown';
 
 import {
   RETRO_URLS,
@@ -20,6 +21,7 @@ import {
   RETRO_HELP_CONTENT,
   VOLUNTEER_CONTENT,
   renderContent,
+  WHATISNEW_MARKDOWN,
 } from './extensionSettingsMenuDialogContent';
 
 interface IExtensionSettingsMenuState {
@@ -412,7 +414,9 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
           defaultButtonText="Open change log"
           containerClassName="whatsnew-dialog"
         >
-          {renderContent(CHANGELOG_CONTENT)}
+          <div className="markdown-content">
+            <ReactMarkdown>{WHATISNEW_MARKDOWN}</ReactMarkdown>
+          </div>
         </ExtensionDialog>
         <ExtensionDialog
           hidden={this.state.isGetHelpDialogHidden}
