@@ -1,19 +1,5 @@
 # Retrospective Extension for Azure DevOps
 
-> ## TL;DR
->
-> _We're looking for contributors!_
->
-> _We’ll continue maintaining the Retrospective Extension, but with limited time for new features, we need help to make it even better. Join us if you’re interested! 🙌_
->
-> ## Summary Announcement
->
-> Hi everyone!
->
-> Maintaining the `Retrospective Extension for Azure DevOps` has been a passion project we’ve worked on in our personal time. While we’ll continue to handle security updates and occasional feature improvements when we can, our available time has become more limited. To take this project to the next level, we’d love to invite contributors to join and help make it even better for the community.
->
-> If you're interested in contributing, please check out the repo and the [Contributing Guideline](./CONTRIBUTING.md)! Together, we can ensure the project thrives. 🚀
-
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/microsoft/vsts-extension-retrospectives/badge)](https://scorecard.dev/viewer/?uri=github.com/microsoft/vsts-extension-retrospectives)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9514/badge)](https://www.bestpractices.dev/projects/9514)
 [![CodeCov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
@@ -24,7 +10,7 @@ Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform 
 
 Retrospectives are an important practice in becoming an effective team, allowing the team to gather feedback and continuously improve based on the feedback.
 
-Research from the [2018 State of DevOps report](https://services.google.com/fh/files/misc/state-of-devops-2018.pdf) indicates that Elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a [2013 meta-analysis on teams](https://journals.sagepub.com/doi/full/10.1177/0018720812448394) indicates that teams that effectively debrief/conduct retrospectives are 20-25% more effective.
+Research from the [2018 State of DevOps report](https://services.google.com/fh/files/misc/state-of-devops-2018.pdf) indicates that elite teams are 1.5 times more likely to consistently hold retrospectives and use them to improve their work. Furthermore, a [2013 meta-analysis on teams](https://journals.sagepub.com/doi/full/10.1177/0018720812448394) indicates that teams that effectively debrief/conduct retrospectives are 20-25% more effective.
 
 Teams often use external retrospective tools, white boards with Post-its, OneNote, etc. to conduct retrospectives. The data then needs to be collated, and any actionable items need to be created in your Azure DevOps pipeline.
 
@@ -87,14 +73,13 @@ If you have created a retrospective before for your selected team, then you can 
 
 When you select **Create Board** or **Create new retrospective** as above, you will see the following dialog:
 
-![A screenshot showing the modal box that controls the initial settings for creating a retrospective board. The settings include: a text field for title of the retrospective; a number input box for maximum votes per person; a checkbox to include a Team Assessment; a checkbox to obscure the feedback of others during the Collect Phase; a checkbox to include Retrospective Prime Directive; and a section to pick the different columns to include in the retrospective, either customized or loaded from predefined templates.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retro-lightmode.png)
+![A screenshot showing the modal box that controls the initial settings for creating a retrospective board. The settings include: a text field for title of the retrospective; a number input box for maximum votes per person; a checkbox to include a Team Assessment; a checkbox to obscure the feedback of others during the Collect Phase; a checkbox to include Retrospective Prime Directive; and a section to pick the different columns to include in the retrospective, either customized or loaded from predefined templates.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retrospective.png)
 
 Please enter the appropriate information:
 
 - **Retrospective Title**: Title for the Retrospective.
 - **Max Votes per User**: The maximum number of votes a participant has to use in the "Vote" phase.
 - **Include Team Assessment**: Include a Team Assessment link at the top of the board.
-- **Display 'Retrospective Prime Directive'**: Include a link to the 'Prime Directive' at the top of the board.
 - **Obscure the feedback of others until after Collect phase**: When selected, users cannot see other users input until they have moved to another phase. Other users' feedback will be blurred.
 - **Do not display names in feedback**: When checked, anonymize who creates individual feedback items.
 - **Columns Settings**: You can either apply from a pre-populated template or individually select and configure columns yourself.
@@ -104,7 +89,7 @@ Please enter the appropriate information:
 **Notes:**
 
 - Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Once the title is provided, the `Save` button is enabled. Save the retrospective using the `Save` button.
-- The system will remember your selection for maximum votes, team assessment, prime directive, obscure feedback, and do not display names when saving and use those setting as your defaults for the next a board you create.
+- The system will remember your selection for maximum votes, team assessment, obscure feedback, and do not display names when saving and use those setting as your defaults for the next a board you create.
 - The **Permission** tab allows the board owner or team admin to restrict access to the retrospective board by team or by individual. By default the retrospective board is accessible to everyone in the project.
 
 ### 5. Select An Existing Retrospective Board
@@ -125,9 +110,9 @@ The number of columns in each retrospective is determined by the selection made 
 
 #### The Prime Directive
 
-If you had selected the 'Display 'Retrospective Prime Directive', you will see the option to view that directive which sets the stage for the retrospective. It is recommended that you click on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues discovered will be assumed to be process problems, not people problems.
+Begin by reminding participants that the retrospective is a safe space and that the issues raised are meant to address process problems, not people problems. Optionally, display the 'Retrospective Prime Directive' by clicking the Directive icon in the upper-right Retrospectives Extension menu. Read the Prime Directive aloud for everyone to hear, and allow space for participants to voice any concerns.
 
-![A screenshot of the prime directive](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
+![A screenshot of the prime directive](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/the-prime-directive.png)
 
 #### Collect
 
@@ -184,7 +169,7 @@ This will open up the standard Azure DevOps work item creation form. Enter the w
 You can optionally include a "Team Assessment" that anonymously collects feedback from participants.
 To get the feedback form, you can click on the "Team Assessment" link at the top of the board.
 
-![A screenshot of where you see the link to "Team Assessment"](https://user-images.githubusercontent.com/114175122/216712371-7fd79231-99a2-43cf-90f8-145c4c71bb81.png)
+![A screenshot of where you see the link to "Team Assessment"](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/team-assessment.png)
 
 The assessment tracks 6 categories:
 
@@ -222,20 +207,17 @@ improvement.
 Create a new retrospective using the steps above with the following exceptions:
 
 - 'Include Team Assessment' is checked
-- 'Display 'Retrospective Prime Directive'' is checked
 - 'Do not display names in feedback' is checked
 - Note: You do not need to select a template. The template will be modified after the assessment is complete
 - Share the link to the retrospective with the team
 
-![A screenshot of the new retrospective box](https://user-images.githubusercontent.com/114175122/205405481-2f02f772-7d5a-4be5-bc9d-f9a712062565.png)
+![A screenshot of the new retrospective box](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-new-retro-with-team-assessment-and-anonymous.png)
 
-#### The Prime Directive
+#### Safe Space
 
-In this phase the facilitator sets the stage for the retrospective. It is recommended that you click
-on the Prime Directive and read it out loud for everyone to hear. Remind everyone that any issues that
-discovered will be assumed to be process problems, not people problems.
+In this phase, the facilitator sets the stage for the retrospective. Remind everyone that any issues raised will be viewed as process problems, not people problems. Optionally, click the Directive icon and read the Prime Directive aloud to reinforce that the retrospective is a safe space for the team to improve together.
 
-![A screenshot of the prime directive](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-lightmode.png)
+![A screenshot of the prime directive](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/prime-directive-zoom.png)
 
 #### Team Assessment
 
@@ -265,13 +247,13 @@ with a template that aligns to the dimension.
 In this phase team members will provide feedback to help improve the dimension they've chosen to focus
 on. Ask team members to input feedback cards on the left 2 columns.
 
-![A screenshot of the Efficiency Retrospective Board Template](https://user-images.githubusercontent.com/114175122/203426762-9fc09511-377d-4368-9a9a-a547e22bbdf5.png)
+![A screenshot of the Efficiency Retrospective Board Template](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/team-assessment-discuss-and-act-efficiency.png)
 
-After a few moments, the facilitator reads the cards outloud. When it's apparent that no additional
+After a few moments, the facilitator reads the cards out loud. When it's apparent that no additional
 feedback cards are being added, the facilitator asks the following question: "Reflecting on the
 feedback we've collected, if you could take only one action in the next sprint that would yield the
 biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be?
-Capture this in a feedback card in the third column (One action in the next sprint)"
+Capture this in a feedback card in the third column for one action to try next sprint."
 
 #### Group
 
@@ -430,11 +412,11 @@ survey and conducting deep dive discussions to identify drivers combined with fo
 associated actions should result in increased sustainability for the team. Drive continuous improvement
 in work-life balance by using the “Work-Life Balance” Retrospective Board template, following the
 standard retrospective process.
-- Best practices for improving **Confidence** include sharing Objectives and Key Results (OKRs) from
+- Best practices for improving **confidence** include sharing Objectives and Key Results (OKRs) from
 different levels across your organization. Bringing transparency into the OKRs can help teams and
 individuals better understand how their work aligns to the organizations' priorities and can build
 confidence in doing the right work to deliver against those OKRs.
-- Best practices for improving **Efficiency** can also include the implementation of agile practices
+- Best practices for improving **efficiency** can also include the implementation of agile practices
 including backlog refinement and prioritization. Limiting Work In Process by establishing WIP limits
 and adhering to them enables teams to be more efficient so they can "stop starting and start finishing"!
 

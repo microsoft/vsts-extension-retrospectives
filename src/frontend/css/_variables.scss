@@ -1,7 +1,7 @@
 // header
 $header_horizontal_spacing: 15px;
-$extension_header_height: 55px;
-$second_level_header_height: 40px;
+$extension_header_height: 45px;
+$second_level_header_height: 30px;
 
 // feedback column
 $column_items_distribution_breakpoint: 2000px;
@@ -10,19 +10,20 @@ $column_items_distribution_breakpoint: 2000px;
 $main_item_card_max_width: 320px;
 $feedback_item_action_button_height: 30px;
 $feedback_item_action_button_width: 30px;
-$feedback_item_header_height: $feedback_item_action_button_height + 5;
+$feedback_item_header_height: $feedback_item_action_button_height + 5px;
 
 // mobile-specific
 $mobile_breakpoint: 1024px;
 $mobile_smallest: 764px;
-$mobile_font_size: 26px;
-$mobile_extension_header_height: 65px;
-$mobile_extension_header_height_with_margin: $mobile_extension_header_height + 10px;
-$mobile_second_level_header_height: 55px;
-$mobile_feedback_item_action_button_height: 60px;
+$mobile_font_size_small: 24px;
+$mobile_font_size: 28px;
+$mobile_font_size_large: 32px;
+$mobile_extension_header_height: 32px;
+$mobile_extension_header_height_with_margin: $mobile_extension_header_height + 4px;
+$mobile_second_level_header_height: 20px;
+$mobile_feedback_item_action_button_height: 24px;
 $mobile_feedback_item_action_button_width: 60px;
-$mobile_feedback_item_header_height: $mobile_feedback_item_action_button_height + 15;
-$mobile_font_size_main: 50px;
+$mobile_feedback_item_header_height: $mobile_feedback_item_action_button_height + 2px;
 
 // colors
 $azure_devops_navigator_light_grey: #f4f4f4;

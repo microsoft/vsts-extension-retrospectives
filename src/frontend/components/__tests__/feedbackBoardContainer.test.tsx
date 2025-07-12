@@ -52,6 +52,10 @@ jest.mock('azure-devops-extension-api/Work/WorkClient', () => {
     getTeamFieldValues: getTeamFieldValuesMock,
   };
 });
+jest.mock('react-markdown', () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+}));
 
 const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
   isHostedAzureDevOps: false,
