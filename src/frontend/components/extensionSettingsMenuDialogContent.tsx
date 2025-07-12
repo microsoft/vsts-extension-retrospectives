@@ -10,7 +10,6 @@ export const RETRO_URLS = {
 
 interface ContentItem {
   content: string;
-  bullet?: boolean; // defaults to false
   style?: 'normal' | 'bold' | 'italic'; // defaults to 'normal'
 }
 
@@ -62,7 +61,6 @@ export const VOLUNTEER_CONTENT: ContentItem[] = [
 ];
 
 export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] => {
-  const bullets: ContentItem[] = [];
   const elements: React.ReactNode[] = [];
 
   const applyFontStyle = (text: string, style: 'normal' | 'bold' | 'italic' = 'normal') => {
@@ -71,63 +69,24 @@ export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] =>
     return text;
   };
 
-  const flushBullets = (
-    key: string,
-    addTopSpace: boolean,
-    addBottomSpace: boolean
-  ) => {
-    if (!bullets.length) return;
-
-    elements.push(
-      <ul
-        key={key}
-        className="menu-item-dialog-list"
-        style={{
-          marginTop: addTopSpace ? '1rem' : undefined,
-          marginBottom: addBottomSpace ? '1rem' : undefined,
-        }}
-      >
-        {bullets.map((bullet, i) => (
-          <li key={`${key}-li-${i}`}>{bullet.content}</li>
-        ))}
-      </ul>
-    );
-    bullets.length = 0;
-  };
-
   contentArray.forEach((item, index) => {
-    const prev = contentArray[index - 1];
-    const next = contentArray[index + 1];
     const isFirst = index === 0;
     const isLast = index === contentArray.length - 1;
 
-    if (item.bullet) { // prepare lines with bullets
-      bullets.push(item);
+    const addTopMargin = !isFirst;
+    const addBottomMargin = !isLast;
 
-      const nextIsParagraph = next && !next.bullet;
-      const isLastBullet = isLast || nextIsParagraph;
-      if (isLastBullet) {
-        const addTop = !isFirst && (!prev || !prev.bullet);
-        const addBottom = !isLast && (!next || !next.bullet);
-        flushBullets(`ul-${index}`, addTop, addBottom);
-      }
-    } else { // prepare lines without bullets
-      flushBullets(`ul-${index}`, false, false);
-
-      const addBottom = !isLast;
-
-      elements.push(
-        <div
-          key={`p-${index}`}
-          style={{
-            marginTop: !isFirst && (!prev || prev.bullet) ? '1rem' : undefined,
-            marginBottom: addBottom ? '1rem' : undefined,
-          }}
-        >
-          {applyFontStyle(item.content, item.style || 'normal')}
-        </div>
-      );
-    }
+    elements.push(
+      <div
+        key={`p-${index}`}
+        style={{
+          marginTop: addTopMargin ? '1rem' : undefined,
+          marginBottom: addBottomMargin ? '1rem' : undefined,
+        }}
+      >
+        {applyFontStyle(item.content, item.style || 'normal')}
+      </div>
+    );
   });
 
   return elements;
