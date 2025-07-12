@@ -17,13 +17,13 @@ interface ContentItem {
 export const WHATISNEW_MARKDOWN = `
 The latest release includes redesign of menu options, enabling mobile view, role-based permission setting, redesign of deleting boards, and implementation of sticky defaults.
 
-- Extension settings menu was redesigned to mirror the ADO settings menu, while moving Prime Directive and adding Volunteer options.
-- Switch to mobile view was enabled with only core functionality and improved viewing on mobile devices.
+- Extension settings menu was redesigned to mirror the ADO settings menu, in addition to moving Prime Directive and adding Volunteer options.
+- Switch to mobile view was enabled for improved viewing on mobile devices with support limited to core functionality.
 - Ability to set permissions for accessing the retrospective board is now restricted to the board owner or a team admin.
 - Functionality to delete boards was moved from the Board menu to the History table and is only enabled for archived boards.
 - User settings for maximum votes, Team Assessment, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.
 
-Refer to the [Changelog](${RETRO_URLS.changelog}) for a comprehensive listing of the updates included in this release and past releases.
+Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.
 `;
 
 export const PRIME_DIRECTIVE_CONTENT: ContentItem[] = [
