@@ -8,11 +8,13 @@
   display: table-row;
   height: auto;
 
+  /*
   .feedback-items-container {
     padding-top: 0;
     display: flex;
     flex-wrap: wrap;
   }
+    */
 
 //.feedback-column-header {
   .feedback-column-title {
@@ -87,3 +89,9 @@
   }
 }
 //}
+
+  .feedback-items-container {
+    padding-top: 0;
+    display: flex;
+    flex-wrap: wrap;
+  }
