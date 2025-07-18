@@ -33,7 +33,7 @@
 
 /* Apply hover effect similar to .board-actions-menu */
 .extended-options-menu button.ms-ContextualMenu-link:hover {
-  background-color: var(--border-subtle-color); /* Matches the other menu */
+  background-color: var(--border-subtle-color); // Matches the other menu
   color: var(--text-primary-color);
 }
 
