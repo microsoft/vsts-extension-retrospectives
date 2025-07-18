@@ -2,7 +2,6 @@
 
 // Unified mobile styles for feedback cards (grouped and ungrouped)
 .feedback-item-group,
-//.feedback-item-group.feedback-item-group-expanded,
 .feedbackItem,
 .feedbackItemGroupItem,
 .feedbackItemGroupItem.feedbackItemGroupGroupedItem {
@@ -23,26 +22,20 @@
   // All card variants
   .mainItemCard,
   .groupedItemCard
-  //.feedbackItemGroupItem,
-  //.feedbackItemGroupGroupedItem
   {
     min-width: calc(100vw - 45px);
     max-width: calc(100vw - 45px);
     border: none;
-    //background: #fff;
     padding: 2px 4px;
     font-size: variables.$mobile_font_size_large;
 
     .card-integral-part {
       border-left-width: 10px;
       border-left-style: solid;
-      //outline: 2px solid red;
 
       .card-header {
-        // Reduce header height
         height: variables.$mobile_feedback_item_header_height;
         font-size: variables.$mobile_font_size_small;
-        //outline: 2px solid blue;
 
         .feedback-action-button {
           height: variables.$mobile_feedback_item_action_button_height;
