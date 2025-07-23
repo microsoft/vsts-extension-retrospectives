@@ -2,16 +2,17 @@
 
 .editable-document-card-title {
   height: 100%;
+  border: none;
 
   .input-validation-message {
-    font-size: variables.$mobile_font_size_main - 20px;
+    font-size: variables.$mobile_font_size_large - 20px;
   }
 
   .editable-text {
     max-width: 100%;
-    font-size: variables.$mobile_font_size_main;
-    line-height: variables.$mobile_font_size_main + 5px;
-    margin-top: 10px;
+    font-size: variables.$mobile_font_size_large;
+    line-height: variables.$mobile_font_size_large + 5px;
+    margin-top: 5px;
   }
 
   .editable-text-input-container {
@@ -21,8 +22,8 @@
     .ms-TextField-wrapper {
       .ms-TextField-fieldGroup {
         .editable-text-input {
-          font-size: variables.$mobile_font_size_main;
-          line-height: variables.$mobile_font_size_main + 5px;
+          font-size: variables.$mobile_font_size_large;
+          line-height: variables.$mobile_font_size_large + 5px;
         }
       }
     }

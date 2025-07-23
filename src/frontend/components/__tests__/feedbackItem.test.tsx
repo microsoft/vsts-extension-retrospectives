@@ -136,7 +136,7 @@ describe('Feedback Item', () => {
 
       component.findWhere(c => c.prop('className') === 'feedback-expand-group-focus').simulate('click', { stopPropagation() {} });
 
-      const originalColumn = component.findWhere(c => c.prop('className') === 'original-column-info').first();
+      const originalColumn = component.findWhere(c => c.prop('className') === 'original-column-info hide-mobile').first();
       expect(originalColumn.text()).toEqual(`Original Column: ${testGroupColumnsObj[testGroupColumnUuidTwo].columnProperties.title}`);
     })
   });

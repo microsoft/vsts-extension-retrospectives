@@ -41,7 +41,6 @@ const mockBoard: IFeedbackBoardDocument = {
   modifiedDate: new Date(),
   maxVotesPerUser: 5,
   isIncludeTeamEffectivenessMeasurement: true,
-  displayPrimeDirective: true,
   shouldShowFeedbackAfterCollect: false,
   isAnonymous: false,
   activePhase: "Collect",

@@ -8,33 +8,27 @@
   display: table-row;
   height: auto;
 
-  .feedback-items-container {
-    padding-top: 0;
-    display: flex;
-    flex-wrap: wrap;
-  }
-
   .feedback-column-title {
-    padding: 24px 32px 10px 28px;
+    padding: 20px 28px 10px 28px;
     cursor: pointer;
-    background-color: #f8f8f8;
     margin: 0;
     border-bottom: 1px solid #eaeaea;
     border-top: 1px solid #eaeaea;
-    height: 100px;
+    height: 75px;
 
     .feedback-column-icon {
       padding-top: 3px;
       padding-right: 20px;
       display: inline-block;
+      font-size: 30px;
 
       i {
-        font-size: 40px;
+        font-size: 36px;
       }
     }
 
     .feedback-column-name {
-      font-size: variables.$mobile_font_size_main;
+      font-size: variables.$mobile_font_size_large;
       margin-top: -5px;
       display: inline-block;
     }
@@ -46,7 +40,7 @@
       width: 100vw;
       max-width: variables.$mobile_breakpoint;
       flex-wrap: wrap;
-      padding-bottom: 30px;
+      padding-bottom: 20px;
       display: flex;
       transform-origin: 0 0;
 
@@ -55,32 +49,38 @@
       }
 
       .input-validation-message {
-        font-size: variables.$mobile_font_size_main - 20px;
+        font-size: variables.$mobile_font_size_large - 20px;
       }
 
       .feedback-item-form {
         display: flex;
 
         .fa-plus {
-          font-size: variables.$mobile_font_size_main;
+          font-size: variables.$mobile_font_size_large;
         }
       }
 
       .title-input {
         width: 100%;
-        height: 90px;
-        font-size: variables.$mobile_font_size_main;
+        height: 75px;
+        font-size: variables.$mobile_font_size_large;
         padding-left: 30px;
       }
 
       .create-button {
         margin-top: 16px;
         margin-bottom: 12px;
-        font-size: variables.$mobile_font_size_main;
+        font-size: variables.$mobile_font_size;
         i {
-          font-size: variables.$mobile_font_size_main;
+          font-size: variables.$mobile_font_size;
         }
       }
     }
   }
 }
+
+  .feedback-items-container {
+    padding-top: 0;
+    display: flex;
+    flex-wrap: wrap;
+  }

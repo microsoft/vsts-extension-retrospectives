@@ -11,7 +11,7 @@
   }
 
   &:hover {
-    background-color: rgba(var(--palette-neutral-0), 0.05);
+    background-color: rgba(var(--palette-neutral-0), 0.15);
     color: var(--text-primary-color);
   }
 }
@@ -22,26 +22,30 @@
   }
 }
 
-.user-settings-menu {
+.extended-options-menu {
   background-color: var(--callout-background-color);
-  height: 155px;
-  margin-top: -10px;
-  overflow-y: auto;
-
-  button.ms-ContextualMenu-link {
-    color: var(--text-primary-color);
-
-    &:hover {
-      background-color: rgba(var(--palette-neutral-0), 0.05);
-      color: var(--text-primary-color);
-    }
-  }
+  max-height: none;
 }
 
-.whatsnew-dialog, .gethelp-dialog {
+.extended-options-menu button.ms-ContextualMenu-link {
+  color: var(--text-primary-color);
+}
+
+/* Apply hover effect similar to .board-actions-menu */
+.extended-options-menu button.ms-ContextualMenu-link:hover {
+  background-color: var(--border-subtle-color); // Matches the other menu
+  color: var(--text-primary-color);
+}
+
+.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog {
   background-color: var(--background-color);
 
   div[role=heading] {
+    color: var(--text-primary-color);
+    padding-bottom: 10px;
+  }
+
+  .ms-Dialog-content {
     color: var(--text-primary-color);
   }
 

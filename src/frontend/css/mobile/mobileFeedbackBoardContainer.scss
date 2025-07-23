@@ -1,11 +1,11 @@
 @use "../_variables.scss";
 $mobile_stage_block_width: 90px;
-$mobile_stage_block_height: 40px;
+$mobile_stage_block_height: 30px;
 $mobile_stage_block_left_margin_width: 10px;
 $mobile_team_selector_list_item_height: 90px;
 
 .feedback-board-container {
-  height: calc(100vh - #{variables.$mobile_extension_header_height_with_margin} - 55px); // 55px is the approximate height of the second-level header on mobile.
+  height: calc(100vh - #{variables.$mobile_extension_header_height_with_margin} - variables.$mobile_second_level_header_height);
   overflow-x: hidden;
 }
 
@@ -30,12 +30,11 @@ $mobile_team_selector_list_item_height: 90px;
 }
 
 .team-filter-container {
-  padding-top: 20px;
+  padding-top: 15px;
 }
 
 .retrospectives-dialog-modal {
   .ms-Dialog-main {
-    width: 90%;
     min-width: auto;
     max-width: none;
     position: absolute;
@@ -43,7 +42,7 @@ $mobile_team_selector_list_item_height: 90px;
     max-height: 85%;
 
     .ms-TextField-fieldGroup {
-      height: 90px;
+      height: 70px;
       align-items: center;
       font-size: 20px;
 
@@ -61,16 +60,16 @@ $mobile_team_selector_list_item_height: 90px;
       button {
         font-size: 30px;
         margin-left: 20px;
-        margin-top: 30px;
-        margin-bottom: 30px;
-        height: 60px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        height: 50px;
         min-width: 30%;
       }
     }
 
     &.selector {
       .ms-Dialog-title {
-        height: 50px;
+        height: 40px;
       }
     }
 
@@ -78,8 +77,7 @@ $mobile_team_selector_list_item_height: 90px;
     &.retrospectives-board-metadata-dialog,
     &.retrospectives-board-deleted-info-dialog,
     &.retrospectives-unlink-feedback-item-confirmation-dialog,
-    &.retrospectives-delete-board-confirmation-dialog,
-    &.retrospectives-visit-history-cleared-info-dialog {
+    &.retrospectives-delete-board-confirmation-dialog {
       .ms-Dialog-title {
         font-size: 40px;
       }
@@ -120,7 +118,7 @@ $mobile_team_selector_list_item_height: 90px;
   }
 
   .input-validation-message {
-    font-size: variables.$mobile_font_size_main - 20px;
+    font-size: variables.$mobile_font_size_large - 20px;
     color: variables.$bug_red;
   }
 }
@@ -156,8 +154,13 @@ $mobile_team_selector_list_item_height: 90px;
 }
 
 .feedback-board-container-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
   width: 100vw;
   max-width: variables.$mobile_breakpoint;
+  overflow-x: auto;
+  gap: 1rem;
   margin-left: variables.$header_horizontal_spacing;
   margin-top: -55px;
 
@@ -166,8 +169,15 @@ $mobile_team_selector_list_item_height: 90px;
   }
 
   .board-selector-group {
-    min-width: 330px;
+    min-width: 0;
+    max-width: 300px;
+    width: 100%;
     transform-origin: 0 0;
+    margin-left: 4rem;
+
+    .board-selector {
+      display: flex;
+    }
 
     .board-actions-menu {
       margin-bottom: 0px;
