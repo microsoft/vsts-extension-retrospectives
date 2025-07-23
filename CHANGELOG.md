@@ -2,7 +2,7 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## v1.92.42
+## v1.92.43
 
 * Refactored the Retrospective Extension settings menu to more closely mirror the ADO menus format.
 * Moved the Prime Directive option from the Retrospective Board to the Retrospective menu options.
