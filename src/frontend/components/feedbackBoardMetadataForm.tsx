@@ -145,6 +145,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleDeleteColumnConfirm = (event: any) => {
     this.setState({ isDeleteColumnConfirmationDialogHidden: true }, () => {
       this.handleFormSubmit(event);
