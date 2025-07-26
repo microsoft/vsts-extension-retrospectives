@@ -146,6 +146,13 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handleDeleteColumnConfirm = (event: any) => {
+    this.setState({ isDeleteColumnConfirmationDialogHidden: true }, () => {
+      this.handleFormSubmit(event);
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async handleFormSubmit(event: any) {
     event.preventDefault();
     event.stopPropagation();
@@ -600,7 +607,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   className: 'retrospectives-dialog-modal',
                 }}>
                 <DialogFooter>
-                  <PrimaryButton onClick={this.handleFormSubmit} text="Confirm" />
+                  <PrimaryButton onClick={this.handleDeleteColumnConfirm} text="Confirm" />
                   <DefaultButton onClick={this.hideDeleteColumnConfirmationDialog} text="Cancel" />
                 </DialogFooter>
               </Dialog>}
