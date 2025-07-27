@@ -153,9 +153,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async handleFormSubmit(event: any) {
-    event.preventDefault();
-    event.stopPropagation();
+  public async handleFormSubmit(event?: any) {
+    event?.preventDefault();
+    event?.stopPropagation();
 
     if (this.state.title.trim() === '') return;
 
