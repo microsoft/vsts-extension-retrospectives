@@ -286,5 +286,5 @@ describe('Board Metadata Form', () => {
       const submittedColumns = onFormSubmit.mock.calls[0][2];
       expect(submittedColumns.find((col: any) => col.id === deletedColumnId)).toBeUndefined();
     });
-  }); 
+  });
 });
