@@ -4,6 +4,7 @@ import { mockUuid } from '../__mocks__/uuid/v4';
 import FeedbackBoardMetadataForm, { IFeedbackBoardMetadataFormProps, IFeedbackColumnCard } from '../feedbackBoardMetadataForm';
 import { testColumns, testExistingBoard, testTeamId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
 import { Checkbox, List, TextField } from 'office-ui-fabric-react';
+import BoardDataService from '../../dal/boardDataService';
 
 const mockedProps: IFeedbackBoardMetadataFormProps = {
   isNewBoardCreation: true,
@@ -236,44 +237,54 @@ describe('Board Metadata Form', () => {
       expect(columns.every(c => c.markedForDeletion === false)).toBeTruthy();
     });
   })
-/*
+
   describe('Simulate Defect', () => {
-  it('removes marked column and closes dialog when Confirm is clicked', () => {
-    // Arrange: Set up a board where the first column is marked for deletion
-    const onFormSubmit = jest.fn();
-    const mockBoard = { ...testExistingBoard };
-    const mockProps = {
-      ...mockedProps,
-      isNewBoardCreation: false,
-      currentBoard: mockBoard,
-      onFormSubmit,
-    };
 
-    const wrapper = shallow(<FeedbackBoardMetadataForm {...mockProps} />);
-    const component = wrapper.children().dive();
+it('removes marked column and closes dialog when Confirm is clicked', async () => {
+  // Arrange: Mock board name check to avoid real data service call
+  jest.spyOn(BoardDataService, 'checkIfBoardNameIsTaken').mockResolvedValue(false);
 
-    // Mark the first column for deletion in the state
-    const columns = component.state('columnCards') as IFeedbackColumnCard[];
-    const firstColumnId = columns[0].column.id;
-    const updatedColumns = columns.map((col: any, idx: number) =>
-      idx === 0 ? { ...col, markedForDeletion: true } : col
-    );
+  const onFormSubmit = jest.fn();
+  const mockBoard = { ...testExistingBoard };
 
-    component.setState({
-      columnCards: updatedColumns,
-      isDeleteColumnConfirmationDialogHidden: false, // dialog is open
-    });
+  const mockProps = {
+    ...mockedProps,
+    isNewBoardCreation: false,
+    currentBoard: mockBoard,
+    onFormSubmit,
+  };
 
-    // Act: Simulate clicking the Confirm button (calls handleFormSubmit)
-    (component.instance() as any).handleFormSubmit({ preventDefault: () => {}, stopPropagation: () => {} });
+  const wrapper = shallow(<FeedbackBoardMetadataForm {...mockProps} />);
+  const component = wrapper.children().dive();
 
-    // Assert: The dialog is closed
-    expect(component.state('isDeleteColumnConfirmationDialogHidden')).toBe(true);
+  // Mark the first column for deletion
+  const columns = component.state('columnCards') as IFeedbackColumnCard[];
+  const deletedColumnId = columns[0].column.id;
 
-    // Assert: onFormSubmit called with column 0 removed
-    expect(onFormSubmit).toHaveBeenCalled();
-    const submittedColumns = onFormSubmit.mock.calls[0][2];
-    expect(submittedColumns.find((col: any) => col.id === firstColumnId)).toBeUndefined();
+  const updatedColumns = columns.map((col, idx) =>
+    idx === 0 ? { ...col, markedForDeletion: true } : col
+  );
+
+  component.setState({
+    columnCards: updatedColumns,
+    isDeleteColumnConfirmationDialogHidden: false,
   });
-});*/
+
+  // Act: Call the old handleFormSubmit directly (which is what the old code did)
+  await (component.instance() as any).handleFormSubmit({
+    preventDefault: () => {},
+    stopPropagation: () => {},
+  });
+
+  // Assert: Dialog closes
+  expect(component.state('isDeleteColumnConfirmationDialogHidden')).toBe(true);
+
+  // Assert: onFormSubmit called
+  expect(onFormSubmit).toHaveBeenCalled();
+
+  // Assert: Deleted column is not passed through
+  const submittedColumns = onFormSubmit.mock.calls[0][2];
+  expect(submittedColumns.find((col: any) => col.id === deletedColumnId)).toBeUndefined();
+});
+
 });
