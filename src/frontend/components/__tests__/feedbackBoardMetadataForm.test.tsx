@@ -241,6 +241,57 @@ describe('Board Metadata Form', () => {
   describe('Simulate Defect', () => {
 
     it('removes marked column and closes dialog when Confirm is clicked', async () => {
+  const onFormSubmit = jest.fn();
+  const mockBoard = { ...testExistingBoard };
+  const mockProps = {
+    ...mockedProps,
+    isNewBoardCreation: false,
+    currentBoard: mockBoard,
+    onFormSubmit,
+  };
+
+  const wrapper = shallow(<FeedbackBoardMetadataForm {...mockProps} />);
+  const component = wrapper.children().dive();
+
+  // Mark last column for deletion
+  const columns = component.state('columnCards') as IFeedbackColumnCard[];
+  const lastColumnId = columns[columns.length - 1].column.id;
+
+  const updatedColumns = columns.map((col: any, idx: number) =>
+    idx === columns.length - 1 ? { ...col, markedForDeletion: true } : col
+  );
+
+  component.setState({
+    columnCards: updatedColumns,
+    isDeleteColumnConfirmationDialogHidden: false, // simulate open dialog
+  });
+
+  component.update();
+
+  // Simulate clicking the Confirm button in the dialog
+  const dialog = component.find('Dialog');
+  const confirmButton = dialog.dive().find('PrimaryButton');
+
+  // If button isn't found, fail clearly
+  expect(confirmButton.exists()).toBe(true);
+
+  // Simulate user clicking the Confirm button
+  await confirmButton.prop('onClick')!({ preventDefault: () => {}, stopPropagation: () => {} });
+
+  // Let React process state update
+  component.update();
+
+  // Assert dialog is closed
+  expect(component.state('isDeleteColumnConfirmationDialogHidden')).toBe(true);
+
+  // Assert form was submitted without the deleted column
+  expect(onFormSubmit).toHaveBeenCalled();
+  const submittedColumns = onFormSubmit.mock.calls[0][2];
+  expect(submittedColumns.find((col: any) => col.id === lastColumnId)).toBeUndefined();
+});
+
+/*
+    it('removes marked column and closes dialog when Confirm is clicked', async () => {
       // Arrange: Mock board name check to avoid real data service call
       jest.spyOn(BoardDataService, 'checkIfBoardNameIsTaken').mockResolvedValue(false);
 
@@ -286,6 +337,6 @@ describe('Board Metadata Form', () => {
       // Assert: Deleted column is not passed through
       const submittedColumns = onFormSubmit.mock.calls[0][2];
       expect(submittedColumns.find((col: any) => col.id === deletedColumnId)).toBeUndefined();
-    });
+    }); */
   });
 });
