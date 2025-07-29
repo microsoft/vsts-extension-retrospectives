@@ -260,7 +260,7 @@ describe('Board Metadata Form', () => {
   })
 
 describe('Board Metadata Form - Simulate Defect', () => {
-  it('removes marked column and closes dialog when Confirm is clicked', async () => {
+  it('removes marked column and closes dialog when Confirm is clicked', () => {
     const onFormSubmit = jest.fn();
     const testUserId = 'test-user-id-123';
 
@@ -279,23 +279,23 @@ describe('Board Metadata Form - Simulate Defect', () => {
       />
     );
 
-    // Wait for component state to initialize
-    await waitForColumnCards(wrapper);
+    // Set up known state to bypass loading/async complexity
+    const deletedColumnId = testExistingBoard.columns[0].id;
+    const columnCards: IFeedbackColumnCard[] = testExistingBoard.columns.map((col, idx) => ({
+      column: col,
+      markedForDeletion: idx === 0, // mark first one for deletion
+    }));
 
-    // Mark the first column for deletion
-    const initialColumns = wrapper.state('columnCards') as IFeedbackColumnCard[];
-    const deletedColumnId = initialColumns[0].column.id;
-    const updatedColumns = initialColumns.map((col, idx) =>
-      idx === 0 ? { ...col, markedForDeletion: true } : col
-    );
-    wrapper.setState({ columnCards: updatedColumns });
+    wrapper.setState({
+      columnCards,
+      isDeleteColumnConfirmationDialogHidden: false,
+    });
 
-    // Show the delete confirmation dialog
-    wrapper.setState({ isDeleteColumnConfirmationDialogHidden: false });
-    wrapper.update();
+    // Find the Confirm button and simulate click
+    const confirmButton = wrapper
+      .find('PrimaryButton')
+      .filterWhere(btn => btn.prop('text') === 'Confirm');
 
-    // Simulate click on Confirm button
-    const confirmButton = wrapper.find('PrimaryButton').filterWhere(btn => btn.prop('text') === 'Confirm');
     expect(confirmButton.exists()).toBe(true);
 
     const mockEvent = {
@@ -306,11 +306,12 @@ describe('Board Metadata Form - Simulate Defect', () => {
     confirmButton.prop('onClick')?.(mockEvent);
     wrapper.update();
 
-    // Verify dialog was closed
+    // Expect the dialog to close
     expect(wrapper.state('isDeleteColumnConfirmationDialogHidden')).toBe(true);
 
-    // Verify column was removed and onFormSubmit was called correctly
-    const submittedColumns = onFormSubmit.mock.calls[0][2];
+    // Expect onFormSubmit to be called with the correct arguments
+    expect(onFormSubmit).toHaveBeenCalled();
+    const submittedColumns = onFormSubmit.mock.calls[0][2]; // Third argument
     expect(submittedColumns.length).toBe(testExistingBoard.columns.length - 1);
     expect(submittedColumns.some((col: IFeedbackColumnCard) => col.column.id === deletedColumnId)).toBe(false);
   });
