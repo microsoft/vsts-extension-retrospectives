@@ -255,25 +255,23 @@ it('removes marked column and closes dialog when Confirm is clicked', async () =
   const testUserId = 'test-user-id-123';
 
   const wrapper = mount(
-    <FeedbackBoardMetadataForm
-      currentBoard={testExistingBoard}
-      teamId={testTeamId}
-      currentUserId={testUserId}
-      isNewBoardCreation={false}
-      isDuplicatingBoard={false}
-      onFormSubmit={onFormSubmit}
-      onFormCancel={onFormCancel}
-      maxVotesPerUser={10}
-      availablePermissionOptions={[]}
-      placeholderText="Enter board name"
-    />
-  );
+  <FeedbackBoardMetadataForm
+    currentBoard={testExistingBoard}
+    teamId={testTeamId}
+    currentUserId={testUserId}
+    placeholderText=""
+    maxVotesPerUser={10}
+    availablePermissionOptions={[]}
+    isNewBoardCreation={false}
+    isDuplicatingBoard={false}
+    onFormSubmit={onFormSubmit}
+    onFormCancel={() => {}}
+  />
+);
 
-  // Wait for componentDidMount to finish
-  await act(async () => {
-    await Promise.resolve();
-  });
-  wrapper.update();
+// Wait for state to initialize
+await new Promise(setImmediate);
+wrapper.update();
 
   // Mark the first column for deletion
   const initialColumns = wrapper.state('columnCards') as IFeedbackColumnCard[];
