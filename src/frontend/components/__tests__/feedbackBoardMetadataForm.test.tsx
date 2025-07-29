@@ -270,7 +270,7 @@ it('removes marked column and closes dialog when Confirm is clicked', async () =
 );
 
 // Wait for state to initialize
-await new Promise(setImmediate);
+await new Promise(resolve => setTimeout(resolve, 0));
 wrapper.update();
 
   // Mark the first column for deletion
