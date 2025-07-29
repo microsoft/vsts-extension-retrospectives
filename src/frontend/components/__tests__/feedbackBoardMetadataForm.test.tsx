@@ -316,7 +316,7 @@ describe('Board Metadata Form - Simulate Defect', () => {
     const submittedColumns = onFormSubmit.mock.calls[0][2]; // Third argument
     expect(submittedColumns.length).toBe(testExistingBoard.columns.length - 1);
     expect(submittedColumns.some((col: IFeedbackColumnCard) => col.column.id === deletedColumnId)).toBe(false);
-  });*/
-});
+  });
+});*/
 
 });
