@@ -12,6 +12,7 @@ jest.mock('../../dal/boardDataService', () => ({
   default: {
     checkIfBoardNameIsTaken: jest.fn().mockResolvedValue(false),
     saveSetting: jest.fn().mockResolvedValue(undefined),
+    getSetting: jest.fn().mockResolvedValue(undefined),
   },
 }));
 
