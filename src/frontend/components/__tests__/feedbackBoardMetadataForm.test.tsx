@@ -271,10 +271,18 @@ describe('Board Metadata Form', () => {
       });
 
       // Act: Call the old handleFormSubmit directly (which is what the old code did)
-      await (component.instance() as any).handleFormSubmit({
+      // 🔁 Now simulate the click on the Confirm button (calls handleDeleteColumnConfirm)
+      const confirmButton = component.find('PrimaryButton').at(0);
+      confirmButton.prop('onClick')!(
+        {
+          preventDefault: () => {},
+          stopPropagation: () => {}
+        } as any
+      );
+      /*await (component.instance() as any).handleFormSubmit({
         preventDefault: () => {},
         stopPropagation: () => {},
-      });
+      });*/
 
       // Assert: Dialog closes
       expect(component.state('isDeleteColumnConfirmationDialogHidden')).toBe(true);
