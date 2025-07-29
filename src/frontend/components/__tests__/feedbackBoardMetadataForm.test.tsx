@@ -266,14 +266,13 @@ describe('Board Metadata Form', () => {
     isDeleteColumnConfirmationDialogHidden: false, // simulate open dialog
   });
 
-  component.update();
+  // Show the confirmation dialog first
+component.setState({ isDeleteColumnConfirmationDialogHidden: false });
+component.update();
 
-  // Simulate clicking the Confirm button in the dialog
-  const dialog = component.find('Dialog');
-  const confirmButton = dialog.dive().find('PrimaryButton');
-
-  // If button isn't found, fail clearly
-  expect(confirmButton.exists()).toBe(true);
+// Now find the Confirm button in the dialog footer
+const confirmButton = component.find('PrimaryButton').filterWhere(btn => btn.prop('text') === 'Confirm');
+expect(confirmButton.exists()).toBe(true);  // should now pass
 
   // Simulate user clicking the Confirm button
   const mockEvent = {
@@ -282,7 +281,6 @@ describe('Board Metadata Form', () => {
   } as unknown as React.MouseEvent;
 
   confirmButton.prop('onClick')!(mockEvent);
-
 
   // Let React process state update
   component.update();
