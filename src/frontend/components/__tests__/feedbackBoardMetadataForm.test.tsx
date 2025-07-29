@@ -276,7 +276,13 @@ describe('Board Metadata Form', () => {
   expect(confirmButton.exists()).toBe(true);
 
   // Simulate user clicking the Confirm button
-  await confirmButton.prop('onClick')!({ preventDefault: () => {}, stopPropagation: () => {} });
+  const mockEvent = {
+    preventDefault: jest.fn(),
+    stopPropagation: jest.fn(),
+  } as unknown as React.MouseEvent;
+
+  confirmButton.prop('onClick')!(mockEvent);
+
 
   // Let React process state update
   component.update();
