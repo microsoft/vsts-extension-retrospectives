@@ -237,4 +237,43 @@ describe('Board Metadata Form', () => {
     });
   })
 
+  describe('Simulate Defect', () => {
+  it('removes marked column and closes dialog when Confirm is clicked', () => {
+    // Arrange: Set up a board where the first column is marked for deletion
+    const onFormSubmit = jest.fn();
+    const mockBoard = { ...testExistingBoard };
+    const mockProps = {
+      ...mockedProps,
+      isNewBoardCreation: false,
+      currentBoard: mockBoard,
+      onFormSubmit,
+    };
+
+    const wrapper = shallow(<FeedbackBoardMetadataForm {...mockProps} />);
+    const component = wrapper.children().dive();
+
+    // Mark the first column for deletion in the state
+    const columns = component.state('columnCards') as IFeedbackColumnCard[];
+    const firstColumnId = columns[0].column.id;
+    const updatedColumns = columns.map((col: any, idx: number) =>
+      idx === 0 ? { ...col, markedForDeletion: true } : col
+    );
+
+    component.setState({
+      columnCards: updatedColumns,
+      isDeleteColumnConfirmationDialogHidden: false, // dialog is open
+    });
+
+    // Act: Simulate clicking the Confirm button (calls handleFormSubmit)
+    (component.instance() as any).handleFormSubmit({ preventDefault: () => {}, stopPropagation: () => {} });
+
+    // Assert: The dialog is closed
+    expect(component.state('isDeleteColumnConfirmationDialogHidden')).toBe(true);
+
+    // Assert: onFormSubmit called with column 0 removed
+    expect(onFormSubmit).toHaveBeenCalled();
+    const submittedColumns = onFormSubmit.mock.calls[0][2];
+    expect(submittedColumns.find((col: any) => col.id === firstColumnId)).toBeUndefined();
+  });
+});
 });
