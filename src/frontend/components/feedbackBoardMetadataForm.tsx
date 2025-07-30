@@ -146,7 +146,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   }
 
   handleDeleteColumnConfirm = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); // Optional, depending on usage
+    event.preventDefault();
     event.stopPropagation();
 
     this.setState({ isDeleteColumnConfirmationDialogHidden: true }, () => {
@@ -155,7 +155,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   }
 
   // Accept either MouseEvent or FormEvent
-  public async handleFormSubmit(event: React.SyntheticEvent) {
+  public async handleFormSubmit(
+    event: Pick<React.SyntheticEvent, 'preventDefault' | 'stopPropagation'>
+  ) {
     event.preventDefault();
     event.stopPropagation();
 
