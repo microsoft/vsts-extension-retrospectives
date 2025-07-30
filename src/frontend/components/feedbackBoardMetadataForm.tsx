@@ -145,12 +145,14 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     });
   }
 
-  handleDeleteColumnConfirm = (event: React.FormEvent<HTMLFormElement>) => {
-  //handleDeleteColumnConfirm = (event: any) => {
-    this.setState({ isDeleteColumnConfirmationDialogHidden: true }, () => {
-      this.handleFormSubmit(event);
-    });
-  }
+handleDeleteColumnConfirm = (event: React.MouseEvent<HTMLButtonElement>) => {
+  event.preventDefault(); // Optional, depending on usage
+  event.stopPropagation();
+
+  this.setState({ isDeleteColumnConfirmationDialogHidden: true }, () => {
+    this.handleFormSubmit(event); // Now passes MouseEvent
+  });
+}
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async handleFormSubmit(event: any) {
