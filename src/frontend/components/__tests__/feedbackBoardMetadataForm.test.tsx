@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 import { mockUuid } from '../__mocks__/uuid/v4';
 import FeedbackBoardMetadataForm, { IFeedbackBoardMetadataFormProps, IFeedbackColumnCard } from '../feedbackBoardMetadataForm';
 import { testColumns, testExistingBoard, testTeamId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
@@ -31,10 +31,27 @@ describe('Board Metadata Form', () => {
   });
 
   describe('New Board', () => {
-
     beforeEach(() => {
       mockedProps.currentBoard = null;
-    })
+    });
+
+    it('renders the title input with empty value for a new board', () => {
+      const wrapper = mount(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const titleField = wrapper.find('input#retrospective-title-input');
+
+      expect(titleField.exists()).toBe(true);
+      expect(titleField.prop('value')).toBe('');
+    });
+
+    it('updates state when max vote counter input changes', () => {
+      const wrapper = mount(<FeedbackBoardMetadataForm {...mockedProps} />);
+      const input = wrapper.find('input#max-vote-counter');
+
+      input.simulate('change', { target: { value: '10' } });
+
+      const updatedInput = wrapper.find('input#max-vote-counter');
+      expect(updatedInput.prop('value')).toBe('10');
+    });
 
     it('should set the title to nothing', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
@@ -82,7 +99,7 @@ describe('Board Metadata Form', () => {
       expect(checkbox).toBeDefined();
       expect(checkbox.prop('checked')).toEqual(false);
       expect(checkbox.prop('disabled')).toEqual(false);
-  });
+    });
 
     it('should properly set the column list', () => {
       const wrapper = shallow(<FeedbackBoardMetadataForm {...mockedProps} />);
@@ -236,5 +253,4 @@ describe('Board Metadata Form', () => {
       expect(columns.every(c => c.markedForDeletion === false)).toBeTruthy();
     });
   })
-
 });
