@@ -116,7 +116,7 @@ describe('Board Metadata Form', () => {
 
     it('should add a new column when "Add new column" button is clicked', () => {
       const wrapper = mount(<FeedbackBoardMetadataForm {...mockedProps} />);
-  
+
       // Initial column count
       let columnItems = wrapper.find(List).prop<IFeedbackColumnCard[]>('items');
       expect(columnItems).toHaveLength(2); // default length from mock
