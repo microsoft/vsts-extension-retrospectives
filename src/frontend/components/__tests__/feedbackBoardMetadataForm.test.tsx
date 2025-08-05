@@ -140,7 +140,7 @@ describe('Board Metadata Form', () => {
       // Find the checkbox by id prop
       const checkbox = wrapper.find(Checkbox).filterWhere(c => c.prop('id') === 'include-team-assessment-checkbox');
       expect(checkbox.exists()).toBe(true);
-  
+
       // The initial checked state should be true (per your test)
       expect(checkbox.prop('checked')).toBe(true);
 
