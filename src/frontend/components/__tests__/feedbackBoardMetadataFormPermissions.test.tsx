@@ -230,6 +230,12 @@ describe('Board Metadata Form Permissions', () => {
 
   describe('Permission Table', () => {
 
+    it('renders nothing when no permission options are provided', () => {
+  const props = makeProps({ permissionOptions: [] });
+  const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
+  expect(wrapper.isEmptyRender()).toBe(true);
+});
+
     it('should show team permissions', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
         ...mockedProps,
