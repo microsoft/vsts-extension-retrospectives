@@ -761,37 +761,36 @@ describe('Select Permissions', () => {
     expect(lastCall.permissions.Teams).not.toContain('team-1');
   });
 
-  describe('Search and Filtering', () => {
-    it('filters permission options correctly based on search term', () => {
-      const props = makeProps({
-        permissionOptions: [
-          { id: 'team-1', name: 'Team Alpha', uniqueName: 'team-alpha', type: 'team' },
-          { id: 'user-1', name: 'User Beta', uniqueName: 'user-beta', type: 'member' },
-          { id: 'group-1', name: '[Project]\\Group One', uniqueName: 'group-one', type: 'member' }, // group option, filtered out
-        ],
-      });
-
-      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const searchInput = wrapper.find('input#retrospective-permission-search-input');
-
-      // Type 'alpha' to filter
-      searchInput.simulate('change', { target: { value: 'alpha' } });
-      wrapper.update();
-
-      let rows = wrapper.find('tbody tr.option-row');
-      expect(rows.length).toBe(1);
-      expect(rows.text()).toContain('Team Alpha');
-
-      // Clear search to reset filter
-      searchInput.simulate('change', { target: { value: '' } });
-      wrapper.update();
-
-      rows = wrapper.find('tbody tr.option-row');
-      expect(rows.length).toBe(2); // Group is filtered out, so only 2 options remain
-      expect(rows.at(0).text()).toContain('Team Alpha');
-      expect(rows.at(1).text()).toContain('User Beta');
+describe('Search and Filtering', () => {
+  it('filters permission options correctly based on search term', () => {
+    const props = makeProps({
+      permissionOptions: [
+        { id: 'team-1', name: 'Team Alpha', uniqueName: 'team-alpha', type: 'team' },
+        { id: 'user-1', name: 'User Beta', uniqueName: 'user-beta', type: 'member' },
+        { id: 'group-1', name: '[Project]\\Group One', uniqueName: 'group-one', type: 'member' }, // group, should be filtered
+      ],
     });
+
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+    // Trigger the Fabric TextField's onChange manually
+    wrapper.find(TextField).prop('onChange')!(undefined as any, 'alpha');
+    wrapper.update();
+
+    let rows = wrapper.find('tbody tr.option-row');
+    expect(rows.length).toBe(1);
+    expect(rows.at(0).text()).toContain('Team Alpha');
+
+    // Clear search input
+    wrapper.find(TextField).prop('onChange')!(undefined as any, '');
+    wrapper.update();
+
+    rows = wrapper.find('tbody tr.option-row');
+    expect(rows.length).toBe(2); // Group is still filtered out
+    expect(rows.at(0).text()).toContain('Team Alpha');
+    expect(rows.at(1).text()).toContain('User Beta');
   });
+});
 
   describe('Board Owner Row Rendering', () => {
     it('should show the current user as board owner when creating a new board or copying a board (isNewBoardCreation: true)', () => {
