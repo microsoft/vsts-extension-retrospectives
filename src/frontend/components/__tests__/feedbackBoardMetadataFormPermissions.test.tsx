@@ -762,70 +762,58 @@ describe('Select Permissions', () => {
   });
 
 describe('Search and Filtering', () => {
-  let wrapper: ReactWrapper;
-  const teamAlpha: FeedbackBoardPermissionOption = {
-    id: 'team-alpha',
-    name: 'Team Alpha',
-    uniqueName: 'team-alpha',
-    type: 'team',
-    thumbnailUrl: ''
-  };
-
-  const userBeta: FeedbackBoardPermissionOption = {
-    id: 'user-beta',
-    name: 'User Beta',
-    uniqueName: 'user-beta',
-    type: 'member',
-    thumbnailUrl: ''
-  };
-
-  // Board owner is set to 'user-beta'
-  const boardOwnerId = 'user-beta';
-
-  beforeEach(() => {
+  it('filters permission options correctly based on search term', () => {
     const props = makeProps({
-      permissionOptions: [teamAlpha, userBeta],
+      currentUserId: 'user-1', // board owner
       board: {
-        createdBy: { ...mockIdentityRef, id: boardOwnerId }
+        ...mockedProps.board,
+        createdBy: { ...mockedProps.board.createdBy, id: 'user-1' }
       },
       permissions: {
-        Teams: [],
-        Members: []
+        Teams: [teamOption.id],
+        Members: [adminOption.id, memberOption.id]
       },
-      currentUserId: boardOwnerId
+      permissionOptions: [
+        {
+          id: 'owner-id',
+          name: 'Board Owner',
+          uniqueName: 'owner-unique',
+          type: 'member'
+        },
+        teamOption,
+        adminOption,
+        memberOption
+      ]
     });
 
-    wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-  });
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-  afterEach(() => {
-    wrapper.unmount();
-  });
+    // Initially, all 4 options should be visible (owner, team, admin, member)
+    let rows = wrapper.find('tr.option-row');
+    expect(rows).toHaveLength(4);
 
-  it('filters permission options correctly based on search term', () => {
-    // Initially, both options are visible, owner renders first
-    let rows = wrapper.find('tbody tr.option-row');
-    expect(rows).toHaveLength(2);
+    // Board owner is always first
+    expect(rows.at(0).text()).toContain('Board Owner');
+    expect(rows.at(1).text()).toContain('Team 1');
+    expect(rows.at(2).text()).toContain('Team Admin');
+    expect(rows.at(3).text()).toContain('Team Member');
 
-    // Board owner (User Beta) should be first because of createdBy
-    expect(rows.at(0).text()).toContain('User Beta');
-    expect(rows.at(1).text()).toContain('Team Alpha');
+    // Simulate entering 'Team' in the search input to filter options
+    wrapper.find('input#search-permissions').simulate('change', { target: { value: 'Team' } });
 
-    // Simulate entering 'team' in the search input
-    wrapper.find('input[type="search"]').simulate('change', { target: { value: 'team' } });
+    rows = wrapper.find('tr.option-row');
+    // Should filter to team and team members only, board owner excluded since it does not match 'Team'
+    expect(rows).toHaveLength(3);
+    expect(rows.at(0).text()).toContain('Team 1');
+    expect(rows.at(1).text()).toContain('Team Admin');
+    expect(rows.at(2).text()).toContain('Team Member');
 
-    rows = wrapper.find('tbody tr.option-row');
-    // Now only Team Alpha should be visible (owner still first if it matches)
+    // Simulate entering 'Owner' in the search input
+    wrapper.find('input#search-permissions').simulate('change', { target: { value: 'Owner' } });
+
+    rows = wrapper.find('tr.option-row');
     expect(rows).toHaveLength(1);
-    expect(rows.at(0).text()).toContain('Team Alpha');
-
-    // Simulate clearing the search input
-    wrapper.find('input[type="search"]').simulate('change', { target: { value: '' } });
-
-    rows = wrapper.find('tbody tr.option-row');
-    expect(rows).toHaveLength(2);
-    expect(rows.at(0).text()).toContain('User Beta');
-    expect(rows.at(1).text()).toContain('Team Alpha');
+    expect(rows.at(0).text()).toContain('Board Owner');
   });
 });
 
