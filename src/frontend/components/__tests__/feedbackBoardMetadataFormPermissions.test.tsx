@@ -761,6 +761,45 @@ describe('Select Permissions', () => {
     expect(lastCall.permissions.Teams).not.toContain('team-1');
   });
 
+  it('removes all filtered permissions when Select All is unchecked', () => {
+  const initialTeams = ['team-1', 'team-2'];
+  const initialMembers = ['user-1', 'user-2'];
+
+  const props = makeProps({
+    permissions: {
+      Teams: initialTeams,
+      Members: initialMembers,
+    },
+    currentUserId: 'user-1', // board owner to allow edits
+  });
+
+  const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
+  const component = wrapper.dive();
+
+  // Set initial state manually for test
+  component.setState({
+    teamPermissions: initialTeams,
+    memberPermissions: initialMembers,
+    filteredPermissionOptions: [
+      { id: 'team-1', type: 'team', name: 'Team 1' },
+      { id: 'user-1', type: 'member', name: 'User 1' }
+    ]
+  });
+
+  const instance = component.instance() as any;
+
+  // Call handleSelectAllClicked with false to uncheck "Select All"
+  instance.handleSelectAllClicked(false);
+
+  // After unchecking, all filtered permissions should be removed
+  expect(component.state('teamPermissions')).not.toContain('team-1');
+  expect(component.state('memberPermissions')).not.toContain('user-1');
+
+  // The other permissions not in filteredPermissionOptions should remain
+  expect(component.state('teamPermissions')).toContain('team-2');
+  expect(component.state('memberPermissions')).toContain('user-2');
+});
+
   describe('Board Owner Row Rendering', () => {
     it('should show the current user as board owner when creating a new board or copying a board (isNewBoardCreation: true)', () => {
       const props = makeProps({
