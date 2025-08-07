@@ -761,44 +761,37 @@ describe('Select Permissions', () => {
     expect(lastCall.permissions.Teams).not.toContain('team-1');
   });
 
-  it('removes all filtered permissions when Select All is unchecked', () => {
-  const initialTeams = ['team-1', 'team-2'];
-  const initialMembers = ['user-1', 'user-2'];
+  describe('Search and Filtering', () => {
+    it('filters permission options correctly based on search term', () => {
+      const props = makeProps({
+        permissionOptions: [
+          { id: 'team-1', name: 'Team Alpha', uniqueName: 'team-alpha', type: 'team' },
+          { id: 'user-1', name: 'User Beta', uniqueName: 'user-beta', type: 'member' },
+          { id: 'group-1', name: '[Project]\\Group One', uniqueName: 'group-one', type: 'member' }, // group option, filtered out
+        ],
+      });
 
-  const props = makeProps({
-    permissions: {
-      Teams: initialTeams,
-      Members: initialMembers,
-    },
-    currentUserId: 'user-1', // board owner to allow edits
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const searchInput = wrapper.find('input#retrospective-permission-search-input');
+
+      // Type 'alpha' to filter
+      searchInput.simulate('change', { target: { value: 'alpha' } });
+      wrapper.update();
+
+      let rows = wrapper.find('tbody tr.option-row');
+      expect(rows.length).toBe(1);
+      expect(rows.text()).toContain('Team Alpha');
+
+      // Clear search to reset filter
+      searchInput.simulate('change', { target: { value: '' } });
+      wrapper.update();
+
+      rows = wrapper.find('tbody tr.option-row');
+      expect(rows.length).toBe(2); // Group is filtered out, so only 2 options remain
+      expect(rows.at(0).text()).toContain('Team Alpha');
+      expect(rows.at(1).text()).toContain('User Beta');
+    });
   });
-
-  const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
-  const component = wrapper.dive();
-
-  // Set initial state manually for test
-  component.setState({
-    teamPermissions: initialTeams,
-    memberPermissions: initialMembers,
-    filteredPermissionOptions: [
-      { id: 'team-1', type: 'team', name: 'Team 1' },
-      { id: 'user-1', type: 'member', name: 'User 1' }
-    ]
-  });
-
-  const instance = component.instance() as any;
-
-  // Call handleSelectAllClicked with false to uncheck "Select All"
-  instance.handleSelectAllClicked(false);
-
-  // After unchecking, all filtered permissions should be removed
-  expect(component.state('teamPermissions')).not.toContain('team-1');
-  expect(component.state('memberPermissions')).not.toContain('user-1');
-
-  // The other permissions not in filteredPermissionOptions should remain
-  expect(component.state('teamPermissions')).toContain('team-2');
-  expect(component.state('memberPermissions')).toContain('user-2');
-});
 
   describe('Board Owner Row Rendering', () => {
     it('should show the current user as board owner when creating a new board or copying a board (isNewBoardCreation: true)', () => {
