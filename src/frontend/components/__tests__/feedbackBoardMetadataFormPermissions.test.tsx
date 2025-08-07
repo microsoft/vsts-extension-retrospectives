@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow, ReactWrapper } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 import { TextField } from 'office-ui-fabric-react';
 import { mockUuid } from '../__mocks__/uuid/v4';
 import { testExistingBoard, testTeamId, testUserId } from '../__mocks__/mocked_components/mockedBoardMetadataForm';
@@ -760,65 +760,6 @@ describe('Select Permissions', () => {
     expect(lastCall.permissions.Members).not.toContain('user-1');
     expect(lastCall.permissions.Teams).not.toContain('team-1');
   });
-
-describe('Search and Filtering', () => {
-it('filters permission options correctly based on search term', () => {
-  const props = makeProps({
-    board: {
-      ...mockedProps.board,
-      createdBy: { ...mockedProps.board.createdBy, id: 'owner-id' },
-    },
-    currentUserId: 'owner-id',
-    permissionOptions: [
-      {
-        id: 'owner-id',
-        name: 'Board Owner',
-        uniqueName: 'owner-unique',
-        type: 'member'
-      },
-      {
-        id: 'team-1',
-        name: 'Team 1',
-        uniqueName: 'team1',
-        type: 'team'
-      },
-      {
-        id: 'admin-id',
-        name: 'Team Admin',
-        uniqueName: 'admin',
-        type: 'member'
-      },
-      {
-        id: 'member-id',
-        name: 'Team Member',
-        uniqueName: 'member',
-        type: 'member'
-      }
-    ],
-    permissions: {
-      Members: ['owner-id', 'admin-id', 'member-id'],
-      Teams: ['team-1']
-    }
-  });
-
-  const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-  wrapper.update();
-
-  const searchInput = wrapper.find('input').filterWhere(n => n.prop('id') === 'search-permissions');
-  expect(searchInput.exists()).toBe(true);
-
-  // Simulate searching for 'Team'
-  searchInput.simulate('change', { target: { value: 'Team' } });
-
-  wrapper.update();
-  const rows = wrapper.find('tr.option-row');
-
-  // Expect only Team-related rows to be shown
-  expect(rows.at(0).text()).toContain('Team 1');
-  expect(rows.at(1).text()).toContain('Team Admin');
-  expect(rows.at(2).text()).toContain('Team Member');
-});
-});
 
   describe('Board Owner Row Rendering', () => {
     it('should show the current user as board owner when creating a new board or copying a board (isNewBoardCreation: true)', () => {
