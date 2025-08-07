@@ -773,22 +773,28 @@ describe('Search and Filtering', () => {
 
     const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-    // Trigger the Fabric TextField's onChange manually
-    wrapper.find(TextField).prop('onChange')!(undefined as any, 'alpha');
+    // Initial state: group should be filtered out
+    let visibleRows = wrapper.find('tr.option-row');
+    expect(visibleRows).toHaveLength(2);
+    expect(visibleRows.at(0).text()).toContain('Team Alpha');
+    expect(visibleRows.at(1).text()).toContain('User Beta');
+
+    // Simulate entering 'beta' in search input
+    wrapper.find(TextField).prop('onChange')?.(undefined as any, 'beta');
     wrapper.update();
 
-    let rows = wrapper.find('tbody tr.option-row');
-    expect(rows.length).toBe(1);
-    expect(rows.at(0).text()).toContain('Team Alpha');
+    visibleRows = wrapper.find('tr.option-row');
+    expect(visibleRows).toHaveLength(1);
+    expect(visibleRows.at(0).text()).toContain('User Beta');
 
-    // Clear search input
-    wrapper.find(TextField).prop('onChange')!(undefined as any, '');
-    wrapper.update();
+    // Clear the search input
+wrapper.find(TextField).prop('onChange')!({ target: { value: '' } } as any);
+wrapper.update();
 
-    rows = wrapper.find('tbody tr.option-row');
-    expect(rows.length).toBe(2); // Group is still filtered out
-    expect(rows.at(0).text()).toContain('Team Alpha');
-    expect(rows.at(1).text()).toContain('User Beta');
+    visibleRows = wrapper.find('tr.option-row');
+    expect(visibleRows).toHaveLength(2);
+    expect(visibleRows.at(0).text()).toContain('Team Alpha');
+    expect(visibleRows.at(1).text()).toContain('User Beta');
   });
 });
 
