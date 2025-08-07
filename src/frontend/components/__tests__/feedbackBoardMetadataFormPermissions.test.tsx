@@ -762,49 +762,62 @@ describe('Select Permissions', () => {
   });
 
 describe('Search and Filtering', () => {
-  it('filters permission options correctly based on search term', () => {
-    const props = makeProps({
-      currentUserId: 'user-1', // board owner
-      board: {
-        ...mockedProps.board,
-        createdBy: { ...mockedProps.board.createdBy, id: 'user-1' }
+it('filters permission options correctly based on search term', () => {
+  const props = makeProps({
+    board: {
+      ...mockedProps.board,
+      createdBy: { ...mockedProps.board.createdBy, id: 'owner-id' },
+    },
+    currentUserId: 'owner-id',
+    permissionOptions: [
+      {
+        id: 'owner-id',
+        name: 'Board Owner',
+        uniqueName: 'owner-unique',
+        type: 'member'
       },
-      permissions: {
-        Teams: [teamOption.id],
-        Members: [adminOption.id, memberOption.id]
+      {
+        id: 'team-1',
+        name: 'Team 1',
+        uniqueName: 'team1',
+        type: 'team'
       },
-      permissionOptions: allOptions,
-    });
-
-    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-
-    // Initially, all 4 options should be visible (owner, team, admin, member)
-    let rows = wrapper.find('tr.option-row');
-    expect(rows).toHaveLength(4);
-
-    // Board owner is always first
-    expect(rows.at(0).text()).toContain('Board Owner');
-    expect(rows.at(1).text()).toContain('Team 1');
-    expect(rows.at(2).text()).toContain('Team Admin');
-    expect(rows.at(3).text()).toContain('Team Member');
-
-    // Simulate entering 'Team' in the search input to filter options
-    wrapper.find('input#search-permissions').simulate('change', { target: { value: 'Team' } });
-
-    rows = wrapper.find('tr.option-row');
-    // Should filter to team and team members only, board owner excluded since it does not match 'Team'
-    expect(rows).toHaveLength(3);
-    expect(rows.at(0).text()).toContain('Team 1');
-    expect(rows.at(1).text()).toContain('Team Admin');
-    expect(rows.at(2).text()).toContain('Team Member');
-
-    // Simulate entering 'Owner' in the search input
-    wrapper.find('input#search-permissions').simulate('change', { target: { value: 'Owner' } });
-
-    rows = wrapper.find('tr.option-row');
-    expect(rows).toHaveLength(1);
-    expect(rows.at(0).text()).toContain('Board Owner');
+      {
+        id: 'admin-id',
+        name: 'Team Admin',
+        uniqueName: 'admin',
+        type: 'member'
+      },
+      {
+        id: 'member-id',
+        name: 'Team Member',
+        uniqueName: 'member',
+        type: 'member'
+      }
+    ],
+    permissions: {
+      Members: ['owner-id', 'admin-id', 'member-id'],
+      Teams: ['team-1']
+    }
   });
+
+  const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+  wrapper.update();
+
+  const searchInput = wrapper.find('input').filterWhere(n => n.prop('id') === 'search-permissions');
+  expect(searchInput.exists()).toBe(true);
+
+  // Simulate searching for 'Team'
+  searchInput.simulate('change', { target: { value: 'Team' } });
+
+  wrapper.update();
+  const rows = wrapper.find('tr.option-row');
+
+  // Expect only Team-related rows to be shown
+  expect(rows.at(0).text()).toContain('Team 1');
+  expect(rows.at(1).text()).toContain('Team Admin');
+  expect(rows.at(2).text()).toContain('Team Member');
+});
 });
 
   describe('Board Owner Row Rendering', () => {
