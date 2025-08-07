@@ -773,17 +773,7 @@ describe('Search and Filtering', () => {
         Teams: [teamOption.id],
         Members: [adminOption.id, memberOption.id]
       },
-      permissionOptions: [
-        {
-          id: 'owner-id',
-          name: 'Board Owner',
-          uniqueName: 'owner-unique',
-          type: 'member'
-        },
-        teamOption,
-        adminOption,
-        memberOption
-      ]
+      permissionOptions: allOptions,
     });
 
     const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
