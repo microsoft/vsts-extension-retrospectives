@@ -41,7 +41,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   );
   const canEditPermissions = isBoardOwner || isTeamAdmin;
   const isGroupOption = (option: FeedbackBoardPermissionOption): boolean => {
-    return /^\[[^\]]+\]\\/.test(option.uniqueName); // assumes groups have names like [project]\group
+    return /^\[[^\]]+\]\\/.test(option.name); // assumes groups have names like [project]\group
   };
 
   const cleanPermissionOptions = props.permissionOptions.filter(option => !isGroupOption(option)); // removes groups
