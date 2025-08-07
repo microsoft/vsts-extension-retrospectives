@@ -31,7 +31,7 @@ export interface FeedbackBoardPermissionOption {
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
-  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
+  //const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
@@ -40,6 +40,12 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     (option) => option.id === props.currentUserId && option.isTeamAdmin
   );
   const canEditPermissions = isBoardOwner || isTeamAdmin;
+  const isGroupOption = (option: FeedbackBoardPermissionOption): boolean => {
+    return /^\[[^\]]+\]\\/.test(option.uniqueName); // assumes groups have names like [project]\group
+  };
+
+  const cleanPermissionOptions = props.permissionOptions.filter(option => !isGroupOption(option)); // removes groups
+  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
   const handleSelectAllClicked = (checked: boolean) => {
     if (!canEditPermissions) return; // Block unauthorized users from selecting/unselecting all
@@ -75,7 +81,33 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       setMemberPermissions([...permissionList]);
     }
   }
+/*
+  const handleSearchTermChanged = (newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm);
 
+    const filteredOptions = props.permissionOptions
+      .filter(option => !isGroupOption(option)) // Exclude groups
+      .filter(option => {
+        if (newSearchTerm.length === 0) return true;
+        return option.name.toLowerCase().includes(newSearchTerm.toLowerCase());
+      });
+
+    setSelectAllState();
+    setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
+  };
+*/
+  const handleSearchTermChanged = (newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm);
+
+    const filteredOptions = cleanPermissionOptions.filter(option => {
+      if (newSearchTerm.length === 0) return true;
+      return option.name.toLowerCase().includes(newSearchTerm.toLowerCase());
+    });
+
+    setSelectAllState();
+    setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
+  };
+/*
   const handleSearchTermChanged = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
 
@@ -90,7 +122,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
   }
-
+*/
   const setSelectAllState = () => {
     const allVisibleIds = filteredPermissionOptions.map(o => o.id);
     const allPermissionIds = [...teamPermissions, ...memberPermissions];
