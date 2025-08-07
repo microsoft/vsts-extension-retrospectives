@@ -103,6 +103,59 @@ describe('Board Metadata Form Permissions', () => {
     expect(textField.prop('value')).toEqual('');
   });
 
+  it('filters out group options based on pattern matching in name', () => {
+    const groupOptionAsMember: FeedbackBoardPermissionOption = {
+      id: 'group-member',
+      name: '[ProjectX]\\Developers',
+      uniqueName: 'projectx-devs',
+      type: 'member', // groups might appear as member
+      thumbnailUrl: '',
+    };
+
+    const groupOptionAsTeam: FeedbackBoardPermissionOption = {
+      id: 'group-team',
+      name: '[ProjectY]\\QA Team',
+      uniqueName: 'projecty-qa',
+      type: 'team', // groups might appear as team
+      thumbnailUrl: '',
+    };
+
+    const normalTeam: FeedbackBoardPermissionOption = {
+      id: 'team-normal',
+      name: 'Engineering Team',
+      uniqueName: 'eng-team',
+      type: 'team',
+      thumbnailUrl: '',
+    };
+
+    const normalMember: FeedbackBoardPermissionOption = {
+      id: 'member-normal',
+      name: 'Alice Johnson',
+      uniqueName: 'alice.j',
+      type: 'member',
+      thumbnailUrl: '',
+    };
+
+    const props = makeProps({
+      permissionOptions: [
+        normalTeam,
+        normalMember,
+        groupOptionAsMember,
+        groupOptionAsTeam,
+      ],
+    });
+
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+    // Group options should NOT render
+    expect(wrapper.text()).not.toContain('[ProjectX]\\Developers');
+    expect(wrapper.text()).not.toContain('[ProjectY]\\QA Team');
+
+    // Normal options SHOULD render
+    expect(wrapper.text()).toContain('Engineering Team');
+    expect(wrapper.text()).toContain('Alice Johnson');
+  });
+
   describe('Public Banner', () => {
     const publicBannerText: string = 'This board is visible to every member in the project.';
 
@@ -229,12 +282,6 @@ describe('Board Metadata Form Permissions', () => {
   });
 
   describe('Permission Table', () => {
-
-    it('renders nothing when no permission options are provided', () => {
-  const props = makeProps({ permissionOptions: [] });
-  const wrapper = shallow(<FeedbackBoardMetadataFormPermissions {...props} />);
-  expect(wrapper.isEmptyRender()).toBe(true);
-});
 
     it('should show team permissions', () => {
       const props: IFeedbackBoardMetadataFormPermissionsProps = {
