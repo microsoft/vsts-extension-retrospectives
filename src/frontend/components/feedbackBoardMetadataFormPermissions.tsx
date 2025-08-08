@@ -31,7 +31,6 @@ export interface FeedbackBoardPermissionOption {
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): JSX.Element {
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
-  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(props.permissionOptions);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
@@ -40,6 +39,12 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     (option) => option.id === props.currentUserId && option.isTeamAdmin
   );
   const canEditPermissions = isBoardOwner || isTeamAdmin;
+  const isGroupOption = (option: FeedbackBoardPermissionOption): boolean => {
+    return /^\[[^\]]+\]\\/.test(option.name); // assumes groups have names like [project]\group
+  };
+
+  const cleanPermissionOptions = props.permissionOptions.filter(option => !isGroupOption(option)); // removes groups
+  const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
   const handleSelectAllClicked = (checked: boolean) => {
     if (!canEditPermissions) return; // Block unauthorized users from selecting/unselecting all
@@ -79,17 +84,14 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const handleSearchTermChanged = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
 
-    const filteredOptions: FeedbackBoardPermissionOption[] = props.permissionOptions.filter(o => {
-      if(newSearchTerm.length === 0) {
-        return true
-      }
-
-      return o.name.toLowerCase().includes(newSearchTerm.toLowerCase());
+    const filteredOptions = cleanPermissionOptions.filter(option => {
+      if (newSearchTerm.length === 0) return true;
+      return option.name.toLowerCase().includes(newSearchTerm.toLowerCase());
     });
 
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
-  }
+  };
 
   const setSelectAllState = () => {
     const allVisibleIds = filteredPermissionOptions.map(o => o.id);
@@ -225,8 +227,8 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                       boxSide="start"
                       disabled={isBoardOwner}
                       checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
-    indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} // Set indeterminate only if no permissions exist
-                    onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
+                      indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} // Set indeterminate only if no permissions exist
+                      onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
                     />
                   </td>
                   <td className="cell-content flex flex-row flex-nowrap">

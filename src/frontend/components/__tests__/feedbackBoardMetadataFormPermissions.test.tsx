@@ -103,6 +103,59 @@ describe('Board Metadata Form Permissions', () => {
     expect(textField.prop('value')).toEqual('');
   });
 
+  it('filters out group options based on pattern matching in name', () => {
+    const groupOptionAsMember: FeedbackBoardPermissionOption = {
+      id: 'group-member',
+      name: '[ProjectX]\\Developers',
+      uniqueName: 'projectx-devs',
+      type: 'member', // groups might appear as member
+      thumbnailUrl: '',
+    };
+
+    const groupOptionAsTeam: FeedbackBoardPermissionOption = {
+      id: 'group-team',
+      name: '[ProjectY]\\QA Team',
+      uniqueName: 'projecty-qa',
+      type: 'team', // groups might appear as team
+      thumbnailUrl: '',
+    };
+
+    const normalTeam: FeedbackBoardPermissionOption = {
+      id: 'team-normal',
+      name: 'Engineering Team',
+      uniqueName: 'eng-team',
+      type: 'team',
+      thumbnailUrl: '',
+    };
+
+    const normalMember: FeedbackBoardPermissionOption = {
+      id: 'member-normal',
+      name: 'Alice Johnson',
+      uniqueName: 'alice.j',
+      type: 'member',
+      thumbnailUrl: '',
+    };
+
+    const props = makeProps({
+      permissionOptions: [
+        normalTeam,
+        normalMember,
+        groupOptionAsMember,
+        groupOptionAsTeam,
+      ],
+    });
+
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+    // Group options should NOT render
+    expect(wrapper.text()).not.toContain('[ProjectX]\\Developers');
+    expect(wrapper.text()).not.toContain('[ProjectY]\\QA Team');
+
+    // Normal options SHOULD render
+    expect(wrapper.text()).toContain('Engineering Team');
+    expect(wrapper.text()).toContain('Alice Johnson');
+  });
+
   describe('Public Banner', () => {
     const publicBannerText: string = 'This board is visible to every member in the project.';
 
@@ -668,44 +721,81 @@ describe('Board Metadata Form Permissions', () => {
       expect(onPermissionChanged).not.toHaveBeenCalled();
     });
   });
-});
 
-describe('Select Permissions', () => {
-  it('should grant permission to all when select all is clicked and saved', async () => {
-    const onPermissionChanged = jest.fn();
-    const props = makeProps({ onPermissionChanged, currentUserId: 'user-1', isNewBoardCreation: true, board: { ...mockedProps.board, createdBy: { ...mockedProps.board.createdBy, id: 'user-3' } } });
-    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-    wrapper.find('input#select-all-permission-options-visible').simulate('change', { target: { checked: true } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
-    expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
-    expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-1', 'user-2', 'user-3']));
-  });
+  describe('Select Permissions', () => {
+    it('should grant permission to all when select all is clicked and saved', async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({
+        onPermissionChanged,
+        currentUserId: 'user-1',
+        isNewBoardCreation: true,
+        board: { ...mockedProps.board, createdBy: { ...mockedProps.board.createdBy, id: 'user-3' } }
+      });
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      wrapper.find('input#select-all-permission-options-visible').simulate('change', { target: { checked: true } });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+      expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
+      expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-1', 'user-2', 'user-3']));
+    });
 
-  it('should grant permission to the selected team and the board owner only when team is selected and saved', async () => {
-    const onPermissionChanged = jest.fn();
-    const props = makeProps({ onPermissionChanged });
-    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-    wrapper.find('input#permission-option-team-1').simulate('change', { target: { checked: true } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
-    expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
-    expect(lastCall.permissions.Members).not.toContain('user-1');
-    expect(lastCall.permissions.Members).not.toContain('user-2');
-    expect(lastCall.permissions.Members).not.toContain('user-3');
-  });
+    it('should grant permission to the selected team and the board owner only when team is selected and saved', async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({ onPermissionChanged });
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      wrapper.find('input#permission-option-team-1').simulate('change', { target: { checked: true } });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+      expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
+      expect(lastCall.permissions.Members).not.toContain('user-1');
+      expect(lastCall.permissions.Members).not.toContain('user-2');
+      expect(lastCall.permissions.Members).not.toContain('user-3');
+    });
 
-  it('should grant permission to the selected users only when their checkboxes are selected and saved', async () => {
-    const onPermissionChanged = jest.fn();
-    const props = makeProps({ onPermissionChanged });
-    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-    wrapper.find('input#permission-option-user-2').simulate('change', { target: { checked: true } });
-    wrapper.find('input#permission-option-user-3').simulate('change', { target: { checked: true } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
-    expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-2', 'user-3']));
-    expect(lastCall.permissions.Members).not.toContain('user-1');
-    expect(lastCall.permissions.Teams).not.toContain('team-1');
+    it('should grant permission to the selected users only when their checkboxes are selected and saved', async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({ onPermissionChanged });
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      wrapper.find('input#permission-option-user-2').simulate('change', { target: { checked: true } });
+      wrapper.find('input#permission-option-user-3').simulate('change', { target: { checked: true } });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+      expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-2', 'user-3']));
+      expect(lastCall.permissions.Members).not.toContain('user-1');
+      expect(lastCall.permissions.Teams).not.toContain('team-1');
+    });
+
+    it('should revoke all visible permissions when select all is unchecked and saved', async () => {
+      const onPermissionChanged = jest.fn();
+      // Start with all permissions selected (simulate initial state)
+      const props = makeProps({
+        onPermissionChanged,
+        currentUserId: 'user-1',
+        isNewBoardCreation: true,
+        board: {
+          ...mockedProps.board,
+          createdBy: { ...mockedProps.board.createdBy, id: 'user-3' }
+        },
+        // Optional: preset permissions as all selected to simulate unchecking
+        permissions: {
+          Teams: ['team-1'],
+          Members: ['user-1', 'user-2', 'user-3']
+        }
+      });
+
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      // Simulate unchecking the select all checkbox
+      wrapper.find('input#select-all-permission-options-visible').simulate('change', { target: { checked: false } });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+
+      // Expect no Teams or Members to have permissions after unchecking "select all"
+      expect(lastCall.permissions.Teams).toHaveLength(0);
+      expect(lastCall.permissions.Members).toHaveLength(0);
+    });
   });
 
   describe('Board Owner Row Rendering', () => {
@@ -740,5 +830,63 @@ describe('Select Permissions', () => {
       // Admin badge should also exist if user2 is admin
       //expect(ownerRow.find('[aria-label="Team admin badge"]').exists()).toBe(true);
     });
+  });
+});
+
+describe('Test handleSearchTermChanged', () => {
+  let defaultProps: IFeedbackBoardMetadataFormPermissionsProps;
+
+  beforeEach(() => {
+    defaultProps = {
+      ...mockedProps,
+      board: {
+        ...mockedProps.board,
+        createdBy: { ...mockIdentityRef, id: 'owner-id', uniqueName: 'owner-id', displayName: 'Owner User' }
+      },
+      permissions: { Teams: [], Members: [] },
+      permissionOptions: [
+        { id: 'team-1', name: 'Alpha Team', uniqueName: 'alpha', type: 'team' },
+        { id: 'member-1', name: 'Bob Smith', uniqueName: 'robert.smith.05', type: 'member' },
+        { id: 'member-2', name: 'Charlie Brown', uniqueName: 'charles.brown.02', type: 'member' },
+      ] as FeedbackBoardPermissionOption[],
+      currentUserId: 'owner-id',
+      isNewBoardCreation: false,
+      onPermissionChanged: jest.fn(),
+    };
+  });
+
+  it('filters permission options based on search term', () => {
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...defaultProps} />);
+
+    const input = wrapper.find('input#retrospective-permission-search-input');
+    expect(input).toHaveLength(1); // make sure input is found
+
+    // Simulate user typing 'Bob' into the search input
+    input.simulate('change', { target: { value: 'Bob' } });
+
+    wrapper.update(); // re-render after state changes
+
+    // Now find table rows filtered by search
+    const filtered = wrapper.find('tbody tr');
+    expect(filtered).toHaveLength(1);
+    expect(filtered.at(0).text()).toContain('Bob Smith');
+  });
+
+  it('shows all options when search term is cleared', () => {
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...defaultProps} />);
+
+    const input = wrapper.find('input#retrospective-permission-search-input');
+    expect(input).toHaveLength(1);
+
+    // Type 'Bob' first
+    input.simulate('change', { target: { value: 'Bob' } });
+    wrapper.update();
+    expect(wrapper.find('tbody tr')).toHaveLength(1);
+
+    // Clear the search input
+    input.simulate('change', { target: { value: '' } });
+    wrapper.update();
+
+    expect(wrapper.find('tbody tr')).toHaveLength(defaultProps.permissionOptions.length);
   });
 });
