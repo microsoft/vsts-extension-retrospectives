@@ -12,7 +12,7 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.45
 
-* Reverted azure-devops-extension-api to prior version to be compatible with older on-prem version. From [GitHub PR #1282](https://github.com/microsoft/vsts-extension-retrospectives/pull/1282)
+* Reverted Azure DevOps extension API to prior version to be compatible with older on-premise version. From [GitHub PR #1282](https://github.com/microsoft/vsts-extension-retrospectives/pull/1282)
 
 ## v1.92.43
 
