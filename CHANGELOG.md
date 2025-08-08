@@ -2,6 +2,18 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.[TBD]
+
+* Removes groups from Permission table, since setting permission by groups not supported. From [GitHub PR #1294](https://github.com/microsoft/vsts-extension-retrospectives/pull/1294)
+
+## v1.92.46
+
+* Corrected defect preventing user from saving after marking column for deletion. From [GitHub PR #1284](https://github.com/microsoft/vsts-extension-retrospectives/pull/1284)
+
+## v1.92.45
+
+* Reverted azure-devops-extension-api to prior version to be compatible with older on-prem version. From [GitHub PR #1282](https://github.com/microsoft/vsts-extension-retrospectives/pull/1282)
+
 ## v1.92.43
 
 * Refactored the Retrospective Extension settings menu to more closely mirror the ADO menus format.
