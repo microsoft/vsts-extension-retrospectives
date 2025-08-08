@@ -795,3 +795,61 @@ describe('Select Permissions', () => {
     });
   });
 });
+
+describe('Test handleSearchTermChanged', () => {
+  let defaultProps: IFeedbackBoardMetadataFormPermissionsProps;
+
+  beforeEach(() => {
+    defaultProps = {
+      ...mockedProps,
+      board: {
+        ...mockedProps.board,
+        createdBy: { ...mockIdentityRef, id: 'owner-id', uniqueName: 'owner-id', displayName: 'Owner User' }
+      },
+      permissions: { Teams: [], Members: [] },
+      permissionOptions: [
+        { id: 'team-1', name: 'Alpha Team', uniqueName: 'alpha', type: 'team' },
+        { id: 'member-1', name: 'Bob Smith', uniqueName: 'robert.smith.05', type: 'member' },
+        { id: 'member-2', name: 'Charlie Brown', uniqueName: 'charles.brown.02', type: 'member' },
+      ] as FeedbackBoardPermissionOption[],
+      currentUserId: 'owner-id',
+      isNewBoardCreation: false,
+      onPermissionChanged: jest.fn(),
+    };
+  });
+
+  it('filters permission options based on search term', () => {
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...defaultProps} />);
+
+    const input = wrapper.find('input#retrospective-permission-search-input');
+    expect(input).toHaveLength(1); // make sure input is found
+
+    // Simulate user typing 'Bob' into the search input
+    input.simulate('change', { target: { value: 'Bob' } });
+
+    wrapper.update(); // re-render after state changes
+
+    // Now find table rows filtered by search
+    const filtered = wrapper.find('tbody tr');
+    expect(filtered).toHaveLength(1);
+    expect(filtered.at(0).text()).toContain('Bob Smith');
+  });
+
+  it('shows all options when search term is cleared', () => {
+    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...defaultProps} />);
+
+    const input = wrapper.find('input#retrospective-permission-search-input');
+    expect(input).toHaveLength(1);
+
+    // Type 'Bob' first
+    input.simulate('change', { target: { value: 'Bob' } });
+    wrapper.update();
+    expect(wrapper.find('tbody tr')).toHaveLength(1);
+
+    // Clear the search input
+    input.simulate('change', { target: { value: '' } });
+    wrapper.update();
+
+    expect(wrapper.find('tbody tr')).toHaveLength(defaultProps.permissionOptions.length);
+  });
+});
