@@ -721,44 +721,81 @@ describe('Board Metadata Form Permissions', () => {
       expect(onPermissionChanged).not.toHaveBeenCalled();
     });
   });
-});
 
-describe('Select Permissions', () => {
-  it('should grant permission to all when select all is clicked and saved', async () => {
-    const onPermissionChanged = jest.fn();
-    const props = makeProps({ onPermissionChanged, currentUserId: 'user-1', isNewBoardCreation: true, board: { ...mockedProps.board, createdBy: { ...mockedProps.board.createdBy, id: 'user-3' } } });
-    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-    wrapper.find('input#select-all-permission-options-visible').simulate('change', { target: { checked: true } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
-    expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
-    expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-1', 'user-2', 'user-3']));
-  });
+  describe('Select Permissions', () => {
+    it('should grant permission to all when select all is clicked and saved', async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({
+        onPermissionChanged,
+        currentUserId: 'user-1',
+        isNewBoardCreation: true,
+        board: { ...mockedProps.board, createdBy: { ...mockedProps.board.createdBy, id: 'user-3' } }
+      });
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      wrapper.find('input#select-all-permission-options-visible').simulate('change', { target: { checked: true } });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+      expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
+      expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-1', 'user-2', 'user-3']));
+    });
 
-  it('should grant permission to the selected team and the board owner only when team is selected and saved', async () => {
-    const onPermissionChanged = jest.fn();
-    const props = makeProps({ onPermissionChanged });
-    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-    wrapper.find('input#permission-option-team-1').simulate('change', { target: { checked: true } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
-    expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
-    expect(lastCall.permissions.Members).not.toContain('user-1');
-    expect(lastCall.permissions.Members).not.toContain('user-2');
-    expect(lastCall.permissions.Members).not.toContain('user-3');
-  });
+    it('should grant permission to the selected team and the board owner only when team is selected and saved', async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({ onPermissionChanged });
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      wrapper.find('input#permission-option-team-1').simulate('change', { target: { checked: true } });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+      expect(lastCall.permissions.Teams).toEqual(expect.arrayContaining(['team-1']));
+      expect(lastCall.permissions.Members).not.toContain('user-1');
+      expect(lastCall.permissions.Members).not.toContain('user-2');
+      expect(lastCall.permissions.Members).not.toContain('user-3');
+    });
 
-  it('should grant permission to the selected users only when their checkboxes are selected and saved', async () => {
-    const onPermissionChanged = jest.fn();
-    const props = makeProps({ onPermissionChanged });
-    const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
-    wrapper.find('input#permission-option-user-2').simulate('change', { target: { checked: true } });
-    wrapper.find('input#permission-option-user-3').simulate('change', { target: { checked: true } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
-    expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-2', 'user-3']));
-    expect(lastCall.permissions.Members).not.toContain('user-1');
-    expect(lastCall.permissions.Teams).not.toContain('team-1');
+    it('should grant permission to the selected users only when their checkboxes are selected and saved', async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({ onPermissionChanged });
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+      wrapper.find('input#permission-option-user-2').simulate('change', { target: { checked: true } });
+      wrapper.find('input#permission-option-user-3').simulate('change', { target: { checked: true } });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+      expect(lastCall.permissions.Members).toEqual(expect.arrayContaining(['user-2', 'user-3']));
+      expect(lastCall.permissions.Members).not.toContain('user-1');
+      expect(lastCall.permissions.Teams).not.toContain('team-1');
+    });
+
+    it('should revoke all visible permissions when select all is unchecked and saved', async () => {
+      const onPermissionChanged = jest.fn();
+      // Start with all permissions selected (simulate initial state)
+      const props = makeProps({
+        onPermissionChanged,
+        currentUserId: 'user-1',
+        isNewBoardCreation: true,
+        board: {
+          ...mockedProps.board,
+          createdBy: { ...mockedProps.board.createdBy, id: 'user-3' }
+        },
+        // Optional: preset permissions as all selected to simulate unchecking
+        permissions: {
+          Teams: ['team-1'],
+          Members: ['user-1', 'user-2', 'user-3']
+        }
+      });
+
+      const wrapper = mount(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      // Simulate unchecking the select all checkbox
+      wrapper.find('input#select-all-permission-options-visible').simulate('change', { target: { checked: false } });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+
+      // Expect no Teams or Members to have permissions after unchecking "select all"
+      expect(lastCall.permissions.Teams).toHaveLength(0);
+      expect(lastCall.permissions.Members).toHaveLength(0);
+    });
   });
 
   describe('Board Owner Row Rendering', () => {
