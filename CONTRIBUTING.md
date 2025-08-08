@@ -40,7 +40,7 @@
   - [Storage](#storage)
   - [Code](#code)
   - [Unit Testing](#backend-unit-testing)
-- [Application Monitoring and Telemetry](application-monitoring-and-telemetry)
+- [Application Monitoring and Telemetry](#application-monitoring-and-telemetry)
 
 ## Background
 
