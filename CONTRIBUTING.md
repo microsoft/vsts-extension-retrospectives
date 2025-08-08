@@ -17,6 +17,10 @@
 ## Table of Contents
 
 - [Background](#background)
+- [Ways to Contribute](#ways-to-contribute)
+  - [Reporting Issues](#reporting-issues)
+  - [Helping the Community](#helping-the-community)
+  - [Adding Features and Fixing Bugs](#adding-features-and-fixing-bugs)
 - [Contributing Guidelines](#contributing-guidelines)
   - [Branching and Pull Requests](#branching-and-pull-requests)
   - [Continuous Integration (CI) and Pre-commit Hook](#continuous-integration-ci-and-pre-commit-hook)
@@ -36,7 +40,7 @@
   - [Storage](#storage)
   - [Code](#code)
   - [Unit Testing](#backend-unit-testing)
-- [Application Monitoring and Telemetry](application-monitoring-and-telemetry)
+- [Application Monitoring and Telemetry](#application-monitoring-and-telemetry)
 
 ## Background
 
@@ -45,6 +49,38 @@ Retrospectives is an Azure DevOps extension. Visit the
 learn more about developing extensions. The Retrospectives Azure DevOps
 extension frontend is implemented in React using Typescript, and the backend is
 implemented in C#. The project follows a single branch source control strategy.
+
+## Ways to Contribute
+
+There are several ways you can contribute to the Retrospectives extension:
+
+### Reporting Issues
+
+If you encounter bugs, have feature requests, or need help with the extension, please visit the [GitHub Issues](https://github.com/microsoft/vsts-extension-retrospectives/issues) page. When reporting an issue:
+
+1. Search existing issues to avoid duplicates
+2. Use the appropriate issue template
+3. Provide clear steps to reproduce the problem
+4. Include relevant screenshots or error messages
+5. Specify your browser, Azure DevOps version, and extension version
+
+### Helping the Community
+
+You can help other users by participating in community discussions:
+
+- **GitHub Discussions**: Join conversations and share insights at the [GitHub Discussions](https://github.com/microsoft/vsts-extension-retrospectives/discussions) page
+- **GitHub Issues**: Help answer questions and provide solutions in existing [GitHub Issues](https://github.com/microsoft/vsts-extension-retrospectives/issues)
+- Share your experience and best practices with the extension
+- Help troubleshoot problems reported by other users
+
+### Adding Features and Fixing Bugs
+
+If you want to contribute code changes, bug fixes, or new features:
+
+1. Follow the [Contributing Guidelines](#contributing-guidelines) outlined in this document
+2. Read through the [Development Environments](#development-environments) section to set up your local development environment
+3. Review the [Frontend Development](#frontend-development) and [Backend Development](#backend-development) sections for specific guidance
+4. Ensure your changes include appropriate tests and documentation
 
 ## Contributing Guidelines
 
