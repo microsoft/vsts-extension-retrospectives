@@ -112,7 +112,7 @@ If you want to contribute code changes, bug fixes, or new features:
 
 Our CI pipeline can be invoked on Github, or if you want to get ahead of the potential failures, you
 can use the [`pre-commit` configuration](./.pre-commit-config.yaml). It will run
-linting on markdown files and ython files, and run a spellcheck. The same rules will be caught locally
+linting on markdown files and Python files, and run a spellcheck. The same rules will be caught locally
 that will be caught in Github actions.
 
 To use `pre-commit`, it's recommended to have a [Python virtual environment (venv)](https://docs.python.org/3/library/venv.html#creating-virtual-environments).
