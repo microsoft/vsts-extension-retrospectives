@@ -386,7 +386,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       setTableData,
       setOpenDialogBoardId,
       currentUserId,
-      permissionOptions 
+      permissionOptions
     );
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
