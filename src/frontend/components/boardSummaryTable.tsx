@@ -190,7 +190,7 @@ function getTable(
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
   setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>,
   currentUserId: string,
-  permissionOptions: FeedbackBoardPermissionOption[],
+  //permissionOptions: FeedbackBoardPermissionOption[],
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
@@ -386,7 +386,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       setTableData,
       setOpenDialogBoardId,
       currentUserId,
-      permissionOptions
+      //permissionOptions
     );
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
