@@ -16,6 +16,7 @@ import { appInsights, reactPlugin, TelemetryEvents } from '../utilities/telemetr
 import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
 import BoardSummaryTableHeader from './boardSummaryTableHeader';
 import BoardSummaryTableBody from './boardSummaryTableBody';
+import { FeedbackBoardPermissionOption } from '../components/feedbackBoardMetadataFormPermissions';
 
 import {
   createColumnHelper,
@@ -117,6 +118,9 @@ export async function handleArchiveToggle(
   }
 }
 
+const currentUserId = encrypt(getUserIdentity().id);
+const [permissionOptions] = useState<FeedbackBoardPermissionOption[]>([]); // not functional
+
 const ARCHIVE_DELETE_DELAY = 2 * 60 * 1000; // 2 minutes
 
 export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
@@ -126,14 +130,37 @@ export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
   return now >= archivedAt + ARCHIVE_DELETE_DELAY;
 }
 
+function canUserDeleteBoard(
+  board: IBoardSummaryTableItem,
+  currentUserId: string,
+  permissionOptions: FeedbackBoardPermissionOption[]
+): boolean {
+  const isBoardOwner = board.ownerId === currentUserId;
+  const isTeamAdmin = permissionOptions.some(
+    (option) => option.id === currentUserId && option.isTeamAdmin
+  );
+  return isBoardOwner || isTeamAdmin;
+}
+
 export function TrashIcon({
   board,
+  currentUserId,
+  permissionOptions,
   onClick,
 }: {
   board: IBoardSummaryTableItem;
+  currentUserId: string;
+  permissionOptions: FeedbackBoardPermissionOption[];
   onClick: (event: React.MouseEvent) => void;
 }) {
   if (!board.isArchived) return <div className="centered-cell" />;
+
+  const allowedToDelete = canUserDeleteBoard(board, currentUserId, permissionOptions);
+
+  if (!allowedToDelete) {
+    // User can’t delete — no icon at all
+    return <div className="centered-cell" />;
+  }
 
   return isTrashEnabled(board) ? (
     <div
@@ -161,7 +188,9 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>> // New parameter
+  setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>,
+  currentUserId: string,
+  permissionOptions: FeedbackBoardPermissionOption[],
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
@@ -258,6 +287,8 @@ function getTable(
       cell: (cellContext) => (
         <TrashIcon
           board={cellContext.row.original}
+          currentUserId={currentUserId}              // pass current user ID
+          permissionOptions={permissionOptions}      // pass permissions array
           onClick={(event) => {
             event.stopPropagation();
             setOpenDialogBoardId(cellContext.row.original.id);
@@ -353,7 +384,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       setSorting,
       props.onArchiveToggle,
       setTableData,
-      setOpenDialogBoardId
+      setOpenDialogBoardId,
+      currentUserId,
+      permissionOptions 
     );
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
