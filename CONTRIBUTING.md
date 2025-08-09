@@ -78,9 +78,11 @@ You can help other users by participating in community discussions:
 If you want to contribute code changes, bug fixes, or new features:
 
 1. Follow the [Contributing Guidelines](#contributing-guidelines) outlined in this document
-2. Read through the [Development Environments](#development-environments) section to set up your local development environment
+2. Read through the [Development Environments](#development-environments) section to set up your local development environment*
 3. Review the [Frontend Development](#frontend-development) and [Backend Development](#backend-development) sections for specific guidance
 4. Ensure your changes include appropriate tests and documentation
+
+*Alternatively, watch the [Azure DevOps Retrospective Extension - Setting Up Development Environment](https://www.youtube.com/watch?v=GwsscfcAjg8) video for instructions on setting up your development environment.
 
 ## Contributing Guidelines
 
@@ -89,7 +91,7 @@ If you want to contribute code changes, bug fixes, or new features:
 1. When creating a new branch, follow the `{alias}/{issue##}` naming
    convention. - **Note:** It is recommended to keep the branch name length below 30
    characters in order to allow the Github Action which builds and deploys the
-   development extension on Pull Request creation or update to successfully execute.
+   development extension on pull request creation or update to successfully execute.
 
 2. Once your feature addition or bug fix is ready for review, create a pull
    request against the `main` branch of the repository.
@@ -103,17 +105,17 @@ If you want to contribute code changes, bug fixes, or new features:
    changes.
 
 6. You may merge the pull request in once you have the sign-off from one
-   developer from the [Retrospectives team](retrospectives@microsoft.com), or if
+   developer from the [Retrospectives team](mailto:retrospectives@microsoft.com), or if
    you do not have permission to do that, you may request the reviewer to merge it for you.
 
 ### Continuous Integration (CI) and Pre-commit Hook
 
 Our CI pipeline can be invoked on Github, or if you want to get ahead of the potential failures, you
 can use the [`pre-commit` configuration](./.pre-commit-config.yaml). It will run
-linting on markdown files and python files, and run a spellcheck. The same rules will be caught locally
+linting on markdown files and ython files, and run a spellcheck. The same rules will be caught locally
 that will be caught in Github actions.
 
-To use `pre-commit`, it's recommended to have a [python virtual environment (venv)](https://docs.python.org/3/library/venv.html#creating-virtual-environments).
+To use `pre-commit`, it's recommended to have a [Python virtual environment (venv)](https://docs.python.org/3/library/venv.html#creating-virtual-environments).
 If the venv ends with `-env`, such as `retro-env`, then the `.gitignore` is configured to not watch
 this environment during development!
 
@@ -126,10 +128,10 @@ Either in the [dev container](#dev-containers) or locally:
     - `pre-commit run --all-files` will run against *everything*
     - `pre-commit run markdownlint` to run the markdown linting
     - `pre-commit run spellcheck-cli` to run the spellchecking
-4. To run linting for the typescript/javascript (must be done within the `RetrospectiveExtension.Frontend`
+4. To run linting for the typescript/javascript (must be done within the `src/frontend`
 directory): `npm run lint`
 
-Read more about the [python pre-commit framework](https://pre-commit.com/). To disable the pre-commit
+Read more about the [Python pre-commit framework](https://pre-commit.com/). To disable the pre-commit
 hook run `pre-commit uninstall` from the root folder.
 
 ## Development Environments
@@ -201,7 +203,7 @@ extension for Visual Studio Code.
 8. Perform the commands listed in the [Dockerfile](.devcontainer/Dockerfile) to
    globally install required packages such as dotnet core.
 
-9. Run the [setup_ci.sh](RetrospectiveExtension.Frontend/scripts/setup_ci.sh)
+9. Run the [setup_ci.sh](src/frontend/scripts/setup_ci.sh)
    script to configure the WSL for the pre-commit hook.
 
 10. Follow the steps outlined in the [Build](#build) section to build, test,
@@ -236,12 +238,12 @@ version of the extension under an Azure DevOps publisher account.
 ---
 
 1. Clone this repository, and open in your preferred [development environment](#development-environments).
-2. Using Powershell, navigate to the `/RetrospectiveExtension.Frontend` folder,
+2. Using Powershell, navigate to the `/src/frontend` folder,
     run `npm install`. This will download all the dependent packages listed in
     `package.json`.
 3. When developing or publishing the extension locally, you need to create a .env file at the top-level
 directory of the front end project (where `package.json` lives). You can copy
-`RetrospectiveExtension.Frontend/.env.template` to `RetrospectiveExtension.Frontend/.env` to get started.
+`src/frontend/.env.template` to `src/frontend/.env` to get started.
 The contents of the `.env` file are
 
     ```bash
@@ -269,12 +271,12 @@ The contents of the `.env` file are
     the only way to test the extension.
 6. Copy the file `vss-extension-dev.json.template` into a new
     `vss-extension-dev.json` file with the new publisher that you setup. Also
-    update the name and id fields.
+    update the name and ID fields.
 
     ```json
     {
       "manifestVersion": 1,
-      "id": <any new id>,
+      "id": <any new ID>,
       "publisher": <the new publisher you created>,
       "version": <your staring version>,
       "name": <your extension's name. Can be any name you can identify by. Eg. Retrospectives-test>,
@@ -286,7 +288,7 @@ The contents of the `.env` file are
     generated using information from the manifest file and your built code. Refer
     to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts)
     to know more about extension manifests.
-8. [Publish your to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish).
+8. [Publish your package to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish).
     Once published, share the extension with the newly created test org. See
     [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share)
     for documentation on sharing.
@@ -308,7 +310,7 @@ The contents of the `.env` file are
   your project.
 
 - For the real time live syncing to work, our service needs to know your
-  publisher id and your extension's unique key. To enable real time updates for
+  publisher ID and your extension's unique key. To enable real time updates for
   your test extension, please
   [reach out to us](https://github.com/microsoft/vsts-extension-retrospectives/issues)
   with your publisher ID and the
@@ -335,7 +337,7 @@ VS Code extension
 
 ---
 
-1. In the `RetrospectiveExtension.Frontend` folder, create the
+1. In the `src/frontend` folder, create the
     `vss-extension-dev.json` file using the template file
     `vss-extension-dev.json.template` for reference.
 2. Update the `webpack.config.js` to enable source maps. Set the devtool
@@ -373,7 +375,7 @@ VS Code extension
     configuration for VS Code that launches Firefox with the correct path mappings.
     Inside of this file, you will add a path mapping with `url` set to
     `webpack:///` and have the path set to
-    `${workspaceFolder}/RetrospectiveExtension.Frontend/`. Also set the reAttach
+    `${workspaceFolder}/src/frontend/`. Also set the reAttach
     property on the configuration to true to avoid restarting Firefox every time
     you debug.
 
@@ -390,15 +392,15 @@ VS Code extension
           "pathMappings": [
             {
               "url": "webpack://retrospective-vsts-extension/components",
-              "path": "${workspaceFolder}/RetrospectiveExtension.Frontend/components"
+              "path": "${workspaceFolder}/src/frontend/components"
             },
             {
               "url": "webpack://retrospective-vsts-extension/dal",
-              "path": "${workspaceFolder}/RetrospectiveExtension.Frontend/dal"
+              "path": "${workspaceFolder}/src/frontend/dal"
             },
             {
               "url": "webpack:///",
-              "path": "${workspaceFolder}/RetrospectiveExtension.Frontend/"
+              "path": "${workspaceFolder}/src/frontend/"
             }
           ]
         }
@@ -406,7 +408,7 @@ VS Code extension
     }
     ```
 
-5. Navigate to the `/RetrospectiveExtension.Frontend` folder, run `npm install`
+5. Navigate to the `/src/frontend` folder, run `npm install`
     to download all the dependent packages listed in `package.json`.
 6. Run `npm run build:d` to build the project.
 7. Run `npm run start:dev` to start the webpack-dev-server
@@ -432,7 +434,7 @@ VS Code extension
 The Retrospectives extension uses the
 [Azure SignalR service](https://azure.microsoft.com/en-us/services/signalr-service/)
 to add real time support. The backend codebase can be found in the
-[Retrospectives Extension Backend Repository](https://github.com/microsoft/vsts-extension-retrospectives/tree/main/RetrospectiveExtension.Backend).
+[Retrospectives Extension Backend Repository](src/backend).
 
 To enable real time updates from your test extension you will need to deploy
 the backend to Azure specifying your publisher ID and the unique key of your
@@ -486,7 +488,7 @@ extension.
    [Azure Portal](https://portal.azure.com) and validate that the `rg-<RESOURCE_NAME_SUFFIX>` resource
    group exists and contains the App Service, App Service Plan and SignalR resources.
 
-6. Update the `RetrospectiveExtension.FrontEnd/config/environment.tsx` to
+6. Update the `src/frontend/config/environment.tsx` to
    reflect changes to:
 
    - `CollaborationStateServiceUrl` value to the App Service URL -
@@ -519,7 +521,7 @@ React Component tests are written using the following packages:
 
 To automatically generate the test coverage report, add the `--coverage` flag
 to the `test` script defined in
-[package.json](RetrospectiveExtension.Frontend/package.json). After the test
+[package.json](src/frontend/package.json). After the test
 run is completed, coverage statistics will then be reported in the newly
 created `coverage` directory.
 
@@ -529,9 +531,9 @@ created `coverage` directory.
 
 - `npm install` must be executed before running any tests.
 - `npm run test` is the default test execution method defined in the
-  [package.json](RetrospectiveExtension.Frontend/package.json) file. This will
+  [package.json](src/frontend/package.json) file. This will
   automatically run all of the tests in files suffixed with `.test.tsx` inside of
-  the [tests folder](RetrospectiveExtension.Frontend/components/__tests__).
+  the [tests folder](src/frontend/components/__tests__).
 - `npm run test:watch` will run tests in watch mode, re-running tests every
   time a component change is saved.
 - `jest --env=jsdom --silent -ci --testResultsProcessor=jest-junit {FULL_FILE_PATH}`
@@ -544,9 +546,9 @@ created `coverage` directory.
 
 - In this project, mocks have been implemented for simulating API calls and
   external module functionality. Reusable mocks should be added to the
-  [mock folder](RetrospectiveExtension.Frontend/components/__mocks__).
+  [mock folder](src/frontend/components/__mocks__).
 - Mocks which are shared by the majority of tests should be initialized in the
-  [test setup file](RetrospectiveExtension.Frontend/components/__tests__/setupTests.tsx).
+  [test setup file](src/frontend/components/__tests__/setupTests.tsx).
 
 ---
 
@@ -558,13 +560,13 @@ Snapshot tests will fail when changes are made to components that are not
 accounted for through updates to these stored snapshots.
 
 To update snapshots, delete the snapshot for the component you are testing,
-(located in the [snapshots folder](RetrospectiveExtension.Frontend/components/__tests__/__snapshots__))
+(located in the [snapshots folder](src/frontend/components/__tests__/__snapshots__))
 and run the test command. On test run completion, new snapshots should be
 created. Please check the newly created snapshot file, to ensure that the
 expected changes are present, and include the snapshot in your pull request.
 
 To enable real time updates from your test extension you will need to deploy
-the backend to Azure specifying your publisher id and the unique key of your
+the backend to Azure specifying your publisher ID and the unique key of your
 extension. **Note:** If you are part of a team working on the retro tool you can
 deploy a single backend to support multiple developer test extensions.
 
@@ -591,7 +593,7 @@ deploy a single backend to support multiple developer test extensions.
 1. Once the script completes, it will output the URL of the backend service. You can navigate to the
   [Azure Portal](https://portal.azure.com) and validate that the `rg-<RESOURCE_NAME_SUFFIX>` resource
   group exists and contains the App Service, App Service Plan and SignalR resources.
-1. Update the `RetrospectiveExtension.FrontEnd/config/environment.tsx` to reflect changes to:
+1. Update the `src/frontend/config/environment.tsx` to reflect changes to:
    - `CollaborationStateServiceUrl` value to the App Service URL -
      `https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
    - `AppInsightsInstrumentKey` value to Application Insights' Instrumentation Key for the resource `ai-<RESOURCE_NAME_SUFFIX>`.
@@ -630,7 +632,7 @@ for handling all its storage.
          /// <summary>
          /// Adds the client to the group for this reflect board.
          /// </summary>
-         /// <param name="reflectBoardId">The id of the reflect board.</param>
+         /// <param name="reflectBoardId">The ID of the reflect board.</param>
          public Task JoinReflectBoardGroup( string reflectBoardId )
          {
              _insights.TrackEvent("Adding client to board");
@@ -648,9 +650,9 @@ for handling all its storage.
      /// <summary>
      /// Broadcast receiveNewItem to all other clients viewing the same reflect board.
      /// </summary>
-     /// <param name="reflectBoardId">The id of the reflect board.</param>
-     /// <param name="columnId">The id of column this item is associated with.</param>
-     /// <param name="feedbackItemId">The id of the new feedback item.</param>
+     /// <param name="reflectBoardId">The ID of the reflect board.</param>
+     /// <param name="columnId">The ID of column this item is associated with.</param>
+     /// <param name="feedbackItemId">The ID of the new feedback item.</param>
      public Task BroadcastNewItem( string reflectBoardId, string columnId, string feedbackItemId )
      {
          _insights.TrackEvent("Broadcasting new item");
@@ -662,7 +664,7 @@ for handling all its storage.
 ### Backend Unit Testing
 
 Unit Tests for the Backend are located in the
-[Backend Tests folder](RetrospectiveExtension.Backend.Tests/). To execute
+[Backend Tests folder](src/backend.tests). To execute
 these tests, perform the following steps:
 
 1. Navigate to the `RetrospectiveExtension.Backend` folder.
