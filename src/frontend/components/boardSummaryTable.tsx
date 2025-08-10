@@ -119,7 +119,7 @@ export async function handleArchiveToggle(
 }
 
 const currentUserId = encrypt(getUserIdentity().id);
-const [permissionOptions] = useState<FeedbackBoardPermissionOption[]>([]); // not functional
+const isBoardOwner = board.ownerId === currentUserId;
 
 const ARCHIVE_DELETE_DELAY = 2 * 60 * 1000; // 2 minutes
 
@@ -128,18 +128,6 @@ export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
   const now = new Date().getTime();
   const archivedAt = new Date(board.archivedDate).getTime();
   return now >= archivedAt + ARCHIVE_DELETE_DELAY;
-}
-
-function canUserDeleteBoard(
-  board: IBoardSummaryTableItem,
-  currentUserId: string,
-  permissionOptions: FeedbackBoardPermissionOption[]
-): boolean {
-  const isBoardOwner = board.ownerId === currentUserId;
-  const isTeamAdmin = permissionOptions.some(
-    (option) => option.id === currentUserId && option.isTeamAdmin
-  );
-  return isBoardOwner || isTeamAdmin;
 }
 
 export function TrashIcon({
@@ -157,7 +145,7 @@ export function TrashIcon({
 
   const allowedToDelete = canUserDeleteBoard(board, currentUserId, permissionOptions);
 
-  if (!allowedToDelete) {
+  if (!isBoardOwner) {
     // User can’t delete — no icon at all
     return <div className="centered-cell" />;
   }
