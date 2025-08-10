@@ -34,6 +34,7 @@ import {
 export interface IBoardSummaryTableProps {
   teamId: string;
   currentUserId: string;
+  currentUserIsTeamAdmin: boolean;
   supportedWorkItemTypes: WorkItemType[];
   onArchiveToggle: () => void; // Notify the parent about archive toggles
 }
@@ -130,13 +131,15 @@ export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
 export function TrashIcon({
   board,
   currentUserId,
+  currentUserIsTeamAdmin,
   onClick,
 }: {
   board: IBoardSummaryTableItem;
   currentUserId: string;
+  currentUserIsTeamAdmin: boolean;
   onClick: (event: React.MouseEvent) => void;
 }) {
-  if (!board.isArchived || board.ownerId !== currentUserId) {
+  if (!board.isArchived || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
     return <div className="centered-cell" />; // no icon if not archived or not board owner
   }
   return isTrashEnabled(board) ? (
@@ -166,7 +169,8 @@ function getTable(
   onArchiveToggle: () => void,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
   setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>,
-  currentUserId: string
+  currentUserId: string,
+  currentUserIsTeamAdmin: boolean
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
@@ -264,6 +268,7 @@ function getTable(
         <TrashIcon
           board={cellContext.row.original}
           currentUserId={currentUserId}
+          currentUserIsTeamAdmin={currentUserIsTeamAdmin}
           onClick={(event) => {
             event.stopPropagation();
             setOpenDialogBoardId(cellContext.row.original.id);
@@ -360,7 +365,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       props.onArchiveToggle,
       setTableData,
       setOpenDialogBoardId,
-      props.currentUserId
+      props.currentUserId,
+      props.currentUserIsTeamAdmin
     );
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };

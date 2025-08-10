@@ -665,6 +665,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
+  private isCurrentUserTeamAdmin(): boolean {
+    return this.state.allMembers?.some(
+      m => m.identity.id === this.state.currentUserId && m.isTeamAdmin
+    ) ?? false;
+  }
+
   /**
    * @description Load the last team and board that this user visited, if such records exist.
    * @returns An object to update the state with recently visited or default team and board data.
@@ -1052,52 +1058,52 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     ) => void,
     onCancel: () => void) => {
 
-    const permissionOptions: FeedbackBoardPermissionOption[] = []
+  const permissionOptions: FeedbackBoardPermissionOption[] = []
 
-    for (const team of this.state.projectTeams) {
-      permissionOptions.push({
-        id: team.id,
-        name: team.name,
-        uniqueName: team.projectName,
-        type: 'team',
-      })
-    }
+  for (const team of this.state.projectTeams) {
+    permissionOptions.push({
+      id: team.id,
+      name: team.name,
+      uniqueName: team.projectName,
+      type: 'team',
+    })
+  }
 
-    for (const member of this.state.allMembers) {
-      permissionOptions.push({
-        id: member.identity.id,
-        name: member.identity.displayName,
-        uniqueName: member.identity.uniqueName,
-        thumbnailUrl: member.identity.imageUrl,
-        type: 'member',
-        isTeamAdmin: member.isTeamAdmin,
-      })
-    }
+  for (const member of this.state.allMembers) {
+    permissionOptions.push({
+      id: member.identity.id,
+      name: member.identity.displayName,
+      uniqueName: member.identity.uniqueName,
+      thumbnailUrl: member.identity.imageUrl,
+      type: 'member',
+      isTeamAdmin: member.isTeamAdmin,
+    })
+  }
 
-    return (
-      <Dialog
-        hidden={hidden}
-        onDismiss={onDismiss}
-        dialogContentProps={{
-          type: DialogType.normal,
-          title: dialogTitle,
-        }}
-        modalProps={{
-          containerClassName: 'retrospectives-board-metadata-dialog',
-          className: 'retrospectives-dialog-modal',
-        }}>
-        <FeedbackBoardMetadataForm
-          isNewBoardCreation={isNewBoardCreation}
-          isDuplicatingBoard={isDuplicatingBoard}
-          currentBoard={this.state.currentBoard}
-          teamId={this.state.currentTeam.id}
-          maxVotesPerUser={this.state.maxVotesPerUser}
-          placeholderText={placeholderText}
-          availablePermissionOptions={permissionOptions}
-          currentUserId={this.state.currentUserId}
-          onFormSubmit={onSubmit}
-          onFormCancel={onCancel} />
-      </Dialog>);
+  return (
+    <Dialog
+      hidden={hidden}
+      onDismiss={onDismiss}
+      dialogContentProps={{
+        type: DialogType.normal,
+        title: dialogTitle,
+      }}
+      modalProps={{
+        containerClassName: 'retrospectives-board-metadata-dialog',
+        className: 'retrospectives-dialog-modal',
+      }}>
+      <FeedbackBoardMetadataForm
+        isNewBoardCreation={isNewBoardCreation}
+        isDuplicatingBoard={isDuplicatingBoard}
+        currentBoard={this.state.currentBoard}
+        teamId={this.state.currentTeam.id}
+        maxVotesPerUser={this.state.maxVotesPerUser}
+        placeholderText={placeholderText}
+        availablePermissionOptions={permissionOptions}
+        currentUserId={this.state.currentUserId}
+        onFormSubmit={onSubmit}
+        onFormCancel={onCancel} />
+    </Dialog>);
   }
 
   private readonly updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
@@ -1653,6 +1659,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   <BoardSummaryTable
                     teamId={this.state.currentTeam.id}
                     currentUserId={this.state.currentUserId}
+                    currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()}
                     supportedWorkItemTypes={this.state.allWorkItemTypes}
                     onArchiveToggle={this.handleArchiveToggle}
                   />
