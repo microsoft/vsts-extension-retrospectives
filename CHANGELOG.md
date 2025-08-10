@@ -6,7 +6,7 @@ You can find the changelog of the Retrospective Extension below.
 
 * Added "Ways to Contribute" to the CONTRIBUTING markdown file. From [GitHub PR #1304](https://github.com/microsoft/vsts-extension-retrospectives/pull/1304)
 * Removes groups from Permission table, since setting permission by groups not supported. From [GitHub PR #1294](https://github.com/microsoft/vsts-extension-retrospectives/pull/1294)
-* Improved test code coverage for feedbackMetadataForm. From [GitHub PR #1289](https://github.com/microsoft/vsts-extension-retrospectives/pull/1289)
+* Improved test code coverage. From [GitHub PR #1289](https://github.com/microsoft/vsts-extension-retrospectives/pull/1289)
 
 ## v1.92.46
 
