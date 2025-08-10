@@ -33,6 +33,7 @@ import {
 
 export interface IBoardSummaryTableProps {
   teamId: string;
+  currentUserId: string;
   supportedWorkItemTypes: WorkItemType[];
   onArchiveToggle: () => void; // Notify the parent about archive toggles
 }
@@ -128,13 +129,16 @@ export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
 
 export function TrashIcon({
   board,
+  currentUserId,
   onClick,
 }: {
   board: IBoardSummaryTableItem;
+  currentUserId: string;
   onClick: (event: React.MouseEvent) => void;
 }) {
-  if (!board.isArchived) return <div className="centered-cell" />;
-
+  if (!board.isArchived || board.ownerId !== currentUserId) {
+    return <div className="centered-cell" />; // no icon if not archived or not board owner
+  }
   return isTrashEnabled(board) ? (
     <div
       className="centered-cell trash-icon"
@@ -161,7 +165,8 @@ function getTable(
   onSortingChange: OnChangeFn<SortingState>,
   onArchiveToggle: () => void,
   setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>> // New parameter
+  setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>,
+  currentUserId: string
 ): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
@@ -258,6 +263,7 @@ function getTable(
       cell: (cellContext) => (
         <TrashIcon
           board={cellContext.row.original}
+          currentUserId={currentUserId}
           onClick={(event) => {
             event.stopPropagation();
             setOpenDialogBoardId(cellContext.row.original.id);
@@ -353,7 +359,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       setSorting,
       props.onArchiveToggle,
       setTableData,
-      setOpenDialogBoardId
+      setOpenDialogBoardId,
+      props.currentUserId
     );
 
   const updatedState: IBoardSummaryTableState = { ...boardSummaryState };

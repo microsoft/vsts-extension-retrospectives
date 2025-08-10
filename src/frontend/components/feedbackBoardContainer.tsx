@@ -1652,6 +1652,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 <div className="pivot-content-wrapper">
                   <BoardSummaryTable
                     teamId={this.state.currentTeam.id}
+                    currentUserId={this.state.currentUserId}
                     supportedWorkItemTypes={this.state.allWorkItemTypes}
                     onArchiveToggle={this.handleArchiveToggle}
                   />
