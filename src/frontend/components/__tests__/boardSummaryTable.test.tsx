@@ -72,7 +72,7 @@ const baseProps: IBoardSummaryTableProps = {
   teamId: 'team-1',
   supportedWorkItemTypes: [],
   onArchiveToggle: jest.fn(),
-  currentUserId: 'user-123',
+  currentUserId: 'user-1',
 };
 
 describe('BoardSummaryTable', () => {
@@ -148,7 +148,7 @@ describe('TrashIcon', () => {
       ownerId: 'user-1',
     };
 
-    const wrapper = shallow(<TrashIcon board={board} currentUserId="user-123" onClick={jest.fn()} />);
+    const wrapper = shallow(<TrashIcon board={board} currentUserId="user-1" onClick={jest.fn()} />);
 
     expect(wrapper.find('.trash-icon').exists()).toBe(true);
   });
@@ -167,7 +167,7 @@ describe('TrashIcon', () => {
       ownerId: 'user-1',
     };
 
-    const wrapper = shallow(<TrashIcon board={board} currentUserId="user-123" onClick={jest.fn()} />);
+    const wrapper = shallow(<TrashIcon board={board} currentUserId="user-1" onClick={jest.fn()} />);
 
     expect(wrapper.find('.trash-icon-disabled').exists()).toBe(true);
   });
@@ -186,7 +186,7 @@ describe('TrashIcon', () => {
       ownerId: 'user-1',
     };
 
-    const wrapper = shallow(<TrashIcon board={board} currentUserId="user-123" onClick={jest.fn()} />);
+    const wrapper = shallow(<TrashIcon board={board} currentUserId="user-1" onClick={jest.fn()} />);
 
     expect(wrapper.find('.trash-icon').exists()).toBe(false);
     expect(wrapper.find('.trash-icon-disabled').exists()).toBe(false);
