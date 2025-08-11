@@ -260,8 +260,8 @@ function getTable(
       header: () => (
         <div className="centered-cell trash-icon-header">
           <i className="fas fa-trash-alt"
-            title="Delete only enabled for archived boards"
-            aria-label="Delete only enabled for archived boards"></i>
+            title="Delete enabled for archived boards if user is board owner or team admin."
+            aria-label="Archived boards can be deleted by board owner or team admin."></i>
         </div>
       ),
       cell: (cellContext) => (

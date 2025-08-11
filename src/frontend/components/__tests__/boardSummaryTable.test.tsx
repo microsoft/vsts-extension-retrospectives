@@ -174,10 +174,10 @@ describe('Revised TrashIcon tests', () => {
   });
 
   it('should not render trash icon when board is not archived', () => {
-    const unarchived: IBoardSummaryTableItem = { 
-      ...baseBoard, 
-      isArchived: false, 
-      archivedDate: undefined 
+    const unarchived: IBoardSummaryTableItem = {
+      ...baseBoard,
+      isArchived: false,
+      archivedDate: undefined
     };
 
     const wrapper = shallow(
