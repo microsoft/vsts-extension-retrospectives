@@ -134,7 +134,117 @@ describe('isTrashEnabled', () => {
   });
 });
 
-describe('TrashIcon', () => {
+describe('Revised TrashIcon tests', () => {
+  const baseBoard: IBoardSummaryTableItem = {
+    boardName: 'Sample Board',
+    createdDate: new Date(),
+    isArchived: true,
+    archivedDate: new Date(Date.now() - 3 * 60 * 1000), // Archived 3 mins ago
+    pendingWorkItemsCount: 0,
+    totalWorkItemsCount: 0,
+    feedbackItemsCount: 0,
+    id: 'board-1',
+    teamId: 'team-1',
+    ownerId: 'user-1',
+  };
+
+  it('should render enabled trash icon when board is deletable', () => {
+    const wrapper = shallow(
+      <TrashIcon
+        board={baseBoard}
+        currentUserId="user-1"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon').exists()).toBe(true);
+  });
+
+  it('should render disabled trash icon when board is not deletable yet', () => {
+    const recentlyArchived = { ...baseBoard, archivedDate: new Date(Date.now() - 1 * 60 * 1000) };
+    const wrapper = shallow(
+      <TrashIcon
+        board={recentlyArchived}
+        currentUserId="user-1"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon-disabled').exists()).toBe(true);
+  });
+
+  it('should not render trash icon when board is not archived', () => {
+    const unarchived: IBoardSummaryTableItem = { 
+      ...baseBoard, 
+      isArchived: false, 
+      archivedDate: undefined 
+    };
+
+    const wrapper = shallow(
+      <TrashIcon
+        board={unarchived}
+        currentUserId="user-1"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
+
+    expect(wrapper.find('.trash-icon').exists()).toBe(false);
+    expect(wrapper.find('.trash-icon-disabled').exists()).toBe(false);
+  });
+
+  // --- New permission tests ---
+
+  it('should NOT show trash icon if not owner AND not team admin', () => {
+    const wrapper = shallow(
+      <TrashIcon
+        board={{ ...baseBoard, ownerId: 'someone-else' }}
+        currentUserId="user-2"
+        currentUserIsTeamAdmin={false}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon').exists()).toBe(false);
+  });
+
+  it('should show trash icon if owner BUT not team admin', () => {
+    const wrapper = shallow(
+      <TrashIcon
+        board={{ ...baseBoard, ownerId: 'user-1' }}
+        currentUserId="user-1"
+        currentUserIsTeamAdmin={false}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon').exists()).toBe(true);
+  });
+
+  it('should show trash icon if not owner BUT is team admin', () => {
+    const wrapper = shallow(
+      <TrashIcon
+        board={{ ...baseBoard, ownerId: 'someone-else' }}
+        currentUserId="user-2"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon').exists()).toBe(true);
+  });
+
+  it('should show trash icon if owner AND is team admin', () => {
+    const wrapper = shallow(
+      <TrashIcon
+        board={{ ...baseBoard, ownerId: 'user-1' }}
+        currentUserId="user-1"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon').exists()).toBe(true);
+  });
+});
+
+describe('original TrashIcon tests', () => {
   it('should render enabled trash icon when board is deletable', () => {
     const board: IBoardSummaryTableItem = {
       boardName: 'Sample Board',
