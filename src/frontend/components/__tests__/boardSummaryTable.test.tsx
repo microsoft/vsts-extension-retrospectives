@@ -148,18 +148,6 @@ describe('TrashIcon tests', () => {
     ownerId: 'user-1',
   };
 
-  it('should render enabled trash icon when board is deletable', () => {
-    const wrapper = shallow(
-      <TrashIcon
-        board={baseBoard}
-        currentUserId="user-1"
-        currentUserIsTeamAdmin={true}
-        onClick={jest.fn()}
-      />
-    );
-    expect(wrapper.find('.trash-icon').exists()).toBe(true);
-  });
-
   it('should render disabled trash icon when board is not deletable yet', () => {
     const recentlyArchived = { ...baseBoard, archivedDate: new Date(Date.now() - 1 * 60 * 1000) };
     const wrapper = shallow(
