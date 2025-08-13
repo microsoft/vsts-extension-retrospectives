@@ -30,8 +30,8 @@ class WorkService {
 
     try {
       teamIterations = await this._httpWorkClient.getTeamIterations(teamContext, timeframe);
-    } catch (e: any) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
       appInsights.trackException({ exception: e, properties: { teamId } });
       if (e.serverError?.typeKey === "CurrentIterationDoesNotExistException") {
         appInsights.trackTrace({ message: TelemetryExceptions.CurrentTeamIterationNotFound, properties: { teamId, e } });
