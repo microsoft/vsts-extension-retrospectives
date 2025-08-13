@@ -72,4 +72,9 @@ export default [{
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-empty-object-type": "off"
     },
+}, {
+    files: ["**/__tests__/**/*.ts", "**/__tests__/**/*.tsx", "**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+        "@typescript-eslint/no-explicit-any": "off"
+    }
 }];
