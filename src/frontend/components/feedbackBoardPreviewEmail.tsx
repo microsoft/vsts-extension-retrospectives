@@ -1,13 +1,13 @@
-import React from 'react';
-import copy from 'copy-to-clipboard';
-import { ActionButton } from 'office-ui-fabric-react/lib/Button';
-import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
-import { ITextField, TextField } from 'office-ui-fabric-react/lib/TextField';
-import { IFeedbackBoardDocument } from '../interfaces/feedback';
-import { getBoardUrl } from '../utilities/boardUrlHelper';
-import { shareBoardHelper } from '../utilities/shareBoardHelper';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+import React from "react";
+import copy from "copy-to-clipboard";
+import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
+import { ITextField, TextField } from "office-ui-fabric-react/lib/TextField";
+import { IFeedbackBoardDocument } from "../interfaces/feedback";
+import { getBoardUrl } from "../utilities/boardUrlHelper";
+import { shareBoardHelper } from "../utilities/shareBoardHelper";
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { reactPlugin } from "../utilities/telemetryClient";
 
 interface IFeedbackBoardPreviewEmailState {
   emailContent: string;
@@ -25,7 +25,7 @@ class FeedbackBoardPreviewEmail extends React.Component<IFeedbackBoardPreviewEma
   constructor(props: IFeedbackBoardPreviewEmailProps) {
     super(props);
     this.state = {
-      emailContent: '',
+      emailContent: "",
     };
   }
 
@@ -39,35 +39,36 @@ class FeedbackBoardPreviewEmail extends React.Component<IFeedbackBoardPreviewEma
     if (this.emailTextField) {
       this.emailTextField.select();
     }
-  }
+  };
 
   private onCopyButtonClick = () => {
     copy(this.state.emailContent);
     this.props.onCopy();
-  }
+  };
 
   public render(): JSX.Element {
     if (!this.state.emailContent) {
-      return (
-        <Spinner className="preview-email-spinner"
-          size={SpinnerSize.large}
-          label="Loading..."
-          ariaLive="assertive" />
-      );
+      return <Spinner className="preview-email-spinner" size={SpinnerSize.large} label="Loading..." ariaLive="assertive" />;
     }
 
     return (
       <>
-        <ActionButton className="copy-email-button"
-          text="Copy to clipboard"
-          onClick={this.onCopyButtonClick}
-          iconProps={{ iconName: "Copy" }} />
-        <TextField multiline rows={20} className="preview-email-field"
-            componentRef={(element: ITextField) => {this.emailTextField = element;}}
-            readOnly={true}
-            ariaLabel="Email summary for retrospective"
-            onClick={(e: React.MouseEvent<HTMLTextAreaElement | HTMLInputElement, MouseEvent>) => {e.stopPropagation(); this.handleClick();}}
-            value={this.state.emailContent} />
+        <ActionButton className="copy-email-button" text="Copy to clipboard" onClick={this.onCopyButtonClick} iconProps={{ iconName: "Copy" }} />
+        <TextField
+          multiline
+          rows={20}
+          className="preview-email-field"
+          componentRef={(element: ITextField) => {
+            this.emailTextField = element;
+          }}
+          readOnly={true}
+          ariaLabel="Email summary for retrospective"
+          onClick={(e: React.MouseEvent<HTMLTextAreaElement | HTMLInputElement, MouseEvent>) => {
+            e.stopPropagation();
+            this.handleClick();
+          }}
+          value={this.state.emailContent}
+        />
       </>
     );
   }

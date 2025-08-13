@@ -33,7 +33,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     if (this.props.text !== prevProps.text) {
       if (!this.state.isEditing) {
         this.setState({
-          newText: this.props.text
+          newText: this.props.text,
         });
       }
     }
@@ -45,38 +45,38 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     if (!newValue.trim()) {
       this.setState({
         newText: "",
-        hasErrors: true
+        hasErrors: true,
       });
       return;
     }
 
     this.setState({
       newText: newValue.replace(/\r?|\r/g, ""),
-      hasErrors: !newValue.trim()
+      hasErrors: !newValue.trim(),
     });
 
     if (this.props.isChangeEventRequired) {
       this.props.onSave(newValue.replace(/\r?|\r/g, ""));
     }
-  }
+  };
 
   private readonly handleEdit = (event: React.MouseEvent<HTMLParagraphElement>) => {
     event.stopPropagation();
     this.setState({
       isEditing: true,
-      hasErrors: false
+      hasErrors: false,
     });
-  }
+  };
 
   private readonly handleEditKeyDown = (event: React.KeyboardEvent<HTMLParagraphElement>) => {
     if (event.key === "Enter") {
       event.stopPropagation();
       this.setState({
         isEditing: true,
-        hasErrors: false
+        hasErrors: false,
       });
     }
-  }
+  };
 
   componentDidMount() {
     document.addEventListener("mousedown", this.handleClickOutside);
@@ -89,34 +89,40 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
   private readonly handleClickOutside = (event: Event) => {
     if (this.editableTextRef && !this.editableTextRef.contains(event.target as Node)) {
       if (!this.state.newText.trim()) {
-        this.setState({
-          newText: "",
-          hasErrors: true
-        }, () => {
-          this.props.onSave("")
-        });
+        this.setState(
+          {
+            newText: "",
+            hasErrors: true,
+          },
+          () => {
+            this.props.onSave("");
+          },
+        );
         return;
       }
 
       this.props.onSave(this.state.newText);
       this.setState({
         isEditing: false,
-        hasErrors: !this.state.newText.trim()
+        hasErrors: !this.state.newText.trim(),
       });
     }
-  }
+  };
 
   private readonly handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     event.stopPropagation();
 
     // ESC
     if (event.key === "Escape") {
-      this.setState({
-        isEditing: false,
-        newText: this.props.text,
-      }, () => {
-        this.props.onSave(this.props.text);
-      });
+      this.setState(
+        {
+          isEditing: false,
+          newText: this.props.text,
+        },
+        () => {
+          this.props.onSave(this.props.text);
+        },
+      );
       return;
     }
 
@@ -130,7 +136,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
       this.setState({
         newText: `${this.state.newText} \n`,
         isEditing: true,
-        hasErrors: false
+        hasErrors: false,
       });
 
       return;
@@ -145,21 +151,23 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
       this.props.onSave(this.state.newText);
       this.setState({
         isEditing: false,
-        hasErrors: false
+        hasErrors: false,
       });
     }
-  }
+  };
 
   public render(): JSX.Element {
     if (this.state.isEditing) {
       return (
         <div
           className="editable-text-container"
-          ref={(element) => {
+          ref={element => {
             this.editableTextRef = element;
           }}
-          aria-live="assertive">
-          <TextField autoFocus
+          aria-live="assertive"
+        >
+          <TextField
+            autoFocus
             ariaLabel="Please enter feedback title"
             aria-required={true}
             inputClassName={`editable-text-input${this.state.hasErrors ? " error-border" : ""}`}
@@ -181,16 +189,8 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     }
 
     return (
-      <div
-        className="editable-text-container">
-        <p className="editable-text"
-          tabIndex={0}
-          onKeyDown={this.props.isDisabled ? () => { } : this.handleEditKeyDown}
-          onClick={this.props.isDisabled ? () => { } : this.handleEdit}
-          role="textbox"
-          title="Click to edit"
-          aria-required={true}
-          aria-label={`Feedback title is ${this.props.isDisabled ? "obscured during collection." : this.props.text + ". Click to edit."}`}>
+      <div className="editable-text-container">
+        <p className="editable-text" tabIndex={0} onKeyDown={this.props.isDisabled ? () => {} : this.handleEditKeyDown} onClick={this.props.isDisabled ? () => {} : this.handleEdit} role="textbox" title="Click to edit" aria-required={true} aria-label={`Feedback title is ${this.props.isDisabled ? "obscured during collection." : this.props.text + ". Click to edit."}`}>
           {this.props.text}
         </p>
       </div>

@@ -4,12 +4,12 @@ const CommonServiceIds = {
   HostNavigationService: "ms.vss-features.host-navigation-service",
   HostPageLayoutService: "ms.vss-features.host-page-layout-service",
   LocationService: "ms.vss-features.location-service",
-  ProjectPageService: "ms.vss-tfs-web.tfs-page-data-service"
+  ProjectPageService: "ms.vss-tfs-web.tfs-page-data-service",
 };
 
 const mockExtensionDataManager = {
   getDocuments: () => {},
-  getDocument: () => {}
+  getDocument: () => {},
 };
 
 const mockExtensionDataService = {
@@ -17,34 +17,39 @@ const mockExtensionDataService = {
 };
 
 const mockLocationService = {
-  getResourceAreaLocation: () => {return 'https://hosturl'},
+  getResourceAreaLocation: () => {
+    return "https://hosturl";
+  },
 };
 
 const mockProjectPageService = {
   getProject: () => {
     return {
-    id: "id",
-    name: "name",
+      id: "id",
+      name: "name",
     };
   },
 };
 
-const mockUser = { id: "01234567-8910-1112-1314-151617181920", };
-const mockExtensionContext = { id: "contextId", };
-const getServiceMock = (id:string) => {
-  if (id == CommonServiceIds.LocationService)
-    return mockLocationService;
-  else if (id == CommonServiceIds.ProjectPageService)
-    return mockProjectPageService;
-  else
-    return mockExtensionDataService;
+const mockUser = { id: "01234567-8910-1112-1314-151617181920" };
+const mockExtensionContext = { id: "contextId" };
+const getServiceMock = (id: string) => {
+  if (id == CommonServiceIds.LocationService) return mockLocationService;
+  else if (id == CommonServiceIds.ProjectPageService) return mockProjectPageService;
+  else return mockExtensionDataService;
 };
 
 const mockSdk = {
   getService: getServiceMock,
-  getUser: () => { return mockUser },
-  getExtensionContext: () => { return mockExtensionContext },
-  getAccessToken: () => { return 'token' },
+  getUser: () => {
+    return mockUser;
+  },
+  getExtensionContext: () => {
+    return mockExtensionContext;
+  },
+  getAccessToken: () => {
+    return "token";
+  },
 };
 
 export const MockSDK = mockSdk;

@@ -3,7 +3,6 @@
 $content-padding: 10px;
 
 .board-metadata-form-permissions {
-
   .board-metadata-form-board-settings {
     padding-top: 20px;
     border: variables.$border_grey 1px solid;
@@ -15,7 +14,7 @@ $content-padding: 10px;
     }
 
     .board-metadata-form-section-information {
-      margin: $content-padding
+      margin: $content-padding;
     }
 
     .search-bar {
@@ -28,12 +27,13 @@ $content-padding: 10px;
     }
 
     .board-metadata-table {
-      border-top: 1px solid rgba(0,0,0,0.1);
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
       border-collapse: collapse;
       overflow: auto;
       width: 100%;
 
-      td, th {
+      td,
+      th {
         color: var(--text-primary-color);
         padding: $content-padding;
       }
@@ -51,7 +51,6 @@ $content-padding: 10px;
       }
 
       .option-row {
-
         td {
           &.cell-content {
             background-color: var(--background-color);
@@ -101,5 +100,4 @@ $content-padding: 10px;
       }
     }
   }
-
 }

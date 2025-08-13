@@ -5,7 +5,7 @@
 }
 
 .feedback-carousel-pivot-item {
-  width: 100%
+  width: 100%;
 }
 
 .feedback-carousel-pivot > .ms-Pivot .ms-Button {
@@ -19,7 +19,6 @@
   }
 
   .retrospectives-carousel-dialog {
-
     background-color: rgba(var(--palette-neutral-2, 248, 248, 248), 1);
 
     .ms-Dialog-title {
@@ -41,7 +40,8 @@
       }
     }
 
-    div[class^='content-'], div[class*=' content'] {
+    div[class^="content-"],
+    div[class*=" content"] {
       overflow-y: hidden;
 
       .slick-dots {

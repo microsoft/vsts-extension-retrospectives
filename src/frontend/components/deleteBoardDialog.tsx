@@ -1,7 +1,7 @@
-import React from 'react';
-import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
-import { Dialog, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
-import { IBoardSummaryTableItem } from './boardSummaryTable';
+import React from "react";
+import { DefaultButton, PrimaryButton } from "office-ui-fabric-react/lib/Button";
+import { Dialog, DialogFooter, DialogType } from "office-ui-fabric-react/lib/Dialog";
+import { IBoardSummaryTableItem } from "./boardSummaryTable";
 
 interface DeleteBoardDialogProps {
   board: IBoardSummaryTableItem | undefined;
@@ -10,12 +10,7 @@ interface DeleteBoardDialogProps {
   onCancel: () => void;
 }
 
-const DeleteBoardDialog: React.FC<DeleteBoardDialogProps> = ({
-  board,
-  hidden,
-  onConfirm,
-  onCancel
-}) => {
+const DeleteBoardDialog: React.FC<DeleteBoardDialogProps> = ({ board, hidden, onConfirm, onCancel }) => {
   if (!board) return null;
 
   return (
@@ -24,12 +19,12 @@ const DeleteBoardDialog: React.FC<DeleteBoardDialogProps> = ({
       onDismiss={onCancel}
       dialogContentProps={{
         type: DialogType.close,
-        title: 'Delete Retrospective'
+        title: "Delete Retrospective",
       }}
       modalProps={{
         isBlocking: true,
-        containerClassName: 'retrospectives-delete-board-confirmation-dialog',
-        className: 'retrospectives-dialog-modal'
+        containerClassName: "retrospectives-delete-board-confirmation-dialog",
+        className: "retrospectives-dialog-modal",
       }}
     >
       <div>

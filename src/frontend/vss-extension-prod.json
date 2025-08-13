@@ -28,17 +28,9 @@
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "demands": [
-    "api-version/4.1"
-  ],
-  "tags": [
-    "agile",
-    "feedback",
-    "retrospective"
-  ],
-  "categories": [
-    "Azure Boards"
-  ],
+  "demands": ["api-version/4.1"],
+  "tags": ["agile", "feedback", "retrospective"],
+  "categories": ["Azure Boards"],
   "repository": {
     "type": "git",
     "uri": "https://github.com/microsoft/vsts-extension-retrospectives"
@@ -46,17 +38,12 @@
   "CustomerQnASupport": {
     "enableqna": "true"
   },
-  "scopes": [
-    "vso.work",
-    "vso.work_write"
-  ],
+  "scopes": ["vso.work", "vso.work_write"],
   "contributions": [
     {
       "id": "home",
       "type": "ms.vss-web.hub",
-      "targets": [
-        "ms.vss-work-web.work-hub-group"
-      ],
+      "targets": ["ms.vss-work-web.work-hub-group"],
       "properties": {
         "name": "Retrospectives",
         "uri": "src/index.html",

@@ -1,8 +1,8 @@
-import { getValue, setValue } from './dataService';
-import { IUserVisit } from '../interfaces/feedback';
+import { getValue, setValue } from "./dataService";
+import { IUserVisit } from "../interfaces/feedback";
 
 const enum UserDataKey {
-  Visits = 'visits'
+  Visits = "visits",
 }
 
 class UserDataService {
@@ -13,10 +13,9 @@ class UserDataService {
     let newVisits: IUserVisit[] = [];
 
     if (existingVisits) {
-      newVisits = existingVisits.filter((existingVisit) => {
-        return !(existingVisit.teamId === visit.teamId &&
-          existingVisit.boardId === visit.boardId);
-      })
+      newVisits = existingVisits.filter(existingVisit => {
+        return !(existingVisit.teamId === visit.teamId && existingVisit.boardId === visit.boardId);
+      });
     }
 
     newVisits.push(visit);
@@ -24,17 +23,14 @@ class UserDataService {
     // We will keep only the 10 most recently visited team-board combinations.
     newVisits.splice(0, newVisits.length - 10);
 
-    const updatedVisits: IUserVisit[] = await setValue<IUserVisit[]>(
-      UserDataKey.Visits,
-      newVisits,
-      true);
+    const updatedVisits: IUserVisit[] = await setValue<IUserVisit[]>(UserDataKey.Visits, newVisits, true);
     return updatedVisits;
-  }
+  };
 
   public getVisits = async (): Promise<IUserVisit[]> => {
     const retrievedVisits: IUserVisit[] = await getValue<IUserVisit[]>(UserDataKey.Visits, true);
     return retrievedVisits;
-  }
+  };
 
   public getMostRecentVisit = async (): Promise<IUserVisit> => {
     const retrievedVisits: IUserVisit[] = await getValue<IUserVisit[]>(UserDataKey.Visits, true);
@@ -43,16 +39,13 @@ class UserDataService {
     } else {
       return undefined;
     }
-  }
+  };
 
   public clearVisits = async (): Promise<IUserVisit[]> => {
-    const updatedVisits: IUserVisit[] = await setValue<IUserVisit[]>(
-      UserDataKey.Visits,
-      [],
-      true);
+    const updatedVisits: IUserVisit[] = await setValue<IUserVisit[]>(UserDataKey.Visits, [], true);
 
     return updatedVisits;
-  }
+  };
 }
 
 export const userDataService = new UserDataService();

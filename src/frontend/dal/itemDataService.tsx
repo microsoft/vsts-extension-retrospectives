@@ -1,11 +1,11 @@
-import { WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from '../interfaces/feedback';
-import { appInsights } from '../utilities/telemetryClient';
-import { encrypt, getUserIdentity } from '../utilities/userIdentityHelper';
-import { workItemService } from './azureDevOpsWorkItemService';
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from './dataService';
-import { generateUUID } from '../utilities/random';
-import { IColumnItem } from '../../frontend/components/feedbackBoard';
+import { WorkItem } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
+import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
+import { appInsights } from "../utilities/telemetryClient";
+import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
+import { workItemService } from "./azureDevOpsWorkItemService";
+import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from "./dataService";
+import { generateUUID } from "../utilities/random";
+import { IColumnItem } from "../../frontend/components/feedbackBoard";
 
 class ItemDataService {
   /**
@@ -13,13 +13,12 @@ class ItemDataService {
    */
   public appendItemToBoard = async (item: IFeedbackItemDocument): Promise<IFeedbackItemDocument> => {
     return await createDocument<IFeedbackItemDocument>(item.boardId, item);
-  }
+  };
 
   /**
    * Create an item with given title and column ID in the board.
    */
-  public createItemForBoard = async (
-    boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
+  public createItemForBoard = async (boardId: string, title: string, columnId: string, isAnonymous: boolean = true): Promise<IFeedbackItemDocument> => {
     const itemId: string = generateUUID();
     const userIdentity = getUserIdentity();
 
@@ -38,24 +37,22 @@ class ItemDataService {
       timerstate: false,
       timerId: null,
       groupIds: [],
-      isGroupedCarouselItem: false
+      isGroupedCarouselItem: false,
     };
 
-    const createdItem: IFeedbackItemDocument =
-      await createDocument<IFeedbackItemDocument>(boardId, feedbackItem);
+    const createdItem: IFeedbackItemDocument = await createDocument<IFeedbackItemDocument>(boardId, feedbackItem);
     createdItem.voteCollection = {};
 
     return createdItem;
-  }
+  };
 
   /**
    * Get the feedback item.
    */
   public getFeedbackItem = async (boardId: string, feedbackItemId: string): Promise<IFeedbackItemDocument> => {
-    const feedbackItem: IFeedbackItemDocument =
-      await readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
+    const feedbackItem: IFeedbackItemDocument = await readDocument<IFeedbackItemDocument>(boardId, feedbackItemId);
     return feedbackItem;
-  }
+  };
 
   /**
    * Get the board item.
@@ -63,7 +60,7 @@ class ItemDataService {
   public getBoardItem = async (teamId: string, boardId: string): Promise<IFeedbackBoardDocument> => {
     // Can we get it this way? [const boardItem:  IFeedbackBoardDocument = await boardDataService.getBoardForTeamById(VSS.getWebContext().team.id, boardId);]
     return await readDocument<IFeedbackBoardDocument>(teamId, boardId);
-  }
+  };
 
   /**
    * Get all feedback items in the board.
@@ -76,12 +73,12 @@ class ItemDataService {
       feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-      if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
+      if (e.serverError?.typeKey === "DocumentCollectionDoesNotExistException") {
         console.warn(`No feedback items found for board ${boardId}—expected for new or unused boards.`);
 
         appInsights.trackTrace({
           message: `Feedback items not found for board ${boardId}.`,
-          properties: { boardId, exception: e }
+          properties: { boardId, exception: e },
         });
 
         return [];
@@ -100,13 +97,12 @@ class ItemDataService {
     const feedbackitemsForBoard: IFeedbackItemDocument[] = await this.getFeedbackItemsForBoard(boardId);
     const feedbackItems: IFeedbackItemDocument[] = feedbackitemsForBoard.filter(item => feedbackItemIds.find(id => id === item.id));
     return feedbackItems;
-  }
+  };
 
   /**
    * Delete the feedback item and propagate the changes to the parent and children feedback items (if any).
    */
-  public deleteFeedbackItem = async (boardId: string, feedbackItemId: string): Promise<{ updatedParentFeedbackItem: IFeedbackItemDocument, updatedChildFeedbackItems: IFeedbackItemDocument[] }> => {
-
+  public deleteFeedbackItem = async (boardId: string, feedbackItemId: string): Promise<{ updatedParentFeedbackItem: IFeedbackItemDocument; updatedChildFeedbackItems: IFeedbackItemDocument[] }> => {
     let updatedParentFeedbackItem: IFeedbackItemDocument = null;
     let updatedChildFeedbackItems: IFeedbackItemDocument[] = [];
 
@@ -116,7 +112,7 @@ class ItemDataService {
       return undefined;
     }
 
-    if(feedbackItem && feedbackItem.upvotes > 0) {
+    if (feedbackItem && feedbackItem.upvotes > 0) {
       console.log(`Cannot delete a feedback item which has upvotes. Board: ${boardId} Item: ${feedbackItemId}`);
       return undefined;
     }
@@ -127,21 +123,20 @@ class ItemDataService {
       parentFeedbackItem.childFeedbackItemIds = parentFeedbackItem.childFeedbackItemIds.filter(id => id !== feedbackItemId);
 
       updatedParentFeedbackItem = await this.updateFeedbackItem(boardId, parentFeedbackItem);
-    }
-    else if (feedbackItem.childFeedbackItemIds) {
-      const childFeedbackItemPromises = feedbackItem.childFeedbackItemIds.map((childFeedbackItemId) => {
+    } else if (feedbackItem.childFeedbackItemIds) {
+      const childFeedbackItemPromises = feedbackItem.childFeedbackItemIds.map(childFeedbackItemId => {
         return readDocument<IFeedbackItemDocument>(boardId, childFeedbackItemId);
       });
 
-      const updatedChildFeedbackItemPromises = await Promise.all(childFeedbackItemPromises).then((childFeedbackItems) => {
-        return childFeedbackItems.map((childFeedbackItem) => {
+      const updatedChildFeedbackItemPromises = await Promise.all(childFeedbackItemPromises).then(childFeedbackItems => {
+        return childFeedbackItems.map(childFeedbackItem => {
           childFeedbackItem.parentFeedbackItemId = null;
           return this.updateFeedbackItem(boardId, childFeedbackItem);
-        })
+        });
       });
 
-      updatedChildFeedbackItems = await Promise.all(updatedChildFeedbackItemPromises).then((updatedChildFeedbackItems) => {
-        return updatedChildFeedbackItems.map((updatedChildFeedbackItem) => updatedChildFeedbackItem);
+      updatedChildFeedbackItems = await Promise.all(updatedChildFeedbackItemPromises).then(updatedChildFeedbackItems => {
+        return updatedChildFeedbackItems.map(updatedChildFeedbackItem => updatedChildFeedbackItem);
       });
     }
 
@@ -149,9 +144,9 @@ class ItemDataService {
 
     return {
       updatedParentFeedbackItem,
-      updatedChildFeedbackItems
+      updatedChildFeedbackItems,
     };
-  }
+  };
 
   /**
    * Update the feedback item.
@@ -159,7 +154,7 @@ class ItemDataService {
   private readonly updateFeedbackItem = async (boardId: string, feedbackItem: IFeedbackItemDocument): Promise<IFeedbackItemDocument> => {
     const updatedFeedbackItem: IFeedbackItemDocument = await updateDocument<IFeedbackItemDocument>(boardId, feedbackItem);
     return updatedFeedbackItem;
-  }
+  };
 
   /**
    * Update the board item.
@@ -167,7 +162,7 @@ class ItemDataService {
   private readonly updateBoardItem = async (teamId: string, boardItem: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
     const updatedBoardItem: IFeedbackBoardDocument = await updateDocument<IFeedbackBoardDocument>(teamId, boardItem);
     return updatedBoardItem;
-  }
+  };
 
   /**
    * Check if the user has voted on this item.
@@ -183,11 +178,10 @@ class ItemDataService {
       return "0";
     } else if (feedbackItem.voteCollection[userId] === undefined || feedbackItem.voteCollection[userId] === null || feedbackItem.voteCollection[userId] === 0) {
       return "0";
-    }
-    else {
+    } else {
       return feedbackItem.voteCollection[userId].toString();
     }
-  }
+  };
 
   /**
    * Calculate total votes for a feedback item.
@@ -206,10 +200,7 @@ class ItemDataService {
   /**
    * Calculate total votes for grouped feedback items.
    */
-  public getVotesForGroupedItems(
-    mainFeedbackItem: IFeedbackItemDocument,
-    groupedFeedbackItems: IFeedbackItemDocument[]
-  ): number {
+  public getVotesForGroupedItems(mainFeedbackItem: IFeedbackItemDocument, groupedFeedbackItems: IFeedbackItemDocument[]): number {
     const mainItemVotes = itemDataService.getVotes(mainFeedbackItem);
     const groupedItemsVotes = groupedFeedbackItems.reduce((sum, item) => {
       return sum + itemDataService.getVotes(item);
@@ -221,11 +212,7 @@ class ItemDataService {
   /**
    * Calculate total votes for a specific user on a set of grouped feedback items.
    */
-  public getVotesForGroupedItemsByUser(
-    mainFeedbackItem: IFeedbackItemDocument,
-    groupedFeedbackItems: IFeedbackItemDocument[],
-    encryptedUserId: string
-  ): number {
+  public getVotesForGroupedItemsByUser(mainFeedbackItem: IFeedbackItemDocument, groupedFeedbackItems: IFeedbackItemDocument[], encryptedUserId: string): number {
     // Calculate votes for the main feedback item using getTotalVotesByUser
     const mainItemVotesByUser = this.getVotesByUser(mainFeedbackItem, encryptedUserId);
 
@@ -248,8 +235,14 @@ class ItemDataService {
       const groupedItemsB = allItems.filter(item => b.feedbackItem.childFeedbackItemIds?.includes(item.feedbackItem.id));
 
       // Calculate total votes using getVotesForGroupedItems
-      const totalVotesA = this.getVotesForGroupedItems(a.feedbackItem, groupedItemsA.map(item => item.feedbackItem));
-      const totalVotesB = this.getVotesForGroupedItems(b.feedbackItem, groupedItemsB.map(item => item.feedbackItem));
+      const totalVotesA = this.getVotesForGroupedItems(
+        a.feedbackItem,
+        groupedItemsA.map(item => item.feedbackItem),
+      );
+      const totalVotesB = this.getVotesForGroupedItems(
+        b.feedbackItem,
+        groupedItemsB.map(item => item.feedbackItem),
+      );
 
       // Primary sort by total votes (descending)
       if (totalVotesB !== totalVotesA) {
@@ -264,13 +257,7 @@ class ItemDataService {
   /**
    * Increment or decrement the vote of the feedback item.
    */
-  public updateVote = async (
-    boardId: string,
-    teamId: string,
-    userId: string,
-    feedbackItemId: string,
-    decrement: boolean = false
-  ): Promise<IFeedbackItemDocument> => {
+  public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
     const encryptedUserId = encrypt(userId);
 
     // Step 1: Fetch Feedback and Board Items
@@ -303,12 +290,7 @@ class ItemDataService {
     return updatedFeedbackItem;
   };
 
-  private validateVotingEligibility(
-    feedbackItem: IFeedbackItemDocument,
-    boardItem: IFeedbackBoardDocument,
-    userId: string,
-    decrement: boolean
-  ): boolean {
+  private validateVotingEligibility(feedbackItem: IFeedbackItemDocument, boardItem: IFeedbackBoardDocument, userId: string, decrement: boolean): boolean {
     const userVotes = boardItem.boardVoteCollection?.[userId] || 0;
     const itemVotes = feedbackItem.voteCollection?.[userId] || 0;
 
@@ -322,12 +304,7 @@ class ItemDataService {
     }
   }
 
-  private modifyVotes(
-    feedbackItem: IFeedbackItemDocument,
-    boardItem: IFeedbackBoardDocument,
-    userId: string,
-    decrement: boolean
-  ): void {
+  private modifyVotes(feedbackItem: IFeedbackItemDocument, boardItem: IFeedbackBoardDocument, userId: string, decrement: boolean): void {
     const voteChange = decrement ? -1 : 1;
 
     // Initialize vote collections if needed
@@ -339,11 +316,7 @@ class ItemDataService {
     feedbackItem.upvotes += voteChange;
   }
 
-  private rollbackVotes(
-    feedbackItem: IFeedbackItemDocument,
-    userId: string,
-    decrement: boolean
-  ): void {
+  private rollbackVotes(feedbackItem: IFeedbackItemDocument, userId: string, decrement: boolean): void {
     const voteChange = decrement ? 1 : -1;
 
     feedbackItem.voteCollection[userId] = (feedbackItem.voteCollection[userId] || 0) + voteChange;
@@ -364,8 +337,7 @@ class ItemDataService {
 
     if (feedbackItem.timerstate === false) {
       feedbackItem.timerstate = true;
-    }
-    else {
+    } else {
       feedbackItem.timerstate = false;
     }
 
@@ -374,7 +346,7 @@ class ItemDataService {
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
 
     return updatedFeedbackItem;
-  }
+  };
 
   /**
    * update the timer count.
@@ -388,15 +360,14 @@ class ItemDataService {
 
     if (setZero) {
       feedbackItem.timerSecs = 0;
-    }
-    else {
+    } else {
       feedbackItem.timerSecs++;
     }
 
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
 
     return updatedFeedbackItem;
-  }
+  };
 
   /**
    * Update the team effectiveness measurement.
@@ -421,7 +392,7 @@ class ItemDataService {
     await this.updateBoardItem(teamId, boardItem);
 
     return boardItem;
-  }
+  };
 
   /**
    * Update the title of the feedback item.
@@ -437,7 +408,7 @@ class ItemDataService {
 
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
     return updatedFeedbackItem;
-  }
+  };
 
   /**
    * Add a feedback item as a child feedback item of another feedback item.
@@ -448,7 +419,7 @@ class ItemDataService {
    *   3) that the child feedback item and the existing children of the child feedback item (if any) are
    *   assigned the same columnId as the parent feedback item.
    */
-  public addFeedbackItemAsChild = async (boardId: string, parentFeedbackItemId: string, childFeedbackItemId: string): Promise<{ updatedParentFeedbackItem: IFeedbackItemDocument, updatedChildFeedbackItem: IFeedbackItemDocument, updatedOldParentFeedbackItem: IFeedbackItemDocument, updatedGrandchildFeedbackItems: IFeedbackItemDocument[] }> => {
+  public addFeedbackItemAsChild = async (boardId: string, parentFeedbackItemId: string, childFeedbackItemId: string): Promise<{ updatedParentFeedbackItem: IFeedbackItemDocument; updatedChildFeedbackItem: IFeedbackItemDocument; updatedOldParentFeedbackItem: IFeedbackItemDocument; updatedGrandchildFeedbackItems: IFeedbackItemDocument[] }> => {
     const parentFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, parentFeedbackItemId);
     const childFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, childFeedbackItemId);
 
@@ -470,8 +441,7 @@ class ItemDataService {
     let updatedOldParentFeedbackItem: IFeedbackItemDocument;
     if (childFeedbackItem.parentFeedbackItemId) {
       const oldParentFeedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, childFeedbackItem.parentFeedbackItemId);
-      oldParentFeedbackItem.childFeedbackItemIds = oldParentFeedbackItem.childFeedbackItemIds
-        .filter((existingchildFeedbackItemId) => existingchildFeedbackItemId !== childFeedbackItemId);
+      oldParentFeedbackItem.childFeedbackItemIds = oldParentFeedbackItem.childFeedbackItemIds.filter(existingchildFeedbackItemId => existingchildFeedbackItemId !== childFeedbackItemId);
       updatedOldParentFeedbackItem = await this.updateFeedbackItem(boardId, oldParentFeedbackItem);
     }
 
@@ -480,19 +450,17 @@ class ItemDataService {
     let grandchildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = [];
 
     if (childFeedbackItem.childFeedbackItemIds) {
-      grandchildFeedbackItemPromises = childFeedbackItem.childFeedbackItemIds.map((grandchildFeedbackItem) =>
-        this.getFeedbackItem(boardId, grandchildFeedbackItem));
+      grandchildFeedbackItemPromises = childFeedbackItem.childFeedbackItemIds.map(grandchildFeedbackItem => this.getFeedbackItem(boardId, grandchildFeedbackItem));
     }
 
-    const grandchildFeedbackItems: IFeedbackItemDocument[] =
-      await Promise.all(grandchildFeedbackItemPromises).then((promiseResults) => {
-        return promiseResults.map((grandchildFeedbackItem) => {
-          grandchildFeedbackItem.parentFeedbackItemId = parentFeedbackItemId;
-          grandchildFeedbackItem.columnId = parentFeedbackItem.columnId;
-          parentFeedbackItem.childFeedbackItemIds.push(grandchildFeedbackItem.id);
-          return grandchildFeedbackItem;
-        })
+    const grandchildFeedbackItems: IFeedbackItemDocument[] = await Promise.all(grandchildFeedbackItemPromises).then(promiseResults => {
+      return promiseResults.map(grandchildFeedbackItem => {
+        grandchildFeedbackItem.parentFeedbackItemId = parentFeedbackItemId;
+        grandchildFeedbackItem.columnId = parentFeedbackItem.columnId;
+        parentFeedbackItem.childFeedbackItemIds.push(grandchildFeedbackItem.id);
+        return grandchildFeedbackItem;
       });
+    });
 
     childFeedbackItem.childFeedbackItemIds = [];
     childFeedbackItem.columnId = parentFeedbackItem.columnId;
@@ -500,28 +468,26 @@ class ItemDataService {
     const updatedParentFeedbackItem = await this.updateFeedbackItem(boardId, parentFeedbackItem);
     const updatedChildFeedbackItem = await this.updateFeedbackItem(boardId, childFeedbackItem);
 
-    const updatedGrandchildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = grandchildFeedbackItems.map((grandchildFeedbackItem) =>
-      this.updateFeedbackItem(boardId, grandchildFeedbackItem));
+    const updatedGrandchildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = grandchildFeedbackItems.map(grandchildFeedbackItem => this.updateFeedbackItem(boardId, grandchildFeedbackItem));
 
-    const updatedGrandchildFeedbackItems: IFeedbackItemDocument[] =
-      await Promise.all(updatedGrandchildFeedbackItemPromises).then((promiseResults) => {
-        return promiseResults.map((updatedGrandchildFeedbackItem) => updatedGrandchildFeedbackItem)
-      });
+    const updatedGrandchildFeedbackItems: IFeedbackItemDocument[] = await Promise.all(updatedGrandchildFeedbackItemPromises).then(promiseResults => {
+      return promiseResults.map(updatedGrandchildFeedbackItem => updatedGrandchildFeedbackItem);
+    });
 
     return {
       updatedParentFeedbackItem,
       updatedChildFeedbackItem,
       updatedOldParentFeedbackItem,
       updatedGrandchildFeedbackItems,
-    }
-  }
+    };
+  };
 
   /**
    * Add the feedback item as main item to the column specified.
    * If the feedback item has a parent, the parent-child relationship is removed.
    * If the feedback item is being moved to a different column, its children are also updated.
    */
-  public addFeedbackItemAsMainItemToColumn = async (boardId: string, feedbackItemId: string, newColumnId: string): Promise<{ updatedOldParentFeedbackItem: IFeedbackItemDocument, updatedFeedbackItem: IFeedbackItemDocument, updatedChildFeedbackItems: IFeedbackItemDocument[] }> => {
+  public addFeedbackItemAsMainItemToColumn = async (boardId: string, feedbackItemId: string, newColumnId: string): Promise<{ updatedOldParentFeedbackItem: IFeedbackItemDocument; updatedFeedbackItem: IFeedbackItemDocument; updatedChildFeedbackItems: IFeedbackItemDocument[] }> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {
@@ -536,28 +502,28 @@ class ItemDataService {
         return undefined;
       }
 
-      parentFeedbackItem.childFeedbackItemIds = parentFeedbackItem.childFeedbackItemIds.filter((item) => item !== feedbackItemId);
+      parentFeedbackItem.childFeedbackItemIds = parentFeedbackItem.childFeedbackItemIds.filter(item => item !== feedbackItemId);
 
       updatedOldParentFeedbackItem = await this.updateFeedbackItem(boardId, parentFeedbackItem);
     }
 
-    let updatedChildFeedbackItems: IFeedbackItemDocument[] = []
+    let updatedChildFeedbackItems: IFeedbackItemDocument[] = [];
     if (feedbackItem.columnId !== newColumnId && feedbackItem.childFeedbackItemIds) {
       let getChildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = [];
 
-      getChildFeedbackItemPromises = feedbackItem.childFeedbackItemIds.map((childFeedbackItem) => this.getFeedbackItem(boardId, childFeedbackItem));
+      getChildFeedbackItemPromises = feedbackItem.childFeedbackItemIds.map(childFeedbackItem => this.getFeedbackItem(boardId, childFeedbackItem));
 
-      const childFeedbackItems = await Promise.all(getChildFeedbackItemPromises).then((promiseResults) => {
-        return promiseResults.map((childFeedbackItem) => {
+      const childFeedbackItems = await Promise.all(getChildFeedbackItemPromises).then(promiseResults => {
+        return promiseResults.map(childFeedbackItem => {
           childFeedbackItem.columnId = newColumnId;
           return childFeedbackItem;
-        })
+        });
       });
 
-      const updatedChildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = childFeedbackItems.map((childFeedbackItem) => this.updateFeedbackItem(boardId, childFeedbackItem));
+      const updatedChildFeedbackItemPromises: Promise<IFeedbackItemDocument>[] = childFeedbackItems.map(childFeedbackItem => this.updateFeedbackItem(boardId, childFeedbackItem));
 
-      updatedChildFeedbackItems = await Promise.all(updatedChildFeedbackItemPromises).then((promiseResults) => {
-        return promiseResults.map((updatedChildFeedbackItem) => updatedChildFeedbackItem)
+      updatedChildFeedbackItems = await Promise.all(updatedChildFeedbackItemPromises).then(promiseResults => {
+        return promiseResults.map(updatedChildFeedbackItem => updatedChildFeedbackItem);
       });
     }
 
@@ -569,9 +535,9 @@ class ItemDataService {
     return Promise.resolve({
       updatedOldParentFeedbackItem,
       updatedFeedbackItem,
-      updatedChildFeedbackItems
+      updatedChildFeedbackItems,
     });
-  }
+  };
 
   /**
    * Add an associated work item to a feedback item.
@@ -581,8 +547,7 @@ class ItemDataService {
 
     try {
       updatedFeedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
-    }
-    catch (e) {
+    } catch (e) {
       appInsights.trackException(e);
       updatedFeedbackItem = undefined;
     }
@@ -603,7 +568,7 @@ class ItemDataService {
 
     await this.updateFeedbackItem(boardId, updatedFeedbackItem);
     return updatedFeedbackItem;
-  }
+  };
 
   /**
    * Remove an associated work item from a feedback item.
@@ -613,8 +578,7 @@ class ItemDataService {
 
     try {
       updatedFeedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
-    }
-    catch (e) {
+    } catch (e) {
       appInsights.trackException(e);
       updatedFeedbackItem = undefined;
     }
@@ -627,7 +591,7 @@ class ItemDataService {
     updatedFeedbackItem.associatedActionItemIds = updatedAssociatedList;
     await this.updateFeedbackItem(boardId, updatedFeedbackItem);
     return updatedFeedbackItem;
-  }
+  };
 
   /**
    * Get all associated work items of a feedback item.
@@ -637,8 +601,7 @@ class ItemDataService {
 
     try {
       feedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
-    }
-    catch (e) {
+    } catch (e) {
       appInsights.trackException(e);
       throw new Error(`Failed to read Feedback item with id: ${feedbackItemId}.`);
     }
@@ -652,7 +615,7 @@ class ItemDataService {
     }
 
     return feedbackItem.associatedActionItemIds;
-  }
+  };
 
   /**
    * Checks if the work item exists in VSTS and if not, removes it.
@@ -665,8 +628,7 @@ class ItemDataService {
 
     try {
       workItems = await workItemService.getWorkItemsByIds([associatedWorkItemId]);
-    }
-    catch (e) {
+    } catch (e) {
       appInsights.trackException(e);
       return await this.removeAssociatedActionItem(boardId, feedbackItemId, associatedWorkItemId);
     }
@@ -676,7 +638,7 @@ class ItemDataService {
     }
 
     return await this.getFeedbackItem(boardId, feedbackItemId);
-  }
+  };
 }
 
 export const itemDataService = new ItemDataService();

@@ -1,5 +1,5 @@
-import { IdentityRef } from 'azure-devops-extension-api/WebApi';
-import { WorkflowPhase } from './workItem';
+import { IdentityRef } from "azure-devops-extension-api/WebApi";
+import { WorkflowPhase } from "./workItem";
 
 export interface IUserVisit {
   teamId: string;
@@ -37,7 +37,7 @@ export interface IFeedbackBoardDocument {
 
 export class FeedbackBoardDocumentHelper {
   static sort(board1: IFeedbackBoardDocument, board2: IFeedbackBoardDocument): number {
-    return (new Date(board2.createdDate).getTime() - new Date(board1.createdDate).getTime())
+    return new Date(board2.createdDate).getTime() - new Date(board1.createdDate).getTime();
   }
 
   /**
@@ -67,7 +67,7 @@ export interface IFeedbackBoardDocumentPermissions {
 
 export interface ITeamEffectivenessMeasurementVoteCollection {
   userId: string;
-  responses: { questionId: number, selection: number }[]
+  responses: { questionId: number; selection: number }[];
 }
 
 export interface IFeedbackColumn {

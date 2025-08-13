@@ -122,7 +122,9 @@
       ]
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)"
+      "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)",
+      "components/__mocks__/cheerio\\.js$",
+      "components/__mocks__/cheerio-utils\\.js$"
     ],
     "setupFiles": [
       "./components/__tests__/setupTests.tsx"

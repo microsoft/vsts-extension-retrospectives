@@ -1,7 +1,7 @@
-import React from 'react';
-import { flexRender } from '@tanstack/react-table';
-import type { Header, HeaderGroup, SortDirection } from '@tanstack/table-core';
-import type { IBoardSummaryTableItem } from './boardSummaryTable';
+import React from "react";
+import { flexRender } from "@tanstack/react-table";
+import type { Header, HeaderGroup, SortDirection } from "@tanstack/table-core";
+import type { IBoardSummaryTableItem } from "./boardSummaryTable";
 
 interface BoardSummaryTableHeaderProps {
   headerGroups: HeaderGroup<IBoardSummaryTableItem>[];
@@ -21,23 +21,23 @@ const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
   }
 
   return {
-    key: header.id,
-    role: "columnheader",
-    'aria-sort': ariaSort,
-    style: {
+    "key": header.id,
+    "role": "columnheader",
+    "aria-sort": ariaSort,
+    "style": {
       minWidth: header.getSize(),
-      width: header.getSize()
+      width: header.getSize(),
     },
-    className: sortClassName,
-    onClick: header.column.getToggleSortingHandler()
+    "className": sortClassName,
+    "onClick": header.column.getToggleSortingHandler(),
   };
 };
 
 const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ headerGroups }) => (
   <thead role="rowgroup">
-    {headerGroups.map((headerGroup) => (
+    {headerGroups.map(headerGroup => (
       <tr key={headerGroup.id} role="row">
-        {headerGroup.headers.map((header) => (
+        {headerGroup.headers.map(header => (
           <th key={header.id} {...getThProps(header)}>
             {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
             <div
@@ -45,8 +45,8 @@ const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ heade
                 onMouseDown: header.getResizeHandler(),
                 onTouchStart: header.getResizeHandler(),
                 className: `
-                  ${header.column.getCanResize() ? 'resizer' : ''}
-                  ${header.column.getIsResizing() ? 'isResizing' : ''}
+                  ${header.column.getCanResize() ? "resizer" : ""}
+                  ${header.column.getIsResizing() ? "isResizing" : ""}
                 `,
               }}
             />

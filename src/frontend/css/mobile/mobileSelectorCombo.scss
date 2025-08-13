@@ -3,16 +3,16 @@
 $mobile_team_selector_list_item_height: 90px;
 
 .selector-list-header {
-    height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
-    width: 100%;
-    padding-left: 15px;
+  height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
+  width: 100%;
+  padding-left: 15px;
 
   .selector-list-header-text {
-      vertical-align: middle;
-      text-align: center;
-      line-height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
-      margin-right: 15px;
-      font-size: 40px;
+    vertical-align: middle;
+    text-align: center;
+    line-height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
+    margin-right: 15px;
+    font-size: 40px;
   }
 }
 
@@ -21,45 +21,44 @@ $mobile_team_selector_list_item_height: 90px;
 }
 
 .selector-list-container {
-    max-height: none;
-    overflow: visible;
+  max-height: none;
+  overflow: visible;
 
-    .selector-list-item {
-      height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
-      width: 100%;
-      align-items: center;
+  .selector-list-item {
+    height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
+    width: 100%;
+    align-items: center;
+    font-size: 40px;
+
+    .selector-list-item-text {
+      vertical-align: middle;
+      text-align: center;
+      line-height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
+      margin-right: 15px;
       font-size: 40px;
-
-      .selector-list-item-text {
-        vertical-align: middle;
-        text-align: center;
-        line-height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
-        margin-right: 15px;
-        font-size: 40px;
-      }
-
-      i {
-        line-height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
-        font-size: 40px;
-      }
     }
+
+    i {
+      line-height: mobileFeedbackBoardContainer.$mobile_team_selector_list_item_height;
+      font-size: 40px;
+    }
+  }
 }
 
 .selector-button {
-
-    i.selector-button-icon {
-      font-size: 30px;
-    }
-
-    .selector-button-text-wrapper {
-      max-width: 200px;
-    }
-
-    .selector-button-text {
-      font-size: 30px;
-    }
-
-    i.selector-button-chevron {
-      font-size: 20px;
-    }
+  i.selector-button-icon {
+    font-size: 30px;
   }
+
+  .selector-button-text-wrapper {
+    max-width: 200px;
+  }
+
+  .selector-button-text {
+    font-size: 30px;
+  }
+
+  i.selector-button-chevron {
+    font-size: 20px;
+  }
+}

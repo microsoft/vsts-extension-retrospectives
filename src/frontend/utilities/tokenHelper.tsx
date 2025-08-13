@@ -1,4 +1,4 @@
-import { Buffer } from 'buffer';
+import { Buffer } from "buffer";
 
 export interface JwtPayload {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,12 +17,11 @@ export interface JwtPayload {
  */
 export const decodeJwt = (token: string): null | JwtPayload => {
   try {
-    const base64Main = token.split('.')[1];
-    const decodedMain = Buffer.from(base64Main, 'base64').toString();
+    const base64Main = token.split(".")[1];
+    const decodedMain = Buffer.from(base64Main, "base64").toString();
 
     return JSON.parse(decodedMain);
-  }
-  catch (e) {
+  } catch (e) {
     return null;
   }
-}
+};

@@ -1,5 +1,5 @@
-import { IdentityRef } from 'azure-devops-extension-api/WebApi';
-import { IUserContext, getUser } from 'azure-devops-extension-sdk';
+import { IdentityRef } from "azure-devops-extension-api/WebApi";
+import { IUserContext, getUser } from "azure-devops-extension-sdk";
 
 let userIdentity: IdentityRef;
 
@@ -7,7 +7,7 @@ let userIdentity: IdentityRef;
  * Get the identity of current user
  */
 export const getUserIdentity = (): IdentityRef => {
-  if (!userIdentity){
+  if (!userIdentity) {
     const currentUser: IUserContext = getUser();
 
     userIdentity = {
@@ -24,16 +24,24 @@ export const getUserIdentity = (): IdentityRef => {
   }
 
   return userIdentity;
-}
+};
 
 export const encrypt = (id: string): string => {
-  return id.split('').reverse().map(char => {
-    return String.fromCharCode(char.charCodeAt(0) + 4);
-  }).join('');
-}
+  return id
+    .split("")
+    .reverse()
+    .map(char => {
+      return String.fromCharCode(char.charCodeAt(0) + 4);
+    })
+    .join("");
+};
 
 export const decrypt = (id: string): string => {
-  return id.split('').reverse().map(char => {
-    return String.fromCharCode(char.charCodeAt(0) - 4);
-  }).join('');
-}
+  return id
+    .split("")
+    .reverse()
+    .map(char => {
+      return String.fromCharCode(char.charCodeAt(0) - 4);
+    })
+    .join("");
+};

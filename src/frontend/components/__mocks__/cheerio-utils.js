@@ -4,6 +4,6 @@ module.exports = {
   isTextNode: () => false,
   isComment: () => false,
   hasChildren: () => false,
-  html: () => '<div></div>',
-  text: () => 'mock text'
+  html: () => "<div></div>",
+  text: () => "mock text",
 };

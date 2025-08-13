@@ -10,7 +10,7 @@ $mobile_team_selector_list_item_height: 90px;
 }
 
 .initialization-spinner {
-    font-size: 40px;
+  font-size: 40px;
 
   .ms-Spinner-circle {
     height: 80px;
@@ -56,7 +56,6 @@ $mobile_team_selector_list_item_height: 90px;
     }
 
     .ms-Dialog-inner {
-
       button {
         font-size: 30px;
         margin-left: 20px;
@@ -194,7 +193,8 @@ $mobile_team_selector_list_item_height: 90px;
       width: $mobile_stage_block_width;
       margin-left: $mobile_stage_block_left_margin_width;
 
-      &:nth-child(2), &:nth-child(4) {
+      &:nth-child(2),
+      &:nth-child(4) {
         pointer-events: none;
         opacity: 0.4;
         color: grey;

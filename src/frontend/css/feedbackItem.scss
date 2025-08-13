@@ -113,10 +113,10 @@
           }
 
           &.voteAnimation {
-            animation: push .3s linear 1;
+            animation: push 0.3s linear 1;
 
             i {
-              color: variables.$main_blue  !important;
+              color: variables.$main_blue !important;
             }
           }
 

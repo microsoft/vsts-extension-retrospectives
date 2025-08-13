@@ -6,7 +6,7 @@ describe("effectivenessMeasurementQuestionHelper", () => {
   });
 
   it("should have the correct properties for each question", () => {
-    questions.forEach((question) => {
+    questions.forEach(question => {
       expect(question).toHaveProperty("id");
       expect(question).toHaveProperty("shortTitle");
       expect(question).toHaveProperty("discussActTemplate");
@@ -60,7 +60,7 @@ describe("getQuestionShortName", () => {
 describe("getQuestionTooltip", () => {
   it("should return the tooltip for a valid question ID", () => {
     const questionId = 1;
-    const expectedTooltip = "Only about 50% employees strongly indicate they know what is expected of them at work according to <a target=\"_blank\" rel=\"noreferrer\" href=\"https://www.gallup.com/workplace/236567/obsolete-annual-reviews-gallup-advice.aspx\">Gallup</a>. Furthermore, clarity of expectations is statistically linked to many important organizational outcomes. Getting expectations right relates to better customer perceptions of service quality, productivity, retention of employees and safety. Substantial gains in clarity of expectations connect to productivity gains of 5% to 10%, and link to 10% to 20% fewer safety incidents, for example.";
+    const expectedTooltip = 'Only about 50% employees strongly indicate they know what is expected of them at work according to <a target="_blank" rel="noreferrer" href="https://www.gallup.com/workplace/236567/obsolete-annual-reviews-gallup-advice.aspx">Gallup</a>. Furthermore, clarity of expectations is statistically linked to many important organizational outcomes. Getting expectations right relates to better customer perceptions of service quality, productivity, retention of employees and safety. Substantial gains in clarity of expectations connect to productivity gains of 5% to 10%, and link to 10% to 20% fewer safety incidents, for example.';
 
     const result = getQuestionTooltip(questionId);
 

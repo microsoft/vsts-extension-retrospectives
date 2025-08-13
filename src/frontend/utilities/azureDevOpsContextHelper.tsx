@@ -1,15 +1,7 @@
-import { getHost } from 'azure-devops-extension-sdk';
-import { getHostAuthority } from '../utilities/servicesHelper';
+import { getHost } from "azure-devops-extension-sdk";
+import { getHostAuthority } from "../utilities/servicesHelper";
 
-const internalOrgNames = [
-  'reflect-retrospective-hackathon',
-  'reflect-demo',
-  'microsoft',
-  'microsoftit',
-  'mseng',
-  'msazure',
-  'onebranch',
-];
+const internalOrgNames = ["reflect-retrospective-hackathon", "reflect-demo", "microsoft", "microsoftit", "mseng", "msazure", "onebranch"];
 
 /**
  * Returns whether the current org in VSTS context is a recognized internal org.
@@ -26,5 +18,5 @@ export const isInternalOrg = () => {
  */
 export const isHostedAzureDevOps = async () => {
   const hostAuthority = await getHostAuthority();
-  return hostAuthority === 'dev.azure.com' || hostAuthority.endsWith('.visualstudio.com');
+  return hostAuthority === "dev.azure.com" || hostAuthority.endsWith(".visualstudio.com");
 };

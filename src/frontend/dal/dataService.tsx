@@ -1,6 +1,6 @@
-import { getAccessToken, getExtensionContext, getService } from 'azure-devops-extension-sdk';
-import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from 'azure-devops-extension-api';
-import { appInsights } from '../utilities/telemetryClient';
+import { getAccessToken, getExtensionContext, getService } from "azure-devops-extension-sdk";
+import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from "azure-devops-extension-api";
+import { appInsights } from "../utilities/telemetryClient";
 
 let extensionDataManager: IExtensionDataManager;
 
@@ -17,27 +17,21 @@ async function getDataService(): Promise<IExtensionDataManager> {
 /**
  * Read user/account scoped documents.
  */
-export async function readDocuments<T>(
-  collectionName: string,
-  isPrivate?: boolean,
-  throwCollectionDoesNotExistException?: boolean
-): Promise<T[]> {
+export async function readDocuments<T>(collectionName: string, isPrivate?: boolean, throwCollectionDoesNotExistException?: boolean): Promise<T[]> {
   const dataService: IExtensionDataManager = await getDataService();
   let data: T[];
 
   try {
     // Attempt to fetch documents
-    data = await dataService.getDocuments(collectionName, isPrivate ? { scopeType: 'User' } : undefined);
+    data = await dataService.getDocuments(collectionName, isPrivate ? { scopeType: "User" } : undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     // Check for specific exception type
-    if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
-      console.warn(
-        `Collection ${collectionName} does not exist or contains no documents.`
-      ); // expect no documents for new collections
+    if (e.serverError?.typeKey === "DocumentCollectionDoesNotExistException") {
+      console.warn(`Collection ${collectionName} does not exist or contains no documents.`); // expect no documents for new collections
       appInsights.trackTrace({
         message: `Collection ${collectionName} is missing or empty.`,
-        properties: { collectionName }
+        properties: { collectionName },
       });
       if (throwCollectionDoesNotExistException) {
         throw e;
@@ -61,7 +55,7 @@ export async function readDocument<T>(collectionName: string, id: string, isPriv
   const dataService: IExtensionDataManager = await getDataService();
   let data: T;
   try {
-    data = await dataService.getDocument(collectionName, id, isPrivate ? { scopeType: 'User' } : undefined);
+    data = await dataService.getDocument(collectionName, id, isPrivate ? { scopeType: "User" } : undefined);
   } catch (e) {
     appInsights.trackException(e, { collectionName, id });
     data = undefined;
@@ -75,7 +69,7 @@ export async function readDocument<T>(collectionName: string, id: string, isPriv
  */
 export async function createDocument<T>(collectionName: string, data: T, isPrivate?: boolean): Promise<T> {
   const dataService: IExtensionDataManager = await getDataService();
-  return dataService.createDocument(collectionName, data, isPrivate ? { scopeType: 'User' } : undefined);
+  return dataService.createDocument(collectionName, data, isPrivate ? { scopeType: "User" } : undefined);
 }
 
 /**
@@ -83,7 +77,7 @@ export async function createDocument<T>(collectionName: string, data: T, isPriva
  */
 export async function createOrUpdateDocument<T>(collectionName: string, data: T, isPrivate?: boolean): Promise<T> {
   const dataService: IExtensionDataManager = await getDataService();
-  return dataService.setDocument(collectionName, data, isPrivate ? { scopeType: 'User' } : undefined);
+  return dataService.setDocument(collectionName, data, isPrivate ? { scopeType: "User" } : undefined);
 }
 
 /**
@@ -94,7 +88,7 @@ export async function updateDocument<T>(collectionName: string, data: T, isPriva
 
   let updatedData: T;
   try {
-    updatedData = await dataService.updateDocument(collectionName, data, isPrivate ? { scopeType: 'User' } : undefined);
+    updatedData = await dataService.updateDocument(collectionName, data, isPrivate ? { scopeType: "User" } : undefined);
   } catch (e) {
     appInsights.trackException(e);
     updatedData = undefined;
@@ -108,7 +102,7 @@ export async function updateDocument<T>(collectionName: string, data: T, isPriva
  */
 export async function deleteDocument(collectionName: string, id: string, isPrivate?: boolean): Promise<void> {
   const dataService: IExtensionDataManager = await getDataService();
-  return dataService.deleteDocument(collectionName, id, isPrivate ? { scopeType: 'User' } : undefined);
+  return dataService.deleteDocument(collectionName, id, isPrivate ? { scopeType: "User" } : undefined);
 }
 
 /**
@@ -119,7 +113,7 @@ export async function setValue<T>(id: string, data: T, isPrivate?: boolean): Pro
 
   let updatedData: T;
   try {
-    return dataService.setValue(id, data, isPrivate ? { scopeType: 'User' } : undefined);
+    return dataService.setValue(id, data, isPrivate ? { scopeType: "User" } : undefined);
   } catch (e) {
     appInsights.trackException(e);
     updatedData = undefined;
@@ -136,7 +130,7 @@ export async function getValue<T>(id: string, isPrivate?: boolean): Promise<T> {
 
   let data: T;
   try {
-    data = await dataService.getValue<T>(id, isPrivate ? { scopeType: 'User' } : undefined);
+    data = await dataService.getValue<T>(id, isPrivate ? { scopeType: "User" } : undefined);
   } catch (e) {
     appInsights.trackException(e);
     data = undefined;

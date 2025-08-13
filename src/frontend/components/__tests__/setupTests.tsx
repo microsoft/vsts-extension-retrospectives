@@ -1,16 +1,16 @@
-import { randomUUID } from "crypto"
+import { randomUUID } from "crypto";
 
-import Enzyme from 'enzyme';
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import { mockCore } from '../__mocks__/azure-devops-extension-api/Core/Core';
-import { mockCommon } from '../__mocks__/azure-devops-extension-api/Common/Common';
-import { mockUuid } from '../__mocks__/uuid/v4';
-import { MockSDK } from '../__mocks__/azure-devops-extension-sdk/sdk';
+import Enzyme from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import { mockCore } from "../__mocks__/azure-devops-extension-api/Core/Core";
+import { mockCommon } from "../__mocks__/azure-devops-extension-api/Common/Common";
+import { mockUuid } from "../__mocks__/uuid/v4";
+import { MockSDK } from "../__mocks__/azure-devops-extension-sdk/sdk";
 
 Enzyme.configure({ adapter: new Adapter() });
 
 window.crypto = {
-  randomUUID: () => randomUUID() as `${string}-${string}-${string}-${string}-${string}`
+  randomUUID: () => randomUUID() as `${string}-${string}-${string}-${string}-${string}`,
 } as Crypto;
 
 window.matchMedia = jest.fn().mockImplementation(query => {
@@ -22,13 +22,19 @@ window.matchMedia = jest.fn().mockImplementation(query => {
     removeListener: jest.fn(),
   };
 });
-jest.mock('azure-devops-extension-sdk', () => { return MockSDK; });
-jest.mock('azure-devops-extension-api/Core', () => { return mockCore; });
-jest.mock('azure-devops-extension-api/Core/CoreClient', () => { return mockCore; });
-jest.mock('azure-devops-extension-api/WebApi', () => { });
-jest.mock('azure-devops-extension-api/WorkItemTracking', () => { });
-jest.mock('azure-devops-extension-api/WorkItemTracking/WorkItemTracking', () => { });
-jest.mock('azure-devops-extension-api/WorkItemTracking/WorkItemTrackingClient', () => {
+jest.mock("azure-devops-extension-sdk", () => {
+  return MockSDK;
+});
+jest.mock("azure-devops-extension-api/Core", () => {
+  return mockCore;
+});
+jest.mock("azure-devops-extension-api/Core/CoreClient", () => {
+  return mockCore;
+});
+jest.mock("azure-devops-extension-api/WebApi", () => {});
+jest.mock("azure-devops-extension-api/WorkItemTracking", () => {});
+jest.mock("azure-devops-extension-api/WorkItemTracking/WorkItemTracking", () => {});
+jest.mock("azure-devops-extension-api/WorkItemTracking/WorkItemTrackingClient", () => {
   const mockWorkItemTrackingClient = {
     WorkItemTrackingRestClient: {},
   };
@@ -36,8 +42,10 @@ jest.mock('azure-devops-extension-api/WorkItemTracking/WorkItemTrackingClient', 
   return mockWorkItemTrackingClient;
 });
 
-jest.mock('azure-devops-extension-api/Common', () => {
+jest.mock("azure-devops-extension-api/Common", () => {
   return mockCommon;
 });
 
-jest.mock('uuid', () => { return mockUuid });
+jest.mock("uuid", () => {
+  return mockUuid;
+});

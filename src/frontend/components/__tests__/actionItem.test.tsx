@@ -1,16 +1,16 @@
 import React from "react";
-import { shallow, mount } from 'enzyme';
+import { shallow, mount } from "enzyme";
 import toJson from "enzyme-to-json";
 import { ActionItem, ActionItemProps } from "../actionItem";
-import { DocumentCardActions, DocumentCardTitle, DocumentCardPreview, IDocumentCardPreviewProps } from 'office-ui-fabric-react/lib/DocumentCard';
-import Dialog from 'office-ui-fabric-react/lib/Dialog';
-import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
-import { itemDataService } from '../../dal/itemDataService';
-import { workItemService } from '../../dal/azureDevOpsWorkItemService';
-import { IFeedbackItemDocument } from '../../interfaces/feedback';
-import { WorkItemType, WorkItem } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
+import { DocumentCardActions, DocumentCardTitle, DocumentCardPreview, IDocumentCardPreviewProps } from "office-ui-fabric-react/lib/DocumentCard";
+import Dialog from "office-ui-fabric-react/lib/Dialog";
+import { PrimaryButton, DefaultButton } from "office-ui-fabric-react/lib/Button";
+import { itemDataService } from "../../dal/itemDataService";
+import { workItemService } from "../../dal/azureDevOpsWorkItemService";
+import { IFeedbackItemDocument } from "../../interfaces/feedback";
+import { WorkItemType, WorkItem } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 
-const mockOnUpdateActionItem = jest.fn(() => { });
+const mockOnUpdateActionItem = jest.fn(() => {});
 
 const defaultTestProps: ActionItemProps = {
   feedbackItemId: "101",
@@ -30,8 +30,8 @@ const defaultTestProps: ActionItemProps = {
       transitions: {},
       xmlForm: "Test xmlForm",
       _links: {},
-      url: "Test url"
-    }
+      url: "Test url",
+    },
   ],
   onUpdateActionItem: mockOnUpdateActionItem,
   actionItem: {
@@ -47,7 +47,7 @@ const defaultTestProps: ActionItemProps = {
     },
   },
   areActionIconsHidden: false,
-  shouldFocus: false
+  shouldFocus: false,
 };
 
 describe("Action Item component", () => {
@@ -86,18 +86,18 @@ describe("Action Item component", () => {
   });
 });
 
-describe('Behavioral tests for ActionItem', () => {
-  it('does not render actions when areActionIconsHidden is true', () => {
+describe("Behavioral tests for ActionItem", () => {
+  it("does not render actions when areActionIconsHidden is true", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} areActionIconsHidden={true} />);
     expect(wrapper.find(DocumentCardActions)).toHaveLength(0);
   });
 
-  it('renders actions when areActionIconsHidden is false', () => {
+  it("renders actions when areActionIconsHidden is false", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} areActionIconsHidden={false} />);
     expect(wrapper.find(DocumentCardActions)).toHaveLength(1);
   });
 
-  it('toggles unlink confirmation dialog visibility based on state', () => {
+  it("toggles unlink confirmation dialog visibility based on state", () => {
     const wrapper = mount(<ActionItem {...defaultTestProps} />);
     // initially dialog is hidden
     expect(wrapper.find(Dialog)).toHaveLength(0);
@@ -111,56 +111,54 @@ describe('Behavioral tests for ActionItem', () => {
     expect(wrapper.find(Dialog)).toHaveLength(0);
   });
 
-  it('truncates titles longer than 25 characters', () => {
-    const longTitle = 'A'.repeat(30);
+  it("truncates titles longer than 25 characters", () => {
+    const longTitle = "A".repeat(30);
     const modifiedProps = {
       ...defaultTestProps,
       actionItem: {
         ...defaultTestProps.actionItem,
-        fields: { ...defaultTestProps.actionItem.fields, 'System.Title': longTitle }
-      }
+        fields: { ...defaultTestProps.actionItem.fields, "System.Title": longTitle },
+      },
     };
     const wrapper = shallow(<ActionItem {...modifiedProps} />);
-    const titleText = wrapper.find(DocumentCardTitle).prop('title');
+    const titleText = wrapper.find(DocumentCardTitle).prop("title");
     expect(titleText.length).toBe(28); // 25 chars + '...'
-    expect(titleText.endsWith('...')).toBe(true);
+    expect(titleText.endsWith("...")).toBe(true);
   });
 });
 
-describe('UI-level integration tests for ActionItem', () => {
-  it('renders the correct icon in DocumentCardPreview', () => {
+describe("UI-level integration tests for ActionItem", () => {
+  it("renders the correct icon in DocumentCardPreview", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const preview = wrapper.find(DocumentCardPreview);
-    const previewImages = preview.prop('previewImages') as IDocumentCardPreviewProps['previewImages'];
-    expect(previewImages![0].previewIconProps.imageProps.src).toBe('testUrl');
+    const previewImages = preview.prop("previewImages") as IDocumentCardPreviewProps["previewImages"];
+    expect(previewImages![0].previewIconProps.imageProps.src).toBe("testUrl");
   });
 
-  it('applies resolved-border-right class when work item state is Completed', () => {
+  it("applies resolved-border-right class when work item state is Completed", () => {
     const modifiedProps = {
       ...defaultTestProps,
       actionItem: {
         ...defaultTestProps.actionItem,
         fields: {
           ...defaultTestProps.actionItem.fields,
-          'System.State': 'Completed'
-        }
+          "System.State": "Completed",
+        },
       },
-      allWorkItemTypes: [
-        { ...defaultTestProps.allWorkItemTypes[0], states: [{ name: 'Completed', category: 'Completed', color: 'blue' }] }
-      ]
+      allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Completed", category: "Completed", color: "blue" }] }],
     };
     const wrapper = shallow(<ActionItem {...modifiedProps} />);
-    expect(wrapper.find('.related-task-sub-card').hasClass('resolved-border-right')).toBe(true);
+    expect(wrapper.find(".related-task-sub-card").hasClass("resolved-border-right")).toBe(true);
   });
 
-  it('calls onUpdateActionItem when confirming unlink', async () => {
-    jest.spyOn(itemDataService, 'removeAssociatedActionItem').mockResolvedValue({} as IFeedbackItemDocument);
+  it("calls onUpdateActionItem when confirming unlink", async () => {
+    jest.spyOn(itemDataService, "removeAssociatedActionItem").mockResolvedValue({} as IFeedbackItemDocument);
     const wrapper = mount(<ActionItem {...defaultTestProps} />);
     // show dialog by setting state
     wrapper.setState({ isUnlinkWorkItemConfirmationDialogHidden: false });
     wrapper.update();
-    const removeBtn = wrapper.find(PrimaryButton).filterWhere(b => b.prop('text') === 'Remove');
-    removeBtn.simulate('click', { stopPropagation: () => { }, preventDefault: () => { } });
+    const removeBtn = wrapper.find(PrimaryButton).filterWhere(b => b.prop("text") === "Remove");
+    removeBtn.simulate("click", { stopPropagation: () => {}, preventDefault: () => {} });
     // Wait for promises to resolve (flush microtasks)
     await Promise.resolve();
     await Promise.resolve();
@@ -168,57 +166,57 @@ describe('UI-level integration tests for ActionItem', () => {
   });
 });
 
-describe('Accessibility and edge case tests for ActionItem', () => {
-  it('opens work item form on Enter key press', () => {
+describe("Accessibility and edge case tests for ActionItem", () => {
+  it("opens work item form on Enter key press", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
-    const detailsDiv = wrapper.find('.ms-DocumentCard-details');
+    const detailsDiv = wrapper.find(".ms-DocumentCard-details");
     const instance = wrapper.instance() as ActionItem;
     const spy = jest.fn();
     // @ts-expect-error: override private for test
     instance.onActionItemClick = spy;
-    detailsDiv.simulate('keyPress', { key: 'Enter', stopPropagation: () => { } });
+    detailsDiv.simulate("keyPress", { key: "Enter", stopPropagation: () => {} });
     expect(spy).toHaveBeenCalledWith(defaultTestProps.actionItem.id);
   });
 
-  it('hides dialog when cancel button is clicked', () => {
+  it("hides dialog when cancel button is clicked", () => {
     const wrapper = mount(<ActionItem {...defaultTestProps} />);
     wrapper.setState({ isUnlinkWorkItemConfirmationDialogHidden: false });
     wrapper.update();
-    const cancelBtn = wrapper.find(DefaultButton).filterWhere(b => b.prop('text') === 'Cancel');
-    cancelBtn.simulate('click', { stopPropagation: () => { }, preventDefault: () => { } });
+    const cancelBtn = wrapper.find(DefaultButton).filterWhere(b => b.prop("text") === "Cancel");
+    cancelBtn.simulate("click", { stopPropagation: () => {}, preventDefault: () => {} });
     expect(wrapper.find(Dialog)).toHaveLength(0);
   });
 
-  it('renders without icon if work item type is not found', () => {
+  it("renders without icon if work item type is not found", () => {
     // Provide a stub workItemType with minimal properties to avoid undefined errors
-    const props = { ...defaultTestProps, allWorkItemTypes: [{ name: '', icon: { url: '' } }] as WorkItemType[] };
+    const props = { ...defaultTestProps, allWorkItemTypes: [{ name: "", icon: { url: "" } }] as WorkItemType[] };
     const wrapper = shallow(<ActionItem {...props} />);
     const preview = wrapper.find(DocumentCardPreview);
     expect(preview.exists()).toBe(true);
   });
 
-  it('does not throw if work item type is missing (allWorkItemTypes empty)', () => {
+  it("does not throw if work item type is missing (allWorkItemTypes empty)", () => {
     const props = { ...defaultTestProps, allWorkItemTypes: [] as WorkItemType[] };
     expect(() => shallow(<ActionItem {...props} />)).not.toThrow();
   });
 });
 
-describe('Private method coverage tests', () => {
+describe("Private method coverage tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('showUnlinkWorkItemConfirmationDialog sets state correctly', () => {
+  it("showUnlinkWorkItemConfirmationDialog sets state correctly", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
 
     // @ts-expect-error: accessing private method for test
     instance.showUnlinkWorkItemConfirmationDialog();
 
-    expect(wrapper.state('isUnlinkWorkItemConfirmationDialogHidden')).toBe(false);
+    expect(wrapper.state("isUnlinkWorkItemConfirmationDialogHidden")).toBe(false);
   });
 
-  it('hideUnlinkWorkItemConfirmationDialog sets state correctly', () => {
+  it("hideUnlinkWorkItemConfirmationDialog sets state correctly", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     wrapper.setState({ isUnlinkWorkItemConfirmationDialogHidden: false });
     const instance = wrapper.instance() as ActionItem;
@@ -226,11 +224,11 @@ describe('Private method coverage tests', () => {
     // @ts-expect-error: accessing private method for test
     instance.hideUnlinkWorkItemConfirmationDialog();
 
-    expect(wrapper.state('isUnlinkWorkItemConfirmationDialogHidden')).toBe(true);
+    expect(wrapper.state("isUnlinkWorkItemConfirmationDialogHidden")).toBe(true);
   });
 
-  it('onConfirmUnlinkWorkItem calls onUnlinkWorkItemClick and hides dialog', async () => {
-    jest.spyOn(itemDataService, 'removeAssociatedActionItem').mockResolvedValue({} as IFeedbackItemDocument);
+  it("onConfirmUnlinkWorkItem calls onUnlinkWorkItemClick and hides dialog", async () => {
+    jest.spyOn(itemDataService, "removeAssociatedActionItem").mockResolvedValue({} as IFeedbackItemDocument);
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
 
@@ -240,20 +238,20 @@ describe('Private method coverage tests', () => {
     await instance.onConfirmUnlinkWorkItem(defaultTestProps.actionItem.id);
 
     expect(defaultTestProps.onUpdateActionItem).toHaveBeenCalled();
-    expect(wrapper.state('isUnlinkWorkItemConfirmationDialogHidden')).toBe(true);
+    expect(wrapper.state("isUnlinkWorkItemConfirmationDialogHidden")).toBe(true);
   });
 
-  it('updateLinkedItem updates state when linkedWorkItem matches ID', async () => {
+  it("updateLinkedItem updates state when linkedWorkItem matches ID", async () => {
     const mockUpdatedWorkItem = {
       id: 123,
-      fields: { 'System.Title': 'Updated' },
+      fields: { "System.Title": "Updated" },
       commentVersionRef: { commentId: 1, version: 1, url: "test", createdInRevision: 1, isDeleted: false, text: "test" },
       relations: [],
       rev: 1,
       _links: {},
-      url: "test"
+      url: "test",
     } as WorkItem;
-    jest.spyOn(workItemService, 'getWorkItemsByIds').mockResolvedValue([mockUpdatedWorkItem]);
+    jest.spyOn(workItemService, "getWorkItemsByIds").mockResolvedValue([mockUpdatedWorkItem]);
 
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
@@ -263,20 +261,20 @@ describe('Private method coverage tests', () => {
     // @ts-expect-error: accessing private method for test
     await instance.updateLinkedItem(123);
 
-    expect(wrapper.state('linkedWorkItem')).toEqual(mockUpdatedWorkItem);
+    expect(wrapper.state("linkedWorkItem")).toEqual(mockUpdatedWorkItem);
   });
 
-  it('updateLinkedItem does not update when linkedWorkItem ID does not match', async () => {
+  it("updateLinkedItem does not update when linkedWorkItem ID does not match", async () => {
     const mockUpdatedWorkItem = {
       id: 456,
-      fields: { 'System.Title': 'Updated' },
+      fields: { "System.Title": "Updated" },
       commentVersionRef: { commentId: 1, version: 1, url: "test", createdInRevision: 1, isDeleted: false, text: "test" },
       relations: [],
       rev: 1,
       _links: {},
-      url: "test"
+      url: "test",
     } as WorkItem;
-    jest.spyOn(workItemService, 'getWorkItemsByIds').mockResolvedValue([mockUpdatedWorkItem]);
+    jest.spyOn(workItemService, "getWorkItemsByIds").mockResolvedValue([mockUpdatedWorkItem]);
 
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
@@ -287,10 +285,10 @@ describe('Private method coverage tests', () => {
     // @ts-expect-error: accessing private method for test
     await instance.updateLinkedItem(456);
 
-    expect(wrapper.state('linkedWorkItem')).toEqual(originalLinkedItem);
+    expect(wrapper.state("linkedWorkItem")).toEqual(originalLinkedItem);
   });
 
-  it('handleKeyPressSelectorButton calls showUnlinkWorkItem on Enter key', () => {
+  it("handleKeyPressSelectorButton calls showUnlinkWorkItem on Enter key", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
     const spy = jest.fn();
@@ -298,7 +296,7 @@ describe('Private method coverage tests', () => {
     // @ts-expect-error: override private method for test
     instance.showUnlinkWorkItem = spy;
 
-    const event = { key: 'Enter', preventDefault: jest.fn(), stopPropagation: jest.fn() };
+    const event = { key: "Enter", preventDefault: jest.fn(), stopPropagation: jest.fn() };
 
     // @ts-expect-error: accessing private method for test
     instance.handleKeyPressSelectorButton(event);
@@ -306,7 +304,7 @@ describe('Private method coverage tests', () => {
     expect(spy).toHaveBeenCalledWith(event);
   });
 
-  it('handleKeyPressSelectorButton does not call showUnlinkWorkItem on other keys', () => {
+  it("handleKeyPressSelectorButton does not call showUnlinkWorkItem on other keys", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
     const spy = jest.fn();
@@ -314,7 +312,7 @@ describe('Private method coverage tests', () => {
     // @ts-expect-error: override private method for test
     instance.showUnlinkWorkItem = spy;
 
-    const event = { key: 'Space', preventDefault: jest.fn(), stopPropagation: jest.fn() };
+    const event = { key: "Space", preventDefault: jest.fn(), stopPropagation: jest.fn() };
 
     // @ts-expect-error: accessing private method for test
     instance.handleKeyPressSelectorButton(event);
@@ -322,13 +320,13 @@ describe('Private method coverage tests', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it('showUnlinkWorkItem prevents default and stops propagation', () => {
+  it("showUnlinkWorkItem prevents default and stops propagation", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
 
     const event = {
       preventDefault: jest.fn(),
-      stopPropagation: jest.fn()
+      stopPropagation: jest.fn(),
     };
 
     // @ts-expect-error: accessing private method for test
@@ -336,10 +334,10 @@ describe('Private method coverage tests', () => {
 
     expect(event.preventDefault).toHaveBeenCalled();
     expect(event.stopPropagation).toHaveBeenCalled();
-    expect(wrapper.state('isUnlinkWorkItemConfirmationDialogHidden')).toBe(false);
+    expect(wrapper.state("isUnlinkWorkItemConfirmationDialogHidden")).toBe(false);
   });
 
-  it('showWorkItemForm stops propagation and calls onActionItemClick', () => {
+  it("showWorkItemForm stops propagation and calls onActionItemClick", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
     const spy = jest.fn();
@@ -356,7 +354,7 @@ describe('Private method coverage tests', () => {
     expect(spy).toHaveBeenCalledWith(defaultTestProps.actionItem.id);
   });
 
-  it('showWorkItemForm handles null/undefined event', () => {
+  it("showWorkItemForm handles null/undefined event", () => {
     const wrapper = shallow(<ActionItem {...defaultTestProps} />);
     const instance = wrapper.instance() as ActionItem;
     const spy = jest.fn();

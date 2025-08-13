@@ -1,24 +1,24 @@
 /* global jest */
 
 const mockCheerioInstance = {
-  html: () => '<div></div>',
-  text: () => 'mock text',
+  html: () => "<div></div>",
+  text: () => "mock text",
   find: () => ({
     length: 0,
     each: () => {},
-    text: () => 'mock text',
-    html: () => '<div></div>'
+    text: () => "mock text",
+    html: () => "<div></div>",
   }),
   each: () => {},
   attr: () => {},
   prop: () => {},
-  val: () => {}
+  val: () => {},
 };
 
 const mockCheerio = {
   load: () => mockCheerioInstance,
   contains: () => false,
-  merge: () => {}
+  merge: () => {},
 };
 
 module.exports = mockCheerio;
