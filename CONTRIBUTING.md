@@ -196,12 +196,12 @@ version of the extension under an Azure DevOps publisher account.
 
 The contents of the `.env` file are
 
-    ```bash
-    # Backend Service URL
-    REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service URL here"
-    # App Instrumentation Key
-    REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
-    ```
+```bash
+# Backend Service URL
+REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service URL here"
+# App Instrumentation Key
+REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
+```
 
     - In lieu of the .env file you can set actual environment variables.
 
