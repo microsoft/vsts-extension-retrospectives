@@ -134,7 +134,7 @@ describe('isTrashEnabled', () => {
   });
 });
 
-describe('Revised TrashIcon tests', () => {
+describe('TrashIcon tests', () => {
   const baseBoard: IBoardSummaryTableItem = {
     boardName: 'Sample Board',
     createdDate: new Date(),
@@ -193,9 +193,7 @@ describe('Revised TrashIcon tests', () => {
     expect(wrapper.find('.trash-icon-disabled').exists()).toBe(false);
   });
 
-  // --- New permission tests ---
-
-  it('should NOT show trash icon if not owner AND not team admin', () => {
+  it('should NOT show trash icon if user is not board owner AND not team admin', () => {
     const wrapper = shallow(
       <TrashIcon
         board={{ ...baseBoard, ownerId: 'someone-else' }}
@@ -207,7 +205,7 @@ describe('Revised TrashIcon tests', () => {
     expect(wrapper.find('.trash-icon').exists()).toBe(false);
   });
 
-  it('should show trash icon if owner BUT not team admin', () => {
+  it('should show trash icon if user is board owner BUT not team admin', () => {
     const wrapper = shallow(
       <TrashIcon
         board={{ ...baseBoard, ownerId: 'user-1' }}
@@ -219,7 +217,7 @@ describe('Revised TrashIcon tests', () => {
     expect(wrapper.find('.trash-icon').exists()).toBe(true);
   });
 
-  it('should show trash icon if not owner BUT is team admin', () => {
+  it('should show trash icon if user is not board owner BUT is team admin', () => {
     const wrapper = shallow(
       <TrashIcon
         board={{ ...baseBoard, ownerId: 'someone-else' }}
@@ -231,7 +229,7 @@ describe('Revised TrashIcon tests', () => {
     expect(wrapper.find('.trash-icon').exists()).toBe(true);
   });
 
-  it('should show trash icon if owner AND is team admin', () => {
+  it('should show trash icon if user is board owner AND team admin', () => {
     const wrapper = shallow(
       <TrashIcon
         board={{ ...baseBoard, ownerId: 'user-1' }}
@@ -241,66 +239,6 @@ describe('Revised TrashIcon tests', () => {
       />
     );
     expect(wrapper.find('.trash-icon').exists()).toBe(true);
-  });
-});
-
-describe('original TrashIcon tests', () => {
-  it('should render enabled trash icon when board is deletable', () => {
-    const board: IBoardSummaryTableItem = {
-      boardName: 'Sample Board',
-      createdDate: new Date(),
-      isArchived: true,
-      archivedDate: new Date(Date.now() - 3 * 60 * 1000), // Archived 3 mins ago
-      pendingWorkItemsCount: 0,
-      totalWorkItemsCount: 0,
-      feedbackItemsCount: 0,
-      id: 'board-1',
-      teamId: 'team-1',
-      ownerId: 'user-1',
-    };
-
-    const wrapper = shallow(<TrashIcon board={board} currentUserId="user-1" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
-
-    expect(wrapper.find('.trash-icon').exists()).toBe(true);
-  });
-
-  it('should render disabled trash icon when board is not deletable yet', () => {
-    const board = {
-      boardName: 'Sample Board',
-      createdDate: new Date(),
-      isArchived: true,
-      archivedDate: new Date(Date.now() - 1 * 60 * 1000), // Archived 1 min ago
-      pendingWorkItemsCount: 0,
-      totalWorkItemsCount: 0,
-      feedbackItemsCount: 0,
-      id: 'board-1',
-      teamId: 'team-1',
-      ownerId: 'user-1',
-    };
-
-    const wrapper = shallow(<TrashIcon board={board} currentUserId="user-1" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
-
-    expect(wrapper.find('.trash-icon-disabled').exists()).toBe(true);
-  });
-
-  it('should not render trash icon when board is not archived', () => {
-    const board = {
-      boardName: 'Sample Board',
-      createdDate: new Date(),
-      isArchived: false,
-      archivedDate: undefined as Date | undefined,
-      pendingWorkItemsCount: 0,
-      totalWorkItemsCount: 0,
-      feedbackItemsCount: 0,
-      id: 'board-1',
-      teamId: 'team-1',
-      ownerId: 'user-1',
-    };
-
-    const wrapper = shallow(<TrashIcon board={board} currentUserId="user-1" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
-
-    expect(wrapper.find('.trash-icon').exists()).toBe(false);
-    expect(wrapper.find('.trash-icon-disabled').exists()).toBe(false);
   });
 });
 
