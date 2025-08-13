@@ -205,11 +205,11 @@ REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
 
 - In lieu of the .env file you can set actual environment variables.
 
-    - When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set Application Insights instrumentation key and the backend service URL.
+  - When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set Application Insights instrumentation key and the backend service URL.
 
-4. Run `npm run build` to build the project.
-5. To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of. (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page.) Currently this is the only way to test the extension.
-6. Copy the file `vss-extension-dev.json.template` into a new `vss-extension-dev.json` file with the new publisher that you setup. Also update the name and id fields.
+1. Run `npm run build` to build the project.
+2. To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of. (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page.) Currently this is the only way to test the extension.
+3. Copy the file `vss-extension-dev.json.template` into a new `vss-extension-dev.json` file with the new publisher that you setup. Also update the name and id fields.
 
 ```json
 {
@@ -221,8 +221,8 @@ REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
 }
 ```
 
-7. Run `npm run pack:d` to package the modules into a Azure DevOps extension package. This generated package has a `.vsix` extension. This package is generated using information from the manifest file and your built code. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts) to know more about extension manifests.
-8. [Publish your to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish). Once published, share the extension with the newly created test org. See [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share) for documentation on sharing.
+1. Run `npm run pack:d` to package the modules into a Azure DevOps extension package. This generated package has a `.vsix` extension. This package is generated using information from the manifest file and your built code. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts) to know more about extension manifests.
+2. [Publish your to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish). Once published, share the extension with the newly created test org. See [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share) for documentation on sharing.
 
 ---
 
