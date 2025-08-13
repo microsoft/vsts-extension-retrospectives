@@ -164,7 +164,6 @@ All of the development prerequisites, such as [Webpack](https://webpack.js.org/)
 
 8. Perform the commands listed in the [Dockerfile](.devcontainer/Dockerfile) to globally install required packages such as dotnet core.
 
-
 9. Follow the steps outlined in the [Build](#build) section to build, test, and deploy development versions of the extension.
 
 ---
