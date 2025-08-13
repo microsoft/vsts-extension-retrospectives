@@ -1,7 +1,7 @@
 export interface AppConfiguration {
-  CollaborationStateServiceUrl: string,
-  AppInsightsInstrumentKey: string,
-  CurrentEnvironment: string,
+  CollaborationStateServiceUrl: string;
+  AppInsightsInstrumentKey: string;
+  CurrentEnvironment: string;
 }
 
 const getConfiguration = (): AppConfiguration => {
@@ -14,10 +14,10 @@ const getConfiguration = (): AppConfiguration => {
     console.warn(`Backend Service URL was not provided, the real time updates feature will be disabled`);
   }
   return {
-    AppInsightsInstrumentKey: appInsightsInstrumentKey || '',
-    CollaborationStateServiceUrl: collaborationStateServiceUrl || 'https://website-unset.com/',
+    AppInsightsInstrumentKey: appInsightsInstrumentKey || "",
+    CollaborationStateServiceUrl: collaborationStateServiceUrl || "https://website-unset.com/",
     CurrentEnvironment: process.env.NODE_ENV,
-  }
-}
+  };
+};
 
 export const config: AppConfiguration = getConfiguration();

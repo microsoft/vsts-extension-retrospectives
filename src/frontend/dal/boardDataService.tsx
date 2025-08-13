@@ -1,25 +1,15 @@
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, getValue, setValue } from './dataService';
-import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from '../interfaces/feedback';
-import { WorkflowPhase } from '../interfaces/workItem';
-import { getUserIdentity } from '../utilities/userIdentityHelper';
-import { generateUUID } from '../utilities/random';
-import { appInsights, TelemetryExceptions } from '../utilities/telemetryClient';
+import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, getValue, setValue } from "./dataService";
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from "../interfaces/feedback";
+import { WorkflowPhase } from "../interfaces/workItem";
+import { getUserIdentity } from "../utilities/userIdentityHelper";
+import { generateUUID } from "../utilities/random";
+import { appInsights, TelemetryExceptions } from "../utilities/telemetryClient";
 
 class BoardDataService {
-  public readonly legacyPositiveColumnId: string = 'whatwentwell';
-  public readonly legacyNegativeColumnId: string = 'whatdidntgowell';
+  public readonly legacyPositiveColumnId: string = "whatwentwell";
+  public readonly legacyNegativeColumnId: string = "whatdidntgowell";
 
-  public createBoardForTeam = async (
-    teamId: string,
-    title: string,
-    maxVotesPerUser: number,
-    columns: IFeedbackColumn[],
-    isIncludeTeamEffectivenessMeasurement?: boolean,
-    shouldShowFeedbackAfterCollect?: boolean,
-    isAnonymous?: boolean,
-    startDate?: Date,
-    endDate?: Date,
-    permissions?: IFeedbackBoardDocumentPermissions) => {
+  public createBoardForTeam = async (teamId: string, title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement?: boolean, shouldShowFeedbackAfterCollect?: boolean, isAnonymous?: boolean, startDate?: Date, endDate?: Date, permissions?: IFeedbackBoardDocumentPermissions) => {
     const boardId: string = generateUUID();
     const userIdentity = getUserIdentity();
 
@@ -41,23 +31,21 @@ class BoardDataService {
       boardVoteCollection: {},
       teamEffectivenessMeasurementVoteCollection: [],
       isPublic: this.isBoardPublic(permissions),
-      permissions: permissions
-    }
+      permissions: permissions,
+    };
 
     return await createDocument<IFeedbackBoardDocument>(teamId, board);
-  }
+  };
 
   public checkIfBoardNameIsTaken = async (teamId: string, boardName: string) => {
     const teamBoards: IFeedbackBoardDocument[] = await this.getBoardsForTeam(teamId);
 
-    const boardNameExists =
-      teamBoards.find(teamBoard => {
-        return (teamBoard.title.replace(/\s+/g, ' ').trim().localeCompare(boardName.replace(/\s+/g, ' ').trim(), [],
-          { sensitivity: "accent" }) === 0);
-      });
+    const boardNameExists = teamBoards.find(teamBoard => {
+      return teamBoard.title.replace(/\s+/g, " ").trim().localeCompare(boardName.replace(/\s+/g, " ").trim(), [], { sensitivity: "accent" }) === 0;
+    });
 
     return boardNameExists ? true : false;
-  }
+  };
 
   public getBoardsForTeam = async (teamId: string) => {
     let teamBoards: IFeedbackBoardDocument[] = [];
@@ -67,29 +55,29 @@ class BoardDataService {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       appInsights.trackException(e);
-      if (e.serverError?.typeKey === 'DocumentCollectionDoesNotExistException') {
+      if (e.serverError?.typeKey === "DocumentCollectionDoesNotExistException") {
         appInsights.trackTrace({ message: TelemetryExceptions.BoardsNotFoundForTeam, properties: { teamId, e } });
       }
     }
 
     return teamBoards;
-  }
+  };
 
   public getBoardForTeamById = async (teamId: string, boardId: string) => {
     return await readDocument<IFeedbackBoardDocument>(teamId, boardId);
-  }
+  };
 
   public deleteFeedbackBoard = async (teamId: string, boardId: string) => {
     // Delete all documents in this board's collection.
     const boardItems = await readDocuments<IFeedbackItemDocument>(boardId);
     if (boardItems && boardItems.length) {
-      boardItems.forEach(async (item) => {
+      boardItems.forEach(async item => {
         await deleteDocument(boardId, item.id);
       });
     }
 
     await deleteDocument(teamId, boardId);
-  }
+  };
 
   public archiveFeedbackBoard = async (teamId: string, boardId: string) => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
@@ -106,7 +94,7 @@ class BoardDataService {
     board.archivedBy = userIdentity;
 
     return await this.updateBoard(teamId, board);
-  }
+  };
 
   public restoreArchivedFeedbackBoard = async (teamId: string, boardId: string) => {
     const board: IFeedbackBoardDocument = await this.getBoardForTeamById(teamId, boardId);
@@ -122,7 +110,7 @@ class BoardDataService {
     board.archivedBy = undefined;
 
     return await this.updateBoard(teamId, board);
-  }
+  };
 
   public async saveSetting<T>(key: string, value: T): Promise<void> {
     await setValue(key, value, true); // Use 'true' to make it user-scoped
@@ -146,20 +134,19 @@ class BoardDataService {
     board.maxVotesPerUser = maxVotesPerUser;
     board.columns = newColumns;
     board.modifiedDate = new Date(Date.now());
-    board.isPublic = this.isBoardPublic(permissions),
-    board.permissions = permissions;
+    ((board.isPublic = this.isBoardPublic(permissions)), (board.permissions = permissions));
 
     return await this.updateBoard(teamId, board);
-  }
+  };
 
   // Update the board document.
   private updateBoard = async (teamId: string, board: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
     return await updateDocument<IFeedbackBoardDocument>(teamId, board);
-  }
+  };
 
   private isBoardPublic = (permissions: IFeedbackBoardDocumentPermissions): boolean => {
     return permissions === undefined || (permissions.Teams.length === 0 && permissions.Members.length === 0);
-  }
+  };
 }
 
 export default new BoardDataService();

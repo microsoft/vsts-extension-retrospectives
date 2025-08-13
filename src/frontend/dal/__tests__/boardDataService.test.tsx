@@ -1,9 +1,9 @@
-import BoardDataService from '../boardDataService';
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, setValue, getValue } from '../dataService';
-import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../../interfaces/feedback';
-import { IdentityRef } from 'azure-devops-extension-api/WebApi';
+import BoardDataService from "../boardDataService";
+import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, setValue, getValue } from "../dataService";
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../../interfaces/feedback";
+import { IdentityRef } from "azure-devops-extension-api/WebApi";
 
-jest.mock('../dataService', () => ({
+jest.mock("../dataService", () => ({
   createDocument: jest.fn(),
   deleteDocument: jest.fn(),
   readDocument: jest.fn(),
@@ -162,7 +162,7 @@ describe("BoardDataService - archiveFeedbackBoard", () => {
     (updateDocument as jest.Mock).mockResolvedValue({
       ...mockBoard,
       isArchived: true,
-      archivedDate: new Date() // Ensure it returns a Date
+      archivedDate: new Date(), // Ensure it returns a Date
     });
 
     const result = await BoardDataService.archiveFeedbackBoard("team-123", "board-1");
@@ -184,7 +184,7 @@ describe("BoardDataService - restoreArchivedFeedbackBoard", () => {
     (updateDocument as jest.Mock).mockResolvedValue({
       ...mockBoard,
       isArchived: false,
-      archivedDate: undefined // Ensure it resets properly
+      archivedDate: undefined, // Ensure it resets properly
     });
 
     const result = await BoardDataService.restoreArchivedFeedbackBoard("team-123", "board-1");
