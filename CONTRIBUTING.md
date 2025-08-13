@@ -44,11 +44,7 @@
 
 ## Background
 
-Retrospectives is an Azure DevOps extension. Visit the
-[Azure DevOps Extension overview](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) to
-learn more about developing extensions. The Retrospectives Azure DevOps
-extension frontend is implemented in React using Typescript, and the backend is
-implemented in C#. The project follows a single branch source control strategy.
+Retrospectives is an Azure DevOps extension. Visit the [Azure DevOps Extension overview](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) to learn more about developing extensions. The Retrospectives Azure DevOps extension frontend is implemented in React using Typescript, and the backend is implemented in C#. The project follows a single branch source control strategy.
 
 ## Ways to Contribute
 
@@ -86,36 +82,25 @@ If you want to contribute code changes, bug fixes, or new features:
 
 ### Branching and Pull Requests
 
-1. When creating a new branch, follow the `{alias}/{issue##}` naming
-   convention. - **Note:** It is recommended to keep the branch name length below 30
-   characters in order to allow the Github Action which builds and deploys the
-   development extension on Pull Request creation or update to successfully execute.
+1. When creating a new branch, follow the `{alias}/{issue##}` naming convention. - **Note:** It is recommended to keep the branch name length below 30 characters in order to allow the Github Action which builds and deploys the development extension on Pull Request creation or update to successfully execute.
 
-2. Once your feature addition or bug fix is ready for review, create a pull
-   request against the `main` branch of the repository.
+2. Once your feature addition or bug fix is ready for review, create a pull request against the `main` branch of the repository.
 
-3. Include a link to the GitHub issue you are addressing to the description of
-   your pull request. Reviewers will be added to the pull request automatically.
+3. Include a link to the GitHub issue you are addressing to the description of your pull request. Reviewers will be added to the pull request automatically.
 
 4. Ensure all CI/CD checks are successful after the creation of the pull request.
 
-5. Update any documentation, user and contributor, that is impacted by your
-   changes.
+5. Update any documentation, user and contributor, that is impacted by your changes.
 
-6. You may merge the pull request in once you have the sign-off from one
-   developer from the [Retrospectives team](retrospectives@microsoft.com), or if
-   you do not have permission to do that, you may request the reviewer to merge it for you.
+6. You may merge the pull request in once you have the sign-off from one developer from the [Retrospectives team](retrospectives@microsoft.com), or if you do not have permission to do that, you may request the reviewer to merge it for you.
 
 ### Continuous Integration (CI) and Pre-commit Hook
 
-Our CI pipeline can be invoked on Github, or if you want to get ahead of the potential failures, you
-can use the [`pre-commit` configuration](./.pre-commit-config.yaml). It will run
-linting on markdown files and python files, and run a spellcheck. The same rules will be caught locally
-that will be caught in Github actions.
+Our CI pipeline can be invoked on Github, or if you want to get ahead of the potential failures, you can use the [`pre-commit` configuration](./.pre-commit-config.yaml). It will run linting on markdown files and python files, and run a spellcheck. The same rules will be caught locally that will be caught in Github actions.
 
 To use `pre-commit`, it's recommended to have a [python virtual environment (venv)](https://docs.python.org/3/library/venv.html#creating-virtual-environments).
-If the venv ends with `-env`, such as `retro-env`, then the `.gitignore` is configured to not watch
-this environment during development!
+
+If the venv ends with `-env`, such as `retro-env`, then the `.gitignore` is configured to not watch this environment during development!
 
 Either in the [dev container](#dev-containers) or locally:
 
@@ -126,41 +111,26 @@ Either in the [dev container](#dev-containers) or locally:
     - `pre-commit run --all-files` will run against *everything*
     - `pre-commit run markdownlint` to run the markdown linting
     - `pre-commit run spellcheck-cli` to run the spellchecking
-4. To run linting for the typescript/javascript (must be done within the `RetrospectiveExtension.Frontend`
-directory): `npm run lint`
+4. To run linting for the typescript/javascript (must be done within the `RetrospectiveExtension.Frontend` directory): `npm run lint`
 
-Read more about the [python pre-commit framework](https://pre-commit.com/). To disable the pre-commit
-hook run `pre-commit uninstall` from the root folder.
+Read more about the [python pre-commit framework](https://pre-commit.com/). To disable the pre-commit hook run `pre-commit uninstall` from the root folder.
 
 ## Development Environments
 
-The Retrospectives Extension can be built, developed and tested in several
-development environments. This section highlights three of the primary
-environments in order of relevance.
+The Retrospectives Extension can be built, developed and tested in several development environments. This section highlights three of the primary environments in order of relevance.
 
-All of the development prerequisites, such as [Webpack](https://webpack.js.org/)
-and [NodeJS](https://nodejs.org/en/download/) are listed in the
-[Dockerfile](.devcontainer/Dockerfile). This file can be opened in a text
-editor and the install commands can be used to configure the prerequisites
-outside of a [dev container](#dev-containers).
+All of the development prerequisites, such as [Webpack](https://webpack.js.org/) and [NodeJS](https://nodejs.org/en/download/) are listed in the
+[Dockerfile](.devcontainer/Dockerfile). This file can be opened in a text editor and the install commands can be used to configure the prerequisites outside of a [dev container](#dev-containers).
 
 ### Dev Containers
 
-1. Install the latest version of [Docker Desktop](https://www.docker.com/products/docker-desktop).
+1. Install the latest version of [Visual Studio Code](https://code.visualstudio.com/).
 
-2. Install the latest version of
-   [Visual Studio Code](https://code.visualstudio.com/).
+2. Install the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension for Visual Studio Code.
 
-3. Install the [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
-extension for Visual Studio Code.
+3. Check out this repository and open the parent folder in Visual Studio Code.
 
-4. Install the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-extension for Visual Studio Code.
-
-5. Check out this repository and open the parent folder in Visual Studio Code.
-
-6. Follow the steps outlined in the [Build](#build) section to build, test, and
-   deploy development versions of the extension.
+4. Follow the steps outlined in the [Build](#build) section to build, test, and deploy development versions of the extension.
 
 ---
 
@@ -178,39 +148,29 @@ extension for Visual Studio Code.
 
 ### Windows Subsystem For Linux
 
-1. To configure the WSL if it is not already available on the development
-   machine, follow this [tutorial](https://docs.microsoft.com/en-us/learn/modules/get-started-with-windows-subsystem-for-linux/).
+1. To configure the WSL if it is not already available on the development machine, follow this [tutorial](https://docs.microsoft.com/en-us/learn/modules/get-started-with-windows-subsystem-for-linux/).
 
-2. Follow [Git on WSL Instructions](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-git)
-if Git is not already installed on the development machine.
+2. Follow [Git on WSL Instructions](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-git) if Git is not already installed on the development machine.
 
-3. Follow [Node Installation Instructions](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl)
-to enable Node for WSL.
+3. Follow [Node Installation Instructions](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl) to enable Node for WSL.
 
 4. Install the latest version of [Visual Studio Code](https://code.visualstudio.com/).
 
-5. Install the [Remote – WSL](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl)
-extension for Visual Studio Code.
+5. Install the [Remote – WSL](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) extension for Visual Studio Code.
 
 6. Check out this repository and open the parent folder in Visual Studio Code.
 
-7. If VSCode does not recognize the WSL on its own, in the top right hand
-   corner of the terminal window, select the down arrow to "Launch Profile..."
-   and select the name of the distribution in use to create a new WSL terminal.
+7. If VSCode does not recognize the WSL on its own, in the top right hand corner of the terminal window, select the down arrow to "Launch Profile..." and select the name of the distribution in use to create a new WSL terminal.
 
-8. Perform the commands listed in the [Dockerfile](.devcontainer/Dockerfile) to
-   globally install required packages such as dotnet core.
+8. Perform the commands listed in the [Dockerfile](.devcontainer/Dockerfile) to globally install required packages such as dotnet core.
 
-9. Run the [setup_ci.sh](RetrospectiveExtension.Frontend/scripts/setup_ci.sh)
-   script to configure the WSL for the pre-commit hook.
+9. Run the [setup_ci.sh](RetrospectiveExtension.Frontend/scripts/setup_ci.sh) script to configure the WSL for the pre-commit hook.
 
-10. Follow the steps outlined in the [Build](#build) section to build, test,
-    and deploy development versions of the extension.
+10. Follow the steps outlined in the [Build](#build) section to build, test, and deploy development versions of the extension.
 
 ---
 
-- Some commands, such as `dotnet build` and `npm run build:p` may need `sudo`
-  prefixed to execute successfully.
+- Some commands, such as `dotnet build` and `npm run build:p` may need `sudo` prefixed to execute successfully.
 
 ### Github Codespaces
 
@@ -221,10 +181,7 @@ documentation.
 
 3. Create a codespace through the new branch's dropdown on GitHub.
 
-4. Codespaces are powered by [Visual Studio Code and dev containers](https://docs.github.com/en/codespaces/developing-in-codespaces/developing-in-a-codespace)
-\- once the codespace has been entered, you can follow the instructions within the [dev containers section](#dev-containers)
-for continuing to set up the development environment. View the [Developing in a codespace](https://docs.github.com/en/codespaces/developing-in-codespaces/developing-in-a-codespace)
-documentation for additional details.
+4. Codespaces are powered by [Visual Studio Code and dev containers](https://docs.github.com/en/codespaces/developing-in-codespaces/developing-in-a-codespace) \- once the codespace has been entered, you can follow the instructions within the [dev containers section](#dev-containers) for continuing to set up the development environment. View the [Developing in a codespace](https://docs.github.com/en/codespaces/developing-in-codespaces/developing-in-a-codespace) documentation for additional details.
 
 ## Build
 
@@ -236,12 +193,9 @@ version of the extension under an Azure DevOps publisher account.
 ---
 
 1. Clone this repository, and open in your preferred [development environment](#development-environments).
-2. Using Powershell, navigate to the `/RetrospectiveExtension.Frontend` folder,
-    run `npm install`. This will download all the dependent packages listed in
-    `package.json`.
-3. When developing or publishing the extension locally, you need to create a .env file at the top-level
-directory of the front end project (where `package.json` lives). You can copy
-`RetrospectiveExtension.Frontend/.env.template` to `RetrospectiveExtension.Frontend/.env` to get started.
+2. Using Powershell, navigate to the `/RetrospectiveExtension.Frontend` folder, run `npm install`. This will download all the dependent packages listed in `package.json`.
+3. When developing or publishing the extension locally, you need to create a .env file at the top-level directory of the front end project (where `package.json` lives). You can copy `RetrospectiveExtension.Frontend/.env.template` to `RetrospectiveExtension.Frontend/.env` to get started.
+
 The contents of the `.env` file are
 
     ```bash
@@ -253,23 +207,11 @@ The contents of the `.env` file are
 
     - In lieu of the .env file you can set actual environment variables.
 
-    - When using the CI/CD Github action(s) pipeline to deploy the extension,
-      environment variables are used to set Application Insights instrumentation
-      key and the backend service URL.
+    - When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set Application Insights instrumentation key and the backend service URL.
 
-4. Run `npm run build:d` or `npm run build:p` to build the project. The
-    difference in commands is `development` versus `production`, respectively;
-    the `production` command will generate a smaller bundle.
-5. To test your changes, you will need to publish a new extension under a new
-    Azure DevOps publisher account. Refer to the
-    [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts)
-    on publishing extensions. You can publish it to any test Azure DevOps
-    organization that you are an admin of. (As a Microsoft employee, you can create
-    a new test organization from your Azure DevOps profile page.) Currently this is
-    the only way to test the extension.
-6. Copy the file `vss-extension-dev.json.template` into a new
-    `vss-extension-dev.json` file with the new publisher that you setup. Also
-    update the name and id fields.
+4. Run `npm run build:d` or `npm run build:p` to build the project. The difference in commands is `development` versus `production`, respectively; the `production` command will generate a smaller bundle.
+5. To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of. (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page.) Currently this is the only way to test the extension.
+6. Copy the file `vss-extension-dev.json.template` into a new `vss-extension-dev.json` file with the new publisher that you setup. Also update the name and id fields.
 
     ```json
     {
@@ -281,44 +223,22 @@ The contents of the `.env` file are
     }
     ```
 
-7. Run `npm run pack:d` to package the modules into a Azure DevOps extension
-    package. This generated package has a `.vsix` extension. This package is
-    generated using information from the manifest file and your built code. Refer
-    to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts)
-    to know more about extension manifests.
-8. [Publish your to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish).
-    Once published, share the extension with the newly created test org. See
-    [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share)
-    for documentation on sharing.
+7. Run `npm run pack:d` to package the modules into a Azure DevOps extension package. This generated package has a `.vsix` extension. This package is generated using information from the manifest file and your built code. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts) to know more about extension manifests.
+8. [Publish your to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish). Once published, share the extension with the newly created test org. See [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share) for documentation on sharing.
 
 ---
 
-- Once the extension has been shared with your test org, you can install it to
-  your org and start using it. This installation process is similar to installing
-  any other DevOps extensions. Refer to
-  [this link](https://docs.microsoft.com/en-us/azure/devops/marketplace/install-extension?view=vsts)
-  for instructions. Since the extension is still in preview mode, it needs to be
-  enabled for the Azure DevOps project. Enable the extension from the
-  `Preview Features` tab.
+- Once the extension has been shared with your test org, you can install it to your org and start using it. This installation process is similar to installing any other DevOps extensions. Refer to [this link](https://docs.microsoft.com/en-us/azure/devops/marketplace/install-extension?view=vsts) for instructions. Since the extension is still in preview mode, it needs to be enabled for the Azure DevOps project. Enable the extension from the `Preview Features` tab.
 
 - Now start using the extension to test your changes.
 
-- For updates, rebuild and package your extension and publish an update from
-  the Azure DevOps marketplace. That will automatically update the extension in
-  your project.
+- For updates, rebuild and package your extension and publish an update from the Azure DevOps marketplace. That will automatically update the extension in your project.
 
-- For the real time live syncing to work, our service needs to know your
-  publisher id and your extension's unique key. To enable real time updates for
-  your test extension, please
-  [reach out to us](https://github.com/microsoft/vsts-extension-retrospectives/issues)
-  with your publisher ID and the
-  [unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key)
-  of your extension.
+- For the real time live syncing to work, our service needs to know your publisher id and your extension's unique key. To enable real time updates for your test extension, please [reach out to us](https://github.com/microsoft/vsts-extension-retrospectives/issues) with your publisher ID and the [unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key) of your extension.
 
 ### Test with Hot Reload and Debug
 
-Test changes by loading changes locally without having to re-package and
-re-publish the extension in the marketplace.
+Test changes by loading changes locally without having to re-package and re-publish the extension in the marketplace.
 
 ---
 
@@ -335,12 +255,8 @@ VS Code extension
 
 ---
 
-1. In the `RetrospectiveExtension.Frontend` folder, create the
-    `vss-extension-dev.json` file using the template file
-    `vss-extension-dev.json.template` for reference.
-2. Update the `webpack.config.js` to enable source maps. Set the devtool
-    property to `inline-source-map`. Also set `devServer.https` to true and
-    devServer.port to 3000.
+1. In the `RetrospectiveExtension.Frontend` folder, create the `vss-extension-dev.json` file using the template file `vss-extension-dev.json.template` for reference.
+2. Update the `webpack.config.js` to enable source maps. Set the devtool property to `inline-source-map`. Also set `devServer.https` to true and devServer.port to 3000.
 
     ```js
     module.exports = {
