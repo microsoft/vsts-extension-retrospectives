@@ -164,13 +164,12 @@ All of the development prerequisites, such as [Webpack](https://webpack.js.org/)
 
 8. Perform the commands listed in the [Dockerfile](.devcontainer/Dockerfile) to globally install required packages such as dotnet core.
 
-9. Run the [setup_ci.sh](RetrospectiveExtension.Frontend/scripts/setup_ci.sh) script to configure the WSL for the pre-commit hook.
 
-10. Follow the steps outlined in the [Build](#build) section to build, test, and deploy development versions of the extension.
+9. Follow the steps outlined in the [Build](#build) section to build, test, and deploy development versions of the extension.
 
 ---
 
-- Some commands, such as `dotnet build` and `npm run build:p` may need `sudo` prefixed to execute successfully.
+- Some commands, such as `dotnet build` and `npm run build` may need `sudo` prefixed to execute successfully.
 
 ### Github Codespaces
 
@@ -209,7 +208,7 @@ The contents of the `.env` file are
 
     - When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set Application Insights instrumentation key and the backend service URL.
 
-4. Run `npm run build:d` or `npm run build:p` to build the project. The difference in commands is `development` versus `production`, respectively; the `production` command will generate a smaller bundle.
+4. Run `npm run build` to build the project.
 5. To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of. (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page.) Currently this is the only way to test the extension.
 6. Copy the file `vss-extension-dev.json.template` into a new `vss-extension-dev.json` file with the new publisher that you setup. Also update the name and id fields.
 
