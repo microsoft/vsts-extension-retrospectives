@@ -4,6 +4,7 @@ import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { useReactTable } from '@tanstack/react-table';
+import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 import DeleteBoardDialog from './deleteBoardDialog';
 import BoardSummary from './boardSummary';
@@ -300,6 +301,59 @@ function getTable(
   return useReactTable(tableOptions);
 }
 
+export async function handleConfirmDelete(
+  openDialogBoardId: string | null,
+  tableData: IBoardSummaryTableItem[],
+  teamId: string,
+  setOpenDialogBoardId: (id: string | null) => void,
+  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
+  setRefreshKey: (value: boolean) => void,
+  appInsights: ApplicationInsights,
+) {
+  if (!openDialogBoardId) return;
+
+  const deletedBoard = tableData.find(board => board.id === openDialogBoardId);
+  const deletedBoardName = deletedBoard?.boardName || 'Unknown Board';
+  const deletedFeedbackCount = deletedBoard?.feedbackItemsCount || 0;
+
+  try {
+    console.log(
+      'Deleting board: ',
+      deletedBoardName,
+      ' with ',
+      deletedFeedbackCount,
+      ' feedback items.'
+    );
+
+    setOpenDialogBoardId(null); // close dialog
+
+    await BoardDataService.deleteFeedbackBoard(teamId, openDialogBoardId);
+    reflectBackendService.broadcastDeletedBoard(teamId, openDialogBoardId);
+
+    setTableData(prevData =>
+      prevData.filter(board => board.id !== openDialogBoardId)
+    );
+
+    appInsights.trackEvent({
+      name: TelemetryEvents.FeedbackBoardDeleted,
+      properties: {
+        boardId: openDialogBoardId,
+        boardName: deletedBoardName,
+        feedbackItemsCount: deletedFeedbackCount,
+        deletedByUserId: encrypt(getUserIdentity().id),
+      },
+    });
+  } catch (error) {
+    appInsights.trackException(error, {
+      boardId: openDialogBoardId,
+      boardName: deletedBoardName,
+      feedbackItemsCount: deletedFeedbackCount,
+      action: 'delete',
+    });
+    setRefreshKey(true);
+  }
+}
+
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [openDialogBoardId, setOpenDialogBoardId] = useState<string | null>(null);
   const [teamId, setTeamId] = useState<string>();
@@ -318,44 +372,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }, [boardSummaryState.boardsTableItems]);
 
   const [refreshKey, setRefreshKey] = useState(false);
-
-  const handleConfirmDelete = async () => {
-    if (!openDialogBoardId) return;
-
-    const deletedBoard = tableData.find(board => board.id === openDialogBoardId);
-    const deletedBoardName = deletedBoard?.boardName || "Unknown Board";
-    const deletedFeedbackCount = deletedBoard?.feedbackItemsCount || 0;
-
-    try {
-      console.log("Deleting board: ", deletedBoardName, " with ", deletedFeedbackCount, " feedback items.");
-
-      setOpenDialogBoardId(null); // close dialog
-
-      await BoardDataService.deleteFeedbackBoard(props.teamId, openDialogBoardId);
-      reflectBackendService.broadcastDeletedBoard(props.teamId, openDialogBoardId);
-
-      setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
-
-      appInsights.trackEvent({
-        name: TelemetryEvents.FeedbackBoardDeleted,
-        properties: {
-          boardId: openDialogBoardId,
-          boardName: deletedBoardName,
-          feedbackItemsCount: deletedFeedbackCount,
-          deletedByUserId: encrypt(getUserIdentity().id),
-        },
-      });
-
-    } catch (error) {
-      appInsights.trackException(error, {
-        boardId: openDialogBoardId,
-        boardName: deletedBoardName,
-        feedbackItemsCount: deletedFeedbackCount,
-        action: 'delete',
-      });
-      setRefreshKey(true);
-    }
-  };
 
   const table: Table<IBoardSummaryTableItem> =
     getTable(
@@ -531,7 +547,17 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       <DeleteBoardDialog
         board={selectedBoardForDelete}
         hidden={!openDialogBoardId}
-        onConfirm={handleConfirmDelete}
+        onConfirm={() =>
+          handleConfirmDelete(
+            openDialogBoardId,
+            tableData,
+            props.teamId,
+            setOpenDialogBoardId,
+            setTableData,
+            setRefreshKey,
+            appInsights
+          )
+      }
         onCancel={() => setOpenDialogBoardId(null)}
       />
       <table>

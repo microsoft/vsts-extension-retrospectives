@@ -7,7 +7,7 @@ import BoardSummaryTable, { IBoardSummaryTableProps, IBoardSummaryTableItem } fr
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from '../boardSummaryTable';
 import BoardDataService from '../../dal/boardDataService';
 import { IFeedbackBoardDocument } from '../../interfaces/feedback';
-import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
+import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient"
 
 jest.mock('../../utilities/telemetryClient', () => {
   return {
@@ -56,10 +56,23 @@ const mockBoards: IFeedbackBoardDocument[] = [
   {
     id: 'board-1',
     teamId: 'team-1',
-    title: 'Test Board',
+    title: 'Test Board Not Archived',
     createdDate: new Date(),
     createdBy: mockedIdentity,
     isArchived: false,
+    columns: [], // Adjust as needed
+    activePhase: 'Collect',
+    maxVotesPerUser: 5,
+    boardVoteCollection: {},
+    teamEffectivenessMeasurementVoteCollection: [],
+  },
+    {
+    id: 'board-2',
+    teamId: 'team-1',
+    title: 'Test Board Archived',
+    createdDate: new Date(),
+    createdBy: mockedIdentity,
+    isArchived: true,
     columns: [], // Adjust as needed
     activePhase: 'Collect',
     maxVotesPerUser: 5,
@@ -74,6 +87,16 @@ const baseProps: IBoardSummaryTableProps = {
   currentUserIsTeamAdmin: true,
   supportedWorkItemTypes: [],
   onArchiveToggle: jest.fn(),
+};
+
+const defaultProps = {
+  boards: mockBoards,
+  currentUserId: 'user-1',
+  currentUserIsTeamAdmin: false,
+  onDeleteBoard: jest.fn(),
+  onArchiveBoard: jest.fn(),
+  onRestoreBoard: jest.fn(),
+  loading: false,
 };
 
 describe('BoardSummaryTable', () => {
