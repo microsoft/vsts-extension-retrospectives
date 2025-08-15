@@ -354,6 +354,48 @@ export async function handleConfirmDelete(
   }
 }
 
+export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[]): IBoardSummaryTableState {
+  if (!boardDocuments.length) {
+    return {
+      boardsTableItems: [],
+      isDataLoaded: true,
+      feedbackBoards: [],
+      actionItemsByBoard: {},
+      allDataLoaded: false, // <-- include required property
+    };
+  }
+
+  const boardsTableItems: IBoardSummaryTableItem[] = [];
+  const actionItems: IActionItemsTableItems = {};
+
+  boardDocuments.forEach(board => {
+    boardsTableItems.push({
+      boardName: board.title,
+      createdDate: new Date(board.createdDate),
+      isArchived: board.isArchived ?? false,
+      archivedDate: board.archivedDate ? new Date(board.archivedDate) : null,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+      feedbackItemsCount: 0,
+      id: board.id,
+      teamId: board.teamId,
+      ownerId: board.createdBy.id,
+    });
+
+    actionItems[board.id] = { isDataLoaded: false, actionItems: [] };
+  });
+
+  boardsTableItems.sort((a, b) => b.createdDate.getTime() - a.createdDate.getTime());
+
+  return {
+    boardsTableItems,
+    isDataLoaded: true,
+    feedbackBoards: boardDocuments,
+    actionItemsByBoard: actionItems,
+    allDataLoaded: false, // <-- include required property
+  };
+}
+
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
   const [openDialogBoardId, setOpenDialogBoardId] = useState<string | null>(null);
   const [teamId, setTeamId] = useState<string>();
@@ -385,8 +427,14 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       props.currentUserIsTeamAdmin
     );
 
-  const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
+  //const updatedState: IBoardSummaryTableState = { ...boardSummaryState };
 
+  const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
+    const newState = buildBoardSummaryState(boardDocuments);
+    setBoardSummaryState(prev => ({ ...prev, ...newState }));
+    handleActionItems(newState).then();
+  };
+/*
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     if ((boardDocuments ?? []).length === 0) {
       updatedState.boardsTableItems = [];
@@ -429,7 +477,79 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     }
     handleActionItems().then()
   };
+*/
+const handleActionItems = async (state: IBoardSummaryTableState) => {
+  const updatedBoardsTableItems = [...state.boardsTableItems];
+  const updatedActionItemsByBoard = { ...state.actionItemsByBoard };
 
+  // Preload all work item state info once, up front
+  const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
+  await Promise.all(props.supportedWorkItemTypes.map(async (workItemType) => {
+    const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
+    workItemTypeToStatesMap[workItemType.name] = workItemTypeStates;
+  }));
+
+  await Promise.all(state.feedbackBoards.map(async (feedbackBoard) => {
+    const feedbackBoardId: string = feedbackBoard.id;
+
+    const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
+
+    // Always set feedback item count, even if 0
+    const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
+    if (boardIndex !== -1) {
+      updatedBoardsTableItems[boardIndex] = {
+        ...updatedBoardsTableItems[boardIndex],
+        feedbackItemsCount: feedbackItems.length,
+      };
+    }
+
+    if (!feedbackItems.length) return;
+
+    const actionableFeedbackItems = feedbackItems.filter(
+      item => item.associatedActionItemIds?.length
+    );
+
+    if (!actionableFeedbackItems.length) return;
+
+    const aggregatedWorkItems: WorkItem[] = [];
+    await Promise.all(actionableFeedbackItems.map(async (item) => {
+      const workItems = await workItemService.getWorkItemsByIds(item.associatedActionItemIds);
+      if (workItems?.length) {
+        aggregatedWorkItems.push(...workItems);
+      }
+    }));
+
+    // Update action items for this board
+    updatedActionItemsByBoard[feedbackBoardId] = {
+      isDataLoaded: true,
+      actionItems: aggregatedWorkItems,
+    };
+
+    const pendingWorkItems = aggregatedWorkItems.filter((workItem) => {
+      const states = workItemTypeToStatesMap[workItem.fields['System.WorkItemType']]
+        .filter(state => state.name === workItem.fields['System.State']);
+      return !states.length || (states[0].category !== 'Completed' && states[0].category !== 'Removed');
+    });
+
+    // Update board table item with work item counts
+    if (boardIndex !== -1) {
+      updatedBoardsTableItems[boardIndex] = {
+        ...updatedBoardsTableItems[boardIndex],
+        pendingWorkItemsCount: pendingWorkItems.length,
+        totalWorkItemsCount: aggregatedWorkItems.length,
+      };
+    }
+  }));
+
+  // Final state update
+  setBoardSummaryState({
+    ...state,
+    boardsTableItems: updatedBoardsTableItems,
+    actionItemsByBoard: updatedActionItemsByBoard,
+    allDataLoaded: true,
+  });
+};
+/*
   const handleActionItems = async () => {
     const updatedBoardsTableItems = [...updatedState.boardsTableItems];
     const updatedActionItemsByBoard = { ...updatedState.actionItemsByBoard };
@@ -505,7 +625,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
       allDataLoaded: true,
     });
   };
-
+*/
   const boardRowSummary = (row: Row<IBoardSummaryTableItem>) => {
     const currentBoard = boardSummaryState.boardsTableItems.find(board => board.id === row.original.id);
     const actionItems = boardSummaryState.actionItemsByBoard[currentBoard.id];
