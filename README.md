@@ -61,7 +61,7 @@ If you need to access another team's retrospective board in the project, you wil
 
 Create a new retrospective using the 'Create Board' button. If this is your first retrospective for your selected team, then press the "Create Board" button in the center of the screen.
 
-![Video](https://user-images.githubusercontent.com/118744/208821363-cde5b0e1-e747-4158-8d8b-99017b4c3cc4.mp4)
+[▶ Watch video](https://user-images.githubusercontent.com/118744/208821363-cde5b0e1-e747-4158-8d8b-99017b4c3cc4.mp4)
 
 ![A screenshot of the Retrospective main page. The screen is mostly empty except for the top navigation of the tool. In the center there is a blue button to 'Create Board.'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/create-first-retrospective.png)
 
