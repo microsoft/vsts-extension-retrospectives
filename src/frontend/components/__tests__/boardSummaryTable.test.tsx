@@ -3,20 +3,24 @@ import { shallow, mount, ReactWrapper } from 'enzyme';
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 import { act } from 'react-dom/test-utils';
 
-import BoardSummaryTable, { IBoardSummaryTableProps, IBoardSummaryTableItem } from '../boardSummaryTable';
+import BoardSummaryTable, { handleConfirmDelete, IBoardSummaryTableProps, IBoardSummaryTableItem } from '../boardSummaryTable';
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from '../boardSummaryTable';
 import BoardDataService from '../../dal/boardDataService';
 import { IFeedbackBoardDocument } from '../../interfaces/feedback';
-import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
+import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient"
+import { reflectBackendService } from '../../dal/reflectBackendService';
+import * as userIdentityHelper from '../../utilities/userIdentityHelper';
 
 jest.mock('../../utilities/telemetryClient', () => {
   return {
     appInsights: {
       trackEvent: jest.fn(),
+      trackException: jest.fn(),
     },
     TelemetryEvents: {
       FeedbackBoardArchived: 'FeedbackBoardArchived',
       FeedbackBoardRestored: 'FeedbackBoardRestored',
+      FeedbackBoardDeleted: 'FeedbackBoardDeleted',
     },
   };
 });
@@ -33,8 +37,13 @@ jest.mock('../../dal/boardDataService', () => ({
   restoreArchivedFeedbackBoard: jest.fn(),
 }));
 
+jest.mock('../../dal/reflectBackendService', () => ({
+  reflectBackendService: {
+    broadcastDeletedBoard: jest.fn(),
+  },
+}));
+
 jest.mock('../../dal/azureDevOpsWorkItemService');
-jest.mock('../../dal/reflectBackendService');
 
 const mockedIdentity: IdentityRef = {
   directoryAlias: 'test.user',
@@ -56,10 +65,23 @@ const mockBoards: IFeedbackBoardDocument[] = [
   {
     id: 'board-1',
     teamId: 'team-1',
-    title: 'Test Board',
+    title: 'Test Board Not Archived',
     createdDate: new Date(),
     createdBy: mockedIdentity,
     isArchived: false,
+    columns: [], // Adjust as needed
+    activePhase: 'Collect',
+    maxVotesPerUser: 5,
+    boardVoteCollection: {},
+    teamEffectivenessMeasurementVoteCollection: [],
+  },
+    {
+    id: 'board-2',
+    teamId: 'team-1',
+    title: 'Test Board Archived',
+    createdDate: new Date(),
+    createdBy: mockedIdentity,
+    isArchived: true,
     columns: [], // Adjust as needed
     activePhase: 'Collect',
     maxVotesPerUser: 5,
@@ -70,6 +92,8 @@ const mockBoards: IFeedbackBoardDocument[] = [
 
 const baseProps: IBoardSummaryTableProps = {
   teamId: 'team-1',
+  currentUserId: 'user-1',
+  currentUserIsTeamAdmin: true,
   supportedWorkItemTypes: [],
   onArchiveToggle: jest.fn(),
 };
@@ -132,63 +156,99 @@ describe('isTrashEnabled', () => {
   });
 });
 
-describe('TrashIcon', () => {
-  it('should render enabled trash icon when board is deletable', () => {
-    const board: IBoardSummaryTableItem = {
-      boardName: 'Sample Board',
-      createdDate: new Date(),
-      isArchived: true,
-      archivedDate: new Date(Date.now() - 3 * 60 * 1000), // Archived 3 mins ago
-      pendingWorkItemsCount: 0,
-      totalWorkItemsCount: 0,
-      feedbackItemsCount: 0,
-      id: 'board-1',
-      teamId: 'team-1',
-      ownerId: 'user-1',
-    };
-
-    const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
-
-    expect(wrapper.find('.trash-icon').exists()).toBe(true);
-  });
+describe('TrashIcon tests', () => {
+  const baseBoard: IBoardSummaryTableItem = {
+    boardName: 'Sample Board',
+    createdDate: new Date(),
+    isArchived: true,
+    archivedDate: new Date(Date.now() - 3 * 60 * 1000), // Archived 3 mins ago
+    pendingWorkItemsCount: 0,
+    totalWorkItemsCount: 0,
+    feedbackItemsCount: 0,
+    id: 'board-1',
+    teamId: 'team-1',
+    ownerId: 'user-1',
+  };
 
   it('should render disabled trash icon when board is not deletable yet', () => {
-    const board = {
-      boardName: 'Sample Board',
-      createdDate: new Date(),
-      isArchived: true,
-      archivedDate: new Date(Date.now() - 1 * 60 * 1000), // Archived 1 min ago
-      pendingWorkItemsCount: 0,
-      totalWorkItemsCount: 0,
-      feedbackItemsCount: 0,
-      id: 'board-1',
-      teamId: 'team-1',
-      ownerId: 'user-1',
-    };
-
-    const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
-
+    const recentlyArchived = { ...baseBoard, archivedDate: new Date(Date.now() - 1 * 60 * 1000) };
+    const wrapper = shallow(
+      <TrashIcon
+        board={recentlyArchived}
+        currentUserId="user-1"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
     expect(wrapper.find('.trash-icon-disabled').exists()).toBe(true);
   });
 
   it('should not render trash icon when board is not archived', () => {
-    const board = {
-      boardName: 'Sample Board',
-      createdDate: new Date(),
+    const unarchived: IBoardSummaryTableItem = {
+      ...baseBoard,
       isArchived: false,
-      archivedDate: undefined as Date | undefined,
-      pendingWorkItemsCount: 0,
-      totalWorkItemsCount: 0,
-      feedbackItemsCount: 0,
-      id: 'board-1',
-      teamId: 'team-1',
-      ownerId: 'user-1',
+      archivedDate: undefined
     };
 
-    const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
+    const wrapper = shallow(
+      <TrashIcon
+        board={unarchived}
+        currentUserId="user-1"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
 
     expect(wrapper.find('.trash-icon').exists()).toBe(false);
     expect(wrapper.find('.trash-icon-disabled').exists()).toBe(false);
+  });
+
+  it('should NOT show trash icon if user is not board owner AND not team admin', () => {
+    const wrapper = shallow(
+      <TrashIcon
+        board={{ ...baseBoard, ownerId: 'someone-else' }}
+        currentUserId="user-2"
+        currentUserIsTeamAdmin={false}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon').exists()).toBe(false);
+  });
+
+  it('should show trash icon if user is board owner BUT not team admin', () => {
+    const wrapper = shallow(
+      <TrashIcon
+        board={{ ...baseBoard, ownerId: 'user-1' }}
+        currentUserId="user-1"
+        currentUserIsTeamAdmin={false}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon').exists()).toBe(true);
+  });
+
+  it('should show trash icon if user is not board owner BUT is team admin', () => {
+    const wrapper = shallow(
+      <TrashIcon
+        board={{ ...baseBoard, ownerId: 'someone-else' }}
+        currentUserId="user-2"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon').exists()).toBe(true);
+  });
+
+  it('should show trash icon if user is board owner AND team admin', () => {
+    const wrapper = shallow(
+      <TrashIcon
+        board={{ ...baseBoard, ownerId: 'user-1' }}
+        currentUserId="user-1"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
+    expect(wrapper.find('.trash-icon').exists()).toBe(true);
   });
 });
 
@@ -221,5 +281,92 @@ describe('handleArchiveToggle', () => {
     });
     expect(mockSetTableData).toHaveBeenCalled();
     expect(mockOnArchiveToggle).toHaveBeenCalled();
+  });
+});
+
+jest
+  .spyOn(userIdentityHelper, 'getUserIdentity')
+  .mockReturnValue({
+    ...mockedIdentity,
+    id: 'user-1'  // make sure the id matches your test
+  });
+
+jest.spyOn(userIdentityHelper, 'encrypt').mockImplementation((id) => `encrypted-${id}`);
+
+describe('handleConfirmDelete', () => {
+  const mockSetOpenDialogBoardId = jest.fn();
+  const mockSetTableData = jest.fn();
+  const mockSetRefreshKey = jest.fn();
+
+  const board: IBoardSummaryTableItem = {
+    id: 'board-1',
+    boardName: 'Board One',
+    feedbackItemsCount: 3,
+    teamId: 'team-1',
+    ownerId: 'user-1',
+    createdDate: new Date(),
+    isArchived: true,
+    archivedDate: new Date(Date.now() - 5 * 60 * 1000),
+    pendingWorkItemsCount: 0,
+    totalWorkItemsCount: 0,
+  };
+
+  const tableData: IBoardSummaryTableItem[] = [board];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('returns early if openDialogBoardId is null', async () => {
+    await handleConfirmDelete(
+      null,
+      tableData,
+      'team-1',
+      mockSetOpenDialogBoardId,
+      mockSetTableData,
+      mockSetRefreshKey,
+    );
+
+    expect(BoardDataService.deleteFeedbackBoard).not.toHaveBeenCalled();
+    expect(mockSetOpenDialogBoardId).not.toHaveBeenCalled();
+  });
+
+  it('deletes board successfully and tracks event', async () => {
+    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+
+    await handleConfirmDelete(
+      'board-1',
+      tableData,
+      'team-1',
+      mockSetOpenDialogBoardId,
+      mockSetTableData,
+      mockSetRefreshKey,
+    );
+
+    expect(mockSetOpenDialogBoardId).toHaveBeenCalledWith(null);
+    expect(BoardDataService.deleteFeedbackBoard).toHaveBeenCalledWith('team-1', 'board-1');
+    expect(reflectBackendService.broadcastDeletedBoard).toHaveBeenCalledWith('team-1', 'board-1');
+    expect(mockSetTableData).toHaveBeenCalledWith(expect.any(Function));
+  });
+
+  it('handles errors and sets refresh key', async () => {
+    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockRejectedValue(new Error('fail'));
+
+    await handleConfirmDelete(
+      'board-1',
+      tableData,
+      'team-1',
+      mockSetOpenDialogBoardId,
+      mockSetTableData,
+      mockSetRefreshKey,
+    );
+
+    expect(appInsights.trackException).toHaveBeenCalledWith(expect.any(Error), {
+      boardId: 'board-1',
+      boardName: 'Board One',
+      feedbackItemsCount: 3,
+      action: 'delete',
+    });
+    expect(mockSetRefreshKey).toHaveBeenCalledWith(true);
   });
 });
