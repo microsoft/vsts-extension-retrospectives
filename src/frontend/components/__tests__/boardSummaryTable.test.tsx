@@ -3,20 +3,24 @@ import { shallow, mount, ReactWrapper } from 'enzyme';
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 import { act } from 'react-dom/test-utils';
 
-import BoardSummaryTable, { IBoardSummaryTableProps, IBoardSummaryTableItem } from '../boardSummaryTable';
+import BoardSummaryTable, { handleConfirmDelete, IBoardSummaryTableProps, IBoardSummaryTableItem } from '../boardSummaryTable';
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from '../boardSummaryTable';
 import BoardDataService from '../../dal/boardDataService';
 import { IFeedbackBoardDocument } from '../../interfaces/feedback';
 import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient"
+import { reflectBackendService } from '../../dal/reflectBackendService';
+import * as userIdentityHelper from '../../utilities/userIdentityHelper';
 
 jest.mock('../../utilities/telemetryClient', () => {
   return {
     appInsights: {
       trackEvent: jest.fn(),
+      trackException: jest.fn(),
     },
     TelemetryEvents: {
       FeedbackBoardArchived: 'FeedbackBoardArchived',
       FeedbackBoardRestored: 'FeedbackBoardRestored',
+      FeedbackBoardDeleted: 'FeedbackBoardDeleted',
     },
   };
 });
@@ -33,8 +37,13 @@ jest.mock('../../dal/boardDataService', () => ({
   restoreArchivedFeedbackBoard: jest.fn(),
 }));
 
+jest.mock('../../dal/reflectBackendService', () => ({
+  reflectBackendService: {
+    broadcastDeletedBoard: jest.fn(),
+  },
+}));
+
 jest.mock('../../dal/azureDevOpsWorkItemService');
-jest.mock('../../dal/reflectBackendService');
 
 const mockedIdentity: IdentityRef = {
   directoryAlias: 'test.user',
@@ -87,16 +96,6 @@ const baseProps: IBoardSummaryTableProps = {
   currentUserIsTeamAdmin: true,
   supportedWorkItemTypes: [],
   onArchiveToggle: jest.fn(),
-};
-
-const defaultProps = {
-  boards: mockBoards,
-  currentUserId: 'user-1',
-  currentUserIsTeamAdmin: false,
-  onDeleteBoard: jest.fn(),
-  onArchiveBoard: jest.fn(),
-  onRestoreBoard: jest.fn(),
-  loading: false,
 };
 
 describe('BoardSummaryTable', () => {
@@ -282,5 +281,92 @@ describe('handleArchiveToggle', () => {
     });
     expect(mockSetTableData).toHaveBeenCalled();
     expect(mockOnArchiveToggle).toHaveBeenCalled();
+  });
+});
+
+jest
+  .spyOn(userIdentityHelper, 'getUserIdentity')
+  .mockReturnValue({
+    ...mockedIdentity,
+    id: 'user-1'  // make sure the id matches your test
+  });
+
+jest.spyOn(userIdentityHelper, 'encrypt').mockImplementation((id) => `encrypted-${id}`);
+
+describe('handleConfirmDelete', () => {
+  const mockSetOpenDialogBoardId = jest.fn();
+  const mockSetTableData = jest.fn();
+  const mockSetRefreshKey = jest.fn();
+
+  const board: IBoardSummaryTableItem = {
+    id: 'board-1',
+    boardName: 'Board One',
+    feedbackItemsCount: 3,
+    teamId: 'team-1',
+    ownerId: 'user-1',
+    createdDate: new Date(),
+    isArchived: true,
+    archivedDate: new Date(Date.now() - 5 * 60 * 1000),
+    pendingWorkItemsCount: 0,
+    totalWorkItemsCount: 0,
+  };
+
+  const tableData: IBoardSummaryTableItem[] = [board];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('returns early if openDialogBoardId is null', async () => {
+    await handleConfirmDelete(
+      null,
+      tableData,
+      'team-1',
+      mockSetOpenDialogBoardId,
+      mockSetTableData,
+      mockSetRefreshKey,
+    );
+
+    expect(BoardDataService.deleteFeedbackBoard).not.toHaveBeenCalled();
+    expect(mockSetOpenDialogBoardId).not.toHaveBeenCalled();
+  });
+
+  it('deletes board successfully and tracks event', async () => {
+    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+
+    await handleConfirmDelete(
+      'board-1',
+      tableData,
+      'team-1',
+      mockSetOpenDialogBoardId,
+      mockSetTableData,
+      mockSetRefreshKey,
+    );
+
+    expect(mockSetOpenDialogBoardId).toHaveBeenCalledWith(null);
+    expect(BoardDataService.deleteFeedbackBoard).toHaveBeenCalledWith('team-1', 'board-1');
+    expect(reflectBackendService.broadcastDeletedBoard).toHaveBeenCalledWith('team-1', 'board-1');
+    expect(mockSetTableData).toHaveBeenCalledWith(expect.any(Function));
+  });
+
+  it('handles errors and sets refresh key', async () => {
+    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockRejectedValue(new Error('fail'));
+
+    await handleConfirmDelete(
+      'board-1',
+      tableData,
+      'team-1',
+      mockSetOpenDialogBoardId,
+      mockSetTableData,
+      mockSetRefreshKey,
+    );
+
+    expect(appInsights.trackException).toHaveBeenCalledWith(expect.any(Error), {
+      boardId: 'board-1',
+      boardName: 'Board One',
+      feedbackItemsCount: 3,
+      action: 'delete',
+    });
+    expect(mockSetRefreshKey).toHaveBeenCalledWith(true);
   });
 });
