@@ -3,7 +3,7 @@ import { shallow, mount, ReactWrapper } from 'enzyme';
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
 import { act } from 'react-dom/test-utils';
 
-import BoardSummaryTable, { handleConfirmDelete, IBoardSummaryTableProps, IBoardSummaryTableItem } from '../boardSummaryTable';
+import BoardSummaryTable, { buildBoardSummaryState, handleConfirmDelete, IBoardSummaryTableProps, IBoardSummaryTableItem } from '../boardSummaryTable';
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from '../boardSummaryTable';
 import BoardDataService from '../../dal/boardDataService';
 import { IFeedbackBoardDocument } from '../../interfaces/feedback';
@@ -368,5 +368,47 @@ describe('handleConfirmDelete', () => {
       action: 'delete',
     });
     expect(mockSetRefreshKey).toHaveBeenCalledWith(true);
+  });
+});
+
+describe('buildBoardSummaryState', () => {
+  it('returns empty state when no boards exist', () => {
+    const state = buildBoardSummaryState([]);
+    expect(state.boardsTableItems).toEqual([]);
+    expect(state.isDataLoaded).toBe(true);
+    expect(state.feedbackBoards).toEqual([]);
+    expect(state.actionItemsByBoard).toEqual({});
+    expect(state.allDataLoaded).toBe(false);
+  });
+
+  it('builds board summary state correctly for provided boards', () => {
+    const state = buildBoardSummaryState(mockBoards);
+
+    // Sort mockBoards by createdDate descending to match function behavior
+    const sortedMockBoards = [...mockBoards].sort(
+      (a, b) => b.createdDate.getTime() - a.createdDate.getTime()
+    );
+
+    // The returned boardsTableItems should have the same length as mockBoards
+    expect(state.boardsTableItems.length).toBe(mockBoards.length);
+
+    // The boards should be sorted by createdDate descending
+    sortedMockBoards.forEach((originalBoard, index) => {
+      const item = state.boardsTableItems[index];
+      expect(item.id).toBe(originalBoard.id);
+      expect(item.boardName).toBe(originalBoard.title);
+      expect(item.createdDate.getTime()).toBe(originalBoard.createdDate.getTime());
+      expect(item.isArchived).toBe(originalBoard.isArchived);
+      expect(item.archivedDate).toBe(
+        originalBoard.archivedDate ? new Date(originalBoard.archivedDate) : null
+      );
+      expect(item.ownerId).toBe(originalBoard.createdBy.id);
+    });
+
+    // Check that actionItemsByBoard keys match board IDs
+    expect(Object.keys(state.actionItemsByBoard)).toEqual(mockBoards.map(b => b.id));
+
+    // Check that allDataLoaded is false
+    expect(state.allDataLoaded).toBe(false);
   });
 });

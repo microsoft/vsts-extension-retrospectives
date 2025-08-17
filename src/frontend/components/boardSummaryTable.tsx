@@ -4,7 +4,6 @@ import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { useReactTable } from '@tanstack/react-table';
-import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 import DeleteBoardDialog from './deleteBoardDialog';
 import BoardSummary from './boardSummary';
