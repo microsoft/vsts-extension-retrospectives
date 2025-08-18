@@ -1,11 +1,10 @@
 import { IFeedbackItemDocument, IFeedbackBoardDocument, IFeedbackColumn } from "../interfaces/feedback";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../dal/itemDataService";
-import { getBoardUrl } from '../utilities/boardUrlHelper';
-import { saveAs } from 'file-saver';
+import { getBoardUrl } from "../utilities/boardUrlHelper";
+import { saveAs } from "file-saver";
 
 class ShareBoardHelper {
-
   // Builds CSV content which lists the given board's feedback and work items
   public generateCSVContent = async (board: IFeedbackBoardDocument) => {
     const feedbackItems: IFeedbackItemDocument[] = await itemDataService.getFeedbackItemsForBoard(board.id);
@@ -13,9 +12,9 @@ class ShareBoardHelper {
 
     /* eslint-disable  no-useless-escape */
     let content: string = `\"Retrospectives Summary for '${board.title}' (${boardUrl})\"\n`;
-    content += "\n\nFeedback Items\nType,Description,Votes,CreatedDate,CreatedBy\n"
+    content += "\n\nFeedback Items\nType,Description,Votes,CreatedDate,CreatedBy\n";
 
-    const contentList: { type: string, description: string, votes: number, createdDate: Date, createdBy: string }[] = [];
+    const contentList: { type: string; description: string; votes: number; createdDate: Date; createdBy: string }[] = [];
 
     for (const feedbackItem of feedbackItems) {
       if (feedbackItem.parentFeedbackItemId) {
@@ -27,14 +26,12 @@ class ShareBoardHelper {
         description: feedbackItem.title,
         votes: feedbackItem.upvotes,
         createdDate: feedbackItem.createdDate,
-        createdBy: feedbackItem.createdBy?.displayName
+        createdBy: feedbackItem.createdBy?.displayName,
       });
 
       if (feedbackItem.childFeedbackItemIds && feedbackItem.childFeedbackItemIds.length) {
         // Remove child feedback item that does not exist. This non-existent child feedback item sometimes occurs due to race conditions.
-        const childFeedbackItems: IFeedbackItemDocument[] = feedbackItem.childFeedbackItemIds
-          .map((childId) => feedbackItems.find(f => f.id === childId))
-          .filter((childFeedbackItem) => childFeedbackItem);
+        const childFeedbackItems: IFeedbackItemDocument[] = feedbackItem.childFeedbackItemIds.map(childId => feedbackItems.find(f => f.id === childId)).filter(childFeedbackItem => childFeedbackItem);
 
         if (childFeedbackItems.length) {
           for (const childId of feedbackItem.childFeedbackItemIds) {
@@ -45,7 +42,7 @@ class ShareBoardHelper {
                 description: child.title,
                 votes: child.upvotes,
                 createdDate: child.createdDate,
-                createdBy: child.createdBy?.displayName
+                createdBy: child.createdBy?.displayName,
               });
             }
           }
@@ -72,7 +69,7 @@ class ShareBoardHelper {
 
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     saveAs(blob, "retro.csv");
-  }
+  };
 
   // Builds an email message which lists the given board's feedback and work items
   public generateEmailText = async (board: IFeedbackBoardDocument, boardUrl: string, sendEmail: boolean): Promise<string> => {
@@ -80,7 +77,7 @@ class ShareBoardHelper {
     let emailBody: string = `Retrospectives Summary\n\nRetrospective: ${board.title}\n`;
 
     emailBody += await this.getFeedbackBody(feedbackItems, board.columns);
-    emailBody += "\n" + await this.getActionItemsBody(feedbackItems);
+    emailBody += "\n" + (await this.getActionItemsBody(feedbackItems));
     emailBody += "\n\nLink to retrospective:\n" + boardUrl + " \n\n";
 
     if (sendEmail) {
@@ -88,7 +85,7 @@ class ShareBoardHelper {
     }
 
     return emailBody;
-  }
+  };
 
   private async getFeedbackBody(feedbackItems: IFeedbackItemDocument[], columns: IFeedbackColumn[]): Promise<string> {
     const columnContent: { [columnId: string]: string } = {};
@@ -106,9 +103,7 @@ class ShareBoardHelper {
 
       if (feedbackItem.childFeedbackItemIds && feedbackItem.childFeedbackItemIds.length) {
         // Remove child feedback item that does not exist. This non-existent child feedback item sometimes occurs due to race conditions.
-        const childFeedbackItems: IFeedbackItemDocument[] = feedbackItem.childFeedbackItemIds
-          .map((childId) => feedbackItems.find(f => f.id === childId))
-          .filter((childFeedbackItem) => childFeedbackItem);
+        const childFeedbackItems: IFeedbackItemDocument[] = feedbackItem.childFeedbackItemIds.map(childId => feedbackItems.find(f => f.id === childId)).filter(childFeedbackItem => childFeedbackItem);
 
         if (childFeedbackItems.length) {
           columnContent[feedbackItem.columnId] += `\t- Grouped feedback items:\n`;
@@ -122,10 +117,10 @@ class ShareBoardHelper {
       }
     }
 
-    let emailBody: string = '';
+    let emailBody: string = "";
     for (const column of columns) {
       if (!columnContent[column.id]) {
-        columnContent[column.id] = " - No items\n"
+        columnContent[column.id] = " - No items\n";
       }
 
       emailBody += `\n${column.title}:\n${columnContent[column.id]}`;
@@ -152,9 +147,8 @@ class ShareBoardHelper {
       for (const actionItem of allActionItems) {
         actionItemsBody += ` - ${actionItem}\n`;
       }
-    }
-    else {
-      actionItemsBody += " - No work items"
+    } else {
+      actionItemsBody += " - No work items";
     }
 
     return actionItemsBody;
