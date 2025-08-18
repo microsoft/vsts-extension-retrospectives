@@ -1,25 +1,25 @@
-import React from 'react';
-import { shallow } from 'enzyme';
+import React from "react";
+import { shallow } from "enzyme";
 import toJson from "enzyme-to-json";
-import EditableText, { EditableTextProps } from '../editableText';
+import EditableText, { EditableTextProps } from "../editableText";
 
-const mockOnSave = jest.fn(() => { });
+const mockOnSave = jest.fn(() => {});
 
 const mockedTestProps: EditableTextProps = {
-  text: '',
+  text: "",
   isChangeEventRequired: false,
-  onSave: mockOnSave
-}
+  onSave: mockOnSave,
+};
 
-describe('Editable Text Component', () => {
-  it('renders correctly.', () => {
+describe("Editable Text Component", () => {
+  it("renders correctly.", () => {
     const wrapper = shallow(<EditableText {...mockedTestProps} />);
     const component = wrapper.children().dive();
     expect(toJson(component)).toMatchSnapshot();
   });
 
-  it('updates text appropriately.', () => {
-    mockedTestProps.text = 'Test Text';
+  it("updates text appropriately.", () => {
+    mockedTestProps.text = "Test Text";
 
     const wrapper = shallow(<EditableText {...mockedTestProps} />);
     const component = wrapper.children().dive();

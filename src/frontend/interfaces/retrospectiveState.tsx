@@ -1,8 +1,8 @@
-import { WorkItemTypeModel } from 'azure-devops-extension-api/WorkItemTrackingProcessDefinitions';
+import { WorkItemTypeModel } from "azure-devops-extension-api/WorkItemTrackingProcessDefinitions";
 
 export enum ExceptionCode {
-    Unexpected = 0,
-    NotInheritedProcess = 1,
+  Unexpected = 0,
+  NotInheritedProcess = 1,
 }
 
 export interface InitialRetrospectiveState {
