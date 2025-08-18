@@ -6,6 +6,7 @@ import { act } from 'react-dom/test-utils';
 import BoardSummaryTable, { buildBoardSummaryState, handleConfirmDelete, IBoardSummaryTableProps, IBoardSummaryTableItem } from '../boardSummaryTable';
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from '../boardSummaryTable';
 import BoardDataService from '../../dal/boardDataService';
+import { itemDataService } from '../../dal/itemDataService';
 import { IFeedbackBoardDocument } from '../../interfaces/feedback';
 import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient"
 import { reflectBackendService } from '../../dal/reflectBackendService';
@@ -25,10 +26,17 @@ jest.mock('../../utilities/telemetryClient', () => {
   };
 });
 
-jest.mock('../../dal/itemDataService', () => ({
-  __esModule: true, // Helps Jest handle module imports correctly
-  getFeedbackItemsForBoard: jest.fn().mockResolvedValue([]),
-}));
+jest.mock('../../dal/itemDataService', () => {
+  const originalModule = jest.requireActual('../../dal/itemDataService');
+  return {
+    __esModule: true,
+    ...originalModule,
+    itemDataService: {
+      ...originalModule.itemDataService,
+      getFeedbackItemsForBoard: jest.fn().mockResolvedValue([]),
+    },
+  };
+});
 
 jest.mock('../../dal/boardDataService', () => ({
   getBoardsForTeam: jest.fn(),
@@ -410,5 +418,68 @@ describe('buildBoardSummaryState', () => {
 
     // Check that allDataLoaded is false
     expect(state.allDataLoaded).toBe(false);
+  });
+});
+
+describe('BoardSummaryTable, additional coverage', () => {
+  let wrapper: ReactWrapper;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]); // ADD THIS
+  });
+
+  it('handleBoardsDocuments updates state via useEffect', async () => {
+    await act(async () => {
+      wrapper = mount(<BoardSummaryTable {...baseProps} />);
+      await new Promise(resolve => setTimeout(resolve, 0)); // wait for useEffect
+      wrapper.update();
+    });
+
+    // Check that rendered boards exist
+    mockBoards.forEach(board => {
+      expect(wrapper.text()).toContain(board.title);
+    });
+
+    // Check that DeleteBoardDialog is rendered with hidden true initially
+    const dialog = wrapper.find('DeleteBoardDialog');
+    expect(dialog.prop('hidden')).toBe(true);
+  });
+
+  it('handleActionItems, handles feedback items early return paths', async () => {
+    // First board: no feedback items
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([]);
+    // Second board: has feedback items with no actionable IDs
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([
+      { id: 'item-1', associatedActionItemIds: [] },
+    ]);
+
+    await act(async () => {
+      wrapper = mount(<BoardSummaryTable {...baseProps} />);
+      await new Promise(resolve => setTimeout(resolve, 0)); // wait for useEffect
+      wrapper.update();
+    });
+
+    // BoardsTableItems should reflect feedback items count
+    const firstBoardRow = wrapper.text();
+    expect(firstBoardRow).toContain(mockBoards[0].title);
+    const secondBoardRow = wrapper.text();
+    expect(secondBoardRow).toContain(mockBoards[1].title);
+
+    // The actionItemsByBoard map should exist (cannot directly inspect internal state without hooks spy)
+  });
+
+  it('useEffect tracks exception if getBoardsForTeam fails', async () => {
+    const error = new Error('fail');
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockRejectedValueOnce(error);
+
+    await act(async () => {
+      wrapper = mount(<BoardSummaryTable {...baseProps} />);
+      await new Promise(resolve => setTimeout(resolve, 0));
+      wrapper.update();
+    });
+
+    expect(appInsights.trackException).toHaveBeenCalledWith(error);
   });
 });

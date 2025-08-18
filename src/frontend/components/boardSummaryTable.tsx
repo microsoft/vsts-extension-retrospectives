@@ -140,7 +140,7 @@ export function TrashIcon({
   onClick: (event: React.MouseEvent) => void;
 }) {
   if (!board.isArchived || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
-    return <div className="centered-cell" />; // no icon if not archived or not board owner
+    return <div className="centered-cell" />;
   }
   return isTrashEnabled(board) ? (
     <div
