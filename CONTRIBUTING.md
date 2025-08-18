@@ -111,8 +111,8 @@ Either in the [dev container](#dev-containers) or locally:
     - `pre-commit run --all-files` will run against *everything*
     - `pre-commit run markdownlint` to run the markdown linting
     - `pre-commit run spellcheck-cli` to run the spellchecking
-4. To run linting for the typescript/javascript (must be done within the `src/frontend`
-directory): `npm run lint`
+
+4. To run linting for the typescript/javascript (must be done within the `src/frontend` directory): `npm run lint`
 
 Read more about the [Python pre-commit framework](https://pre-commit.com/). To disable the pre-commit hook run `pre-commit uninstall` from the root folder.
 
@@ -120,8 +120,7 @@ Read more about the [Python pre-commit framework](https://pre-commit.com/). To d
 
 The Retrospectives Extension can be built, developed and tested in several development environments. This section highlights three of the primary environments in order of relevance.
 
-All of the development prerequisites, such as [Webpack](https://webpack.js.org/) and [NodeJS](https://nodejs.org/en/download/) are listed in the [Dockerfile](.devcontainer/Dockerfile). This file can be opened in a text
-editor and the install commands can be used to configure the prerequisites outside of a [dev container](#dev-containers).
+All of the development prerequisites, such as [Webpack](https://webpack.js.org/) and [NodeJS](https://nodejs.org/en/download/) are listed in the [Dockerfile](.devcontainer/Dockerfile). This file can be opened in a text editor and the install commands can be used to configure the prerequisites outside of a [dev container](#dev-containers).
 
 ### Dev Containers
 
@@ -169,7 +168,7 @@ editor and the install commands can be used to configure the prerequisites outsi
 
 ---
 
-- Some commands, such as `dotnet build` and `npm run build:p` may need `sudo` prefixed to execute successfully.
+- Some commands, such as `dotnet build` and `npm run build` may need `sudo` prefixed to execute successfully.
 
 ### Github Codespaces
 
@@ -192,14 +191,15 @@ Test changes in the Azure DevOps environment by publishing a development version
 1. Clone this repository, and open in your preferred [development environment](#development-environments).
 2. Using Powershell, navigate to the `/src/frontend` folder, run `npm install`. This will download all the dependent packages listed in `package.json`.
 3. When developing or publishing the extension locally, you need to create a .env file at the top-level directory of the front end project (where `package.json` lives). You can copy `src/frontend/.env.template` to `src/frontend/.env` to get started.
+
 The contents of the `.env` file are
 
-    ```bash
-    # Backend Service URL
-    REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service URL here"
-    # App Instrumentation Key
-    REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
-    ```
+```bash
+# Backend Service URL
+REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service URL here"
+# App Instrumentation Key
+REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
+```
 
     - In lieu of the .env file you can set actual environment variables.
 
