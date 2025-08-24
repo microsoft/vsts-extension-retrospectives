@@ -1,10 +1,23 @@
 import React from "react";
+import { render } from "@testing-library/react";
 import { IFeedbackBoardDocument } from "../../interfaces/feedback";
-import { shallow } from "enzyme";
 import { mocked } from "jest-mock";
 import FeedbackBoard, { FeedbackBoardProps } from "../../components/feedbackBoard";
 import { testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
+
+// Mock telemetryClient
+jest.mock("../../utilities/telemetryClient", () => ({
+  reactPlugin: {
+    trackMetric: jest.fn(),
+    trackEvent: jest.fn(),
+  },
+  appInsights: {
+    trackEvent: jest.fn(),
+    trackException: jest.fn(),
+  },
+  TelemetryEvents: {},
+}));
 
 jest.mock("../feedbackBoardMetadataForm", () => mocked({}));
 
@@ -105,13 +118,13 @@ const mockedProps: FeedbackBoardProps = {
 };
 
 it(`can be rendered`, () => {
-  const wrapper = shallow(<FeedbackBoard {...mockedProps} />);
-  const component = wrapper.children().dive();
-  expect(component.prop("className")).toBe("feedback-board");
+  const { container } = render(<FeedbackBoard {...mockedProps} />);
+  const feedbackBoard = container.querySelector(".feedback-board");
+  expect(feedbackBoard).toBeTruthy();
 });
 
 it(`shows correct vote counts`, () => {
-  const wrapper = shallow(<FeedbackBoard {...mockedProps} />);
-  const component = wrapper.children().dive();
-  expect(component.findWhere(child => child.prop("className") === "feedback-maxvotes-per-user").text()).toBe("Votes Used: 0 / 5");
+  const { container } = render(<FeedbackBoard {...mockedProps} />);
+  const voteElement = container.querySelector(".feedback-maxvotes-per-user");
+  expect(voteElement?.textContent).toBe("Votes Used: 0 / 5");
 });

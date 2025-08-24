@@ -1,7 +1,7 @@
 import React from "react";
 import Slider, { Settings } from "react-slick";
 import FeedbackColumn, { FeedbackColumnProps } from "./feedbackColumn";
-import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
+import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import FeedbackItem from "./feedbackItem";
 import { IColumnItem } from "./feedbackBoard";
 import { itemDataService } from "../dal/itemDataService";

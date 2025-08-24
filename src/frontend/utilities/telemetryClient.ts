@@ -8,7 +8,7 @@ const reactPlugin = new ReactPlugin();
 const appInsights = new ApplicationInsights({
   config: {
     instrumentationKey: environment.AppInsightsInstrumentKey,
-    extensions: [reactPlugin],
+    extensions: [reactPlugin as any],
     loggingLevelConsole: 2,
     loggingLevelTelemetry: 2,
     extensionConfig: {

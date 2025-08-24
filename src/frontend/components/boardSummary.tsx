@@ -1,10 +1,10 @@
 ﻿import React from "react";
 import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { DocumentCard, DocumentCardTitle, DocumentCardType } from "office-ui-fabric-react/lib/DocumentCard";
-import { Image } from "office-ui-fabric-react/lib/Image";
+import { DocumentCard, DocumentCardTitle, DocumentCardType } from "@fluentui/react/lib/DocumentCard";
+import { Image } from "@fluentui/react/lib/Image";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
-import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from "office-ui-fabric-react/lib/DetailsList";
+import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from "@fluentui/react/lib/DetailsList";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 

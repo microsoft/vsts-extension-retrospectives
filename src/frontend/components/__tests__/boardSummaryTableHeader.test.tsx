@@ -1,16 +1,16 @@
 import React from "react";
-import { shallow, mount } from "enzyme";
+import { render } from "@testing-library/react";
+import { fireEvent } from "@testing-library/dom";
+import "@testing-library/jest-dom";
 import BoardSummaryTableHeader from "../boardSummaryTableHeader";
-import type { Header, HeaderGroup } from "@tanstack/table-core";
-import type { IBoardSummaryTableItem } from "../boardSummaryTable";
 
 const resizeHandler = jest.fn();
 
-const mockHeader: Header<IBoardSummaryTableItem, unknown> = {
+const mockHeader: any = {
   id: "column-1",
   isPlaceholder: false,
   depth: 1,
-  headerGroup: {} as HeaderGroup<IBoardSummaryTableItem>,
+  headerGroup: {} as any,
   colSpan: 1,
   getSize: () => 150,
   getResizeHandler: () => resizeHandler,
@@ -22,29 +22,37 @@ const mockHeader: Header<IBoardSummaryTableItem, unknown> = {
     getToggleSortingHandler: jest.fn(),
   },
   getContext: () => ({}),
-  getLeafHeaders: (): Header<IBoardSummaryTableItem, unknown>[] => [],
-} as unknown as Header<IBoardSummaryTableItem, unknown>;
+  getLeafHeaders: (): any[] => [],
+} as any;
 
-const mockHeaderGroup: HeaderGroup<IBoardSummaryTableItem> = {
+const mockHeaderGroup: any = {
   id: "header-group-1",
   depth: 0,
   headers: [mockHeader],
-} as unknown as HeaderGroup<IBoardSummaryTableItem>;
+} as any;
 
 describe("BoardSummaryTableHeader", () => {
   it("renders table headers correctly", () => {
-    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    expect(wrapper.find("thead")).toHaveLength(1);
-    expect(wrapper.find("tr")).toHaveLength(1);
-    expect(wrapper.find("th")).toHaveLength(mockHeaderGroup.headers.length);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
+      </table>
+    );
+    expect(container.querySelectorAll("thead")).toHaveLength(1);
+    expect(container.querySelectorAll("tr")).toHaveLength(1);
+    expect(container.querySelectorAll("th")).toHaveLength(mockHeaderGroup.headers.length);
   });
 
   it("applies correct sorting properties to headers", () => {
-    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    const headerElement = wrapper.find("th").at(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
+      </table>
+    );
+    const headerElement = container.querySelector("th")!;
 
-    expect(headerElement.prop("aria-sort")).toBe("ascending");
-    expect(headerElement.hasClass("asc")).toBeTruthy();
+    expect(headerElement).toHaveAttribute("aria-sort", "ascending");
+    expect(headerElement).toHaveClass("asc");
   });
 
   it("applies correct sorting properties when sorting is descending", () => {
@@ -54,42 +62,59 @@ describe("BoardSummaryTableHeader", () => {
         ...mockHeader.column,
         getIsSorted: () => "desc",
       },
-    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+    } as any;
 
     const mockDescendingHeaderGroup = {
       ...mockHeaderGroup,
       headers: [mockDescendingHeader],
-    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+    } as any;
 
-    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockDescendingHeaderGroup]} />);
-    const headerElement = wrapper.find("th").at(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[mockDescendingHeaderGroup]} />
+      </table>
+    );
+    const headerElement = container.querySelector("th")!;
 
-    expect(headerElement.prop("aria-sort")).toBe("descending");
-    expect(headerElement.hasClass("desc")).toBeTruthy();
+    expect(headerElement).toHaveAttribute("aria-sort", "descending");
+    expect(headerElement).toHaveClass("desc");
   });
 
   it("calls sorting handler when header is clicked", () => {
-    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    wrapper.find("th").simulate("click");
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
+      </table>
+    );
+    const headerElement = container.querySelector("th")!;
+    fireEvent.click(headerElement);
     expect(mockHeaderGroup.headers[0].column.getToggleSortingHandler).toHaveBeenCalled();
   });
 
   it("renders empty <thead> when no headers exist", () => {
-    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[]} />);
-    expect(wrapper.find("thead")).toHaveLength(1);
-    expect(wrapper.find("th")).toHaveLength(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[]} />
+      </table>
+    );
+    expect(container.querySelectorAll("thead")).toHaveLength(1);
+    expect(container.querySelectorAll("th")).toHaveLength(0);
   });
 
   it("renders header content and resizer with correct classes", () => {
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    const th = wrapper.find("th").at(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
+      </table>
+    );
+    const th = container.querySelector("th")!;
 
-    expect(th.text()).toContain("Board Name");
+    expect(th.textContent).toContain("Board Name");
 
-    const resizerDiv = th.find("div").at(0);
-    expect(resizerDiv.exists()).toBe(true);
-    expect(resizerDiv.hasClass("resizer")).toBe(true);
-    expect(resizerDiv.hasClass("isResizing")).toBe(true);
+    const resizerDiv = th.querySelector("div")!;
+    expect(resizerDiv).toBeInTheDocument();
+    expect(resizerDiv).toHaveClass("resizer");
+    expect(resizerDiv).toHaveClass("isResizing");
   });
 
   it("calls resize handler on mouse down and touch start", () => {
@@ -97,25 +122,33 @@ describe("BoardSummaryTableHeader", () => {
     const resizableHeader = {
       ...mockHeader,
       getResizeHandler: () => resizeFn,
-    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+    } as any;
 
     const resizableHeaderGroup = {
       ...mockHeaderGroup,
       headers: [resizableHeader],
-    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+    } as any;
 
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />);
-    const resizerDiv = wrapper.find("div").at(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />
+      </table>
+    );
+    const resizerDiv = container.querySelector("div")!;
 
-    resizerDiv.simulate("mouseDown");
-    resizerDiv.simulate("touchStart");
+    fireEvent.mouseDown(resizerDiv);
+    fireEvent.touchStart(resizerDiv);
 
     expect(resizeFn).toHaveBeenCalledTimes(2);
   });
 
   it("renders header content using flexRender", () => {
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />);
-    expect(wrapper.find("th").text()).toContain("Board Name");
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
+      </table>
+    );
+    expect(container.querySelector("th")!.textContent).toContain("Board Name");
   });
 
   it("renders resizer div with correct classes and triggers resize handlers", () => {
@@ -123,21 +156,25 @@ describe("BoardSummaryTableHeader", () => {
     const resizableHeader = {
       ...mockHeader,
       getResizeHandler: () => resizeFn,
-    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+    } as any;
 
     const resizableHeaderGroup = {
       ...mockHeaderGroup,
       headers: [resizableHeader],
-    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+    } as any;
 
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />);
-    const resizerDiv = wrapper.find("div").at(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />
+      </table>
+    );
+    const resizerDiv = container.querySelector("div")!;
 
-    expect(resizerDiv.hasClass("resizer")).toBe(true);
-    expect(resizerDiv.hasClass("isResizing")).toBe(true);
+    expect(resizerDiv).toHaveClass("resizer");
+    expect(resizerDiv).toHaveClass("isResizing");
 
-    resizerDiv.simulate("mouseDown");
-    resizerDiv.simulate("touchStart");
+    fireEvent.mouseDown(resizerDiv);
+    fireEvent.touchStart(resizerDiv);
 
     expect(resizeFn).toHaveBeenCalledTimes(2);
   });
@@ -146,18 +183,22 @@ describe("BoardSummaryTableHeader", () => {
     const placeholderHeader = {
       ...mockHeader,
       isPlaceholder: true,
-    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+    } as any;
 
     const placeholderHeaderGroup = {
       ...mockHeaderGroup,
       headers: [placeholderHeader],
-    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+    } as any;
 
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[placeholderHeaderGroup]} />);
-    const th = wrapper.find("th").at(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[placeholderHeaderGroup]} />
+      </table>
+    );
+    const th = container.querySelector("th")!;
 
-    expect(th.text()).not.toContain("Board Name");
-    expect(th.find("span")).toHaveLength(0);
+    expect(th.textContent).not.toContain("Board Name");
+    expect(th.querySelectorAll("span")).toHaveLength(0);
   });
 
   it("renders resizer div without resizer class when column cannot resize", () => {
@@ -168,18 +209,22 @@ describe("BoardSummaryTableHeader", () => {
         getCanResize: () => false,
         getIsResizing: () => false,
       },
-    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+    } as any;
 
     const nonResizableHeaderGroup = {
       ...mockHeaderGroup,
       headers: [nonResizableHeader],
-    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+    } as any;
 
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[nonResizableHeaderGroup]} />);
-    const resizerDiv = wrapper.find("div").at(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[nonResizableHeaderGroup]} />
+      </table>
+    );
+    const resizerDiv = container.querySelector("div")!;
 
-    expect(resizerDiv.hasClass("resizer")).toBe(false);
-    expect(resizerDiv.hasClass("isResizing")).toBe(false);
+    expect(resizerDiv).not.toHaveClass("resizer");
+    expect(resizerDiv).not.toHaveClass("isResizing");
   });
 
   it("renders resizer div with resizer class but without isResizing class when column can resize but is not currently resizing", () => {
@@ -190,18 +235,22 @@ describe("BoardSummaryTableHeader", () => {
         getCanResize: () => true,
         getIsResizing: () => false,
       },
-    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+    } as any;
 
     const resizableNotResizingHeaderGroup = {
       ...mockHeaderGroup,
       headers: [resizableNotResizingHeader],
-    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+    } as any;
 
-    const wrapper = mount(<BoardSummaryTableHeader headerGroups={[resizableNotResizingHeaderGroup]} />);
-    const resizerDiv = wrapper.find("div").at(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[resizableNotResizingHeaderGroup]} />
+      </table>
+    );
+    const resizerDiv = container.querySelector("div")!;
 
-    expect(resizerDiv.hasClass("resizer")).toBe(true);
-    expect(resizerDiv.hasClass("isResizing")).toBe(false);
+    expect(resizerDiv).toHaveClass("resizer");
+    expect(resizerDiv).not.toHaveClass("isResizing");
   });
 
   it("applies correct sorting properties when no sorting is applied", () => {
@@ -211,17 +260,21 @@ describe("BoardSummaryTableHeader", () => {
         ...mockHeader.column,
         getIsSorted: () => false,
       },
-    } as unknown as Header<IBoardSummaryTableItem, unknown>;
+    } as any;
 
     const unsortedHeaderGroup = {
       ...mockHeaderGroup,
       headers: [unsortedHeader],
-    } as unknown as HeaderGroup<IBoardSummaryTableItem>;
+    } as any;
 
-    const wrapper = shallow(<BoardSummaryTableHeader headerGroups={[unsortedHeaderGroup]} />);
-    const headerElement = wrapper.find("th").at(0);
+    const { container } = render(
+      <table>
+        <BoardSummaryTableHeader headerGroups={[unsortedHeaderGroup]} />
+      </table>
+    );
+    const headerElement = container.querySelector("th")!;
 
-    expect(headerElement.prop("aria-sort")).toBe("none");
-    expect(headerElement.prop("className")).toBe("");
+    expect(headerElement).toHaveAttribute("aria-sort", "none");
+    expect(headerElement.className).toBe("");
   });
 });

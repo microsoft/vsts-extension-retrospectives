@@ -1,6 +1,6 @@
 import React from "react";
-import { DefaultButton, PrimaryButton } from "office-ui-fabric-react/lib/Button";
-import { Dialog, DialogFooter, DialogType } from "office-ui-fabric-react/lib/Dialog";
+import { DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
+import { Dialog, DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
 import { IBoardSummaryTableItem } from "./boardSummaryTable";
 
 interface DeleteBoardDialogProps {

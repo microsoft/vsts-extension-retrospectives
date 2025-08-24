@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { DefaultButton } from "office-ui-fabric-react/lib/Button";
-import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
+import { DefaultButton } from "@fluentui/react/lib/Button";
+import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { useReactTable } from "@tanstack/react-table";
 
