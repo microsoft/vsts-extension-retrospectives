@@ -93,7 +93,7 @@ describe("Board Metadata Form Permissions", () => {
       permissionOptions: [],
       onPermissionChanged: jest.fn(),
     };
-    
+
     render(<FeedbackBoardMetadataFormPermissions {...props} />);
   });
 
@@ -104,7 +104,7 @@ describe("Board Metadata Form Permissions", () => {
       uniqueName: "group1@domain.com",
       type: "team",
     };
-    
+
     const props: IFeedbackBoardMetadataFormPermissionsProps = {
       board: testExistingBoard,
       permissions: { Teams: [], Members: [] },
@@ -113,7 +113,7 @@ describe("Board Metadata Form Permissions", () => {
       permissionOptions: [groupOption],
       onPermissionChanged: jest.fn(),
     };
-    
+
     const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
     // Group options with [Project]\\Group pattern should be filtered out
     expect(container).toBeTruthy();
@@ -131,7 +131,7 @@ describe("Board Metadata Form Permissions", () => {
         permissionOptions: [],
         onPermissionChanged: jest.fn(),
       };
-      
+
       const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       expect(getByText("This board is visible to every member in the project.")).toBeInTheDocument();
     });
@@ -145,7 +145,7 @@ describe("Board Metadata Form Permissions", () => {
         permissionOptions: [],
         onPermissionChanged: jest.fn(),
       };
-      
+
       const { queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       expect(queryByText("This board is visible to every member in the project.")).not.toBeInTheDocument();
     });
@@ -159,7 +159,7 @@ describe("Board Metadata Form Permissions", () => {
         permissionOptions: [],
         onPermissionChanged: jest.fn(),
       };
-      
+
       const { queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       expect(queryByText("This board is visible to every member in the project.")).not.toBeInTheDocument();
     });
@@ -173,9 +173,9 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: "not-owner-id", // Different from board owner
         permissions: { Teams: [], Members: [] },
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and handle permission state
       expect(container.firstChild).toBeTruthy();
     });
@@ -185,9 +185,9 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: testUserId, // Use testUserId which should match board owner
         permissions: { Teams: [], Members: [] },
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render without warning for owner
       expect(container.firstChild).toBeTruthy();
     });
@@ -197,9 +197,9 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: "team-admin-id",
         permissions: { Teams: [], Members: [] },
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render without warning for team admin
       expect(container.firstChild).toBeTruthy();
     });
@@ -214,9 +214,9 @@ describe("Board Metadata Form Permissions", () => {
           { id: "team2", name: "Team Two", uniqueName: "team2", type: "team" },
         ],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render with team permissions
       expect(container.firstChild).toBeTruthy();
     });
@@ -229,9 +229,9 @@ describe("Board Metadata Form Permissions", () => {
           { id: "user2", name: "User Two", uniqueName: "user2@example.com", type: "member" },
         ],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render with member permissions
       expect(container.firstChild).toBeTruthy();
     });
@@ -246,9 +246,9 @@ describe("Board Metadata Form Permissions", () => {
           { id: "user1", name: "Alice User", uniqueName: "alice@example.com", type: "member" },
         ],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render with proper ordering
       expect(container.firstChild).toBeTruthy();
     });
@@ -263,9 +263,9 @@ describe("Board Metadata Form Permissions", () => {
           { id: "user2", name: "User Two", uniqueName: "user2@example.com", type: "member" },
         ],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render with permissions ordered first
       expect(container.firstChild).toBeTruthy();
     });
@@ -279,9 +279,9 @@ describe("Board Metadata Form Permissions", () => {
           { id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" },
         ],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render with owner label and ordering
       expect(container.firstChild).toBeTruthy();
     });
@@ -289,13 +289,11 @@ describe("Board Metadata Form Permissions", () => {
     it("should display the Team Admin badge for a team admin", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: ["admin-user"] },
-        permissionOptions: [
-          { id: "admin-user", name: "Admin User", uniqueName: "admin@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "admin-user", name: "Admin User", uniqueName: "admin@example.com", type: "member" }],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render with team admin badge
       expect(container.firstChild).toBeTruthy();
     });
@@ -303,13 +301,11 @@ describe("Board Metadata Form Permissions", () => {
     it("should not display the Team Admin badge if isTeamAdmin is false or missing", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: ["regular-user"] },
-        permissionOptions: [
-          { id: "regular-user", name: "Regular User", uniqueName: "regular@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "regular-user", name: "Regular User", uniqueName: "regular@example.com", type: "member" }],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render without team admin badge for regular users
       expect(container.firstChild).toBeTruthy();
     });
@@ -317,13 +313,11 @@ describe("Board Metadata Form Permissions", () => {
     it("should display correct admin badges for users who are team admins on different teams", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: ["multi-admin"] },
-        permissionOptions: [
-          { id: "multi-admin", name: "Multi Admin", uniqueName: "multiadmin@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "multi-admin", name: "Multi Admin", uniqueName: "multiadmin@example.com", type: "member" }],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render with multiple team admin badges
       expect(container.firstChild).toBeTruthy();
     });
@@ -334,14 +328,12 @@ describe("Board Metadata Form Permissions", () => {
       const onPermissionChanged = jest.fn();
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" }],
         onPermissionChanged,
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and handle permission changes
       expect(container.firstChild).toBeTruthy();
       expect(onPermissionChanged).toBeDefined();
@@ -351,14 +343,12 @@ describe("Board Metadata Form Permissions", () => {
       const onPermissionChanged = jest.fn();
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "team1", name: "Team One", uniqueName: "team1", type: "team" },
-        ],
+        permissionOptions: [{ id: "team1", name: "Team One", uniqueName: "team1", type: "team" }],
         onPermissionChanged,
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and handle adding team permissions
       expect(container.firstChild).toBeTruthy();
     });
@@ -367,14 +357,12 @@ describe("Board Metadata Form Permissions", () => {
       const onPermissionChanged = jest.fn();
       const props = makeProps({
         permissions: { Teams: ["team1"], Members: [] },
-        permissionOptions: [
-          { id: "team1", name: "Team One", uniqueName: "team1", type: "team" },
-        ],
+        permissionOptions: [{ id: "team1", name: "Team One", uniqueName: "team1", type: "team" }],
         onPermissionChanged,
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and handle removing team permissions
       expect(container.firstChild).toBeTruthy();
     });
@@ -383,14 +371,12 @@ describe("Board Metadata Form Permissions", () => {
       const onPermissionChanged = jest.fn();
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" }],
         onPermissionChanged,
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and handle adding member permissions
       expect(container.firstChild).toBeTruthy();
     });
@@ -399,14 +385,12 @@ describe("Board Metadata Form Permissions", () => {
       const onPermissionChanged = jest.fn();
       const props = makeProps({
         permissions: { Teams: [], Members: ["user1"] },
-        permissionOptions: [
-          { id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" }],
         onPermissionChanged,
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and handle removing member permissions
       expect(container.firstChild).toBeTruthy();
     });
@@ -416,14 +400,12 @@ describe("Board Metadata Form Permissions", () => {
       const props = makeProps({
         currentUserId: "owner-id",
         permissions: { Teams: [], Members: ["owner-id"] },
-        permissionOptions: [
-          { id: "owner-id", name: "Board Owner", uniqueName: "owner@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "owner-id", name: "Board Owner", uniqueName: "owner@example.com", type: "member" }],
         onPermissionChanged,
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and prevent owner permission removal
       expect(container.firstChild).toBeTruthy();
     });
@@ -433,14 +415,12 @@ describe("Board Metadata Form Permissions", () => {
       const props = makeProps({
         currentUserId: "regular-user-id",
         permissions: { Teams: [], Members: ["regular-user-id"] },
-        permissionOptions: [
-          { id: "regular-user-id", name: "Regular User", uniqueName: "regular@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "regular-user-id", name: "Regular User", uniqueName: "regular@example.com", type: "member" }],
         onPermissionChanged,
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render with disabled permission changes for non-owners
       expect(container.firstChild).toBeTruthy();
     });
@@ -457,9 +437,9 @@ describe("Board Metadata Form Permissions", () => {
           { id: "team2", name: "Beta Team", uniqueName: "beta-team", type: "team" },
         ],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and handle search filtering
       expect(container.firstChild).toBeTruthy();
     });
@@ -472,9 +452,9 @@ describe("Board Metadata Form Permissions", () => {
           { id: "team1", name: "Alpha Team", uniqueName: "alpha-team", type: "team" },
         ],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and handle empty search results
       expect(container.firstChild).toBeTruthy();
     });
@@ -482,13 +462,11 @@ describe("Board Metadata Form Permissions", () => {
     it("should clear search text", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "user1", name: "Alice Smith", uniqueName: "alice@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "user1", name: "Alice Smith", uniqueName: "alice@example.com", type: "member" }],
       });
-      
+
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      
+
       // Component should render and handle clearing search text
       expect(container.firstChild).toBeTruthy();
     });

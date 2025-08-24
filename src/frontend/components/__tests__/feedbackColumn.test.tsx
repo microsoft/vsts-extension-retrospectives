@@ -16,7 +16,7 @@ jest.mock("../../utilities/telemetryClient", () => ({
 describe("Feedback Column ", () => {
   it("can be rendered", () => {
     const { container } = render(<FeedbackColumn {...testColumnProps} />);
-    const feedbackColumn = container.querySelector('.feedback-column');
+    const feedbackColumn = container.querySelector(".feedback-column");
     expect(feedbackColumn).toBeTruthy();
   });
 

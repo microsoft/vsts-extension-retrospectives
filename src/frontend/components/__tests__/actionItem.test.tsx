@@ -140,7 +140,7 @@ describe("UI-level integration tests for ActionItem", () => {
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
     // Look for the resolved border class
-    const resolvedElement = container.querySelector('.resolved-border-right');
+    const resolvedElement = container.querySelector(".resolved-border-right");
     expect(resolvedElement).toBeTruthy();
   });
 

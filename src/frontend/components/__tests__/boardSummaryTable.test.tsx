@@ -83,7 +83,7 @@ describe("BoardSummaryTable", () => {
     (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
     (BoardDataService.archiveFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
     (BoardDataService.restoreArchivedFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
-    
+
     // Mock itemDataService directly
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
   });
@@ -97,7 +97,7 @@ describe("BoardSummaryTable", () => {
     (BoardDataService.getBoardsForTeam as jest.Mock).mockImplementation(() => new Promise(() => {}));
 
     const { container } = render(<BoardSummaryTable {...baseProps} />);
-    
+
     // Should render the component
     expect(container).toBeTruthy();
   });

@@ -284,7 +284,7 @@ describe("FeedbackBoardContainer integration", () => {
     // Component should mount successfully
     expect(container.firstChild).toBeInTheDocument();
     expect(screen.getByText("Loading...")).toBeInTheDocument();
-    
+
     // Component should unmount without errors
     unmount();
     expect(container.firstChild).toBeNull();

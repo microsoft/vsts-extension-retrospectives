@@ -71,7 +71,7 @@ describe("BoardSummaryTableBody", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
-      </table>
+      </table>,
     );
 
     expect(container.querySelectorAll("tr")).toHaveLength(1);
@@ -90,7 +90,7 @@ describe("BoardSummaryTableBody", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
-      </table>
+      </table>,
     );
 
     const td = container.querySelector("td");
@@ -113,15 +113,15 @@ describe("BoardSummaryTableBody", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
-      </table>
+      </table>,
     );
 
     const tr = container.querySelector("tr")!;
     const firstTd = container.querySelector("td")!;
 
-    Object.defineProperty(tr, 'cells', {
+    Object.defineProperty(tr, "cells", {
       value: [firstTd],
-      configurable: true
+      configurable: true,
     });
 
     firstTd.closest = jest.fn(() => firstTd);
@@ -139,7 +139,7 @@ describe("BoardSummaryTableBody", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
-      </table>
+      </table>,
     );
 
     const tr = container.querySelector("tr")!;
@@ -148,9 +148,9 @@ describe("BoardSummaryTableBody", () => {
     const secondTd = tds[1];
 
     // Mock the HTMLTableRowElement.cells property for the event handler to work
-    Object.defineProperty(tr, 'cells', {
+    Object.defineProperty(tr, "cells", {
       value: [firstTd, secondTd],
-      configurable: true
+      configurable: true,
     });
 
     // Mock closest method to return the second cell when called on the second cell
@@ -170,7 +170,7 @@ describe("BoardSummaryTableBody", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
-      </table>
+      </table>,
     );
 
     const tr = container.querySelector("tr")!;
@@ -217,7 +217,7 @@ describe("BoardSummaryTableBody", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
-      </table>
+      </table>,
     );
 
     // Assert that the summary content is rendered
@@ -234,7 +234,7 @@ describe("BoardSummaryTableBody", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableBody rows={[]} boardRowSummary={mockSummary} />
-      </table>
+      </table>,
     );
     expect(container.querySelectorAll("tr")).toHaveLength(0);
   });

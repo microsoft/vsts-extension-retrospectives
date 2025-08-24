@@ -103,7 +103,7 @@ describe("Board Summary", () => {
 
   it("should render no action items message when no action items are present", () => {
     const { container } = render(<BoardSummary {...mockedDefaultProps} />);
-    const noActionItemsMessage = container.querySelector('.action-items-summary-card');
+    const noActionItemsMessage = container.querySelector(".action-items-summary-card");
     expect(noActionItemsMessage).toBeTruthy();
   });
 

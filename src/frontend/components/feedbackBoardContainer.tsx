@@ -438,7 +438,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     this.setState(
-      (prevState): Pick<FeedbackBoardContainerState, 'boards' | 'currentBoard' | 'isBoardUpdateDialogHidden' | 'isTeamBoardDeletedInfoDialogHidden' | 'isCarouselDialogHidden' | 'teamBoardDeletedDialogTitle' | 'teamBoardDeletedDialogMessage'> => {
+      (prevState): Pick<FeedbackBoardContainerState, "boards" | "currentBoard" | "isBoardUpdateDialogHidden" | "isTeamBoardDeletedInfoDialogHidden" | "isCarouselDialogHidden" | "teamBoardDeletedDialogTitle" | "teamBoardDeletedDialogMessage"> => {
         const currentBoards = prevState.boards;
         // Note: Javascript filter maintains order.
         const boardsForTeam = currentBoards.filter(board => board.id !== deletedBoardId);

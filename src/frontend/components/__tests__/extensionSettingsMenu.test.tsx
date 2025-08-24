@@ -23,11 +23,11 @@ describe("ExtensionSettingsMenu Component Tests", () => {
       // Test that the expected interface properties would be valid
       const mockProps = {
         isDesktop: true,
-        onScreenViewModeChanged: jest.fn()
+        onScreenViewModeChanged: jest.fn(),
       };
-      
-      expect(typeof mockProps.isDesktop).toBe('boolean');
-      expect(typeof mockProps.onScreenViewModeChanged).toBe('function');
+
+      expect(typeof mockProps.isDesktop).toBe("boolean");
+      expect(typeof mockProps.onScreenViewModeChanged).toBe("function");
     });
 
     it("validates dialog state expectations", () => {
@@ -37,11 +37,11 @@ describe("ExtensionSettingsMenu Component Tests", () => {
         isWhatsNewDialogHidden: true,
         isGetHelpDialogHidden: true,
         isPleaseJoinUsDialogHidden: true,
-        isWindowWide: true
+        isWindowWide: true,
       };
 
       Object.values(mockState).forEach(value => {
-        expect(typeof value).toBe('boolean');
+        expect(typeof value).toBe("boolean");
       });
     });
   });
@@ -49,13 +49,13 @@ describe("ExtensionSettingsMenu Component Tests", () => {
   describe("Menu Actions", () => {
     it("validates user settings functionality", () => {
       const mockCallback = jest.fn();
-      
+
       // Test switching to mobile when desktop is true
       mockCallback(false);
       expect(mockCallback).toHaveBeenCalledWith(false);
-      
+
       mockCallback.mockClear();
-      
+
       // Test switching to desktop when mobile is true
       mockCallback(true);
       expect(mockCallback).toHaveBeenCalledWith(true);
@@ -66,13 +66,13 @@ describe("ExtensionSettingsMenu Component Tests", () => {
     it("validates window event handling", () => {
       const mockAddEventListener = jest.fn();
       const mockRemoveEventListener = jest.fn();
-      
+
       // Simulate event listener lifecycle
-      mockAddEventListener('resize', jest.fn());
-      mockRemoveEventListener('resize', jest.fn());
-      
-      expect(mockAddEventListener).toHaveBeenCalledWith('resize', expect.any(Function));
-      expect(mockRemoveEventListener).toHaveBeenCalledWith('resize', expect.any(Function));
+      mockAddEventListener("resize", jest.fn());
+      mockRemoveEventListener("resize", jest.fn());
+
+      expect(mockAddEventListener).toHaveBeenCalledWith("resize", expect.any(Function));
+      expect(mockRemoveEventListener).toHaveBeenCalledWith("resize", expect.any(Function));
     });
   });
 
@@ -80,12 +80,12 @@ describe("ExtensionSettingsMenu Component Tests", () => {
     it("validates window width calculations", () => {
       const mockWindowWidth = 1200;
       const isWide = mockWindowWidth > 768;
-      
+
       expect(isWide).toBe(true);
-      
+
       const mockNarrowWidth = 600;
       const isNarrow = mockNarrowWidth <= 768;
-      
+
       expect(isNarrow).toBe(true);
     });
   });
@@ -95,8 +95,8 @@ describe("ExtensionSettingsMenu Component Tests", () => {
       const mockImportedData = [
         {
           boards: [{ id: "board1", title: "Test Board" }],
-          items: [{ id: "item1", text: "Test Item" }]
-        }
+          items: [{ id: "item1", text: "Test Item" }],
+        },
       ];
 
       expect(mockImportedData).toHaveLength(1);
@@ -114,12 +114,12 @@ describe("ExtensionSettingsMenu Component Tests", () => {
         readme: "https://github.com/test/readme",
         contributing: "https://github.com/test/contributing",
         issues: "https://github.com/test/issues",
-        retrospectivewiki: "https://retrospectivewiki.org/"
+        retrospectivewiki: "https://retrospectivewiki.org/",
       };
 
       Object.values(mockUrls).forEach(url => {
-        expect(typeof url).toBe('string');
-        expect(url.startsWith('http')).toBe(true);
+        expect(typeof url).toBe("string");
+        expect(url.startsWith("http")).toBe(true);
       });
     });
   });
@@ -130,20 +130,20 @@ describe("ExtensionSettingsMenu Component Tests", () => {
         readAsText: jest.fn(),
         result: '{"test": "data"}',
         onload: null as any,
-        onerror: null as any
+        onerror: null as any,
       };
 
       expect(mockFileReader.readAsText).toBeDefined();
-      expect(typeof mockFileReader.result).toBe('string');
+      expect(typeof mockFileReader.result).toBe("string");
     });
 
     it("validates blob URL handling", () => {
-      const mockCreateObjectURL = jest.fn(() => 'mock-url');
+      const mockCreateObjectURL = jest.fn(() => "mock-url");
       const mockRevokeObjectURL = jest.fn();
-      
+
       const url = mockCreateObjectURL();
-      expect(url).toBe('mock-url');
-      
+      expect(url).toBe("mock-url");
+
       mockRevokeObjectURL(url);
       expect(mockRevokeObjectURL).toHaveBeenCalledWith(url);
     });
@@ -154,13 +154,13 @@ describe("ExtensionSettingsMenu Component Tests", () => {
       // Test that error handling would work
       const mockError = new Error("Service error");
       const mockErrorHandler = jest.fn();
-      
+
       try {
         throw mockError;
       } catch (error) {
         mockErrorHandler(error);
       }
-      
+
       expect(mockErrorHandler).toHaveBeenCalledWith(mockError);
     });
   });
@@ -168,10 +168,10 @@ describe("ExtensionSettingsMenu Component Tests", () => {
   describe("API Mocking", () => {
     it("validates window API mocking", () => {
       const mockOpen = jest.fn();
-      expect(typeof mockOpen).toBe('function');
-      
-      mockOpen('http://example.com');
-      expect(mockOpen).toHaveBeenCalledWith('http://example.com');
+      expect(typeof mockOpen).toBe("function");
+
+      mockOpen("http://example.com");
+      expect(mockOpen).toHaveBeenCalledWith("http://example.com");
     });
   });
 
@@ -179,14 +179,14 @@ describe("ExtensionSettingsMenu Component Tests", () => {
     it("validates service method signatures", () => {
       const mockBoardService = {
         getBoardsForTeam: jest.fn().mockResolvedValue([]),
-        createBoardForTeam: jest.fn().mockResolvedValue({})
+        createBoardForTeam: jest.fn().mockResolvedValue({}),
       };
-      
+
       const mockItemService = {
         createItemForBoard: jest.fn().mockResolvedValue({}),
-        getFeedbackItemsForBoard: jest.fn().mockResolvedValue([])
+        getFeedbackItemsForBoard: jest.fn().mockResolvedValue([]),
       };
-      
+
       expect(mockBoardService.getBoardsForTeam).toBeDefined();
       expect(mockBoardService.createBoardForTeam).toBeDefined();
       expect(mockItemService.createItemForBoard).toBeDefined();
@@ -218,7 +218,7 @@ describe("ExtensionSettingsMenu Static Tests", () => {
     // - Error handling ✓
     // - API mocking ✓
     // - Service integration ✓
-    
+
     expect(true).toBe(true);
   });
 });

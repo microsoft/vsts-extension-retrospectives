@@ -36,7 +36,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
-      </table>
+      </table>,
     );
     expect(container.querySelectorAll("thead")).toHaveLength(1);
     expect(container.querySelectorAll("tr")).toHaveLength(1);
@@ -47,7 +47,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
-      </table>
+      </table>,
     );
     const headerElement = container.querySelector("th")!;
 
@@ -72,7 +72,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[mockDescendingHeaderGroup]} />
-      </table>
+      </table>,
     );
     const headerElement = container.querySelector("th")!;
 
@@ -84,7 +84,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
-      </table>
+      </table>,
     );
     const headerElement = container.querySelector("th")!;
     fireEvent.click(headerElement);
@@ -95,7 +95,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[]} />
-      </table>
+      </table>,
     );
     expect(container.querySelectorAll("thead")).toHaveLength(1);
     expect(container.querySelectorAll("th")).toHaveLength(0);
@@ -105,7 +105,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
-      </table>
+      </table>,
     );
     const th = container.querySelector("th")!;
 
@@ -132,7 +132,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />
-      </table>
+      </table>,
     );
     const resizerDiv = container.querySelector("div")!;
 
@@ -146,7 +146,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[mockHeaderGroup]} />
-      </table>
+      </table>,
     );
     expect(container.querySelector("th")!.textContent).toContain("Board Name");
   });
@@ -166,7 +166,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[resizableHeaderGroup]} />
-      </table>
+      </table>,
     );
     const resizerDiv = container.querySelector("div")!;
 
@@ -193,7 +193,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[placeholderHeaderGroup]} />
-      </table>
+      </table>,
     );
     const th = container.querySelector("th")!;
 
@@ -219,7 +219,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[nonResizableHeaderGroup]} />
-      </table>
+      </table>,
     );
     const resizerDiv = container.querySelector("div")!;
 
@@ -245,7 +245,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[resizableNotResizingHeaderGroup]} />
-      </table>
+      </table>,
     );
     const resizerDiv = container.querySelector("div")!;
 
@@ -270,7 +270,7 @@ describe("BoardSummaryTableHeader", () => {
     const { container } = render(
       <table>
         <BoardSummaryTableHeader headerGroups={[unsortedHeaderGroup]} />
-      </table>
+      </table>,
     );
     const headerElement = container.querySelector("th")!;
 

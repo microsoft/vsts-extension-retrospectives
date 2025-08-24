@@ -49,30 +49,26 @@ describe("DeleteBoardDialog", () => {
   it("calls onConfirm when Delete is clicked", async () => {
     const user = userEvent.setup();
     render(<DeleteBoardDialog {...mockProps} />);
-    
+
     // Find button by text content in the document
-    const deleteButton = Array.from(document.querySelectorAll('button')).find(
-      button => button.textContent === 'Delete'
-    );
+    const deleteButton = Array.from(document.querySelectorAll("button")).find(button => button.textContent === "Delete");
     expect(deleteButton).toBeDefined();
-    
+
     await user.click(deleteButton!);
-    
+
     expect(mockProps.onConfirm).toHaveBeenCalledTimes(1);
   });
 
   it("calls onCancel when Cancel is clicked", async () => {
     const user = userEvent.setup();
     render(<DeleteBoardDialog {...mockProps} />);
-    
+
     // Find button by text content in the document
-    const cancelButton = Array.from(document.querySelectorAll('button')).find(
-      button => button.textContent === 'Cancel'
-    );
+    const cancelButton = Array.from(document.querySelectorAll("button")).find(button => button.textContent === "Cancel");
     expect(cancelButton).toBeDefined();
-    
+
     await user.click(cancelButton!);
-    
+
     expect(mockProps.onCancel).toHaveBeenCalledTimes(1);
   });
 });

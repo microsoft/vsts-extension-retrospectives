@@ -100,7 +100,7 @@ describe("EffectivenessMeasurementRow", () => {
   describe("Accessibility", () => {
     it("provides proper aria-labels for screen readers", () => {
       const { container } = render(<EffectivenessMeasurementRow {...defaultProps} />);
-      
+
       for (let i = 1; i <= 10; i++) {
         const button = container.querySelector(`button[aria-label="${i}"]`);
         expect(button).toBeInTheDocument();
@@ -109,12 +109,12 @@ describe("EffectivenessMeasurementRow", () => {
 
     it("renders buttons with appropriate accessibility attributes", () => {
       const { container } = render(<EffectivenessMeasurementRow {...defaultProps} />);
-      
-      const buttons = container.querySelectorAll('button[aria-label]');
+
+      const buttons = container.querySelectorAll("button[aria-label]");
       expect(buttons).toHaveLength(10);
-      
+
       buttons.forEach((button: any) => {
-        expect(button).toHaveAttribute('aria-label');
+        expect(button).toHaveAttribute("aria-label");
       });
     });
   });

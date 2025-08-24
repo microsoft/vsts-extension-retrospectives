@@ -111,7 +111,7 @@ describe("Feedback Item", () => {
     };
 
     const { container } = render(<FeedbackItem {...minimalProps} />);
-    
+
     // Basic rendering check - component should render without crashing
     expect(container.firstChild).toBeTruthy();
     // Check that it contains the feedback item title
@@ -151,11 +151,11 @@ describe("Feedback Item", () => {
     };
 
     const { container, getByText } = render(<FeedbackItem {...minimalProps} />);
-    
+
     // Verify the feedback item renders
     expect(container.firstChild).toBeTruthy();
     expect(getByText("Test Feedback Item")).toBeInTheDocument();
-    
+
     // Verify it has no child feedback items
     expect(minimalProps.groupIds).toHaveLength(0);
     expect(container.querySelectorAll('[data-testid="child-feedback-item"]')).toHaveLength(0);
@@ -196,7 +196,7 @@ describe("Feedback Item", () => {
       };
 
       const { container } = render(<FeedbackItem {...minimalProps} />);
-      
+
       // Verify the component renders
       expect(container.firstChild).toBeTruthy();
       // Verify it contains the group feedback item title
@@ -236,7 +236,7 @@ describe("Feedback Item", () => {
       };
 
       const { container, getByText } = render(<FeedbackItem {...minimalProps} />);
-      
+
       // Verify the component renders and shows the title
       expect(container.firstChild).toBeTruthy();
       expect(getByText("Test Group Title")).toBeInTheDocument();
@@ -275,7 +275,7 @@ describe("Feedback Item", () => {
       };
 
       const { container } = render(<FeedbackItem {...minimalProps} />);
-      
+
       // Verify the component renders
       expect(container.firstChild).toBeTruthy();
       // Verify original column ID is set correctly

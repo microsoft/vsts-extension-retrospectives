@@ -32,61 +32,61 @@ describe("Workflow Stage", () => {
   it("renders as active when isActive is true", () => {
     const activeProps = { ...mockedProps, isActive: true };
     render(<WorkflowStage {...activeProps} />);
-    
+
     // Check aria-label for active state
     expect(document.querySelector('[aria-label="Selected Sample Workflow Stage Text workflow stage"]')).toBeTruthy();
     // Check active class
-    expect(document.querySelector('.retrospective-workflowState.active')).toBeTruthy();
+    expect(document.querySelector(".retrospective-workflowState.active")).toBeTruthy();
   });
 
   it("renders as inactive when isActive is false", () => {
     const inactiveProps = { ...mockedProps, isActive: false };
     render(<WorkflowStage {...inactiveProps} />);
-    
+
     // Check aria-label for inactive state
     expect(document.querySelector('[aria-label="Not selected Sample Workflow Stage Text workflow stage"]')).toBeTruthy();
     // Check that active class is not present
-    expect(document.querySelector('.retrospective-workflowState.active')).toBeFalsy();
-    expect(document.querySelector('.retrospective-workflowState')).toBeTruthy();
+    expect(document.querySelector(".retrospective-workflowState.active")).toBeFalsy();
+    expect(document.querySelector(".retrospective-workflowState")).toBeTruthy();
   });
 
   it("calls clickEventCallback when the Enter key is pressed", async () => {
     const user = userEvent.setup();
     render(<WorkflowStage {...mockedProps} />);
-    
-    const element = document.querySelector('.retrospective-workflowState') as HTMLElement;
-    
+
+    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
+
     // Focus the element first
     await user.click(element);
-    
+
     // Press Enter key using keyboard method with keyCode
-    await user.keyboard('{Enter}');
-    
+    await user.keyboard("{Enter}");
+
     expect(mockedProps.clickEventCallback).toHaveBeenCalledTimes(1);
   });
 
   it("calls clickEventCallback when the component is clicked", async () => {
     render(<WorkflowStage {...mockedProps} />);
-    
-    const element = document.querySelector('.retrospective-workflowState') as HTMLElement;
+
+    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
     await userEvent.click(element);
-    
+
     expect(mockedProps.clickEventCallback).toHaveBeenCalledTimes(1);
   });
 
   it("displays the correct text", () => {
     render(<WorkflowStage {...mockedProps} />);
-    
+
     expect(document.body.textContent).toContain("Sample Workflow Stage Text");
   });
 
   it("has correct ARIA attributes", () => {
     render(<WorkflowStage {...mockedProps} />);
-    
-    const element = document.querySelector('.retrospective-workflowState');
-    expect(element?.getAttribute('role')).toBe('tab');
-    expect(element?.getAttribute('aria-setsize')).toBe('4');
-    expect(element?.getAttribute('aria-posinset')).toBe('1');
-    expect(element?.getAttribute('tabindex')).toBe('0');
+
+    const element = document.querySelector(".retrospective-workflowState");
+    expect(element?.getAttribute("role")).toBe("tab");
+    expect(element?.getAttribute("aria-setsize")).toBe("4");
+    expect(element?.getAttribute("aria-posinset")).toBe("1");
+    expect(element?.getAttribute("tabindex")).toBe("0");
   });
 });

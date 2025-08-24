@@ -192,11 +192,7 @@ describe("Action Item Display component", () => {
     const propsWithMultipleTypes = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
-      nonHiddenWorkItemTypes: [
-        { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any,
-        { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any,
-        { name: "User Story", referenceName: "Microsoft.VSTS.WorkItemTypes.UserStory", icon: { url: "story-icon.png" }, _links: {} } as any
-      ],
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any, { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any, { name: "User Story", referenceName: "Microsoft.VSTS.WorkItemTypes.UserStory", icon: { url: "story-icon.png" }, _links: {} } as any],
     };
     const { container } = render(<ActionItemDisplay {...propsWithMultipleTypes} />);
     expect(container.querySelector(".add-action-item-wrapper")).toBeTruthy();
@@ -241,10 +237,7 @@ describe("Action Item Display component", () => {
   it("handles allWorkItemTypes prop", () => {
     const propsWithAllTypes = {
       ...defaultTestProps,
-      allWorkItemTypes: [
-        { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any,
-        { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any
-      ],
+      allWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any, { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any],
     };
     const { container } = render(<ActionItemDisplay {...propsWithAllTypes} />);
     expect(container.querySelector(".action-items")).toBeTruthy();
