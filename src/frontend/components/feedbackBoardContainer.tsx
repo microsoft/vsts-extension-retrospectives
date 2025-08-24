@@ -1,10 +1,10 @@
 import React from "react";
-import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from "office-ui-fabric-react/lib/Button";
-import { ContextualMenuItemType, IContextualMenuItem } from "office-ui-fabric-react/lib/ContextualMenu";
-import { Dialog, DialogType, DialogFooter, DialogContent } from "office-ui-fabric-react/lib/Dialog";
-import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
-import { MessageBar, MessageBarType } from "office-ui-fabric-react/lib/MessageBar";
-import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
+import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from "@fluentui/react/lib/Button";
+import { ContextualMenuItemType, IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
+import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react/lib/Dialog";
+import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
+import { MessageBar, MessageBarType } from "@fluentui/react/lib/MessageBar";
+import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
 import { MobileWidthBreakpoint } from "../config/constants";
 import { WorkflowPhase } from "../interfaces/workItem";
@@ -27,7 +27,7 @@ import SelectorCombo, { ISelectorList } from "./selectorCombo";
 import FeedbackBoardPreviewEmail from "./feedbackBoardPreviewEmail";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { TooltipHost } from "office-ui-fabric-react/lib/Tooltip";
+import { TooltipHost } from "@fluentui/react/lib/Tooltip";
 import { shareBoardHelper } from "../utilities/shareBoardHelper";
 import { itemDataService } from "../dal/itemDataService";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
@@ -438,7 +438,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     this.setState(
-      (prevState): Pick<FeedbackBoardContainerState, 'boards' | 'currentBoard' | 'isBoardUpdateDialogHidden' | 'isTeamBoardDeletedInfoDialogHidden' | 'isCarouselDialogHidden' | 'teamBoardDeletedDialogTitle' | 'teamBoardDeletedDialogMessage'> => {
+      (prevState): Pick<FeedbackBoardContainerState, "boards" | "currentBoard" | "isBoardUpdateDialogHidden" | "isTeamBoardDeletedInfoDialogHidden" | "isCarouselDialogHidden" | "teamBoardDeletedDialogTitle" | "teamBoardDeletedDialogMessage"> => {
         const currentBoards = prevState.boards;
         // Note: Javascript filter maintains order.
         const boardsForTeam = currentBoards.filter(board => board.id !== deletedBoardId);

@@ -1,8 +1,18 @@
 import React from "react";
-import { shallow } from "enzyme";
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 import { mocked } from "jest-mock";
 import WorkflowStage from "../../components/workflowStage";
 import { WorkflowPhase } from "../../interfaces/workItem";
+
+jest.mock("../../utilities/telemetryClient", () => ({
+  reactPlugin: {
+    trackMetric: jest.fn(),
+    trackEvent: jest.fn(),
+    trackException: jest.fn(),
+  },
+}));
 
 const mockedProps = mocked({
   display: "Sample Workflow Stage Text",
@@ -12,39 +22,63 @@ const mockedProps = mocked({
   clickEventCallback: jest.fn(() => {}),
 });
 
-describe("Workflow Stage ", () => {
-  it("can be rendered when active.", () => {
-    mockedProps.isActive = true;
-    const wrapper = shallow(<WorkflowStage {...mockedProps} />);
-    const component = wrapper.children().dive();
-    expect(component.prop("aria-label")).toBe(`Selected ${mockedProps.display} workflow stage`);
+describe("Workflow Stage", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it("can be rendered when inactive.", () => {
-    mockedProps.isActive = false;
-    const wrapper = shallow(<WorkflowStage {...mockedProps} />);
-    const component = wrapper.children().dive();
+  it("renders as active when isActive is true", () => {
+    const activeProps = { ...mockedProps, isActive: true };
+    render(<WorkflowStage {...activeProps} />);
 
-    expect(component.prop("aria-label")).toBe(`Not selected ${mockedProps.display} workflow stage`);
+    expect(document.querySelector('[aria-label="Selected Sample Workflow Stage Text workflow stage"]')).toBeTruthy();
+    expect(document.querySelector(".retrospective-workflowState.active")).toBeTruthy();
   });
 
-  it("calls clickEventCallback when the Enter key is pressed.", () => {
-    mockedProps.isActive = true;
-    const wrapper = shallow(<WorkflowStage {...mockedProps} />);
-    const component = wrapper.children().dive();
+  it("renders as inactive when isActive is false", () => {
+    const inactiveProps = { ...mockedProps, isActive: false };
+    render(<WorkflowStage {...inactiveProps} />);
 
-    component.simulate("keydown", { keyCode: 13 });
-
-    expect(mockedProps.clickEventCallback).toBeCalledTimes(1);
+    expect(document.querySelector('[aria-label="Not selected Sample Workflow Stage Text workflow stage"]')).toBeTruthy();
+    expect(document.querySelector(".retrospective-workflowState.active")).toBeFalsy();
+    expect(document.querySelector(".retrospective-workflowState")).toBeTruthy();
   });
 
-  it("calls clickEventCallback when the component is clicked.", () => {
-    mockedProps.isActive = true;
-    const wrapper = shallow(<WorkflowStage {...mockedProps} />);
-    const component = wrapper.children().dive();
+  it("calls clickEventCallback when the Enter key is pressed", async () => {
+    const user = userEvent.setup();
+    render(<WorkflowStage {...mockedProps} />);
 
-    component.simulate("click");
+    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
 
-    expect(mockedProps.clickEventCallback).toBeCalledTimes(1);
+    await user.click(element);
+
+    await user.keyboard("{Enter}");
+
+    expect(mockedProps.clickEventCallback).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls clickEventCallback when the component is clicked", async () => {
+    render(<WorkflowStage {...mockedProps} />);
+
+    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
+    await userEvent.click(element);
+
+    expect(mockedProps.clickEventCallback).toHaveBeenCalledTimes(1);
+  });
+
+  it("displays the correct text", () => {
+    render(<WorkflowStage {...mockedProps} />);
+
+    expect(document.body.textContent).toContain("Sample Workflow Stage Text");
+  });
+
+  it("has correct ARIA attributes", () => {
+    render(<WorkflowStage {...mockedProps} />);
+
+    const element = document.querySelector(".retrospective-workflowState");
+    expect(element?.getAttribute("role")).toBe("tab");
+    expect(element?.getAttribute("aria-setsize")).toBe("4");
+    expect(element?.getAttribute("aria-posinset")).toBe("1");
+    expect(element?.getAttribute("tabindex")).toBe("0");
   });
 });

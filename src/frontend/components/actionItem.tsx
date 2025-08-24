@@ -1,6 +1,6 @@
 import React from "react";
-import { DefaultButton, IButtonProps, PrimaryButton, BaseButton, Button } from "office-ui-fabric-react/lib/Button";
-import { DocumentCard, DocumentCardActions, DocumentCardTitle, DocumentCardType, DocumentCardPreview, IDocumentCardPreviewProps } from "office-ui-fabric-react/lib/DocumentCard";
+import { DefaultButton, IButtonProps, PrimaryButton, BaseButton, Button } from "@fluentui/react/lib/Button";
+import { DocumentCard, DocumentCardActions, DocumentCardTitle, DocumentCardType, DocumentCardPreview, IDocumentCardPreviewProps } from "@fluentui/react/lib/DocumentCard";
 import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
@@ -8,7 +8,7 @@ import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azur
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
-import Dialog, { DialogType, DialogFooter } from "office-ui-fabric-react/lib/Dialog";
+import Dialog, { DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 

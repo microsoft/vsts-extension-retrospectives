@@ -1,6 +1,6 @@
 import React from "react";
-import { DefaultButton } from "office-ui-fabric-react/lib/Button";
-import { TooltipHost } from "office-ui-fabric-react/lib/Tooltip";
+import { DefaultButton } from "@fluentui/react/lib/Button";
+import { TooltipHost } from "@fluentui/react/lib/Tooltip";
 
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";

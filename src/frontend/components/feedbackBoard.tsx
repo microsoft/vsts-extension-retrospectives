@@ -12,7 +12,7 @@ import { ExceptionCode } from "../interfaces/retrospectiveState";
 import { WorkflowPhase } from "../interfaces/workItem";
 
 import FeedbackItemCarousel from "./feedbackCarousel";
-import { Dialog, DialogType } from "office-ui-fabric-react/lib/Dialog";
+import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { encrypt } from "../utilities/userIdentityHelper";

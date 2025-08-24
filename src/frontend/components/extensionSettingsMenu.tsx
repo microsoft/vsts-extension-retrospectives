@@ -1,7 +1,7 @@
 import React from "react";
-import { PrimaryButton, DefaultButton } from "office-ui-fabric-react/lib/Button";
-import { Dialog, DialogContent, DialogFooter, DialogType } from "office-ui-fabric-react/lib/Dialog";
-import { IContextualMenuItem } from "office-ui-fabric-react/lib/ContextualMenu";
+import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
+import { Dialog, DialogContent, DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
+import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import boardDataService from "../dal/boardDataService";

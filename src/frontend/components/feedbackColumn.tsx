@@ -8,7 +8,7 @@ import FeedbackItemGroup from "./feedbackItemGroup";
 import { IColumnItem, IColumn } from "./feedbackBoard";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import { ActionButton, IButton } from "office-ui-fabric-react/lib/Button";
+import { ActionButton, IButton } from "@fluentui/react/lib/Button";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";

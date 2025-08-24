@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import { TextField } from "office-ui-fabric-react/lib/TextField";
+import { TextField } from "@fluentui/react/lib/TextField";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 

@@ -1,10 +1,10 @@
 import React from "react";
 import classNames from "classnames";
-import { ActionButton, PrimaryButton, DefaultButton } from "office-ui-fabric-react/lib/Button";
-import { IContextualMenuItem } from "office-ui-fabric-react/lib/ContextualMenu";
-import { Dialog, DialogType, DialogFooter } from "office-ui-fabric-react/lib/Dialog";
-import { DocumentCard, DocumentCardActivity } from "office-ui-fabric-react/lib/DocumentCard";
-import { SearchBox } from "office-ui-fabric-react/lib/SearchBox";
+import { ActionButton, PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
+import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
+import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
+import { DocumentCard, DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
+import { SearchBox } from "@fluentui/react/lib/SearchBox";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WebApiTeam } from "azure-devops-extension-api/Core";

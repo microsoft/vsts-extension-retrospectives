@@ -1,8 +1,8 @@
 import React from "react";
 import copy from "copy-to-clipboard";
-import { ActionButton } from "office-ui-fabric-react/lib/Button";
-import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
-import { ITextField, TextField } from "office-ui-fabric-react/lib/TextField";
+import { ActionButton } from "@fluentui/react/lib/Button";
+import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
+import { ITextField, TextField } from "@fluentui/react/lib/TextField";
 import { IFeedbackBoardDocument } from "../interfaces/feedback";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../utilities/shareBoardHelper";

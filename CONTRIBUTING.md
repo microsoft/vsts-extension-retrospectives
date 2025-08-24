@@ -392,7 +392,6 @@ To automatically generate the test coverage report, add the `--coverage` flag to
 
 - `npm install` must be executed before running any tests.
 - `npm run test` is the default test execution method defined in the [package.json](src/frontend/package.json) file. This will automatically run all of the tests in files suffixed with `.test.tsx` inside of the [tests folder](src/frontend/components/__tests__).
-- `npm run test:watch` will run tests in watch mode, re-running tests every time a component change is saved.
 - `jest --env=jsdom --silent -ci --testResultsProcessor=jest-junit {FULL_FILE_PATH}` can be used to run tests only in the specified file. Wildcards also work instead of a fully qualified path.
 
 ---
