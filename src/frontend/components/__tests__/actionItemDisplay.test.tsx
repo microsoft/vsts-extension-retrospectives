@@ -1,7 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react";
 
-// Mock all Azure DevOps SDK and services BEFORE importing the component
 const mockOpenNewWorkItem = jest.fn();
 const mockGetUser = jest.fn(() => ({ name: "Test User", displayName: "Test User", id: "test-user-id" }));
 const mockGetService = jest.fn(() => ({
@@ -19,7 +18,6 @@ jest.mock("azure-devops-extension-api/WorkItemTracking", () => ({
   },
 }));
 
-// Mock both getService and getUser globally to ensure they work everywhere
 (global as any).getService = mockGetService;
 (global as any).getUser = mockGetUser;
 
@@ -46,7 +44,6 @@ jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {},
 }));
 
-// Mock workItemService to avoid Azure SDK calls
 const mockGetWorkItemsByIds = jest.fn();
 const mockCreateWorkItem = jest.fn();
 jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
@@ -56,12 +53,10 @@ jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
   },
 }));
 
-// Mock the HOC wrapper that's causing issues
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: (reactPlugin: any, Component: any) => Component,
 }));
 
-// Now import the component after all mocks are set up
 import ActionItemDisplay, { ActionItemDisplayProps } from "../actionItemDisplay";
 
 const defaultTestProps: ActionItemDisplayProps = {

@@ -5,7 +5,6 @@ import EffectivenessMeasurementRow, { EffectivenessMeasurementRowProps } from ".
 import { ITeamEffectivenessMeasurementVoteCollection } from "../../interfaces/feedback";
 import { encrypt, getUserIdentity } from "../../utilities/userIdentityHelper";
 
-// Mock the user identity helper
 jest.mock("../../utilities/userIdentityHelper", () => ({
   getUserIdentity: jest.fn(),
   encrypt: jest.fn(),

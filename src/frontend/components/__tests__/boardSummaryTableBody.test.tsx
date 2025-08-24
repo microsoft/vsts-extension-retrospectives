@@ -147,16 +147,13 @@ describe("BoardSummaryTableBody", () => {
     const firstTd = tds[0];
     const secondTd = tds[1];
 
-    // Mock the HTMLTableRowElement.cells property for the event handler to work
     Object.defineProperty(tr, "cells", {
       value: [firstTd, secondTd],
       configurable: true,
     });
 
-    // Mock closest method to return the second cell when called on the second cell
     secondTd.closest = jest.fn(() => secondTd);
 
-    // Click directly on the second TD element
     fireEvent.click(secondTd);
 
     expect(toggleExpanded).not.toHaveBeenCalled();
@@ -175,14 +172,12 @@ describe("BoardSummaryTableBody", () => {
 
     const tr = container.querySelector("tr")!;
 
-    // Try using user events API for more realistic interaction
     fireEvent.keyPress(tr, { key: "Enter", code: "Enter", charCode: 13 });
 
     expect(toggleExpanded).toHaveBeenCalled();
   });
 
   it("renders boardRowSummary when row is expanded", () => {
-    // Mock row with full original data including required properties
     const row = {
       id: "row1",
       getIsExpanded: () => true,
@@ -199,31 +194,24 @@ describe("BoardSummaryTableBody", () => {
       } as IBoardSummaryTableItem,
     } as any;
 
-    // Create mock cells without the row property yet
     const mockCells = [createMockCell("boardName", "Board A"), createMockCell("totalWorkItemsCount", 2)];
 
-    // Assign the row object to each cell's 'row' property to avoid undefined 'original'
     mockCells.forEach((cell: any) => {
       cell.row = row;
     });
 
-    // Add getVisibleCells method to the row to return the mock cells
     (row as any).getVisibleCells = () => mockCells;
 
-    // Mock boardRowSummary component
     const mockSummary = jest.fn(() => <div>Mock summary</div>);
 
-    // Mount BoardSummaryTableBody inside a table (needed for <tr> to render correctly)
     const { container } = render(
       <table>
         <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
       </table>,
     );
 
-    // Assert that the summary content is rendered
     expect(container.textContent).toContain("Mock summary");
 
-    // Assert the summary row's cell spans the full number of visible cells
     const trs = container.querySelectorAll("tr");
     const lastTr = trs[trs.length - 1];
     const expandedTd = lastTr.querySelector("td");

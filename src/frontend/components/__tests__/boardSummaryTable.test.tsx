@@ -1,4 +1,3 @@
-// Mock all modules first before importing anything
 jest.mock("../../utilities/telemetryClient", () => {
   return {
     appInsights: {
@@ -62,7 +61,7 @@ const mockBoards: IFeedbackBoardDocument[] = [
     createdDate: new Date(),
     createdBy: mockedIdentity,
     isArchived: false,
-    columns: [], // Adjust as needed
+    columns: [],
     activePhase: "Collect",
     maxVotesPerUser: 5,
     boardVoteCollection: {},
@@ -79,12 +78,10 @@ const baseProps: IBoardSummaryTableProps = {
 describe("BoardSummaryTable", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Set up default mock implementations
     (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
     (BoardDataService.archiveFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
     (BoardDataService.restoreArchivedFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
 
-    // Mock itemDataService directly
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
   });
 
@@ -98,7 +95,6 @@ describe("BoardSummaryTable", () => {
 
     const { container } = render(<BoardSummaryTable {...baseProps} />);
 
-    // Should render the component
     expect(container).toBeTruthy();
   });
 });
@@ -138,7 +134,7 @@ describe("TrashIcon", () => {
       boardName: "Sample Board",
       createdDate: new Date(),
       isArchived: true,
-      archivedDate: new Date(Date.now() - 3 * 60 * 1000), // Archived 3 mins ago
+      archivedDate: new Date(Date.now() - 3 * 60 * 1000),
       pendingWorkItemsCount: 0,
       totalWorkItemsCount: 0,
       feedbackItemsCount: 0,
@@ -157,7 +153,7 @@ describe("TrashIcon", () => {
       boardName: "Sample Board",
       createdDate: new Date(),
       isArchived: true,
-      archivedDate: new Date(Date.now() - 1 * 60 * 1000), // Archived 1 min ago
+      archivedDate: new Date(Date.now() - 1 * 60 * 1000),
       pendingWorkItemsCount: 0,
       totalWorkItemsCount: 0,
       feedbackItemsCount: 0,

@@ -110,7 +110,6 @@ describe("Board Summary", () => {
   it("should display correct work item counts", () => {
     const { container } = render(<BoardSummary {...mockedWorkItemCountProps} />);
     expect(container).toBeTruthy();
-    // Component should render with the provided counts
   });
 
   it("should render DetailsList when action items are present", () => {
@@ -122,30 +121,25 @@ describe("Board Summary", () => {
   it("should render action items with correct properties", () => {
     const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
     expect(container).toBeTruthy();
-    // Component should render with action items
   });
 
   it("should handle work item navigation correctly", () => {
     const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
     expect(container).toBeTruthy();
-    // Component should handle navigation when items are clicked
   });
 
   it("should display correct feedback count information", () => {
     const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
     expect(container).toBeTruthy();
-    // Component should display feedback count information
   });
 
   it("should render board name when provided", () => {
     const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
     expect(container).toBeTruthy();
-    // Component should display the board name
   });
 
   it("should handle empty supported work item types", () => {
     const { container } = render(<BoardSummary {...mockedDefaultProps} />);
     expect(container).toBeTruthy();
-    // Component should handle empty work item types gracefully
   });
 });

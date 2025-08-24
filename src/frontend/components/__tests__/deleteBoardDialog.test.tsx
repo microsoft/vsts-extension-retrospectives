@@ -1,6 +1,5 @@
 import React from "react";
 import { render } from "@testing-library/react";
-// @ts-ignore - user-event types seem to have issues
 import userEvent from "@testing-library/user-event";
 import DeleteBoardDialog from "../deleteBoardDialog";
 import { IBoardSummaryTableItem } from "../boardSummaryTable";
@@ -35,7 +34,6 @@ describe("DeleteBoardDialog", () => {
 
   it("renders dialog when visible", () => {
     render(<DeleteBoardDialog {...mockProps} />);
-    // FluentUI Dialog renders to document body, so we need to search the whole document
     expect(document.body.textContent).toContain("Delete Retrospective");
     expect(document.body.textContent).toContain("Warning:");
   });
@@ -50,7 +48,6 @@ describe("DeleteBoardDialog", () => {
     const user = userEvent.setup();
     render(<DeleteBoardDialog {...mockProps} />);
 
-    // Find button by text content in the document
     const deleteButton = Array.from(document.querySelectorAll("button")).find(button => button.textContent === "Delete");
     expect(deleteButton).toBeDefined();
 
@@ -63,7 +60,6 @@ describe("DeleteBoardDialog", () => {
     const user = userEvent.setup();
     render(<DeleteBoardDialog {...mockProps} />);
 
-    // Find button by text content in the document
     const cancelButton = Array.from(document.querySelectorAll("button")).find(button => button.textContent === "Cancel");
     expect(cancelButton).toBeDefined();
 

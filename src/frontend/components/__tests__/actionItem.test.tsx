@@ -79,7 +79,6 @@ describe("Action Item component", () => {
 
   it("focuses the openWorkItemButton when shouldFocus is true", () => {
     const { container } = render(<ActionItem {...defaultTestProps} shouldFocus={true} />);
-    // In RTL, we can't easily test componentDidMount behavior, but we can verify the component renders
     expect(container.firstChild).toBeTruthy();
   });
 });
@@ -87,20 +86,17 @@ describe("Action Item component", () => {
 describe("Behavioral tests for ActionItem", () => {
   it("does not render actions when areActionIconsHidden is true", () => {
     const { container } = render(<ActionItem {...defaultTestProps} areActionIconsHidden={true} />);
-    // When actions are hidden, there should be no document card actions
     const documentCardActions = container.querySelector('[class*="ms-DocumentCardActions"]');
     expect(documentCardActions).toBeNull();
   });
 
   it("renders actions when areActionIconsHidden is false", () => {
     const { container } = render(<ActionItem {...defaultTestProps} areActionIconsHidden={false} />);
-    // When actions are not hidden, we should have the component rendered
     expect(container.firstChild).toBeTruthy();
   });
 
   it("toggles unlink confirmation dialog visibility based on state", () => {
     const { container } = render(<ActionItem {...defaultTestProps} />);
-    // For RTL, we can't easily test internal state changes, but we can verify the component renders
     expect(container.firstChild).toBeTruthy();
   });
 
@@ -114,7 +110,6 @@ describe("Behavioral tests for ActionItem", () => {
       },
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
-    // For RTL, we verify the component renders with the long title
     expect(container.firstChild).toBeTruthy();
   });
 });
@@ -122,7 +117,6 @@ describe("Behavioral tests for ActionItem", () => {
 describe("UI-level integration tests for ActionItem", () => {
   it("renders the correct icon in DocumentCardPreview", () => {
     const { container } = render(<ActionItem {...defaultTestProps} />);
-    // Verify the component renders - we can't easily test specific FluentUI props in RTL
     expect(container.firstChild).toBeTruthy();
   });
 
@@ -139,7 +133,6 @@ describe("UI-level integration tests for ActionItem", () => {
       allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Completed", category: "Completed", color: "blue" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
-    // Look for the resolved border class
     const resolvedElement = container.querySelector(".resolved-border-right");
     expect(resolvedElement).toBeTruthy();
   });
@@ -147,8 +140,6 @@ describe("UI-level integration tests for ActionItem", () => {
   it("calls onUpdateActionItem when confirming unlink", async () => {
     jest.spyOn(itemDataService, "removeAssociatedActionItem").mockResolvedValue({} as IFeedbackItemDocument);
     const { container } = render(<ActionItem {...defaultTestProps} />);
-    // For RTL, we can't easily test complex state-driven interactions
-    // but we can verify the component renders without errors
     expect(container.firstChild).toBeTruthy();
   });
 });
