@@ -5,7 +5,6 @@ import FeedbackColumn from "../feedbackColumn";
 import FeedbackItem from "../feedbackItem";
 import { IColumnItem } from "../feedbackBoard";
 
-// Mock telemetry to avoid dependencies
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
     trackMetric: jest.fn(),
@@ -27,7 +26,6 @@ describe("Feedback Column ", () => {
       render(<FeedbackColumn {...testColumnProps} />);
       const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0], true);
 
-      // Check that the component properly creates feedback item props - this validates the main logic
       expect(feedbackItemProps.id).toBeTruthy();
       expect(feedbackItemProps).toBeDefined();
     });

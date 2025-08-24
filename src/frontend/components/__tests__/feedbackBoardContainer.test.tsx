@@ -10,7 +10,6 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 
-// Mock user identity helper FIRST (most important)
 const mockUserIdentity = {
   id: "mock-user-id",
   displayName: "Mock User",
@@ -28,7 +27,6 @@ jest.mock("../../utilities/userIdentityHelper", () => ({
   encrypt: () => "encrypted-data",
 }));
 
-// Mock telemetryClient to avoid ApplicationInsights type conflicts
 jest.mock("../../utilities/telemetryClient", () => ({
   appInsights: {
     trackEvent: jest.fn(),
@@ -39,7 +37,6 @@ jest.mock("../../utilities/telemetryClient", () => ({
   TelemetryExceptions: {},
 }));
 
-// Mock Azure DevOps services
 jest.mock("../../dal/boardDataService");
 jest.mock("../../dal/reflectBackendService");
 jest.mock("../../dal/azureDevOpsCoreService");
@@ -47,7 +44,6 @@ jest.mock("../../dal/azureDevOpsWorkItemService");
 jest.mock("../../dal/userDataService");
 jest.mock("../../dal/itemDataService");
 
-// Mock utilities services
 jest.mock("../../utilities/servicesHelper", () => ({
   getLocationService: jest.fn(() => ({
     getResourceAreaLocation: jest.fn(() => Promise.resolve("mock-location")),
@@ -59,7 +55,6 @@ jest.mock("../../utilities/servicesHelper", () => ({
   getAccessToken: jest.fn(() => Promise.resolve("mock-token")),
 }));
 
-// Mock Azure DevOps context helper
 jest.mock("../../utilities/azureDevOpsContextHelper", () => ({
   getHostUrl: jest.fn(() => Promise.resolve("https://mock-host")),
   getCurrentUser: jest.fn(() => Promise.resolve({ id: "mock-user" })),
@@ -67,7 +62,6 @@ jest.mock("../../utilities/azureDevOpsContextHelper", () => ({
   getProjectId: jest.fn(() => Promise.resolve("mock-project-id")),
 }));
 
-// Mock Azure DevOps extension SDK
 jest.mock("azure-devops-extension-sdk", () => ({
   getService: jest.fn(),
   init: jest.fn(),
@@ -80,10 +74,8 @@ jest.mock("azure-devops-extension-sdk", () => ({
   })),
 }));
 
-// Mock copy-to-clipboard
 jest.mock("copy-to-clipboard", () => jest.fn());
 
-// Mock ApplicationInsights React wrapper
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: jest.fn((plugin, component) => component),
 }));
@@ -208,9 +200,6 @@ describe("deduplicateTeamMembers", () => {
 });
 
 describe("FeedbackBoardContainer integration", () => {
-  // Note: These integration tests require access to component instance and state
-  // which is not recommended with React Testing Library approach
-  // They would need to be rewritten to test user-visible behavior instead
   let props: FeedbackBoardContainerProps;
 
   const mockUserId = "user-1";
@@ -249,43 +238,33 @@ describe("FeedbackBoardContainer integration", () => {
 
   it("renders main UI after loading", () => {
     const { container } = render(<FeedbackBoardContainer {...props} />);
-    // The component should render its container structure
     expect(container.firstChild).toBeInTheDocument();
-    // Initially shows loading state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("handles workflow phase change", () => {
     const { container } = render(<FeedbackBoardContainer {...props} />);
-    // Component should render and handle different workflow phases gracefully
     expect(container.firstChild).toBeInTheDocument();
-    // Component should start in loading state and handle phase changes internally
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("renders main board view when fully initialized", () => {
     const { container } = render(<FeedbackBoardContainer {...props} />);
-    // Component should render its container even during initialization
     expect(container.firstChild).toBeInTheDocument();
-    // Should show loading initially before being fully initialized
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("renders with different workflow phases", () => {
     const { container } = render(<FeedbackBoardContainer {...props} />);
-    // Component should render regardless of workflow phase
     expect(container.firstChild).toBeInTheDocument();
-    // Component handles different workflow phases through its internal state management
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("handles component mount and unmount lifecycle", () => {
     const { container, unmount } = render(<FeedbackBoardContainer {...props} />);
-    // Component should mount successfully
     expect(container.firstChild).toBeInTheDocument();
     expect(screen.getByText("Loading...")).toBeInTheDocument();
 
-    // Component should unmount without errors
     unmount();
     expect(container.firstChild).toBeNull();
   });

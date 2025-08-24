@@ -1,15 +1,9 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import FeedbackItem, { IFeedbackItemProps } from "../feedbackItem";
-import FeedbackColumn from "../feedbackColumn";
-import EditableDocumentCardTitle from "../editableDocumentCardTitle";
-import Dialog from "@fluentui/react/lib/Dialog";
-import ActionItemDisplay from "../actionItemDisplay";
-import { WorkflowPhase } from "../../interfaces/workItem";
-import { testColumnProps, testColumnItem, testColumnTwoTitle, testUpvotes, testFeedbackItem, testColumns, testBoardId, testColumnUuidOne, testColumnIds, testGroupColumnProps, testGroupFeedbackItemOne, testGroupColumnItemOne, testGroupColumnsObj, testGroupColumnUuidTwo } from "../__mocks__/mocked_components/mockedFeedbackColumn";
+import FeedbackItem from "../feedbackItem";
+import { testColumns, testBoardId, testColumnUuidOne, testColumnIds } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 
-// Mock telemetry and ApplicationInsights
 jest.mock("../../utilities/telemetryClient", () => ({
   trackTrace: jest.fn(),
   trackEvent: jest.fn(),
@@ -24,7 +18,6 @@ jest.mock("applicationinsights-js", () => ({
   },
 }));
 
-// Mock Azure DevOps extension SDK
 jest.mock("azure-devops-extension-sdk", () => ({
   getConfiguration: () => ({}),
   notifyLoadSucceeded: jest.fn(),
@@ -42,21 +35,18 @@ jest.mock("azure-devops-extension-sdk", () => ({
   getExtensionContext: () => ({ id: "test-extension-id" }),
 }));
 
-// Mock servicesHelper
 jest.mock("../../utilities/servicesHelper", () => ({
   getService: jest.fn(),
   getHostAuthority: jest.fn().mockResolvedValue("dev.azure.com"),
   WorkItemTrackingServiceIds: {},
 }));
 
-// Mock azureDevOpsContextHelper
 jest.mock("../../utilities/azureDevOpsContextHelper", () => ({
   getHostAuthority: jest.fn().mockResolvedValue("dev.azure.com"),
   getCurrentUser: jest.fn().mockResolvedValue({ id: "test-user" }),
   isHostedAzureDevOps: jest.fn().mockResolvedValue(true),
 }));
 
-// Mock data service completely
 jest.mock("../../dal/dataService", () => ({
   getTeamEffectiveness: jest.fn().mockResolvedValue({}),
   getBoard: jest.fn().mockResolvedValue({}),
@@ -66,7 +56,6 @@ jest.mock("../../dal/dataService", () => ({
   deleteDocument: jest.fn().mockResolvedValue({}),
 }));
 
-// Mock VSS
 (global as any).VSS = {
   getConfiguration: () => ({}),
   notifyLoadSucceeded: jest.fn(),
@@ -78,7 +67,6 @@ jest.mock("../../dal/dataService", () => ({
 
 describe("Feedback Item", () => {
   test("renders without crashing with basic props", () => {
-    // Create minimal props to test basic rendering without triggering service calls
     const minimalProps: any = {
       id: "test-feedback-id",
       title: "Test Feedback Item",
@@ -88,7 +76,7 @@ describe("Feedback Item", () => {
       columnIds: testColumnIds,
       boardId: testBoardId,
       createdDate: new Date("2023-01-01T10:00:00Z"),
-      createdBy: null, // Make it anonymous to avoid user service calls
+      createdBy: null,
       upvotes: 0,
       voteCollection: {},
       groupIds: [],
@@ -112,9 +100,7 @@ describe("Feedback Item", () => {
 
     const { container } = render(<FeedbackItem {...minimalProps} />);
 
-    // Basic rendering check - component should render without crashing
     expect(container.firstChild).toBeTruthy();
-    // Check that it contains the feedback item title
     expect(container.textContent).toContain("Test Feedback Item");
   });
 
@@ -152,18 +138,15 @@ describe("Feedback Item", () => {
 
     const { container, getByText } = render(<FeedbackItem {...minimalProps} />);
 
-    // Verify the feedback item renders
     expect(container.firstChild).toBeTruthy();
     expect(getByText("Test Feedback Item")).toBeInTheDocument();
 
-    // Verify it has no child feedback items
     expect(minimalProps.groupIds).toHaveLength(0);
     expect(container.querySelectorAll('[data-testid="child-feedback-item"]')).toHaveLength(0);
   });
 
   describe("Group feedback items", () => {
     test("should show the related feedback header", () => {
-      // Create minimal props similar to the working test to avoid service calls
       const minimalProps: any = {
         id: "test-group-feedback-id",
         title: "Test Group Feedback Item",
@@ -197,9 +180,7 @@ describe("Feedback Item", () => {
 
       const { container } = render(<FeedbackItem {...minimalProps} />);
 
-      // Verify the component renders
       expect(container.firstChild).toBeTruthy();
-      // Verify it contains the group feedback item title
       expect(container.textContent).toContain("Test Group Feedback Item");
     });
 
@@ -237,7 +218,6 @@ describe("Feedback Item", () => {
 
       const { container, getByText } = render(<FeedbackItem {...minimalProps} />);
 
-      // Verify the component renders and shows the title
       expect(container.firstChild).toBeTruthy();
       expect(getByText("Test Group Title")).toBeInTheDocument();
     });
@@ -276,11 +256,8 @@ describe("Feedback Item", () => {
 
       const { container } = render(<FeedbackItem {...minimalProps} />);
 
-      // Verify the component renders
       expect(container.firstChild).toBeTruthy();
-      // Verify original column ID is set correctly
       expect(minimalProps.originalColumnId).toBe(testColumnUuidOne);
-      // Verify current column ID matches (no move in this test)
       expect(minimalProps.columnId).toBe(testColumnUuidOne);
     });
   });

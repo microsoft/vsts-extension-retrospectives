@@ -6,7 +6,6 @@ import FeedbackBoard, { FeedbackBoardProps } from "../../components/feedbackBoar
 import { testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 
-// Mock telemetryClient
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
     trackMetric: jest.fn(),

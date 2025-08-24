@@ -1,13 +1,11 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-// @ts-ignore - user-event types seem to have issues
 import userEvent from "@testing-library/user-event";
 import { mocked } from "jest-mock";
 import WorkflowStage from "../../components/workflowStage";
 import { WorkflowPhase } from "../../interfaces/workItem";
 
-// Mock the telemetry client to avoid dependency issues
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
     trackMetric: jest.fn(),
@@ -33,9 +31,7 @@ describe("Workflow Stage", () => {
     const activeProps = { ...mockedProps, isActive: true };
     render(<WorkflowStage {...activeProps} />);
 
-    // Check aria-label for active state
     expect(document.querySelector('[aria-label="Selected Sample Workflow Stage Text workflow stage"]')).toBeTruthy();
-    // Check active class
     expect(document.querySelector(".retrospective-workflowState.active")).toBeTruthy();
   });
 
@@ -43,9 +39,7 @@ describe("Workflow Stage", () => {
     const inactiveProps = { ...mockedProps, isActive: false };
     render(<WorkflowStage {...inactiveProps} />);
 
-    // Check aria-label for inactive state
     expect(document.querySelector('[aria-label="Not selected Sample Workflow Stage Text workflow stage"]')).toBeTruthy();
-    // Check that active class is not present
     expect(document.querySelector(".retrospective-workflowState.active")).toBeFalsy();
     expect(document.querySelector(".retrospective-workflowState")).toBeTruthy();
   });
@@ -56,10 +50,8 @@ describe("Workflow Stage", () => {
 
     const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
 
-    // Focus the element first
     await user.click(element);
 
-    // Press Enter key using keyboard method with keyCode
     await user.keyboard("{Enter}");
 
     expect(mockedProps.clickEventCallback).toHaveBeenCalledTimes(1);
