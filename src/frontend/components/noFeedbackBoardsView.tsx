@@ -1,5 +1,5 @@
 import React from "react";
-import { DefaultButton } from "office-ui-fabric-react/lib/Button";
+import { DefaultButton } from "@fluentui/react/lib/Button";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 

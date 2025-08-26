@@ -1,11 +1,11 @@
 import React, { ChangeEvent } from "react";
-import { PrimaryButton, DefaultButton, IconButton, ActionButton } from "office-ui-fabric-react/lib/Button";
-import { TextField } from "office-ui-fabric-react/lib/TextField";
-import Dialog, { DialogFooter, DialogType } from "office-ui-fabric-react/lib/Dialog";
-import { Checkbox } from "office-ui-fabric-react/lib/Checkbox";
-import { List } from "office-ui-fabric-react/lib/List";
-import { DocumentCardType, DocumentCard } from "office-ui-fabric-react/lib/DocumentCard";
-import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
+import { PrimaryButton, DefaultButton, IconButton, ActionButton } from "@fluentui/react/lib/Button";
+import { TextField } from "@fluentui/react/lib/TextField";
+import Dialog, { DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
+import { Checkbox } from "@fluentui/react/lib/Checkbox";
+import { List } from "@fluentui/react/lib/List";
+import { DocumentCardType, DocumentCard } from "@fluentui/react/lib/DocumentCard";
+import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import classNames from "classnames";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 

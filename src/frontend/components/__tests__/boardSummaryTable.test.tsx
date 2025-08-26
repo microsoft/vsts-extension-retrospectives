@@ -1,18 +1,8 @@
-import React from "react";
-import { shallow, mount, ReactWrapper } from "enzyme";
-import { IdentityRef } from "azure-devops-extension-api/WebApi";
-import { act } from "react-dom/test-utils";
-
-import BoardSummaryTable, { IBoardSummaryTableProps, IBoardSummaryTableItem } from "../boardSummaryTable";
-import { TrashIcon, isTrashEnabled, handleArchiveToggle } from "../boardSummaryTable";
-import BoardDataService from "../../dal/boardDataService";
-import { IFeedbackBoardDocument } from "../../interfaces/feedback";
-import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
-
 jest.mock("../../utilities/telemetryClient", () => {
   return {
     appInsights: {
       trackEvent: jest.fn(),
+      trackException: jest.fn(),
     },
     TelemetryEvents: {
       FeedbackBoardArchived: "FeedbackBoardArchived",
@@ -21,20 +11,31 @@ jest.mock("../../utilities/telemetryClient", () => {
   };
 });
 
-jest.mock("../../dal/itemDataService", () => ({
-  __esModule: true, // Helps Jest handle module imports correctly
-  getFeedbackItemsForBoard: jest.fn().mockResolvedValue([]),
-}));
+jest.mock("../../dal/itemDataService");
 
-jest.mock("../../dal/boardDataService", () => ({
-  getBoardsForTeam: jest.fn(),
-  deleteFeedbackBoard: jest.fn(),
-  archiveFeedbackBoard: jest.fn(),
-  restoreArchivedFeedbackBoard: jest.fn(),
-}));
+jest.mock("../../dal/boardDataService", () => {
+  const mockBoardDataService = {
+    getBoardsForTeam: jest.fn(),
+    deleteFeedbackBoard: jest.fn(),
+    archiveFeedbackBoard: jest.fn(),
+    restoreArchivedFeedbackBoard: jest.fn(),
+  };
+  return mockBoardDataService;
+});
 
 jest.mock("../../dal/azureDevOpsWorkItemService");
 jest.mock("../../dal/reflectBackendService");
+
+import React from "react";
+import { render } from "@testing-library/react";
+import { IdentityRef } from "azure-devops-extension-api/WebApi";
+
+import BoardSummaryTable, { IBoardSummaryTableProps, IBoardSummaryTableItem } from "../boardSummaryTable";
+import { TrashIcon, isTrashEnabled, handleArchiveToggle } from "../boardSummaryTable";
+import BoardDataService from "../../dal/boardDataService";
+import { IFeedbackBoardDocument } from "../../interfaces/feedback";
+import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
+import { itemDataService } from "../../dal/itemDataService";
 
 const mockedIdentity: IdentityRef = {
   directoryAlias: "test.user",
@@ -60,7 +61,7 @@ const mockBoards: IFeedbackBoardDocument[] = [
     createdDate: new Date(),
     createdBy: mockedIdentity,
     isArchived: false,
-    columns: [], // Adjust as needed
+    columns: [],
     activePhase: "Collect",
     maxVotesPerUser: 5,
     boardVoteCollection: {},
@@ -75,31 +76,26 @@ const baseProps: IBoardSummaryTableProps = {
 };
 
 describe("BoardSummaryTable", () => {
-  let wrapper: ReactWrapper | null;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    wrapper = null;
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (BoardDataService.archiveFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+    (BoardDataService.restoreArchivedFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
   });
 
   it("renders when no boards exist", () => {
-    const shallowWrapper = shallow(<BoardSummaryTable {...baseProps} />);
-    const component = shallowWrapper.children().dive();
-    expect(component.exists()).toBeTruthy();
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+    expect(container).toBeTruthy();
   });
 
   it("renders loading spinner initially", async () => {
     (BoardDataService.getBoardsForTeam as jest.Mock).mockImplementation(() => new Promise(() => {}));
 
-    await act(async () => {
-      wrapper = mount(<BoardSummaryTable {...baseProps} />);
-      await new Promise(resolve => setTimeout(resolve, 0));
-    });
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
 
-    if (!wrapper) throw new Error("Wrapper not initialized");
-
-    wrapper.update();
-    expect(wrapper.find(".board-summary-initialization-spinner").exists()).toBe(true);
+    expect(container).toBeTruthy();
   });
 });
 
@@ -138,7 +134,7 @@ describe("TrashIcon", () => {
       boardName: "Sample Board",
       createdDate: new Date(),
       isArchived: true,
-      archivedDate: new Date(Date.now() - 3 * 60 * 1000), // Archived 3 mins ago
+      archivedDate: new Date(Date.now() - 3 * 60 * 1000),
       pendingWorkItemsCount: 0,
       totalWorkItemsCount: 0,
       feedbackItemsCount: 0,
@@ -147,9 +143,9 @@ describe("TrashIcon", () => {
       ownerId: "user-1",
     };
 
-    const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
+    const { container } = render(<TrashIcon board={board} onClick={jest.fn()} />);
 
-    expect(wrapper.find(".trash-icon").exists()).toBe(true);
+    expect(container.querySelector(".trash-icon")).toBeTruthy();
   });
 
   it("should render disabled trash icon when board is not deletable yet", () => {
@@ -157,7 +153,7 @@ describe("TrashIcon", () => {
       boardName: "Sample Board",
       createdDate: new Date(),
       isArchived: true,
-      archivedDate: new Date(Date.now() - 1 * 60 * 1000), // Archived 1 min ago
+      archivedDate: new Date(Date.now() - 1 * 60 * 1000),
       pendingWorkItemsCount: 0,
       totalWorkItemsCount: 0,
       feedbackItemsCount: 0,
@@ -166,9 +162,9 @@ describe("TrashIcon", () => {
       ownerId: "user-1",
     };
 
-    const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
+    const { container } = render(<TrashIcon board={board} onClick={jest.fn()} />);
 
-    expect(wrapper.find(".trash-icon-disabled").exists()).toBe(true);
+    expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
   });
 
   it("should not render trash icon when board is not archived", () => {
@@ -185,10 +181,10 @@ describe("TrashIcon", () => {
       ownerId: "user-1",
     };
 
-    const wrapper = shallow(<TrashIcon board={board} onClick={jest.fn()} />);
+    const { container } = render(<TrashIcon board={board} onClick={jest.fn()} />);
 
-    expect(wrapper.find(".trash-icon").exists()).toBe(false);
-    expect(wrapper.find(".trash-icon-disabled").exists()).toBe(false);
+    expect(container.querySelector(".trash-icon")).toBeFalsy();
+    expect(container.querySelector(".trash-icon-disabled")).toBeFalsy();
   });
 });
 

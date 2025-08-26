@@ -1,9 +1,9 @@
 import React from "react";
 import classNames from "classnames";
-import { FocusTrapCallout, DirectionalHint } from "office-ui-fabric-react/lib/Callout";
-import { List } from "office-ui-fabric-react/lib/List";
-import { Shimmer } from "office-ui-fabric-react/lib/Shimmer";
-import { TextField } from "office-ui-fabric-react/lib/TextField";
+import { FocusTrapCallout, DirectionalHint } from "@fluentui/react/lib/Callout";
+import { List } from "@fluentui/react/lib/List";
+import { Shimmer } from "@fluentui/react/lib/Shimmer";
+import { TextField } from "@fluentui/react/lib/TextField";
 
 export interface ISelectorComboProps<T> {
   className: string;

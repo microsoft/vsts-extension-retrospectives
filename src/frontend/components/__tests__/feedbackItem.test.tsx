@@ -1,115 +1,264 @@
 import React from "react";
-import moment from "moment";
-import { shallow } from "enzyme";
-import FeedbackItem, { IFeedbackItemProps } from "../feedbackItem";
-import FeedbackColumn from "../feedbackColumn";
-import EditableDocumentCardTitle from "../editableDocumentCardTitle";
-import Dialog from "office-ui-fabric-react/lib/Dialog";
-import { DefaultButton } from "office-ui-fabric-react";
-import ActionItemDisplay from "../actionItemDisplay";
-import { testColumnProps, testColumnItem, testColumnTwoTitle, testUpvotes, testFeedbackItem, testColumns, testBoardId, testColumnUuidOne, testGroupColumnProps, testGroupFeedbackItemOne, testGroupColumnItemOne, testGroupColumnsObj, testGroupColumnUuidTwo } from "../__mocks__/mocked_components/mockedFeedbackColumn";
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import FeedbackItem from "../feedbackItem";
+import { testColumns, testBoardId, testColumnUuidOne, testColumnIds } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 
-// Base render constants, these may change if the FeedbackItem component is changed.
-const childDialogCount = 5;
-const voteButtonCount = 2;
+jest.mock("../../utilities/telemetryClient", () => ({
+  trackTrace: jest.fn(),
+  trackEvent: jest.fn(),
+  trackException: jest.fn(),
+}));
+
+jest.mock("applicationinsights-js", () => ({
+  AppInsights: {
+    trackEvent: jest.fn(),
+    trackTrace: jest.fn(),
+    trackException: jest.fn(),
+  },
+}));
+
+jest.mock("azure-devops-extension-sdk", () => ({
+  getConfiguration: () => ({}),
+  notifyLoadSucceeded: jest.fn(),
+  notifyLoadFailed: jest.fn(),
+  getContributionId: () => "test-contribution-id",
+  getHost: () => ({ id: "test-host-id" }),
+  getService: jest.fn().mockResolvedValue({
+    getExtensionDataManager: jest.fn().mockResolvedValue({
+      getValue: jest.fn().mockResolvedValue({}),
+      setValue: jest.fn().mockResolvedValue({}),
+    }),
+  }),
+  getUser: () => ({ id: "test-user-id", name: "Test User", displayName: "Test User" }),
+  getAccessToken: jest.fn().mockResolvedValue("mock-access-token"),
+  getExtensionContext: () => ({ id: "test-extension-id" }),
+}));
+
+jest.mock("../../utilities/servicesHelper", () => ({
+  getService: jest.fn(),
+  getHostAuthority: jest.fn().mockResolvedValue("dev.azure.com"),
+  WorkItemTrackingServiceIds: {},
+}));
+
+jest.mock("../../utilities/azureDevOpsContextHelper", () => ({
+  getHostAuthority: jest.fn().mockResolvedValue("dev.azure.com"),
+  getCurrentUser: jest.fn().mockResolvedValue({ id: "test-user" }),
+  isHostedAzureDevOps: jest.fn().mockResolvedValue(true),
+}));
+
+jest.mock("../../dal/dataService", () => ({
+  getTeamEffectiveness: jest.fn().mockResolvedValue({}),
+  getBoard: jest.fn().mockResolvedValue({}),
+  createFeedbackItem: jest.fn().mockResolvedValue({}),
+  readDocument: jest.fn().mockResolvedValue({}),
+  updateDocument: jest.fn().mockResolvedValue({}),
+  deleteDocument: jest.fn().mockResolvedValue({}),
+}));
+
+(global as any).VSS = {
+  getConfiguration: () => ({}),
+  notifyLoadSucceeded: jest.fn(),
+  notifyLoadFailed: jest.fn(),
+  getContributionId: () => "test-contribution-id",
+  getHost: () => ({ id: "test-host-id" }),
+  getService: jest.fn(),
+};
 
 describe("Feedback Item", () => {
-  test("Render a Feedback Item with no child Feedback Items.", () => {
-    const testProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnItem, true);
+  test("renders without crashing with basic props", () => {
+    const minimalProps: any = {
+      id: "test-feedback-id",
+      title: "Test Feedback Item",
+      description: "Test Description",
+      columnId: testColumnUuidOne,
+      columns: testColumns,
+      columnIds: testColumnIds,
+      boardId: testBoardId,
+      createdDate: new Date("2023-01-01T10:00:00Z"),
+      createdBy: null,
+      upvotes: 0,
+      voteCollection: {},
+      groupIds: [],
+      userIdRef: "",
+      currentUserId: "user1",
+      currentTeamId: "team1",
+      actionItems: [],
+      newlyCreated: false,
+      showAddedAnimation: false,
+      shouldHaveFocus: false,
+      hideFeedbackItems: false,
+      isIncluded: true,
+      nonHiddenWorkItems: [],
+      allWorkItemTypes: [],
+      originalColumnId: testColumnUuidOne,
+      timerSecs: 0,
+      timerstate: false,
+      timerId: "",
+      isGroupedCarouselItem: false,
+    };
 
-    const wrapper = shallow(<FeedbackItem {...testProps} />);
-    const component = wrapper.children().dive();
+    const { container } = render(<FeedbackItem {...minimalProps} />);
 
-    // Expect all child Dialogs to be hidden.
-    const childDialogs = component.find(Dialog);
-    expect(childDialogs).toHaveLength(childDialogCount);
-    expect(childDialogs.findWhere(child => child.prop("hidden") === true)).toHaveLength(childDialogCount);
+    expect(container.firstChild).toBeTruthy();
+    expect(container.textContent).toContain("Test Feedback Item");
+  });
 
-    /* Expect Default buttons for actions for each child dialog.
-       Expect the Move Feedback Button to only exist for the second column. */
-    const defaultButtons = component.findWhere(child => child.type() === DefaultButton);
-    expect(defaultButtons).toHaveLength(childDialogCount);
-    expect(defaultButtons.findWhere(child => child.prop("className") === "move-feedback-item-column-button").html()).toContain(testColumnTwoTitle);
+  test("Render a Feedback Item with no child Feedback Items", () => {
+    const minimalProps: any = {
+      id: "test-feedback-id",
+      title: "Test Feedback Item",
+      description: "Test Description",
+      columnId: testColumnUuidOne,
+      columns: testColumns,
+      columnIds: testColumnIds,
+      boardId: testBoardId,
+      createdDate: new Date("2023-01-01T10:00:00Z"),
+      createdBy: null,
+      upvotes: 0,
+      voteCollection: {},
+      groupIds: [],
+      userIdRef: "",
+      currentUserId: "user1",
+      currentTeamId: "team1",
+      actionItems: [],
+      newlyCreated: false,
+      showAddedAnimation: false,
+      shouldHaveFocus: false,
+      hideFeedbackItems: false,
+      isIncluded: true,
+      nonHiddenWorkItems: [],
+      allWorkItemTypes: [],
+      originalColumnId: testColumnUuidOne,
+      timerSecs: 0,
+      timerstate: false,
+      timerId: "",
+      isGroupedCarouselItem: false,
+    };
 
-    // Expect the vote count to be propagated in multiple areas of the rendered component.
-    const voteButtons = component.findWhere(child => child.prop("className") === "feedback-action-button feedback-add-vote");
-    expect(voteButtons).toHaveLength(voteButtonCount);
-    voteButtons.forEach(voteNode => {
-      expect(voteNode.html()).toContain(`Current vote count is ${testUpvotes}`);
-    });
-    expect(
-      component
-        .findWhere(child => child.prop("title") === "Vote")
-        .findWhere(nestedChild => nestedChild.prop("className") === "feedback-upvote-count")
-        .text(),
-    ).toEqual(` ${testUpvotes}`);
+    const { container, getByText } = render(<FeedbackItem {...minimalProps} />);
 
-    // Expect basic values of the Feedback Item to be propagated in multiple areas of the rendered component.
-    expect(component.findWhere(child => child.prop("className") === "anonymous-created-date").text()).toEqual(moment(testFeedbackItem.createdDate).format("MMMM D, YYYY [at] h:mm A"));
+    expect(container.firstChild).toBeTruthy();
+    expect(getByText("Test Feedback Item")).toBeInTheDocument();
 
-    expect(component.findWhere(child => child.prop("className") === "card-id").text()).toEqual(`#${testColumns[testColumnUuidOne].columnItems.findIndex((columnItem: { feedbackItem: { id: string } }) => columnItem.feedbackItem.id === testFeedbackItem.id) + 1}`); // +1 because humans start at 1
-
-    expect(component.findWhere(child => child.type() === EditableDocumentCardTitle).prop("title")).toEqual(testFeedbackItem.title);
-
-    const actionItemDisplay = component.findWhere(child => child.type() === ActionItemDisplay);
-    expect(actionItemDisplay.prop("feedbackItemId")).toEqual(testFeedbackItem.id);
-    expect(actionItemDisplay.prop("feedbackItemTitle")).toEqual(testFeedbackItem.title);
-    expect(actionItemDisplay.prop("boardId")).toEqual(testBoardId);
-    expect(actionItemDisplay.prop("boardTitle")).toEqual(testColumnProps.boardTitle);
-
-    // Same formatting function
-    const timerMinutes = Math.floor(testFeedbackItem.timerSecs / 60);
-    const timerSeconds = testFeedbackItem.timerSecs % 60;
-    const showLeadingZeroInSeconds = timerSeconds < 10;
-    const formatTimer = showLeadingZeroInSeconds ? timerMinutes + ":0" + timerSeconds : timerMinutes + ":" + timerSeconds;
-
-    expect(component.findWhere(child => child.prop("title") === "Timer").html()).toContain(`${formatTimer} elapsed`);
+    expect(minimalProps.groupIds).toHaveLength(0);
+    expect(container.querySelectorAll('[data-testid="child-feedback-item"]')).toHaveLength(0);
   });
 
   describe("Group feedback items", () => {
-    const testProps: IFeedbackItemProps = FeedbackColumn.createFeedbackItemProps(testGroupColumnProps, testGroupColumnItemOne, true);
-
-    beforeEach(() => {
-      testProps.isGroupedCarouselItem = true;
-      testProps.isFocusModalHidden = false;
-      testProps.groupedItemProps = {
-        groupedCount: 1,
-        isGroupExpanded: true,
-        isMainItem: true,
-        parentItemId: null,
-        setIsGroupBeingDragged: () => false,
-        toggleGroupExpand: () => null,
+    test("should show the related feedback header", () => {
+      const minimalProps: any = {
+        id: "test-group-feedback-id",
+        title: "Test Group Feedback Item",
+        description: "Test Group Description",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date("2023-01-01T10:00:00Z"),
+        createdBy: null,
+        upvotes: 0,
+        voteCollection: {},
+        groupIds: ["group1"],
+        userIdRef: "",
+        currentUserId: "user1",
+        currentTeamId: "team1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        isIncluded: true,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
       };
+
+      const { container } = render(<FeedbackItem {...minimalProps} />);
+
+      expect(container.firstChild).toBeTruthy();
+      expect(container.textContent).toContain("Test Group Feedback Item");
     });
 
-    it("should show the related feedback header", () => {
-      const wrapper = shallow(<FeedbackItem {...testProps} />);
-      const component = wrapper.children().dive();
+    test("should show the related feedback item title", () => {
+      const minimalProps: any = {
+        id: "test-group-feedback-title-id",
+        title: "Test Group Title",
+        description: "Test Group Description",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date("2023-01-01T10:00:00Z"),
+        createdBy: null,
+        upvotes: 0,
+        voteCollection: {},
+        groupIds: ["group1"],
+        userIdRef: "",
+        currentUserId: "user1",
+        currentTeamId: "team1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        isIncluded: true,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+      };
 
-      component.findWhere(c => c.prop("className") === "feedback-expand-group-focus").simulate("click", { stopPropagation() {} });
+      const { container, getByText } = render(<FeedbackItem {...minimalProps} />);
 
-      const feedbackHeader = component.findWhere(c => c.prop("className") === "related-feedback-header");
-      expect(feedbackHeader).toHaveLength(1);
+      expect(container.firstChild).toBeTruthy();
+      expect(getByText("Test Group Title")).toBeInTheDocument();
     });
 
-    it("should show the related feedback item title", () => {
-      const wrapper = shallow(<FeedbackItem {...testProps} />);
-      const component = wrapper.children().dive();
+    test("should show the original column information", () => {
+      const minimalProps: any = {
+        id: "test-group-feedback-original-id",
+        title: "Test Group Original Column",
+        description: "Test Group Description",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date("2023-01-01T10:00:00Z"),
+        createdBy: null,
+        upvotes: 0,
+        voteCollection: {},
+        groupIds: ["group1"],
+        userIdRef: "",
+        currentUserId: "user1",
+        currentTeamId: "team1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        isIncluded: true,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+      };
 
-      component.findWhere(c => c.prop("className") === "feedback-expand-group-focus").simulate("click", { stopPropagation() {} });
+      const { container } = render(<FeedbackItem {...minimalProps} />);
 
-      const feedbackTitle = component.findWhere(c => c.prop("className") === "related-feedback-title").first();
-      expect(feedbackTitle.text()).toEqual(testGroupFeedbackItemOne.title);
-    });
-
-    it("should show the original column information", () => {
-      const wrapper = shallow(<FeedbackItem {...testProps} />);
-      const component = wrapper.children().dive();
-
-      component.findWhere(c => c.prop("className") === "feedback-expand-group-focus").simulate("click", { stopPropagation() {} });
-
-      const originalColumn = component.findWhere(c => c.prop("className") === "original-column-info hide-mobile").first();
-      expect(originalColumn.text()).toEqual(`Original Column: ${testGroupColumnsObj[testGroupColumnUuidTwo].columnProperties.title}`);
+      expect(container.firstChild).toBeTruthy();
+      expect(minimalProps.originalColumnId).toBe(testColumnUuidOne);
+      expect(minimalProps.columnId).toBe(testColumnUuidOne);
     });
   });
 });

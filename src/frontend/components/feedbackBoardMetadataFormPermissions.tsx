@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { TextField } from "office-ui-fabric-react/lib/TextField";
-import { Checkbox } from "office-ui-fabric-react/lib/Checkbox";
+import { TextField } from "@fluentui/react/lib/TextField";
+import { Checkbox } from "@fluentui/react/lib/Checkbox";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../interfaces/feedback";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
