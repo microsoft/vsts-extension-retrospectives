@@ -1,6 +1,6 @@
 import { initializeIcons } from "@fluentui/react/lib/Icons";
 import React from "react";
-import * as ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { init as sdkInit } from "azure-devops-extension-sdk";
 import { isHostedAzureDevOps } from "./utilities/azureDevOpsContextHelper";
 import { getProjectId } from "./utilities/servicesHelper";
@@ -18,11 +18,11 @@ sdkInit({ applyTheme: true }).then(() => {
       projectId: res[1],
     };
 
-    ReactDOM.render(
+    const root = createRoot(document.getElementById("root"));
+    root.render(
       <AppInsightsErrorBoundary onError={() => <h1>We detected an error in the application</h1>} appInsights={reactPlugin}>
         <FeedbackBoardContainer {...feedbackBoardContainerProps} />
-      </AppInsightsErrorBoundary>,
-      document.getElementById("root") as HTMLElement,
+      </AppInsightsErrorBoundary>
     );
   });
 });
