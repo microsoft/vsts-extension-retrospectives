@@ -201,13 +201,13 @@ The contents of the `.env` file are
   REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
   ```
 
-  - In lieu of the .env file you can set actual environment variables.
+- In lieu of the .env file you can set actual environment variables.
 
-  - When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set Application Insights instrumentation key and the backend service URL.
+- When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set Application Insights instrumentation key and the backend service URL.
 
-4. Run `npm run build:d` or `npm run build:p` to build the project. The difference in commands is `development` versus `production`, respectively; the `production` command will generate a smaller bundle.
-5. To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of. (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page.) Currently this is the only way to test the extension.
-6. Copy the file `vss-extension-dev.json.template` into a new `vss-extension-dev.json` file with the new publisher that you setup. Also update the name and ID fields.
+1. Run `npm run build:d` or `npm run build:p` to build the project. The difference in commands is `development` versus `production`, respectively; the `production` command will generate a smaller bundle.
+2. To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of. (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page.) Currently this is the only way to test the extension.
+3. Copy the file `vss-extension-dev.json.template` into a new `vss-extension-dev.json` file with the new publisher that you setup. Also update the name and ID fields.
 
   ```json
   {
@@ -219,14 +219,14 @@ The contents of the `.env` file are
   }
   ```
 
-7. Run `npm run pack:d` to package the modules into a Azure DevOps extension package. This generated package has a `.vsix` extension. This package is generated using information from the manifest file and your built code. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts) to know more about extension manifests.
-8. [Publish your package to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish).  Once published, share the extension with the newly created test org. See [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share) for documentation on sharing.
+1. Run `npm run pack:d` to package the modules into a Azure DevOps extension package. This generated package has a `.vsix` extension. This package is generated using information from the manifest file and your built code. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts) to know more about extension manifests.
+2. [Publish your package to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish).  Once published, share the extension with the newly created test org. See [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share) for documentation on sharing.
 
 ---
 
-- Once the extension has been shared with your test org, you can install it to your org and start using it. This installation process is similar to installing any other DevOps extensions. Refer to [this link](https://docs.microsoft.com/en-us/azure/devops/marketplace/install-extension?view=vsts) for instructions. Since the extension is still in preview mode, it needs to be enabled for the Azure DevOps project. Enable the extension from the `Preview Features` tab.
+1. Once the extension has been shared with your test org, you can install it to your org and start using it. This installation process is similar to installing any other DevOps extensions. Refer to [this link](https://docs.microsoft.com/en-us/azure/devops/marketplace/install-extension?view=vsts) for instructions. Since the extension is still in preview mode, it needs to be enabled for the Azure DevOps project. Enable the extension from the `Preview Features` tab.
 
-- Now start using the extension to test your changes.
+2. Now start using the extension to test your changes.
 
 - For updates, rebuild and package your extension and publish an update from the Azure DevOps marketplace. That will automatically update the extension in your project.
 

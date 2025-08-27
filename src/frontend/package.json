@@ -8,8 +8,8 @@
     "compile": "npx postcss ./css/index.css -o ./css/bundle.css --config ./postcss.config.js --no-map",
     "build": "npm run clean && npm run compile && npx webpack --mode=production",
     "format": "npx prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
-    "lint": "npx eslint **/*.ts*",
-    "lint:fix": "npx eslint **/*.ts* --fix",
+    "lint": "npx eslint **/*.ts* --no-warn-ignored",
+    "lint:fix": "npx eslint **/*.ts* --fix --no-warn-ignored",
     "pack:d": "npm run build && npx tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
     "pack:test": "npm run compile && npx webpack --mode=production && npx tfx extension create --manifests vss-extension-prod.json --output-path ./dist/testing",
     "pack:p": "npm run build && npx tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
@@ -25,7 +25,7 @@
     "url": "https://github.com/microsoft/vsts-extension-retrospectives"
   },
   "author": "Microsoft",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@microsoft/applicationinsights-react-js": "17.3.5",
     "@microsoft/applicationinsights-web": "3.3.6",
