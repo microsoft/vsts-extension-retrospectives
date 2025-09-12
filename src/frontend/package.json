@@ -8,8 +8,8 @@
     "compile": "npx postcss ./css/index.css -o ./css/bundle.css --config ./postcss.config.js --no-map",
     "build": "npm run clean && npm run compile && npx webpack --mode=production",
     "format": "npx prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
-    "lint": "npx eslint **/*.ts*",
-    "lint:fix": "npx eslint **/*.ts* --fix",
+    "lint": "npx eslint **/*.ts* --no-warn-ignored",
+    "lint:fix": "npx eslint **/*.ts* --fix --no-warn-ignored",
     "pack:d": "npm run build && npx tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
     "pack:p": "npm run build && npx tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
     "publish:d": "npm run pack:d && npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix",
@@ -23,7 +23,7 @@
     "url": "https://github.com/microsoft/vsts-extension-retrospectives"
   },
   "author": "Microsoft",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@fluentui/react": "8.123.4",
     "@microsoft/applicationinsights-react-js": "18.3.6",
@@ -57,7 +57,6 @@
     "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "14.6.1",
     "@types/classnames": "2.3.4",
-    "@types/enzyme": "3.10.12",
     "@types/file-saver": "2.0.7",
     "@types/jest": "30.0.0",
     "@types/jsdom": "21.1.7",
@@ -66,8 +65,8 @@
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.6",
     "@types/react-slick": "0.23.13",
-    "@typescript-eslint/eslint-plugin": "8.24.0",
-    "@typescript-eslint/parser": "8.24.0",
+    "@typescript-eslint/eslint-plugin": "8.41.0",
+    "@typescript-eslint/parser": "8.41.0",
     "cheerio": "1.1.0",
     "compression-webpack-plugin": "11.1.0",
     "crypto-browserify": "3.12.1",
@@ -111,8 +110,7 @@
   },
   "jest": {
     "testPathIgnorePatterns": [
-      "./components/__tests__/setupTests.tsx",
-      "./components/__tests__/enzymeMocks.ts"
+      "./components/__tests__/setupTests.tsx"
     ],
     "transform": {
       ".+\\.(js|ts|tsx|jsx)$": [
@@ -135,8 +133,6 @@
     ],
     "moduleNameMapper": {
       ".+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx",
-      "^enzyme$": "<rootDir>/components/__tests__/enzymeMocks.ts",
-      "^enzyme-to-json$": "<rootDir>/components/__tests__/enzymeMocks.ts",
       "^cheerio$": "<rootDir>/components/__mocks__/cheerio.js",
       "^cheerio/lib/utils$": "<rootDir>/components/__mocks__/cheerio-utils.js"
     },
