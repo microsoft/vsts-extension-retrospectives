@@ -118,7 +118,6 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
           items={items}
           // Not virtualizing the list for mobile views due to bug on fabricUI blocking scroll events
           // on elements other than the modal plane
-          // https://github.com/OfficeDev/office-ui-fabric-react/issues/6315
           onShouldVirtualize={() => shouldVirtualizeItems}
           onRenderCell={(item: T, itemIndex: number) => {
             const itemName: string = this.props.nameGetter(item);

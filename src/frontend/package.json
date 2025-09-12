@@ -133,14 +133,6 @@
     ],
     "moduleNameMapper": {
       ".+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx",
-      "^office-ui-fabric-react/lib/(.*)$": "@fluentui/react/lib/$1",
-      "^office-ui-fabric-react$": "@fluentui/react",
-      "^office-ui-fabric-react/lib/Button$": "@fluentui/react/lib/Button",
-      "^office-ui-fabric-react/lib/Dialog$": "@fluentui/react/lib/Dialog",
-      "^office-ui-fabric-react/lib/DocumentCard$": "@fluentui/react/lib/DocumentCard",
-      "^office-ui-fabric-react/lib/DetailsList$": "@fluentui/react/lib/DetailsList",
-      "^office-ui-fabric-react/lib/Image$": "@fluentui/react/lib/Image",
-      "^office-ui-fabric-react/lib/Tooltip$": "@fluentui/react/lib/Tooltip",
       "^cheerio$": "<rootDir>/components/__mocks__/cheerio.js",
       "^cheerio/lib/utils$": "<rootDir>/components/__mocks__/cheerio-utils.js"
     },
