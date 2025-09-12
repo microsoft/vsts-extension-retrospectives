@@ -1388,31 +1388,29 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           >
             Board
           </button>
-          {this.state.isDesktop && (
-            <button
-              role="tab"
-              className="px-3 py-2 text-sm cursor-pointer transition-colors border-none outline-none border-b-2"
-              style={{
-                color: this.state.activeTab === "history" ? "var(--status-info-foreground)" : "var(--text-primary-color)",
-                backgroundColor: this.state.activeTab === "history" ? "var(--nav-header-active-item-background)" : "transparent",
-                borderBottomColor: this.state.activeTab === "history" ? "var(--status-info-foreground)" : "transparent"
-              }}
-              onClick={() => this.handleTabClick("history")}
-              aria-selected={this.state.activeTab === "history"}
-              onMouseEnter={(e) => {
-                if (this.state.activeTab !== "history") {
-                  e.currentTarget.style.color = "var(--status-info-foreground)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (this.state.activeTab !== "history") {
-                  e.currentTarget.style.color = "var(--text-primary-color)";
-                }
-              }}
-            >
-              History
-            </button>
-          )}
+          <button
+            role="tab"
+            className="px-3 py-2 text-sm cursor-pointer transition-colors border-none outline-none border-b-2"
+            style={{
+              color: this.state.activeTab === "history" ? "var(--status-info-foreground)" : "var(--text-primary-color)",
+              backgroundColor: this.state.activeTab === "history" ? "var(--nav-header-active-item-background)" : "transparent",
+              borderBottomColor: this.state.activeTab === "history" ? "var(--status-info-foreground)" : "transparent"
+            }}
+            onClick={() => this.handleTabClick("history")}
+            aria-selected={this.state.activeTab === "history"}
+            onMouseEnter={(e) => {
+              if (this.state.activeTab !== "history") {
+                e.currentTarget.style.color = "var(--status-info-foreground)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (this.state.activeTab !== "history") {
+                e.currentTarget.style.color = "var(--text-primary-color)";
+              }
+            }}
+          >
+            History
+          </button>
         </div>
         {this.state.activeTab === "board" && this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
           <div className="pivot-content-wrapper">
