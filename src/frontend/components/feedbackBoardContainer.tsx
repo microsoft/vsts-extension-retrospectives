@@ -1315,7 +1315,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <div className="flex flex-col h-full overflow-hidden">
+      <>
         <div className="flex items-center px-2 py-2">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
@@ -1364,10 +1364,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <div style={{ flexGrow: 1 }}></div>
           <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.setScreenViewMode} />
         </div>
-
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex">
-            <button
+        <div className="flex">
+          <button
             role="tab"
             className="px-3 py-2 text-sm cursor-pointer transition-colors outline-none rounded-t-lg border-x border-t border-b-2 border-[var(--nav-header-active-item-background)] text-[var(--text-primary-color)] aria-selected:true:text-[var(--status-info-foreground)] aria-selected:true:bg-[var(--nav-header-active-item-background)] aria-selected:true:border-b-[var(--status-info-foreground)] hover:text-[var(--status-info-foreground)]"
             onClick={() => this.handleTabClick("board")}
@@ -1384,256 +1382,253 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             History
           </button>
         </div>
-        <div className="flex-1 overflow-auto">
-          {this.state.activeTab === "board" && this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
-          <div className="pivot-content-wrapper">
-            <div className="feedback-board-container-header">
-              <div className="vertical-tab-separator hide-mobile" />
-              <div className="board-selector-group">
-                <div className="board-selector">
-                  <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
-                </div>
-                <div className="board-actions-menu">
-                  <DefaultButton
-                    className="contextual-menu-button hide-mobile"
-                    aria-label="Board Actions Menu"
-                    title="Board Actions"
-                    menuProps={{
-                      className: "board-actions-menu",
-                      items: this.boardActionContexualMenuItems,
-                    }}
-                  >
-                    <span className="ms-Button-icon">
-                      <i className="fa-solid fa-ellipsis-h"></i>
-                    </span>
-                    &nbsp;
-                  </DefaultButton>
+        {this.state.activeTab === "board" && this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
+        <div className="pivot-content-wrapper">
+          <div className="feedback-board-container-header">
+            <div className="vertical-tab-separator hide-mobile" />
+            <div className="board-selector-group">
+              <div className="board-selector">
+                <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
+              </div>
+              <div className="board-actions-menu">
+                <DefaultButton
+                  className="contextual-menu-button hide-mobile"
+                  aria-label="Board Actions Menu"
+                  title="Board Actions"
+                  menuProps={{
+                    className: "board-actions-menu",
+                    items: this.boardActionContexualMenuItems,
+                  }}
+                >
+                  <span className="ms-Button-icon">
+                    <i className="fa-solid fa-ellipsis-h"></i>
+                  </span>
+                  &nbsp;
+                </DefaultButton>
+                <Dialog
+                  hidden={this.state.isMobileBoardActionsDialogHidden}
+                  onDismiss={this.hideMobileBoardActionsDialog}
+                  modalProps={{
+                    isBlocking: false,
+                    containerClassName: "ms-dialogMainOverride",
+                    className: "retrospectives-dialog-modal",
+                  }}
+                >
+                  <div className="mobile-contextual-menu-list">
+                    {this.boardActionContexualMenuItems.map(boardAction => (
+                      <ActionButton
+                        key={boardAction.key}
+                        className={boardAction.className}
+                        iconProps={boardAction.iconProps}
+                        aria-label="User Settings Menu"
+                        onClick={() => {
+                          this.hideMobileBoardActionsDialog();
+                          boardAction.onClick();
+                        }}
+                        text={boardAction.text}
+                        title={boardAction.title}
+                      />
+                    ))}
+                  </div>
+                  <DialogFooter>
+                    <DefaultButton onClick={this.hideMobileBoardActionsDialog} text="Close" />
+                  </DialogFooter>
+                </Dialog>
+              </div>
+            </div>
+            <div className="feedback-workflow-wrapper">
+              {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+                <div className="team-effectiveness-dialog-section">
                   <Dialog
-                    hidden={this.state.isMobileBoardActionsDialogHidden}
-                    onDismiss={this.hideMobileBoardActionsDialog}
+                    hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                    onDismiss={() => {
+                      this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                    }}
+                    dialogContentProps={{
+                      type: DialogType.close,
+                    }}
+                    minWidth={640}
                     modalProps={{
-                      isBlocking: false,
-                      containerClassName: "ms-dialogMainOverride",
+                      isBlocking: true,
+                      containerClassName: "team-effectiveness-dialog",
                       className: "retrospectives-dialog-modal",
                     }}
                   >
-                    <div className="mobile-contextual-menu-list">
-                      {this.boardActionContexualMenuItems.map(boardAction => (
-                        <ActionButton
-                          key={boardAction.key}
-                          className={boardAction.className}
-                          iconProps={boardAction.iconProps}
-                          aria-label="User Settings Menu"
-                          onClick={() => {
-                            this.hideMobileBoardActionsDialog();
-                            boardAction.onClick();
-                          }}
-                          text={boardAction.text}
-                          title={boardAction.title}
-                        />
-                      ))}
-                    </div>
+                    <DialogContent>
+                      <div className="team-effectiveness-section-information">
+                        <i className="fa fa-info-circle" />
+                        &nbsp;All answers will be saved anonymously
+                      </div>
+                      <table className="team-effectiveness-measurement-table">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th></th>
+                            <th colSpan={6} className="team-effectiveness-favorability-label">
+                              Unfavorable
+                            </th>
+                            <th colSpan={2} className="team-effectiveness-favorability-label">
+                              Neutral
+                            </th>
+                            <th colSpan={2} className="team-effectiveness-favorability-label">
+                              Favorable
+                            </th>
+                          </tr>
+                          <tr>
+                            <th></th>
+                            <th></th>
+                            <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
+                            <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
+                            <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
+                            <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
+                            <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
+                            <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
+                            <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
+                            <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
+                            <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
+                            <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {questions.map(question => {
+                            return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                          })}
+                        </tbody>
+                      </table>
+                    </DialogContent>
                     <DialogFooter>
-                      <DefaultButton onClick={this.hideMobileBoardActionsDialog} text="Close" />
+                      <PrimaryButton
+                        className="team-effectiveness-submit-button"
+                        onClick={() => {
+                          saveTeamEffectivenessMeasurement();
+                        }}
+                        text="Submit"
+                      />
+                      <DefaultButton
+                        onClick={() => {
+                          this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                        }}
+                        text="Cancel"
+                      />
                     </DialogFooter>
                   </Dialog>
+                  <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile" content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
+                    <ActionButton
+                      className="toggle-carousel-button"
+                      iconProps={{ iconName: "Chart" }}
+                      text="Team Assessment"
+                      onClick={() => {
+                        this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
+                      }}
+                    ></ActionButton>
+                  </TooltipHost>
                 </div>
-              </div>
-              <div className="feedback-workflow-wrapper">
-                {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                  <div className="team-effectiveness-dialog-section">
-                    <Dialog
-                      hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
-                      onDismiss={() => {
-                        this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                      }}
-                      dialogContentProps={{
-                        type: DialogType.close,
-                      }}
-                      minWidth={640}
-                      modalProps={{
-                        isBlocking: true,
-                        containerClassName: "team-effectiveness-dialog",
-                        className: "retrospectives-dialog-modal",
-                      }}
-                    >
-                      <DialogContent>
-                        <div className="team-effectiveness-section-information">
-                          <i className="fa fa-info-circle" />
-                          &nbsp;All answers will be saved anonymously
-                        </div>
-                        <table className="team-effectiveness-measurement-table">
-                          <thead>
-                            <tr>
-                              <th></th>
-                              <th></th>
-                              <th colSpan={6} className="team-effectiveness-favorability-label">
-                                Unfavorable
-                              </th>
-                              <th colSpan={2} className="team-effectiveness-favorability-label">
-                                Neutral
-                              </th>
-                              <th colSpan={2} className="team-effectiveness-favorability-label">
-                                Favorable
-                              </th>
-                            </tr>
-                            <tr>
-                              <th></th>
-                              <th></th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
-                              <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
-                              <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
-                              <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
-                              <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {questions.map(question => {
-                              return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
-                            })}
-                          </tbody>
-                        </table>
-                      </DialogContent>
-                      <DialogFooter>
-                        <PrimaryButton
-                          className="team-effectiveness-submit-button"
-                          onClick={() => {
-                            saveTeamEffectivenessMeasurement();
-                          }}
-                          text="Submit"
-                        />
-                        <DefaultButton
-                          onClick={() => {
-                            this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                          }}
-                          text="Cancel"
-                        />
-                      </DialogFooter>
-                    </Dialog>
-                    <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile" content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
-                      <ActionButton
-                        className="toggle-carousel-button"
-                        iconProps={{ iconName: "Chart" }}
-                        text="Team Assessment"
-                        onClick={() => {
-                          this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
-                        }}
-                      ></ActionButton>
-                    </TooltipHost>
-                  </div>
-                )}
-                <div className="workflow-stage-tab-container" role="tablist">
-                  <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
-                  <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
-                  <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
-                  <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
-                </div>
-              </div>
-              {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                  <ActionButton className="toggle-carousel-button hide-mobile" text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
-                </TooltipHost>
               )}
+              <div className="workflow-stage-tab-container" role="tablist">
+                <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
+                <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
+                <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
+                <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
+              </div>
             </div>
-            {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
-              <MessageBar
-                className="info-message-bar"
-                messageBarType={MessageBarType.info}
-                isMultiline={true}
-                onDismiss={this.hideLiveSyncInTfsIssueMessageBar}
-                styles={{
-                  root: {
-                    background: "#cceeff",
-                  },
-                }}
-              >
-                <span>
-                  <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
-                </span>
-              </MessageBar>
+            {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
+              <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
+                <ActionButton className="toggle-carousel-button hide-mobile" text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
+              </TooltipHost>
             )}
-            {!this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected && (
-              <MessageBar className="info-message-bar" messageBarType={MessageBarType.warning} isMultiline={true} onDismiss={this.hideDropIssueInEdgeMessageBar}>
-                <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
-              </MessageBar>
-            )}
-            {this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected && (
-              <MessageBar
-                className="info-message-bar"
-                messageBarType={MessageBarType.warning}
-                isMultiline={true}
-                actions={
-                  <div className="info-message-bar-action">
-                    {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
-                    {!this.state.isReconnectingToBackendService && (
-                      <>
-                        <MessageBarButton className="info-message-bar-action-button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService} text="Reconnect" />
-                        <IconButton
-                          className="info-message-bar-action-button"
-                          onClick={() => {
-                            this.setState({ isBackendServiceConnected: true });
-                          }}
-                          disabled={this.state.isReconnectingToBackendService}
-                          title="Hide"
-                        >
-                          <span className="ms-Button-icon">
-                            <i className="fas fa-times"></i>
-                          </span>
-                        </IconButton>
-                      </>
-                    )}
-                  </div>
-                }
-              >
-                <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
-              </MessageBar>
-            )}
-            <div className="feedback-board-container">
-              <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} />
-            </div>
-            <Dialog
-              hidden={this.state.isArchiveBoardConfirmationDialogHidden}
-              onDismiss={this.hideArchiveBoardConfirmationDialog}
-              dialogContentProps={{
-                type: DialogType.close,
-                title: "Archive Retrospective",
-              }}
-              modalProps={{
-                isBlocking: true,
-                containerClassName: "retrospectives-archive-board-confirmation-dialog",
-                className: "retrospectives-dialog-modal",
+          </div>
+          {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
+            <MessageBar
+              className="info-message-bar"
+              messageBarType={MessageBarType.info}
+              isMultiline={true}
+              onDismiss={this.hideLiveSyncInTfsIssueMessageBar}
+              styles={{
+                root: {
+                  background: "#cceeff",
+                },
               }}
             >
-              <DialogContent>
-                <p>
-                  The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
-                </p>
-                <br />
-                <p>
-                  <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-                </p>
-              </DialogContent>
-              <DialogFooter>
-                <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
-                <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
-              </DialogFooter>
-            </Dialog>
+              <span>
+                <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
+              </span>
+            </MessageBar>
+          )}
+          {!this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected && (
+            <MessageBar className="info-message-bar" messageBarType={MessageBarType.warning} isMultiline={true} onDismiss={this.hideDropIssueInEdgeMessageBar}>
+              <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
+            </MessageBar>
+          )}
+          {this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected && (
+            <MessageBar
+              className="info-message-bar"
+              messageBarType={MessageBarType.warning}
+              isMultiline={true}
+              actions={
+                <div className="info-message-bar-action">
+                  {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
+                  {!this.state.isReconnectingToBackendService && (
+                    <>
+                      <MessageBarButton className="info-message-bar-action-button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService} text="Reconnect" />
+                      <IconButton
+                        className="info-message-bar-action-button"
+                        onClick={() => {
+                          this.setState({ isBackendServiceConnected: true });
+                        }}
+                        disabled={this.state.isReconnectingToBackendService}
+                        title="Hide"
+                      >
+                        <span className="ms-Button-icon">
+                          <i className="fas fa-times"></i>
+                        </span>
+                      </IconButton>
+                    </>
+                  )}
+                </div>
+              }
+            >
+              <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
+            </MessageBar>
+          )}
+          <div className="feedback-board-container">
+            <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} />
+          </div>
+          <Dialog
+            hidden={this.state.isArchiveBoardConfirmationDialogHidden}
+            onDismiss={this.hideArchiveBoardConfirmationDialog}
+            dialogContentProps={{
+              type: DialogType.close,
+              title: "Archive Retrospective",
+            }}
+            modalProps={{
+              isBlocking: true,
+              containerClassName: "retrospectives-archive-board-confirmation-dialog",
+              className: "retrospectives-dialog-modal",
+            }}
+          >
+            <DialogContent>
+              <p>
+                The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
+              </p>
+              <br />
+              <p>
+                <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
+              </p>
+            </DialogContent>
+            <DialogFooter>
+              <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
+              <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
+            </DialogFooter>
+          </Dialog>
+        </div>
+        )}
+        {this.state.activeTab === 'history' && (
+          <div className="pivot-content-wrapper">
+            <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
           </div>
         )}
-          {this.state.activeTab === 'history' && this.state.isDesktop && (
-            <div className="pivot-content-wrapper">
-              <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
-            </div>
-          )}
-          {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
-          {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
-        </div>
-      </div>
+        {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
+        {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
 
         {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
         {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
@@ -1763,7 +1758,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           )}
         </Dialog>
         <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" bodyClassName="retrospective-notification-toast-body" progressClassName="retrospective-notification-toast-progress-bar" />
-      </div>
+      </>
     );
   }
 }
