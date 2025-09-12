@@ -1370,22 +1370,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <div className="flex">
                 <button
                   role="tab"
-                  className="px-3 py-2 font-medium text-sm cursor-pointer transition-colors bg-transparent border-none outline-none border-b-2"
+                  className="px-3 py-2 text-sm cursor-pointer transition-colors border-none outline-none border-b-2"
                   style={{
-                    color: this.state.activeTab === 'board' ? 'var(--status-info-foreground)' : 'var(--text-primary-color)',
-                    backgroundColor: 'transparent',
-                    borderBottomColor: this.state.activeTab === 'board' ? 'var(--status-info-foreground)' : 'transparent'
+                    color: this.state.activeTab === "board" ? "var(--status-info-foreground)" : "var(--text-primary-color)",
+                    backgroundColor: this.state.activeTab === "board" ? "var(--nav-header-active-item-background)" : "transparent",
+                    borderBottomColor: this.state.activeTab === "board" ? "var(--status-info-foreground)" : "transparent"
                   }}
-                  onClick={() => this.handleTabClick('board')}
-                  aria-selected={this.state.activeTab === 'board'}
+                  onClick={() => this.handleTabClick("board")}
+                  aria-selected={this.state.activeTab === "board"}
                   onMouseEnter={(e) => {
-                    if (this.state.activeTab !== 'board') {
-                      e.currentTarget.style.color = 'var(--status-info-foreground)';
+                    if (this.state.activeTab !== "board") {
+                      e.currentTarget.style.color = "var(--status-info-foreground)";
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (this.state.activeTab !== 'board') {
-                      e.currentTarget.style.color = 'var(--text-primary-color)';
+                    if (this.state.activeTab !== "board") {
+                      e.currentTarget.style.color = "var(--text-primary-color)";
                     }
                   }}
                 >
@@ -1394,22 +1394,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 {this.state.isDesktop && (
                   <button
                     role="tab"
-                    className="px-3 py-2 font-medium text-sm cursor-pointer transition-colors bg-transparent border-none outline-none border-b-2"
+                    className="px-3 py-2 text-sm cursor-pointer transition-colors border-none outline-none border-b-2"
                     style={{
-                      color: this.state.activeTab === 'history' ? 'var(--status-info-foreground)' : 'var(--text-primary-color)',
-                      backgroundColor: 'transparent',
-                      borderBottomColor: this.state.activeTab === 'history' ? 'var(--status-info-foreground)' : 'transparent'
+                      color: this.state.activeTab === "history" ? "var(--status-info-foreground)" : "var(--text-primary-color)",
+                      backgroundColor: this.state.activeTab === "history" ? "var(--nav-header-active-item-background)" : "transparent",
+                      borderBottomColor: this.state.activeTab === "history" ? "var(--status-info-foreground)" : "transparent"
                     }}
-                    onClick={() => this.handleTabClick('history')}
-                    aria-selected={this.state.activeTab === 'history'}
+                    onClick={() => this.handleTabClick("history")}
+                    aria-selected={this.state.activeTab === "history"}
                     onMouseEnter={(e) => {
-                      if (this.state.activeTab !== 'history') {
-                        e.currentTarget.style.color = 'var(--status-info-foreground)';
+                      if (this.state.activeTab !== "history") {
+                        e.currentTarget.style.color = "var(--status-info-foreground)";
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (this.state.activeTab !== 'history') {
-                        e.currentTarget.style.color = 'var(--text-primary-color)';
+                      if (this.state.activeTab !== "history") {
+                        e.currentTarget.style.color = "var(--text-primary-color)";
                       }
                     }}
                   >
@@ -1418,7 +1418,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 )}
               </div>
 
-              {this.state.activeTab === 'board' && this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
+              {this.state.activeTab === "board" && this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
                 <div className="pivot-content-wrapper">
                   <div className="feedback-board-container-header">
                     <div className="vertical-tab-separator hide-mobile" />
