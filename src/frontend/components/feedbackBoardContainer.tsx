@@ -1315,7 +1315,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <>
+      <div className="flex flex-col h-full overflow-hidden">
         <div className="flex items-center px-2 py-2">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
@@ -1364,8 +1364,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <div style={{ flexGrow: 1 }}></div>
           <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.setScreenViewMode} />
         </div>
-        <div className="flex">
-          <button
+
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex">
+            <button
             role="tab"
             className="px-3 py-2 text-sm cursor-pointer transition-colors outline-none rounded-t-lg border-x border-t border-b-2 border-[var(--nav-header-active-item-background)] text-[var(--text-primary-color)] aria-selected:true:text-[var(--status-info-foreground)] aria-selected:true:bg-[var(--nav-header-active-item-background)] aria-selected:true:border-b-[var(--status-info-foreground)] hover:text-[var(--status-info-foreground)]"
             onClick={() => this.handleTabClick("board")}
@@ -1382,7 +1384,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             History
           </button>
         </div>
-        {this.state.activeTab === "board" && this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
+        <div className="flex-1 overflow-auto">
+          {this.state.activeTab === "board" && this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
           <div className="pivot-content-wrapper">
             <div className="feedback-board-container-header">
               <div className="vertical-tab-separator hide-mobile" />
@@ -1622,13 +1625,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </Dialog>
           </div>
         )}
-        {this.state.activeTab === 'history' && this.state.isDesktop && (
-          <div className="pivot-content-wrapper">
-            <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
-          </div>
-        )}
-        {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
-        {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
+          {this.state.activeTab === 'history' && this.state.isDesktop && (
+            <div className="pivot-content-wrapper">
+              <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
+            </div>
+          )}
+          {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
+          {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
+        </div>
+      </div>
+
         {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
         {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
         {this.state.currentBoard && this.renderBoardUpdateMetadataFormDialog(false, false, this.state.isBoardUpdateDialogHidden, this.hideBoardUpdateDialog, "Edit retrospective", "", this.updateBoardMetadata, this.hideBoardUpdateDialog)}
@@ -1757,7 +1763,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           )}
         </Dialog>
         <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" bodyClassName="retrospective-notification-toast-body" progressClassName="retrospective-notification-toast-progress-bar" />
-      </>
+      </div>
     );
   }
 }
