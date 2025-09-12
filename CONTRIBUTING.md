@@ -111,8 +111,8 @@ Either in the [dev container](#dev-containers) or locally:
     - `pre-commit run --all-files` will run against *everything*
     - `pre-commit run markdownlint` to run the markdown linting
     - `pre-commit run spellcheck-cli` to run the spellchecking
-4. To run linting for the typescript/javascript (must be done within the `src/frontend`
-directory): `npm run lint`
+
+4. To run linting for the typescript/javascript (must be done within the `src/frontend` directory): `npm run lint`
 
 Read more about the [Python pre-commit framework](https://pre-commit.com/). To disable the pre-commit hook run `pre-commit uninstall` from the root folder.
 
@@ -120,8 +120,7 @@ Read more about the [Python pre-commit framework](https://pre-commit.com/). To d
 
 The Retrospectives Extension can be built, developed and tested in several development environments. This section highlights three of the primary environments in order of relevance.
 
-All of the development prerequisites, such as [Webpack](https://webpack.js.org/) and [NodeJS](https://nodejs.org/en/download/) are listed in the [Dockerfile](.devcontainer/Dockerfile). This file can be opened in a text
-editor and the install commands can be used to configure the prerequisites outside of a [dev container](#dev-containers).
+All of the development prerequisites, such as [Webpack](https://webpack.js.org/) and [NodeJS](https://nodejs.org/en/download/) are listed in the [Dockerfile](.devcontainer/Dockerfile). This file can be opened in a text editor and the install commands can be used to configure the prerequisites outside of a [dev container](#dev-containers).
 
 ### Dev Containers
 
@@ -169,7 +168,7 @@ editor and the install commands can be used to configure the prerequisites outsi
 
 ---
 
-- Some commands, such as `dotnet build` and `npm run build:p` may need `sudo` prefixed to execute successfully.
+- Some commands, such as `dotnet build` and `npm run build` may need `sudo` prefixed to execute successfully.
 
 ### Github Codespaces
 
@@ -192,41 +191,42 @@ Test changes in the Azure DevOps environment by publishing a development version
 1. Clone this repository, and open in your preferred [development environment](#development-environments).
 2. Using Powershell, navigate to the `/src/frontend` folder, run `npm install`. This will download all the dependent packages listed in `package.json`.
 3. When developing or publishing the extension locally, you need to create a .env file at the top-level directory of the front end project (where `package.json` lives). You can copy `src/frontend/.env.template` to `src/frontend/.env` to get started.
+
 The contents of the `.env` file are
 
-    ```bash
-    # Backend Service URL
-    REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service URL here"
-    # App Instrumentation Key
-    REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
-    ```
+  ```bash
+  # Backend Service URL
+  REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service URL here"
+  # App Instrumentation Key
+  REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
+  ```
 
-    - In lieu of the .env file you can set actual environment variables.
+- In lieu of the .env file you can set actual environment variables.
 
-    - When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set Application Insights instrumentation key and the backend service URL.
+- When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set Application Insights instrumentation key and the backend service URL.
 
-4. Run `npm run build:d` or `npm run build:p` to build the project. The difference in commands is `development` versus `production`, respectively; the `production` command will generate a smaller bundle.
-5. To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of. (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page.) Currently this is the only way to test the extension.
-6. Copy the file `vss-extension-dev.json.template` into a new `vss-extension-dev.json` file with the new publisher that you setup. Also update the name and ID fields.
+1. Run `npm run build:d` or `npm run build:p` to build the project. The difference in commands is `development` versus `production`, respectively; the `production` command will generate a smaller bundle.
+2. To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of. (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page.) Currently this is the only way to test the extension.
+3. Copy the file `vss-extension-dev.json.template` into a new `vss-extension-dev.json` file with the new publisher that you setup. Also update the name and ID fields.
 
-    ```json
-    {
-      "manifestVersion": 1,
-      "id": <any new ID>,
-      "publisher": <the new publisher you created>,
-      "version": <your staring version>,
-      "name": <your extension's name. Can be any name you can identify by. Eg. Retrospectives-test>,
-    }
-    ```
+  ```json
+  {
+    "manifestVersion": 1,
+    "id": <any new ID>,
+    "publisher": <the new publisher you created>,
+    "version": <your staring version>,
+    "name": <your extension's name. Can be any name you can identify by. Eg. Retrospectives-test>,
+  }
+  ```
 
-7. Run `npm run pack:d` to package the modules into a Azure DevOps extension package. This generated package has a `.vsix` extension. This package is generated using information from the manifest file and your built code. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts) to know more about extension manifests.
-8. [Publish your package to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish).  Once published, share the extension with the newly created test org. See [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share) for documentation on sharing.
+1. Run `npm run pack:d` to package the modules into a Azure DevOps extension package. This generated package has a `.vsix` extension. This package is generated using information from the manifest file and your built code. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/develop/manifest?view=vsts) to know more about extension manifests.
+2. [Publish your package to the marketplace](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#publish).  Once published, share the extension with the newly created test org. See [this link](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts#share) for documentation on sharing.
 
 ---
 
-- Once the extension has been shared with your test org, you can install it to your org and start using it. This installation process is similar to installing any other DevOps extensions. Refer to [this link](https://docs.microsoft.com/en-us/azure/devops/marketplace/install-extension?view=vsts) for instructions. Since the extension is still in preview mode, it needs to be enabled for the Azure DevOps project. Enable the extension from the `Preview Features` tab.
+1. Once the extension has been shared with your test org, you can install it to your org and start using it. This installation process is similar to installing any other DevOps extensions. Refer to [this link](https://docs.microsoft.com/en-us/azure/devops/marketplace/install-extension?view=vsts) for instructions. Since the extension is still in preview mode, it needs to be enabled for the Azure DevOps project. Enable the extension from the `Preview Features` tab.
 
-- Now start using the extension to test your changes.
+2. Now start using the extension to test your changes.
 
 - For updates, rebuild and package your extension and publish an update from the Azure DevOps marketplace. That will automatically update the extension in your project.
 
