@@ -1367,7 +1367,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         <div className="flex">
           <button
             role="tab"
-            className="px-3 py-2 text-sm cursor-pointer transition-colors border-none outline-none border-b-2"
+            className="px-3 py-2 text-sm cursor-pointer transition-colors outline-none rounded-t-lg border-x border-t border-b-2 border-[var(--nav-header-active-item-background)]"
             style={{
               color: this.state.activeTab === "board" ? "var(--status-info-foreground)" : "var(--text-primary-color)",
               backgroundColor: this.state.activeTab === "board" ? "var(--nav-header-active-item-background)" : "transparent",
