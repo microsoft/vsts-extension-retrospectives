@@ -1371,7 +1371,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             style={{
               color: this.state.activeTab === "board" ? "var(--status-info-foreground)" : "var(--text-primary-color)",
               backgroundColor: this.state.activeTab === "board" ? "var(--nav-header-active-item-background)" : "transparent",
-              borderBottom: this.state.activeTab === "board" ? "2px solid var(--status-info-foreground)" : "2px solid var(--nav-header-active-item-background)",
+              borderBottom: this.state.activeTab === "board" ? "2px solid var(--status-info-foreground)" : "2px solid transparent",
             }}
             onClick={() => this.handleTabClick("board")}
             aria-selected={this.state.activeTab === "board"}
@@ -1384,7 +1384,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             style={{
               color: this.state.activeTab === "history" ? "var(--status-info-foreground)" : "var(--text-primary-color)",
               backgroundColor: this.state.activeTab === "history" ? "var(--nav-header-active-item-background)" : "transparent",
-              borderBottom: this.state.activeTab === "history" ? "2px solid var(--status-info-foreground)" : "2px solid var(--nav-header-active-item-background)",
+              borderBottom: this.state.activeTab === "history" ? "2px solid var(--status-info-foreground)" : "2px solid transparent",
             }}
             onClick={() => this.handleTabClick("history")}
             aria-selected={this.state.activeTab === "history"}
