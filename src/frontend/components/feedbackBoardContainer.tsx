@@ -1378,7 +1378,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           >
             Board
           </button>
-          <button
+          <div
             role="tab"
             className="px-3 py-2 text-sm cursor-pointer outline-none rounded-t-lg border-none"
             style={{
@@ -1390,7 +1390,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             aria-selected={this.state.activeTab === "history"}
           >
             History
-          </button>
+          </div>
         </div>
         {this.state.activeTab === "board" && this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
         <div className="pivot-content-wrapper">
