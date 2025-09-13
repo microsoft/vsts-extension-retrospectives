@@ -1367,7 +1367,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         <div className="flex">
           <button
             role="tab"
-            className="
+            className={`
               px-3
               py-2
               text-sm
@@ -1381,7 +1381,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               border-[var(--nav-header-active-item-background)]
               text-[var(--text-primary-color)]
               hover:text-[var(--status-info-foreground)]
-            "
+              ${this.state.activeTab === "board" ? "text-[var(--status-info-foreground)] bg-[var(--nav-header-active-item-background)] border-b-[var(--status-info-foreground)]" : ""}
+            `}
             onClick={() => this.handleTabClick("board")}
             aria-selected={this.state.activeTab === "board"}
           >
