@@ -1380,11 +1380,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               border-b-2
               border-[var(--nav-header-active-item-background)]
               text-[var(--text-primary-color)]
-              aria-selected:true:text-[var(--status-info-foreground)]
-              aria-selected:true:bg-[var(--nav-header-active-item-background)]
-              aria-selected:true:border-b-[var(--status-info-foreground)]
               hover:text-[var(--status-info-foreground)]
-              hover:border-b-4
             "
             onClick={() => this.handleTabClick("board")}
             aria-selected={this.state.activeTab === "board"}
