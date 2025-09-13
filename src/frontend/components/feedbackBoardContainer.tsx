@@ -1367,7 +1367,25 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         <div className="flex">
           <button
             role="tab"
-            className="px-3 py-2 text-sm cursor-pointer transition-colors outline-none rounded-t-lg border-x border-t border-b-2 border-[var(--nav-header-active-item-background)] text-[var(--text-primary-color)] aria-selected:true:text-[var(--status-info-foreground)] aria-selected:true:bg-[var(--nav-header-active-item-background)] aria-selected:true:border-b-[var(--status-info-foreground)] hover:text-[var(--status-info-foreground)]"
+            className="
+              px-3
+              py-2
+              text-sm
+              cursor-pointer
+              transition-colors
+              outline-none
+              rounded-t-lg
+              border-x
+              border-t
+              border-b-2
+              border-[var(--nav-header-active-item-background)]
+              text-[var(--text-primary-color)]
+              aria-selected:true:text-[var(--status-info-foreground)]
+              aria-selected:true:bg-[var(--nav-header-active-item-background)]
+              aria-selected:true:border-b-[var(--status-info-foreground)]
+              hover:text-[var(--status-info-foreground)]
+              hover:border-b-4
+            "
             onClick={() => this.handleTabClick("board")}
             aria-selected={this.state.activeTab === "board"}
           >
