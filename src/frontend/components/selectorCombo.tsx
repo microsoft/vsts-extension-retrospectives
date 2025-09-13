@@ -1,5 +1,4 @@
 import React from "react";
-import classNames from "classnames";
 import { FocusTrapCallout, DirectionalHint } from "@fluentui/react/lib/Callout";
 import { List } from "@fluentui/react/lib/List";
 import { Shimmer } from "@fluentui/react/lib/Shimmer";
@@ -63,7 +62,7 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
           </span>
           <i className={"selector-button-chevron fas fa-chevron-down"}></i>
         </div>
-        <FocusTrapCallout className={classNames("selector-callout", this.props.className)} target={this.selectorButton} directionalHint={DirectionalHint.bottomLeftEdge} gapSpace={0} focusTrapProps={{ isClickableOutsideFocusTrap: true }} isBeakVisible={false} onDismiss={this.hideSelectorCallout} hidden={!this.state.isSelectorCalloutVisible}>
+        <FocusTrapCallout className={`selector-callout ${this.props.className}`} target={this.selectorButton} directionalHint={DirectionalHint.bottomLeftEdge} gapSpace={0} focusTrapProps={{ isClickableOutsideFocusTrap: true }} isBeakVisible={false} onDismiss={this.hideSelectorCallout} hidden={!this.state.isSelectorCalloutVisible}>
           {this.renderSelectorCombo(this.getFilteredValues(), true)}
         </FocusTrapCallout>
       </div>

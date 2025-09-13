@@ -6,7 +6,6 @@ import { Checkbox } from "@fluentui/react/lib/Checkbox";
 import { List } from "@fluentui/react/lib/List";
 import { DocumentCardType, DocumentCard } from "@fluentui/react/lib/DocumentCard";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
-import classNames from "classnames";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 
 import BoardDataService from "../dal/boardDataService";
@@ -406,10 +405,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
                     return (
                       <DocumentCard
-                        className={classNames({
-                          "feedback-column-card": true,
-                          "marked-for-deletion": columnCard.markedForDeletion,
-                        })}
+                        className={ "feedback-column-card" + (columnCard.markedForDeletion ? " marked-for-deletion" : "") }
                         type={DocumentCardType.compact}
                       >
                         <div className="flex grow items-center">
@@ -425,7 +421,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                               });
                             }}
                           >
-                            <i className={classNames("feedback-column-card-icon", columnCard.column.iconClass)} />
+                            <i className={`feedback-column-card-icon ${columnCard.column.iconClass}`} />
                           </DefaultButton>
                           <DefaultButton
                             className="feedback-column-card-accent-color-button"
@@ -439,7 +435,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                               });
                             }}
                           >
-                            <i className={classNames("feedback-column-card-accent-color", "fas fa-square")} style={{ color: columnCard.column.accentColor }} />
+                            <i className="feedback-column-card-accent-color fas fa-square" style={{ color: columnCard.column.accentColor }} />
                           </DefaultButton>
                           <EditableDocumentCardTitle
                             isDisabled={columnCard.markedForDeletion}
