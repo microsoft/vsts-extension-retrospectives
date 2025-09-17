@@ -26,7 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "@fluentui/react": "8.123.5",
-    "@microsoft/applicationinsights-react-js": "18.3.6",
+    "@microsoft/applicationinsights-react-js": "19.3.7",
     "@microsoft/applicationinsights-web": "3.3.9",
     "@microsoft/signalr": "8.0.7",
     "@tanstack/react-table": "8.21.3",
