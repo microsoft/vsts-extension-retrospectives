@@ -2,24 +2,17 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "ignorePatterns": [
-    "node_modules/**/*.*",
-    "dist/**/*.*"
+    "coverage/**/*.*",
+    "dist/**/*.*",
+    "node_modules/**/*.*"
   ],
   "settings": {
     "react": {
       "version": "detect"
     }
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "plugins": [
-    "@typescript-eslint",
-    "react"
-  ],
+  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
+  "plugins": ["@typescript-eslint", "react"],
   "env": {
     "node": true,
     "es6": true
@@ -32,10 +25,7 @@
     "no-multiple-empty-lines": ["error", { "max": 1 }],
     "no-trailing-spaces": [2, { "skipBlankLines": true }],
     "@typescript-eslint/ban-types": "off",
-    "jsx-quotes": [
-      "error",
-      "prefer-double"
-    ],
+    "jsx-quotes": ["error", "prefer-double"],
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/no-inferrable-types": "off",

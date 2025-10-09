@@ -1,7 +1,7 @@
-import React, { Fragment } from 'react';
-import { flexRender } from '@tanstack/react-table';
-import type { Cell, Row } from '@tanstack/table-core';
-import type { IBoardSummaryTableItem } from './boardSummaryTable';
+import React, { Fragment } from "react";
+import { flexRender } from "@tanstack/react-table";
+import type { Cell, Row } from "@tanstack/table-core";
+import type { IBoardSummaryTableItem } from "./boardSummaryTable";
 
 interface BoardSummaryTableBodyProps {
   rows: Row<IBoardSummaryTableItem>[];
@@ -13,7 +13,7 @@ const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
   const columnId = cell.column.id as keyof IBoardSummaryTableItem | undefined;
   const cellValue = cell.row.original[columnId];
 
-  const ariaLabel = columnId && cellValue ? `${columnId} ${cellValue}` : '';
+  const ariaLabel = columnId && cellValue ? `${columnId} ${cellValue}` : "";
 
   let workItemsClass = "";
   switch (columnId) {
@@ -33,7 +33,7 @@ const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
   }
 
   return {
-    className: `${workItemsClass}`,
+    "className": `${workItemsClass}`,
     "aria-label": ariaLabel,
     "aria-readonly": true,
   };
@@ -41,22 +41,22 @@ const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
 
 const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({ rows, boardRowSummary }) => (
   <tbody>
-    {rows.map((row) => (
+    {rows.map(row => (
       <Fragment key={row.id}>
         <tr
           tabIndex={0}
           aria-label="Board summary row. Click expand row icon to view more statistics for this board."
           onKeyPress={(e: React.KeyboardEvent) => {
-            if (e.key === 'Enter') row.toggleExpanded();
+            if (e.key === "Enter") row.toggleExpanded();
           }}
-          onClick={(event) => {
+          onClick={event => {
             const firstCell = event.currentTarget.cells[0];
-            const clickedCell = (event.target as HTMLElement).closest('td');
+            const clickedCell = (event.target as HTMLElement).closest("td");
             if (clickedCell !== firstCell) return;
             row.toggleExpanded();
           }}
         >
-          {row.getVisibleCells().map((cell) => (
+          {row.getVisibleCells().map(cell => (
             <td key={cell.id} {...getTdProps(cell)}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </td>
@@ -64,9 +64,7 @@ const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({ rows, boa
         </tr>
         {row.getIsExpanded() && (
           <tr>
-            <td colSpan={row.getVisibleCells().length}>
-              {boardRowSummary(row)}
-            </td>
+            <td colSpan={row.getVisibleCells().length}>{boardRowSummary(row)}</td>
           </tr>
         )}
       </Fragment>

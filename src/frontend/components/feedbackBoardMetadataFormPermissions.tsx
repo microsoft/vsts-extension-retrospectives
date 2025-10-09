@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import { TextField } from 'office-ui-fabric-react/lib/TextField';
-import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
-import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from '../interfaces/feedback';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+import React, { useEffect } from "react";
+import { TextField } from "@fluentui/react/lib/TextField";
+import { Checkbox } from "@fluentui/react/lib/Checkbox";
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../interfaces/feedback";
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { reactPlugin } from "../utilities/telemetryClient";
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
   board: IFeedbackBoardDocument;
@@ -15,7 +15,7 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
 }
 
 export interface FeedbackBoardPermissionState {
-  permissions: IFeedbackBoardDocumentPermissions
+  permissions: IFeedbackBoardDocumentPermissions;
 }
 
 export interface FeedbackBoardPermissionOption {
@@ -23,7 +23,7 @@ export interface FeedbackBoardPermissionOption {
   name: string;
   uniqueName: string;
   hasPermission?: boolean;
-  type: 'team' | 'member';
+  type: "team" | "member";
   thumbnailUrl?: string;
   isTeamAdmin?: boolean;
 }
@@ -32,12 +32,10 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
-  const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const [searchTerm, setSearchTerm] = React.useState<string>("");
 
   const isBoardOwner = props.isNewBoardCreation || props.board?.createdBy?.id === props.currentUserId;
-  const isTeamAdmin = props.permissionOptions.some(
-    (option) => option.id === props.currentUserId && option.isTeamAdmin
-  );
+  const isTeamAdmin = props.permissionOptions.some(option => option.id === props.currentUserId && option.isTeamAdmin);
   const canEditPermissions = isBoardOwner || isTeamAdmin;
   const isGroupOption = (option: FeedbackBoardPermissionOption): boolean => {
     return /^\[[^\]]+\]\\/.test(option.name); // assumes groups have names like [project]\group
@@ -49,37 +47,34 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const handleSelectAllClicked = (checked: boolean) => {
     if (!canEditPermissions) return; // Block unauthorized users from selecting/unselecting all
 
-    if(checked) {
-      setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === 'team' && !teamPermissions.includes(o.id)).map(o => o.id)]);
-      setMemberPermissions([...memberPermissions, ...filteredPermissionOptions.filter(o => o.type === 'member' && !memberPermissions.includes(o.id)).map(o => o.id)]);
+    if (checked) {
+      setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === "team" && !teamPermissions.includes(o.id)).map(o => o.id)]);
+      setMemberPermissions([...memberPermissions, ...filteredPermissionOptions.filter(o => o.type === "member" && !memberPermissions.includes(o.id)).map(o => o.id)]);
     } else {
       setTeamPermissions(teamPermissions.filter(o => !filteredPermissionOptions.map(o => o.id).includes(o)));
       setMemberPermissions(memberPermissions.filter(o => !filteredPermissionOptions.map(o => o.id).includes(o)));
     }
 
     setSelectAllState();
-  }
+  };
 
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
     if (!canEditPermissions) return; // Block unauthorized changes
 
-    let permissionList: string[] = option.type === 'team'
-      ? teamPermissions ?? []
-      : memberPermissions ?? [];
+    let permissionList: string[] = option.type === "team" ? (teamPermissions ?? []) : (memberPermissions ?? []);
 
-    if(hasPermission) {
+    if (hasPermission) {
       permissionList.push(option.id);
     } else {
       permissionList = permissionList.filter(t => t !== option.id);
     }
 
-    if(option.type === 'team') {
+    if (option.type === "team") {
       setTeamPermissions([...permissionList]);
-    }
-    else {
+    } else {
       setMemberPermissions([...permissionList]);
     }
-  }
+  };
 
   const handleSearchTermChanged = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
@@ -119,9 +114,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           return b.hasPermission ? 1 : -1;
         }
         // Step 3: Sort by type (team before member)
-        if (a.type === 'team' && b.type === 'member') {
+        if (a.type === "team" && b.type === "member") {
           return -1;
-        } else if (a.type === 'member' && b.type === 'team') {
+        } else if (a.type === "member" && b.type === "team") {
           return 1;
         }
         // Step 4: Sort alphabetically by name
@@ -142,29 +137,31 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     }
   };
 
-  const PermissionImage = (props: {option: FeedbackBoardPermissionOption}) => {
-    if (props.option.type === 'team') {
-      return <i className="permission-image fa-solid fa-users h-11 w-11"></i>
+  const PermissionImage = (props: { option: FeedbackBoardPermissionOption }) => {
+    if (props.option.type === "team") {
+      return <i className="permission-image fa-solid fa-users h-11 w-11"></i>;
     }
 
-    return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission for ${props.option.name}`} />
-  }
+    return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission for ${props.option.name}`} />;
+  };
 
   const PublicWarningBanner = () => {
-    if(teamPermissions.length === 0 && memberPermissions.length === 0) {
-      return <div className="board-metadata-form-section-information">
-        <i className="fas fa-exclamation-circle" aria-label="Board is visible to every member in the project"></i>&nbsp;This board is visible to every member in the project.
-      </div>
+    if (teamPermissions.length === 0 && memberPermissions.length === 0) {
+      return (
+        <div className="board-metadata-form-section-information">
+          <i className="fas fa-exclamation-circle" aria-label="Board is visible to every member in the project"></i>&nbsp;This board is visible to every member in the project.
+        </div>
+      );
     }
 
     return null;
-  }
+  };
 
   const PermissionEditWarning = () => {
     if (!canEditPermissions) {
       return (
         <div className="board-metadata-form-section-information">
-            <i className="fas fa-exclamation-circle" aria-label="Permission restriction warning"></i>&nbsp;Only the Board Owner or a Team Admin can edit permissions.
+          <i className="fas fa-exclamation-circle" aria-label="Permission restriction warning"></i>&nbsp;Only the Board Owner or a Team Admin can edit permissions.
         </div>
       );
     }
@@ -175,86 +172,72 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
     emitChangeEvent();
-  }, [teamPermissions, memberPermissions])
+  }, [teamPermissions, memberPermissions]);
 
-  return <div className="board-metadata-form board-metadata-form-permissions">
-    <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
-      <PublicWarningBanner />
+  return (
+    <div className="board-metadata-form board-metadata-form-permissions">
+      <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
+        <PublicWarningBanner />
 
-      <div className="search-bar">
-        <TextField
-          ariaLabel="Search for a team or a member to add permissions"
-          aria-required={true}
-          placeholder={'Search teams or users'}
-          id="retrospective-permission-search-input"
-          value={searchTerm}
-          onChange={(_, newValue) => handleSearchTermChanged(newValue)}
-        />
-      </div>
+        <div className="search-bar">
+          <TextField ariaLabel="Search for a team or a member to add permissions" aria-required={true} placeholder={"Search teams or users"} id="retrospective-permission-search-input" value={searchTerm} onChange={(_, newValue) => handleSearchTermChanged(newValue)} />
+        </div>
 
-      <div className="board-metadata-table-container">
-        <table className="board-metadata-table">
-          <thead>
-            <tr>
-              <th className="cell-checkbox">
-                <Checkbox
-                  className="my-2"
-                  id="select-all-permission-options-visible"
-                  ariaLabel="Add permission to every team or member in the table."
-                  boxSide="start"
-                  disabled={!canEditPermissions}
-                  checked={selectAllChecked}
-                  onChange={(_, checked) => handleSelectAllClicked(checked)}
-                />
-              </th>
-              <th className={"text-left"}>
-                <span aria-label="Permission option name table header">{"Name"}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredPermissionOptions.map((option) => {
-              const isBoardOwner: boolean = props.isNewBoardCreation
-                ? option.id === props.currentUserId // New board: Current user is the proposed owner
-                : option.id === props.board?.createdBy?.id; // Existing board: Use saved owner
-              return (
-                <tr key={option.id} className="option-row">
-                  <td>
-                    <Checkbox
-                      className="my-2"
-                      id={`permission-option-${option.id}`}
-                      ariaLabel="Add permission to every team or member in the table"
-                      boxSide="start"
-                      disabled={isBoardOwner}
-                      checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
-                      indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} // Set indeterminate only if no permissions exist
-                      onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
-                    />
-                  </td>
-                  <td className="cell-content flex flex-row flex-nowrap">
-                    <div className="content-image">
-                      {PermissionImage({ option })}
-                    </div>
-                    <div className="content-text flex flex-col flex-nowrap text-left">
-                      <span aria-label="Team or member name">{option.name}</span>
-                      <span aria-label="Team or member unique name" className="content-sub-text">{option.uniqueName}</span>
-                      <span>{option.isTeamAdmin}</span>
-                    </div>
-                    <div className="content-badge">
-                      {isBoardOwner && <span aria-label="Board owner badge">{'Owner'}</span>}
-                      {option.isTeamAdmin && <span aria-label="Team admin badge">{'Admin'}</span>}
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-
-    </section>
+        <div className="board-metadata-table-container">
+          <table className="board-metadata-table">
+            <thead>
+              <tr>
+                <th className="cell-checkbox">
+                  <Checkbox className="my-2" id="select-all-permission-options-visible" ariaLabel="Add permission to every team or member in the table." boxSide="start" disabled={!canEditPermissions} checked={selectAllChecked} onChange={(_, checked) => handleSelectAllClicked(checked)} />
+                </th>
+                <th className={"text-left"}>
+                  <span aria-label="Permission option name table header">{"Name"}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPermissionOptions.map(option => {
+                const isBoardOwner: boolean = props.isNewBoardCreation
+                  ? option.id === props.currentUserId // New board: Current user is the proposed owner
+                  : option.id === props.board?.createdBy?.id; // Existing board: Use saved owner
+                return (
+                  <tr key={option.id} className="option-row">
+                    <td>
+                      <Checkbox
+                        className="my-2"
+                        id={`permission-option-${option.id}`}
+                        ariaLabel="Add permission to every team or member in the table"
+                        boxSide="start"
+                        disabled={isBoardOwner}
+                        checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
+                        indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} // Set indeterminate only if no permissions exist
+                        onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
+                      />
+                    </td>
+                    <td className="cell-content flex flex-row flex-nowrap">
+                      <div className="content-image">{PermissionImage({ option })}</div>
+                      <div className="content-text flex flex-col flex-nowrap text-left">
+                        <span aria-label="Team or member name">{option.name}</span>
+                        <span aria-label="Team or member unique name" className="content-sub-text">
+                          {option.uniqueName}
+                        </span>
+                        <span>{option.isTeamAdmin}</span>
+                      </div>
+                      <div className="content-badge">
+                        {isBoardOwner && <span aria-label="Board owner badge">{"Owner"}</span>}
+                        {option.isTeamAdmin && <span aria-label="Team admin badge">{"Admin"}</span>}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
       <PermissionEditWarning />
-  </div>;
+    </div>
+  );
 }
 
 export default withAITracking(reactPlugin, FeedbackBoardMetadataFormPermissions);

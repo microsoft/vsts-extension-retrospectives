@@ -96,7 +96,7 @@ $team_selector_list_item_width: 450px;
   .extension-title-text {
     font-size: 26px;
     line-height: 40px;
-    letter-spacing: -.04em;
+    letter-spacing: -0.04em;
     font-weight: 500;
   }
 
@@ -144,7 +144,7 @@ $team_selector_list_item_width: 450px;
     width: 100%;
   }
 
-  button[role=tab] {
+  button[role="tab"] {
     color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
 
     &:hover {
@@ -160,7 +160,7 @@ $team_selector_list_item_width: 450px;
   height: 24px;
   margin-right: 16px;
   background: variables.$border_grey;
-  margin-top: 12px
+  margin-top: 12px;
 }
 
 .feedback-board-container-header {
@@ -236,7 +236,7 @@ $team_selector_list_item_width: 450px;
           &::before {
             background-color: transparent;
             bottom: 0px;
-            content: '';
+            content: "";
             position: absolute;
             width: 44px;
             margin-left: 14px;
@@ -246,7 +246,6 @@ $team_selector_list_item_width: 450px;
         }
       }
     }
-
   }
 
   .feedback-workflow-wrapper-background {
@@ -301,7 +300,11 @@ $team_selector_list_item_width: 450px;
       color: #ffffff;
 
       &.voting-measurement-index-unfavorable {
-        text-shadow: -2px 0 black,0 2px black,2px 0 black,0 -2px black;
+        text-shadow:
+          -2px 0 black,
+          0 2px black,
+          2px 0 black,
+          0 -2px black;
 
         &.voting-index-1 {
           background-color: rgb(219, 77, 79);
@@ -335,7 +338,11 @@ $team_selector_list_item_width: 450px;
       }
 
       &.voting-measurement-index-neutral {
-        text-shadow: -2px 0 black,0 2px black,2px 0 black,0 -2px black;
+        text-shadow:
+          -2px 0 black,
+          0 2px black,
+          2px 0 black,
+          0 -2px black;
 
         &.voting-index-7 {
           background-color: rgb(255, 211, 92);
@@ -349,20 +356,28 @@ $team_selector_list_item_width: 450px;
       }
 
       &.voting-measurement-index-favorable {
-        text-shadow: -2px 0 black,0 2px black,2px 0 black,0 -2px black;
+        text-shadow:
+          -2px 0 black,
+          0 2px black,
+          2px 0 black,
+          0 -2px black;
 
         &.voting-index-9 {
           background-color: rgb(141, 223, 126);
           background-image: radial-gradient(#00a45d 10%, transparent 10%), radial-gradient(#00a45d 10%, transparent 10%);
           background-size: 12px 12px;
-          background-position: top left, 6px 6px;
+          background-position:
+            top left,
+            6px 6px;
         }
 
         &.voting-index-10 {
           background-color: rgb(98, 204, 126);
           background-image: radial-gradient(#006238 10%, transparent 10%), radial-gradient(#006238 10%, transparent 10%);
           background-size: 12px 12px;
-          background-position: top left, 6px 6px;
+          background-position:
+            top left,
+            6px 6px;
         }
       }
     }
@@ -414,7 +429,7 @@ $team_selector_list_item_width: 450px;
     }
 
     i.accent3 {
-      color: rgba(var(--palette-accent3), .5);
+      color: rgba(var(--palette-accent3), 0.5);
     }
   }
 }

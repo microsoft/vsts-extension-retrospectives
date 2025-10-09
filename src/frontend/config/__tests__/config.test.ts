@@ -1,7 +1,7 @@
-import { config } from '../config';
+import { config } from "../config";
 
-describe('config', () => {
-  it('should return the app configuration', () => {
+describe("config", () => {
+  it("should return the app configuration", () => {
     expect(config).toBeDefined();
   });
   it("should have the 'CollaborationStateServiceUrl' property", () => {

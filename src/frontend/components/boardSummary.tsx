@@ -1,12 +1,12 @@
-﻿import React from 'react';
-import { getService } from 'azure-devops-extension-sdk';
-import { WorkItem, WorkItemType } from 'azure-devops-extension-api/WorkItemTracking/WorkItemTracking';
-import { DocumentCard, DocumentCardTitle, DocumentCardType } from 'office-ui-fabric-react/lib/DocumentCard';
-import { Image } from 'office-ui-fabric-react/lib/Image';
-import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
-import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from 'office-ui-fabric-react/lib/DetailsList';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
+﻿import React from "react";
+import { getService } from "azure-devops-extension-sdk";
+import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
+import { DocumentCard, DocumentCardTitle, DocumentCardType } from "@fluentui/react/lib/DocumentCard";
+import { Image } from "@fluentui/react/lib/Image";
+import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
+import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from "@fluentui/react/lib/DetailsList";
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { reactPlugin } from "../utilities/telemetryClient";
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
@@ -48,27 +48,23 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
 
     const actionItemsTableColumns: IColumn[] = [
       {
-        ariaLabel: 'Work item type icon',
-        key: 'icon',
-        name: 'Work Item Icon',
-        fieldName: 'icon',
+        ariaLabel: "Work item type icon",
+        key: "icon",
+        name: "Work Item Icon",
+        fieldName: "icon",
         isIconOnly: true,
         isResizable: false,
         minWidth: 16,
         maxWidth: 16,
         onRender: ({ icon, type }: IActionItemsTableProps) => {
-          return <Image
-            src={icon.url}
-            className="work-item-type-icon"
-            alt={`${type} icon`}
-          />;
-        }
+          return <Image src={icon.url} className="work-item-type-icon" alt={`${type} icon`} />;
+        },
       },
       {
-        ariaLabel: 'Work item title',
-        key: 'title',
-        name: 'Title',
-        fieldName: 'title',
+        ariaLabel: "Work item title",
+        key: "title",
+        name: "Title",
+        fieldName: "title",
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
@@ -76,20 +72,23 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         minWidth: 100,
         onColumnClick: this.onColumnClick,
         onRender: ({ id, title, onActionItemClick }: IActionItemsTableProps) => {
-          return <button
-            onClick={() => {
-              onActionItemClick(id);
-            }}
-            className="work-item-title overflow-ellipsis">
-            {title}
-          </button>;
-        }
+          return (
+            <button
+              onClick={() => {
+                onActionItemClick(id);
+              }}
+              className="work-item-title overflow-ellipsis"
+            >
+              {title}
+            </button>
+          );
+        },
       },
       {
-        ariaLabel: 'Work item state',
-        key: 'state',
-        name: 'State',
-        fieldName: 'state',
+        ariaLabel: "Work item state",
+        key: "state",
+        name: "State",
+        fieldName: "state",
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
@@ -98,10 +97,10 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         onColumnClick: this.onColumnClick,
       },
       {
-        ariaLabel: 'Work item type',
-        key: 'type',
-        name: 'Type',
-        fieldName: 'type',
+        ariaLabel: "Work item type",
+        key: "type",
+        name: "Type",
+        fieldName: "type",
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
@@ -110,10 +109,10 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         onColumnClick: this.onColumnClick,
       },
       {
-        ariaLabel: 'Work item changed date',
-        key: 'changedDate',
-        name: 'Last Updated',
-        fieldName: 'changedDate',
+        ariaLabel: "Work item changed date",
+        key: "changedDate",
+        name: "Last Updated",
+        fieldName: "changedDate",
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
@@ -121,20 +120,15 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         maxWidth: 150,
         onRender: ({ changedDate }: IActionItemsTableProps) => {
           const changedDateAsDate = new Date(changedDate);
-          return <div
-            className="overflow-ellipsis">
-            {new Intl.DateTimeFormat('en-US',
-              { year: 'numeric', month: 'short', day: 'numeric' }
-            ).format(changedDateAsDate)}
-          </div>;
+          return <div className="overflow-ellipsis">{new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(changedDateAsDate)}</div>;
         },
         onColumnClick: this.onColumnClick,
       },
       {
-        ariaLabel: 'Work item assigned to',
-        key: 'assignedTo',
-        name: 'Assigned To',
-        fieldName: 'assignedTo',
+        ariaLabel: "Work item assigned to",
+        key: "assignedTo",
+        name: "Assigned To",
+        fieldName: "assignedTo",
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
@@ -143,10 +137,10 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         onColumnClick: this.onColumnClick,
       },
       {
-        ariaLabel: 'Work item priority',
-        key: 'priority',
-        name: 'Priority',
-        fieldName: 'priority',
+        ariaLabel: "Work item priority",
+        key: "priority",
+        name: "Priority",
+        fieldName: "priority",
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
@@ -158,7 +152,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
 
     this.state = {
       actionItemTableItems: new Array<IActionItemsTableProps>(),
-      actionItemTableColumns: actionItemsTableColumns
+      actionItemTableColumns: actionItemsTableColumns,
     };
   }
 
@@ -176,32 +170,32 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
       class: workItemType.icon.id,
       url: workItemType.icon.url,
     };
-  }
+  };
 
   private readonly buildActionItemsList = () => {
     const actionItemsList = new Array<IActionItemsTableProps>();
 
     this.props.actionItems.forEach(workItem => {
       const item: IActionItemsTableProps = {
-        icon: this.getIconForWorkItemType(workItem.fields['System.WorkItemType']),
-        title: workItem.fields['System.Title'],
-        state: workItem.fields['System.State'],
-        type: workItem.fields['System.WorkItemType'],
-        changedDate: workItem.fields['System.ChangedDate'],
-        assignedTo: workItem.fields['System.AssignedTo']?.displayName ?? "",
-        priority: workItem.fields['Microsoft.VSTS.Common.Priority'],
+        icon: this.getIconForWorkItemType(workItem.fields["System.WorkItemType"]),
+        title: workItem.fields["System.Title"],
+        state: workItem.fields["System.State"],
+        type: workItem.fields["System.WorkItemType"],
+        changedDate: workItem.fields["System.ChangedDate"],
+        assignedTo: workItem.fields["System.AssignedTo"]?.displayName ?? "",
+        priority: workItem.fields["Microsoft.VSTS.Common.Priority"],
         id: workItem.id,
         onActionItemClick: async (id: number) => {
           const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
           await workItemNavSvc.openWorkItem(id);
-        }
+        },
       };
 
       actionItemsList.push(item);
     });
 
     return actionItemsList;
-  }
+  };
 
   private readonly onColumnClick = (_: React.MouseEvent<HTMLElement>, column: IColumn): void => {
     const actionItems = this.state.actionItemTableItems;
@@ -226,17 +220,17 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
       }
     });
 
-    newActionItems = this.sortActionItemsByColumn(newActionItems, currColumn.fieldName || '', currColumn.isSortedDescending);
+    newActionItems = this.sortActionItemsByColumn(newActionItems, currColumn.fieldName || "", currColumn.isSortedDescending);
     this.setState({
       actionItemTableColumns: newTableColumns,
-      actionItemTableItems: newActionItems
+      actionItemTableItems: newActionItems,
     });
-  }
+  };
 
   private readonly onItemInvoked = async (item: { id: number }) => {
     const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
     await workItemNavSvc.openWorkItem(item.id);
-  }
+  };
 
   private readonly sortActionItemsByColumn = (actionItems: IActionItemsTableProps[], columnName: string, descending = false): IActionItemsTableProps[] => {
     if (descending) {
@@ -260,7 +254,7 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
         return 0;
       });
     }
-  }
+  };
 
   public render() {
     return (
@@ -272,52 +266,43 @@ class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryStat
           <div className="items-stats-container" aria-label="feedback items statistics container">
             <i className="stats-icon fas fa-comment-dots"></i>
             <div className="count-and-text" aria-label="count and text container">
-              <div className="count" aria-label="feedback item count">{this.props.feedbackItemsCount}</div>
+              <div className="count" aria-label="feedback item count">
+                {this.props.feedbackItemsCount}
+              </div>
               <div className="text">Feedback items created.</div>
             </div>
           </div>
           <div className="items-stats-container" aria-label="feedback items statistics container">
             <i className="stats-icon fa-regular fa-square-plus"></i>
             <div className="count-and-text" aria-label="count and text container">
-              <div className="count" aria-label="total work items count">{this.props.actionItems.length}</div>
+              <div className="count" aria-label="total work items count">
+                {this.props.actionItems.length}
+              </div>
               <div className="text">Work items created.</div>
             </div>
           </div>
           <div className="items-stats-container" aria-label="feedback items statistics container">
             <i className="stats-icon pending-action-item-color fa-solid fa-hourglass-half"></i>
             <div className="count-and-text" aria-label="count and text container">
-              <div className={`count ${this.props.pendingWorkItemsCount > 0 ? 'pending-action-item-color' : ''}`} aria-label="pending work items count">
-                {this.props.pendingWorkItemsCount}</div>
+              <div className={`count ${this.props.pendingWorkItemsCount > 0 ? "pending-action-item-color" : ""}`} aria-label="pending work items count">
+                {this.props.pendingWorkItemsCount}
+              </div>
               <div className="text">Work items pending.</div>
             </div>
           </div>
           <div className="items-stats-container" aria-label="feedback items statistics container">
             <i className="stats-icon resolved-green fa-solid fa-clipboard-check"></i>
             <div className="count-and-text" aria-label="count and text container">
-              <div className={`count ${this.props.resolvedActionItemsCount > 0 ? 'resolved-green' : ''}`} aria-label="resolved work items count">
-                {this.props.resolvedActionItemsCount}</div>
+              <div className={`count ${this.props.resolvedActionItemsCount > 0 ? "resolved-green" : ""}`} aria-label="resolved work items count">
+                {this.props.resolvedActionItemsCount}
+              </div>
               <div className="text">Work items resolved.</div>
             </div>
           </div>
         </DocumentCard>
         <div className="action-items-summary-card">
-          {
-            this.props.actionItems.length > 0 &&
-            <DetailsList
-              items={this.state.actionItemTableItems}
-              compact={false}
-              columns={this.state.actionItemTableColumns}
-              selectionMode={SelectionMode.none}
-              setKey="set"
-              layoutMode={DetailsListLayoutMode.justified}
-              isHeaderVisible={true}
-              selectionPreservedOnEmptyClick={true}
-              onItemInvoked={this.onItemInvoked} />
-          }
-          {
-            this.props.actionItems.length === 0 &&
-            <div className="no-action-items">Looks like no work items were created for this board.</div>
-          }
+          {this.props.actionItems.length > 0 && <DetailsList items={this.state.actionItemTableItems} compact={false} columns={this.state.actionItemTableColumns} selectionMode={SelectionMode.none} setKey="set" layoutMode={DetailsListLayoutMode.justified} isHeaderVisible={true} selectionPreservedOnEmptyClick={true} onItemInvoked={this.onItemInvoked} />}
+          {this.props.actionItems.length === 0 && <div className="no-action-items">Looks like no work items were created for this board.</div>}
         </div>
       </div>
     );

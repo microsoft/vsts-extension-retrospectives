@@ -35,7 +35,6 @@
   }
 
   .feedback-column-content {
-
     .create-container {
       width: 100vw;
       max-width: variables.$mobile_breakpoint;
@@ -79,8 +78,8 @@
   }
 }
 
-  .feedback-items-container {
-    padding-top: 0;
-    display: flex;
-    flex-wrap: wrap;
-  }
+.feedback-items-container {
+  padding-top: 0;
+  display: flex;
+  flex-wrap: wrap;
+}

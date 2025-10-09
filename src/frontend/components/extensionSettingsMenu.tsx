@@ -1,26 +1,19 @@
-import React from 'react';
-import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
-import { Dialog, DialogContent, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
-import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../utilities/telemetryClient';
-import boardDataService from '../dal/boardDataService';
-import { azureDevOpsCoreService } from '../dal/azureDevOpsCoreService';
-import { getProjectId } from '../utilities/servicesHelper';
-import { itemDataService } from '../dal/itemDataService';
-import { IFeedbackBoardDocument, IFeedbackItemDocument } from '../interfaces/feedback';
-import { Slide, toast, ToastContainer } from 'react-toastify';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
-import ReactMarkdown from 'react-markdown';
+import React from "react";
+import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
+import { Dialog, DialogContent, DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
+import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { reactPlugin } from "../utilities/telemetryClient";
+import boardDataService from "../dal/boardDataService";
+import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
+import { getProjectId } from "../utilities/servicesHelper";
+import { itemDataService } from "../dal/itemDataService";
+import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/feedback";
+import { Slide, toast, ToastContainer } from "react-toastify";
+import { WebApiTeam } from "azure-devops-extension-api/Core";
+import ReactMarkdown from "react-markdown";
 
-import {
-  RETRO_URLS,
-  PRIME_DIRECTIVE_CONTENT,
-  RETRO_HELP_CONTENT,
-  VOLUNTEER_CONTENT,
-  renderContent,
-  WHATISNEW_MARKDOWN,
-} from './extensionSettingsMenuDialogContent';
+import { RETRO_URLS, PRIME_DIRECTIVE_CONTENT, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, renderContent, WHATISNEW_MARKDOWN } from "./extensionSettingsMenuDialogContent";
 
 interface IExtensionSettingsMenuState {
   isPrimeDirectiveDialogHidden: boolean;
@@ -36,9 +29,9 @@ interface IExtensionSettingsMenuProps {
 }
 
 interface IExportImportDataSchema {
-  team: WebApiTeam
-  board: IFeedbackBoardDocument
-  items: IFeedbackItemDocument[]
+  team: WebApiTeam;
+  board: IFeedbackBoardDocument;
+  items: IFeedbackItemDocument[];
 }
 
 interface ContextualMenuButtonProps {
@@ -49,42 +42,25 @@ interface ContextualMenuButtonProps {
   onClick?: () => void;
   menuItems?: IContextualMenuItem[];
   hideMobile?: boolean;
-  showLabel:boolean;
+  showLabel: boolean;
 }
 
-export const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({
-  ariaLabel,
-  title,
-  iconClass,
-  label,
-  onClick,
-  menuItems,
-  hideMobile = true,
-  showLabel,
-}) => {
-  const buttonClass = `contextual-menu-button${hideMobile ? ' hide-mobile' : ''}`;
+export const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({ ariaLabel, title, iconClass, label, onClick, menuItems, hideMobile = true, showLabel }) => {
+  const buttonClass = `contextual-menu-button${hideMobile ? " hide-mobile" : ""}`;
   const menuProps = menuItems
-  ? {
-      items: menuItems,
-      className: 'extended-options-menu',
-    }
-  : undefined;
+    ? {
+        items: menuItems,
+        className: "extended-options-menu",
+      }
+    : undefined;
 
   return (
-    <DefaultButton
-      className={buttonClass}
-      aria-label={ariaLabel}
-      title={title}
-      onClick={onClick}
-      menuProps={menuProps}
-    >
+    <DefaultButton className={buttonClass} aria-label={ariaLabel} title={title} onClick={onClick} menuProps={menuProps}>
       <span className="ms-Button-icon">
         <i className={iconClass}></i>
       </span>
       &nbsp;
-      {showLabel && (
-        <span className="ms-Button-label">{label}</span>
-      )}
+      {showLabel && <span className="ms-Button-label">{label}</span>}
     </DefaultButton>
   );
 };
@@ -102,18 +78,7 @@ interface ExtensionDialogProps {
   subText?: string;
 }
 
-const ExtensionDialog: React.FC<ExtensionDialogProps> = ({
-  hidden,
-  onDismiss,
-  title,
-  children,
-  onDefaultClick,
-  defaultButtonText,
-  primaryButtonText = "Close",
-  minWidth = 600,
-  containerClassName,
-  subText,
-}) => (
+const ExtensionDialog: React.FC<ExtensionDialogProps> = ({ hidden, onDismiss, title, children, onDefaultClick, defaultButtonText, primaryButtonText = "Close", minWidth = 600, containerClassName, subText }) => (
   <Dialog
     hidden={hidden}
     onDismiss={onDismiss}
@@ -132,11 +97,7 @@ const ExtensionDialog: React.FC<ExtensionDialogProps> = ({
     <DialogContent>{children}</DialogContent>
     <DialogFooter>
       <DefaultButton onClick={onDefaultClick} text={defaultButtonText} />
-      <PrimaryButton
-        onClick={onDismiss}
-        text={primaryButtonText}
-        className={primaryButtonText === "Close" ? "extension-menu-close-button" : undefined}
-      />
+      <PrimaryButton onClick={onDismiss} text={primaryButtonText} className={primaryButtonText === "Close" ? "extension-menu-close-button" : undefined} />
     </DialogFooter>
   </Dialog>
 );
@@ -176,7 +137,7 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
   };
 
   private readonly exportData = async () => {
-    const toastId = toast('Processing boards...');
+    const toastId = toast("Processing boards...");
     const exportedData: IExportImportDataSchema[] = [];
     const projectId = await getProjectId();
     const teams = await azureDevOpsCoreService.getAllTeams(projectId, true);
@@ -198,24 +159,28 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-  }
+  };
 
   private readonly importData = async () => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
-    input.addEventListener('change', () => {
-      const reader = new FileReader()
-      reader.onload = (event: ProgressEvent<FileReader>) => {
-        const importedData: IExportImportDataSchema[] = JSON.parse(event.target.result.toString());
-        this.processImportedData(importedData);
-      };
-      reader.readAsText(input.files[0])
-    }, false);
+    input.addEventListener(
+      "change",
+      () => {
+        const reader = new FileReader();
+        reader.onload = (event: ProgressEvent<FileReader>) => {
+          const importedData: IExportImportDataSchema[] = JSON.parse(event.target.result.toString());
+          this.processImportedData(importedData);
+        };
+        reader.readAsText(input.files[0]);
+      },
+      false,
+    );
     document.body.appendChild(input);
     input.click();
     document.body.removeChild(input);
     return false;
-  }
+  };
 
   private readonly processImportedData = async (importedData: IExportImportDataSchema[]) => {
     const projectId = await getProjectId();
@@ -223,7 +188,7 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
     const teams = await azureDevOpsCoreService.getAllTeams(projectId, true);
     const defaultTeam = await azureDevOpsCoreService.getDefaultTeam(projectId);
 
-    const toastId = toast('Importing data...');
+    const toastId = toast("Importing data...");
 
     for (const dataToProcess of importedData) {
       const team = teams.find(e => e.name === dataToProcess.team.name) ?? defaultTeam;
@@ -250,107 +215,107 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
 
   private readonly showWhatsNewDialog = () => {
     this.setState({ isWhatsNewDialogHidden: false });
-  }
+  };
 
   private readonly hideWhatsNewDialog = () => {
     this.setState({ isWhatsNewDialogHidden: true });
-  }
+  };
 
   private readonly showPleaseJoinUsDialog = () => {
     this.setState({ isPleaseJoinUsDialogHidden: false });
-  }
+  };
 
   private readonly hidePleaseJoinUsDialog = () => {
     this.setState({ isPleaseJoinUsDialogHidden: true });
-  }
+  };
 
   private readonly onRetrospectiveWikiClicked = () => {
-    window.open(RETRO_URLS.retrospectivewiki, '_blank');
-  }
+    window.open(RETRO_URLS.retrospectivewiki, "_blank");
+  };
 
   private readonly onChangeLogClicked = () => {
-    window.open(RETRO_URLS.changelog, '_blank');
-  }
+    window.open(RETRO_URLS.changelog, "_blank");
+  };
 
   private readonly onGetHelpClicked = () => {
-    window.open(RETRO_URLS.readme, '_blank');
-  }
+    window.open(RETRO_URLS.readme, "_blank");
+  };
 
   private readonly onContributingClicked = () => {
-    window.open(RETRO_URLS.contributing, '_blank');
-  }
+    window.open(RETRO_URLS.contributing, "_blank");
+  };
 
   private readonly onContactUsClicked = () => {
-    window.open(RETRO_URLS.issues, '_blank');
-  }
+    window.open(RETRO_URLS.issues, "_blank");
+  };
 
   private readonly exportImportDataMenu: IContextualMenuItem[] = [
     {
-      key: 'exportData',
-      iconProps: { iconName: 'CloudDownload' },
+      key: "exportData",
+      iconProps: { iconName: "CloudDownload" },
       onClick: (ev, item) => {
         this.exportData().catch(console.error); // Ensures async function runs without breaking `onClick`
       },
-      text: 'Export data',
-      title: 'Export data',
+      text: "Export data",
+      title: "Export data",
     },
     {
-      key: 'importData',
-      iconProps: { iconName: 'CloudUpload' },
+      key: "importData",
+      iconProps: { iconName: "CloudUpload" },
       onClick: (ev, item) => {
         this.importData().catch(console.error); // Ensures async function runs without breaking `onClick`
       },
-      text: 'Import data',
-      title: 'Import data',
+      text: "Import data",
+      title: "Import data",
     },
   ];
 
   private readonly retroHelpMenu: IContextualMenuItem[] = [
     {
-      key: 'whatsNew',
-      iconProps: { iconName: 'Megaphone' },
+      key: "whatsNew",
+      iconProps: { iconName: "Megaphone" },
       onClick: this.showWhatsNewDialog,
       text: "What's new",
       title: "What's new",
     },
     {
-      key: 'userGuide',
-      iconProps: { iconName: 'BookAnswers' },
+      key: "userGuide",
+      iconProps: { iconName: "BookAnswers" },
       onClick: () => this.setState({ isGetHelpDialogHidden: false }),
-      text: 'User guide',
-      title: 'User guide',
+      text: "User guide",
+      title: "User guide",
     },
     {
-      key: 'volunteer',
-      iconProps: { iconName: 'Teamwork' },
+      key: "volunteer",
+      iconProps: { iconName: "Teamwork" },
       onClick: this.showPleaseJoinUsDialog,
-      text: 'Volunteer',
-      title: 'Volunteer',
+      text: "Volunteer",
+      title: "Volunteer",
     },
     {
-      key: 'contactUs',
-      iconProps: { iconName: 'ChatInviteFriend' },
+      key: "contactUs",
+      iconProps: { iconName: "ChatInviteFriend" },
       onClick: this.onContactUsClicked,
-      text: 'Contact us',
-      title: 'Contact us',
+      text: "Contact us",
+      title: "Contact us",
     },
   ];
 
-    private extensionSettingsMenuItem(): IContextualMenuItem[] {
+  private extensionSettingsMenuItem(): IContextualMenuItem[] {
     return [
       !this.props.isDesktop && {
-        key: 'switchToDesktop',
-        iconProps: { iconName: 'TVMonitor' },
+        key: "switchToDesktop",
+        iconProps: { iconName: "TVMonitor" },
         onClick: () => this.props.onScreenViewModeChanged(true),
-        text: 'Switch to desktop view',
-        title: 'Switch to desktop view',
+        text: "Switch to desktop view",
+        title: "Switch to desktop view",
       },
       this.props.isDesktop && {
-        key: 'switchToMobile',
-        iconProps: { iconName: 'CellPhone' },
+        key: "switchToMobile",
+        iconProps: { iconName: "CellPhone" },
         onClick: () => this.props.onScreenViewModeChanged(false),
-        text: 'Switch to mobile view',
-        title: 'Switch to mobile view',
+        text: "Switch to mobile view",
+        title: "Switch to mobile view",
       },
     ].filter(Boolean) as IContextualMenuItem[];
   }
@@ -360,65 +325,24 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
 
     return (
       <div className="extension-settings-menu">
-        <ContextualMenuButton
-          ariaLabel="Prime Directive"
-          title="Prime Directive"
-          iconClass="fas fa-shield-halved"
-          label="Directive"
-          onClick={this.showPrimeDirectiveDialog}
-          showLabel={isWindowWide}
-        />
-        <ContextualMenuButton
-          ariaLabel="Export Import"
-          title="Export Import"
-          iconClass="fas fa-cloud"
-          label="Data"
-          menuItems={this.exportImportDataMenu}
-          showLabel={isWindowWide}
-        />
-        <ContextualMenuButton
-          ariaLabel="Retrospective Help"
-          title="Retrospective Help"
-          iconClass="fas fa-question-circle"
-          label="Help"
-          menuItems={this.retroHelpMenu}
-          showLabel={isWindowWide}
-        />
-        <ContextualMenuButton
-          ariaLabel="User Settings"
-          title="User Settings"
-          iconClass="fas fa-user-gear"
-          label="Settings"
-          menuItems={this.extensionSettingsMenuItem()}
-          hideMobile={false}
-          showLabel={isWindowWide && this.props.isDesktop}
-        />
+        <ContextualMenuButton ariaLabel="Prime Directive" title="Prime Directive" iconClass="fas fa-shield-halved" label="Directive" onClick={this.showPrimeDirectiveDialog} showLabel={isWindowWide} />
+        <ContextualMenuButton ariaLabel="Export Import" title="Export Import" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} showLabel={isWindowWide} />
+        <ContextualMenuButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} showLabel={isWindowWide} />
+        <ContextualMenuButton ariaLabel="User Settings" title="User Settings" iconClass="fas fa-user-gear" label="Settings" menuItems={this.extensionSettingsMenuItem()} hideMobile={false} showLabel={isWindowWide && this.props.isDesktop} />
 
-        <ExtensionDialog
-          hidden={this.state.isPrimeDirectiveDialogHidden}
-          onDismiss={this.hidePrimeDirectiveDialog}
-          title="The Prime Directive"
-          onDefaultClick={this.onRetrospectiveWikiClicked}
-          defaultButtonText="Open Retrospective Wiki"
-          containerClassName="prime-directive-dialog"
-        >
+        <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog">
           {renderContent(PRIME_DIRECTIVE_CONTENT)}
         </ExtensionDialog>
-        <ExtensionDialog
-          hidden={this.state.isWhatsNewDialogHidden}
-          onDismiss={this.hideWhatsNewDialog}
-          title="What's New"
-          onDefaultClick={this.onChangeLogClicked}
-          defaultButtonText="Open change log"
-          containerClassName="whatsnew-dialog"
-        >
+        <ExtensionDialog hidden={this.state.isWhatsNewDialogHidden} onDismiss={this.hideWhatsNewDialog} title="What's New" onDefaultClick={this.onChangeLogClicked} defaultButtonText="Open change log" containerClassName="whatsnew-dialog">
           <div className="markdown-content">
             <ReactMarkdown>{WHATISNEW_MARKDOWN}</ReactMarkdown>
           </div>
         </ExtensionDialog>
         <ExtensionDialog
           hidden={this.state.isGetHelpDialogHidden}
-          onDismiss={() => { this.setState({ isGetHelpDialogHidden: true }); }}
+          onDismiss={() => {
+            this.setState({ isGetHelpDialogHidden: true });
+          }}
           title="Retrospectives User Guide"
           onDefaultClick={this.onGetHelpClicked}
           defaultButtonText="Open user guide"
@@ -426,25 +350,11 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
         >
           {renderContent(RETRO_HELP_CONTENT)}
         </ExtensionDialog>
-        <ExtensionDialog
-          hidden={this.state.isPleaseJoinUsDialogHidden}
-          onDismiss={this.hidePleaseJoinUsDialog}
-          title="Volunteer"
-          onDefaultClick={this.onContributingClicked}
-          defaultButtonText="Open contributing guidelines"
-          containerClassName="volunteer-dialog"
-        >
+        <ExtensionDialog hidden={this.state.isPleaseJoinUsDialogHidden} onDismiss={this.hidePleaseJoinUsDialog} title="Volunteer" onDefaultClick={this.onContributingClicked} defaultButtonText="Open contributing guidelines" containerClassName="volunteer-dialog">
           {renderContent(VOLUNTEER_CONTENT)}
         </ExtensionDialog>
 
-        <ToastContainer
-          transition={Slide}
-          closeButton={false}
-          className="retrospective-notification-toast-container"
-          toastClassName="retrospective-notification-toast"
-          bodyClassName="retrospective-notification-toast-body"
-          progressClassName="retrospective-notification-toast-progress-bar"
-        />
+        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" bodyClassName="retrospective-notification-toast-body" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }

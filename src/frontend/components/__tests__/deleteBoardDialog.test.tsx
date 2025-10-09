@@ -1,18 +1,18 @@
-import React from 'react';
-import { shallow } from 'enzyme';
-import DeleteBoardDialog from '../deleteBoardDialog';
-import { IBoardSummaryTableItem } from '../boardSummaryTable';
-import { Dialog, PrimaryButton, DefaultButton } from 'office-ui-fabric-react';
+import React from "react";
+import { render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import DeleteBoardDialog from "../deleteBoardDialog";
+import { IBoardSummaryTableItem } from "../boardSummaryTable";
 
 const mockBoard: IBoardSummaryTableItem = {
-  id: 'board-1',
-  boardName: 'Sprint Retro',
+  id: "board-1",
+  boardName: "Sprint Retro",
   createdDate: new Date(),
   feedbackItemsCount: 12,
   totalWorkItemsCount: 3,
   pendingWorkItemsCount: 1,
-  teamId: 'team-1',
-  ownerId: 'user-1',
+  teamId: "team-1",
+  ownerId: "user-1",
 };
 
 const mockProps = {
@@ -22,33 +22,49 @@ const mockProps = {
   onCancel: jest.fn(),
 };
 
-describe('DeleteBoardDialog', () => {
-  it('does not render when board is undefined', () => {
-    const wrapper = shallow(<DeleteBoardDialog {...mockProps} board={undefined} />);
-    expect(wrapper.html()).toBeNull();
+describe("DeleteBoardDialog", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('renders dialog when visible', () => {
-    const wrapper = shallow(<DeleteBoardDialog {...mockProps} />);
-    expect(wrapper.find(Dialog).prop('hidden')).toBe(false);
-    expect(wrapper.find('p.warning-text')).toHaveLength(1); // Ensure warning message exists
+  it("does not render when board is undefined", () => {
+    const { container } = render(<DeleteBoardDialog {...mockProps} board={undefined} />);
+    expect(container.firstChild).toBeNull();
   });
 
-  it('renders the correct board name and feedback count', () => {
-    const wrapper = shallow(<DeleteBoardDialog {...mockProps} />);
-    expect(wrapper.find('strong').at(0).text()).toBe(mockBoard.boardName);
-    expect(wrapper.find('strong').at(1).text()).toBe(mockBoard.feedbackItemsCount.toString());
+  it("renders dialog when visible", () => {
+    render(<DeleteBoardDialog {...mockProps} />);
+    expect(document.body.textContent).toContain("Delete Retrospective");
+    expect(document.body.textContent).toContain("Warning:");
   });
 
-  it('calls onConfirm when Delete is clicked', () => {
-    const wrapper = shallow(<DeleteBoardDialog {...mockProps} />);
-    wrapper.find(PrimaryButton).simulate('click');
-    expect(mockProps.onConfirm).toHaveBeenCalled();
+  it("renders the correct board name and feedback count", () => {
+    render(<DeleteBoardDialog {...mockProps} />);
+    expect(document.body.textContent).toContain(mockBoard.boardName);
+    expect(document.body.textContent).toContain(mockBoard.feedbackItemsCount.toString());
   });
 
-  it('calls onCancel when Cancel is clicked', () => {
-    const wrapper = shallow(<DeleteBoardDialog {...mockProps} />);
-    wrapper.find(DefaultButton).simulate('click');
-    expect(mockProps.onCancel).toHaveBeenCalled();
+  it("calls onConfirm when Delete is clicked", async () => {
+    const user = userEvent.setup();
+    render(<DeleteBoardDialog {...mockProps} />);
+
+    const deleteButton = Array.from(document.querySelectorAll("button")).find(button => button.textContent === "Delete");
+    expect(deleteButton).toBeDefined();
+
+    await user.click(deleteButton!);
+
+    expect(mockProps.onConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls onCancel when Cancel is clicked", async () => {
+    const user = userEvent.setup();
+    render(<DeleteBoardDialog {...mockProps} />);
+
+    const cancelButton = Array.from(document.querySelectorAll("button")).find(button => button.textContent === "Cancel");
+    expect(cancelButton).toBeDefined();
+
+    await user.click(cancelButton!);
+
+    expect(mockProps.onCancel).toHaveBeenCalledTimes(1);
   });
 });

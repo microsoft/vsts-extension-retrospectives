@@ -1,7 +1,7 @@
-import { CoreRestClient } from 'azure-devops-extension-api/Core/CoreClient';
-import { WebApiTeam } from 'azure-devops-extension-api/Core';
-import { TeamMember } from 'azure-devops-extension-api/WebApi';
-import { getClient } from 'azure-devops-extension-api/Common';
+import { CoreRestClient } from "azure-devops-extension-api/Core/CoreClient";
+import { WebApiTeam } from "azure-devops-extension-api/Core";
+import { TeamMember } from "azure-devops-extension-api/WebApi";
+import { getClient } from "azure-devops-extension-api/Common";
 
 class AzureDevOpsCoreService {
   private _httpCoreClient: CoreRestClient;
@@ -24,8 +24,7 @@ class AzureDevOpsCoreService {
   public async getTeam(projectId: string, teamId: string): Promise<WebApiTeam> {
     try {
       return await this._httpCoreClient.getTeam(projectId, teamId);
-    }
-    catch {
+    } catch {
       return null;
     }
   }
@@ -38,8 +37,7 @@ class AzureDevOpsCoreService {
   public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
     try {
       return await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, 0);
-    }
-    catch {
+    } catch {
       return null;
     }
   }
