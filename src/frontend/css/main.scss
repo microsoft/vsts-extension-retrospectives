@@ -23,11 +23,6 @@
 
 @import "../node_modules/react-toastify/dist/ReactToastify.css";
 
-body {
-  overflow-y: auto;
-  font-family: variables.$default_vsts_font;
-}
-
 .ms-ContextualMenuButtonsExample {
   display: flex;
   background-color: variables.$azure_devops_navigator_light_grey;

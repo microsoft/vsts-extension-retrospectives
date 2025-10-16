@@ -1324,7 +1324,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <div className="retrospective-feedback-board-container">
+      <div className="grid grid-cols-1 grid-rows-2">
         <div className="flex items-center px-2 py-2">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
@@ -1366,7 +1366,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <div style={{ flexGrow: 1 }}></div>
           <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.setScreenViewMode} />
         </div>
-        <div className="flex w-full items-center justify-start">
+        <div className="flex items-center justify-start">
           <Pivot onLinkClick={this.handlePivotClick}>
             <PivotItem headerText="Board">
               {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
