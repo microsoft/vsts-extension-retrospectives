@@ -159,50 +159,46 @@ describe("UI-level integration tests for ActionItem", () => {
   it("calls onUpdateActionItem when confirming unlink", async () => {
     const mockFeedbackItem = { id: "101" } as IFeedbackItemDocument;
     (itemDataService.removeAssociatedActionItem as jest.Mock).mockResolvedValue(mockFeedbackItem);
-    
+
     const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
-    
+
     // Click the unlink button
     const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
     expect(unlinkButton).toBeTruthy();
-    
+
     fireEvent.click(unlinkButton!);
-    
+
     // Wait for dialog to appear
     await waitFor(() => {
       expect(getByText("Remove Work Item Link")).toBeTruthy();
     });
-    
+
     // Click the Remove button in the dialog
     const removeButton = getByText("Remove");
     fireEvent.click(removeButton);
-    
+
     await waitFor(() => {
-      expect(itemDataService.removeAssociatedActionItem).toHaveBeenCalledWith(
-        "Test Board Id",
-        "101",
-        1
-      );
+      expect(itemDataService.removeAssociatedActionItem).toHaveBeenCalledWith("Test Board Id", "101", 1);
       expect(mockOnUpdateActionItem).toHaveBeenCalledWith(mockFeedbackItem);
     });
   });
 
   it("opens unlink confirmation dialog and cancels it", async () => {
     const { container, getByText, queryByText } = render(<ActionItem {...defaultTestProps} />);
-    
+
     // Click the unlink button
     const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
     fireEvent.click(unlinkButton!);
-    
+
     // Wait for dialog to appear
     await waitFor(() => {
       expect(getByText("Remove Work Item Link")).toBeTruthy();
     });
-    
+
     // Click the Cancel button
     const cancelButton = getByText("Cancel");
     fireEvent.click(cancelButton);
-    
+
     await waitFor(() => {
       expect(queryByText("Remove Work Item Link")).toBeNull();
     });
@@ -210,14 +206,14 @@ describe("UI-level integration tests for ActionItem", () => {
 
   it("handles keyboard press on unlink button (Enter key)", async () => {
     const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
-    
+
     // Get the unlink button
     const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
     expect(unlinkButton).toBeTruthy();
-    
+
     // Press Enter on the unlink button
     fireEvent.keyPress(unlinkButton!, { key: "Enter", code: "Enter", charCode: 13 });
-    
+
     // Wait for dialog to appear
     await waitFor(() => {
       expect(getByText("Remove Work Item Link")).toBeTruthy();
@@ -288,24 +284,24 @@ describe("UI-level integration tests for ActionItem", () => {
   it("stops event propagation when clicking Remove button in dialog", async () => {
     const mockFeedbackItem = { id: "101" } as IFeedbackItemDocument;
     (itemDataService.removeAssociatedActionItem as jest.Mock).mockResolvedValue(mockFeedbackItem);
-    
+
     const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
-    
+
     // Click the unlink button
     const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
     fireEvent.click(unlinkButton!);
-    
+
     await waitFor(() => {
       expect(getByText("Remove Work Item Link")).toBeTruthy();
     });
-    
+
     // Create a mock event with stopPropagation
     const removeButton = getByText("Remove");
     const mockEvent = { stopPropagation: jest.fn() };
-    
+
     // Click with a proper event
     fireEvent.click(removeButton, mockEvent);
-    
+
     await waitFor(() => {
       expect(itemDataService.removeAssociatedActionItem).toHaveBeenCalled();
     });

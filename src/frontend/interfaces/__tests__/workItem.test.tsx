@@ -1,12 +1,4 @@
-import {
-  WorkflowPhase,
-  FeedbackType,
-  RelationshipType,
-  WorkItemGroup,
-  WorkItemExtended,
-  IRetrospectiveItemCreate,
-  IRetrospectiveItemsQuery,
-} from "../workItem";
+import { WorkflowPhase, FeedbackType, RelationshipType, WorkItemGroup, WorkItemExtended, IRetrospectiveItemCreate, IRetrospectiveItemsQuery } from "../workItem";
 
 describe("workItem interfaces and enums", () => {
   describe("FeedbackType enum", () => {
@@ -25,15 +17,11 @@ describe("workItem interfaces and enums", () => {
 
   describe("RelationshipType enum", () => {
     it("should have ReferencedByForward value", () => {
-      expect(RelationshipType.ReferencedByForward).toBe(
-        "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Forward"
-      );
+      expect(RelationshipType.ReferencedByForward).toBe("Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Forward");
     });
 
     it("should have ReferencedByReverse value", () => {
-      expect(RelationshipType.ReferencedByReverse).toBe(
-        "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse"
-      );
+      expect(RelationshipType.ReferencedByReverse).toBe("Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse");
     });
 
     it("should have Related value", () => {

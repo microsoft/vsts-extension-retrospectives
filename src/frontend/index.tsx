@@ -22,7 +22,7 @@ sdkInit({ applyTheme: true }).then(() => {
     root.render(
       <AppInsightsErrorBoundary onError={() => <h1>We detected an error in the application</h1>} appInsights={reactPlugin}>
         <FeedbackBoardContainer {...feedbackBoardContainerProps} />
-      </AppInsightsErrorBoundary>
+      </AppInsightsErrorBoundary>,
     );
   });
 });

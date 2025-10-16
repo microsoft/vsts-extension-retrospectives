@@ -1,11 +1,7 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "ignorePatterns": [
-    "coverage/**/*.*",
-    "dist/**/*.*",
-    "node_modules/**/*.*"
-  ],
+  "ignorePatterns": ["coverage/**/*.*", "dist/**/*.*", "node_modules/**/*.*"],
   "settings": {
     "react": {
       "version": "detect"

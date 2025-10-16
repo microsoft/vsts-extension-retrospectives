@@ -292,22 +292,19 @@ describe("Action Item Display component", () => {
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
-      nonHiddenWorkItemTypes: [
-        { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any,
-        { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any,
-      ],
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any, { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any],
     };
     const { container, getByText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     const addButton = container.querySelector(".add-action-item-button");
     expect(addButton).toBeTruthy();
-    
+
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       expect(getByText("Bug")).toBeTruthy();
     });
-    
+
     expect(getByText("Task")).toBeTruthy();
   });
 
@@ -318,10 +315,10 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.keyPress(addButton!, { key: "Enter", code: "Enter", charCode: 13 });
-    
+
     await waitFor(() => {
       expect(getByText("Bug")).toBeTruthy();
     });
@@ -334,17 +331,17 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       expect(getByText("Bug")).toBeTruthy();
     });
-    
+
     // Click the button again to toggle
     fireEvent.click(addButton!);
-    
+
     // Callout should still be open or might close - this depends on Fluent UI behavior
     // So we just verify the test completes without error
     expect(addButton).toBeTruthy();
@@ -358,30 +355,33 @@ describe("Action Item Display component", () => {
       onUpdateActionItem: mockCallback,
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
-    
+
     mockOpenNewWorkItem.mockResolvedValue({ id: 456, fields: { "System.Title": "New Bug" } });
     mockAddAssociatedActionItem.mockResolvedValue({ id: "updated-item" });
-    
+
     const { container, getByText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open callout
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       expect(getByText("Bug")).toBeTruthy();
     });
-    
+
     // Click on Bug work item type
     const bugButton = getByText("Bug").closest("button");
     fireEvent.click(bugButton!);
-    
+
     await waitFor(() => {
-      expect(mockOpenNewWorkItem).toHaveBeenCalledWith("Bug", expect.objectContaining({
-        "System.AssignedTo": "Test User",
-        "Tags": "feedback",
-        "Description": "Test Feedback Item Title",
-      }));
+      expect(mockOpenNewWorkItem).toHaveBeenCalledWith(
+        "Bug",
+        expect.objectContaining({
+          "System.AssignedTo": "Test User",
+          "Tags": "feedback",
+          "Description": "Test Feedback Item Title",
+        }),
+      );
       expect(mockAddAssociatedActionItem).toHaveBeenCalledWith("Test Board Id", "101", 456);
       expect(mockTrackEvent).toHaveBeenCalledWith({
         name: "WorkItemCreated",
@@ -398,20 +398,20 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open callout
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       const linkButton = getByText("Link existing work item");
       expect(linkButton).toBeTruthy();
     });
-    
+
     // Click on "Link existing work item" button in the callout
     const linkButton = getByText("Link existing work item").closest("button");
     fireEvent.click(linkButton!);
-    
+
     await waitFor(() => {
       expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
     });
@@ -424,19 +424,19 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open callout
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       expect(getByText("Link existing work item")).toBeTruthy();
     });
-    
+
     // Press Enter on "Link existing work item"
     const linkButton = getByText("Link existing work item").closest("button");
     fireEvent.keyDown(linkButton!, { key: "Enter", code: "Enter" });
-    
+
     await waitFor(() => {
       expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
     });
@@ -449,24 +449,24 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open dialog
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       const linkButton = getByText("Link existing work item");
       fireEvent.click(linkButton);
     });
-    
+
     await waitFor(() => {
       expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
     });
-    
+
     // Enter invalid input
     const searchBox = getByPlaceholderText("Enter the exact work item id");
     fireEvent.change(searchBox, { target: { value: "abc" } });
-    
+
     await waitFor(() => {
       expect(getByText("Work item ids have to be positive numbers only.")).toBeTruthy();
     });
@@ -479,31 +479,31 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText, getByPlaceholderText, queryByText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open dialog
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       const linkButton = getByText("Link existing work item");
       fireEvent.click(linkButton);
     });
-    
+
     await waitFor(() => {
       const searchBox = getByPlaceholderText("Enter the exact work item id");
-      
+
       // Enter invalid input
       fireEvent.change(searchBox, { target: { value: "abc" } });
     });
-    
+
     await waitFor(() => {
       expect(getByText("Work item ids have to be positive numbers only.")).toBeTruthy();
     });
-    
+
     // Clear input
     const searchBox = getByPlaceholderText("Enter the exact work item id");
     fireEvent.change(searchBox, { target: { value: "" } });
-    
+
     await waitFor(() => {
       expect(queryByText("Work item ids have to be positive numbers only.")).toBeNull();
     });
@@ -519,9 +519,9 @@ describe("Action Item Display component", () => {
       },
       _links: { html: { href: "http://test-url" } },
     };
-    
+
     mockGetWorkItemsByIds.mockResolvedValue([mockWorkItem]);
-    
+
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
@@ -529,21 +529,21 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open dialog
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       const linkButton = getByText("Link existing work item");
       fireEvent.click(linkButton);
     });
-    
+
     await waitFor(() => {
       const searchBox = getByPlaceholderText("Enter the exact work item id");
       fireEvent.change(searchBox, { target: { value: "789" } });
     });
-    
+
     await waitFor(() => {
       expect(mockGetWorkItemsByIds).toHaveBeenCalledWith([789]);
       expect(getByText("Existing Bug")).toBeTruthy();
@@ -552,28 +552,28 @@ describe("Action Item Display component", () => {
 
   it("shows not found message when work item doesn't exist", async () => {
     mockGetWorkItemsByIds.mockResolvedValue([]);
-    
+
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open dialog
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       const linkButton = getByText("Link existing work item");
       fireEvent.click(linkButton);
     });
-    
+
     await waitFor(() => {
       const searchBox = getByPlaceholderText("Enter the exact work item id");
       fireEvent.change(searchBox, { target: { value: "999" } });
     });
-    
+
     await waitFor(() => {
       expect(getByText("The work item you are looking for was not found. Please verify the id.")).toBeTruthy();
     });
@@ -588,10 +588,10 @@ describe("Action Item Display component", () => {
       },
       _links: { html: { href: "http://test-url" } },
     };
-    
+
     mockGetWorkItemsByIds.mockResolvedValue([mockWorkItem]);
     mockAddAssociatedActionItem.mockResolvedValue({ id: "linked-item" });
-    
+
     const mockCallback = jest.fn();
     const propsWithAdd = {
       ...defaultTestProps,
@@ -601,31 +601,31 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open dialog
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       const linkButton = getByText("Link existing work item");
       fireEvent.click(linkButton);
     });
-    
+
     // Enter work item id
     await waitFor(() => {
       const searchBox = getByPlaceholderText("Enter the exact work item id");
       fireEvent.change(searchBox, { target: { value: "789" } });
     });
-    
+
     // Wait for work item to load
     await waitFor(() => {
       expect(getByText("Existing Task")).toBeTruthy();
     });
-    
+
     // Click Link work item button - find the primary button by text
     const linkWorkItemButton = getByText("Link work item").closest("button");
     fireEvent.click(linkWorkItemButton!);
-    
+
     await waitFor(() => {
       expect(mockAddAssociatedActionItem).toHaveBeenCalledWith("Test Board Id", "101", 789);
       expect(mockTrackEvent).toHaveBeenCalledWith({
@@ -643,24 +643,24 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText, queryByText, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open dialog
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       const linkButton = getByText("Link existing work item");
       fireEvent.click(linkButton);
     });
-    
+
     await waitFor(() => {
       expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
     });
-    
+
     // Click Cancel
     const cancelButton = getByText("Cancel");
     fireEvent.click(cancelButton);
-    
+
     await waitFor(() => {
       expect(queryByText("Link existing work item", { selector: ".ms-Dialog-title" })).toBeFalsy();
     });
@@ -670,34 +670,37 @@ describe("Action Item Display component", () => {
     mockGetUser.mockReturnValue({ name: undefined, displayName: "Former User", id: "former-user-id" });
     mockOpenNewWorkItem.mockResolvedValue({ id: 111, fields: { "System.Title": "Test" } });
     mockAddAssociatedActionItem.mockResolvedValue({ id: "updated" });
-    
+
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
       onUpdateActionItem: jest.fn(),
       nonHiddenWorkItemTypes: [{ name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any],
     };
-    
+
     const { container, getByText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open callout
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       expect(getByText("Task")).toBeTruthy();
     });
-    
+
     // Click on Task work item type
     const taskButton = getByText("Task").closest("button");
     fireEvent.click(taskButton!);
-    
+
     await waitFor(() => {
-      expect(mockOpenNewWorkItem).toHaveBeenCalledWith("Task", expect.objectContaining({
-        "System.AssignedTo": "Former User",
-      }));
+      expect(mockOpenNewWorkItem).toHaveBeenCalledWith(
+        "Task",
+        expect.objectContaining({
+          "System.AssignedTo": "Former User",
+        }),
+      );
     });
-    
+
     // Reset mock
     mockGetUser.mockReturnValue({ name: "Test User", displayName: "Test User", id: "test-user-id" });
   });
@@ -709,16 +712,16 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
     const { container, getByText } = render(<ActionItemDisplay {...propsWithAdd} />);
-    
+
     // Open dialog
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
-    
+
     await waitFor(() => {
       const linkButton = getByText("Link existing work item");
       fireEvent.click(linkButton);
     });
-    
+
     await waitFor(() => {
       const linkWorkItemButton = getByText("Link work item").closest("button");
       expect(linkWorkItemButton).toHaveProperty("disabled", true);

@@ -110,17 +110,7 @@ export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
   return now >= archivedAt + ARCHIVE_DELETE_DELAY;
 }
 
-export function TrashIcon({
-  board,
-  currentUserId,
-  currentUserIsTeamAdmin,
-  onClick,
-}: {
-  board: IBoardSummaryTableItem;
-  currentUserId: string;
-  currentUserIsTeamAdmin: boolean;
-  onClick: (event: React.MouseEvent) => void;
-}) {
+export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClick }: { board: IBoardSummaryTableItem; currentUserId: string; currentUserIsTeamAdmin: boolean; onClick: (event: React.MouseEvent) => void }) {
   if (!board.isArchived || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
     return <div className="centered-cell" />;
   }
@@ -135,16 +125,7 @@ export function TrashIcon({
   );
 }
 
-function getTable(
-  tableData: IBoardSummaryTableItem[],
-  sortingState: SortingState,
-  onSortingChange: OnChangeFn<SortingState>,
-  onArchiveToggle: () => void,
-  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>,
-  currentUserId: string,
-  currentUserIsTeamAdmin: boolean
-): Table<IBoardSummaryTableItem> {
+function getTable(tableData: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>, onArchiveToggle: () => void, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>, currentUserId: string, currentUserIsTeamAdmin: boolean): Table<IBoardSummaryTableItem> {
   const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
   const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
 
@@ -230,9 +211,7 @@ function getTable(
       id: "trash",
       header: () => (
         <div className="centered-cell trash-icon-header">
-          <i className="fas fa-trash-alt"
-            title="Delete enabled for archived boards if user is board owner or team admin."
-            aria-label="Archived boards can be deleted by board owner or team admin."></i>
+          <i className="fas fa-trash-alt" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin."></i>
         </div>
       ),
       cell: cellContext => (
@@ -240,7 +219,7 @@ function getTable(
           board={cellContext.row.original}
           currentUserId={currentUserId}
           currentUserIsTeamAdmin={currentUserIsTeamAdmin}
-          onClick={(event) => {
+          onClick={event => {
             event.stopPropagation();
             setOpenDialogBoardId(cellContext.row.original.id);
           }}
@@ -271,18 +250,11 @@ function getTable(
   return useReactTable(tableOptions);
 }
 
-export async function handleConfirmDelete(
-  openDialogBoardId: string | null,
-  tableData: IBoardSummaryTableItem[],
-  teamId: string,
-  setOpenDialogBoardId: (id: string | null) => void,
-  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setRefreshKey: (value: boolean) => void,
-) {
+export async function handleConfirmDelete(openDialogBoardId: string | null, tableData: IBoardSummaryTableItem[], teamId: string, setOpenDialogBoardId: (id: string | null) => void, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, setRefreshKey: (value: boolean) => void) {
   if (!openDialogBoardId) return;
 
   const deletedBoard = tableData.find(board => board.id === openDialogBoardId);
-  const deletedBoardName = deletedBoard?.boardName || 'Unknown Board';
+  const deletedBoardName = deletedBoard?.boardName || "Unknown Board";
   const deletedFeedbackCount = deletedBoard?.feedbackItemsCount || 0;
 
   try {
@@ -291,9 +263,7 @@ export async function handleConfirmDelete(
     await BoardDataService.deleteFeedbackBoard(teamId, openDialogBoardId);
     reflectBackendService.broadcastDeletedBoard(teamId, openDialogBoardId);
 
-    setTableData(prevData =>
-      prevData.filter(board => board.id !== openDialogBoardId)
-    );
+    setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
 
     appInsights.trackEvent({
       name: TelemetryEvents.FeedbackBoardDeleted,
@@ -309,7 +279,7 @@ export async function handleConfirmDelete(
       boardId: openDialogBoardId,
       boardName: deletedBoardName,
       feedbackItemsCount: deletedFeedbackCount,
-      action: 'delete',
+      action: "delete",
     });
     setRefreshKey(true);
   }
@@ -376,17 +346,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const [refreshKey, setRefreshKey] = useState(false);
 
-  const table: Table<IBoardSummaryTableItem> =
-    getTable(
-      tableData,
-      sorting,
-      setSorting,
-      props.onArchiveToggle,
-      setTableData,
-      setOpenDialogBoardId,
-      props.currentUserId,
-      props.currentUserIsTeamAdmin
-    );
+  const table: Table<IBoardSummaryTableItem> = getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setOpenDialogBoardId, props.currentUserId, props.currentUserIsTeamAdmin);
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     const newState = buildBoardSummaryState(boardDocuments);
@@ -400,63 +360,66 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
     // Preload all work item state info once, up front
     const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
-    await Promise.all(props.supportedWorkItemTypes.map(async (workItemType) => {
-      const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
-      workItemTypeToStatesMap[workItemType.name] = workItemTypeStates;
-    }));
+    await Promise.all(
+      props.supportedWorkItemTypes.map(async workItemType => {
+        const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
+        workItemTypeToStatesMap[workItemType.name] = workItemTypeStates;
+      }),
+    );
 
-    await Promise.all(state.feedbackBoards.map(async (feedbackBoard) => {
-      const feedbackBoardId: string = feedbackBoard.id;
-      const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
+    await Promise.all(
+      state.feedbackBoards.map(async feedbackBoard => {
+        const feedbackBoardId: string = feedbackBoard.id;
+        const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
 
-      // Always set feedback item count, even if 0
-      const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
-      if (boardIndex !== -1) {
-        updatedBoardsTableItems[boardIndex] = {
-          ...updatedBoardsTableItems[boardIndex],
-          feedbackItemsCount: feedbackItems.length,
+        // Always set feedback item count, even if 0
+        const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
+        if (boardIndex !== -1) {
+          updatedBoardsTableItems[boardIndex] = {
+            ...updatedBoardsTableItems[boardIndex],
+            feedbackItemsCount: feedbackItems.length,
+          };
+        }
+
+        if (!feedbackItems.length) return;
+
+        // Filter feedback items that have associated action items
+        const actionableFeedbackItems = feedbackItems.filter(item => item.associatedActionItemIds && item.associatedActionItemIds.length > 0);
+
+        if (!actionableFeedbackItems.length) {
+          return;
+        }
+
+        const aggregatedWorkItems: WorkItem[] = [];
+        await Promise.all(
+          actionableFeedbackItems.map(async item => {
+            const workItems = await workItemService.getWorkItemsByIds(item.associatedActionItemIds);
+            if (workItems?.length) {
+              aggregatedWorkItems.push(...workItems);
+            }
+          }),
+        );
+
+        // Update action items for this board
+        updatedActionItemsByBoard[feedbackBoardId] = {
+          isDataLoaded: true,
+          actionItems: aggregatedWorkItems,
         };
-      }
 
-      if (!feedbackItems.length) return;
+        const pendingWorkItems = aggregatedWorkItems.filter(workItem => {
+          const states = workItemTypeToStatesMap[workItem.fields["System.WorkItemType"]].filter(state => state.name === workItem.fields["System.State"]);
+          return !states.length || (states[0].category !== "Completed" && states[0].category !== "Removed");
+        });
 
-      // Filter feedback items that have associated action items
-      const actionableFeedbackItems = feedbackItems.filter(item => item.associatedActionItemIds && item.associatedActionItemIds.length > 0);
-
-      if (!actionableFeedbackItems.length) {
-        return;
-      }
-
-      const aggregatedWorkItems: WorkItem[] = [];
-      await Promise.all(
-        actionableFeedbackItems.map(async item => {
-          const workItems = await workItemService.getWorkItemsByIds(item.associatedActionItemIds);
-          if (workItems?.length) {
-            aggregatedWorkItems.push(...workItems);
-          }
-        }),
-      );
-
-      // Update action items for this board
-      updatedActionItemsByBoard[feedbackBoardId] = {
-        isDataLoaded: true,
-        actionItems: aggregatedWorkItems,
-      };
-
-      const pendingWorkItems = aggregatedWorkItems.filter(workItem => {
-        const states = workItemTypeToStatesMap[workItem.fields["System.WorkItemType"]].filter(state => state.name === workItem.fields["System.State"]);
-        return !states.length || (states[0].category !== "Completed" && states[0].category !== "Removed");
-      });
-
-      // Update board table item with work item counts
-      if (boardIndex !== -1) {
-        updatedBoardsTableItems[boardIndex] = {
-          ...updatedBoardsTableItems[boardIndex],
-          pendingWorkItemsCount: pendingWorkItems.length,
-          totalWorkItemsCount: aggregatedWorkItems.length,
-        };
-      }
-    }),
+        // Update board table item with work item counts
+        if (boardIndex !== -1) {
+          updatedBoardsTableItems[boardIndex] = {
+            ...updatedBoardsTableItems[boardIndex],
+            pendingWorkItemsCount: pendingWorkItems.length,
+            totalWorkItemsCount: aggregatedWorkItems.length,
+          };
+        }
+      }),
     );
 
     // Final state update
@@ -499,21 +462,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   return (
     <div className="board-summary-table-container">
-      <DeleteBoardDialog
-        board={selectedBoardForDelete}
-        hidden={!openDialogBoardId}
-        onConfirm={() =>
-          handleConfirmDelete(
-            openDialogBoardId,
-            tableData,
-            props.teamId,
-            setOpenDialogBoardId,
-            setTableData,
-            setRefreshKey,
-          )
-      }
-        onCancel={() => setOpenDialogBoardId(null)}
-      />
+      <DeleteBoardDialog board={selectedBoardForDelete} hidden={!openDialogBoardId} onConfirm={() => handleConfirmDelete(openDialogBoardId, tableData, props.teamId, setOpenDialogBoardId, setTableData, setRefreshKey)} onCancel={() => setOpenDialogBoardId(null)} />
       <table>
         <BoardSummaryTableHeader headerGroups={table.getHeaderGroups()} />
         <BoardSummaryTableBody rows={table.getRowModel().rows} boardRowSummary={boardRowSummary} />
