@@ -1378,159 +1378,157 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <button className={`bg-transparent border-0 px-4 py-2 text-sm font-normal cursor-pointer relative transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </button>
-
-                      <div className="vertical-tab-separator" />
-                      <div className="flex items-center justify-start">
-                        <div className="board-selector">
-                          <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
+              <div className="vertical-tab-separator" />
+              <div className="flex items-center justify-start">
+                <div className="board-selector">
+                  <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
+                </div>
+                <div className="board-actions-menu">
+                  <DefaultButton
+                    className="contextual-menu-button"
+                    aria-label="Board Actions Menu"
+                    title="Board Actions"
+                    menuProps={{
+                      className: "board-actions-menu",
+                      items: this.boardActionContexualMenuItems,
+                    }}
+                  >
+                    <span className="ms-Button-icon">
+                      <i className="fa-solid fa-ellipsis-h"></i>
+                    </span>
+                    &nbsp;
+                  </DefaultButton>
+                  <Dialog
+                    hidden={this.state.isMobileBoardActionsDialogHidden}
+                    onDismiss={this.hideMobileBoardActionsDialog}
+                    modalProps={{
+                      isBlocking: false,
+                      containerClassName: "ms-dialogMainOverride",
+                      className: "retrospectives-dialog-modal",
+                    }}
+                  >
+                    <div className="mobile-contextual-menu-list">
+                      {this.boardActionContexualMenuItems.map(boardAction => (
+                        <ActionButton
+                          key={boardAction.key}
+                          className={boardAction.className}
+                          iconProps={boardAction.iconProps}
+                          aria-label="User Settings Menu"
+                          onClick={() => {
+                            this.hideMobileBoardActionsDialog();
+                            boardAction.onClick();
+                          }}
+                          text={boardAction.text}
+                          title={boardAction.title}
+                        />
+                      ))}
+                    </div>
+                    <DialogFooter>
+                      <DefaultButton onClick={this.hideMobileBoardActionsDialog} text="Close" />
+                    </DialogFooter>
+                  </Dialog>
+                </div>
+              </div>
+              <div className="flex items-center justify-start">
+                {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+                  <div className="team-effectiveness-dialog-section">
+                    <Dialog
+                      hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                      onDismiss={() => {
+                        this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                      }}
+                      dialogContentProps={{
+                        type: DialogType.close,
+                      }}
+                      minWidth={640}
+                      modalProps={{
+                        isBlocking: true,
+                        containerClassName: "team-effectiveness-dialog",
+                        className: "retrospectives-dialog-modal",
+                      }}
+                    >
+                      <DialogContent>
+                        <div className="team-effectiveness-section-information">
+                          <i className="fa fa-info-circle" />
+                          &nbsp;All answers will be saved anonymously
                         </div>
-                        <div className="board-actions-menu">
-                          <DefaultButton
-                            className="contextual-menu-button"
-                            aria-label="Board Actions Menu"
-                            title="Board Actions"
-                            menuProps={{
-                              className: "board-actions-menu",
-                              items: this.boardActionContexualMenuItems,
-                            }}
-                          >
-                            <span className="ms-Button-icon">
-                              <i className="fa-solid fa-ellipsis-h"></i>
-                            </span>
-                            &nbsp;
-                          </DefaultButton>
-                          <Dialog
-                            hidden={this.state.isMobileBoardActionsDialogHidden}
-                            onDismiss={this.hideMobileBoardActionsDialog}
-                            modalProps={{
-                              isBlocking: false,
-                              containerClassName: "ms-dialogMainOverride",
-                              className: "retrospectives-dialog-modal",
-                            }}
-                          >
-                            <div className="mobile-contextual-menu-list">
-                              {this.boardActionContexualMenuItems.map(boardAction => (
-                                <ActionButton
-                                  key={boardAction.key}
-                                  className={boardAction.className}
-                                  iconProps={boardAction.iconProps}
-                                  aria-label="User Settings Menu"
-                                  onClick={() => {
-                                    this.hideMobileBoardActionsDialog();
-                                    boardAction.onClick();
-                                  }}
-                                  text={boardAction.text}
-                                  title={boardAction.title}
-                                />
-                              ))}
-                            </div>
-                            <DialogFooter>
-                              <DefaultButton onClick={this.hideMobileBoardActionsDialog} text="Close" />
-                            </DialogFooter>
-                          </Dialog>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-start">
-                        {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                          <div className="team-effectiveness-dialog-section">
-                            <Dialog
-                              hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
-                              onDismiss={() => {
-                                this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                              }}
-                              dialogContentProps={{
-                                type: DialogType.close,
-                              }}
-                              minWidth={640}
-                              modalProps={{
-                                isBlocking: true,
-                                containerClassName: "team-effectiveness-dialog",
-                                className: "retrospectives-dialog-modal",
-                              }}
-                            >
-                              <DialogContent>
-                                <div className="team-effectiveness-section-information">
-                                  <i className="fa fa-info-circle" />
-                                  &nbsp;All answers will be saved anonymously
-                                </div>
-                                <table className="team-effectiveness-measurement-table">
-                                  <thead>
-                                    <tr>
-                                      <th></th>
-                                      <th></th>
-                                      <th colSpan={6} className="team-effectiveness-favorability-label">
-                                        Unfavorable
-                                      </th>
-                                      <th colSpan={2} className="team-effectiveness-favorability-label">
-                                        Neutral
-                                      </th>
-                                      <th colSpan={2} className="team-effectiveness-favorability-label">
-                                        Favorable
-                                      </th>
-                                    </tr>
-                                    <tr>
-                                      <th></th>
-                                      <th></th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
-                                      <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
-                                      <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
-                                      <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
-                                      <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {questions.map(question => {
-                                      return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
-                                    })}
-                                  </tbody>
-                                </table>
-                              </DialogContent>
-                              <DialogFooter>
-                                <PrimaryButton
-                                  className="team-effectiveness-submit-button"
-                                  onClick={() => {
-                                    saveTeamEffectivenessMeasurement();
-                                  }}
-                                  text="Submit"
-                                />
-                                <DefaultButton
-                                  onClick={() => {
-                                    this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                                  }}
-                                  text="Cancel"
-                                />
-                              </DialogFooter>
-                            </Dialog>
-                            <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile" content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
-                              <ActionButton
-                                className="toggle-carousel-button"
-                                iconProps={{ iconName: "Chart" }}
-                                text="Team Assessment"
-                                onClick={() => {
-                                  this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
-                                }}
-                              ></ActionButton>
-                            </TooltipHost>
-                          </div>
-                        )}
-                        <div className="workflow-stage-tab-container" role="tablist">
-                          <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
-                          <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
-                          <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
-                          <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
-                        </div>
-                      </div>
-                      {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                        <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                          <ActionButton className="toggle-carousel-button hide-mobile" text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
-                        </TooltipHost>
-                      )}
-
+                        <table className="team-effectiveness-measurement-table">
+                          <thead>
+                            <tr>
+                              <th></th>
+                              <th></th>
+                              <th colSpan={6} className="team-effectiveness-favorability-label">
+                                Unfavorable
+                              </th>
+                              <th colSpan={2} className="team-effectiveness-favorability-label">
+                                Neutral
+                              </th>
+                              <th colSpan={2} className="team-effectiveness-favorability-label">
+                                Favorable
+                              </th>
+                            </tr>
+                            <tr>
+                              <th></th>
+                              <th></th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
+                              <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
+                              <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
+                              <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
+                              <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {questions.map(question => {
+                              return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                            })}
+                          </tbody>
+                        </table>
+                      </DialogContent>
+                      <DialogFooter>
+                        <PrimaryButton
+                          className="team-effectiveness-submit-button"
+                          onClick={() => {
+                            saveTeamEffectivenessMeasurement();
+                          }}
+                          text="Submit"
+                        />
+                        <DefaultButton
+                          onClick={() => {
+                            this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                          }}
+                          text="Cancel"
+                        />
+                      </DialogFooter>
+                    </Dialog>
+                    <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile" content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
+                      <ActionButton
+                        className="toggle-carousel-button"
+                        iconProps={{ iconName: "Chart" }}
+                        text="Team Assessment"
+                        onClick={() => {
+                          this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
+                        }}
+                      ></ActionButton>
+                    </TooltipHost>
+                  </div>
+                )}
+                <div className="flex flex-row" role="tablist">
+                  <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
+                  <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
+                  <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
+                  <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
+                </div>
+              </div>
+              {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
+                <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
+                  <ActionButton className="toggle-carousel-button hide-mobile" text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
+                </TooltipHost>
+              )}
             </div>
             {this.state.activeTab === "Board" && (
               <div className="w-full">
