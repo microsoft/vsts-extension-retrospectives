@@ -80,9 +80,7 @@ $team_selector_list_item_width: 450px;
 }
 
 .pivot-content-wrapper {
-  margin-top: 15px;
   border-top: var(--nav-header-active-item-background) 4px solid;
-  width: 98.5vw;
 }
 
 #extension-header {
@@ -137,11 +135,6 @@ $team_selector_list_item_width: 450px;
 
   .ms-Pivot {
     margin-left: calc(#{variables.$header_horizontal_spacing} - 8px);
-  }
-
-  .pivot-content-wrapper {
-    position: absolute;
-    width: 100%;
   }
 
   button[role="tab"] {
