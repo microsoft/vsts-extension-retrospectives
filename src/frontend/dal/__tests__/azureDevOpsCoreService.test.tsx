@@ -8,25 +8,25 @@ const mockGetTeam = jest.fn();
 const mockGetTeamMembersWithExtendedProperties = jest.fn();
 const mockGetClient = jest.fn();
 
-jest.mock('azure-devops-extension-api/Common', () => ({
+jest.mock("azure-devops-extension-api/Common", () => ({
   getClient: mockGetClient,
 }));
 
 describe("AzureDevOpsCoreService", () => {
   let azureDevOpsCoreService: any;
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockGetClient.mockReturnValue({
       getTeams: mockGetTeams,
       getTeam: mockGetTeam,
       getTeamMembersWithExtendedProperties: mockGetTeamMembersWithExtendedProperties,
     });
-    
+
     jest.resetModules();
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { azureDevOpsCoreService: service } = require('../azureDevOpsCoreService');
+    const { azureDevOpsCoreService: service } = require("../azureDevOpsCoreService");
     azureDevOpsCoreService = service;
   });
 
@@ -47,10 +47,7 @@ describe("AzureDevOpsCoreService", () => {
     });
 
     it("should handle multiple teams and return only the first one", async () => {
-      const mockTeams: WebApiTeam[] = [
-        { id: "team-1", name: "Team 1" } as any,
-        { id: "team-2", name: "Team 2" } as any,
-      ];
+      const mockTeams: WebApiTeam[] = [{ id: "team-1", name: "Team 1" } as any, { id: "team-2", name: "Team 2" } as any];
 
       mockGetTeams.mockResolvedValue(mockTeams);
 
@@ -128,10 +125,7 @@ describe("AzureDevOpsCoreService", () => {
 
   describe("getMembers", () => {
     it("should return team members", async () => {
-      const mockMembers: TeamMember[] = [
-        { identity: { displayName: "User 1", id: "user-1" } } as any,
-        { identity: { displayName: "User 2", id: "user-2" } } as any,
-      ];
+      const mockMembers: TeamMember[] = [{ identity: { displayName: "User 1", id: "user-1" } } as any, { identity: { displayName: "User 2", id: "user-2" } } as any];
 
       mockGetTeamMembersWithExtendedProperties.mockResolvedValue(mockMembers);
 
@@ -179,11 +173,7 @@ describe("AzureDevOpsCoreService", () => {
 
   describe("getAllTeams", () => {
     it("should return all teams when less than 100 teams", async () => {
-      const mockTeams: WebApiTeam[] = [
-        { id: "team-1", name: "Team 1" } as any,
-        { id: "team-2", name: "Team 2" } as any,
-        { id: "team-3", name: "Team 3" } as any,
-      ];
+      const mockTeams: WebApiTeam[] = [{ id: "team-1", name: "Team 1" } as any, { id: "team-2", name: "Team 2" } as any, { id: "team-3", name: "Team 3" } as any];
 
       mockGetTeams.mockResolvedValue(mockTeams);
 
@@ -201,14 +191,9 @@ describe("AzureDevOpsCoreService", () => {
         name: `Team ${i}`,
       })) as any;
 
-      const secondBatch: WebApiTeam[] = [
-        { id: "team-100", name: "Team 100" } as any,
-        { id: "team-101", name: "Team 101" } as any,
-      ];
+      const secondBatch: WebApiTeam[] = [{ id: "team-100", name: "Team 100" } as any, { id: "team-101", name: "Team 101" } as any];
 
-      mockGetTeams
-        .mockResolvedValueOnce(firstBatch)
-        .mockResolvedValueOnce(secondBatch);
+      mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch);
 
       const result = await azureDevOpsCoreService.getAllTeams("project-123", false);
 
@@ -229,14 +214,9 @@ describe("AzureDevOpsCoreService", () => {
         name: `Team ${100 + i}`,
       })) as any;
 
-      const thirdBatch: WebApiTeam[] = [
-        { id: "team-200", name: "Team 200" } as any,
-      ];
+      const thirdBatch: WebApiTeam[] = [{ id: "team-200", name: "Team 200" } as any];
 
-      mockGetTeams
-        .mockResolvedValueOnce(firstBatch)
-        .mockResolvedValueOnce(secondBatch)
-        .mockResolvedValueOnce(thirdBatch);
+      mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch).mockResolvedValueOnce(thirdBatch);
 
       const result = await azureDevOpsCoreService.getAllTeams("project-123", false);
 
@@ -276,9 +256,7 @@ describe("AzureDevOpsCoreService", () => {
         name: `Team ${100 + i}`,
       })) as any;
 
-      mockGetTeams
-        .mockResolvedValueOnce(firstBatch)
-        .mockResolvedValueOnce(secondBatch);
+      mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch);
 
       const result = await azureDevOpsCoreService.getAllTeams("project-123", false);
 
@@ -297,9 +275,7 @@ describe("AzureDevOpsCoreService", () => {
 
       const secondBatch: WebApiTeam[] = [{ id: "team-100", name: "Team 100" } as any];
 
-      mockGetTeams
-        .mockResolvedValueOnce(firstBatch)
-        .mockResolvedValueOnce(secondBatch);
+      mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch);
 
       await azureDevOpsCoreService.getAllTeams("project-xyz", true);
 
