@@ -1351,7 +1351,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <div className={this.state.isDesktop ? "desktop-mode" : "mobile-mode"}>
         <div className="retrospective-feedback-board-container">
           <div className="flex items-center px-2 py-2">
             <Dialog
@@ -1378,14 +1377,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     const board = this.state.currentBoard;
 
                     await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
-
-                    /*
-                TODO (enpolat) : in the future we may need to create feedback items based on the answers of the questions
-                this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.flatMap(e => e.responses).filter(e => e.questionId === question.id).forEach(async vote => {
-                  const item = await itemDataService.createItemForBoard(board.id, vote.selection.toString(), columnId, true);
-                  reflectBackendService.broadcastNewItem(columnId, item.id);
-                });
-                */
 
                     this.setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
                   }}
@@ -1644,18 +1635,19 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </DialogFooter>
                     </Dialog>
                   </div>
+                )}
                   <Dialog
-                    hidden={this.state.isArchiveBoardConfirmationDialogHidden}
-                    onDismiss={this.hideArchiveBoardConfirmationDialog}
-                    dialogContentProps={{
-                      type: DialogType.close,
-                      title: 'Archive Retrospective',
-                    }}
-                    modalProps={{
-                      isBlocking: true,
-                      containerClassName: 'retrospectives-archive-board-confirmation-dialog',
-                      className: 'retrospectives-dialog-modal',
-                    }}>
+                  hidden={this.state.isArchiveBoardConfirmationDialogHidden}
+                  onDismiss={this.hideArchiveBoardConfirmationDialog}
+                  dialogContentProps={{
+                    type: DialogType.close,
+                    title: 'Archive Retrospective',
+                  }}
+                  modalProps={{
+                    isBlocking: true,
+                    containerClassName: 'retrospectives-archive-board-confirmation-dialog',
+                    className: 'retrospectives-dialog-modal',
+                  }}>
                     <DialogContent>
                       <p>The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.</p>
                       <br />
@@ -1666,10 +1658,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
                     </DialogFooter>
                   </Dialog>
-                </div>
-              }
             </PivotItem>
-            {this.state.isDesktop && (
               <PivotItem headerText="History">
                 <div className="pivot-content-wrapper">
                   <BoardSummaryTable
@@ -1681,13 +1670,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   />
                 </div>
               </PivotItem>
-              {this.state.isDesktop && (
-                <PivotItem headerText="History">
-                  <div className="pivot-content-wrapper">
-                    <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
-                  </div>
-                </PivotItem>
-              )}
             </Pivot>
           </div>
           {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
@@ -1821,7 +1803,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           </Dialog>
           <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" bodyClassName="retrospective-notification-toast-body" progressClassName="retrospective-notification-toast-progress-bar" />
         </div>
-      </div>
     );
   }
 }
