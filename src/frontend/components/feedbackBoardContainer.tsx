@@ -1380,7 +1380,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </button>
 
                       <div className="vertical-tab-separator" />
-                      <div className="board-selector-group">
+                      <div className="flex items-center justify-start">
                         <div className="board-selector">
                           <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
                         </div>
@@ -1430,7 +1430,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           </Dialog>
                         </div>
                       </div>
-                      <div className="feedback-workflow-wrapper">
+                      <div className="flex items-center justify-start">
                         {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                           <div className="team-effectiveness-dialog-section">
                             <Dialog
