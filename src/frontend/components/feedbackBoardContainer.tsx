@@ -2,7 +2,6 @@ import React from "react";
 import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from "@fluentui/react/lib/Button";
 import { ContextualMenuItemType, IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
 import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react/lib/Dialog";
-import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { MessageBar, MessageBarType } from "@fluentui/react/lib/MessageBar";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
@@ -107,6 +106,7 @@ export interface FeedbackBoardContainerState {
   castedVoteCount: number;
   boardColumns: IFeedbackColumn[];
   questionIdForDiscussAndActBoardUpdate: number;
+  activeTab: "Board" | "History";
 }
 
 export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
@@ -173,6 +173,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       castedVoteCount: 0,
       boardColumns: [],
       questionIdForDiscussAndActBoardUpdate: -1,
+      activeTab: "Board",
     };
   }
 
@@ -799,8 +800,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   // Handle when "Board" tab is clicked
-  private readonly handlePivotClick = async (item?: PivotItem): Promise<void> => {
-    if (item?.props.headerText === "Board") {
+  private readonly handlePivotClick = async (tabName: "Board" | "History"): Promise<void> => {
+    this.setState({ activeTab: tabName });
+
+    if (tabName === "Board") {
       // Check if "Board" tab is clicked
       if (this.state.hasToggledArchive) {
         // Reload only if archive was toggled
@@ -1367,10 +1370,25 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.setScreenViewMode} />
         </div>
         <div className="flex items-center justify-start">
-          <Pivot onLinkClick={this.handlePivotClick}>
-            <PivotItem headerText="Board">
-              {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
-                <div className="pivot-content-wrapper">
+          <div className="custom-pivot">
+            <div className="custom-pivot-tabs">
+              <button
+                className={`custom-pivot-tab ${this.state.activeTab === "Board" ? "active" : ""}`}
+                onClick={() => this.handlePivotClick("Board")}
+              >
+                Board
+              </button>
+              <button
+                className={`custom-pivot-tab ${this.state.activeTab === "History" ? "active" : ""}`}
+                onClick={() => this.handlePivotClick("History")}
+              >
+                History
+              </button>
+            </div>
+            {this.state.activeTab === "Board" && (
+              <div className="custom-pivot-content">
+                {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
+                  <div className="pivot-content-wrapper">
                   <div className="feedback-board-container-header">
                     <div className="vertical-tab-separator hide-mobile" />
                     <div className="board-selector-group">
@@ -1636,13 +1654,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
                 </DialogFooter>
               </Dialog>
-            </PivotItem>
-            <PivotItem headerText="History">
-              <div className="pivot-content-wrapper">
-                <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
               </div>
-            </PivotItem>
-          </Pivot>
+            )}
+            {this.state.activeTab === "History" && (
+              <div className="custom-pivot-content">
+                <div className="pivot-content-wrapper">
+                  <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
         {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
