@@ -1327,8 +1327,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <div className="grid grid-cols-1 grid-rows-[auto,1fr] gap-x-4">
-        <div className="flex items-center px-2 py-2">
+      <div className="grid grid-cols-1">
+        <div className="flex items-center">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
             onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
@@ -1378,11 +1378,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <button className={`bg-transparent border-0 px-4 py-2 text-sm font-normal cursor-pointer relative transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </button>
-            </div>
-            {this.state.activeTab === "Board" && (
-              <div className="w-full">
-                {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
-                  <>
                     <div className="feedback-board-container-header">
                       <div className="vertical-tab-separator hide-mobile" />
                       <div className="board-selector-group">
@@ -1536,6 +1531,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </TooltipHost>
                       )}
                     </div>
+            </div>
+            {this.state.activeTab === "Board" && (
+              <div className="w-full">
+                {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
+                  <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
                       <MessageBar
                         className="info-message-bar"
