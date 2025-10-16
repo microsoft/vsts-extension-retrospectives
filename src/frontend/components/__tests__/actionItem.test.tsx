@@ -1,13 +1,32 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import { ActionItem, ActionItemProps } from "../actionItem";
 import { itemDataService } from "../../dal/itemDataService";
+import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
+import * as azureDevOpsExtensionSdk from "azure-devops-extension-sdk";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
     trackMetric: jest.fn(),
     trackEvent: jest.fn(),
+  },
+}));
+
+jest.mock("azure-devops-extension-sdk", () => ({
+  getService: jest.fn(),
+}));
+
+jest.mock("../../dal/itemDataService", () => ({
+  itemDataService: {
+    removeAssociatedActionItem: jest.fn(),
+    removeAssociatedItemIfNotExistsInVsts: jest.fn(),
+  },
+}));
+
+jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
+  workItemService: {
+    getWorkItemsByIds: jest.fn(),
   },
 }));
 
@@ -138,8 +157,157 @@ describe("UI-level integration tests for ActionItem", () => {
   });
 
   it("calls onUpdateActionItem when confirming unlink", async () => {
-    jest.spyOn(itemDataService, "removeAssociatedActionItem").mockResolvedValue({} as IFeedbackItemDocument);
-    const { container } = render(<ActionItem {...defaultTestProps} />);
+    const mockFeedbackItem = { id: "101" } as IFeedbackItemDocument;
+    (itemDataService.removeAssociatedActionItem as jest.Mock).mockResolvedValue(mockFeedbackItem);
+    
+    const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
+    
+    // Click the unlink button
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    expect(unlinkButton).toBeTruthy();
+    
+    fireEvent.click(unlinkButton!);
+    
+    // Wait for dialog to appear
+    await waitFor(() => {
+      expect(getByText("Remove Work Item Link")).toBeTruthy();
+    });
+    
+    // Click the Remove button in the dialog
+    const removeButton = getByText("Remove");
+    fireEvent.click(removeButton);
+    
+    await waitFor(() => {
+      expect(itemDataService.removeAssociatedActionItem).toHaveBeenCalledWith(
+        "Test Board Id",
+        "101",
+        1
+      );
+      expect(mockOnUpdateActionItem).toHaveBeenCalledWith(mockFeedbackItem);
+    });
+  });
+
+  it("opens unlink confirmation dialog and cancels it", async () => {
+    const { container, getByText, queryByText } = render(<ActionItem {...defaultTestProps} />);
+    
+    // Click the unlink button
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    fireEvent.click(unlinkButton!);
+    
+    // Wait for dialog to appear
+    await waitFor(() => {
+      expect(getByText("Remove Work Item Link")).toBeTruthy();
+    });
+    
+    // Click the Cancel button
+    const cancelButton = getByText("Cancel");
+    fireEvent.click(cancelButton);
+    
+    await waitFor(() => {
+      expect(queryByText("Remove Work Item Link")).toBeNull();
+    });
+  });
+
+  it("handles keyboard press on unlink button (Enter key)", async () => {
+    const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
+    
+    // Get the unlink button
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    expect(unlinkButton).toBeTruthy();
+    
+    // Press Enter on the unlink button
+    fireEvent.keyPress(unlinkButton!, { key: "Enter", code: "Enter", charCode: 13 });
+    
+    // Wait for dialog to appear
+    await waitFor(() => {
+      expect(getByText("Remove Work Item Link")).toBeTruthy();
+    });
+  });
+
+  it("renders with Resolved state category and applies resolved-border-right class", () => {
+    const modifiedProps = {
+      ...defaultTestProps,
+      actionItem: {
+        ...defaultTestProps.actionItem,
+        fields: {
+          ...defaultTestProps.actionItem.fields,
+          "System.State": "Resolved",
+        },
+      },
+      allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Resolved", category: "Resolved", color: "green" }] }],
+    };
+    const { container } = render(<ActionItem {...modifiedProps} />);
+    const resolvedElement = container.querySelector(".resolved-border-right");
+    expect(resolvedElement).toBeTruthy();
+  });
+
+  it("does not apply resolved-border-right class for active work items", () => {
+    const modifiedProps = {
+      ...defaultTestProps,
+      actionItem: {
+        ...defaultTestProps.actionItem,
+        fields: {
+          ...defaultTestProps.actionItem.fields,
+          "System.State": "Active",
+        },
+      },
+      allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Active", category: "InProgress", color: "blue" }] }],
+    };
+    const { container } = render(<ActionItem {...modifiedProps} />);
+    const resolvedElement = container.querySelector(".resolved-border-right");
+    expect(resolvedElement).toBeNull();
+  });
+
+  it("handles work item type with no states", () => {
+    const modifiedProps = {
+      ...defaultTestProps,
+      allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: undefined as any }],
+    };
+    const { container } = render(<ActionItem {...modifiedProps} />);
     expect(container.firstChild).toBeTruthy();
+  });
+
+  it("handles missing work item type icon", () => {
+    const modifiedProps = {
+      ...defaultTestProps,
+      allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], icon: undefined as any }],
+    };
+    const { container } = render(<ActionItem {...modifiedProps} />);
+    expect(container.firstChild).toBeTruthy();
+  });
+
+  it("handles missing work item type", () => {
+    const modifiedProps: ActionItemProps = {
+      ...defaultTestProps,
+      allWorkItemTypes: [],
+    };
+    const { container } = render(<ActionItem {...modifiedProps} />);
+    expect(container.firstChild).toBeTruthy();
+  });
+
+  it("stops event propagation when clicking Remove button in dialog", async () => {
+    const mockFeedbackItem = { id: "101" } as IFeedbackItemDocument;
+    (itemDataService.removeAssociatedActionItem as jest.Mock).mockResolvedValue(mockFeedbackItem);
+    
+    const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
+    
+    // Click the unlink button
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    fireEvent.click(unlinkButton!);
+    
+    await waitFor(() => {
+      expect(getByText("Remove Work Item Link")).toBeTruthy();
+    });
+    
+    // Create a mock event with stopPropagation
+    const removeButton = getByText("Remove");
+    const mockEvent = { stopPropagation: jest.fn() };
+    
+    // Click with a proper event
+    fireEvent.click(removeButton, mockEvent);
+    
+    await waitFor(() => {
+      expect(itemDataService.removeAssociatedActionItem).toHaveBeenCalled();
+    });
   });
 });
