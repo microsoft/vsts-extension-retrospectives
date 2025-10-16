@@ -1,5 +1,5 @@
 import React from "react";
-import copy from "copy-to-clipboard";
+import { copyToClipboard } from "../utilities/clipboardHelper";
 import { ActionButton } from "@fluentui/react/lib/Button";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 import { ITextField, TextField } from "@fluentui/react/lib/TextField";
@@ -42,7 +42,7 @@ class FeedbackBoardPreviewEmail extends React.Component<IFeedbackBoardPreviewEma
   };
 
   private onCopyButtonClick = () => {
-    copy(this.state.emailContent);
+    copyToClipboard(this.state.emailContent);
     this.props.onCopy();
   };
 

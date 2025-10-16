@@ -38,7 +38,7 @@ import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionF
 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
-import copyToClipboard from "copy-to-clipboard";
+import { copyToClipboard } from "../utilities/clipboardHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";

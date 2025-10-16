@@ -74,7 +74,9 @@ jest.mock("azure-devops-extension-sdk", () => ({
   })),
 }));
 
-jest.mock("copy-to-clipboard", () => jest.fn());
+jest.mock("../../utilities/clipboardHelper", () => ({
+  copyToClipboard: jest.fn(),
+}));
 
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: jest.fn((plugin, component) => component),
