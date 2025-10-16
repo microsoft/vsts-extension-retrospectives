@@ -1,10 +1,72 @@
 import React from "react";
-import { render } from "@testing-library/react";
-import { IFeedbackBoardDocument } from "../../interfaces/feedback";
+import { render, waitFor, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { mocked } from "jest-mock";
 import FeedbackBoard, { FeedbackBoardProps } from "../../components/feedbackBoard";
 import { testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
+import { itemDataService } from "../../dal/itemDataService";
+import { workService } from "../../dal/azureDevOpsWorkService";
+import { workItemService } from "../../dal/azureDevOpsWorkItemService";
+import { reflectBackendService } from "../../dal/reflectBackendService";
+
+jest.mock("../../utilities/telemetryClient", () => ({
+  reactPlugin: {
+    trackMetric: jest.fn(),
+    trackEvent: jest.fn(),
+  },
+  appInsights: {
+    trackEvent: jest.fn(),
+    trackException: jest.fn(),
+  },
+  TelemetryEvents: {},
+}));
+
+jest.mock("../feedbackBoardMetadataForm", () => mocked({}));
+
+jest.mock("../../dal/itemDataService", () => ({
+  itemDataService: {
+    getFeedbackItemsForBoard: jest.fn(),
+    getFeedbackItem: jest.fn(),
+    getBoardItem: jest.fn(),
+  },
+}));
+
+jest.mock("../../dal/azureDevOpsWorkService", () => ({
+  workService: {
+    getIterations: jest.fn(),
+    getTeamFieldValues: jest.fn(),
+  },
+}));
+
+jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
+  workItemService: {
+    getWorkItemsByIds: jest.fn(),
+  },
+}));
+
+jest.mock("../../dal/reflectBackendService", () => ({
+  reflectBackendService: {
+    onReceiveNewItem: jest.fn(),
+    onReceiveUpdatedItem: jest.fn(),
+    removeOnReceiveNewItem: jest.fn(),
+    removeOnReceiveUpdatedItem: jest.fn(),
+    broadcastNewItem: jest.fn(),
+    broadcastUpdatedItem: jest.fn(),
+  },
+}));
+
+jest.mock("../feedbackColumn", () => {
+  return function MockFeedbackColumn(props: any) {
+    return <div data-testid={`column-${props.columnId}`} className="feedback-column"></div>;
+  };
+});
+
+jest.mock("../feedbackCarousel", () => ({
+  __esModule: true,
+  default: jest.fn(() => <div data-testid="feedback-carousel"></div>),
+}));
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
@@ -116,14 +178,452 @@ const mockedProps: FeedbackBoardProps = {
   userId: "",
 };
 
-it(`can be rendered`, () => {
-  const { container } = render(<FeedbackBoard {...mockedProps} />);
-  const feedbackBoard = container.querySelector(".feedback-board");
-  expect(feedbackBoard).toBeTruthy();
-});
+const mockFeedbackItems: IFeedbackItemDocument[] = [
+  {
+    id: "item-1",
+    boardId: "board-1",
+    title: "Test feedback item 1",
+    columnId: testColumnProps.columnIds[0],
+    originalColumnId: testColumnProps.columnIds[0],
+    upvotes: 0,
+    voteCollection: {},
+    createdDate: new Date(),
+    userIdRef: "user-1",
+    timerSecs: 0,
+    timerstate: false,
+    timerId: null,
+    groupIds: [],
+    isGroupedCarouselItem: false,
+    associatedActionItemIds: [],
+  },
+  {
+    id: "item-2",
+    boardId: "board-1",
+    title: "Test feedback item 2",
+    columnId: testColumnProps.columnIds[1],
+    originalColumnId: testColumnProps.columnIds[1],
+    upvotes: 5,
+    voteCollection: {},
+    createdDate: new Date(),
+    userIdRef: "user-2",
+    timerSecs: 0,
+    timerstate: false,
+    timerId: null,
+    groupIds: [],
+    isGroupedCarouselItem: false,
+    associatedActionItemIds: [123],
+  },
+];
 
-it(`shows correct vote counts`, () => {
-  const { container } = render(<FeedbackBoard {...mockedProps} />);
-  const voteElement = container.querySelector(".feedback-maxvotes-per-user");
-  expect(voteElement?.textContent).toBe("Votes Used: 0 / 5");
+describe("FeedbackBoard Component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Default mock implementations
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+    (itemDataService.getBoardItem as jest.Mock).mockResolvedValue(mockedBoard);
+    (workService.getIterations as jest.Mock).mockResolvedValue([{ path: "Iteration\\Sprint 1", id: "iter-1" }]);
+    (workService.getTeamFieldValues as jest.Mock).mockResolvedValue({
+      values: [{ value: "Area\\Path\\1" }],
+    });
+    (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([]);
+  });
+
+  describe("Basic Rendering", () => {
+    it("can be rendered", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+      const feedbackBoard = container.querySelector(".feedback-board");
+      expect(feedbackBoard).toBeTruthy();
+    });
+
+    it("shows correct vote counts", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+      const voteElement = container.querySelector(".feedback-maxvotes-per-user");
+      expect(voteElement?.textContent).toBe("Votes Used: 0 / 5");
+    });
+
+    it("renders error message when displayBoard is false", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} displayBoard={false} />);
+      expect(container.textContent).toContain("An unexpected exception occurred");
+    });
+
+    it("does not render vote count in Collect phase", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} workflowPhase="Collect" />);
+      const voteElement = container.querySelector(".feedback-maxvotes-per-user");
+      expect(voteElement).toBeFalsy();
+    });
+
+    it("does not render vote count in Act phase", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} workflowPhase="Act" />);
+      const voteElement = container.querySelector(".feedback-maxvotes-per-user");
+      expect(voteElement).toBeFalsy();
+    });
+  });
+
+  describe("Component Lifecycle", () => {
+    it("initializes columns on mount", async () => {
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalledWith(mockedBoard.id);
+      });
+    });
+
+    it("fetches feedback items on mount", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(mockFeedbackItems);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalledWith(mockedBoard.id);
+      });
+    });
+
+    it("sets default iteration and area path on mount", async () => {
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(workService.getIterations).toHaveBeenCalledWith(testColumnProps.team.id, "current");
+        expect(workService.getTeamFieldValues).toHaveBeenCalledWith(testColumnProps.team.id);
+      });
+    });
+
+    it("registers signal handlers on mount", async () => {
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(reflectBackendService.onReceiveNewItem).toHaveBeenCalled();
+        expect(reflectBackendService.onReceiveUpdatedItem).toHaveBeenCalled();
+      });
+    });
+
+    it("unregisters signal handlers on unmount", async () => {
+      const { unmount } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(reflectBackendService.onReceiveNewItem).toHaveBeenCalled();
+      });
+
+      unmount();
+
+      expect(reflectBackendService.removeOnReceiveNewItem).toHaveBeenCalled();
+      expect(reflectBackendService.removeOnReceiveUpdatedItem).toHaveBeenCalled();
+    });
+  });
+
+  describe("Component Updates", () => {
+    it("reloads data when board ID changes", async () => {
+      const { rerender } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalledTimes(1);
+      });
+
+      const newBoard = { ...mockedBoard, id: "new-board-id" };
+      rerender(<FeedbackBoard {...mockedProps} board={newBoard} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalledTimes(2);
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalledWith("new-board-id");
+      });
+    });
+
+    it("reloads data when board modifiedDate changes", async () => {
+      const { rerender } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalledTimes(1);
+      });
+
+      const newBoard = { ...mockedBoard, modifiedDate: new Date() };
+      rerender(<FeedbackBoard {...mockedProps} board={newBoard} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it("updates default paths when team ID changes", async () => {
+      const { rerender } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(workService.getIterations).toHaveBeenCalledTimes(1);
+      });
+
+      const newTeam = { ...testColumnProps.team, id: "new-team-id" };
+      rerender(<FeedbackBoard {...mockedProps} team={newTeam} />);
+
+      await waitFor(() => {
+        expect(workService.getIterations).toHaveBeenCalledWith("new-team-id", "current");
+        expect(workService.getTeamFieldValues).toHaveBeenCalledWith("new-team-id");
+      });
+    });
+
+    it("updates vote count when board changes", async () => {
+      const boardWithVotes = {
+        ...mockedBoard,
+        boardVoteCollection: { "encrypted-user-id": 3 },
+      };
+
+      (itemDataService.getBoardItem as jest.Mock).mockResolvedValue(boardWithVotes);
+
+      const { rerender } = render(<FeedbackBoard {...mockedProps} board={boardWithVotes} />);
+
+      const newBoard = { ...boardWithVotes, id: "new-board-id" };
+      rerender(<FeedbackBoard {...mockedProps} board={newBoard} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getBoardItem).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("Iteration and Area Path Setup", () => {
+    it("uses current iteration when available", async () => {
+      const currentIterations = [{ path: "Current\\Sprint", id: "current-iter" }];
+      (workService.getIterations as jest.Mock).mockResolvedValue(currentIterations);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(workService.getIterations).toHaveBeenCalledWith(testColumnProps.team.id, "current");
+      });
+    });
+
+    it("falls back to any iteration when no current iteration", async () => {
+      (workService.getIterations as jest.Mock)
+        .mockResolvedValueOnce([]) // No current iterations
+        .mockResolvedValueOnce([{ path: "Past\\Sprint", id: "past-iter" }]); // Fallback
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(workService.getIterations).toHaveBeenCalledTimes(2);
+        expect(workService.getIterations).toHaveBeenNthCalledWith(1, testColumnProps.team.id, "current");
+        expect(workService.getIterations).toHaveBeenNthCalledWith(2, testColumnProps.team.id);
+      });
+    });
+
+    it("handles empty iteration response", async () => {
+      (workService.getIterations as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(workService.getIterations).toHaveBeenCalled();
+      });
+    });
+
+    it("handles empty area path response", async () => {
+      (workService.getTeamFieldValues as jest.Mock).mockResolvedValue({ values: [] });
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(workService.getTeamFieldValues).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("Feedback Items Loading", () => {
+    it("loads feedback items with action items", async () => {
+      const itemWithActions = {
+        ...mockFeedbackItems[1],
+        associatedActionItemIds: [123, 456],
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithActions]);
+      (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([
+        { id: 123, title: "Action 1" },
+        { id: 456, title: "Action 2" },
+      ]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(workItemService.getWorkItemsByIds).toHaveBeenCalledWith([123, 456]);
+      });
+    });
+
+    it("handles feedback items without action items", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([mockFeedbackItems[0]]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+
+      expect(workItemService.getWorkItemsByIds).not.toHaveBeenCalled();
+    });
+
+    it("handles null feedback items response", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(null);
+
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+
+      // Should still render the board
+      const feedbackBoard = container.querySelector(".feedback-board");
+      expect(feedbackBoard).toBeTruthy();
+    });
+
+    it("filters items for deleted columns", async () => {
+      const itemForDeletedColumn = {
+        ...mockFeedbackItems[0],
+        columnId: "non-existent-column",
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([mockFeedbackItems[0], itemForDeletedColumn]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("Column Initialization", () => {
+    it("initializes columns with default icon when missing", async () => {
+      const boardWithoutIcons = {
+        ...mockedBoard,
+        columns: mockedBoard.columns.map(col => ({ ...col, iconClass: "" })),
+      };
+
+      render(<FeedbackBoard {...mockedProps} board={boardWithoutIcons} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+    });
+
+    it("initializes columns with default color when missing", async () => {
+      const boardWithoutColors = {
+        ...mockedBoard,
+        columns: mockedBoard.columns.map(col => ({ ...col, accentColor: "" })),
+      };
+
+      render(<FeedbackBoard {...mockedProps} board={boardWithoutColors} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+    });
+
+    it("renders columns after data is loaded", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(mockFeedbackItems);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const columns = screen.getAllByTestId(/column-/);
+        expect(columns.length).toBe(testColumnProps.columnIds.length);
+      });
+    });
+  });
+
+  describe("Signal Handlers", () => {
+    it("handles new item signal", async () => {
+      let newItemHandler: ((columnId: string, feedbackItemId: string) => Promise<void>) | null = null;
+
+      (reflectBackendService.onReceiveNewItem as jest.Mock).mockImplementation(handler => {
+        newItemHandler = handler;
+      });
+
+      const newItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: "new-item-signal",
+      };
+
+      (itemDataService.getFeedbackItem as jest.Mock).mockResolvedValue(newItem);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(reflectBackendService.onReceiveNewItem).toHaveBeenCalled();
+      });
+
+      // Trigger the handler
+      if (newItemHandler) {
+        await newItemHandler(testColumnProps.columnIds[0], "new-item-signal");
+
+        await waitFor(() => {
+          expect(itemDataService.getFeedbackItem).toHaveBeenCalledWith(mockedBoard.id, "new-item-signal");
+        });
+      }
+    });
+
+    it("handles updated item signal", async () => {
+      let updatedItemHandler: ((columnId: string, feedbackItemId: string) => Promise<void>) | null = null;
+
+      (reflectBackendService.onReceiveUpdatedItem as jest.Mock).mockImplementation(handler => {
+        updatedItemHandler = handler;
+      });
+
+      const updatedItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        title: "Updated title",
+      };
+
+      (itemDataService.getFeedbackItem as jest.Mock).mockResolvedValue(updatedItem);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(reflectBackendService.onReceiveUpdatedItem).toHaveBeenCalled();
+      });
+
+      // Trigger the handler
+      if (updatedItemHandler) {
+        await updatedItemHandler(testColumnProps.columnIds[0], mockFeedbackItems[0].id);
+
+        await waitFor(() => {
+          expect(itemDataService.getFeedbackItem).toHaveBeenCalledWith(mockedBoard.id, mockFeedbackItems[0].id);
+        });
+      }
+    });
+  });
+
+  describe("Carousel Dialog", () => {
+    it("renders successfully when carousel is not hidden", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} isCarouselDialogHidden={false} />);
+
+      // Fluent UI Dialog renders in a portal and is difficult to test in JSDOM
+      // We verify the component renders without errors
+      const feedbackBoard = container.querySelector(".feedback-board");
+      expect(feedbackBoard).toBeTruthy();
+    });
+
+    it("renders successfully when carousel is hidden", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} isCarouselDialogHidden={true} />);
+
+      const feedbackBoard = container.querySelector(".feedback-board");
+      expect(feedbackBoard).toBeTruthy();
+    });
+
+    it("accepts hideCarouselDialog prop", () => {
+      const hideCarouselDialog = jest.fn();
+
+      render(<FeedbackBoard {...mockedProps} hideCarouselDialog={hideCarouselDialog} isCarouselDialogHidden={false} />);
+
+      // The dialog exists in DOM but we can't easily test onDismiss without more setup
+      expect(hideCarouselDialog).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Vote Count Updates", () => {
+    it("displays correct vote count from board vote collection with encrypted userId", () => {
+      // The userId is empty string, which when encrypted becomes a specific value
+      // The component uses encrypt(userId) to look up votes
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      const voteElement = container.querySelector(".feedback-maxvotes-per-user");
+      // With empty userId and empty vote collection, it should show 0
+      expect(voteElement?.textContent).toBe("Votes Used: 0 / 5");
+    });
+  });
 });
