@@ -157,15 +157,6 @@ $team_selector_list_item_width: 450px;
 }
 
 .feedback-board-container-header {
-  display: flex;
-  position: absolute;
-  z-index: 2;
-  align-items: center;
-  justify-content: flex-start;
-  margin-left: 200px;
-  padding-right: variables.$header_horizontal_spacing;
-  margin-top: -60px;
-
   .menu-button {
     margin-left: 5px;
     margin-right: 20px;

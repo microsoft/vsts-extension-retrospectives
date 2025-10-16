@@ -1371,22 +1371,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         </div>
         <div className="flex items-center justify-start">
           <div className="w-full">
-            <div className="flex">
+            <div className="flex items-center justify-start">
               <button className={`bg-transparent border-0 px-4 py-2 text-sm font-normal cursor-pointer relative transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
               </button>
               <button className={`bg-transparent border-0 px-4 py-2 text-sm font-normal cursor-pointer relative transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </button>
-                    <div className="feedback-board-container-header">
-                      <div className="vertical-tab-separator hide-mobile" />
+
+                      <div className="vertical-tab-separator" />
                       <div className="board-selector-group">
                         <div className="board-selector">
                           <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
                         </div>
                         <div className="board-actions-menu">
                           <DefaultButton
-                            className="contextual-menu-button hide-mobile"
+                            className="contextual-menu-button"
                             aria-label="Board Actions Menu"
                             title="Board Actions"
                             menuProps={{
@@ -1530,7 +1530,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           <ActionButton className="toggle-carousel-button hide-mobile" text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
                         </TooltipHost>
                       )}
-                    </div>
+
             </div>
             {this.state.activeTab === "Board" && (
               <div className="w-full">
