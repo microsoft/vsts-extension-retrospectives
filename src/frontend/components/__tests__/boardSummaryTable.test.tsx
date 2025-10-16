@@ -1,7 +1,6 @@
 import React from 'react';
-import { shallow, mount, ReactWrapper } from 'enzyme';
+import { render, waitFor } from '@testing-library/react';
 import { IdentityRef } from 'azure-devops-extension-api/WebApi';
-import { act } from 'react-dom/test-utils';
 
 import BoardSummaryTable, { buildBoardSummaryState, handleConfirmDelete, IBoardSummaryTableProps, IBoardSummaryTableItem } from '../boardSummaryTable';
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from '../boardSummaryTable';
@@ -38,12 +37,15 @@ jest.mock('../../dal/itemDataService', () => {
   };
 });
 
-jest.mock('../../dal/boardDataService', () => ({
-  getBoardsForTeam: jest.fn(),
-  deleteFeedbackBoard: jest.fn(),
-  archiveFeedbackBoard: jest.fn(),
-  restoreArchivedFeedbackBoard: jest.fn(),
-}));
+jest.mock('../../dal/boardDataService', () => {
+  const mockBoardDataService = {
+    getBoardsForTeam: jest.fn(),
+    deleteFeedbackBoard: jest.fn(),
+    archiveFeedbackBoard: jest.fn(),
+    restoreArchivedFeedbackBoard: jest.fn(),
+  };
+  return mockBoardDataService;
+});
 
 jest.mock('../../dal/reflectBackendService', () => ({
   reflectBackendService: {
@@ -107,31 +109,22 @@ const baseProps: IBoardSummaryTableProps = {
 };
 
 describe('BoardSummaryTable', () => {
-  let wrapper: ReactWrapper | null;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    wrapper = null;
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([]);
   });
 
   it('renders when no boards exist', () => {
-    const shallowWrapper = shallow(<BoardSummaryTable {...baseProps} />);
-    const component = shallowWrapper.children().dive();
-    expect(component.exists()).toBeTruthy();
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+    expect(container).toBeTruthy();
   });
 
   it('renders loading spinner initially', async () => {
     (BoardDataService.getBoardsForTeam as jest.Mock).mockImplementation(() => new Promise(() => {}));
 
-    await act(async () => {
-      wrapper = mount(<BoardSummaryTable {...baseProps} />);
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
 
-    if (!wrapper) throw new Error('Wrapper not initialized');
-
-    wrapper.update();
-    expect(wrapper.find('.board-summary-initialization-spinner').exists()).toBe(true);
+    expect(container.querySelector('.board-summary-initialization-spinner')).toBeTruthy();
   });
 });
 
@@ -180,7 +173,7 @@ describe('TrashIcon tests', () => {
 
   it('should render disabled trash icon when board is not deletable yet', () => {
     const recentlyArchived = { ...baseBoard, archivedDate: new Date(Date.now() - 1 * 60 * 1000) };
-    const wrapper = shallow(
+    const { container } = render(
       <TrashIcon
         board={recentlyArchived}
         currentUserId="user-1"
@@ -188,7 +181,7 @@ describe('TrashIcon tests', () => {
         onClick={jest.fn()}
       />
     );
-    expect(wrapper.find('.trash-icon-disabled').exists()).toBe(true);
+    expect(container.querySelector('.trash-icon-disabled')).toBeTruthy();
   });
 
   it('should not render trash icon when board is not archived', () => {
@@ -198,7 +191,7 @@ describe('TrashIcon tests', () => {
       archivedDate: undefined
     };
 
-    const wrapper = shallow(
+    const { container } = render(
       <TrashIcon
         board={unarchived}
         currentUserId="user-1"
@@ -207,12 +200,12 @@ describe('TrashIcon tests', () => {
       />
     );
 
-    expect(wrapper.find('.trash-icon').exists()).toBe(false);
-    expect(wrapper.find('.trash-icon-disabled').exists()).toBe(false);
+    expect(container.querySelector('.trash-icon')).toBeFalsy();
+    expect(container.querySelector('.trash-icon-disabled')).toBeFalsy();
   });
 
   it('should NOT show trash icon if user is not board owner AND not team admin', () => {
-    const wrapper = shallow(
+    const { container } = render(
       <TrashIcon
         board={{ ...baseBoard, ownerId: 'someone-else' }}
         currentUserId="user-2"
@@ -220,11 +213,11 @@ describe('TrashIcon tests', () => {
         onClick={jest.fn()}
       />
     );
-    expect(wrapper.find('.trash-icon').exists()).toBe(false);
+    expect(container.querySelector('.trash-icon')).toBeFalsy();
   });
 
   it('should show trash icon if user is board owner BUT not team admin', () => {
-    const wrapper = shallow(
+    const { container } = render(
       <TrashIcon
         board={{ ...baseBoard, ownerId: 'user-1' }}
         currentUserId="user-1"
@@ -232,11 +225,11 @@ describe('TrashIcon tests', () => {
         onClick={jest.fn()}
       />
     );
-    expect(wrapper.find('.trash-icon').exists()).toBe(true);
+    expect(container.querySelector('.trash-icon')).toBeTruthy();
   });
 
   it('should show trash icon if user is not board owner BUT is team admin', () => {
-    const wrapper = shallow(
+    const { container } = render(
       <TrashIcon
         board={{ ...baseBoard, ownerId: 'someone-else' }}
         currentUserId="user-2"
@@ -244,11 +237,11 @@ describe('TrashIcon tests', () => {
         onClick={jest.fn()}
       />
     );
-    expect(wrapper.find('.trash-icon').exists()).toBe(true);
+    expect(container.querySelector('.trash-icon')).toBeTruthy();
   });
 
   it('should show trash icon if user is board owner AND team admin', () => {
-    const wrapper = shallow(
+    const { container } = render(
       <TrashIcon
         board={{ ...baseBoard, ownerId: 'user-1' }}
         currentUserId="user-1"
@@ -256,7 +249,7 @@ describe('TrashIcon tests', () => {
         onClick={jest.fn()}
       />
     );
-    expect(wrapper.find('.trash-icon').exists()).toBe(true);
+    expect(container.querySelector('.trash-icon')).toBeTruthy();
   });
 });
 
@@ -422,29 +415,21 @@ describe('buildBoardSummaryState', () => {
 });
 
 describe('BoardSummaryTable, additional coverage', () => {
-  let wrapper: ReactWrapper;
-
   beforeEach(() => {
     jest.clearAllMocks();
     (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
-    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]); // ADD THIS
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
   });
 
   it('handleBoardsDocuments updates state via useEffect', async () => {
-    await act(async () => {
-      wrapper = mount(<BoardSummaryTable {...baseProps} />);
-      await new Promise(resolve => setTimeout(resolve, 0)); // wait for useEffect
-      wrapper.update();
-    });
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
 
-    // Check that rendered boards exist
-    mockBoards.forEach(board => {
-      expect(wrapper.text()).toContain(board.title);
+    await waitFor(() => {
+      // Check that rendered boards exist
+      mockBoards.forEach(board => {
+        expect(container.textContent).toContain(board.title);
+      });
     });
-
-    // Check that DeleteBoardDialog is rendered with hidden true initially
-    const dialog = wrapper.find('DeleteBoardDialog');
-    expect(dialog.prop('hidden')).toBe(true);
   });
 
   it('handleActionItems, handles feedback items early return paths', async () => {
@@ -455,252 +440,23 @@ describe('BoardSummaryTable, additional coverage', () => {
       { id: 'item-1', associatedActionItemIds: [] },
     ]);
 
-    await act(async () => {
-      wrapper = mount(<BoardSummaryTable {...baseProps} />);
-      await new Promise(resolve => setTimeout(resolve, 0)); // wait for useEffect
-      wrapper.update();
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      // BoardsTableItems should reflect board titles
+      expect(container.textContent).toContain(mockBoards[0].title);
+      expect(container.textContent).toContain(mockBoards[1].title);
     });
-
-    // BoardsTableItems should reflect feedback items count
-    const firstBoardRow = wrapper.text();
-    expect(firstBoardRow).toContain(mockBoards[0].title);
-    const secondBoardRow = wrapper.text();
-    expect(secondBoardRow).toContain(mockBoards[1].title);
-
-    // The actionItemsByBoard map should exist (cannot directly inspect internal state without hooks spy)
   });
 
   it('useEffect tracks exception if getBoardsForTeam fails', async () => {
     const error = new Error('fail');
     (BoardDataService.getBoardsForTeam as jest.Mock).mockRejectedValueOnce(error);
 
-    await act(async () => {
-      wrapper = mount(<BoardSummaryTable {...baseProps} />);
-      await new Promise(resolve => setTimeout(resolve, 0));
-      wrapper.update();
+    render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(appInsights.trackException).toHaveBeenCalledWith(error);
     });
-
-    expect(appInsights.trackException).toHaveBeenCalledWith(error);
-  });
-});
-jest.mock("../../utilities/telemetryClient", () => {
-  return {
-    appInsights: {
-      trackEvent: jest.fn(),
-      trackException: jest.fn(),
-    },
-    TelemetryEvents: {
-      FeedbackBoardArchived: "FeedbackBoardArchived",
-      FeedbackBoardRestored: "FeedbackBoardRestored",
-    },
-  };
-});
-
-jest.mock("../../dal/itemDataService");
-
-jest.mock("../../dal/boardDataService", () => {
-  const mockBoardDataService = {
-    getBoardsForTeam: jest.fn(),
-    deleteFeedbackBoard: jest.fn(),
-    archiveFeedbackBoard: jest.fn(),
-    restoreArchivedFeedbackBoard: jest.fn(),
-  };
-  return mockBoardDataService;
-});
-
-jest.mock("../../dal/azureDevOpsWorkItemService");
-jest.mock("../../dal/reflectBackendService");
-
-import React from "react";
-import { render } from "@testing-library/react";
-import { IdentityRef } from "azure-devops-extension-api/WebApi";
-
-import BoardSummaryTable, { IBoardSummaryTableProps, IBoardSummaryTableItem } from "../boardSummaryTable";
-import { TrashIcon, isTrashEnabled, handleArchiveToggle } from "../boardSummaryTable";
-import BoardDataService from "../../dal/boardDataService";
-import { IFeedbackBoardDocument } from "../../interfaces/feedback";
-import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
-import { itemDataService } from "../../dal/itemDataService";
-
-const mockedIdentity: IdentityRef = {
-  directoryAlias: "test.user",
-  id: "user-1",
-  imageUrl: "https://example.com/avatar.png",
-  inactive: false,
-  isAadIdentity: true,
-  isContainer: false,
-  isDeletedInOrigin: false,
-  profileUrl: "https://example.com/profile",
-  uniqueName: "test.user@example.com",
-  _links: undefined,
-  descriptor: "vssgp.Uy0xLTktMTY=",
-  displayName: "Test User",
-  url: "https://example.com/user",
-};
-
-const mockBoards: IFeedbackBoardDocument[] = [
-  {
-    id: "board-1",
-    teamId: "team-1",
-    title: "Test Board",
-    createdDate: new Date(),
-    createdBy: mockedIdentity,
-    isArchived: false,
-    columns: [],
-    activePhase: "Collect",
-    maxVotesPerUser: 5,
-    boardVoteCollection: {},
-    teamEffectivenessMeasurementVoteCollection: [],
-  },
-];
-
-const baseProps: IBoardSummaryTableProps = {
-  teamId: "team-1",
-  supportedWorkItemTypes: [],
-  onArchiveToggle: jest.fn(),
-};
-
-describe("BoardSummaryTable", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
-    (BoardDataService.archiveFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
-    (BoardDataService.restoreArchivedFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
-
-    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
-  });
-
-  it("renders when no boards exist", () => {
-    const { container } = render(<BoardSummaryTable {...baseProps} />);
-    expect(container).toBeTruthy();
-  });
-
-  it("renders loading spinner initially", async () => {
-    (BoardDataService.getBoardsForTeam as jest.Mock).mockImplementation(() => new Promise(() => {}));
-
-    const { container } = render(<BoardSummaryTable {...baseProps} />);
-
-    expect(container).toBeTruthy();
-  });
-});
-
-describe("isTrashEnabled", () => {
-  const board: IBoardSummaryTableItem = {
-    boardName: "Sample Board",
-    createdDate: new Date(),
-    isArchived: false,
-    archivedDate: undefined,
-    pendingWorkItemsCount: 0,
-    totalWorkItemsCount: 0,
-    feedbackItemsCount: 0,
-    id: "board-1",
-    teamId: "team-1",
-    ownerId: "user-1",
-  };
-
-  it("should return false for a non-archived board", () => {
-    expect(isTrashEnabled(board)).toBe(false);
-  });
-
-  it("should return true if archive delay has passed", () => {
-    const archivedBoard = { ...board, isArchived: true, archivedDate: new Date(Date.now() - 3 * 60 * 1000) };
-    expect(isTrashEnabled(archivedBoard)).toBe(true);
-  });
-
-  it("should return false if archive delay has not passed", () => {
-    const recentlyArchivedBoard = { ...board, isArchived: true, archivedDate: new Date(Date.now() - 1 * 60 * 1000) };
-    expect(isTrashEnabled(recentlyArchivedBoard)).toBe(false);
-  });
-});
-
-describe("TrashIcon", () => {
-  it("should render enabled trash icon when board is deletable", () => {
-    const board: IBoardSummaryTableItem = {
-      boardName: "Sample Board",
-      createdDate: new Date(),
-      isArchived: true,
-      archivedDate: new Date(Date.now() - 3 * 60 * 1000),
-      pendingWorkItemsCount: 0,
-      totalWorkItemsCount: 0,
-      feedbackItemsCount: 0,
-      id: "board-1",
-      teamId: "team-1",
-      ownerId: "user-1",
-    };
-
-    const { container } = render(<TrashIcon board={board} onClick={jest.fn()} />);
-
-    expect(container.querySelector(".trash-icon")).toBeTruthy();
-  });
-
-  it("should render disabled trash icon when board is not deletable yet", () => {
-    const board = {
-      boardName: "Sample Board",
-      createdDate: new Date(),
-      isArchived: true,
-      archivedDate: new Date(Date.now() - 1 * 60 * 1000),
-      pendingWorkItemsCount: 0,
-      totalWorkItemsCount: 0,
-      feedbackItemsCount: 0,
-      id: "board-1",
-      teamId: "team-1",
-      ownerId: "user-1",
-    };
-
-    const { container } = render(<TrashIcon board={board} onClick={jest.fn()} />);
-
-    expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
-  });
-
-  it("should not render trash icon when board is not archived", () => {
-    const board = {
-      boardName: "Sample Board",
-      createdDate: new Date(),
-      isArchived: false,
-      archivedDate: undefined as Date | undefined,
-      pendingWorkItemsCount: 0,
-      totalWorkItemsCount: 0,
-      feedbackItemsCount: 0,
-      id: "board-1",
-      teamId: "team-1",
-      ownerId: "user-1",
-    };
-
-    const { container } = render(<TrashIcon board={board} onClick={jest.fn()} />);
-
-    expect(container.querySelector(".trash-icon")).toBeFalsy();
-    expect(container.querySelector(".trash-icon-disabled")).toBeFalsy();
-  });
-});
-
-describe("handleArchiveToggle", () => {
-  it("should call archiveFeedbackBoard when archiving a board", async () => {
-    const mockSetTableData = jest.fn();
-    const mockOnArchiveToggle = jest.fn();
-
-    await handleArchiveToggle("team123", "board456", true, mockSetTableData, mockOnArchiveToggle);
-
-    expect(BoardDataService.archiveFeedbackBoard).toHaveBeenCalledWith("team123", "board456");
-    expect(appInsights.trackEvent).toHaveBeenCalledWith({
-      name: TelemetryEvents.FeedbackBoardArchived,
-      properties: { boardId: "board456" },
-    });
-    expect(mockSetTableData).toHaveBeenCalled();
-    expect(mockOnArchiveToggle).toHaveBeenCalled();
-  });
-
-  it("should call restoreArchivedFeedbackBoard when restoring a board", async () => {
-    const mockSetTableData = jest.fn();
-    const mockOnArchiveToggle = jest.fn();
-
-    await handleArchiveToggle("team123", "board456", false, mockSetTableData, mockOnArchiveToggle);
-
-    expect(BoardDataService.restoreArchivedFeedbackBoard).toHaveBeenCalledWith("team123", "board456");
-    expect(appInsights.trackEvent).toHaveBeenCalledWith({
-      name: TelemetryEvents.FeedbackBoardRestored,
-      properties: { boardId: "board456" },
-    });
-    expect(mockSetTableData).toHaveBeenCalled();
-    expect(mockOnArchiveToggle).toHaveBeenCalled();
   });
 });

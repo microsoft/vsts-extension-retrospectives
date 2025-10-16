@@ -420,55 +420,43 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
       if (!feedbackItems.length) return;
 
-        // Always set feedback item count, even if 0
-        const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
-        if (boardIndex !== -1) {
-          updatedBoardsTableItems[boardIndex] = {
-            ...updatedBoardsTableItems[boardIndex],
-            feedbackItemsCount: feedbackItems.length,
-          };
-        }
+      // Filter feedback items that have associated action items
+      const actionableFeedbackItems = feedbackItems.filter(item => item.associatedActionItemIds && item.associatedActionItemIds.length > 0);
 
-        if (!feedbackItems.length) {
-          return;
-        }
+      if (!actionableFeedbackItems.length) {
+        return;
+      }
 
-      if (!actionableFeedbackItems.length) return;
+      const aggregatedWorkItems: WorkItem[] = [];
+      await Promise.all(
+        actionableFeedbackItems.map(async item => {
+          const workItems = await workItemService.getWorkItemsByIds(item.associatedActionItemIds);
+          if (workItems?.length) {
+            aggregatedWorkItems.push(...workItems);
+          }
+        }),
+      );
 
-        if (!actionableFeedbackItems.length) {
-          return;
-        }
+      // Update action items for this board
+      updatedActionItemsByBoard[feedbackBoardId] = {
+        isDataLoaded: true,
+        actionItems: aggregatedWorkItems,
+      };
 
-        const aggregatedWorkItems: WorkItem[] = [];
-        await Promise.all(
-          actionableFeedbackItems.map(async item => {
-            const workItems = await workItemService.getWorkItemsByIds(item.associatedActionItemIds);
-            if (workItems?.length) {
-              aggregatedWorkItems.push(...workItems);
-            }
-          }),
-        );
+      const pendingWorkItems = aggregatedWorkItems.filter(workItem => {
+        const states = workItemTypeToStatesMap[workItem.fields["System.WorkItemType"]].filter(state => state.name === workItem.fields["System.State"]);
+        return !states.length || (states[0].category !== "Completed" && states[0].category !== "Removed");
+      });
 
-        // Update action items for this board
-        updatedActionItemsByBoard[feedbackBoardId] = {
-          isDataLoaded: true,
-          actionItems: aggregatedWorkItems,
+      // Update board table item with work item counts
+      if (boardIndex !== -1) {
+        updatedBoardsTableItems[boardIndex] = {
+          ...updatedBoardsTableItems[boardIndex],
+          pendingWorkItemsCount: pendingWorkItems.length,
+          totalWorkItemsCount: aggregatedWorkItems.length,
         };
-
-        const pendingWorkItems = aggregatedWorkItems.filter(workItem => {
-          const states = workItemTypeToStatesMap[workItem.fields["System.WorkItemType"]].filter(state => state.name === workItem.fields["System.State"]);
-          return !states.length || (states[0].category !== "Completed" && states[0].category !== "Removed");
-        });
-
-        // Update board table item with work item counts
-        if (boardIndex !== -1) {
-          updatedBoardsTableItems[boardIndex] = {
-            ...updatedBoardsTableItems[boardIndex],
-            pendingWorkItemsCount: pendingWorkItems.length,
-            totalWorkItemsCount: aggregatedWorkItems.length,
-          };
-        }
-      }),
+      }
+    }),
     );
 
     // Final state update
