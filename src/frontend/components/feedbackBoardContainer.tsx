@@ -1327,7 +1327,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <div className="grid grid-cols-1">
+      <div className="flex flex-col h-screen">
         <div className="flex items-center">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}

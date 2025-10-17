@@ -19,7 +19,7 @@ $team_selector_list_item_width: 450px;
 
 .feedback-board-container {
   display: flex;
-  height: calc(100vh - #{variables.$extension_header_height} - #{variables.$second_level_header_height});
+  flex: 1;
   overflow-y: auto;
 }
 

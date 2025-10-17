@@ -23,6 +23,10 @@
 
 @import "../node_modules/react-toastify/dist/ReactToastify.css";
 
+body {
+  overflow: hidden;
+}
+
 .ms-ContextualMenuButtonsExample {
   display: flex;
   background-color: variables.$azure_devops_navigator_light_grey;
