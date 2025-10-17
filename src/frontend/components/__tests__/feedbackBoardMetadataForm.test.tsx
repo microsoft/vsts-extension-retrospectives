@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mockUuid } from "../__mocks__/uuid/v4";
@@ -464,9 +464,11 @@ describe("FeedbackBoardMetadataForm - Column Management", () => {
 
     await user.click(addColumnButton);
 
-    // Should have one more column now
-    const newIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
-    expect(newIconButtons.length).toBe(initialCount + 1);
+    // Should have one more column now - wait for the new button to appear
+    await waitFor(() => {
+      const newIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
+      expect(newIconButtons.length).toBe(initialCount + 1);
+    });
   });
 
   it("should disable Add New Column button when max columns reached", async () => {
