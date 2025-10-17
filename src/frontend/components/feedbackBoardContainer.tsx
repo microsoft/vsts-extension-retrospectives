@@ -1327,7 +1327,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <div className="flex flex-col h-screen">
+      <div className="grid">
         <div className="flex items-center">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
@@ -1536,7 +1536,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               )}
             </div>
             {this.state.activeTab === "Board" && (
-              <div className="w-full">
+              <div>
                 {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
