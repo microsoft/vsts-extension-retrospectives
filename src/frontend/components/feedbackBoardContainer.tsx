@@ -1536,7 +1536,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               )}
             </div>
             {this.state.activeTab === "Board" && (
-              <div>
+              <div className="flex-1 min-h-0 flex flex-col">
                 {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
@@ -1654,7 +1654,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </div>
             )}
             {this.state.activeTab === "History" && (
-              <div className="custom-pivot-content">
+              <div className="custom-pivot-content flex-1 min-h-0 overflow-auto">
                 <div className="pivot-content-wrapper">
                   <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
                 </div>
