@@ -2,7 +2,6 @@ import React from "react";
 import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from "@fluentui/react/lib/Button";
 import { ContextualMenuItemType, IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
 import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react/lib/Dialog";
-import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { MessageBar, MessageBarType } from "@fluentui/react/lib/MessageBar";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
@@ -38,7 +37,7 @@ import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionF
 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
-import copyToClipboard from "copy-to-clipboard";
+import { copyToClipboard } from "../utilities/clipboardHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
@@ -107,6 +106,7 @@ export interface FeedbackBoardContainerState {
   castedVoteCount: number;
   boardColumns: IFeedbackColumn[];
   questionIdForDiscussAndActBoardUpdate: number;
+  activeTab: "Board" | "History";
 }
 
 export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
@@ -173,6 +173,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       castedVoteCount: 0,
       boardColumns: [],
       questionIdForDiscussAndActBoardUpdate: -1,
+      activeTab: "Board",
     };
   }
 
@@ -683,6 +684,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   };
 
+  private isCurrentUserTeamAdmin(): boolean {
+    return this.state.allMembers?.some(m => m.identity.id === this.state.currentUserId && m.isTeamAdmin) ?? false;
+  }
+
   /**
    * @description Load the last team and board that this user visited, if such records exist.
    * @returns An object to update the state with recently visited or default team and board data.
@@ -795,8 +800,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   // Handle when "Board" tab is clicked
-  private readonly handlePivotClick = async (item?: PivotItem): Promise<void> => {
-    if (item?.props.headerText === "Board") {
+  private readonly handlePivotClick = async (tabName: "Board" | "History"): Promise<void> => {
+    this.setState({ activeTab: tabName });
+
+    if (tabName === "Board") {
       // Check if "Board" tab is clicked
       if (this.state.hasToggledArchive) {
         // Reload only if archive was toggled
@@ -1320,215 +1327,218 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <div className={this.state.isDesktop ? "desktop-mode" : "mobile-mode"}>
-        <div className="retrospective-feedback-board-container">
-          <div className="flex items-center px-2 py-2">
-            <Dialog
-              hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
-              onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
-              dialogContentProps={{
-                type: DialogType.close,
-                title: "Discuss and Act",
-                subText: `Are you sure you want to change the template of this board?`,
-              }}
-              modalProps={{
-                isBlocking: true,
-                containerClassName: "retrospectives-delete-feedback-item-dialog",
-                className: "retrospectives-dialog-modal",
-              }}
-            >
-              <DialogFooter>
-                <PrimaryButton
-                  onClick={async () => {
-                    const question = questions.filter(question => question.id === this.state.questionIdForDiscussAndActBoardUpdate)[0];
-                    const templateName = question.discussActTemplate;
-                    const columns = getColumnsByTemplateId(templateName);
+      <div className="flex flex-col h-screen">
+        <div className="flex items-center flex-shrink-0">
+          <Dialog
+            hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
+            onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
+            dialogContentProps={{
+              type: DialogType.close,
+              title: "Discuss and Act",
+              subText: `Are you sure you want to change the template of this board?`,
+            }}
+            modalProps={{
+              isBlocking: true,
+              containerClassName: "retrospectives-delete-feedback-item-dialog",
+              className: "retrospectives-dialog-modal",
+            }}
+          >
+            <DialogFooter>
+              <PrimaryButton
+                onClick={async () => {
+                  const question = questions.filter(question => question.id === this.state.questionIdForDiscussAndActBoardUpdate)[0];
+                  const templateName = question.discussActTemplate;
+                  const columns = getColumnsByTemplateId(templateName);
 
-                    const board = this.state.currentBoard;
+                  const board = this.state.currentBoard;
 
-                    await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
+                  await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
 
-                    /*
-                TODO (enpolat) : in the future we may need to create feedback items based on the answers of the questions
-                this.state.currentBoard.teamEffectivenessMeasurementVoteCollection.flatMap(e => e.responses).filter(e => e.questionId === question.id).forEach(async vote => {
-                  const item = await itemDataService.createItemForBoard(board.id, vote.selection.toString(), columnId, true);
-                  reflectBackendService.broadcastNewItem(columnId, item.id);
-                });
-                */
+                  this.setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
+                }}
+                text="Proceed"
+              />
+              <DefaultButton onClick={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
+            </DialogFooter>
+          </Dialog>
 
-                    this.setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
-                  }}
-                  text="Proceed"
-                />
-                <DefaultButton onClick={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
-              </DialogFooter>
-            </Dialog>
-
-            <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
-              Retrospectives
-            </h1>
-            <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="users" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
-            <div style={{ flexGrow: 1 }}></div>
-            <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.setScreenViewMode} />
-          </div>
-          <div className="flex w-full items-center justify-start">
-            <Pivot onLinkClick={this.handlePivotClick}>
-              <PivotItem headerText="Board">
-                {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
-                  <div className="pivot-content-wrapper">
-                    <div className="feedback-board-container-header">
-                      <div className="vertical-tab-separator hide-mobile" />
-                      <div className="board-selector-group">
-                        <div className="board-selector">
-                          <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
-                        </div>
-                        <div className="board-actions-menu">
-                          <DefaultButton
-                            className="contextual-menu-button hide-mobile"
-                            aria-label="Board Actions Menu"
-                            title="Board Actions"
-                            menuProps={{
-                              className: "board-actions-menu",
-                              items: this.boardActionContexualMenuItems,
-                            }}
-                          >
-                            <span className="ms-Button-icon">
-                              <i className="fa-solid fa-ellipsis-h"></i>
-                            </span>
-                            &nbsp;
-                          </DefaultButton>
-                          <Dialog
-                            hidden={this.state.isMobileBoardActionsDialogHidden}
-                            onDismiss={this.hideMobileBoardActionsDialog}
-                            modalProps={{
-                              isBlocking: false,
-                              containerClassName: "ms-dialogMainOverride",
-                              className: "retrospectives-dialog-modal",
-                            }}
-                          >
-                            <div className="mobile-contextual-menu-list">
-                              {this.boardActionContexualMenuItems.map(boardAction => (
-                                <ActionButton
-                                  key={boardAction.key}
-                                  className={boardAction.className}
-                                  iconProps={boardAction.iconProps}
-                                  aria-label="User Settings Menu"
-                                  onClick={() => {
-                                    this.hideMobileBoardActionsDialog();
-                                    boardAction.onClick();
-                                  }}
-                                  text={boardAction.text}
-                                  title={boardAction.title}
-                                />
-                              ))}
-                            </div>
-                            <DialogFooter>
-                              <DefaultButton onClick={this.hideMobileBoardActionsDialog} text="Close" />
-                            </DialogFooter>
-                          </Dialog>
-                        </div>
-                      </div>
-                      <div className="feedback-workflow-wrapper">
-                        {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                          <div className="team-effectiveness-dialog-section">
-                            <Dialog
-                              hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
-                              onDismiss={() => {
-                                this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                              }}
-                              dialogContentProps={{
-                                type: DialogType.close,
-                              }}
-                              minWidth={640}
-                              modalProps={{
-                                isBlocking: true,
-                                containerClassName: "team-effectiveness-dialog",
-                                className: "retrospectives-dialog-modal",
-                              }}
-                            >
-                              <DialogContent>
-                                <div className="team-effectiveness-section-information">
-                                  <i className="fa fa-info-circle" />
-                                  &nbsp;All answers will be saved anonymously
-                                </div>
-                                <table className="team-effectiveness-measurement-table">
-                                  <thead>
-                                    <tr>
-                                      <th></th>
-                                      <th></th>
-                                      <th colSpan={6} className="team-effectiveness-favorability-label">
-                                        Unfavorable
-                                      </th>
-                                      <th colSpan={2} className="team-effectiveness-favorability-label">
-                                        Neutral
-                                      </th>
-                                      <th colSpan={2} className="team-effectiveness-favorability-label">
-                                        Favorable
-                                      </th>
-                                    </tr>
-                                    <tr>
-                                      <th></th>
-                                      <th></th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
-                                      <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
-                                      <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
-                                      <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
-                                      <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
-                                      <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {questions.map(question => {
-                                      return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
-                                    })}
-                                  </tbody>
-                                </table>
-                              </DialogContent>
-                              <DialogFooter>
-                                <PrimaryButton
-                                  className="team-effectiveness-submit-button"
-                                  onClick={() => {
-                                    saveTeamEffectivenessMeasurement();
-                                  }}
-                                  text="Submit"
-                                />
-                                <DefaultButton
-                                  onClick={() => {
-                                    this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                                  }}
-                                  text="Cancel"
-                                />
-                              </DialogFooter>
-                            </Dialog>
-                            <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile" content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
-                              <ActionButton
-                                className="toggle-carousel-button"
-                                iconProps={{ iconName: "Chart" }}
-                                text="Team Assessment"
-                                onClick={() => {
-                                  this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
-                                }}
-                              ></ActionButton>
-                            </TooltipHost>
-                          </div>
-                        )}
-                        <div className="workflow-stage-tab-container" role="tablist">
-                          <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
-                          <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
-                          <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
-                          <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
-                        </div>
-                      </div>
-                      {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                        <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                          <ActionButton className="toggle-carousel-button hide-mobile" text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
-                        </TooltipHost>
-                      )}
+          <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
+            Retrospectives
+          </h1>
+          <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="users" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
+          <div style={{ flexGrow: 1 }}></div>
+          <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.setScreenViewMode} />
+        </div>
+        <div className="flex items-center justify-start flex-shrink-0">
+          <div className="w-full">
+            <div className="flex items-center justify-start">
+              <button className={`bg-transparent border-0 px-4 text-sm font-normal cursor-pointer transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
+                Board
+              </button>
+              <button className={`bg-transparent border-0 px-4 text-sm font-normal cursor-pointer transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
+                History
+              </button>
+              <div className="vertical-tab-separator" />
+              <div className="flex items-center justify-start">
+                <div className="board-selector">
+                  <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
+                </div>
+                <div className="board-actions-menu">
+                  <DefaultButton
+                    className="contextual-menu-button"
+                    aria-label="Board Actions Menu"
+                    title="Board Actions"
+                    menuProps={{
+                      className: "board-actions-menu",
+                      items: this.boardActionContexualMenuItems,
+                    }}
+                  >
+                    <span className="ms-Button-icon">
+                      <i className="fa-solid fa-ellipsis-h"></i>
+                    </span>
+                    &nbsp;
+                  </DefaultButton>
+                  <Dialog
+                    hidden={this.state.isMobileBoardActionsDialogHidden}
+                    onDismiss={this.hideMobileBoardActionsDialog}
+                    modalProps={{
+                      isBlocking: false,
+                      containerClassName: "ms-dialogMainOverride",
+                      className: "retrospectives-dialog-modal",
+                    }}
+                  >
+                    <div className="mobile-contextual-menu-list">
+                      {this.boardActionContexualMenuItems.map(boardAction => (
+                        <ActionButton
+                          key={boardAction.key}
+                          className={boardAction.className}
+                          iconProps={boardAction.iconProps}
+                          aria-label="User Settings Menu"
+                          onClick={() => {
+                            this.hideMobileBoardActionsDialog();
+                            boardAction.onClick();
+                          }}
+                          text={boardAction.text}
+                          title={boardAction.title}
+                        />
+                      ))}
                     </div>
+                    <DialogFooter>
+                      <DefaultButton onClick={this.hideMobileBoardActionsDialog} text="Close" />
+                    </DialogFooter>
+                  </Dialog>
+                </div>
+              </div>
+              <div className="flex items-center justify-start">
+                {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+                  <div className="team-effectiveness-dialog-section">
+                    <Dialog
+                      hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                      onDismiss={() => {
+                        this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                      }}
+                      dialogContentProps={{
+                        type: DialogType.close,
+                      }}
+                      minWidth={640}
+                      modalProps={{
+                        isBlocking: true,
+                        containerClassName: "team-effectiveness-dialog",
+                        className: "retrospectives-dialog-modal",
+                      }}
+                    >
+                      <DialogContent>
+                        <div className="team-effectiveness-section-information">
+                          <i className="fa fa-info-circle" />
+                          &nbsp;All answers will be saved anonymously
+                        </div>
+                        <table className="team-effectiveness-measurement-table">
+                          <thead>
+                            <tr>
+                              <th></th>
+                              <th></th>
+                              <th colSpan={6} className="team-effectiveness-favorability-label">
+                                Unfavorable
+                              </th>
+                              <th colSpan={2} className="team-effectiveness-favorability-label">
+                                Neutral
+                              </th>
+                              <th colSpan={2} className="team-effectiveness-favorability-label">
+                                Favorable
+                              </th>
+                            </tr>
+                            <tr>
+                              <th></th>
+                              <th></th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
+                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
+                              <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
+                              <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
+                              <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
+                              <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {questions.map(question => {
+                              return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                            })}
+                          </tbody>
+                        </table>
+                      </DialogContent>
+                      <DialogFooter>
+                        <PrimaryButton
+                          className="team-effectiveness-submit-button"
+                          onClick={() => {
+                            saveTeamEffectivenessMeasurement();
+                          }}
+                          text="Submit"
+                        />
+                        <DefaultButton
+                          onClick={() => {
+                            this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                          }}
+                          text="Cancel"
+                        />
+                      </DialogFooter>
+                    </Dialog>
+                    <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile" content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
+                      <button
+                        className="toggle-carousel-button flex items-center bg-transparent border-0 cursor-pointer p-1 hover:bg-gray-100"
+                        onClick={() => {
+                          this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
+                        }}
+                        aria-label="Team Assessment"
+                        type="button"
+                      >
+                        <span className="inline-flex items-center justify-center mr-1">
+                          <i className="fas fa-chart-line"></i>
+                        </span>
+                        <span>Team Assessment</span>
+                      </button>
+                    </TooltipHost>
+                  </div>
+                )}
+                <div className="flex flex-row" role="tablist">
+                  <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
+                  <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
+                  <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
+                  <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
+                </div>
+              </div>
+              {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
+                <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
+                  <ActionButton className="toggle-carousel-button hide-mobile" text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
+                </TooltipHost>
+              )}
+            </div>
+            {this.state.activeTab === "Board" && (
+              <div className="flex-1 min-h-0 flex flex-col">
+                {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
+                  <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
                       <MessageBar
                         className="info-message-bar"
@@ -1612,149 +1622,176 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
                       </DialogFooter>
                     </Dialog>
+                  </>
+                )}
+                <Dialog
+                  hidden={this.state.isArchiveBoardConfirmationDialogHidden}
+                  onDismiss={this.hideArchiveBoardConfirmationDialog}
+                  dialogContentProps={{
+                    type: DialogType.close,
+                    title: "Archive Retrospective",
+                  }}
+                  modalProps={{
+                    isBlocking: true,
+                    containerClassName: "retrospectives-archive-board-confirmation-dialog",
+                    className: "retrospectives-dialog-modal",
+                  }}
+                >
+                  <DialogContent>
+                    <p>
+                      The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
+                    </p>
+                    <br />
+                    <p>
+                      <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
+                    </p>
+                  </DialogContent>
+                  <DialogFooter>
+                    <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
+                    <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
+                  </DialogFooter>
+                </Dialog>
+              </div>
+            )}
+            {this.state.activeTab === "History" && (
+              <div className="custom-pivot-content flex-1 min-h-0 overflow-auto">
+                <div className="pivot-content-wrapper">
+                  <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
+        {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
+        {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
+        {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
+        {this.state.currentBoard && this.renderBoardUpdateMetadataFormDialog(false, false, this.state.isBoardUpdateDialogHidden, this.hideBoardUpdateDialog, "Edit retrospective", "", this.updateBoardMetadata, this.hideBoardUpdateDialog)}
+        <Dialog
+          hidden={this.state.isPreviewEmailDialogHidden}
+          onDismiss={this.hidePreviewEmailDialog}
+          dialogContentProps={{
+            type: DialogType.normal,
+            title: "Email summary",
+          }}
+          modalProps={{
+            containerClassName: "retrospectives-preview-email-dialog",
+            className: "retrospectives-dialog-modal",
+          }}
+        >
+          <FeedbackBoardPreviewEmail teamId={this.state.currentTeam.id} board={this.state.currentBoard} onCopy={this.showEmailCopiedToast} />
+        </Dialog>
+        <Dialog
+          hidden={this.state.isRetroSummaryDialogHidden}
+          onDismiss={this.hideRetroSummaryDialog}
+          dialogContentProps={{
+            type: DialogType.normal,
+            title: `Retrospective Board Summary`,
+          }}
+          modalProps={{
+            containerClassName: "retrospectives-retro-summary-dialog",
+            className: "retrospectives-dialog-modal",
+          }}
+        >
+          {this.state.currentBoard && (
+            <>
+              <section className="retro-summary-section">
+                <div className="retro-summary-section-header">Basic Settings</div>
+                <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(this.state.currentBoard.createdDate))}</div>
+                <div id="retro-summary-created-by">
+                  Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} alt={this.state.currentBoard?.createdBy.displayName} /> {this.state.currentBoard?.createdBy.displayName}{" "}
+                </div>
+              </section>
+              <section className="retro-summary-section">
+                <div className="retro-summary-section-header">Participant Summary</div>
+                <div className="retro-summary-section-item">Contributors: {this.state.contributors.length} participant(s)</div>
+
+                {!this.state.currentBoard.isAnonymous && this.state.contributors.length > 0 && (
+                  <div className="retro-summary-contributors-section">
+                    {this.state.contributors.map(contributor => (
+                      <div key={contributor.id} className="retro-summary-contributor">
+                        <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
+                      </div>
+                    ))}
                   </div>
                 )}
-              </PivotItem>
-              {this.state.isDesktop && (
-                <PivotItem headerText="History">
-                  <div className="pivot-content-wrapper">
-                    <BoardSummaryTable teamId={this.state.currentTeam.id} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
+                <div className="retro-summary-item-horizontal-group">
+                  <div className="retro-summary-section-item horizontal-group-item">
+                    {Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {this.state.castedVoteCount} vote(s)
                   </div>
-                </PivotItem>
-              )}
-            </Pivot>
-          </div>
-          {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
-          {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
-          {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
-          {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
-          {this.state.currentBoard && this.renderBoardUpdateMetadataFormDialog(false, false, this.state.isBoardUpdateDialogHidden, this.hideBoardUpdateDialog, "Edit retrospective", "", this.updateBoardMetadata, this.hideBoardUpdateDialog)}
-          <Dialog
-            hidden={this.state.isPreviewEmailDialogHidden}
-            onDismiss={this.hidePreviewEmailDialog}
-            dialogContentProps={{
-              type: DialogType.normal,
-              title: "Email summary",
-            }}
-            modalProps={{
-              containerClassName: "retrospectives-preview-email-dialog",
-              className: "retrospectives-dialog-modal",
-            }}
-          >
-            <FeedbackBoardPreviewEmail teamId={this.state.currentTeam.id} board={this.state.currentBoard} onCopy={this.showEmailCopiedToast} />
-          </Dialog>
-          <Dialog
-            hidden={this.state.isRetroSummaryDialogHidden}
-            onDismiss={this.hideRetroSummaryDialog}
-            dialogContentProps={{
-              type: DialogType.normal,
-              title: `Retrospective Board Summary`,
-            }}
-            modalProps={{
-              containerClassName: "retrospectives-retro-summary-dialog",
-              className: "retrospectives-dialog-modal",
-            }}
-          >
-            {this.state.currentBoard && (
-              <>
+                  <div className="retro-summary-section-item horizontal-group-item">{this.state.feedbackItems.length} feedback item(s) created</div>
+                  <div className="retro-summary-section-item horizontal-group-item">{this.state.actionItemIds.length} action item(s) created</div>
+                </div>
+              </section>
+              {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                 <section className="retro-summary-section">
-                  <div className="retro-summary-section-header">Basic Settings</div>
-                  <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(this.state.currentBoard.createdDate))}</div>
-                  <div id="retro-summary-created-by">
-                    Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} alt={this.state.currentBoard?.createdBy.displayName} /> {this.state.currentBoard?.createdBy.displayName}{" "}
-                  </div>
-                </section>
-                <section className="retro-summary-section">
-                  <div className="retro-summary-section-header">Participant Summary</div>
-                  <div className="retro-summary-section-item">Contributors: {this.state.contributors.length} participant(s)</div>
-
-                  {!this.state.currentBoard.isAnonymous && this.state.contributors.length > 0 && (
-                    <div className="retro-summary-contributors-section">
-                      {this.state.contributors.map(contributor => (
-                        <div key={contributor.id} className="retro-summary-contributor">
-                          <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <div className="retro-summary-item-horizontal-group">
-                    <div className="retro-summary-section-item horizontal-group-item">
-                      {Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {this.state.castedVoteCount} vote(s)
-                    </div>
-                    <div className="retro-summary-section-item horizontal-group-item">{this.state.feedbackItems.length} feedback item(s) created</div>
-                    <div className="retro-summary-section-item horizontal-group-item">{this.state.actionItemIds.length} action item(s) created</div>
-                  </div>
-                </section>
-                {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                  <section className="retro-summary-section">
-                    <div className="retro-summary-section-header">Team Assessment</div>
-                    <div>
-                      Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
-                      <div className="retro-summary-effectiveness-scores">
-                        <ul className="chart">
-                          {this.state.effectivenessMeasurementChartData.map(data => {
-                            const averageScore = this.state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
-                            const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
-                            const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
-                            const redScore = (data.red * 100) / teamEffectivenessResponseCount;
-                            return (
-                              <li className="chart-question-block" key={data.questionId}>
-                                <div className="chart-question">
-                                  <i className={getQuestionFontAwesomeClass(data.questionId)} /> &nbsp;
-                                  {getQuestionShortName(data.questionId)}
+                  <div className="retro-summary-section-header">Team Assessment</div>
+                  <div>
+                    Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
+                    <div className="retro-summary-effectiveness-scores">
+                      <ul className="chart">
+                        {this.state.effectivenessMeasurementChartData.map(data => {
+                          const averageScore = this.state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
+                          const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
+                          const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
+                          const redScore = (data.red * 100) / teamEffectivenessResponseCount;
+                          return (
+                            <li className="chart-question-block" key={data.questionId}>
+                              <div className="chart-question">
+                                <i className={getQuestionFontAwesomeClass(data.questionId)} /> &nbsp;
+                                {getQuestionShortName(data.questionId)}
+                              </div>
+                              {data.red > 0 && (
+                                <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
+                                  {this.percentageFormatter(redScore)}
                                 </div>
-                                {data.red > 0 && (
-                                  <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
-                                    {this.percentageFormatter(redScore)}
-                                  </div>
-                                )}
-                                {data.yellow > 0 && (
-                                  <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
-                                    {this.percentageFormatter(yellowScore)}
-                                  </div>
-                                )}
-                                {data.green > 0 && (
-                                  <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
-                                    {this.percentageFormatter(greenScore)}
-                                  </div>
-                                )}
-                                {averageScore > 0 && (
-                                  <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${this.numberFormatter(averageScore)}`}>
-                                    {this.numberFormatter(averageScore)}
-                                  </div>
-                                )}
-                                <button className="assessment-chart-action" title={`${this.state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={this.state.feedbackItems.length > 0} onClick={() => this.setState({ questionIdForDiscussAndActBoardUpdate: data.questionId })}>
-                                  Discuss and Act
-                                </button>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                        <div className="chart-legend-section">
-                          <div className="chart-legend-group">
-                            <section>
-                              <div style={{ backgroundColor: "#d6201f" }}></div>
-                              <span>Unfavorable</span>
-                            </section>
-                            <section>
-                              <div style={{ backgroundColor: "#ffd302" }}></div>
-                              <span>Neutral</span>
-                            </section>
-                            <section>
-                              <div style={{ backgroundColor: "#006b3d" }}></div>
-                              <span>Favorable</span>
-                            </section>
-                          </div>
+                              )}
+                              {data.yellow > 0 && (
+                                <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
+                                  {this.percentageFormatter(yellowScore)}
+                                </div>
+                              )}
+                              {data.green > 0 && (
+                                <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
+                                  {this.percentageFormatter(greenScore)}
+                                </div>
+                              )}
+                              {averageScore > 0 && (
+                                <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${this.numberFormatter(averageScore)}`}>
+                                  {this.numberFormatter(averageScore)}
+                                </div>
+                              )}
+                              <button className="assessment-chart-action" title={`${this.state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={this.state.feedbackItems.length > 0} onClick={() => this.setState({ questionIdForDiscussAndActBoardUpdate: data.questionId })}>
+                                Discuss and Act
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <div className="chart-legend-section">
+                        <div className="chart-legend-group">
+                          <section>
+                            <div style={{ backgroundColor: "#d6201f" }}></div>
+                            <span>Unfavorable</span>
+                          </section>
+                          <section>
+                            <div style={{ backgroundColor: "#ffd302" }}></div>
+                            <span>Neutral</span>
+                          </section>
+                          <section>
+                            <div style={{ backgroundColor: "#006b3d" }}></div>
+                            <span>Favorable</span>
+                          </section>
                         </div>
                       </div>
                     </div>
-                  </section>
-                )}
-              </>
-            )}
-          </Dialog>
-          <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" bodyClassName="retrospective-notification-toast-body" progressClassName="retrospective-notification-toast-progress-bar" />
-        </div>
+                  </div>
+                </section>
+              )}
+            </>
+          )}
+        </Dialog>
+        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" bodyClassName="retrospective-notification-toast-body" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }

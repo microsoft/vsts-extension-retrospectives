@@ -24,8 +24,7 @@
 @import "../node_modules/react-toastify/dist/ReactToastify.css";
 
 body {
-  overflow-y: auto;
-  font-family: variables.$default_vsts_font;
+  overflow: hidden;
 }
 
 .ms-ContextualMenuButtonsExample {
@@ -57,5 +56,57 @@ button:focus:not(.ms-Button) {
   }
   .hide-mobile {
     display: initial !important;
+  }
+}
+
+// Custom Pivot Tabs styling to replace Fluent UI Pivot
+.custom-pivot {
+  width: 100%;
+
+  .custom-pivot-tabs {
+    display: flex;
+    border-bottom: 2px solid #d2d2d2;
+    gap: 0;
+  }
+
+  .custom-pivot-tab {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #605e5c;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.1s ease;
+
+    &:hover {
+      color: #323130;
+      background-color: #f3f2f1;
+    }
+
+    &:focus {
+      outline: 1px solid #605e5c;
+      outline-offset: -1px;
+    }
+
+    &.active {
+      color: #0078d4;
+      font-weight: 600;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #0078d4;
+      }
+    }
+  }
+
+  .custom-pivot-content {
+    width: 100%;
   }
 }

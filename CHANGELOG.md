@@ -4,6 +4,8 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.[TBD]
 
+* Restricts delete board functionality to the board owner or a team admin. From [GitHub PR #1308](https://github.com/microsoft/vsts-extension-retrospectives/pull/1308)
+* Updated hyperlinks in CONTRIBUTING markdown file. From [GitHub PR #1305](https://github.com/microsoft/vsts-extension-retrospectives/pull/1305)
 * Added "Ways to Contribute" to the CONTRIBUTING markdown file. From [GitHub PR #1304](https://github.com/microsoft/vsts-extension-retrospectives/pull/1304)
 * Removes groups from Permission table, since setting permission by groups not supported. From [GitHub PR #1294](https://github.com/microsoft/vsts-extension-retrospectives/pull/1294)
 * Improved test code coverage. From [GitHub PR #1289](https://github.com/microsoft/vsts-extension-retrospectives/pull/1289)

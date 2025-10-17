@@ -81,4 +81,19 @@ describe("Workflow Stage", () => {
     expect(element?.getAttribute("aria-posinset")).toBe("1");
     expect(element?.getAttribute("tabindex")).toBe("0");
   });
+
+  it("does not call clickEventCallback for non-Enter key presses", async () => {
+    const user = userEvent.setup();
+    render(<WorkflowStage {...mockedProps} />);
+
+    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
+    element.focus();
+
+    await user.keyboard("{Space}");
+    await user.keyboard("{Escape}");
+    await user.keyboard("a");
+
+    // clickEventCallback should not have been called for these keys
+    expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
+  });
 });

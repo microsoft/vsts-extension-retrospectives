@@ -117,4 +117,101 @@ describe("EffectivenessMeasurementRow", () => {
       });
     });
   });
+
+  describe("User Interaction", () => {
+    it("updates selection when voting button is clicked", () => {
+      const mockOnSelectedChange = jest.fn();
+      const props = { ...defaultProps, onSelectedChange: mockOnSelectedChange };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      const button5 = container.querySelector('button[aria-label="5"]') as HTMLButtonElement;
+      button5.click();
+
+      expect(mockOnSelectedChange).toHaveBeenCalledWith(5);
+    });
+
+    it("calls onSelectedChange with correct values for different buttons", () => {
+      const mockOnSelectedChange = jest.fn();
+      const props = { ...defaultProps, onSelectedChange: mockOnSelectedChange };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      const testValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      testValues.forEach(value => {
+        const button = container.querySelector(`button[aria-label="${value}"]`) as HTMLButtonElement;
+        button.click();
+        expect(mockOnSelectedChange).toHaveBeenCalledWith(value);
+      });
+    });
+
+    it("shows CircleFill icon for selected value and CircleRing for others", () => {
+      const props = { ...defaultProps, votes: mockVotes };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      // Button 5 should be selected (from mockVotes)
+      const button5 = container.querySelector('button[aria-label="5"]');
+      expect(button5?.querySelector('[data-icon-name="CircleFill"]')).toBeInTheDocument();
+
+      // Other buttons should have CircleRing
+      const button1 = container.querySelector('button[aria-label="1"]');
+      expect(button1?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+    });
+
+    it("updates icon when selection changes", () => {
+      const mockOnSelectedChange = jest.fn();
+      const props = { ...defaultProps, onSelectedChange: mockOnSelectedChange };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      // Initially button 1 should have CircleRing
+      const button1 = container.querySelector('button[aria-label="1"]');
+      expect(button1?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+
+      // Click button 1
+      (button1 as HTMLButtonElement).click();
+
+      // After click, verify callback was called
+      expect(mockOnSelectedChange).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe("Vote Initialization", () => {
+    it("initializes with existing vote for the current user and question", () => {
+      const props = { ...defaultProps, questionId: 1, votes: mockVotes };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      // User's vote for question 1 is 5, so button 5 should show CircleFill
+      const button5 = container.querySelector('button[aria-label="5"]');
+      expect(button5?.querySelector('[data-icon-name="CircleFill"]')).toBeInTheDocument();
+    });
+
+    it("initializes with different vote for different question", () => {
+      const props = { ...defaultProps, questionId: 2, votes: mockVotes };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      // User's vote for question 2 is 8, so button 8 should show CircleFill
+      const button8 = container.querySelector('button[aria-label="8"]');
+      expect(button8?.querySelector('[data-icon-name="CircleFill"]')).toBeInTheDocument();
+    });
+
+    it("initializes with no selection when no votes exist", () => {
+      const props = { ...defaultProps, votes: [] as ITeamEffectivenessMeasurementVoteCollection[] };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      // All buttons should have CircleRing when no vote exists
+      for (let i = 1; i <= 10; i++) {
+        const button = container.querySelector(`button[aria-label="${i}"]`);
+        expect(button?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+      }
+    });
+
+    it("initializes with no selection when user has no vote for this question", () => {
+      const props = { ...defaultProps, questionId: 999, votes: mockVotes };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      // All buttons should have CircleRing when user hasn't voted on this question
+      for (let i = 1; i <= 10; i++) {
+        const button = container.querySelector(`button[aria-label="${i}"]`);
+        expect(button?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+      }
+    });
+  });
 });

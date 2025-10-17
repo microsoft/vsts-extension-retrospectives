@@ -1,10 +1,4 @@
-﻿div[role="toolbar"] .ms-FocusZone {
-  height: 40px;
-}
-
-.ms-FocusZone {
-  padding-top: 11px;
-
+﻿.ms-FocusZone {
   .ms-Pivot-link {
     &.is-selected {
       background-color: var(--border-subtle-color);
