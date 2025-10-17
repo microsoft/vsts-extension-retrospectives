@@ -30,7 +30,7 @@ jest.mock("../extensionSettingsMenuDialogContent", () => ({
   RETRO_HELP_CONTENT: [{ content: "Test", style: "normal" }],
   VOLUNTEER_CONTENT: [{ content: "Test", style: "normal" }],
   WHATISNEW_MARKDOWN: "# What's New\n\nTest",
-  renderContent: jest.fn((content) => (
+  renderContent: jest.fn(content => (
     <div data-testid="rendered-content">
       {content.map((item: any, i: number) => (
         <span key={i}>{item.content}</span>
@@ -262,10 +262,7 @@ describe("ExtensionSettingsMenu", () => {
     await waitFor(() => {
       fireEvent.click(screen.getByText("Open change log"));
     });
-    expect(windowOpenSpy).toHaveBeenCalledWith(
-      "https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md",
-      "_blank"
-    );
+    expect(windowOpenSpy).toHaveBeenCalledWith("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank");
   });
 
   it("opens readme from User Guide", async () => {
@@ -277,10 +274,7 @@ describe("ExtensionSettingsMenu", () => {
     await waitFor(() => {
       fireEvent.click(screen.getByText("Open user guide"));
     });
-    expect(windowOpenSpy).toHaveBeenCalledWith(
-      "https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md",
-      "_blank"
-    );
+    expect(windowOpenSpy).toHaveBeenCalledWith("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md", "_blank");
   });
 
   it("closes User Guide dialog", async () => {
@@ -308,10 +302,7 @@ describe("ExtensionSettingsMenu", () => {
     await waitFor(() => {
       fireEvent.click(screen.getByText("Open contributing guidelines"));
     });
-    expect(windowOpenSpy).toHaveBeenCalledWith(
-      "https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md",
-      "_blank"
-    );
+    expect(windowOpenSpy).toHaveBeenCalledWith("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md", "_blank");
   });
 
   it("closes Volunteer dialog", async () => {

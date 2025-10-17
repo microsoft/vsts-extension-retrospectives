@@ -455,13 +455,13 @@ describe("FeedbackBoardMetadataForm - Column Management", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const addColumnButton = screen.getByRole("button", { name: /add new column/i });
-    
+
     expect(addColumnButton).toBeEnabled();
-    
+
     // Get initial number of icon change buttons (one per column)
     const initialIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
     const initialCount = initialIconButtons.length;
-    
+
     await user.click(addColumnButton);
 
     // Should have one more column now
@@ -489,7 +489,7 @@ describe("FeedbackBoardMetadataForm - Column Management", () => {
 
     const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
     expect(deleteButtons.length).toBeGreaterThan(0);
-    
+
     const firstDeleteButton = deleteButtons[0];
     await user.click(firstDeleteButton);
 
@@ -504,9 +504,9 @@ describe("FeedbackBoardMetadataForm - Column Management", () => {
     // Just verify the component renders and has delete buttons
     const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
     expect(deleteButtons.length).toBeGreaterThan(0);
-    
+
     await user.click(deleteButtons[0]);
-    
+
     // Component should still be functional
     expect(screen.getByRole("heading", { name: /column settings/i })).toBeInTheDocument();
   });
@@ -517,7 +517,7 @@ describe("FeedbackBoardMetadataForm - Column Management", () => {
     // Just verify that delete buttons exist and the component renders
     const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
     expect(deleteButtons.length).toBeGreaterThan(0);
-    
+
     // At least some delete buttons should be present
     expect(deleteButtons.length).toBeLessThanOrEqual(5); // Max columns is 5
   });
@@ -528,7 +528,7 @@ describe("FeedbackBoardMetadataForm - Column Management", () => {
 
     const moveUpButtons = screen.getAllByRole("button", { name: /move up/i });
     expect(moveUpButtons.length).toBeGreaterThan(0);
-    
+
     // The first move-up button should be disabled
     expect(moveUpButtons[0]).toBeDisabled();
   });
@@ -539,7 +539,7 @@ describe("FeedbackBoardMetadataForm - Column Management", () => {
 
     const moveDownButtons = screen.getAllByRole("button", { name: /move down/i });
     expect(moveDownButtons.length).toBeGreaterThan(0);
-    
+
     // The last move-down button should be disabled
     expect(moveDownButtons[moveDownButtons.length - 1]).toBeDisabled();
   });
@@ -575,7 +575,7 @@ describe("FeedbackBoardMetadataForm - Template Selection", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const templateDropdown = screen.getByLabelText(/apply template/i) as HTMLSelectElement;
-    
+
     await user.selectOptions(templateDropdown, "start-stop-continue");
 
     expect(templateDropdown.value).toBe("start-stop-continue");
@@ -586,7 +586,7 @@ describe("FeedbackBoardMetadataForm - Template Selection", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const templateDropdown = screen.getByLabelText(/apply template/i) as HTMLSelectElement;
-    
+
     await user.selectOptions(templateDropdown, "mad-sad-glad");
 
     expect(templateDropdown.value).toBe("mad-sad-glad");
@@ -597,7 +597,7 @@ describe("FeedbackBoardMetadataForm - Template Selection", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const templateDropdown = screen.getByLabelText(/apply template/i) as HTMLSelectElement;
-    
+
     await user.selectOptions(templateDropdown, "4ls");
 
     expect(templateDropdown.value).toBe("4ls");
@@ -608,7 +608,7 @@ describe("FeedbackBoardMetadataForm - Template Selection", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const templateDropdown = screen.getByLabelText(/apply template/i) as HTMLSelectElement;
-    
+
     await user.selectOptions(templateDropdown, "daki");
 
     expect(templateDropdown.value).toBe("daki");
@@ -656,11 +656,11 @@ describe("FeedbackBoardMetadataForm - Icon and Color Selection", () => {
 
     // Verify dialog is open
     expect(screen.getByText(/choose column icon/i)).toBeInTheDocument();
-    
+
     // Select an icon button in the dialog and click OK or Cancel
     const okButton = screen.queryByRole("button", { name: /ok/i });
     const cancelButton = screen.queryByRole("button", { name: /cancel/i });
-    
+
     if (okButton) {
       await user.click(okButton);
     } else if (cancelButton) {
@@ -678,11 +678,11 @@ describe("FeedbackBoardMetadataForm - Icon and Color Selection", () => {
 
     // Verify dialog is open
     expect(screen.getByText(/choose column color/i)).toBeInTheDocument();
-    
+
     // Click OK or Cancel button
     const okButton = screen.queryByRole("button", { name: /ok/i });
     const cancelButton = screen.queryByRole("button", { name: /cancel/i });
-    
+
     if (okButton) {
       await user.click(okButton);
     } else if (cancelButton) {
