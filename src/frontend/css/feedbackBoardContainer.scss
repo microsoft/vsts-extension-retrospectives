@@ -19,7 +19,9 @@ $team_selector_list_item_width: 450px;
 
 .feedback-board-container {
   display: flex;
-  overflow-y: scroll;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .initialization-spinner {

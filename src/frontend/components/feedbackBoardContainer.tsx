@@ -1327,8 +1327,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
-      <div className="grid">
-        <div className="flex items-center">
+      <div className="flex flex-col h-screen">
+        <div className="flex items-center flex-shrink-0">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
             onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
@@ -1369,7 +1369,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <div style={{ flexGrow: 1 }}></div>
           <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.setScreenViewMode} />
         </div>
-        <div className="flex items-center justify-start">
+        <div className="flex items-center justify-start flex-shrink-0">
           <div className="w-full">
             <div className="flex items-center justify-start">
               <button className={`bg-transparent border-0 px-4 text-sm font-normal cursor-pointer transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
