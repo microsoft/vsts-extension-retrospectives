@@ -6,6 +6,7 @@
 ## Example: ./cleanup.sh
 ##
 (
+  # shellcheck disable=SC2153
   if [[ -z "${SUBSCRIPTION_ID}" || -z "${TENANT_ID}" || -z "${SERVICE_PRINCIPAL_ID}" || -z "${SERVICE_PRINCIPAL_SECRET}" ]]; then
     echo "SUBSCRIPTION_ID, TENANT_ID, SERVICE_PRINCIPAL_ID, SERVICE_PRINCIPAL_SECRET is not set. Please set the environment variables."
     exit 1

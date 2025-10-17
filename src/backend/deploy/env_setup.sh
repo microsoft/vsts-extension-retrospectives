@@ -11,6 +11,7 @@
 ## - Application Insights
 
 (
+  # shellcheck disable=SC2153
   if [[ -z "${RESOURCE_NAME_SUFFIX}" || -z "${LOCATION}" || -z "${ALERT_RECIPIENT_EMAIL}" || -z "${SUBSCRIPTION_ID}" || -z "${TENANT_ID}" || -z "${SERVICE_PRINCIPAL_ID}" || -z "${SERVICE_PRINCIPAL_SECRET}" ]]; then
     echo "RESOURCE_NAME_SUFFIX, LOCATION, ALERT_RECIPIENT_EMAIL, SUBSCRIPTION_ID, TENANT_ID, SERVICE_PRINCIPAL_ID, SERVICE_PRINCIPAL_SECRET is not set. Please set the environment variables."
     exit 1
