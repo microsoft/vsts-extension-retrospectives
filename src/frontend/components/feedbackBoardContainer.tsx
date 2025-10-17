@@ -1372,10 +1372,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         <div className="flex items-center justify-start">
           <div className="w-full">
             <div className="flex items-center justify-start">
-              <button className={`bg-transparent border-0 px-4 py-2 text-sm font-normal cursor-pointer relative transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
+              <button className={`bg-transparent border-0 px-4 text-sm font-normal cursor-pointer transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
               </button>
-              <button className={`bg-transparent border-0 px-4 py-2 text-sm font-normal cursor-pointer relative transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
+              <button className={`bg-transparent border-0 px-4 text-sm font-normal cursor-pointer transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </button>
               <div className="vertical-tab-separator" />
@@ -1506,14 +1506,19 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </DialogFooter>
                     </Dialog>
                     <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile" content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
-                      <ActionButton
-                        className="toggle-carousel-button"
-                        iconProps={{ iconName: "Chart" }}
-                        text="Team Assessment"
+                      <button
+                        className="toggle-carousel-button flex items-center bg-transparent border-0 cursor-pointer p-1 hover:bg-gray-100"
                         onClick={() => {
                           this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
                         }}
-                      ></ActionButton>
+                        aria-label="Team Assessment"
+                        type="button"
+                      >
+                        <span className="inline-flex items-center justify-center mr-1">
+                          <i className="fas fa-chart-line"></i>
+                        </span>
+                        <span>Team Assessment</span>
+                      </button>
                     </TooltipHost>
                   </div>
                 )}
