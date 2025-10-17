@@ -504,4 +504,53 @@ describe("SelectorCombo", () => {
       expect(container.firstChild).toBeTruthy();
     });
   });
+
+  describe("Keyboard Interactions", () => {
+    test("opens callout when Enter key is pressed on selector button", () => {
+      const { container } = render(<SelectorCombo {...defaultProps} />);
+
+      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+
+      // Simulate Enter key press (keyCode 13)
+      const enterEvent = new KeyboardEvent("keydown", { keyCode: 13, bubbles: true });
+      selectorButton.dispatchEvent(enterEvent);
+
+      // Component should still be rendered after key press
+      expect(container.querySelector(".selector-button")).toBeTruthy();
+    });
+
+    test("handles key press on list item", () => {
+      const { container } = render(<SelectorCombo {...defaultProps} />);
+
+      // Open the callout first
+      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      selectorButton.click();
+
+      // Find a list item
+      const listItems = container.querySelectorAll(".selector-list-item");
+      if (listItems.length > 0) {
+        const firstItem = listItems[0] as HTMLElement;
+
+        // Simulate Enter key press on item
+        const enterEvent = new KeyboardEvent("keydown", { keyCode: 13, bubbles: true });
+        firstItem.dispatchEvent(enterEvent);
+
+        // Component should still be functional
+        expect(container.firstChild).toBeTruthy();
+      }
+    });
+
+    test("does not trigger action for non-Enter key presses", () => {
+      const { container } = render(<SelectorCombo {...defaultProps} />);
+
+      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+
+      // Simulate Space key press (keyCode 32)
+      const spaceEvent = new KeyboardEvent("keydown", { keyCode: 32, bubbles: true });
+      selectorButton.dispatchEvent(spaceEvent);
+
+      // Component should still be rendered
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
 });

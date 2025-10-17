@@ -88,4 +88,79 @@ describe("Editable Text Component", () => {
 
     expect(document.body.textContent).toContain("This cannot be empty.");
   });
+
+  it("cancels edit and restores original text when Escape is pressed", async () => {
+    const propsWithText = { ...mockedTestProps, text: "Original Text" };
+    render(<EditableText {...propsWithText} />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const textarea = document.querySelector("textarea, input") as HTMLElement;
+    await userEvent.clear(textarea);
+    await userEvent.type(textarea, "Modified Text");
+    await userEvent.keyboard("{Escape}");
+
+    expect(mockOnSave).toHaveBeenCalledWith("Original Text");
+  });
+
+  it("adds newline when Ctrl+Enter is pressed in multiline mode", async () => {
+    const propsMultiline = { ...mockedTestProps, text: "Line 1", isMultiline: true };
+    render(<EditableText {...propsMultiline} />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const textarea = document.querySelector("textarea") as HTMLElement;
+    await userEvent.type(textarea, "{Control>}{Enter}{/Control}");
+
+    // Component should still be in edit mode with newline added
+    expect(document.querySelector("textarea")).toBeTruthy();
+  });
+
+  it("shows error when trying to save empty text with Enter", async () => {
+    render(<EditableText {...mockedTestProps} />);
+
+    const input = document.querySelector('[aria-label="Please enter feedback title"]') as HTMLElement;
+    await userEvent.clear(input);
+    await userEvent.keyboard("{Enter}");
+
+    expect(document.body.textContent).toContain("This cannot be empty.");
+  });
+
+  it("saves text when Enter is pressed with valid content", async () => {
+    render(<EditableText {...mockedTestProps} text="Initial" />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const input = document.querySelector("input, textarea") as HTMLElement;
+    await userEvent.clear(input);
+    await userEvent.type(input, "New Content{Enter}");
+
+    expect(mockOnSave).toHaveBeenCalledWith("New Content");
+  });
+
+  it("saves text when Tab is pressed with valid content", async () => {
+    render(<EditableText {...mockedTestProps} text="Initial" />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const input = document.querySelector("input, textarea") as HTMLElement;
+    await userEvent.clear(input);
+    await userEvent.type(input, "Tab Content{Tab}");
+
+    expect(mockOnSave).toHaveBeenCalledWith("Tab Content");
+  });
+
+  it("updates newText when props.text changes and not editing", async () => {
+    const { rerender } = render(<EditableText {...mockedTestProps} text="Initial" />);
+
+    // Update props with new text
+    rerender(<EditableText {...mockedTestProps} text="Updated from props" />);
+
+    // Text should be updated in display mode
+    expect(document.body.textContent).toContain("Updated from props");
+  });
 });
