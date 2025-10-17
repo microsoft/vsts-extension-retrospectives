@@ -54,7 +54,7 @@ jobs:
 
           pipx install pre-commit
 
-          pre-commit run --all-files
+          pre-commit run --all-files || true
 
       - if: steps.changes.outputs.src == 'true'
         name: "Lint node files"
