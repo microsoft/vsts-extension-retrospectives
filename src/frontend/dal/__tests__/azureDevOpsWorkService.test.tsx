@@ -80,7 +80,7 @@ describe("WorkService", () => {
           team: "",
           teamId: "team-123",
         },
-        undefined
+        undefined,
       );
     });
 
@@ -105,7 +105,7 @@ describe("WorkService", () => {
           team: "",
           teamId: "team-456",
         },
-        "current"
+        "current",
       );
     });
 
@@ -164,7 +164,7 @@ describe("WorkService", () => {
           team: "",
           teamId: "team-abc",
         },
-        undefined
+        undefined,
       );
     });
 
@@ -193,7 +193,7 @@ describe("WorkService", () => {
         expect.objectContaining({
           teamId: "team-123",
         }),
-        "past"
+        "past",
       );
     });
   });
