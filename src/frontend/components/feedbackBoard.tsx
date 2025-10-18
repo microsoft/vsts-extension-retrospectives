@@ -15,7 +15,6 @@ import FeedbackItemCarousel from "./feedbackCarousel";
 import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
-import { encrypt } from "../utilities/userIdentityHelper";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -30,6 +29,7 @@ export interface FeedbackBoardProps {
   isCarouselDialogHidden: boolean;
   hideCarouselDialog: () => void;
   userId: string;
+  onVoteCasted?: () => void;
 }
 
 export interface IColumn {
@@ -54,17 +54,11 @@ export interface FeedbackBoardState {
   hasItems: boolean;
   defaultActionItemIteration: string;
   defaultActionItemAreaPath: string;
-  currentVoteCount: string;
 }
 
 class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
   constructor(props: FeedbackBoardProps) {
     super(props);
-
-    const userId = encrypt(this.props.userId);
-
-    const boardVoteCollection = props?.board?.boardVoteCollection ?? {};
-    const voteCount = boardVoteCollection[userId]?.toString() || "0";
 
     this.state = {
       columnIds: [],
@@ -73,7 +67,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       defaultActionItemIteration: "",
       hasItems: false,
       isDataLoaded: false,
-      currentVoteCount: voteCount,
     };
   }
 
@@ -97,9 +90,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       });
       this.initColumns();
       await this.getAllBoardFeedbackItems();
-
-      // Refresh currentVoteCount after board change
-      this.updateCurrentVoteCount();
     }
 
     if (prevProps.board.modifiedDate !== this.props.board.modifiedDate) {
@@ -111,16 +101,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       await this.setDefaultIterationAndAreaPath(this.props.team.id);
     }
   }
-
-  private updateCurrentVoteCount = async () => {
-    // Assuming userId is encrypted in props and vote data is available
-    const userId = encrypt(this.props.userId);
-    const boardItem = await itemDataService.getBoardItem(this.props.team.id, this.props.board.id);
-    const voteCollection = boardItem?.boardVoteCollection || {};
-    const currentVoteCount = voteCollection[userId]?.toString() || "0";
-
-    this.setState({ currentVoteCount });
-  };
 
   public async componentWillUnmount() {
     // Remove event listeners.
@@ -410,25 +390,15 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         isFocusModalHidden: true,
         groupIds: [] as string[],
         onVoteCasted: () => {
-          itemDataService.getBoardItem(this.props.team.id, this.props.board.id).then((boardItem: IFeedbackBoardDocument) => {
-            const voteCollection = boardItem.boardVoteCollection;
-            const userId = encrypt(this.props.userId);
-
-            this.setState({ currentVoteCount: voteCollection?.[userId]?.toString() || "0" });
-          });
+          if (this.props.onVoteCasted) {
+            this.props.onVoteCasted();
+          }
         },
       };
     });
 
     return (
       <div className="feedback-board">
-        {this.props.workflowPhase === WorkflowPhase.Vote && (
-          <div className="feedback-maxvotes-per-user">
-            <label>
-              Votes Used: {this.state.currentVoteCount} / {this.props.board?.maxVotesPerUser?.toString()}
-            </label>
-          </div>
-        )}
         <div className="feedback-columns-container">
           {this.state.isDataLoaded &&
             feedbackColumnPropsList.map(columnProps => {

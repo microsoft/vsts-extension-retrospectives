@@ -104,6 +104,7 @@ export interface FeedbackBoardContainerState {
    */
   allMembers: TeamMember[];
   castedVoteCount: number;
+  currentVoteCount: string;
   boardColumns: IFeedbackColumn[];
   questionIdForDiscussAndActBoardUpdate: number;
   activeTab: "Board" | "History";
@@ -171,6 +172,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       actionItemIds: [],
       allMembers: [],
       castedVoteCount: 0,
+      currentVoteCount: "0",
       boardColumns: [],
       questionIdForDiscussAndActBoardUpdate: -1,
       activeTab: "Board",
@@ -262,6 +264,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       if (this.state.isAppInitialized) {
         userDataService.addVisit(this.state.currentTeam.id, this.state.currentBoard ? this.state.currentBoard.id : undefined);
       }
+      // Update vote counts when board changes
+      if (this.state.currentTeam && this.state.currentBoard) {
+        this.updateFeedbackItemsAndContributors(this.state.currentTeam, this.state.currentBoard);
+      }
     }
   }
 
@@ -315,11 +321,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const votes = Object.values(board.boardVoteCollection || []);
 
+    // Calculate current user's vote count
+    const userId = encrypt(this.state.currentUserId);
+    const currentUserVoteCount = board.boardVoteCollection?.[userId]?.toString() || "0";
+
     this.setState({
       actionItemIds: actionItemIds.filter(item => item !== undefined),
       feedbackItems,
       contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
       castedVoteCount: votes !== null && votes.length > 0 ? votes.reduce((a, b) => a + b, 0) : 0,
+      currentVoteCount: currentUserVoteCount,
     });
   }
 
@@ -1129,6 +1140,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     );
   };
 
+  private readonly updateCurrentVoteCount = async () => {
+    const boardItem = await itemDataService.getBoardItem(this.state.currentTeam.id, this.state.currentBoard.id);
+    const voteCollection = boardItem?.boardVoteCollection || {};
+    const userId = encrypt(this.state.currentUserId);
+    const currentVoteCount = voteCollection[userId]?.toString() || "0";
+
+    this.setState({ currentVoteCount });
+  };
+
   private readonly updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
     if (!updatedBoard) {
       this.handleBoardDeleted(this.state.currentTeam.id, this.state.currentBoard.id);
@@ -1531,14 +1551,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   </div>
                 </div>
               )}
+              {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
+                <div className="feedback-maxvotes-per-user">
+                  <label>
+                    Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}
+                  </label>
+                </div>
+              )}
               {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
                 <TooltipHost content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                  <button
-                    type="button"
-                    onClick={this.showCarouselDialog}
-                    className="flex items-center bg-transparent border border-solid border-gray-300 rounded px-3 py-1 text-sm cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    aria-label="Focus Mode"
-                  >
+                  <button type="button" onClick={this.showCarouselDialog} className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none" aria-label="Focus Mode">
                     <span className="inline-flex items-center justify-center mr-2">
                       <i className="fas fa-bullseye"></i>
                     </span>
@@ -1605,7 +1627,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </MessageBar>
                     )}
                     <div className="feedback-board-container">
-                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} />
+                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} />
                     </div>
                     <Dialog
                       hidden={this.state.isArchiveBoardConfirmationDialogHidden}

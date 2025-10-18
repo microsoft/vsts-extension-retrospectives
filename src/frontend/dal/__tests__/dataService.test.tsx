@@ -1,15 +1,6 @@
 import { IExtensionDataManager, IExtensionDataService } from "azure-devops-extension-api";
 import { appInsights } from "../../utilities/telemetryClient";
-import {
-  readDocuments,
-  readDocument,
-  createDocument,
-  createOrUpdateDocument,
-  updateDocument,
-  deleteDocument,
-  setValue,
-  getValue,
-} from "../dataService";
+import { readDocuments, readDocument, createDocument, createOrUpdateDocument, updateDocument, deleteDocument, setValue, getValue } from "../dataService";
 
 const mockGetAccessToken = jest.fn();
 const mockGetService = jest.fn();
@@ -51,7 +42,10 @@ describe("dataService", () => {
 
   describe("readDocuments", () => {
     it("should read documents successfully with default scope", async () => {
-      const mockData = [{ id: "1", name: "Test" }, { id: "2", name: "Test2" }];
+      const mockData = [
+        { id: "1", name: "Test" },
+        { id: "2", name: "Test2" },
+      ];
       mockDataManager.getDocuments.mockResolvedValue(mockData);
 
       const result = await readDocuments("testCollection");
