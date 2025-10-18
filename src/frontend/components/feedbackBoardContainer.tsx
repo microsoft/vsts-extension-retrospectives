@@ -1506,9 +1506,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           />
                         </DialogFooter>
                       </Dialog>
-                      <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile" content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
+                      <TooltipHost content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
                         <button
-                          className="toggle-carousel-button flex items-center bg-transparent border-0 cursor-pointer p-1 hover:bg-gray-100"
+                          className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-gray-100"
                           onClick={() => {
                             this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
                           }}
@@ -1532,8 +1532,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 </div>
               )}
               {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                  <ActionButton className="toggle-carousel-button hide-mobile" text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
+                <TooltipHost content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
+                  <ActionButton text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
                 </TooltipHost>
               )}
             </div>

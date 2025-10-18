@@ -50,35 +50,6 @@ $team_selector_list_item_width: 450px;
   }
 }
 
-.toggle-carousel-button-tooltip-wrapper {
-  position: relative;
-  margin-bottom: -6px;
-
-  .toggle-carousel-button {
-    margin: 8px 8px 0 8px;
-    font-size: 13px;
-    color: var(--text-primary-color);
-
-    &:hover {
-      color: var(--status-info-foreground);
-
-      .ms-Button-icon {
-        color: var(--status-info-foreground) !important;
-      }
-    }
-
-    .ms-Button-icon {
-      color: var(--text-primary-color) !important;
-    }
-
-    .ms-Button-textContainer {
-      .ms-Button-label {
-        width: 100%;
-      }
-    }
-  }
-}
-
 .pivot-content-wrapper {
   border-top: var(--nav-header-active-item-background) 4px solid;
 }
@@ -398,13 +369,6 @@ $team_selector_list_item_width: 450px;
       color: rgba(var(--palette-accent3), 0.5);
     }
   }
-}
-
-.team-effectiveness-dialog-section {
-  border: 1px var(--nav-header-active-item-background) solid;
-  border-radius: 5px;
-  margin-left: 8px;
-  margin-right: 8px;
 }
 
 .board-actions-menu {
