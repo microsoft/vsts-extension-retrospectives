@@ -151,9 +151,7 @@ $team_selector_list_item_width: 450px;
   width: 2px;
   display: flex;
   height: 24px;
-  margin-right: 16px;
   background: variables.$border_grey;
-  margin-top: 12px;
 }
 
 .menu-button {
@@ -400,6 +398,13 @@ $team_selector_list_item_width: 450px;
       color: rgba(var(--palette-accent3), 0.5);
     }
   }
+}
+
+.team-effectiveness-dialog-section {
+  border: 1px var(--nav-header-active-item-background) solid;
+  border-radius: 5px;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 .board-actions-menu {
