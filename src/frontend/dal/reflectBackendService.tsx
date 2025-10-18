@@ -1,5 +1,4 @@
 import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
-import moment from "moment";
 import { getAppToken } from "azure-devops-extension-sdk";
 
 import { config } from "../config/config";
@@ -71,7 +70,7 @@ class ReflectBackendService {
   };
 
   private retrieveValidToken = (that = this) => {
-    if (that._tokenExpiry && moment().isBefore(that._tokenExpiry)) {
+    if (that._tokenExpiry && new Date() < that._tokenExpiry) {
       return that._appToken;
     }
 
@@ -81,7 +80,7 @@ class ReflectBackendService {
 
         const tokenData = decodeJwt(that._appToken);
         if (tokenData) {
-          that._tokenExpiry = moment.unix(tokenData.exp).toDate();
+          that._tokenExpiry = new Date(tokenData.exp * 1000);
           return that._appToken;
         }
 

@@ -1,5 +1,3 @@
-import moment from "moment";
-
 // Create comprehensive mocks before any imports
 const mockStart = jest.fn();
 const mockSend = jest.fn();
@@ -65,7 +63,7 @@ describe("ReflectBackendService", () => {
     mockStart.mockResolvedValue(undefined);
     mockSend.mockResolvedValue(undefined);
     mockGetAppToken.mockResolvedValue("mock-token");
-    mockDecodeJwt.mockReturnValue({ exp: moment().add(1, "hour").unix() });
+    mockDecodeJwt.mockReturnValue({ exp: Math.floor(Date.now() / 1000) + 3600 });
   });
 
   describe("constructor", () => {

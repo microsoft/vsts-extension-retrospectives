@@ -7,8 +7,6 @@ import { IColumnItem } from "./feedbackBoard";
 import { itemDataService } from "../dal/itemDataService";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { generateUUID } from "../utilities/random";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 
 export interface IFeedbackCarouselProps {
