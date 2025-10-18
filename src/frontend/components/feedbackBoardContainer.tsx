@@ -1552,11 +1552,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 </div>
               )}
               {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
-                <div className="feedback-maxvotes-per-user">
-                  <label>
-                    Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}
-                  </label>
-                </div>
+                <div className="feedback-maxvotes-per-user">Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}</div>
               )}
               {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
                 <TooltipHost content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
