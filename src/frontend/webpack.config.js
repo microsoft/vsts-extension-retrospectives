@@ -1,7 +1,6 @@
 ﻿const webpack = require("webpack");
 const path = require("path");
 
-const MomentLocalesPlugin = require("moment-locales-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 
 const CompressionPlugin = require("compression-webpack-plugin");
@@ -72,9 +71,6 @@ module.exports = (env, argv) => {
       maxEntrypointSize: 1600000, // 1.6 MB
     },
     plugins: [
-      new MomentLocalesPlugin({
-        localesToKeep: [], // Keep only default (English) locale
-      }),
       new ESLintPlugin(),
       new webpack.ProvidePlugin({
         process: "process/browser",
