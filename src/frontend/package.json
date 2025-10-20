@@ -42,7 +42,7 @@
     "react-dom": "18.3.1",
     "react-markdown": "10.1.0",
     "react-slick": "0.30.2",
-    "react-toastify": "9.0.7",
+    "react-toastify": "11.0.5",
     "slick-carousel": "1.8.1",
     "telemetryclient-team-services-extension": "1.0.10"
   },
