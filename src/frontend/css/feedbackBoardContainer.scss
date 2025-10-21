@@ -19,7 +19,7 @@ $team_selector_list_item_width: 450px;
 
 .feedback-board-container {
   display: flex;
-  height: calc(100vh - 77px);
+  height: calc(100vh - 93px);
   overflow-y: auto;
 }
 
@@ -47,35 +47,6 @@ $team_selector_list_item_width: 450px;
 .team-filter-container {
   .ms-TextField {
     margin: 8px 6px;
-  }
-}
-
-.toggle-carousel-button-tooltip-wrapper {
-  position: relative;
-  margin-bottom: -6px;
-
-  .toggle-carousel-button {
-    margin: 8px 8px 0 8px;
-    font-size: 13px;
-    color: var(--text-primary-color);
-
-    &:hover {
-      color: var(--status-info-foreground);
-
-      .ms-Button-icon {
-        color: var(--status-info-foreground) !important;
-      }
-    }
-
-    .ms-Button-icon {
-      color: var(--text-primary-color) !important;
-    }
-
-    .ms-Button-textContainer {
-      .ms-Button-label {
-        width: 100%;
-      }
-    }
   }
 }
 
@@ -151,9 +122,7 @@ $team_selector_list_item_width: 450px;
   width: 2px;
   display: flex;
   height: 24px;
-  margin-right: 16px;
   background: variables.$border_grey;
-  margin-top: 12px;
 }
 
 .menu-button {

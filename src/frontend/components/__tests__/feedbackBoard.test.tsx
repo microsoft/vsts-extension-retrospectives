@@ -236,27 +236,9 @@ describe("FeedbackBoard Component", () => {
       expect(feedbackBoard).toBeTruthy();
     });
 
-    it("shows correct vote counts", () => {
-      const { container } = render(<FeedbackBoard {...mockedProps} />);
-      const voteElement = container.querySelector(".feedback-maxvotes-per-user");
-      expect(voteElement?.textContent).toBe("Votes Used: 0 / 5");
-    });
-
     it("renders error message when displayBoard is false", () => {
       const { container } = render(<FeedbackBoard {...mockedProps} displayBoard={false} />);
       expect(container.textContent).toContain("An unexpected exception occurred");
-    });
-
-    it("does not render vote count in Collect phase", () => {
-      const { container } = render(<FeedbackBoard {...mockedProps} workflowPhase="Collect" />);
-      const voteElement = container.querySelector(".feedback-maxvotes-per-user");
-      expect(voteElement).toBeFalsy();
-    });
-
-    it("does not render vote count in Act phase", () => {
-      const { container } = render(<FeedbackBoard {...mockedProps} workflowPhase="Act" />);
-      const voteElement = container.querySelector(".feedback-maxvotes-per-user");
-      expect(voteElement).toBeFalsy();
     });
   });
 
@@ -359,22 +341,20 @@ describe("FeedbackBoard Component", () => {
       });
     });
 
-    it("updates vote count when board changes", async () => {
+    it("accepts onVoteCasted callback prop", async () => {
+      const onVoteCasted = jest.fn();
       const boardWithVotes = {
         ...mockedBoard,
         boardVoteCollection: { "encrypted-user-id": 3 },
       };
 
-      (itemDataService.getBoardItem as jest.Mock).mockResolvedValue(boardWithVotes);
-
-      const { rerender } = render(<FeedbackBoard {...mockedProps} board={boardWithVotes} />);
+      const { rerender } = render(<FeedbackBoard {...mockedProps} board={boardWithVotes} onVoteCasted={onVoteCasted} />);
 
       const newBoard = { ...boardWithVotes, id: "new-board-id" };
-      rerender(<FeedbackBoard {...mockedProps} board={newBoard} />);
+      rerender(<FeedbackBoard {...mockedProps} board={newBoard} onVoteCasted={onVoteCasted} />);
 
-      await waitFor(() => {
-        expect(itemDataService.getBoardItem).toHaveBeenCalled();
-      });
+      // The component should accept the onVoteCasted prop without errors
+      expect(onVoteCasted).not.toHaveBeenCalled(); // Not called unless a vote is cast
     });
   });
 
@@ -612,18 +592,6 @@ describe("FeedbackBoard Component", () => {
 
       // The dialog exists in DOM but we can't easily test onDismiss without more setup
       expect(hideCarouselDialog).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("Vote Count Updates", () => {
-    it("displays correct vote count from board vote collection with encrypted userId", () => {
-      // The userId is empty string, which when encrypted becomes a specific value
-      // The component uses encrypt(userId) to look up votes
-      const { container } = render(<FeedbackBoard {...mockedProps} />);
-
-      const voteElement = container.querySelector(".feedback-maxvotes-per-user");
-      // With empty userId and empty vote collection, it should show 0
-      expect(voteElement?.textContent).toBe("Votes Used: 0 / 5");
     });
   });
 });

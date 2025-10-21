@@ -104,6 +104,7 @@ export interface FeedbackBoardContainerState {
    */
   allMembers: TeamMember[];
   castedVoteCount: number;
+  currentVoteCount: string;
   boardColumns: IFeedbackColumn[];
   questionIdForDiscussAndActBoardUpdate: number;
   activeTab: "Board" | "History";
@@ -171,6 +172,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       actionItemIds: [],
       allMembers: [],
       castedVoteCount: 0,
+      currentVoteCount: "0",
       boardColumns: [],
       questionIdForDiscussAndActBoardUpdate: -1,
       activeTab: "Board",
@@ -262,6 +264,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       if (this.state.isAppInitialized) {
         userDataService.addVisit(this.state.currentTeam.id, this.state.currentBoard ? this.state.currentBoard.id : undefined);
       }
+      // Update vote counts when board changes
+      if (this.state.currentTeam && this.state.currentBoard) {
+        this.updateFeedbackItemsAndContributors(this.state.currentTeam, this.state.currentBoard);
+      }
     }
   }
 
@@ -315,11 +321,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const votes = Object.values(board.boardVoteCollection || []);
 
+    // Calculate current user's vote count
+    const userId = encrypt(this.state.currentUserId);
+    const currentUserVoteCount = board.boardVoteCollection?.[userId]?.toString() || "0";
+
     this.setState({
       actionItemIds: actionItemIds.filter(item => item !== undefined),
       feedbackItems,
       contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
       castedVoteCount: votes !== null && votes.length > 0 ? votes.reduce((a, b) => a + b, 0) : 0,
+      currentVoteCount: currentUserVoteCount,
     });
   }
 
@@ -1129,6 +1140,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     );
   };
 
+  private readonly updateCurrentVoteCount = async () => {
+    const boardItem = await itemDataService.getBoardItem(this.state.currentTeam.id, this.state.currentBoard.id);
+    const voteCollection = boardItem?.boardVoteCollection || {};
+    const userId = encrypt(this.state.currentUserId);
+    const currentVoteCount = voteCollection[userId]?.toString() || "0";
+
+    this.setState({ currentVoteCount });
+  };
+
   private readonly updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
     if (!updatedBoard) {
       this.handleBoardDeleted(this.state.currentTeam.id, this.state.currentBoard.id);
@@ -1328,7 +1348,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return (
       <div className="flex flex-col h-screen">
-        <div className="flex items-center flex-shrink-0">
+        <div className="flex items-center flex-shrink-0 mt-2 ml-4">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
             onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
@@ -1371,14 +1391,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         </div>
         <div className="flex items-center justify-start flex-shrink-0">
           <div className="w-full">
-            <div className="flex items-center justify-start">
-              <button className={`bg-transparent border-0 px-4 text-sm font-normal cursor-pointer transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
+            <div className="flex items-center justify-start mt-2 ml-2">
+              <button className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
               </button>
-              <button className={`bg-transparent border-0 px-4 text-sm font-normal cursor-pointer transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? " text-[#0078d4]" : " text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
+              <button className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </button>
-              <div className="vertical-tab-separator" />
+              <div className="mx-4 vertical-tab-separator" />
               <div className="flex items-center justify-start">
                 <div className="board-selector">
                   <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
@@ -1429,109 +1449,119 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   </Dialog>
                 </div>
               </div>
-              <div className="flex items-center justify-start">
-                {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                  <div className="team-effectiveness-dialog-section">
-                    <Dialog
-                      hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
-                      onDismiss={() => {
-                        this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                      }}
-                      dialogContentProps={{
-                        type: DialogType.close,
-                      }}
-                      minWidth={640}
-                      modalProps={{
-                        isBlocking: true,
-                        containerClassName: "team-effectiveness-dialog",
-                        className: "retrospectives-dialog-modal",
-                      }}
-                    >
-                      <DialogContent>
-                        <div className="team-effectiveness-section-information">
-                          <i className="fa fa-info-circle" />
-                          &nbsp;All answers will be saved anonymously
-                        </div>
-                        <table className="team-effectiveness-measurement-table">
-                          <thead>
-                            <tr>
-                              <th></th>
-                              <th></th>
-                              <th colSpan={6} className="team-effectiveness-favorability-label">
-                                Unfavorable
-                              </th>
-                              <th colSpan={2} className="team-effectiveness-favorability-label">
-                                Neutral
-                              </th>
-                              <th colSpan={2} className="team-effectiveness-favorability-label">
-                                Favorable
-                              </th>
-                            </tr>
-                            <tr>
-                              <th></th>
-                              <th></th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
-                              <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
-                              <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
-                              <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
-                              <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
-                              <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {questions.map(question => {
-                              return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
-                            })}
-                          </tbody>
-                        </table>
-                      </DialogContent>
-                      <DialogFooter>
-                        <PrimaryButton
-                          className="team-effectiveness-submit-button"
-                          onClick={() => {
-                            saveTeamEffectivenessMeasurement();
-                          }}
-                          text="Submit"
-                        />
-                        <DefaultButton
-                          onClick={() => {
-                            this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                          }}
-                          text="Cancel"
-                        />
-                      </DialogFooter>
-                    </Dialog>
-                    <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper hide-mobile" content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
-                      <button
-                        className="toggle-carousel-button flex items-center bg-transparent border-0 cursor-pointer p-1 hover:bg-gray-100"
-                        onClick={() => {
-                          this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
+              {this.state.activeTab === "Board" && (
+                <div className="flex items-center justify-start">
+                  {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+                    <div className="border border-solid border-[var(--nav-header-active-item-background)] rounded-lg ml-2 mr-2">
+                      <Dialog
+                        hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                        onDismiss={() => {
+                          this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
                         }}
-                        aria-label="Team Assessment"
-                        type="button"
+                        dialogContentProps={{
+                          type: DialogType.close,
+                        }}
+                        minWidth={640}
+                        modalProps={{
+                          isBlocking: true,
+                          containerClassName: "team-effectiveness-dialog",
+                          className: "retrospectives-dialog-modal",
+                        }}
                       >
-                        <span className="inline-flex items-center justify-center mr-1">
-                          <i className="fas fa-chart-line"></i>
-                        </span>
-                        <span>Team Assessment</span>
-                      </button>
-                    </TooltipHost>
+                        <DialogContent>
+                          <div className="team-effectiveness-section-information">
+                            <i className="fa fa-info-circle" />
+                            &nbsp;All answers will be saved anonymously
+                          </div>
+                          <table className="team-effectiveness-measurement-table">
+                            <thead>
+                              <tr>
+                                <th></th>
+                                <th></th>
+                                <th colSpan={6} className="team-effectiveness-favorability-label">
+                                  Unfavorable
+                                </th>
+                                <th colSpan={2} className="team-effectiveness-favorability-label">
+                                  Neutral
+                                </th>
+                                <th colSpan={2} className="team-effectiveness-favorability-label">
+                                  Favorable
+                                </th>
+                              </tr>
+                              <tr>
+                                <th></th>
+                                <th></th>
+                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
+                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
+                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
+                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
+                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
+                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
+                                <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
+                                <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
+                                <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
+                                <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {questions.map(question => {
+                                return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                              })}
+                            </tbody>
+                          </table>
+                        </DialogContent>
+                        <DialogFooter>
+                          <PrimaryButton
+                            className="team-effectiveness-submit-button"
+                            onClick={() => {
+                              saveTeamEffectivenessMeasurement();
+                            }}
+                            text="Submit"
+                          />
+                          <DefaultButton
+                            onClick={() => {
+                              this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                            }}
+                            text="Cancel"
+                          />
+                        </DialogFooter>
+                      </Dialog>
+                      <TooltipHost content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
+                        <button
+                          className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
+                          onClick={() => {
+                            this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
+                          }}
+                          aria-label="Team Assessment"
+                          type="button"
+                        >
+                          <span className="inline-flex items-center justify-center mr-1">
+                            <i className="fas fa-chart-line"></i>
+                          </span>
+                          <span>Team Assessment</span>
+                        </button>
+                      </TooltipHost>
+                    </div>
+                  )}
+                  <div className="flex flex-row" role="tablist">
+                    <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
+                    <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
+                    <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
+                    <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
                   </div>
-                )}
-                <div className="flex flex-row" role="tablist">
-                  <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
-                  <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
-                  <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
-                  <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
                 </div>
-              </div>
+              )}
+              {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
+                <div className="feedback-maxvotes-per-user">Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}</div>
+              )}
               {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                  <ActionButton className="toggle-carousel-button hide-mobile" text="Focus Mode" iconProps={{ iconName: "Bullseye" }} onClick={this.showCarouselDialog}></ActionButton>
+                <TooltipHost content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
+                  <button type="button" onClick={this.showCarouselDialog} className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none" aria-label="Focus Mode">
+                    <span className="inline-flex items-center justify-center mr-2">
+                      <i className="fas fa-bullseye"></i>
+                    </span>
+                    Focus Mode
+                  </button>
                 </TooltipHost>
               )}
             </div>
@@ -1593,7 +1623,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </MessageBar>
                     )}
                     <div className="feedback-board-container">
-                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} />
+                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} />
                     </div>
                     <Dialog
                       hidden={this.state.isArchiveBoardConfirmationDialogHidden}
