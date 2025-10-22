@@ -45,12 +45,7 @@ describe("BoardSummaryTableBody", () => {
     const mockSummary = jest.fn(() => <div>Summary</div>);
     const { container } = render(
       <table>
-        <BoardSummaryTableBody
-          columns={mockColumns}
-          data={[mockItem]}
-          expandedRows={new Set()}
-          boardRowSummary={mockSummary}
-        />
+        <BoardSummaryTableBody columns={mockColumns} data={[mockItem]} expandedRows={new Set()} boardRowSummary={mockSummary} />
       </table>,
     );
     expect(container.querySelectorAll("tbody")).toHaveLength(1);
@@ -62,12 +57,7 @@ describe("BoardSummaryTableBody", () => {
     const mockSummary = jest.fn(() => <div>Summary</div>);
     const { getByText } = render(
       <table>
-        <BoardSummaryTableBody
-          columns={mockColumns}
-          data={[mockItem]}
-          expandedRows={new Set()}
-          boardRowSummary={mockSummary}
-        />
+        <BoardSummaryTableBody columns={mockColumns} data={[mockItem]} expandedRows={new Set()} boardRowSummary={mockSummary} />
       </table>,
     );
     expect(getByText("Sprint 1 Retro")).toBeInTheDocument();
@@ -79,12 +69,7 @@ describe("BoardSummaryTableBody", () => {
     const expandedRows = new Set(["board-1"]);
     const { getByText } = render(
       <table>
-        <BoardSummaryTableBody
-          columns={mockColumns}
-          data={[mockItem]}
-          expandedRows={expandedRows}
-          boardRowSummary={mockSummary}
-        />
+        <BoardSummaryTableBody columns={mockColumns} data={[mockItem]} expandedRows={expandedRows} boardRowSummary={mockSummary} />
       </table>,
     );
     expect(getByText("Expanded Summary")).toBeInTheDocument();
@@ -95,12 +80,7 @@ describe("BoardSummaryTableBody", () => {
     const mockSummary = jest.fn(() => <div>Expanded Summary</div>);
     const { queryByText } = render(
       <table>
-        <BoardSummaryTableBody
-          columns={mockColumns}
-          data={[mockItem]}
-          expandedRows={new Set()}
-          boardRowSummary={mockSummary}
-        />
+        <BoardSummaryTableBody columns={mockColumns} data={[mockItem]} expandedRows={new Set()} boardRowSummary={mockSummary} />
       </table>,
     );
     expect(queryByText("Expanded Summary")).not.toBeInTheDocument();
@@ -111,12 +91,7 @@ describe("BoardSummaryTableBody", () => {
     const mockSummary = jest.fn(() => <div>Summary</div>);
     const { container } = render(
       <table>
-        <BoardSummaryTableBody
-          columns={mockColumns}
-          data={[]}
-          expandedRows={new Set()}
-          boardRowSummary={mockSummary}
-        />
+        <BoardSummaryTableBody columns={mockColumns} data={[]} expandedRows={new Set()} boardRowSummary={mockSummary} />
       </table>,
     );
     expect(container.querySelectorAll("tbody")).toHaveLength(1);

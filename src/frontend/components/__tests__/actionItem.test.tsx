@@ -307,4 +307,3 @@ describe("UI-level integration tests for ActionItem", () => {
     });
   });
 });
-

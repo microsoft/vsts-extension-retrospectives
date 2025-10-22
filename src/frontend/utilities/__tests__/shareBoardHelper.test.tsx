@@ -47,7 +47,7 @@ describe("ShareBoardHelper", () => {
   beforeEach(() => {
     capturedBlob = null;
     capturedFilename = null;
-    
+
     mockCreateObjectURL.mockReturnValue("blob:mock-url");
     mockCreateObjectURL.mockClear();
     mockRevokeObjectURL.mockClear();
@@ -61,14 +61,14 @@ describe("ShareBoardHelper", () => {
         const link = originalCreateElement(tagName);
         const originalHrefSetter = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, "href")?.set;
         const originalDownloadSetter = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, "download")?.set;
-        
+
         Object.defineProperty(link, "href", {
           set: (value: string) => {
             originalHrefSetter?.call(link, value);
           },
           get: () => link.getAttribute("href"),
         });
-        
+
         Object.defineProperty(link, "download", {
           set: (value: string) => {
             capturedFilename = value;
@@ -76,7 +76,7 @@ describe("ShareBoardHelper", () => {
           },
           get: () => link.getAttribute("download"),
         });
-        
+
         link.click = mockClick;
         return link;
       }
@@ -275,7 +275,7 @@ describe("ShareBoardHelper", () => {
       expect(mockGetBoardUrl).toHaveBeenCalledWith("team1", "board1");
       expect(mockItemDataService.getFeedbackItemsForBoard).toHaveBeenCalledWith("board1");
       expect(mockWorkItemService.getWorkItemsByIds).toHaveBeenCalledWith([123, 456]);
-      
+
       expect(mockCreateObjectURL).toHaveBeenCalled();
       expect(mockClick).toHaveBeenCalled();
       expect(capturedFilename).toBe("retro.csv");

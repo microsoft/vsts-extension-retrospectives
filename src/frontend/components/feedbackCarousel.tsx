@@ -125,7 +125,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
 
           // Always call renderFeedbackCarouselItems for consistent item rendering
           const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
-          
+
           // Initialize ref for this column if needed
           if (!this.carouselRefs[columnProps.columnId]) {
             this.carouselRefs[columnProps.columnId] = React.createRef<HTMLDivElement>();
@@ -137,20 +137,12 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
             <PivotItem key={columnProps.columnId} headerText={columnProps.columnName} className="feedback-carousel-pivot-item" {...columnProps}>
               {mainCardCount > 1 ? (
                 <div className="custom-carousel-container">
-                  <button 
-                    className="carousel-arrow carousel-arrow-prev" 
-                    onClick={() => this.goToPrevSlide(columnProps.columnId, mainCardCount)}
-                    disabled={currentSlide === 0}
-                    aria-label="Previous slide"
-                  >
+                  <button className="carousel-arrow carousel-arrow-prev" onClick={() => this.goToPrevSlide(columnProps.columnId, mainCardCount)} disabled={currentSlide === 0} aria-label="Previous slide">
                     <i className="fas fa-chevron-left" />
                   </button>
-                  
+
                   <div className="carousel-viewport">
-                    <div 
-                      className="carousel-track" 
-                      ref={this.carouselRefs[columnProps.columnId]}
-                    >
+                    <div className="carousel-track" ref={this.carouselRefs[columnProps.columnId]}>
                       {feedbackCarouselItems.map((child: React.ReactElement<typeof FeedbackItem>) => (
                         <div className="carousel-slide" key={child.key}>
                           {child}
@@ -158,24 +150,14 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
                       ))}
                     </div>
                   </div>
-                  
-                  <button 
-                    className="carousel-arrow carousel-arrow-next" 
-                    onClick={() => this.goToNextSlide(columnProps.columnId, mainCardCount)}
-                    disabled={currentSlide === mainCardCount - 1}
-                    aria-label="Next slide"
-                  >
+
+                  <button className="carousel-arrow carousel-arrow-next" onClick={() => this.goToNextSlide(columnProps.columnId, mainCardCount)} disabled={currentSlide === mainCardCount - 1} aria-label="Next slide">
                     <i className="fas fa-chevron-right" />
                   </button>
-                  
+
                   <div className="carousel-dots">
                     {feedbackCarouselItems.map((_, index) => (
-                      <button
-                        key={index}
-                        className={`carousel-dot ${index === currentSlide ? "active" : ""}`}
-                        onClick={() => this.goToSlide(columnProps.columnId, index, mainCardCount)}
-                        aria-label={`Go to slide ${index + 1}`}
-                      />
+                      <button key={index} className={`carousel-dot ${index === currentSlide ? "active" : ""}`} onClick={() => this.goToSlide(columnProps.columnId, index, mainCardCount)} aria-label={`Go to slide ${index + 1}`} />
                     ))}
                   </div>
                 </div>

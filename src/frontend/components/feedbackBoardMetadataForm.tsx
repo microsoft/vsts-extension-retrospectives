@@ -405,13 +405,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   items={this.state.columnCards}
                   onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
                     return (
-                      <DocumentCard
-                        className={cn(
-                          "feedback-column-card",
-                          columnCard.markedForDeletion && "marked-for-deletion"
-                        )}
-                        type={DocumentCardType.compact}
-                      >
+                      <DocumentCard className={cn("feedback-column-card", columnCard.markedForDeletion && "marked-for-deletion")} type={DocumentCardType.compact}>
                         <div className="flex grow items-center">
                           <DefaultButton
                             className="feedback-column-card-icon-button"

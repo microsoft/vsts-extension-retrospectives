@@ -563,15 +563,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           }
         }}
       >
-        <i
-          className={cn(
-            "fa",
-            isFocusButton && this.state.isShowingGroupedChildrenTitles && "fa-angle-double-down",
-            isFocusButton && !this.state.isShowingGroupedChildrenTitles && "fa-angle-double-right",
-            !isFocusButton && this.props.groupedItemProps.isGroupExpanded && "fa-chevron-down",
-            !isFocusButton && !this.props.groupedItemProps.isGroupExpanded && "fa-chevron-right"
-          )}
-        />
+        <i className={cn("fa", isFocusButton && this.state.isShowingGroupedChildrenTitles && "fa-angle-double-down", isFocusButton && !this.state.isShowingGroupedChildrenTitles && "fa-angle-double-right", !isFocusButton && this.props.groupedItemProps.isGroupExpanded && "fa-chevron-down", !isFocusButton && !this.props.groupedItemProps.isGroupExpanded && "fa-chevron-right")} />
         &nbsp;
         {isFocusButton ? `${this.props.groupCount + 1} Items` : `${groupItemsCount} Items`}
         {isFocusButton && <i className="far fa-comments" />}
@@ -665,33 +657,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
 
     return (
-      <div
-        ref={this.itemElementRef}
-        tabIndex={0}
-        aria-live="polite"
-        aria-label={ariaLabel}
-        className={cn(
-          isNotGroupedItem && "feedbackItem",
-          !isNotGroupedItem && "feedbackItemGroupItem",
-          !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem",
-          this.props.showAddedAnimation && "newFeedbackItem",
-          this.state.isMarkedForDeletion && "removeFeedbackItem",
-          hideFeedbackItems && "hideFeedbackItem"
-        )}
-        draggable={isDraggable}
-        onDragStart={this.dragFeedbackItemStart}
-        onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null}
-        onDragEnd={this.dragFeedbackItemEnd}
-        onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null}
-        onAnimationEnd={this.onAnimationEnd}
-      >
+      <div ref={this.itemElementRef} tabIndex={0} aria-live="polite" aria-label={ariaLabel} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
         <div className="document-card-wrapper">
-          <DocumentCard
-            className={cn(
-              isMainItem && "mainItemCard",
-              !isMainItem && "groupedItemCard"
-            )}
-          >
+          <DocumentCard className={cn(isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")}>
             <div
               className="card-integral-part"
               style={{

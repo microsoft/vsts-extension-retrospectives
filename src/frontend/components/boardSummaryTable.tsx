@@ -142,15 +142,7 @@ export interface ITableData {
   expandedRows: Set<string>;
 }
 
-function getColumns(
-  onArchiveToggle: () => void,
-  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>,
-  currentUserId: string,
-  currentUserIsTeamAdmin: boolean,
-  expandedRows: Set<string>,
-  toggleExpanded: (id: string) => void
-): ISimpleColumn[] {
+function getColumns(onArchiveToggle: () => void, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>, currentUserId: string, currentUserIsTeamAdmin: boolean, expandedRows: Set<string>, toggleExpanded: (id: string) => void): ISimpleColumn[] {
   const dateFormatter = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" });
 
   return [
@@ -336,7 +328,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   const [sortColumn, setSortColumn] = useState<string>("createdDate");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  
+
   const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]);
   useEffect(() => {
     setTableData(boardSummaryState.boardsTableItems);
@@ -378,11 +370,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   // Get sorted data
   const getSortedData = (): IBoardSummaryTableItem[] => {
     if (!sortDirection) return tableData;
-    
+
     const sorted = [...tableData].sort((a, b) => {
       let aVal: Date | string | number | boolean | null | undefined;
       let bVal: Date | string | number | boolean | null | undefined;
-      
+
       if (sortColumn === "createdDate" || sortColumn === "archivedDate") {
         aVal = a[sortColumn as keyof IBoardSummaryTableItem];
         bVal = b[sortColumn as keyof IBoardSummaryTableItem];
@@ -390,32 +382,24 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
         if (!bVal) return -1;
         const aTime = new Date(aVal as Date).getTime();
         const bTime = new Date(bVal as Date).getTime();
-        return sortDirection === "asc" ? (aTime < bTime ? -1 : 1) : (aTime < bTime ? 1 : -1);
+        return sortDirection === "asc" ? (aTime < bTime ? -1 : 1) : aTime < bTime ? 1 : -1;
       } else {
         aVal = a[sortColumn as keyof IBoardSummaryTableItem];
         bVal = b[sortColumn as keyof IBoardSummaryTableItem];
       }
-      
+
       if (aVal == null || aVal === undefined) return 1;
       if (bVal == null || bVal === undefined) return -1;
       if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
       if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
-    
+
     return sorted;
   };
 
   // Get columns
-  const columns = getColumns(
-    props.onArchiveToggle,
-    setTableData,
-    setOpenDialogBoardId,
-    props.currentUserId,
-    props.currentUserIsTeamAdmin,
-    expandedRows,
-    toggleExpanded
-  );
+  const columns = getColumns(props.onArchiveToggle, setTableData, setOpenDialogBoardId, props.currentUserId, props.currentUserIsTeamAdmin, expandedRows, toggleExpanded);
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     const newState = buildBoardSummaryState(boardDocuments);
@@ -535,18 +519,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     <div className="board-summary-table-container">
       <DeleteBoardDialog board={selectedBoardForDelete} hidden={!openDialogBoardId} onConfirm={() => handleConfirmDelete(openDialogBoardId, tableData, props.teamId, setOpenDialogBoardId, setTableData, setRefreshKey)} onCancel={() => setOpenDialogBoardId(null)} />
       <table>
-        <BoardSummaryTableHeader
-          columns={columns}
-          sortColumn={sortColumn}
-          sortDirection={sortDirection}
-          onSort={toggleSort}
-        />
-        <BoardSummaryTableBody
-          columns={columns}
-          data={sortedData}
-          expandedRows={expandedRows}
-          boardRowSummary={boardRowSummary}
-        />
+        <BoardSummaryTableHeader columns={columns} sortColumn={sortColumn} sortDirection={sortDirection} onSort={toggleSort} />
+        <BoardSummaryTableBody columns={columns} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
       </table>
     </div>
   );
