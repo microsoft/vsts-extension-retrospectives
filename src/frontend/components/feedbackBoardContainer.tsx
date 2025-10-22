@@ -1392,12 +1392,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         <div className="flex items-center justify-start flex-shrink-0">
           <div className="w-full">
             <div className="flex items-center justify-start mt-2 ml-2">
-              <button className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
+              <div className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
-              </button>
-              <button className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
+              </div>
+              <div className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
                 History
-              </button>
+              </div>
               <div className="mx-4 vertical-tab-separator" />
               <div className="flex items-center justify-start">
                 <div className="board-selector">
