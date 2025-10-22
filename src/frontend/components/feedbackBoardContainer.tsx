@@ -279,12 +279,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
+    const currentPhase = this.getCurrentBoardPhase();
     getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
-      service.setHash(`teamId=${teamId}&boardId=${boardId}`);
+      service.setHash(`teamId=${teamId}&boardId=${boardId}&phase=${currentPhase}`);
     });
   }
 
-  private async parseUrlForBoardAndTeamInformation(): Promise<{ teamId: string; boardId: string }> {
+  private async parseUrlForBoardAndTeamInformation(): Promise<{ teamId: string; boardId: string; phase?: WorkflowPhase }> {
     const service = await getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
     let hash = await service.getHash();
     if (hash.startsWith("#")) {
@@ -293,8 +294,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const hashParams = new URLSearchParams(hash);
     const teamId = hashParams.get("teamId");
     const boardId = hashParams.get("boardId");
+    const phase = hashParams.get("phase") as WorkflowPhase;
 
-    return { teamId, boardId };
+    return { teamId, boardId, phase };
   }
 
   private async updateFeedbackItemsAndContributors(currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) {
@@ -550,7 +552,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, { Members: [], Teams: [] });
 
-      parent.location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id);
+      parent.location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id, newBoard.activePhase);
     }
 
     const info = await this.parseUrlForBoardAndTeamInformation();
@@ -647,6 +649,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
         matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
       }
+
+      // Set the active phase from URL if provided
+      if (info.phase) {
+        matchedBoard.activePhase = info.phase;
+      }
+
       return {
         ...queryParamTeamAndDefaultBoardState,
         currentBoard: matchedBoard,
@@ -1067,7 +1075,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly showBoardUrlCopiedToast = () => {
-    toast(`The link to retrospective ${this.state.currentBoard.title} has been copied to your clipboard.`);
+    const currentPhase = this.getCurrentBoardPhase();
+    const phaseText = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
+    toast(`The link to retrospective ${this.state.currentBoard.title} (${phaseText} phase) has been copied to your clipboard.`);
   };
 
   private readonly showEmailCopiedToast = () => {
@@ -1095,7 +1105,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly copyBoardUrl = async () => {
-    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
+    const currentPhase = this.getCurrentBoardPhase();
+    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, currentPhase);
     copyToClipboard(boardDeepLinkUrl);
   };
 
@@ -1161,90 +1172,95 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardMetadataUpdated, properties: { boardId: updatedBoard.id } });
   };
 
-  private readonly boardActionContexualMenuItems: IContextualMenuItem[] = [
-    {
-      key: "createBoard",
-      className: "hide-mobile",
-      iconProps: { iconName: "Add" },
-      onClick: this.showBoardCreationDialog,
-      text: "Create new retrospective",
-      title: "Create new retrospective",
-    },
-    {
-      key: "duplicateBoard",
-      className: "hide-mobile",
-      iconProps: { iconName: "Copy" },
-      onClick: this.showBoardDuplicateDialog,
-      text: "Create copy of retrospective",
-      title: "Create copy of retrospective",
-    },
-    {
-      key: "editBoard",
-      iconProps: { iconName: "Edit" },
-      onClick: this.showBoardUpdateDialog,
-      text: "Edit retrospective",
-      title: "Edit retrospective",
-    },
-    {
-      key: "seperator",
-      itemType: ContextualMenuItemType.Divider,
-    },
-    {
-      key: "copyLink",
-      iconProps: { iconName: "Link" },
-      onClick: async () => {
-        await this.copyBoardUrl();
-        this.showBoardUrlCopiedToast();
+  private readonly getBoardActionContextualMenuItems = (): IContextualMenuItem[] => {
+    const currentPhase = this.getCurrentBoardPhase();
+    const phaseText = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
+
+    return [
+      {
+        key: "createBoard",
+        className: "hide-mobile",
+        iconProps: { iconName: "Add" },
+        onClick: this.showBoardCreationDialog,
+        text: "Create new retrospective",
+        title: "Create new retrospective",
       },
-      text: "Copy retrospective link",
-      title: "Copy retrospective link",
-    },
-    {
-      key: "seperator",
-      itemType: ContextualMenuItemType.Divider,
-    },
-    {
-      key: "exportCSV",
-      className: "hide-mobile",
-      iconProps: { iconName: "DownloadDocument" },
-      onClick: () => {
-        shareBoardHelper.generateCSVContent(this.state.currentBoard);
+      {
+        key: "duplicateBoard",
+        className: "hide-mobile",
+        iconProps: { iconName: "Copy" },
+        onClick: this.showBoardDuplicateDialog,
+        text: "Create copy of retrospective",
+        title: "Create copy of retrospective",
       },
-      text: "Export CSV content",
-      title: "Export CSV content",
-    },
-    {
-      key: "emailPreview",
-      className: "hide-mobile",
-      iconProps: { iconName: "Mail" },
-      onClick: this.showPreviewEmailDialog,
-      text: "Create email summary",
-      title: "Create email summary",
-    },
-    {
-      key: "seperator",
-      itemType: ContextualMenuItemType.Divider,
-    },
-    {
-      key: "retroSummary",
-      className: "hide-mobile",
-      iconProps: { iconName: "ReportDocument" },
-      onClick: this.showRetroSummaryDialog,
-      text: "Show retrospective summary",
-      title: "Show retrospective summary",
-    },
-    {
-      key: "seperator",
-      itemType: ContextualMenuItemType.Divider,
-    },
-    {
-      key: "archiveBoard",
-      iconProps: { iconName: "Archive" },
-      onClick: this.showArchiveBoardConfirmationDialog,
-      text: "Archive retrospective",
-      title: "Archive retrospective",
-    },
-  ];
+      {
+        key: "editBoard",
+        iconProps: { iconName: "Edit" },
+        onClick: this.showBoardUpdateDialog,
+        text: "Edit retrospective",
+        title: "Edit retrospective",
+      },
+      {
+        key: "seperator",
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: "copyLink",
+        iconProps: { iconName: "Link" },
+        onClick: async () => {
+          await this.copyBoardUrl();
+          this.showBoardUrlCopiedToast();
+        },
+        text: `Copy retrospective link (${phaseText})`,
+        title: `Copy retrospective link (${phaseText})`,
+      },
+      {
+        key: "seperator",
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: "exportCSV",
+        className: "hide-mobile",
+        iconProps: { iconName: "DownloadDocument" },
+        onClick: () => {
+          shareBoardHelper.generateCSVContent(this.state.currentBoard);
+        },
+        text: "Export CSV content",
+        title: "Export CSV content",
+      },
+      {
+        key: "emailPreview",
+        className: "hide-mobile",
+        iconProps: { iconName: "Mail" },
+        onClick: this.showPreviewEmailDialog,
+        text: "Create email summary",
+        title: "Create email summary",
+      },
+      {
+        key: "seperator",
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: "retroSummary",
+        className: "hide-mobile",
+        iconProps: { iconName: "ReportDocument" },
+        onClick: this.showRetroSummaryDialog,
+        text: "Show retrospective summary",
+        title: "Show retrospective summary",
+      },
+      {
+        key: "seperator",
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: "archiveBoard",
+        iconProps: { iconName: "Archive" },
+        onClick: this.showArchiveBoardConfirmationDialog,
+        text: "Archive retrospective",
+        title: "Archive retrospective",
+      },
+    ];
+  };
 
   private readonly hideMobileBoardActionsDialog = () => {
     this.setState({
@@ -1391,7 +1407,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         </div>
         <div className="flex items-center justify-start flex-shrink-0">
           <div className="w-full">
-            <div className="flex items-center justify-start mt-2 ml-2">
+            <div className="flex items-center justify-start mt-2 ml-4">
               <div className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
               </div>
@@ -1410,7 +1426,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     title="Board Actions"
                     menuProps={{
                       className: "board-actions-menu",
-                      items: this.boardActionContexualMenuItems,
+                      items: this.getBoardActionContextualMenuItems(),
                     }}
                   >
                     <span className="ms-Button-icon">
@@ -1428,7 +1444,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     }}
                   >
                     <div className="mobile-contextual-menu-list">
-                      {this.boardActionContexualMenuItems.map(boardAction => (
+                      {this.getBoardActionContextualMenuItems().map((boardAction: IContextualMenuItem) => (
                         <ActionButton
                           key={boardAction.key}
                           className={boardAction.className}
