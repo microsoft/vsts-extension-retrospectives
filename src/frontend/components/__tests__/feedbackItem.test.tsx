@@ -1192,4 +1192,491 @@ describe("Feedback Item", () => {
       expect(container.firstChild).toBeTruthy();
     });
   });
+
+  describe("Timer functionality", () => {
+    test("renders with timer enabled", () => {
+      const props: any = {
+        id: "test-timer",
+        title: "Timer Test",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 60,
+        timerstate: true,
+        timerId: "timer-1",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("renders with zero timer", () => {
+      const props: any = {
+        id: "test-zero-timer",
+        title: "Zero Timer",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: true,
+        timerId: "timer-2",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("Voting functionality", () => {
+    test("renders with vote collection", () => {
+      const props: any = {
+        id: "test-votes",
+        title: "Vote Test",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 5,
+        voteCollection: { user1: 2, user2: 3 },
+        groupIds: [],
+        userIdRef: "user1",
+        currentUserId: "user1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("renders with onVoteCasted callback", () => {
+      const mockVoteCasted = jest.fn();
+      const props: any = {
+        id: "test-vote-callback",
+        title: "Vote Callback",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        voteCollection: {},
+        groupIds: [],
+        userIdRef: "user1",
+        currentUserId: "user1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        onVoteCasted: mockVoteCasted,
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("Deletion scenarios", () => {
+    test("renders item marked for deletion", () => {
+      const props: any = {
+        id: "test-delete",
+        title: "Delete Test",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("renders with upvotes preventing deletion", () => {
+      const props: any = {
+        id: "test-delete-disabled",
+        title: "Cannot Delete",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 5,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("Grouped items", () => {
+    test("renders main item in group", () => {
+      const props: any = {
+        id: "test-main-group",
+        title: "Main Group Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: ["child1", "child2"],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        groupedItemProps: {
+          isMainItem: true,
+          isGroupExpanded: true,
+          parentItemId: "test-main-group",
+          childItemIds: ["child1", "child2"],
+          toggleGroupExpand: jest.fn(),
+          setIsGroupBeingDragged: jest.fn(),
+        },
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("renders child item in group", () => {
+      const props: any = {
+        id: "test-child-group",
+        title: "Child Group Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        groupedItemProps: {
+          isMainItem: false,
+          isGroupExpanded: true,
+          parentItemId: "parent-item",
+          childItemIds: [],
+          toggleGroupExpand: jest.fn(),
+          setIsGroupBeingDragged: jest.fn(),
+        },
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("Edit scenarios", () => {
+    test("renders newly created item", () => {
+      const props: any = {
+        id: "test-newly-created",
+        title: "New Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: true,
+        showAddedAnimation: true,
+        shouldHaveFocus: true,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("renders with shouldHaveFocus enabled", () => {
+      const props: any = {
+        id: "test-focus",
+        title: "Focus Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: true,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("Action items", () => {
+    test("renders with multiple action items", () => {
+      const mockActionItems = [
+        {
+          id: 1,
+          fields: {
+            "System.Title": "Action 1",
+            "System.WorkItemType": "Task",
+            "System.State": "Active",
+          },
+        },
+        {
+          id: 2,
+          fields: {
+            "System.Title": "Action 2",
+            "System.WorkItemType": "Bug",
+            "System.State": "Resolved",
+          },
+        },
+      ];
+
+      const props: any = {
+        id: "test-actions",
+        title: "With Actions",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: mockActionItems,
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [
+          {
+            name: "Task",
+            icon: { id: "1", url: "task-icon.png" },
+            states: [{ name: "Active", category: "InProgress", color: "blue" }],
+          },
+          {
+            name: "Bug",
+            icon: { id: "2", url: "bug-icon.png" },
+            states: [{ name: "Resolved", category: "Resolved", color: "green" }],
+          },
+        ],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Act",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("Workflow phases", () => {
+    test("renders in Collect phase", () => {
+      const props: any = {
+        id: "test-collect",
+        title: "Collect Phase",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("renders in Group phase", () => {
+      const props: any = {
+        id: "test-group",
+        title: "Group Phase",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("renders in Act phase", () => {
+      const props: any = {
+        id: "test-act",
+        title: "Act Phase",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Act",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
 });
+
