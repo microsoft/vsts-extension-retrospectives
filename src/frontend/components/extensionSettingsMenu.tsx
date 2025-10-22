@@ -11,9 +11,8 @@ import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/feedback";
 import { Slide, toast, ToastContainer } from "react-toastify";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import ReactMarkdown from "react-markdown";
 
-import { RETRO_URLS, PRIME_DIRECTIVE_CONTENT, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, renderContent, WHATISNEW_MARKDOWN } from "./extensionSettingsMenuDialogContent";
+import { RETRO_URLS, PRIME_DIRECTIVE_CONTENT, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, WHATISNEW_CONTENT, renderContent, WHATISNEW_MARKDOWN } from "./extensionSettingsMenuDialogContent";
 
 interface IExtensionSettingsMenuState {
   isPrimeDirectiveDialogHidden: boolean;
@@ -334,9 +333,7 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
           {renderContent(PRIME_DIRECTIVE_CONTENT)}
         </ExtensionDialog>
         <ExtensionDialog hidden={this.state.isWhatsNewDialogHidden} onDismiss={this.hideWhatsNewDialog} title="What's New" onDefaultClick={this.onChangeLogClicked} defaultButtonText="Open change log" containerClassName="whatsnew-dialog">
-          <div className="markdown-content">
-            <ReactMarkdown>{WHATISNEW_MARKDOWN}</ReactMarkdown>
-          </div>
+          {renderContent(WHATISNEW_CONTENT)}
         </ExtensionDialog>
         <ExtensionDialog
           hidden={this.state.isGetHelpDialogHidden}
@@ -354,7 +351,7 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
           {renderContent(VOLUNTEER_CONTENT)}
         </ExtensionDialog>
 
-        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" bodyClassName="retrospective-notification-toast-body" progressClassName="retrospective-notification-toast-progress-bar" />
+        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }

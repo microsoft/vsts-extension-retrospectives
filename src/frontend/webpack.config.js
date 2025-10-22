@@ -1,5 +1,6 @@
 ﻿const webpack = require("webpack");
 const path = require("path");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const ESLintPlugin = require("eslint-webpack-plugin");
 
@@ -60,6 +61,16 @@ module.exports = (env, argv) => {
     },
     optimization: {
       minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              drop_console: mode === "production",
+              pure_funcs: mode === "production" ? ["console.info", "console.debug", "console.warn"] : [],
+            },
+          },
+        }),
+      ],
       usedExports: true,
       sideEffects: false,
       splitChunks: false,

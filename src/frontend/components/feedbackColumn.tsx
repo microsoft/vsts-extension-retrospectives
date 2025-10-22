@@ -1,5 +1,5 @@
 import React from "react";
-import classNames from "classnames";
+import { cn } from "../utilities/classNameHelper";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { itemDataService } from "../dal/itemDataService";
@@ -207,11 +207,11 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       <div className="feedback-column" role="application" onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
         <div className="feedback-column-header">
           <div className="feedback-column-title" aria-label={`${this.props.columnName} (${this.props.columnItems.length} feedback items)`}>
-            <i className={classNames(this.props.iconClass, "feedback-column-icon")} />
+            <i className={cn(this.props.iconClass, "feedback-column-icon")} />
             <h2 className="feedback-column-name">{this.props.columnName}</h2>
           </div>
         </div>
-        <div className={classNames("feedback-column-content", { "hide-collapse": this.state.isCollapsed })}>
+        <div className={cn("feedback-column-content", this.state.isCollapsed && "hide-collapse")}>
           {this.props.workflowPhase === WorkflowPhase.Collect && (
             <div className="create-container">
               <ActionButton
@@ -227,7 +227,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
               </ActionButton>
             </div>
           )}
-          {this.props.isDataLoaded && <div className={classNames("feedback-items-container", { "feedback-items-actions": this.props.workflowPhase === WorkflowPhase.Act })}>{this.renderFeedbackItems()}</div>}
+          {this.props.isDataLoaded && <div className={cn("feedback-items-container", this.props.workflowPhase === WorkflowPhase.Act && "feedback-items-actions")}>{this.renderFeedbackItems()}</div>}
         </div>
       </div>
     );

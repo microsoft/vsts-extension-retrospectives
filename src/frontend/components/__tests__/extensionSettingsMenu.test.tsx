@@ -39,12 +39,6 @@ jest.mock("../extensionSettingsMenuDialogContent", () => ({
   )),
 }));
 
-jest.mock("react-markdown", () => {
-  return function ReactMarkdown({ children }: { children: string }) {
-    return <div data-testid="markdown-content">{children}</div>;
-  };
-});
-
 jest.mock("../../dal/boardDataService", () => ({
   default: {
     getBoardsForTeam: jest.fn().mockResolvedValue([]),

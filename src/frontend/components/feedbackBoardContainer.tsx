@@ -1823,7 +1823,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </>
           )}
         </Dialog>
-        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" bodyClassName="retrospective-notification-toast-body" progressClassName="retrospective-notification-toast-progress-bar" />
+        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }

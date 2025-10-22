@@ -1,5 +1,5 @@
 import React from "react";
-import classNames from "classnames";
+import { cn } from "../utilities/classNameHelper";
 import { ActionButton, PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
 import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
 import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
@@ -564,12 +564,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         }}
       >
         <i
-          className={classNames("fa", {
-            "fa-angle-double-down": isFocusButton && this.state.isShowingGroupedChildrenTitles,
-            "fa-angle-double-right": isFocusButton && !this.state.isShowingGroupedChildrenTitles,
-            "fa-chevron-down": !isFocusButton && this.props.groupedItemProps.isGroupExpanded,
-            "fa-chevron-right": !isFocusButton && !this.props.groupedItemProps.isGroupExpanded,
-          })}
+          className={cn(
+            "fa",
+            isFocusButton && this.state.isShowingGroupedChildrenTitles && "fa-angle-double-down",
+            isFocusButton && !this.state.isShowingGroupedChildrenTitles && "fa-angle-double-right",
+            !isFocusButton && this.props.groupedItemProps.isGroupExpanded && "fa-chevron-down",
+            !isFocusButton && !this.props.groupedItemProps.isGroupExpanded && "fa-chevron-right"
+          )}
         />
         &nbsp;
         {isFocusButton ? `${this.props.groupCount + 1} Items` : `${groupItemsCount} Items`}
@@ -590,7 +591,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         aria-label={buttonAriaLabel}
         tabIndex={0}
         disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-        className={classNames("feedback-action-button", "feedback-add-vote", { voteAnimation: this.state.showVotedAnimation })}
+        className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
         onClick={e => {
           e.preventDefault();
           e.stopPropagation();
@@ -669,14 +670,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         tabIndex={0}
         aria-live="polite"
         aria-label={ariaLabel}
-        className={classNames({
-          feedbackItem: isNotGroupedItem,
-          feedbackItemGroupItem: !isNotGroupedItem,
-          feedbackItemGroupGroupedItem: !isNotGroupedItem && !isMainItem,
-          newFeedbackItem: this.props.showAddedAnimation,
-          removeFeedbackItem: this.state.isMarkedForDeletion,
-          hideFeedbackItem: hideFeedbackItems,
-        })}
+        className={cn(
+          isNotGroupedItem && "feedbackItem",
+          !isNotGroupedItem && "feedbackItemGroupItem",
+          !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem",
+          this.props.showAddedAnimation && "newFeedbackItem",
+          this.state.isMarkedForDeletion && "removeFeedbackItem",
+          hideFeedbackItems && "hideFeedbackItem"
+        )}
         draggable={isDraggable}
         onDragStart={this.dragFeedbackItemStart}
         onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null}
@@ -686,10 +687,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       >
         <div className="document-card-wrapper">
           <DocumentCard
-            className={classNames({
-              mainItemCard: isMainItem,
-              groupedItemCard: !isMainItem,
-            })}
+            className={cn(
+              isMainItem && "mainItemCard",
+              !isMainItem && "groupedItemCard"
+            )}
           >
             <div
               className="card-integral-part"
@@ -778,7 +779,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       aria-live="polite"
                       aria-label={"Start/stop"}
                       tabIndex={0}
-                      className={classNames("feedback-action-button")}
+                      className={cn("feedback-action-button")}
                       onClick={e => {
                         e.preventDefault();
                         e.stopPropagation();

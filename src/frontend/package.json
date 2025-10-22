@@ -5,7 +5,7 @@
   "main": "index.tsx",
   "scripts": {
     "build": "npm run clean && npm run compile && npx webpack --mode=production",
-    "clean": "npx rimraf ./dist ./coverage ./reports && npx del-cli ./node_modules/applicationinsights-js/dist/*.map",
+    "clean": "npx rimraf ./dist ./coverage ./reports && npx rimraf ./node_modules/applicationinsights-js/dist/*.map",
     "compile": "npx postcss ./css/index.css -o ./css/bundle.css --config ./postcss.config.js --no-map",
     "format": "npx prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "lint": "npx eslint **/*.ts* --no-warn-ignored",
@@ -25,53 +25,39 @@
   "author": "Microsoft",
   "license": "MIT",
   "dependencies": {
-    "@fluentui/react": "8.123.5",
+    "@fluentui/react": "8.124.2",
     "@microsoft/applicationinsights-react-js": "18.3.6",
     "@microsoft/applicationinsights-web": "3.3.9",
-    "@microsoft/signalr": "8.0.7",
-    "@tanstack/react-table": "8.21.3",
+    "@microsoft/signalr": "9.0.6",
     "azure-devops-extension-api": "1.152.0",
     "azure-devops-extension-sdk": "2.0.11",
-    "classnames": "2.5.1",
-    "file-saver": "2.0.5",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-markdown": "10.1.0",
-    "react-slick": "0.30.2",
-    "react-toastify": "9.0.7",
-    "slick-carousel": "1.8.1",
+    "react-toastify": "11.0.5",
     "telemetryclient-team-services-extension": "1.0.10"
   },
   "devDependencies": {
     "@codecov/webpack-plugin": "1.9.1",
     "@eslint/eslintrc": "3.3.1",
-    "@eslint/js": "9.20.0",
+    "@eslint/js": "9.38.0",
     "@tailwindcss/postcss": "4.1.11",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.8.0",
     "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "14.6.1",
-    "@types/classnames": "2.3.4",
-    "@types/file-saver": "2.0.7",
     "@types/jest": "30.0.0",
-    "@types/jsdom": "21.1.7",
-    "@types/jsonwebtoken": "9.0.10",
     "@types/node": "22.13.1",
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.6",
-    "@types/react-slick": "0.23.13",
-    "@typescript-eslint/eslint-plugin": "8.46.1",
-    "@typescript-eslint/parser": "8.46.1",
-    "cheerio": "1.1.0",
+    "@typescript-eslint/eslint-plugin": "8.46.2",
+    "@typescript-eslint/parser": "8.46.2",
     "compression-webpack-plugin": "11.1.0",
     "crypto-browserify": "3.12.1",
     "css-loader": "7.1.2",
     "cssnano": "7.1.0",
-    "del-cli": "6.0.0",
     "eslint": "9.25.1",
     "eslint-plugin-react": "7.37.4",
     "eslint-webpack-plugin": "5.0.0",
-    "file-loader": "6.2.0",
     "globals": "16.0.0",
     "history": "5.3.0",
     "jest": "30.0.5",
@@ -79,7 +65,7 @@
     "jest-junit": "16.0.0",
     "jest-junit-reporter": "1.1.0",
     "markdownlint-cli2": "0.14.0",
-    "node-jq": "6.0.1",
+    "node-jq": "6.3.1",
     "postcss": "8.5.6",
     "postcss-cli": "11.0.1",
     "prettier": "3.6.2",
@@ -96,14 +82,9 @@
     "typescript": "5.7.3",
     "url-loader": "4.1.1",
     "util": "0.12.5",
-    "webpack": "5.96.1",
+    "webpack": "5.102.1",
     "webpack-cli": "6.0.1",
     "webpack-dev-server": "5.2.2"
-  },
-  "overrides": {
-    "cross-spawn": "7.0.6",
-    "execa": "9.5.2",
-    "clipboardy": "4.0.0"
   },
   "jest": {
     "testPathIgnorePatterns": [
@@ -118,9 +99,7 @@
       ]
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)",
-      "components/__mocks__/cheerio\\.js$",
-      "components/__mocks__/cheerio-utils\\.js$"
+      "node_modules/(?!(azure-devops-ui|azure-devops-extension-sdk|azure-devops-extension-api)/)"
     ],
     "setupFiles": [
       "./components/__tests__/setupTests.tsx"
@@ -129,9 +108,7 @@
       "@testing-library/jest-dom"
     ],
     "moduleNameMapper": {
-      ".+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx",
-      "^cheerio$": "<rootDir>/components/__mocks__/cheerio.js",
-      "^cheerio/lib/utils$": "<rootDir>/components/__mocks__/cheerio-utils.js"
+      ".+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx"
     },
     "preset": "ts-jest/presets/js-with-babel",
     "resetMocks": true,
