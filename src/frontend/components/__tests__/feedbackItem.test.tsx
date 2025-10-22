@@ -290,27 +290,27 @@ describe("Feedback Item", () => {
 
     test("renders in Collect phase", () => {
       const props = { ...baseProps, workflowPhase: "Collect", isInteractable: true };
-      const { container } = render(<FeedbackItem {...props as any} />);
+      const { container } = render(<FeedbackItem {...(props as any)} />);
       expect(container.querySelector(".feedbackItem")).toBeTruthy();
     });
 
     test("renders in Group phase with draggable", () => {
       const props = { ...baseProps, workflowPhase: "Group", isInteractable: true };
-      const { container } = render(<FeedbackItem {...props as any} />);
+      const { container } = render(<FeedbackItem {...(props as any)} />);
       const item = container.querySelector(".feedbackItem");
       expect(item?.getAttribute("draggable")).toBe("true");
     });
 
     test("renders in Vote phase with vote buttons", () => {
       const props = { ...baseProps, workflowPhase: "Vote", isInteractable: true, isFocusModalHidden: true, onVoteCasted: jest.fn() };
-      const { container } = render(<FeedbackItem {...props as any} />);
+      const { container } = render(<FeedbackItem {...(props as any)} />);
       const voteButtons = container.querySelectorAll(".feedback-add-vote");
       expect(voteButtons.length).toBeGreaterThan(0);
     });
 
     test("renders in Act phase with timer", () => {
       const props = { ...baseProps, workflowPhase: "Act", team: { id: "t1" }, boardTitle: "Board", defaultActionItemAreaPath: "Area", defaultActionItemIteration: "Iter" };
-      const { container } = render(<FeedbackItem {...props as any} />);
+      const { container } = render(<FeedbackItem {...(props as any)} />);
       expect(container.textContent).toContain("0:30 elapsed");
     });
   });

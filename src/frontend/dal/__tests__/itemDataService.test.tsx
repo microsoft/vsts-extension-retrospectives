@@ -859,10 +859,8 @@ describe("ItemDataService - deleteFeedbackItem", () => {
       childFeedbackItemIds: ["child-1", "child-2"],
     };
 
-    (dataService.readDocument as jest.Mock)
-      .mockResolvedValueOnce(childItem)
-      .mockResolvedValueOnce(parentItem);
-    
+    (dataService.readDocument as jest.Mock).mockResolvedValueOnce(childItem).mockResolvedValueOnce(parentItem);
+
     (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...parentItem, childFeedbackItemIds: ["child-2"] });
     (dataService.deleteDocument as jest.Mock).mockResolvedValue(undefined);
 
@@ -892,15 +890,10 @@ describe("ItemDataService - deleteFeedbackItem", () => {
       parentFeedbackItemId: "parent-1",
     };
 
-    (dataService.readDocument as jest.Mock)
-      .mockResolvedValueOnce(parentItem)
-      .mockResolvedValueOnce(child1)
-      .mockResolvedValueOnce(child2);
-    
-    (dataService.updateDocument as jest.Mock)
-      .mockResolvedValueOnce({ ...child1, parentFeedbackItemId: null })
-      .mockResolvedValueOnce({ ...child2, parentFeedbackItemId: null });
-    
+    (dataService.readDocument as jest.Mock).mockResolvedValueOnce(parentItem).mockResolvedValueOnce(child1).mockResolvedValueOnce(child2);
+
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...child1, parentFeedbackItemId: null }).mockResolvedValueOnce({ ...child2, parentFeedbackItemId: null });
+
     (dataService.deleteDocument as jest.Mock).mockResolvedValue(undefined);
 
     const result = await itemDataService.deleteFeedbackItem("board-1", "parent-1");
@@ -911,9 +904,7 @@ describe("ItemDataService - deleteFeedbackItem", () => {
 
 describe("ItemDataService - addFeedbackItemAsChild", () => {
   it("should return undefined when parent or child not found", async () => {
-    jest.spyOn(itemDataService, "getFeedbackItem")
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(baseFeedbackItem);
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(null).mockResolvedValueOnce(baseFeedbackItem);
 
     const result = await itemDataService.addFeedbackItemAsChild("board-1", "parent-1", "child-1");
 
@@ -932,9 +923,7 @@ describe("ItemDataService - addFeedbackItemAsChild", () => {
       id: "child-1",
     };
 
-    jest.spyOn(itemDataService, "getFeedbackItem")
-      .mockResolvedValueOnce(parentItem)
-      .mockResolvedValueOnce(childItem);
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(parentItem).mockResolvedValueOnce(childItem);
 
     const result = await itemDataService.addFeedbackItemAsChild("board-1", "parent-1", "child-1");
 
@@ -956,13 +945,9 @@ describe("ItemDataService - addFeedbackItemAsChild", () => {
       childFeedbackItemIds: undefined,
     };
 
-    jest.spyOn(itemDataService, "getFeedbackItem")
-      .mockResolvedValueOnce(parentItem)
-      .mockResolvedValueOnce(childItem);
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(parentItem).mockResolvedValueOnce(childItem);
 
-    (dataService.updateDocument as jest.Mock)
-      .mockResolvedValueOnce(parentItem)
-      .mockResolvedValueOnce({ ...childItem, parentFeedbackItemId: "parent-1", columnId: "col-1" });
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce(parentItem).mockResolvedValueOnce({ ...childItem, parentFeedbackItemId: "parent-1", columnId: "col-1" });
 
     const result = await itemDataService.addFeedbackItemAsChild("board-1", "parent-1", "child-1");
 
@@ -992,10 +977,7 @@ describe("ItemDataService - addFeedbackItemAsChild", () => {
       childFeedbackItemIds: ["child-1", "other-child"],
     };
 
-    jest.spyOn(itemDataService, "getFeedbackItem")
-      .mockResolvedValueOnce(parentItem)
-      .mockResolvedValueOnce(childItem)
-      .mockResolvedValueOnce(oldParentItem);
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(parentItem).mockResolvedValueOnce(childItem).mockResolvedValueOnce(oldParentItem);
 
     (dataService.updateDocument as jest.Mock)
       .mockResolvedValueOnce({ ...oldParentItem, childFeedbackItemIds: ["other-child"] })
@@ -1031,10 +1013,7 @@ describe("ItemDataService - addFeedbackItemAsChild", () => {
       parentFeedbackItemId: "child-1",
     };
 
-    jest.spyOn(itemDataService, "getFeedbackItem")
-      .mockResolvedValueOnce(parentItem)
-      .mockResolvedValueOnce(childItem)
-      .mockResolvedValueOnce(grandchildItem);
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(parentItem).mockResolvedValueOnce(childItem).mockResolvedValueOnce(grandchildItem);
 
     (dataService.updateDocument as jest.Mock)
       .mockResolvedValueOnce(parentItem)
@@ -1064,9 +1043,7 @@ describe("ItemDataService - addFeedbackItemAsMainItemToColumn", () => {
       columnId: "col-1",
     };
 
-    jest.spyOn(itemDataService, "getFeedbackItem")
-      .mockResolvedValueOnce(feedbackItem)
-      .mockResolvedValueOnce(null);
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(feedbackItem).mockResolvedValueOnce(null);
 
     const result = await itemDataService.addFeedbackItemAsMainItemToColumn("board-1", "item-1", "col-2");
 
@@ -1087,13 +1064,9 @@ describe("ItemDataService - addFeedbackItemAsMainItemToColumn", () => {
       childFeedbackItemIds: ["item-1", "item-2"],
     };
 
-    jest.spyOn(itemDataService, "getFeedbackItem")
-      .mockResolvedValueOnce(feedbackItem)
-      .mockResolvedValueOnce(parentItem);
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(feedbackItem).mockResolvedValueOnce(parentItem);
 
-    (dataService.updateDocument as jest.Mock)
-      .mockResolvedValueOnce({ ...parentItem, childFeedbackItemIds: ["item-2"] })
-      .mockResolvedValueOnce({ ...feedbackItem, parentFeedbackItemId: null, columnId: "col-2" });
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...parentItem, childFeedbackItemIds: ["item-2"] }).mockResolvedValueOnce({ ...feedbackItem, parentFeedbackItemId: null, columnId: "col-2" });
 
     const result = await itemDataService.addFeedbackItemAsMainItemToColumn("board-1", "item-1", "col-2");
 
@@ -1115,13 +1088,9 @@ describe("ItemDataService - addFeedbackItemAsMainItemToColumn", () => {
       columnId: "col-1",
     };
 
-    jest.spyOn(itemDataService, "getFeedbackItem")
-      .mockResolvedValueOnce(feedbackItem)
-      .mockResolvedValueOnce(childItem);
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(feedbackItem).mockResolvedValueOnce(childItem);
 
-    (dataService.updateDocument as jest.Mock)
-      .mockResolvedValueOnce({ ...childItem, columnId: "col-2" })
-      .mockResolvedValueOnce({ ...feedbackItem, columnId: "col-2" });
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...childItem, columnId: "col-2" }).mockResolvedValueOnce({ ...feedbackItem, columnId: "col-2" });
 
     const result = await itemDataService.addFeedbackItemAsMainItemToColumn("board-1", "item-1", "col-2");
 
@@ -1150,12 +1119,7 @@ describe("ItemDataService - updateTeamEffectivenessMeasurement", () => {
   it("should return undefined when board not found", async () => {
     jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(undefined);
 
-    const result = await itemDataService.updateTeamEffectivenessMeasurement(
-      "board-1",
-      "team-1",
-      "user-1",
-      []
-    );
+    const result = await itemDataService.updateTeamEffectivenessMeasurement("board-1", "team-1", "user-1", []);
 
     expect(result).toBeUndefined();
   });
@@ -1170,12 +1134,7 @@ describe("ItemDataService - updateTeamEffectivenessMeasurement", () => {
     jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(mockBoard);
     (dataService.updateDocument as jest.Mock).mockResolvedValue(mockBoard);
 
-    const result = await itemDataService.updateTeamEffectivenessMeasurement(
-      "board-1",
-      "team-1",
-      "user-1",
-      [{ userId: "user-1", responses: [{ questionId: 1, selection: 5 }] }]
-    );
+    const result = await itemDataService.updateTeamEffectivenessMeasurement("board-1", "team-1", "user-1", [{ userId: "user-1", responses: [{ questionId: 1, selection: 5 }] }]);
 
     expect(result).toBeDefined();
   });
