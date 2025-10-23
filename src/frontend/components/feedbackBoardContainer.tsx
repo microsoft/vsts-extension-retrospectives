@@ -1660,18 +1660,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}
                       </div>
                     )}
+                    {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
+                      <TooltipHost content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
+                        <button type="button" onClick={this.showCarouselDialog} className="flex items-center bg-transparent border-solid border-[var(--nav-header-active-item-background)] hover:border-[var(--nav-header-active-item-background)] rounded-lg cursor-pointer text-sm py-2 px-4 gap-3 hover:bg-transparent focus:outline-none" aria-label="Focus Mode">
+                          <span className="inline-flex items-center justify-center mr-2">
+                            <i className="fas fa-bullseye"></i>
+                          </span>
+                          Focus Mode
+                        </button>
+                      </TooltipHost>
+                    )}
                   </div>
                 </div>
-              )}
-              {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                <TooltipHost content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                  <button type="button" onClick={this.showCarouselDialog} className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none" aria-label="Focus Mode">
-                    <span className="inline-flex items-center justify-center mr-2">
-                      <i className="fas fa-bullseye"></i>
-                    </span>
-                    Focus Mode
-                  </button>
-                </TooltipHost>
               )}
             </div>
             {this.state.activeTab === "Board" && (
