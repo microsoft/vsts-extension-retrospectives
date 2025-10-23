@@ -114,6 +114,10 @@ export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClic
   if (!board.isArchived || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
     return <div className="centered-cell" />;
   }
+  // If archivedDate missing (legacy archived board), hide trash icon completely
+  if (!board.archivedDate) {
+    return <div className="centered-cell" />;
+  }
   return isTrashEnabled(board) ? (
     <div className="centered-cell trash-icon" title="Delete board" aria-label="Delete board" onClick={onClick}>
       <i className="fas fa-trash-alt"></i>
