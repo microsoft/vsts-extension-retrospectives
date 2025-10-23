@@ -208,7 +208,7 @@ $team_selector_list_item_width: 450px;
     align-items: center;
     cursor: pointer;
     font: inherit;
-    padding: 2px 4px;
+    padding: 2px 6px;
 
     i {
       font-size: 14px;
@@ -227,11 +227,6 @@ $team_selector_list_item_width: 450px;
 
   .workflow-stage-timer-toggle {
     gap: 6px;
-  }
-
-  .workflow-stage-timer-reset {
-    margin-left: 6px;
-    padding-left: 6px;
   }
 }
 
