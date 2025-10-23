@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import BoardSummaryTableBody from "../boardSummaryTableBody";
 import type { IBoardSummaryTableItem, ISimpleColumn } from "../boardSummaryTable";
@@ -85,6 +85,70 @@ describe("BoardSummaryTableBody", () => {
     );
     expect(queryByText("Expanded Summary")).not.toBeInTheDocument();
     expect(mockSummary).not.toHaveBeenCalled();
+  });
+
+  it("invokes the expand column cell when Enter is pressed on a row", () => {
+    const expandCell = jest.fn();
+    const columns: ISimpleColumn[] = [
+      {
+        id: "expand",
+        header: null,
+        cell: expandCell,
+        sortable: false,
+      },
+    ];
+
+    const { container } = render(
+      <table>
+        <BoardSummaryTableBody columns={columns} data={[mockItem]} expandedRows={new Set()} boardRowSummary={() => null} />
+      </table>,
+    );
+
+    const row = container.querySelector("tbody tr");
+    expect(row).toBeTruthy();
+
+    fireEvent.keyPress(row!, { key: "Enter", charCode: 13 });
+
+    expect(expandCell).toHaveBeenCalledWith(mockItem);
+  });
+
+  it("applies pending work item styling when pending items exist", () => {
+    const columns: ISimpleColumn[] = [
+      { id: "pendingWorkItemsCount", header: null, cell: item => item.pendingWorkItemsCount, sortable: false },
+    ];
+
+    const itemWithPending: IBoardSummaryTableItem = { ...mockItem, pendingWorkItemsCount: 2 };
+    const { getByLabelText } = render(
+      <table>
+        <BoardSummaryTableBody columns={columns} data={[itemWithPending]} expandedRows={new Set()} boardRowSummary={() => null} />
+      </table>,
+    );
+
+    const cell = getByLabelText("pendingWorkItemsCount 2");
+    expect(cell).toHaveClass("workItemsCount");
+    expect(cell).toHaveClass("pending-action-item-count");
+  });
+
+  it("omits pending styling when there are no pending items", () => {
+    const columns: ISimpleColumn[] = [
+      { id: "pendingWorkItemsCount", header: null, cell: item => item.pendingWorkItemsCount, sortable: false },
+      { id: "totalWorkItemsCount", header: null, cell: item => item.totalWorkItemsCount, sortable: false },
+    ];
+
+    const itemWithoutPending: IBoardSummaryTableItem = { ...mockItem, pendingWorkItemsCount: 0 };
+    const { container, getByLabelText } = render(
+      <table>
+        <BoardSummaryTableBody columns={columns} data={[itemWithoutPending]} expandedRows={new Set()} boardRowSummary={() => null} />
+      </table>,
+    );
+
+    const pendingCell = container.querySelectorAll("td")[0];
+    expect(pendingCell).toHaveClass("workItemsCount");
+    expect(pendingCell).not.toHaveClass("pending-action-item-count");
+
+    const totalCell = getByLabelText("totalWorkItemsCount 10");
+    expect(totalCell).toHaveClass("workItemsCount");
+    expect(totalCell).toHaveClass("total-work-item-count");
   });
 
   it("handles empty data array", () => {

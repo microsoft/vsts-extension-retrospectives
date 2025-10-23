@@ -1,10 +1,17 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { render, fireEvent, waitFor, act } from "@testing-library/react";
 import { ActionItem, ActionItemProps } from "../actionItem";
+import type { WorkItem } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { itemDataService } from "../../dal/itemDataService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
 import * as azureDevOpsExtensionSdk from "azure-devops-extension-sdk";
+
+jest.mock("azure-devops-extension-api/WorkItemTracking", () => ({
+  WorkItemTrackingServiceIds: {
+    WorkItemFormNavigationService: "WorkItemFormNavigationService",
+  },
+}));
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
@@ -31,6 +38,11 @@ jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
 }));
 
 const mockOnUpdateActionItem = jest.fn(() => {});
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockOnUpdateActionItem.mockClear();
+});
 
 const defaultTestProps: ActionItemProps = {
   feedbackItemId: "101",
@@ -305,5 +317,52 @@ describe("UI-level integration tests for ActionItem", () => {
     await waitFor(() => {
       expect(itemDataService.removeAssociatedActionItem).toHaveBeenCalled();
     });
+  });
+
+  it("opens the work item and refreshes the linked item when the card is activated", async () => {
+    const updatedFeedbackItem = { id: "updated" } as IFeedbackItemDocument;
+    const refreshedWorkItem = { id: 1 } as unknown as WorkItem;
+    const openWorkItem = jest.fn().mockResolvedValue(undefined);
+
+    (azureDevOpsExtensionSdk.getService as jest.Mock).mockResolvedValue({ openWorkItem });
+    (itemDataService.removeAssociatedItemIfNotExistsInVsts as jest.Mock).mockResolvedValue(updatedFeedbackItem);
+    (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([refreshedWorkItem]);
+
+    const actionItemRef = React.createRef<ActionItem>();
+    const { getByRole } = render(<ActionItem {...defaultTestProps} ref={actionItemRef} />);
+
+    await waitFor(() => expect(actionItemRef.current).toBeTruthy());
+
+    act(() => {
+      actionItemRef.current?.setState({
+        isUnlinkWorkItemConfirmationDialogHidden: true,
+        linkedWorkItem: { id: 1 } as WorkItem,
+        workItemSearchTextboxHasErrors: false,
+      });
+    });
+
+    const cardButton = getByRole("button", { name: /click to open work item/i });
+    fireEvent.click(cardButton);
+
+    await waitFor(() => expect(openWorkItem).toHaveBeenCalledWith(1));
+    await waitFor(() => expect(itemDataService.removeAssociatedItemIfNotExistsInVsts).toHaveBeenCalledWith("Test Board Id", "101", 1));
+    await waitFor(() => expect(workItemService.getWorkItemsByIds).toHaveBeenCalledWith([1]));
+
+    expect(mockOnUpdateActionItem).toHaveBeenCalledWith(updatedFeedbackItem);
+    expect(actionItemRef.current?.state.linkedWorkItem).toEqual(refreshedWorkItem);
+  });
+
+  it("handles Enter key on the card to invoke the work item form", async () => {
+    const openWorkItem = jest.fn().mockResolvedValue(undefined);
+    (azureDevOpsExtensionSdk.getService as jest.Mock).mockResolvedValue({ openWorkItem });
+    (itemDataService.removeAssociatedItemIfNotExistsInVsts as jest.Mock).mockResolvedValue({ id: "after-enter" } as IFeedbackItemDocument);
+    (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([]);
+
+    const { getByRole } = render(<ActionItem {...defaultTestProps} />);
+
+    const cardButton = getByRole("button", { name: /click to open work item/i });
+    fireEvent.keyPress(cardButton, { key: "Enter", code: "Enter", charCode: 13 });
+
+    await waitFor(() => expect(openWorkItem).toHaveBeenCalledWith(1));
   });
 });
