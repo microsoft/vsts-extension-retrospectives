@@ -323,8 +323,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly resetBoardTimer = () => {
-    const shouldReset =
-      this.state.boardTimerSeconds !== 0 || this.state.isBoardTimerRunning || this.boardTimerIntervalId !== undefined;
+    const shouldReset = this.state.boardTimerSeconds !== 0 || this.state.isBoardTimerRunning || this.boardTimerIntervalId !== undefined;
 
     if (!shouldReset) {
       return;
@@ -1648,25 +1647,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
                     </div>
                     <div className="workflow-stage-timer hide-mobile" role="status" aria-live="polite">
-                      <button
-                        type="button"
-                        className="workflow-stage-timer-toggle"
-                        title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"}
-                        aria-pressed={this.state.isBoardTimerRunning}
-                        aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} facilitation timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed.`}
-                        onClick={this.handleBoardTimerToggle}
-                      >
+                      <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} facilitation timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed.`} onClick={this.handleBoardTimerToggle}>
                         <i className={this.state.isBoardTimerRunning ? "fa fa-stop-circle" : "fa fa-play-circle"} />
                         <span> {this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed</span>
                       </button>
-                      <button
-                        type="button"
-                        className="workflow-stage-timer-reset"
-                        title="Reset timer"
-                        aria-label="Reset facilitation timer"
-                        disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning}
-                        onClick={this.handleBoardTimerReset}
-                      >
+                      <button type="button" className="workflow-stage-timer-reset" title="Reset timer" aria-label="Reset facilitation timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
                         <i className="fa fa-undo" />
                       </button>
                     </div>

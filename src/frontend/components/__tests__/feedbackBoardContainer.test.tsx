@@ -779,46 +779,46 @@ describe("Facilitation timer", () => {
       expect(instance).not.toBeNull();
       const componentInstance = instance as FeedbackBoardContainerInstance;
 
-    const board = {
-      id: "board-1",
-      title: "Board 1",
-      teamId: "team-1",
-      createdBy: {
-        id: "creator-1",
-        displayName: "Creator",
-        uniqueName: "creator@example.com",
-        imageUrl: "",
-      },
-      createdDate: new Date(),
-      columns: [],
-      activePhase: WorkflowPhase.Collect,
-      isIncludeTeamEffectivenessMeasurement: false,
-      shouldShowFeedbackAfterCollect: false,
-      isAnonymous: false,
-      maxVotesPerUser: 5,
-      boardVoteCollection: {},
-      teamEffectivenessMeasurementVoteCollection: [],
-      permissions: { Teams: [], Members: [] },
-    } as IFeedbackBoardDocument;
+      const board = {
+        id: "board-1",
+        title: "Board 1",
+        teamId: "team-1",
+        createdBy: {
+          id: "creator-1",
+          displayName: "Creator",
+          uniqueName: "creator@example.com",
+          imageUrl: "",
+        },
+        createdDate: new Date(),
+        columns: [],
+        activePhase: WorkflowPhase.Collect,
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        maxVotesPerUser: 5,
+        boardVoteCollection: {},
+        teamEffectivenessMeasurementVoteCollection: [],
+        permissions: { Teams: [], Members: [] },
+      } as IFeedbackBoardDocument;
 
-    const team = {
-      id: "team-1",
-      name: "Team 1",
-      projectName: "Project",
-    } as unknown as WebApiTeam;
+      const team = {
+        id: "team-1",
+        name: "Team 1",
+        projectName: "Project",
+      } as unknown as WebApiTeam;
 
-    act(() => {
-      componentInstance.setState({
-        isAppInitialized: true,
-        isTeamDataLoaded: true,
-        boards: [board],
-        currentBoard: board,
-        currentTeam: team,
-        activeTab: "Board",
-        boardTimerSeconds: 0,
-        isBoardTimerRunning: false,
+      act(() => {
+        componentInstance.setState({
+          isAppInitialized: true,
+          isTeamDataLoaded: true,
+          boards: [board],
+          currentBoard: board,
+          currentTeam: team,
+          activeTab: "Board",
+          boardTimerSeconds: 0,
+          isBoardTimerRunning: false,
+        });
       });
-    });
 
       const toggleButtonInitial = screen.getByRole("button", { pressed: false });
       const resetButton = screen.getByRole("button", { name: "Reset facilitation timer" });
