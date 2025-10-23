@@ -740,7 +740,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 )}
               </div>
               <div className="card-content">
-                <div id="actionTimer" className="card-action-timer hide-mobile">
+                <div className="card-action-timer hide-mobile">
                   {showAddActionItem && (
                     <button
                       title="Timer"

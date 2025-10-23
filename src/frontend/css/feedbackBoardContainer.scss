@@ -186,6 +186,58 @@ $team_selector_list_item_width: 450px;
   }
 }
 
+.workflow-stage-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.workflow-stage-timer {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 12px;
+  padding: 2px 8px;
+  background-color: var(--nav-header-active-item-background);
+  border-radius: 4px;
+  color: var(--text-primary-color);
+
+  button {
+    border: none;
+    background: transparent;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font: inherit;
+    padding: 2px 4px;
+
+    i {
+      font-size: 14px;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--border-subtle-color);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
+  }
+
+  .workflow-stage-timer-toggle {
+    gap: 6px;
+  }
+
+  .workflow-stage-timer-reset {
+    border-left: 1px solid var(--border-subtle-color);
+    margin-left: 6px;
+    padding-left: 6px;
+  }
+}
+
 .feedback-workflow-wrapper-background {
   position: relative;
   margin-left: -325px;

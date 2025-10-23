@@ -108,6 +108,8 @@ export interface FeedbackBoardContainerState {
   boardColumns: IFeedbackColumn[];
   questionIdForDiscussAndActBoardUpdate: number;
   activeTab: "Board" | "History";
+  boardTimerSeconds: number;
+  isBoardTimerRunning: boolean;
 }
 
 export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
@@ -176,8 +178,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       boardColumns: [],
       questionIdForDiscussAndActBoardUpdate: -1,
       activeTab: "Board",
+      boardTimerSeconds: 0,
+      isBoardTimerRunning: false,
     };
   }
+
+  private boardTimerIntervalId?: number;
 
   public async componentDidMount() {
     let initialCurrentTeam: WebApiTeam | undefined;
@@ -268,6 +274,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       if (this.state.currentTeam && this.state.currentBoard) {
         this.updateFeedbackItemsAndContributors(this.state.currentTeam, this.state.currentBoard);
       }
+      if (prevState.currentBoard?.id !== this.state.currentBoard?.id) {
+        this.resetBoardTimer();
+      }
+    }
+    if (prevState.activeTab !== this.state.activeTab && this.state.activeTab !== "Board") {
+      this.pauseBoardTimer();
     }
   }
 
@@ -276,7 +288,76 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveNewBoard(this.handleBoardCreated);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
+    this.clearBoardTimerInterval();
   }
+
+  private readonly clearBoardTimerInterval = () => {
+    if (this.boardTimerIntervalId !== undefined) {
+      window.clearInterval(this.boardTimerIntervalId);
+      this.boardTimerIntervalId = undefined;
+    }
+  };
+
+  private readonly startBoardTimer = () => {
+    if (this.boardTimerIntervalId !== undefined) {
+      return;
+    }
+
+    this.boardTimerIntervalId = window.setInterval(() => {
+      this.setState(previousState => ({ boardTimerSeconds: previousState.boardTimerSeconds + 1 }));
+    }, 1000);
+
+    if (!this.state.isBoardTimerRunning) {
+      this.setState({ isBoardTimerRunning: true });
+    }
+  };
+
+  private readonly pauseBoardTimer = () => {
+    const wasRunning = this.state.isBoardTimerRunning;
+    const hadInterval = this.boardTimerIntervalId !== undefined;
+    this.clearBoardTimerInterval();
+
+    if (wasRunning || hadInterval) {
+      this.setState({ isBoardTimerRunning: false });
+    }
+  };
+
+  private readonly resetBoardTimer = () => {
+    const shouldReset =
+      this.state.boardTimerSeconds !== 0 || this.state.isBoardTimerRunning || this.boardTimerIntervalId !== undefined;
+
+    if (!shouldReset) {
+      return;
+    }
+
+    this.clearBoardTimerInterval();
+    this.setState({ boardTimerSeconds: 0, isBoardTimerRunning: false });
+  };
+
+  private readonly handleBoardTimerToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (this.state.isBoardTimerRunning) {
+      this.pauseBoardTimer();
+      return;
+    }
+
+    this.startBoardTimer();
+  };
+
+  private readonly handleBoardTimerReset = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.resetBoardTimer();
+  };
+
+  private readonly formatBoardTimer = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
     const currentPhase = this.getCurrentBoardPhase();
@@ -1559,11 +1640,36 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </TooltipHost>
                     </div>
                   )}
-                  <div className="flex flex-row" role="tablist">
-                    <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
-                    <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
-                    <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
-                    <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
+                  <div className="flex flex-row items-center workflow-stage-header">
+                    <div className="flex flex-row" role="tablist">
+                      <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
+                      <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
+                      <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
+                      <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
+                    </div>
+                    <div className="workflow-stage-timer hide-mobile" role="status" aria-live="polite">
+                      <button
+                        type="button"
+                        className="workflow-stage-timer-toggle"
+                        title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"}
+                        aria-pressed={this.state.isBoardTimerRunning}
+                        aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} facilitation timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed.`}
+                        onClick={this.handleBoardTimerToggle}
+                      >
+                        <i className={this.state.isBoardTimerRunning ? "fa fa-stop-circle" : "fa fa-play-circle"} />
+                        <span> {this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="workflow-stage-timer-reset"
+                        title="Reset timer"
+                        aria-label="Reset facilitation timer"
+                        disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning}
+                        onClick={this.handleBoardTimerReset}
+                      >
+                        <i className="fa fa-undo" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
