@@ -196,8 +196,6 @@ $team_selector_list_item_width: 450px;
 .workflow-stage-timer {
   display: inline-flex;
   align-items: center;
-  margin-left: 12px;
-  padding: 2px 8px;
   background-color: var(--nav-header-active-item-background);
   border-radius: 4px;
   color: var(--text-primary-color);
@@ -232,7 +230,6 @@ $team_selector_list_item_width: 450px;
   }
 
   .workflow-stage-timer-reset {
-    border-left: 1px solid var(--border-subtle-color);
     margin-left: 6px;
     padding-left: 6px;
   }

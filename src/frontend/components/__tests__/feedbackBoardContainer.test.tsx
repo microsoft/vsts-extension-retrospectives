@@ -8,6 +8,9 @@ import FeedbackBoardContainer, { FeedbackBoardContainerProps, FeedbackBoardConta
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
+import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
+import { reflectBackendService } from "../../dal/reflectBackendService";
+import { userDataService } from "../../dal/userDataService";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -32,7 +35,10 @@ jest.mock("../../utilities/telemetryClient", () => ({
     trackException: jest.fn(),
   },
   reactPlugin: {},
-  TelemetryEvents: {},
+  TelemetryEvents: {
+    TeamSelectionChanged: "TeamSelectionChanged",
+    FeedbackBoardSelectionChanged: "FeedbackBoardSelectionChanged",
+  },
   TelemetryExceptions: {},
 }));
 
@@ -854,5 +860,164 @@ describe("Facilitation timer", () => {
       componentDidMountSpy.mockRestore();
       componentDidUpdateSpy.mockRestore();
     }
+  });
+});
+
+describe("componentDidUpdate", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("handles team and board changes", () => {
+    const instance = createStandaloneTimerInstance();
+    const initialState = instance.state as FeedbackBoardContainerState;
+    const previousState: FeedbackBoardContainerState = {
+      ...initialState,
+      currentTeam: { id: "team-prev" } as WebApiTeam,
+      currentBoard: {
+        id: "board-prev",
+        title: "Board Prev",
+        teamId: "team-prev",
+        createdDate: new Date(),
+        createdBy: mockUserIdentity as unknown as IdentityRef,
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        permissions: { Teams: [], Members: [] },
+        activePhase: WorkflowPhase.Collect,
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      } as IFeedbackBoardDocument,
+      isAppInitialized: true,
+      activeTab: "Board",
+    };
+
+    instance.setState({
+      ...previousState,
+      currentTeam: { id: "team-new" } as WebApiTeam,
+      currentBoard: {
+        id: "board-new",
+        title: "Board New",
+        teamId: "team-new",
+        createdDate: new Date(),
+        createdBy: mockUserIdentity as unknown as IdentityRef,
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        permissions: { Teams: [], Members: [] },
+        activePhase: WorkflowPhase.Collect,
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      } as IFeedbackBoardDocument,
+      isAppInitialized: true,
+      activeTab: "Board",
+    });
+
+    const updateFeedbackSpy = jest.spyOn(instance as any, "updateFeedbackItemsAndContributors").mockResolvedValue(undefined);
+    const resetBoardTimerSpy = jest.spyOn(instance as any, "resetBoardTimer").mockImplementation(() => {});
+    const pauseBoardTimerSpy = jest.spyOn(instance as any, "pauseBoardTimer").mockImplementation(() => {});
+
+    const trackEventMock = appInsights.trackEvent as jest.Mock;
+    const addVisitMock = userDataService.addVisit as jest.Mock;
+    const switchToBoardMock = reflectBackendService.switchToBoard as jest.Mock;
+
+    instance.componentDidUpdate(instance.props, previousState);
+
+    expect(trackEventMock).toHaveBeenCalledTimes(2);
+    expect(trackEventMock).toHaveBeenNthCalledWith(1, {
+      name: TelemetryEvents.TeamSelectionChanged,
+      properties: { teamId: "team-new" },
+    });
+    expect(trackEventMock).toHaveBeenNthCalledWith(2, {
+      name: TelemetryEvents.FeedbackBoardSelectionChanged,
+      properties: { boardId: "board-new" },
+    });
+
+    expect(switchToBoardMock).toHaveBeenCalledWith("board-new");
+    expect(addVisitMock).toHaveBeenCalledWith("team-new", "board-new");
+    expect(updateFeedbackSpy).toHaveBeenCalledWith(expect.objectContaining({ id: "team-new" }), expect.objectContaining({ id: "board-new" }));
+    expect(resetBoardTimerSpy).toHaveBeenCalled();
+    expect(pauseBoardTimerSpy).not.toHaveBeenCalled();
+  });
+
+  it("handles board deselection and skips contributor refresh without board", () => {
+    const instance = createStandaloneTimerInstance();
+    const initialState = instance.state as FeedbackBoardContainerState;
+    const unchangedTeam = { id: "team-1" } as WebApiTeam;
+    const previousState: FeedbackBoardContainerState = {
+      ...initialState,
+      currentTeam: unchangedTeam,
+      currentBoard: {
+        id: "board-active",
+        title: "Board Active",
+        teamId: "team-1",
+        createdDate: new Date(),
+        createdBy: mockUserIdentity as unknown as IdentityRef,
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        permissions: { Teams: [], Members: [] },
+        activePhase: WorkflowPhase.Collect,
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      } as IFeedbackBoardDocument,
+      isAppInitialized: true,
+      activeTab: "Board",
+    };
+
+    instance.setState({
+      ...previousState,
+      currentTeam: unchangedTeam,
+      currentBoard: undefined,
+      isAppInitialized: true,
+      activeTab: "Board",
+    });
+
+    const updateFeedbackSpy = jest.spyOn(instance as any, "updateFeedbackItemsAndContributors").mockResolvedValue(undefined);
+    const resetBoardTimerSpy = jest.spyOn(instance as any, "resetBoardTimer").mockImplementation(() => {});
+    const pauseBoardTimerSpy = jest.spyOn(instance as any, "pauseBoardTimer").mockImplementation(() => {});
+
+    const trackEventMock = appInsights.trackEvent as jest.Mock;
+    const addVisitMock = userDataService.addVisit as jest.Mock;
+    const switchToBoardMock = reflectBackendService.switchToBoard as jest.Mock;
+
+    instance.componentDidUpdate(instance.props, previousState);
+
+    expect(trackEventMock).toHaveBeenCalledTimes(1);
+    expect(trackEventMock).toHaveBeenCalledWith({
+      name: TelemetryEvents.FeedbackBoardSelectionChanged,
+      properties: { boardId: undefined },
+    });
+    expect(switchToBoardMock).toHaveBeenCalledWith(undefined);
+    expect(addVisitMock).toHaveBeenCalledWith("team-1", undefined);
+    expect(updateFeedbackSpy).not.toHaveBeenCalled();
+    expect(resetBoardTimerSpy).toHaveBeenCalled();
+    expect(pauseBoardTimerSpy).not.toHaveBeenCalled();
+  });
+
+  it("pauses the board timer when leaving the board tab", () => {
+    const instance = createStandaloneTimerInstance();
+    const initialState = instance.state as FeedbackBoardContainerState;
+    const previousState: FeedbackBoardContainerState = {
+      ...initialState,
+      activeTab: "Board",
+    };
+
+    instance.setState({
+      ...previousState,
+      activeTab: "History",
+    });
+
+    const pauseBoardTimerSpy = jest.spyOn(instance as any, "pauseBoardTimer").mockImplementation(() => {});
+
+    instance.componentDidUpdate(instance.props, previousState);
+
+    expect(pauseBoardTimerSpy).toHaveBeenCalledTimes(1);
   });
 });

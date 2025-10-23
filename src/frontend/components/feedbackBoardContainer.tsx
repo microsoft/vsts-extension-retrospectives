@@ -1547,99 +1547,99 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </div>
               {this.state.activeTab === "Board" && (
                 <div className="flex items-center justify-start">
-                  {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                    <div className="border border-solid border-[var(--nav-header-active-item-background)] rounded-lg ml-2 mr-2">
-                      <Dialog
-                        hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
-                        onDismiss={() => {
-                          this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                        }}
-                        dialogContentProps={{
-                          type: DialogType.close,
-                        }}
-                        minWidth={640}
-                        modalProps={{
-                          isBlocking: true,
-                          containerClassName: "team-effectiveness-dialog",
-                          className: "retrospectives-dialog-modal",
-                        }}
-                      >
-                        <DialogContent>
-                          <div className="team-effectiveness-section-information">
-                            <i className="fa fa-info-circle" />
-                            &nbsp;All answers will be saved anonymously
-                          </div>
-                          <table className="team-effectiveness-measurement-table">
-                            <thead>
-                              <tr>
-                                <th></th>
-                                <th></th>
-                                <th colSpan={6} className="team-effectiveness-favorability-label">
-                                  Unfavorable
-                                </th>
-                                <th colSpan={2} className="team-effectiveness-favorability-label">
-                                  Neutral
-                                </th>
-                                <th colSpan={2} className="team-effectiveness-favorability-label">
-                                  Favorable
-                                </th>
-                              </tr>
-                              <tr>
-                                <th></th>
-                                <th></th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
-                                <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
-                                <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
-                                <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
-                                <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {questions.map(question => {
-                                return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
-                              })}
-                            </tbody>
-                          </table>
-                        </DialogContent>
-                        <DialogFooter>
-                          <PrimaryButton
-                            className="team-effectiveness-submit-button"
-                            onClick={() => {
-                              saveTeamEffectivenessMeasurement();
-                            }}
-                            text="Submit"
-                          />
-                          <DefaultButton
-                            onClick={() => {
-                              this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                            }}
-                            text="Cancel"
-                          />
-                        </DialogFooter>
-                      </Dialog>
-                      <TooltipHost content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
-                        <button
-                          className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
-                          onClick={() => {
-                            this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
-                          }}
-                          aria-label="Team Assessment"
-                          type="button"
-                        >
-                          <span className="inline-flex items-center justify-center mr-1">
-                            <i className="fas fa-chart-line"></i>
-                          </span>
-                          <span>Team Assessment</span>
-                        </button>
-                      </TooltipHost>
-                    </div>
-                  )}
                   <div className="flex flex-row items-center workflow-stage-header">
+                    {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+                      <div className="border border-solid border-[var(--nav-header-active-item-background)] rounded-lg ml-2 mr-2">
+                        <Dialog
+                          hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                          onDismiss={() => {
+                            this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                          }}
+                          dialogContentProps={{
+                            type: DialogType.close,
+                          }}
+                          minWidth={640}
+                          modalProps={{
+                            isBlocking: true,
+                            containerClassName: "team-effectiveness-dialog",
+                            className: "retrospectives-dialog-modal",
+                          }}
+                        >
+                          <DialogContent>
+                            <div className="team-effectiveness-section-information">
+                              <i className="fa fa-info-circle" />
+                              &nbsp;All answers will be saved anonymously
+                            </div>
+                            <table className="team-effectiveness-measurement-table">
+                              <thead>
+                                <tr>
+                                  <th></th>
+                                  <th></th>
+                                  <th colSpan={6} className="team-effectiveness-favorability-label">
+                                    Unfavorable
+                                  </th>
+                                  <th colSpan={2} className="team-effectiveness-favorability-label">
+                                    Neutral
+                                  </th>
+                                  <th colSpan={2} className="team-effectiveness-favorability-label">
+                                    Favorable
+                                  </th>
+                                </tr>
+                                <tr>
+                                  <th></th>
+                                  <th></th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
+                                  <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
+                                  <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
+                                  <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
+                                  <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {questions.map(question => {
+                                  return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                                })}
+                              </tbody>
+                            </table>
+                          </DialogContent>
+                          <DialogFooter>
+                            <PrimaryButton
+                              className="team-effectiveness-submit-button"
+                              onClick={() => {
+                                saveTeamEffectivenessMeasurement();
+                              }}
+                              text="Submit"
+                            />
+                            <DefaultButton
+                              onClick={() => {
+                                this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                              }}
+                              text="Cancel"
+                            />
+                          </DialogFooter>
+                        </Dialog>
+                        <TooltipHost content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
+                          <button
+                            className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
+                            onClick={() => {
+                              this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
+                            }}
+                            aria-label="Team Assessment"
+                            type="button"
+                          >
+                            <span className="inline-flex items-center justify-center mr-1">
+                              <i className="fas fa-chart-line"></i>
+                            </span>
+                            <span>Team Assessment</span>
+                          </button>
+                        </TooltipHost>
+                      </div>
+                    )}
                     <div className="flex flex-row" role="tablist">
                       <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
@@ -1655,12 +1655,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         <i className="fa fa-undo" />
                       </button>
                     </div>
+                    {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
+                      <div className="feedback-maxvotes-per-user">
+                        Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
-              {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
-                <div className="feedback-maxvotes-per-user">
-                  Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}
                 </div>
               )}
               {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
