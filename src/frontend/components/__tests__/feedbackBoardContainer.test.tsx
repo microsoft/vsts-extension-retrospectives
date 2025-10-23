@@ -1,9 +1,10 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
-import FeedbackBoardContainer, { FeedbackBoardContainerProps, deduplicateTeamMembers } from "../feedbackBoardContainer";
+import type { WebApiTeam } from "azure-devops-extension-api/Core";
+import FeedbackBoardContainer, { FeedbackBoardContainerProps, FeedbackBoardContainerState, deduplicateTeamMembers } from "../feedbackBoardContainer";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
@@ -41,6 +42,12 @@ jest.mock("../../dal/azureDevOpsCoreService");
 jest.mock("../../dal/azureDevOpsWorkItemService");
 jest.mock("../../dal/userDataService");
 jest.mock("../../dal/itemDataService");
+
+jest.mock("../feedbackBoard", () => {
+  const MockFeedbackBoard = () => <div data-testid="feedback-board" />;
+  MockFeedbackBoard.displayName = "MockFeedbackBoard";
+  return MockFeedbackBoard;
+});
 
 jest.mock("../../utilities/servicesHelper", () => ({
   getLocationService: jest.fn(() => ({
@@ -678,5 +685,174 @@ describe("FeedbackBoardContainer - Real-time collaboration", () => {
 
     // Component should track connection status
     expect(screen.getByText("Loading...")).toBeInTheDocument();
+  });
+});
+
+type FeedbackBoardContainerInstance = InstanceType<typeof FeedbackBoardContainer>;
+type TestableFeedbackBoardContainer = FeedbackBoardContainerInstance & { setState: (updater: any) => void };
+
+const createStandaloneTimerInstance = (): TestableFeedbackBoardContainer => {
+  const instance = new FeedbackBoardContainer(feedbackBoardContainerProps) as TestableFeedbackBoardContainer;
+  instance.setState = ((updater: React.SetStateAction<FeedbackBoardContainerState>, callback?: () => void) => {
+    const currentState = instance.state as unknown as FeedbackBoardContainerState;
+    const updatePartial = typeof updater === "function" ? updater(currentState) : updater;
+    if (updatePartial) {
+      Object.assign(currentState, updatePartial as Partial<FeedbackBoardContainerState>);
+    }
+    if (callback) {
+      callback();
+    }
+  }) as typeof instance.setState;
+  return instance;
+};
+
+describe("Facilitation timer", () => {
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  });
+
+  it("formats board timer output", () => {
+    const instance = createStandaloneTimerInstance();
+    expect((instance as any).formatBoardTimer(0)).toBe("0:00");
+    expect((instance as any).formatBoardTimer(9)).toBe("0:09");
+    expect((instance as any).formatBoardTimer(65)).toBe("1:05");
+  });
+
+  it("starts, advances, and pauses the board timer", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    (instance as any).startBoardTimer();
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    const initialIntervalId = (instance as any).boardTimerIntervalId;
+    expect(initialIntervalId).toBeDefined();
+
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(2);
+
+    (instance as any).pauseBoardTimer();
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+    expect((instance as any).boardTimerIntervalId).toBeUndefined();
+  });
+
+  it("does not create duplicate intervals when already running", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    (instance as any).startBoardTimer();
+    const firstIntervalId = (instance as any).boardTimerIntervalId;
+
+    (instance as any).startBoardTimer();
+    expect((instance as any).boardTimerIntervalId).toBe(firstIntervalId);
+  });
+
+  it("clears orphaned intervals when pausing", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+    instance.setState({ isBoardTimerRunning: false });
+    (instance as any).boardTimerIntervalId = window.setInterval((): void => undefined, 1000);
+
+    (instance as any).pauseBoardTimer();
+    expect((instance as any).boardTimerIntervalId).toBeUndefined();
+  });
+
+  it("resets timer state only when necessary", () => {
+    const instance = createStandaloneTimerInstance();
+    (instance as any).resetBoardTimer();
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+  });
+
+  it("renders timer controls and handles user interactions", () => {
+    jest.useFakeTimers();
+    const componentDidMountSpy = jest.spyOn(FeedbackBoardContainer.prototype, "componentDidMount").mockImplementation(async () => {});
+    const componentDidUpdateSpy = jest.spyOn(FeedbackBoardContainer.prototype, "componentDidUpdate").mockImplementation(() => {});
+
+    try {
+      const ref = React.createRef<FeedbackBoardContainerInstance>();
+      const { container } = render(<FeedbackBoardContainer {...feedbackBoardContainerProps} ref={ref} />);
+      const instance = ref.current as FeedbackBoardContainerInstance | null;
+      expect(instance).not.toBeNull();
+      const componentInstance = instance as FeedbackBoardContainerInstance;
+
+    const board = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdBy: {
+        id: "creator-1",
+        displayName: "Creator",
+        uniqueName: "creator@example.com",
+        imageUrl: "",
+      },
+      createdDate: new Date(),
+      columns: [],
+      activePhase: WorkflowPhase.Collect,
+      isIncludeTeamEffectivenessMeasurement: false,
+      shouldShowFeedbackAfterCollect: false,
+      isAnonymous: false,
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      teamEffectivenessMeasurementVoteCollection: [],
+      permissions: { Teams: [], Members: [] },
+    } as IFeedbackBoardDocument;
+
+    const team = {
+      id: "team-1",
+      name: "Team 1",
+      projectName: "Project",
+    } as unknown as WebApiTeam;
+
+    act(() => {
+      componentInstance.setState({
+        isAppInitialized: true,
+        isTeamDataLoaded: true,
+        boards: [board],
+        currentBoard: board,
+        currentTeam: team,
+        activeTab: "Board",
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+      const toggleButtonInitial = screen.getByRole("button", { pressed: false });
+      const resetButton = screen.getByRole("button", { name: "Reset facilitation timer" });
+      expect(resetButton).toBeDisabled();
+
+      act(() => {
+        fireEvent.click(toggleButtonInitial);
+      });
+
+      const toggleButtonRunning = screen.getByRole("button", { pressed: true });
+      expect(toggleButtonRunning).toHaveAttribute("aria-label", expect.stringContaining("Pause"));
+
+      act(() => {
+        jest.advanceTimersByTime(3000);
+      });
+
+      expect(componentInstance.state.boardTimerSeconds).toBe(3);
+      expect(resetButton).not.toBeDisabled();
+
+      act(() => {
+        fireEvent.click(toggleButtonRunning);
+      });
+
+      expect(componentInstance.state.isBoardTimerRunning).toBe(false);
+
+      act(() => {
+        fireEvent.click(resetButton);
+      });
+
+      expect(componentInstance.state.boardTimerSeconds).toBe(0);
+      expect(resetButton).toBeDisabled();
+    } finally {
+      componentDidMountSpy.mockRestore();
+      componentDidUpdateSpy.mockRestore();
+    }
   });
 });
