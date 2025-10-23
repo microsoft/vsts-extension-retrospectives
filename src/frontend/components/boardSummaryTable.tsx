@@ -111,11 +111,7 @@ export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
 }
 
 export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClick }: { board: IBoardSummaryTableItem; currentUserId: string; currentUserIsTeamAdmin: boolean; onClick: (event: React.MouseEvent) => void }) {
-  if (!board.isArchived || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
-    return <div className="centered-cell" />;
-  }
-  // If archivedDate missing (legacy archived board), hide trash icon completely
-  if (!board.archivedDate) {
+  if (!board.isArchived || !board.archivedDate || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
     return <div className="centered-cell" />;
   }
   return isTrashEnabled(board) ? (
