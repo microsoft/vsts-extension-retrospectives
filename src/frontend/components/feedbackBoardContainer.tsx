@@ -737,7 +737,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             )
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
         }
-        const currentBoard = boardsForTeam?.length > 0 ? boardsForTeam.at(0) : null;
+        const currentBoard = boardsForTeam?.length > 0 ? boardsForTeam[0] : null;
 
         const recentVisitState = {
           boards: boardsForTeam,
