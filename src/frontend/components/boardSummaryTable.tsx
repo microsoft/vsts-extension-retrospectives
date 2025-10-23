@@ -115,7 +115,7 @@ export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClic
     return <div className="centered-cell" />;
   }
   // If archivedDate missing (legacy archived board), hide trash icon completely
-  if (board.archivedDate) { //DPH !
+  if (!board.archivedDate)
     return <div className="centered-cell" />;
   }
   return isTrashEnabled(board) ? (
