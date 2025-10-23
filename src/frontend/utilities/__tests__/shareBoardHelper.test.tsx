@@ -272,7 +272,7 @@ describe("ShareBoardHelper", () => {
     it("should generate CSV content with feedback items and work items", async () => {
       await shareBoardHelper.generateCSVContent(mockBoard);
 
-      expect(mockGetBoardUrl).toHaveBeenCalledWith("team1", "board1");
+      expect(mockGetBoardUrl).toHaveBeenCalledWith("team1", "board1", WorkflowPhase.Collect);
       expect(mockItemDataService.getFeedbackItemsForBoard).toHaveBeenCalledWith("board1");
       expect(mockWorkItemService.getWorkItemsByIds).toHaveBeenCalledWith([123, 456]);
 
