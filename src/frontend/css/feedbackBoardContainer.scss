@@ -21,6 +21,7 @@ $team_selector_list_item_width: 450px;
   display: flex;
   height: calc(100vh - 93px);
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .initialization-spinner {
