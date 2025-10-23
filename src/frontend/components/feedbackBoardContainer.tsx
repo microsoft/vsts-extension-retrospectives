@@ -1547,7 +1547,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </div>
               {this.state.activeTab === "Board" && (
                 <div className="flex items-center justify-start">
-                  <div className="flex flex-row items-center workflow-stage-header">
+                  <div className="flex flex-row items-center workflow-stage-header gap-4">
                     {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                       <div className="border border-solid border-[var(--nav-header-active-item-background)] rounded-lg ml-2 mr-2">
                         <Dialog
@@ -1640,7 +1640,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </TooltipHost>
                       </div>
                     )}
-                    <div className="flex flex-row" role="tablist">
+                    <div className="flex flex-row gap-4" role="tablist">
                       <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
