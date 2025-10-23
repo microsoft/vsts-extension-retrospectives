@@ -1211,8 +1211,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           await this.copyBoardUrl();
           this.showBoardUrlCopiedToast();
         },
-        text: `Copy retrospective link (${phaseText})`,
-        title: `Copy retrospective link (${phaseText})`,
+        text: `Copy retrospective link (for ${phaseText} phase)`,
+        title: `Copy retrospective link (for ${phaseText} phase)`,
       },
       {
         key: "seperator",
