@@ -1229,6 +1229,40 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardMetadataUpdated, properties: { boardId: updatedBoard.id } });
   };
 
+  private readonly persistColumnNotes = async (columnId: string, notes: string): Promise<void> => {
+    if (!this.state.currentTeam || !this.state.currentBoard) {
+      return;
+    }
+
+    const updatedColumns = this.state.currentBoard.columns.map(column => (column.id === columnId ? { ...column, notes } : column));
+
+    try {
+      const updatedBoard = await BoardDataService.updateBoardMetadata(
+        this.state.currentTeam.id,
+        this.state.currentBoard.id,
+        this.state.currentBoard.maxVotesPerUser,
+        this.state.currentBoard.title,
+        updatedColumns,
+        this.state.currentBoard.permissions,
+      );
+
+      if (!updatedBoard) {
+        throw new Error("Failed to update board with new column notes.");
+      }
+
+      this.replaceBoard(updatedBoard);
+      reflectBackendService.broadcastUpdatedBoard(this.state.currentTeam.id, updatedBoard.id);
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "updateColumnNotes",
+        boardId: this.state.currentBoard?.id,
+        columnId,
+      });
+
+      throw error;
+    }
+  };
+
   private readonly getBoardActionContextualMenuItems = (): IContextualMenuItem[] => {
     const currentPhase = this.getCurrentBoardPhase();
     const phaseText = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
@@ -1705,7 +1739,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </MessageBar>
                     )}
                     <div className="feedback-board-container">
-                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} onEditBoard={this.showBoardUpdateDialog} />
+                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} onColumnNotesChange={this.persistColumnNotes} />
                     </div>
                     <Dialog
                       hidden={this.state.isArchiveBoardConfirmationDialogHidden}

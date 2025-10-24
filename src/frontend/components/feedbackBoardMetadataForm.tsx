@@ -530,6 +530,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                           title: "New Column",
                           iconClass: this.getRandomArrayElement(this.allIconClassNames).iconClass,
                           accentColor: this.getRandomArrayElement(this.allAccentColors).colorCode,
+                          notes: "",
                         },
                         markedForDeletion: false,
                       });

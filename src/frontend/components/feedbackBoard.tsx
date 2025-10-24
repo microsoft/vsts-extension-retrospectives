@@ -14,7 +14,7 @@ import { WorkflowPhase } from "../interfaces/workItem";
 import FeedbackCarousel from "./feedbackCarousel";
 import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
-import { reactPlugin } from "../utilities/telemetryClient";
+import { appInsights, reactPlugin } from "../utilities/telemetryClient";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -30,7 +30,7 @@ export interface FeedbackBoardProps {
   hideCarouselDialog: () => void;
   userId: string;
   onVoteCasted?: () => void;
-  onEditBoard: () => void;
+  onColumnNotesChange?: (columnId: string, notes: string) => Promise<void>;
 }
 
 export interface IColumn {
@@ -55,6 +55,7 @@ export interface FeedbackBoardState {
   hasItems: boolean;
   defaultActionItemIteration: string;
   defaultActionItemAreaPath: string;
+  columnNotes: { [columnId: string]: string };
 }
 
 class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
@@ -68,6 +69,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       defaultActionItemIteration: "",
       hasItems: false,
       isDataLoaded: false,
+      columnNotes: {},
     };
   }
 
@@ -88,12 +90,14 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         columns: {},
         columnIds: [],
         hasItems: false,
+        columnNotes: {},
       });
       this.initColumns();
       await this.getAllBoardFeedbackItems();
     }
 
     if (prevProps.board.modifiedDate !== this.props.board.modifiedDate) {
+      this.setState({ columnNotes: {} });
       this.initColumns();
       await this.getAllBoardFeedbackItems();
     }
@@ -124,6 +128,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
     const stateColumns: { [id: string]: IColumn } = {};
     const columnIds: string[] = new Array<string>();
+    const columnNotes: { [columnId: string]: string } = {};
 
     columnProperties.forEach(col => {
       if (!col.iconClass) {
@@ -134,6 +139,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         col.accentColor = "#0078d4";
       }
 
+      col.notes = col.notes ?? "";
+
       const column: IColumn = {
         columnProperties: col,
         columnItems: [],
@@ -141,9 +148,68 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       };
       stateColumns[col.id] = column;
       columnIds.push(col.id);
+      columnNotes[col.id] = col.notes ?? "";
     });
 
-    this.setState({ columns: stateColumns, columnIds: columnIds });
+    this.setState({ columns: stateColumns, columnIds: columnIds, columnNotes });
+  };
+
+  private readonly handleColumnNotesChange = (columnId: string, notes: string) => {
+    const previousNotes = this.state.columnNotes[columnId] ?? "";
+
+    this.setState(previousState => {
+      const updatedColumns = { ...previousState.columns };
+
+      if (updatedColumns[columnId]) {
+        updatedColumns[columnId] = {
+          ...updatedColumns[columnId],
+          columnProperties: {
+            ...updatedColumns[columnId].columnProperties,
+            notes,
+          },
+        };
+      }
+
+      return {
+        columns: updatedColumns,
+        columnNotes: {
+          ...previousState.columnNotes,
+          [columnId]: notes,
+        },
+      };
+    });
+
+    const updatePromise = this.props.onColumnNotesChange?.(columnId, notes);
+
+    updatePromise?.catch(error => {
+      appInsights.trackException(error, {
+        action: "updateColumnNotes",
+        boardId: this.props.board.id,
+        columnId,
+      });
+
+      this.setState(previousState => {
+        const revertedColumns = { ...previousState.columns };
+
+        if (revertedColumns[columnId]) {
+          revertedColumns[columnId] = {
+            ...revertedColumns[columnId],
+            columnProperties: {
+              ...revertedColumns[columnId].columnProperties,
+              notes: previousNotes,
+            },
+          };
+        }
+
+        return {
+          columns: revertedColumns,
+          columnNotes: {
+            ...previousState.columnNotes,
+            [columnId]: previousNotes,
+          },
+        };
+      });
+    });
   };
 
   private readonly getAllBoardFeedbackItems = async () => {
@@ -393,7 +459,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         isFocusModalHidden: true,
         groupIds: [] as string[],
         showColumnEditButton: !!canCurrentUserEditBoard,
-        onColumnEditClick: this.props.onEditBoard,
+        columnNotes: this.state.columnNotes[columnId] ?? "",
+        onColumnNotesChange: (notes: string) => this.handleColumnNotesChange(columnId, notes),
         onVoteCasted: () => {
           if (this.props.onVoteCasted) {
             this.props.onVoteCasted();

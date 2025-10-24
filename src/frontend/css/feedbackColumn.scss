@@ -43,8 +43,13 @@
   .feedback-column-actions {
     display: inline-flex;
     align-items: center;
+    gap: 4px;
 
     .feedback-column-edit-button {
+      color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
+    }
+
+    .feedback-column-info-button {
       color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
     }
   }
@@ -53,6 +58,10 @@
 .feedback-column-content {
   padding: 10px;
   padding-left: variables.$header_horizontal_spacing;
+}
+
+.feedback-column-info-dialog-text {
+  white-space: pre-wrap;
 }
 
 .feedback-items-container {

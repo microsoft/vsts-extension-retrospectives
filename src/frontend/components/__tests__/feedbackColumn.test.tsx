@@ -31,15 +31,37 @@ describe("Feedback Column ", () => {
       expect(container.querySelector(".feedback-column-edit-button")).toBeTruthy();
     });
 
-    it("invokes the edit callback with the column id", () => {
-      const onColumnEditClick = jest.fn();
-      const props = { ...testColumnProps, showColumnEditButton: true, onColumnEditClick };
+    it("saves updated column notes when the dialog form is submitted", () => {
+      const onColumnNotesChange = jest.fn();
+      const props = { ...testColumnProps, showColumnEditButton: true, onColumnNotesChange };
 
-      const { getByRole } = render(<FeedbackColumn {...props} />);
+      const { getByRole, getByLabelText } = render(<FeedbackColumn {...props} />);
 
       fireEvent.click(getByRole("button", { name: `Edit column ${props.columnName}` }));
+      fireEvent.change(getByLabelText("Column notes"), { target: { value: "Updated column notes" } });
+      fireEvent.click(getByRole("button", { name: "Save" }));
 
-      expect(onColumnEditClick).toHaveBeenCalledWith(props.columnId);
+      expect(onColumnNotesChange).toHaveBeenCalledWith("Updated column notes");
+    });
+  });
+
+  describe("info button", () => {
+    it("shows the stored notes when clicked", () => {
+      const props = { ...testColumnProps, columnNotes: "Saved notes", showColumnEditButton: false };
+      const { getByRole, getByText } = render(<FeedbackColumn {...props} />);
+
+      fireEvent.click(getByRole("button", { name: `View notes for ${props.columnName}` }));
+
+      expect(getByText("Saved notes")).toBeInTheDocument();
+    });
+
+    it("shows a fallback message when no notes exist", () => {
+      const props = { ...testColumnProps, columnNotes: "", showColumnEditButton: false };
+      const { getByRole, getByText } = render(<FeedbackColumn {...props} />);
+
+      fireEvent.click(getByRole("button", { name: `View notes for ${props.columnName}` }));
+
+      expect(getByText("No notes available for this column.")).toBeInTheDocument();
     });
   });
 

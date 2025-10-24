@@ -65,6 +65,7 @@ testColumnsObj[testColumnUuidOne] = {
     title: "Test Feedback Column One",
     iconClass: "far fa-smile",
     accentColor: "#008000",
+    notes: "",
   },
   columnItems: [
     {
@@ -79,6 +80,7 @@ testColumnsObj[testColumnUuidTwo] = {
     title: testColumnTwoTitle,
     iconClass: "far fa-smile",
     accentColor: "#008100",
+    notes: "",
   },
   columnItems: [],
 };
@@ -137,7 +139,8 @@ export const testColumnProps = mocked({
   groupIds: [],
   isFocusModalHidden: false,
   showColumnEditButton: false,
-  onColumnEditClick: jest.fn(() => {}),
+  columnNotes: "",
+  onColumnNotesChange: jest.fn(() => {}),
   onVoteCasted: jest.fn(() => {}),
   addFeedbackItems: jest.fn(() => {}),
   removeFeedbackItemFromColumn: jest.fn(() => {}),
@@ -253,6 +256,7 @@ testGroupColumnsObj[testGroupColumnUuidOne] = {
     title: "Test Group Feedback Column One",
     iconClass: "far fa-smile",
     accentColor: "#008000",
+    notes: "",
   },
   columnItems: [
     {
@@ -271,6 +275,7 @@ testGroupColumnsObj[testGroupColumnUuidTwo] = {
     title: "Test Group Feedback Column Two",
     iconClass: "far fa-smile",
     accentColor: "#008000",
+    notes: "",
   },
   columnItems: [],
 };
@@ -329,7 +334,8 @@ export const testGroupColumnProps = mocked({
   groupIds: [],
   isFocusModalHidden: false,
   showColumnEditButton: false,
-  onColumnEditClick: jest.fn(() => {}),
+  columnNotes: "",
+  onColumnNotesChange: jest.fn(() => {}),
   onVoteCasted: jest.fn(() => {}),
   addFeedbackItems: jest.fn(() => {}),
   removeFeedbackItemFromColumn: jest.fn(() => {}),

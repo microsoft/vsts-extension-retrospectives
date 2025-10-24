@@ -75,6 +75,7 @@ export interface IFeedbackColumn {
   title: string;
   iconClass: string;
   accentColor: string;
+  notes?: string;
 }
 
 export interface IFeedbackItemDocument {
