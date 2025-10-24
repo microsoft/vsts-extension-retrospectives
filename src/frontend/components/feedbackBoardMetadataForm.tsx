@@ -333,7 +333,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         <Pivot>
           <PivotItem headerText={"General"} aria-label="Board General Settings">
             <div className="board-metadata-form">
-              <section className="board-metadata-edit-column-settings hide-mobile">
+              <section className="board-metadata-edit-column-settings">
                 <h2 className="board-metadata-form-section-header">Board Settings</h2>
                 <div className="board-metadata-form-section-subheader">
                   <label htmlFor="title-input-container">
@@ -366,7 +366,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   <Checkbox id="feedback-display-names-checkbox" label="Do not display names in feedback" ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation." boxSide="start" checked={this.state.isBoardAnonymous} disabled={!this.props.isNewBoardCreation} onChange={this.handleIsAnonymousCheckboxChange} />
                 </div>
               </section>
-              <section className="board-metadata-edit-column-settings hide-mobile">
+              <section className="board-metadata-edit-column-settings">
                 <h2 className="board-metadata-form-section-header">Column Settings</h2>
                 <div className="board-metadata-form-section-information">
                   <i className="fas fa-exclamation-circle"></i>&nbsp;You can create a maximum of {this.maxColumnCount} columns in a retrospective.

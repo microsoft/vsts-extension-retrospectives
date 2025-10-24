@@ -1236,7 +1236,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return [
       {
         key: "createBoard",
-        className: "hide-mobile",
         iconProps: { iconName: "Add" },
         onClick: this.showBoardCreationDialog,
         text: "Create new retrospective",
@@ -1244,7 +1243,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       },
       {
         key: "duplicateBoard",
-        className: "hide-mobile",
         iconProps: { iconName: "Copy" },
         onClick: this.showBoardDuplicateDialog,
         text: "Create copy of retrospective",
@@ -1277,7 +1275,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       },
       {
         key: "exportCSV",
-        className: "hide-mobile",
         iconProps: { iconName: "DownloadDocument" },
         onClick: () => {
           shareBoardHelper.generateCSVContent(this.state.currentBoard);
@@ -1287,7 +1284,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       },
       {
         key: "emailPreview",
-        className: "hide-mobile",
         iconProps: { iconName: "Mail" },
         onClick: this.showPreviewEmailDialog,
         text: "Create email summary",
@@ -1299,7 +1295,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       },
       {
         key: "retroSummary",
-        className: "hide-mobile",
         iconProps: { iconName: "ReportDocument" },
         onClick: this.showRetroSummaryDialog,
         text: "Show retrospective summary",
@@ -1623,7 +1618,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
                     </div>
-                    <div className="workflow-stage-timer hide-mobile" role="status" aria-live="polite">
+                    <div className="workflow-stage-timer" role="status" aria-live="polite">
                       <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} facilitation timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed.`} onClick={this.handleBoardTimerToggle}>
                         <i className={this.state.isBoardTimerRunning ? "fa fa-stop-circle" : "fa fa-play-circle"} />
                         <span> {this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed</span>
