@@ -6,6 +6,14 @@
 @theme {
 }
 
+.extension-settings-menu {
+  @apply mt-3 mr-3;
+}
+
+.extension-settings-menu .ms-Button-label {
+  @apply text-sm;
+}
+
 .ms-Button--primary {
   background-color: #fff;
   color: rgb(0, 120, 212);
