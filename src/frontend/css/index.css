@@ -11,7 +11,7 @@
 }
 
 .extension-settings-menu .ms-Button-label {
-  @apply text-sm;
+  @apply text-xs;
 }
 
 .ms-Button--primary {

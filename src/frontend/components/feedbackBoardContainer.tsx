@@ -1770,10 +1770,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </div>
             )}
             {this.state.activeTab === "History" && (
-              <div className="custom-pivot-content flex-1 min-h-0 overflow-auto">
-                <div className="pivot-content-wrapper">
-                  <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
-                </div>
+              <div className="pivot-content-wrapper flex-1 min-h-0 overflow-auto">
+                <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
               </div>
             )}
           </div>
