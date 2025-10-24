@@ -172,17 +172,6 @@ $team_selector_list_item_width: 450px;
   &.active {
     font-weight: 700;
     background-color: var(--nav-header-active-item-background);
-
-    &::before {
-      background-color: transparent;
-      bottom: 0px;
-      content: "";
-      position: absolute;
-      width: 44px;
-      margin-left: 14px;
-      box-sizing: border-box;
-      border-bottom: 2px solid var(--text-primary-color);
-    }
   }
 }
 

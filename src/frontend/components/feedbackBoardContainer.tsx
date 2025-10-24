@@ -5,7 +5,6 @@ import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react
 import { MessageBar, MessageBarType } from "@fluentui/react/lib/MessageBar";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
-import { MobileWidthBreakpoint } from "../config/constants";
 import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
 import BoardDataService from "../dal/boardDataService";
@@ -89,8 +88,6 @@ export interface FeedbackBoardContainerState {
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
-  isDesktop: boolean;
-  isAutoResizeEnabled: boolean;
   allowCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: { id: string; name: string; imageUrl: string }[];
@@ -140,7 +137,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       hasToggledArchive: false,
       isAllTeamsLoaded: false,
       isAppInitialized: false,
-      isAutoResizeEnabled: true,
       isBackendServiceConnected: false,
       isBoardCreationDialogHidden: true,
       isBoardDuplicateDialogHidden: true,
@@ -148,7 +144,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isCarouselDialogHidden: true,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isArchiveBoardConfirmationDialogHidden: true,
-      isDesktop: true,
       isDropIssueInEdgeMessageBarVisible: true,
       isLiveSyncInTfsIssueMessageBarVisible: true,
       isMobileBoardActionsDialogHidden: true,
@@ -284,7 +279,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   public componentWillUnmount() {
-    window.removeEventListener("resize", this.handleResolutionChange);
     reflectBackendService.removeOnReceiveNewBoard(this.handleBoardCreated);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
@@ -415,23 +409,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       currentVoteCount: currentUserVoteCount,
     });
   }
-
-  private readonly setScreenViewMode = (isDesktop: boolean) => {
-    this.setState({
-      isAutoResizeEnabled: false,
-      isDesktop,
-    });
-  };
-
-  private readonly handleResolutionChange = () => {
-    const isDesktop = window.innerWidth >= MobileWidthBreakpoint;
-
-    if (this.state.isAutoResizeEnabled && this.state.isDesktop != isDesktop) {
-      this.setState({
-        isDesktop: isDesktop,
-      });
-    }
-  };
 
   private readonly numberFormatter = (value: number) => {
     const formatter = new Intl.NumberFormat("en-US", { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -1483,7 +1460,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           </h1>
           <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="users" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
           <div style={{ flexGrow: 1 }}></div>
-          <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.setScreenViewMode} />
+          <ExtensionSettingsMenu />
         </div>
         <div className="flex items-center justify-start flex-shrink-0">
           <div className="w-full">
@@ -1529,7 +1506,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           key={boardAction.key}
                           className={boardAction.className}
                           iconProps={boardAction.iconProps}
-                          aria-label="User Settings Menu"
+                          aria-label="Board Actions Menu"
                           onClick={() => {
                             this.hideMobileBoardActionsDialog();
                             boardAction.onClick();
@@ -1662,12 +1639,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     )}
                     {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
                       <TooltipHost content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                        <button type="button" onClick={this.showCarouselDialog} className="flex items-center bg-transparent border-solid border-[var(--nav-header-active-item-background)] hover:border-[var(--nav-header-active-item-background)] rounded-lg cursor-pointer text-sm py-2 px-4 gap-3 hover:bg-transparent focus:outline-none" aria-label="Focus Mode">
+                        <div role="button" onClick={this.showCarouselDialog} className="flex items-center bg-transparent border border-solid border-[var(--nav-header-active-item-background)] rounded-lg cursor-pointer text-sm py-2 px-4" aria-label="Focus Mode">
                           <span className="inline-flex items-center justify-center mr-2">
                             <i className="fas fa-bullseye"></i>
                           </span>
                           Focus Mode
-                        </button>
+                        </div>
                       </TooltipHost>
                     )}
                   </div>

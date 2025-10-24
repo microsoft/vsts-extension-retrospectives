@@ -22,11 +22,6 @@ interface IExtensionSettingsMenuState {
   isWindowWide: boolean;
 }
 
-interface IExtensionSettingsMenuProps {
-  onScreenViewModeChanged: (isDesktop: boolean) => void;
-  isDesktop: boolean;
-}
-
 interface IExportImportDataSchema {
   team: WebApiTeam;
   board: IFeedbackBoardDocument;
@@ -40,12 +35,11 @@ interface ContextualMenuButtonProps {
   label: string;
   onClick?: () => void;
   menuItems?: IContextualMenuItem[];
-  hideMobile?: boolean;
   showLabel: boolean;
 }
 
-export const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({ ariaLabel, title, iconClass, label, onClick, menuItems, hideMobile = true, showLabel }) => {
-  const buttonClass = `contextual-menu-button${hideMobile ? " hide-mobile" : ""}`;
+export const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({ ariaLabel, title, iconClass, label, onClick, menuItems, showLabel }) => {
+  const buttonClass = "contextual-menu-button";
   const menuProps = menuItems
     ? {
         items: menuItems,
@@ -101,8 +95,8 @@ const ExtensionDialog: React.FC<ExtensionDialogProps> = ({ hidden, onDismiss, ti
   </Dialog>
 );
 
-export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMenuProps, IExtensionSettingsMenuState> {
-  constructor(props: IExtensionSettingsMenuProps) {
+export class ExtensionSettingsMenu extends React.Component<Record<string, never>, IExtensionSettingsMenuState> {
+  constructor(props: Record<string, never>) {
     super(props);
 
     this.state = {
@@ -300,34 +294,14 @@ export class ExtensionSettingsMenu extends React.Component<IExtensionSettingsMen
     },
   ];
 
-  private extensionSettingsMenuItem(): IContextualMenuItem[] {
-    return [
-      !this.props.isDesktop && {
-        key: "switchToDesktop",
-        iconProps: { iconName: "TVMonitor" },
-        onClick: () => this.props.onScreenViewModeChanged(true),
-        text: "Switch to desktop view",
-        title: "Switch to desktop view",
-      },
-      this.props.isDesktop && {
-        key: "switchToMobile",
-        iconProps: { iconName: "CellPhone" },
-        onClick: () => this.props.onScreenViewModeChanged(false),
-        text: "Switch to mobile view",
-        title: "Switch to mobile view",
-      },
-    ].filter(Boolean) as IContextualMenuItem[];
-  }
-
   public render() {
     const { isWindowWide } = this.state;
 
     return (
       <div className="extension-settings-menu">
         <ContextualMenuButton ariaLabel="Prime Directive" title="Prime Directive" iconClass="fas fa-shield-halved" label="Directive" onClick={this.showPrimeDirectiveDialog} showLabel={isWindowWide} />
-        <ContextualMenuButton ariaLabel="Export Import" title="Export Import" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} showLabel={isWindowWide} />
+        <ContextualMenuButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} showLabel={isWindowWide} />
         <ContextualMenuButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} showLabel={isWindowWide} />
-        <ContextualMenuButton ariaLabel="User Settings" title="User Settings" iconClass="fas fa-user-gear" label="Settings" menuItems={this.extensionSettingsMenuItem()} hideMobile={false} showLabel={isWindowWide && this.props.isDesktop} />
 
         <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog">
           {renderContent(PRIME_DIRECTIVE_CONTENT)}

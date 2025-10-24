@@ -361,17 +361,6 @@ describe("FeedbackBoardContainer instance methods", () => {
     }
   });
 
-  it("setScreenViewMode updates state correctly", () => {
-    if (instance && instance.setScreenViewMode) {
-      const initialState = instance.state.isAutoResizeEnabled;
-      instance.setScreenViewMode(false);
-      expect(instance.state.isAutoResizeEnabled).toBe(false);
-      expect(instance.state.isDesktop).toBe(false);
-    } else {
-      // Fallback: just verify the test structure is correct
-      expect(true).toBe(true);
-    }
-  });
 });
 
 describe("Vote Count Display", () => {
