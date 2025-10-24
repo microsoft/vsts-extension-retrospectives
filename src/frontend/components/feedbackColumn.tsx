@@ -252,11 +252,11 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           <div className="feedback-column-actions">
             {this.props.showColumnEditButton && (
               <button className="feedback-column-edit-button" title="Edit column notes" aria-label={`Edit column ${this.props.columnName}`} onClick={this.openEditDialog}>
-                <i className="fa-regular fa-comment-medical"></i>
+                <i className="fas fa-comment-medical"></i>
               </button>
             )}
             <button className="feedback-column-info-button" title="View column notes" aria-label={`View notes for ${this.props.columnName}`} onClick={this.openInfoDialog}>
-              <i className="fa-regular fa-circle-info"></i>
+              <i className="fas fa-circle-info"></i>
             </button>
           </div>
         </div>
@@ -287,6 +287,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           }}
           modalProps={{
             isBlocking: false,
+            className: "retrospectives-dialog-modal",
           }}
         >
           <TextField label="Column notes" multiline autoAdjustHeight value={this.state.columnNotesDraft} onChange={this.handleColumnNotesDraftChange} />
@@ -304,6 +305,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           }}
           modalProps={{
             isBlocking: false,
+            className: "retrospectives-dialog-modal",
           }}
         >
           <div className="feedback-column-info-dialog-text">{this.props.columnNotes ? this.props.columnNotes : "No notes available for this column."}</div>

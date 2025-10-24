@@ -47,10 +47,13 @@
 
     .feedback-column-edit-button {
       color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
+      cursor: pointer;
+      margin-right: 6px;
     }
 
     .feedback-column-info-button {
       color: rgba(var(--palette-neutral-80, 51, 51, 51), 1);
+      cursor: pointer;
     }
   }
 }
