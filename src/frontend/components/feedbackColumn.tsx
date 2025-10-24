@@ -251,21 +251,13 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           </div>
           <div className="feedback-column-actions">
             {this.props.showColumnEditButton && (
-              <IconButton
-                className="feedback-column-edit-button"
-                iconProps={{ iconName: "Edit" }}
-                title="Edit column notes"
-                aria-label={`Edit column ${this.props.columnName}`}
-                onClick={this.openEditDialog}
-              />
+              <button className="feedback-column-edit-button" title="Edit column notes" aria-label={`Edit column ${this.props.columnName}`} onClick={this.openEditDialog}>
+                <i className="fa-regular fa-comment-medical"></i>
+              </button>
             )}
-            <IconButton
-              className="feedback-column-info-button"
-              iconProps={{ iconName: "Info" }}
-              title="View column notes"
-              aria-label={`View notes for ${this.props.columnName}`}
-              onClick={this.openInfoDialog}
-            />
+            <button className="feedback-column-info-button" title="View column notes" aria-label={`View notes for ${this.props.columnName}`} onClick={this.openInfoDialog}>
+              <i className="fa-regular fa-circle-info"></i>
+            </button>
           </div>
         </div>
         <div className={cn("feedback-column-content", this.state.isCollapsed && "hide-collapse")}>

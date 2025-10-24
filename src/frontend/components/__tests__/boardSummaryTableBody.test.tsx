@@ -113,9 +113,7 @@ describe("BoardSummaryTableBody", () => {
   });
 
   it("applies pending work item styling when pending items exist", () => {
-    const columns: ISimpleColumn[] = [
-      { id: "pendingWorkItemsCount", header: null, cell: item => item.pendingWorkItemsCount, sortable: false },
-    ];
+    const columns: ISimpleColumn[] = [{ id: "pendingWorkItemsCount", header: null, cell: item => item.pendingWorkItemsCount, sortable: false }];
 
     const itemWithPending: IBoardSummaryTableItem = { ...mockItem, pendingWorkItemsCount: 2 };
     const { getByLabelText } = render(

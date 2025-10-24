@@ -1237,14 +1237,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const updatedColumns = this.state.currentBoard.columns.map(column => (column.id === columnId ? { ...column, notes } : column));
 
     try {
-      const updatedBoard = await BoardDataService.updateBoardMetadata(
-        this.state.currentTeam.id,
-        this.state.currentBoard.id,
-        this.state.currentBoard.maxVotesPerUser,
-        this.state.currentBoard.title,
-        updatedColumns,
-        this.state.currentBoard.permissions,
-      );
+      const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.maxVotesPerUser, this.state.currentBoard.title, updatedColumns, this.state.currentBoard.permissions);
 
       if (!updatedBoard) {
         throw new Error("Failed to update board with new column notes.");
@@ -1631,7 +1624,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </Dialog>
                         <button
                           className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
-                          onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false }); }}
+                          onClick={() => {
+                            this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
+                          }}
                           title="Team Assessment"
                           aria-label="Team Assessment"
                           type="button"
@@ -1664,13 +1659,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </div>
                     )}
                     {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                      <button
-                        className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
-                        onClick={this.showCarouselDialog}
-                        title="Focus Mode allows your team to focus on one feedback item at a time. Try it!"
-                        aria-label="Focus Mode"
-                        type="button"
-                      >
+                      <button className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
                         <span className="inline-flex items-center justify-center mr-1">
                           <i className="fas fa-bullseye"></i>
                         </span>

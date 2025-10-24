@@ -360,7 +360,6 @@ describe("FeedbackBoardContainer instance methods", () => {
       expect(instance.percentageFormatter(100)).toBe("100.0%");
     }
   });
-
 });
 
 describe("Vote Count Display", () => {
