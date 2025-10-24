@@ -49,12 +49,14 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
 
   private goToPrevSlide = (columnId: string, totalSlides: number) => {
     const currentIndex = this.state.currentSlides[columnId] || 0;
-    this.goToSlide(columnId, currentIndex - 1, totalSlides);
+    console.log("Prev slide clicked:", { columnId, currentIndex, totalSlides });
+    // this.goToSlide(columnId, currentIndex - 1, totalSlides);
   };
 
   private goToNextSlide = (columnId: string, totalSlides: number) => {
     const currentIndex = this.state.currentSlides[columnId] || 0;
-    this.goToSlide(columnId, currentIndex + 1, totalSlides);
+    console.log("Next slide clicked:", { columnId, currentIndex, totalSlides });
+    // this.goToSlide(columnId, currentIndex + 1, totalSlides);
   };
 
   // Render carousel with grouped feedback items ordered by total votes and created date
