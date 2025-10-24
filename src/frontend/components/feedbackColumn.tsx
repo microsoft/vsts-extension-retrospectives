@@ -8,7 +8,7 @@ import FeedbackItemGroup from "./feedbackItemGroup";
 import { IColumnItem, IColumn } from "./feedbackBoard";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import { ActionButton, IButton } from "@fluentui/react/lib/Button";
+import { ActionButton, IconButton, IButton } from "@fluentui/react/lib/Button";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
@@ -36,6 +36,8 @@ export interface FeedbackColumnProps {
   hideFeedbackItems: boolean;
   groupIds: string[];
   onVoteCasted: () => void;
+  showColumnEditButton: boolean;
+  onColumnEditClick: (columnId: string) => void;
 
   addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
   removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
@@ -210,6 +212,17 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
             <i className={cn(this.props.iconClass, "feedback-column-icon")} />
             <h2 className="feedback-column-name">{this.props.columnName}</h2>
           </div>
+          {this.props.showColumnEditButton && (
+            <div className="feedback-column-actions">
+              <IconButton
+                className="feedback-column-edit-button"
+                iconProps={{ iconName: "Edit" }}
+                title="Edit column"
+                aria-label={`Edit column ${this.props.columnName}`}
+                onClick={() => this.props.onColumnEditClick(this.props.columnId)}
+              />
+            </div>
+          )}
         </div>
         <div className={cn("feedback-column-content", this.state.isCollapsed && "hide-collapse")}>
           {this.props.workflowPhase === WorkflowPhase.Collect && (

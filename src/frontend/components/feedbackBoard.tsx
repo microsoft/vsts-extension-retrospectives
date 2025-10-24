@@ -11,7 +11,7 @@ import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from "
 import { ExceptionCode } from "../interfaces/retrospectiveState";
 import { WorkflowPhase } from "../interfaces/workItem";
 
-import FeedbackItemCarousel from "./feedbackCarousel";
+import FeedbackCarousel from "./feedbackCarousel";
 import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
@@ -30,6 +30,7 @@ export interface FeedbackBoardProps {
   hideCarouselDialog: () => void;
   userId: string;
   onVoteCasted?: () => void;
+  onEditBoard: () => void;
 }
 
 export interface IColumn {
@@ -362,6 +363,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       return <div> An unexpected exception occurred. </div>;
     }
 
+    const canCurrentUserEditBoard = this.props.board.createdBy?.id === this.props.userId;
+
     const feedbackColumnPropsList = this.state.columnIds.map(columnId => {
       return {
         key: columnId,
@@ -389,6 +392,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         hideFeedbackItems: this.props.hideFeedbackItems,
         isFocusModalHidden: true,
         groupIds: [] as string[],
+        showColumnEditButton: !!canCurrentUserEditBoard,
+        onColumnEditClick: this.props.onEditBoard,
         onVoteCasted: () => {
           if (this.props.onVoteCasted) {
             this.props.onVoteCasted();
@@ -420,7 +425,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             isBlocking: true,
           }}
         >
-          <FeedbackItemCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
+          <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
         </Dialog>
       </div>
     );

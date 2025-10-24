@@ -176,6 +176,7 @@ const mockedProps: FeedbackBoardProps = {
   isCarouselDialogHidden: false,
   hideCarouselDialog: jest.fn(() => {}),
   userId: "",
+  onEditBoard: jest.fn(() => {}),
 };
 
 const mockFeedbackItems: IFeedbackItemDocument[] = [

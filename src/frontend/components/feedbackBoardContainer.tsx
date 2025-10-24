@@ -1595,21 +1595,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             />
                           </DialogFooter>
                         </Dialog>
-                        <TooltipHost content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
-                          <button
-                            className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
-                            onClick={() => {
-                              this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
-                            }}
-                            aria-label="Team Assessment"
-                            type="button"
-                          >
-                            <span className="inline-flex items-center justify-center mr-1">
-                              <i className="fas fa-chart-line"></i>
-                            </span>
-                            <span>Team Assessment</span>
-                          </button>
-                        </TooltipHost>
+                        <button
+                          className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
+                          onClick={() => { this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false }); }}
+                          title="Team Assessment"
+                          aria-label="Team Assessment"
+                          type="button"
+                        >
+                          <span className="inline-flex items-center justify-center mr-1">
+                            <i className="fas fa-chart-line"></i>
+                          </span>
+                          <span>Team Assessment</span>
+                        </button>
                       </div>
                     )}
                     <div className="flex flex-row gap-3" role="tablist">
@@ -1633,14 +1630,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </div>
                     )}
                     {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                      <TooltipHost content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                        <div role="button" onClick={this.showCarouselDialog} className="flex items-center bg-transparent border border-solid border-[var(--nav-header-active-item-background)] rounded-lg cursor-pointer text-sm py-2 px-4" aria-label="Focus Mode">
-                          <span className="inline-flex items-center justify-center mr-2">
-                            <i className="fas fa-bullseye"></i>
-                          </span>
-                          Focus Mode
-                        </div>
-                      </TooltipHost>
+                      <button
+                        className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
+                        onClick={this.showCarouselDialog}
+                        title="Focus Mode allows your team to focus on one feedback item at a time. Try it!"
+                        aria-label="Focus Mode"
+                        type="button"
+                      >
+                        <span className="inline-flex items-center justify-center mr-1">
+                          <i className="fas fa-bullseye"></i>
+                        </span>
+                        <span>Focus Mode</span>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -1704,7 +1705,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </MessageBar>
                     )}
                     <div className="feedback-board-container">
-                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} />
+                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} onEditBoard={this.showBoardUpdateDialog} />
                     </div>
                     <Dialog
                       hidden={this.state.isArchiveBoardConfirmationDialogHidden}

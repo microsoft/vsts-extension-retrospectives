@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import FeedbackColumn from "../feedbackColumn";
 import FeedbackItem from "../feedbackItem";
@@ -17,6 +17,30 @@ describe("Feedback Column ", () => {
     const { container } = render(<FeedbackColumn {...testColumnProps} />);
     const feedbackColumn = container.querySelector(".feedback-column");
     expect(feedbackColumn).toBeTruthy();
+  });
+
+  describe("edit column button", () => {
+    it("is not rendered when the user cannot edit", () => {
+      const { container } = render(<FeedbackColumn {...testColumnProps} showColumnEditButton={false} />);
+      expect(container.querySelector(".feedback-column-edit-button")).toBeNull();
+    });
+
+    it("is rendered when the user can edit", () => {
+      const props = { ...testColumnProps, showColumnEditButton: true };
+      const { container } = render(<FeedbackColumn {...props} />);
+      expect(container.querySelector(".feedback-column-edit-button")).toBeTruthy();
+    });
+
+    it("invokes the edit callback with the column id", () => {
+      const onColumnEditClick = jest.fn();
+      const props = { ...testColumnProps, showColumnEditButton: true, onColumnEditClick };
+
+      const { getByRole } = render(<FeedbackColumn {...props} />);
+
+      fireEvent.click(getByRole("button", { name: `Edit column ${props.columnName}` }));
+
+      expect(onColumnEditClick).toHaveBeenCalledWith(props.columnId);
+    });
   });
 
   describe("child feedback items", () => {
