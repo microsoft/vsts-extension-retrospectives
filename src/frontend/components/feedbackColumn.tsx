@@ -287,6 +287,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           }}
           modalProps={{
             isBlocking: false,
+            containerClassName: "prime-directive-dialog",
             className: "retrospectives-dialog-modal",
           }}
         >
@@ -305,6 +306,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           }}
           modalProps={{
             isBlocking: false,
+            containerClassName: "prime-directive-dialog",
             className: "retrospectives-dialog-modal",
           }}
         >
