@@ -34,7 +34,7 @@ class ItemDataService {
       upvotes: 0,
       userIdRef: userIdentity.id,
       timerSecs: 0,
-      timerstate: false,
+      timerState: false,
       timerId: null,
       groupIds: [],
       isGroupedCarouselItem: false,
@@ -335,10 +335,10 @@ class ItemDataService {
       return undefined;
     }
 
-    if (feedbackItem.timerstate === false) {
-      feedbackItem.timerstate = true;
+    if (feedbackItem.timerState === false) {
+      feedbackItem.timerState = true;
     } else {
-      feedbackItem.timerstate = false;
+      feedbackItem.timerState = false;
     }
 
     feedbackItem.timerId = timerid;

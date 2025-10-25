@@ -44,7 +44,7 @@ const baseFeedbackItem: IFeedbackItemDocument = {
   groupIds: [],
   isGroupedCarouselItem: false,
   timerSecs: 0,
-  timerstate: false,
+  timerState: false,
   timerId: null,
 };
 
@@ -448,23 +448,23 @@ describe("ItemDataService - flipTimer", () => {
   it("should flip timer state from false to true", async () => {
     const mockFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
-      timerstate: false,
+      timerState: false,
       timerId: null,
     };
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
-    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerstate: true, timerId: "timer-123" });
+    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerState: true, timerId: "timer-123" });
 
     const result = await itemDataService.flipTimer("board-1", "item-1", "timer-123");
 
-    expect(result.timerstate).toBe(true);
+    expect(result.timerState).toBe(true);
     expect(result.timerId).toBe("timer-123");
   });
 
   it("should flip timer state from true to false", async () => {
     const mockFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
-      timerstate: true,
+      timerState: true,
       timerId: "timer-123",
     };
 
@@ -473,7 +473,7 @@ describe("ItemDataService - flipTimer", () => {
 
     const result = await itemDataService.flipTimer("board-1", "item-1", "timer-123");
 
-    expect(result.timerstate).toBe(false);
+    expect(result.timerState).toBe(false);
   });
 
   it("should return undefined when feedback item not found", async () => {

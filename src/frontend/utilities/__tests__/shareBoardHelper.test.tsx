@@ -181,7 +181,7 @@ describe("ShareBoardHelper", () => {
       createdDate: new Date("2023-01-01T11:00:00Z"),
       userIdRef: "user1",
       timerSecs: 0,
-      timerstate: false,
+      timerState: false,
       childFeedbackItemIds: ["item4", "item5", "item6"],
     },
     {
@@ -200,7 +200,7 @@ describe("ShareBoardHelper", () => {
       createdDate: new Date("2023-01-01T11:15:00Z"),
       userIdRef: "user2",
       timerSecs: 0,
-      timerstate: false,
+      timerState: false,
       parentFeedbackItemId: "item3",
     },
     {
@@ -219,7 +219,7 @@ describe("ShareBoardHelper", () => {
       createdDate: new Date("2023-01-01T11:30:00Z"),
       userIdRef: "user1",
       timerSecs: 0,
-      timerstate: false,
+      timerState: false,
       parentFeedbackItemId: "item3",
     },
   ] as IFeedbackItemDocument[];

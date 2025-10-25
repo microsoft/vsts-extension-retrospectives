@@ -99,7 +99,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       upvotes: 0,
       userIdRef: userIdentity.id,
       timerSecs: 0,
-      timerstate: false,
+      timerState: false,
       timerId: null,
       groupIds: [],
       isGroupedCarouselItem: false,
@@ -109,7 +109,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   };
 
   public dragFeedbackItemOverColumn = (e: React.DragEvent<HTMLDivElement>) => {
-    // Can't check what item is being dragged, so always allow.
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = "move";
@@ -164,7 +163,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemUngrouped, properties: { boardId, feedbackItemId, columnId } });
   };
 
-  public static readonly createFeedbackItemProps = (columnProps: FeedbackColumnProps, columnItem: IColumnItem, isInteractable: boolean): IFeedbackItemProps => {
+  public static readonly createFeedbackItemProps = (columnProps: FeedbackColumnProps, columnItem: IColumnItem): IFeedbackItemProps => {
     let accentColor: string = columnProps.accentColor;
     if (columnItem.feedbackItem.originalColumnId !== columnProps.columnId) {
       accentColor = columnProps.columns[columnItem.feedbackItem.originalColumnId]?.columnProperties?.accentColor ?? columnProps.accentColor;
@@ -178,7 +177,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       lastEditedDate: columnItem.feedbackItem.modifiedDate ? columnItem.feedbackItem.modifiedDate.toString() : "",
       upvotes: columnItem.feedbackItem.upvotes,
       timerSecs: columnItem.feedbackItem.timerSecs,
-      timerState: columnItem.feedbackItem.timerstate,
+      timerState: columnItem.feedbackItem.timerState,
       timerId: columnItem.feedbackItem.timerId,
       workflowPhase: columnProps.workflowPhase,
       accentColor: accentColor,
@@ -203,7 +202,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       moveFeedbackItem: FeedbackColumn.moveFeedbackItem,
       nonHiddenWorkItemTypes: columnProps.nonHiddenWorkItemTypes,
       allWorkItemTypes: columnProps.allWorkItemTypes,
-      isInteractable: isInteractable,
       shouldHaveFocus: columnItem.shouldHaveFocus,
       hideFeedbackItems: columnProps.hideFeedbackItems,
       userIdRef: columnItem.feedbackItem.userIdRef,
@@ -229,10 +227,10 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     return columnItems
       .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId) // Exclude child items
       .map(columnItem => {
-        const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem, true);
+        const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem);
 
         if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
-          const childItemsToGroup = this.props.columnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem, true));
+          const childItemsToGroup = this.props.columnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem));
 
           return <FeedbackItemGroup key={feedbackItemProps.id} mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={this.props.workflowPhase} />;
         } else {

@@ -70,7 +70,7 @@ describe("Feedback Column ", () => {
 
     it("can be rendered", () => {
       render(<FeedbackColumn {...testColumnProps} />);
-      const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0], true);
+      const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0]);
 
       expect(feedbackItemProps.id).toBeTruthy();
       expect(feedbackItemProps).toBeDefined();
@@ -78,7 +78,7 @@ describe("Feedback Column ", () => {
 
     it("should render with original accent color when the column ids are the same", () => {
       const expectedAccentColor: string = testColumnProps.accentColor;
-      const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0], true);
+      const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0]);
 
       expect(feedbackItemProps.accentColor).toEqual(expectedAccentColor);
     });
@@ -90,7 +90,7 @@ describe("Feedback Column ", () => {
       testColumnProps.accentColor = "someOtherColor";
       testColumnProps.columnId = "some-other-column-uuid";
 
-      const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0], true);
+      const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0]);
 
       expect(feedbackItemProps.accentColor).toEqual(expectedAccentColor);
     });
