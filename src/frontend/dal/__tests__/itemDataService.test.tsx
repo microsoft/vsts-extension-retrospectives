@@ -469,7 +469,7 @@ describe("ItemDataService - flipTimer", () => {
     };
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
-    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerstate: false, timerId: "timer-123" });
+    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerState: false, timerId: "timer-123" });
 
     const result = await itemDataService.flipTimer("board-1", "item-1", "timer-123");
 

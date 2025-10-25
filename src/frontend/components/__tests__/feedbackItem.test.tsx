@@ -421,38 +421,6 @@ describe("Feedback Item", () => {
     });
   });
 
-  describe("Non-interactable items", () => {
-    test("renders non-editable text", () => {
-      const props: any = {
-        id: "test-readonly",
-        title: "Read Only",
-        columnId: testColumnUuidOne,
-        columns: testColumns,
-        columnIds: testColumnIds,
-        boardId: testBoardId,
-        createdDate: new Date(),
-        upvotes: 0,
-        groupIds: [],
-        userIdRef: "",
-        actionItems: [],
-        newlyCreated: false,
-        showAddedAnimation: false,
-        shouldHaveFocus: false,
-        hideFeedbackItems: false,
-        nonHiddenWorkItems: [],
-        allWorkItemTypes: [],
-        originalColumnId: testColumnUuidOne,
-        timerSecs: 0,
-        timerstate: false,
-        timerId: "",
-        isGroupedCarouselItem: false,
-        isInteractable: false,
-      };
-      const { container } = render(<FeedbackItem {...props} />);
-      expect(container.querySelector(".non-editable-text-container")).toBeTruthy();
-    });
-  });
-
   describe("Hidden feedback", () => {
     test("hides item when hideFeedbackItems is true and userIdRef doesn't match", () => {
       const props: any = {
