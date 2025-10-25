@@ -131,7 +131,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-base text-gray-800;
 }
 
-
 .feedback-carousel-pivot-item .carousel-container {
   @apply min-h-96;
 }
