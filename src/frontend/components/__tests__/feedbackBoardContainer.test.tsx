@@ -1014,17 +1014,17 @@ describe("FeedbackBoardContainer - URL parsing and routing", () => {
   it("should parse URL hash parameters for team and board", async () => {
     const instance = createStandaloneTimerInstance();
     const parseUrlSpy = jest.spyOn(instance as any, "parseUrlForBoardAndTeamInformation");
-    
+
     // Mock getService to return a navigation service
     const mockNavigationService = {
       getHash: jest.fn().mockResolvedValue("#teamId=team-1&boardId=board-1&phase=Collect"),
       setHash: jest.fn().mockResolvedValue(undefined),
     };
-    
+
     jest.spyOn(require("azure-devops-extension-sdk"), "getService").mockResolvedValue(mockNavigationService);
-    
+
     const result = await (instance as any).parseUrlForBoardAndTeamInformation();
-    
+
     expect(result).toBeDefined();
   });
 
@@ -1041,21 +1041,21 @@ describe("FeedbackBoardContainer - URL parsing and routing", () => {
     const mockNavigationService = {
       setHash: jest.fn().mockResolvedValue(undefined),
     };
-    
+
     jest.spyOn(require("azure-devops-extension-sdk"), "getService").mockResolvedValue(mockNavigationService);
 
     await (instance as any).updateUrlWithBoardAndTeamInformation("team-1", "board-1");
-    
+
     expect(true).toBe(true); // Service interaction tested
   });
 
   it("should handle URL parsing errors gracefully", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const mockNavigationService = {
       getHash: jest.fn().mockRejectedValue(new Error("Navigation error")),
     };
-    
+
     jest.spyOn(require("azure-devops-extension-sdk"), "getService").mockResolvedValue(mockNavigationService);
 
     try {
@@ -1093,15 +1093,7 @@ describe("FeedbackBoardContainer - Board operations", () => {
       },
     ]);
 
-    await (instance as any).createBoard(
-      "New Board",
-      5,
-      [],
-      true,
-      false,
-      false,
-      { Teams: [], Members: [] }
-    );
+    await (instance as any).createBoard("New Board", 5, [], true, false, false, { Teams: [], Members: [] });
 
     expect(createBoardMock).toHaveBeenCalled();
   });
@@ -1124,15 +1116,7 @@ describe("FeedbackBoardContainer - Board operations", () => {
       title: "Updated Board",
     });
 
-    await (instance as any).updateBoardMetadata(
-      "Updated Board",
-      10,
-      [],
-      false,
-      false,
-      false,
-      { Teams: [], Members: [] }
-    );
+    await (instance as any).updateBoardMetadata("Updated Board", 10, [], false, false, false, { Teams: [], Members: [] });
 
     expect(updateBoardMock).toHaveBeenCalled();
   });
@@ -1161,40 +1145,40 @@ describe("FeedbackBoardContainer - Board operations", () => {
 
   it("should show and hide board creation dialog", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     (instance as any).showBoardCreationDialog();
     expect(instance.state.isBoardCreationDialogHidden).toBe(false);
-    
+
     (instance as any).hideBoardCreationDialog();
     expect(instance.state.isBoardCreationDialogHidden).toBe(true);
   });
 
   it("should show and hide board update dialog", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     (instance as any).showBoardUpdateDialog();
     expect(instance.state.isBoardUpdateDialogHidden).toBe(false);
-    
+
     (instance as any).hideBoardUpdateDialog();
     expect(instance.state.isBoardUpdateDialogHidden).toBe(true);
   });
 
   it("should show and hide board duplicate dialog", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     (instance as any).showBoardDuplicateDialog();
     expect(instance.state.isBoardDuplicateDialogHidden).toBe(false);
-    
+
     (instance as any).hideBoardDuplicateDialog();
     expect(instance.state.isBoardDuplicateDialogHidden).toBe(true);
   });
 
   it("should show and hide archive confirmation dialog", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     (instance as any).showArchiveBoardConfirmationDialog();
     expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(false);
-    
+
     (instance as any).hideArchiveBoardConfirmationDialog();
     expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(true);
   });
@@ -1205,7 +1189,7 @@ describe("FeedbackBoardContainer - Team and Board selection", () => {
     const instance = createStandaloneTimerInstance();
     const team1 = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const team2 = { id: "team-2", name: "Team 2" } as WebApiTeam;
-    
+
     instance.setState({
       currentTeam: team1,
       projectTeams: [team1, team2],
@@ -1230,13 +1214,13 @@ describe("FeedbackBoardContainer - Team and Board selection", () => {
       title: "Board 1",
       teamEffectivenessMeasurementVoteCollection: [],
     } as IFeedbackBoardDocument;
-    
+
     const board2 = {
       id: "board-2",
       title: "Board 2",
       teamEffectivenessMeasurementVoteCollection: [],
     } as IFeedbackBoardDocument;
-    
+
     instance.setState({
       currentTeam: { id: "team-1", name: "Team 1" } as WebApiTeam,
       currentBoard: board1,
@@ -1256,7 +1240,7 @@ describe("FeedbackBoardContainer - Team and Board selection", () => {
   it("should handle team selection when team does not exist", async () => {
     const instance = createStandaloneTimerInstance();
     const team1 = { id: "team-1", name: "Team 1" } as WebApiTeam;
-    
+
     instance.setState({
       currentTeam: team1,
       projectTeams: [team1],
