@@ -13,13 +13,9 @@ export interface IFeedbackCarouselProps {
 
 export interface IFeedbackCarouselState {
   feedbackColums: FeedbackColumnProps[];
-  currentColumnId: string;
-  currentColumnIndex: number;
 }
 
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState> {
-  private carouselRefs: Record<string, React.RefObject<HTMLDivElement>> = {};
-
   constructor(props: IFeedbackCarouselProps) {
     super(props);
 
@@ -36,38 +32,8 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
 
     this.state = {
       feedbackColums: feedbackColumnPropsList,
-      currentColumnId: feedbackColumnPropsList.length > 0 ? feedbackColumnPropsList[0].columnId : "",
-      currentColumnIndex: 0,
     };
   }
-
-  private goToSlide = (columnId: string, slideIndex: number) => {
-    const totalSlides = this.state.feedbackColums.find(col => col.columnId === columnId)?.columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId).length || 0;
-    const clampedIndex = Math.max(0, Math.min(slideIndex, totalSlides - 1));
-
-    this.setState(() => ({
-      currentColumnIndex: clampedIndex,
-    }));
-
-    const carousel = this.carouselRefs[columnId]?.current;
-    if (carousel) {
-      const slideWidth = carousel.scrollWidth / totalSlides;
-      carousel.scrollTo({
-        left: slideWidth * clampedIndex,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  private goToPrevSlide = (columnId: string) => {
-    const currentIndex = this.state.currentColumnIndex || 0;
-    this.goToSlide(columnId, currentIndex - 1);
-  };
-
-  private goToNextSlide = (columnId: string) => {
-    const currentIndex = this.state.currentColumnIndex || 0;
-    this.goToSlide(columnId, currentIndex + 1);
-  };
 
   private renderFeedbackCarouselItems = (columnProps: FeedbackColumnProps) => {
     const sortedItems = columnProps.columnItems
@@ -140,38 +106,26 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         {this.state.feedbackColums.map(columnProps => {
           const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
 
-          if (!this.carouselRefs[columnProps.columnId]) {
-            this.carouselRefs[columnProps.columnId] = React.createRef<HTMLDivElement>();
-          }
-
-          const currentSlide = this.state.currentColumnIndex || 0;
-
           return (
             <PivotItem key={columnProps.columnId} headerText={columnProps.columnName} className="feedback-carousel-pivot-item" {...columnProps}>
-              <div className="custom-carousel-container">
-                <button className="carousel-arrow carousel-arrow-prev" onClick={() => this.goToPrevSlide(columnProps.columnId)} disabled={currentSlide === 0} aria-label="Previous slide">
-                  <i className="fas fa-chevron-left" />
-                </button>
-
-                <div className="carousel-viewport">
-                  <div className="carousel-track" ref={this.carouselRefs[columnProps.columnId]}>
-                    {feedbackCarouselItems.map(child => (
-                      <div className="carousel-slide" key={child.key}>
-                        {child}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <button className="carousel-arrow carousel-arrow-next" onClick={() => this.goToNextSlide(columnProps.columnId)} disabled={currentSlide === feedbackCarouselItems.length - 1} aria-label="Next slide">
-                  <i className="fas fa-chevron-right" />
-                </button>
-
-                <div className="carousel-dots">
-                  {feedbackCarouselItems.map((_, index) => (
-                    <button key={index} className={`carousel-dot ${index === currentSlide ? "active" : ""}`} onClick={() => this.goToSlide(columnProps.columnId, index)} aria-label={`Go to slide ${index + 1}`} />
+              <div className="carousel-container">
+                <ol className="carousel-track" id={`carousel-${columnProps.columnId}`}>
+                  {feedbackCarouselItems.map((child, index) => (
+                    <li className="carousel-slide" id={`slide-${columnProps.columnId}-${index}`} key={child.key}>
+                      {index > 0 && (
+                        <a href={`#slide-${columnProps.columnId}-${index - 1}`} className="carousel-arrow carousel-arrow-prev" aria-label="Previous slide">
+                          <i className="fas fa-chevron-left" />
+                        </a>
+                      )}
+                      <div className="carousel-viewport">{child}</div>
+                      {index < feedbackCarouselItems.length - 1 && (
+                        <a href={`#slide-${columnProps.columnId}-${index + 1}`} className="carousel-arrow carousel-arrow-next" aria-label="Next slide">
+                          <i className="fas fa-chevron-right" />
+                        </a>
+                      )}
+                    </li>
                   ))}
-                </div>
+                </ol>
               </div>
             </PivotItem>
           );

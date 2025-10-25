@@ -68,13 +68,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   opacity: 0.2;
 }
 
-/* Custom Carousel Styles - replaces react-slick */
-.custom-carousel-container {
+.carousel-container {
   @apply relative w-full flex flex-col items-center gap-4;
-}
-
-.carousel-viewport {
-  @apply w-full overflow-hidden relative;
 }
 
 .carousel-track {
@@ -84,6 +79,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
+  @apply w-full relative;
 }
 
 .carousel-track::-webkit-scrollbar {
@@ -91,24 +87,36 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .carousel-slide {
-  @apply flex-none w-full mx-4;
+  @apply flex-none w-full relative flex items-center justify-center;
   scroll-snap-align: center;
+  scroll-snap-stop: always;
+  min-width: 100%;
+  padding: 0 60px; /* Space for arrows */
+}
+
+.carousel-viewport {
+  @apply w-full flex items-center justify-center;
+}
+
+.carousel-slide .feedback-carousel-item {
+  @apply w-full;
   max-width: 600px;
 }
 
 .carousel-arrow {
   @apply absolute top-1/2 z-10 flex items-center justify-center cursor-pointer transition-all duration-200 ease-in-out;
   @apply bg-white/90 border border-gray-300 rounded-full w-10 h-10;
-  @apply shadow-sm;
+  @apply shadow-sm no-underline;
   transform: translateY(-50%);
 }
 
-.carousel-arrow:hover:not(:disabled) {
-  @apply bg-white shadow-md scale-110;
+.carousel-arrow:hover {
+  @apply bg-white shadow-md;
+  transform: translateY(-50%) scale(1.1);
 }
 
-.carousel-arrow:disabled {
-  @apply opacity-30 cursor-not-allowed;
+.carousel-arrow:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
 }
 
 .carousel-arrow-prev {
@@ -123,23 +131,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-base text-gray-800;
 }
 
-.carousel-dots {
-  @apply flex gap-2 justify-center py-4;
-}
 
-.carousel-dot {
-  @apply w-2.5 h-2.5 rounded-full border-2 border-gray-300 bg-transparent cursor-pointer transition-all duration-200 ease-in-out p-0;
-}
-
-.carousel-dot:hover {
-  @apply border-gray-600 scale-110;
-}
-
-.carousel-dot.active {
-  @apply bg-blue-600 border-blue-600;
-}
-
-/* Ensure carousel works well within focus modal */
-.feedback-carousel-pivot-item .custom-carousel-container {
+.feedback-carousel-pivot-item .carousel-container {
   @apply min-h-96;
 }

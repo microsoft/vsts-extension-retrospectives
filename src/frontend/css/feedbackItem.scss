@@ -152,6 +152,7 @@
           font-weight: 300;
           font-style: italic;
           font-size: 0.75em;
+          color: var(--text-secondary-color);
         }
 
         .feedback-yourvote-count {
@@ -166,6 +167,7 @@
       .card-id {
         margin-left: 16px;
         padding-bottom: 8px;
+        color: var(--text-secondary-color);
       }
 
       .ms-DocumentCardActivity {
