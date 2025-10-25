@@ -1,5 +1,5 @@
 import React from "react";
-import classNames from "classnames";
+import { cn } from "../utilities/classNameHelper";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { itemDataService } from "../dal/itemDataService";
@@ -8,7 +8,9 @@ import FeedbackItemGroup from "./feedbackItemGroup";
 import { IColumnItem, IColumn } from "./feedbackBoard";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import { ActionButton, IButton } from "@fluentui/react/lib/Button";
+import { ActionButton, IconButton, IButton, PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
+import { Dialog, DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
+import { TextField } from "@fluentui/react/lib/TextField";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
@@ -36,6 +38,9 @@ export interface FeedbackColumnProps {
   hideFeedbackItems: boolean;
   groupIds: string[];
   onVoteCasted: () => void;
+  showColumnEditButton: boolean;
+  columnNotes: string;
+  onColumnNotesChange: (notes: string) => void;
 
   addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
   removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
@@ -45,6 +50,9 @@ export interface FeedbackColumnProps {
 export interface FeedbackColumnState {
   isCollapsed: boolean;
   isCarouselHidden: boolean;
+  isEditDialogOpen: boolean;
+  isInfoDialogOpen: boolean;
+  columnNotesDraft: string;
 }
 
 export default class FeedbackColumn extends React.Component<FeedbackColumnProps, FeedbackColumnState> {
@@ -55,6 +63,9 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     this.state = {
       isCarouselHidden: true,
       isCollapsed: false,
+      isEditDialogOpen: false,
+      isInfoDialogOpen: false,
+      columnNotesDraft: "",
     };
   }
 
@@ -88,7 +99,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       upvotes: 0,
       userIdRef: userIdentity.id,
       timerSecs: 0,
-      timerstate: false,
+      timerState: false,
       timerId: null,
       groupIds: [],
       isGroupedCarouselItem: false,
@@ -98,7 +109,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   };
 
   public dragFeedbackItemOverColumn = (e: React.DragEvent<HTMLDivElement>) => {
-    // Can't check what item is being dragged, so always allow.
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = "move";
@@ -114,6 +124,34 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
   };
 
+  private readonly openEditDialog = () => {
+    this.setState({
+      isEditDialogOpen: true,
+      columnNotesDraft: this.props.columnNotes,
+    });
+  };
+
+  private readonly closeEditDialog = () => {
+    this.setState({ isEditDialogOpen: false });
+  };
+
+  private readonly openInfoDialog = () => {
+    this.setState({ isInfoDialogOpen: true });
+  };
+
+  private readonly closeInfoDialog = () => {
+    this.setState({ isInfoDialogOpen: false });
+  };
+
+  private readonly handleColumnNotesDraftChange = (_event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+    this.setState({ columnNotesDraft: newValue ?? "" });
+  };
+
+  private readonly saveColumnNotes = () => {
+    this.props.onColumnNotesChange(this.state.columnNotesDraft);
+    this.setState({ isEditDialogOpen: false });
+  };
+
   public static readonly moveFeedbackItem = async (refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void, boardId: string, feedbackItemId: string, columnId: string) => {
     const updatedFeedbackItems = await itemDataService.addFeedbackItemAsMainItemToColumn(boardId, feedbackItemId, columnId);
 
@@ -125,7 +163,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemUngrouped, properties: { boardId, feedbackItemId, columnId } });
   };
 
-  public static readonly createFeedbackItemProps = (columnProps: FeedbackColumnProps, columnItem: IColumnItem, isInteractable: boolean): IFeedbackItemProps => {
+  public static readonly createFeedbackItemProps = (columnProps: FeedbackColumnProps, columnItem: IColumnItem): IFeedbackItemProps => {
     let accentColor: string = columnProps.accentColor;
     if (columnItem.feedbackItem.originalColumnId !== columnProps.columnId) {
       accentColor = columnProps.columns[columnItem.feedbackItem.originalColumnId]?.columnProperties?.accentColor ?? columnProps.accentColor;
@@ -139,7 +177,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       lastEditedDate: columnItem.feedbackItem.modifiedDate ? columnItem.feedbackItem.modifiedDate.toString() : "",
       upvotes: columnItem.feedbackItem.upvotes,
       timerSecs: columnItem.feedbackItem.timerSecs,
-      timerState: columnItem.feedbackItem.timerstate,
+      timerState: columnItem.feedbackItem.timerState,
       timerId: columnItem.feedbackItem.timerId,
       workflowPhase: columnProps.workflowPhase,
       accentColor: accentColor,
@@ -164,7 +202,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       moveFeedbackItem: FeedbackColumn.moveFeedbackItem,
       nonHiddenWorkItemTypes: columnProps.nonHiddenWorkItemTypes,
       allWorkItemTypes: columnProps.allWorkItemTypes,
-      isInteractable: isInteractable,
       shouldHaveFocus: columnItem.shouldHaveFocus,
       hideFeedbackItems: columnProps.hideFeedbackItems,
       userIdRef: columnItem.feedbackItem.userIdRef,
@@ -190,10 +227,10 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     return columnItems
       .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId) // Exclude child items
       .map(columnItem => {
-        const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem, true);
+        const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem);
 
         if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
-          const childItemsToGroup = this.props.columnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem, true));
+          const childItemsToGroup = this.props.columnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem));
 
           return <FeedbackItemGroup key={feedbackItemProps.id} mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={this.props.workflowPhase} />;
         } else {
@@ -207,11 +244,21 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       <div className="feedback-column" role="application" onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
         <div className="feedback-column-header">
           <div className="feedback-column-title" aria-label={`${this.props.columnName} (${this.props.columnItems.length} feedback items)`}>
-            <i className={classNames(this.props.iconClass, "feedback-column-icon")} />
+            <i className={cn(this.props.iconClass, "feedback-column-icon")} />
             <h2 className="feedback-column-name">{this.props.columnName}</h2>
           </div>
+          <div className="feedback-column-actions">
+            {this.props.showColumnEditButton && (
+              <button className="feedback-column-edit-button" title="Edit column notes" aria-label={`Edit column ${this.props.columnName}`} onClick={this.openEditDialog}>
+                <i className="fas fa-comment-medical"></i>
+              </button>
+            )}
+            <button className="feedback-column-info-button" title="View column notes" aria-label={`View notes for ${this.props.columnName}`} onClick={this.openInfoDialog}>
+              <i className="fas fa-circle-info"></i>
+            </button>
+          </div>
         </div>
-        <div className={classNames("feedback-column-content", { "hide-collapse": this.state.isCollapsed })}>
+        <div className={cn("feedback-column-content", this.state.isCollapsed && "hide-collapse")}>
           {this.props.workflowPhase === WorkflowPhase.Collect && (
             <div className="create-container">
               <ActionButton
@@ -227,8 +274,45 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
               </ActionButton>
             </div>
           )}
-          {this.props.isDataLoaded && <div className={classNames("feedback-items-container", { "feedback-items-actions": this.props.workflowPhase === WorkflowPhase.Act })}>{this.renderFeedbackItems()}</div>}
+          {this.props.isDataLoaded && <div className={cn("feedback-items-container", this.props.workflowPhase === WorkflowPhase.Act && "feedback-items-actions")}>{this.renderFeedbackItems()}</div>}
         </div>
+        <Dialog
+          hidden={!this.state.isEditDialogOpen}
+          onDismiss={this.closeEditDialog}
+          dialogContentProps={{
+            type: DialogType.normal,
+            title: "Edit column notes",
+          }}
+          modalProps={{
+            isBlocking: false,
+            containerClassName: "prime-directive-dialog",
+            className: "retrospectives-dialog-modal",
+          }}
+        >
+          <TextField label="Column notes" multiline autoAdjustHeight value={this.state.columnNotesDraft} onChange={this.handleColumnNotesDraftChange} />
+          <DialogFooter>
+            <PrimaryButton text="Save" onClick={this.saveColumnNotes} />
+            <DefaultButton text="Cancel" onClick={this.closeEditDialog} />
+          </DialogFooter>
+        </Dialog>
+        <Dialog
+          hidden={!this.state.isInfoDialogOpen}
+          onDismiss={this.closeInfoDialog}
+          dialogContentProps={{
+            type: DialogType.normal,
+            title: "Column info",
+          }}
+          modalProps={{
+            isBlocking: false,
+            containerClassName: "prime-directive-dialog",
+            className: "retrospectives-dialog-modal",
+          }}
+        >
+          <div className="feedback-column-info-dialog-text">{this.props.columnNotes ? this.props.columnNotes : "No notes available for this column."}</div>
+          <DialogFooter>
+            <DefaultButton text="Close" onClick={this.closeInfoDialog} />
+          </DialogFooter>
+        </Dialog>
       </div>
     );
   }

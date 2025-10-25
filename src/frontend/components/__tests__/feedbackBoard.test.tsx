@@ -1,5 +1,5 @@
 import React from "react";
-import { render, waitFor, screen } from "@testing-library/react";
+import { render, waitFor, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { mocked } from "jest-mock";
@@ -10,6 +10,9 @@ import { itemDataService } from "../../dal/itemDataService";
 import { workService } from "../../dal/azureDevOpsWorkService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { reflectBackendService } from "../../dal/reflectBackendService";
+import { appInsights } from "../../utilities/telemetryClient";
+
+const feedbackColumnPropsSpy = jest.fn();
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
@@ -58,7 +61,9 @@ jest.mock("../../dal/reflectBackendService", () => ({
 }));
 
 jest.mock("../feedbackColumn", () => {
+  const React = require("react");
   return function MockFeedbackColumn(props: any) {
+    feedbackColumnPropsSpy(props);
     return <div data-testid={`column-${props.columnId}`} className="feedback-column"></div>;
   };
 });
@@ -176,6 +181,7 @@ const mockedProps: FeedbackBoardProps = {
   isCarouselDialogHidden: false,
   hideCarouselDialog: jest.fn(() => {}),
   userId: "",
+  onColumnNotesChange: jest.fn().mockResolvedValue(undefined),
 };
 
 const mockFeedbackItems: IFeedbackItemDocument[] = [
@@ -190,7 +196,7 @@ const mockFeedbackItems: IFeedbackItemDocument[] = [
     createdDate: new Date(),
     userIdRef: "user-1",
     timerSecs: 0,
-    timerstate: false,
+    timerState: false,
     timerId: null,
     groupIds: [],
     isGroupedCarouselItem: false,
@@ -207,7 +213,7 @@ const mockFeedbackItems: IFeedbackItemDocument[] = [
     createdDate: new Date(),
     userIdRef: "user-2",
     timerSecs: 0,
-    timerstate: false,
+    timerState: false,
     timerId: null,
     groupIds: [],
     isGroupedCarouselItem: false,
@@ -218,6 +224,7 @@ const mockFeedbackItems: IFeedbackItemDocument[] = [
 describe("FeedbackBoard Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    feedbackColumnPropsSpy.mockClear();
 
     // Default mock implementations
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
@@ -502,6 +509,112 @@ describe("FeedbackBoard Component", () => {
       await waitFor(() => {
         const columns = screen.getAllByTestId(/column-/);
         expect(columns.length).toBe(testColumnProps.columnIds.length);
+      });
+    });
+  });
+
+  describe("Column Notes Integration", () => {
+    const buildBoardWithNotes = (firstNote: string, secondNote = "") => ({
+      ...mockedBoard,
+      columns: mockedBoard.columns.map((column, index) => ({
+        ...column,
+        notes: index === 0 ? firstNote : secondNote,
+      })),
+    });
+
+    const getColumnPropsById = (columnId: string) => feedbackColumnPropsSpy.mock.calls.find(([props]) => props.columnId === columnId)?.[0];
+
+    const getLatestColumnPropsById = (columnId: string) => {
+      for (let index = feedbackColumnPropsSpy.mock.calls.length - 1; index >= 0; index -= 1) {
+        const [props] = feedbackColumnPropsSpy.mock.calls[index] ?? [];
+        if (props?.columnId === columnId) {
+          return props;
+        }
+      }
+
+      return undefined;
+    };
+
+    it("passes existing column notes to rendered feedback columns", async () => {
+      const boardWithNotes = buildBoardWithNotes("Initial column note", "Other note");
+
+      render(<FeedbackBoard {...mockedProps} board={boardWithNotes} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const firstColumnId = boardWithNotes.columns[0].id;
+      const firstColumnProps = getColumnPropsById(firstColumnId);
+
+      expect(firstColumnProps?.columnNotes).toBe("Initial column note");
+    });
+
+    it("optimistically updates notes and calls persistence handler", async () => {
+      const boardWithNotes = buildBoardWithNotes("Initial column note");
+      const onColumnNotesChange = jest.fn().mockResolvedValue(undefined);
+      const props = { ...mockedProps, board: boardWithNotes, onColumnNotesChange };
+
+      render(<FeedbackBoard {...props} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const firstColumnId = boardWithNotes.columns[0].id;
+      const initialCallCount = feedbackColumnPropsSpy.mock.calls.length;
+      const columnProps = getColumnPropsById(firstColumnId);
+
+      await act(async () => {
+        columnProps?.onColumnNotesChange("Updated notes");
+        await Promise.resolve();
+      });
+
+      expect(onColumnNotesChange).toHaveBeenCalledWith(firstColumnId, "Updated notes");
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy.mock.calls.length).toBeGreaterThan(initialCallCount);
+        const latestCallForColumn = getLatestColumnPropsById(firstColumnId);
+        expect(latestCallForColumn?.columnNotes).toBe("Updated notes");
+      });
+    });
+
+    it("reverts notes and logs telemetry when persistence fails", async () => {
+      const boardWithNotes = buildBoardWithNotes("Persisted note");
+      const persistenceError = new Error("notes update failed");
+      const onColumnNotesChange = jest.fn().mockRejectedValue(persistenceError);
+      const props = { ...mockedProps, board: boardWithNotes, onColumnNotesChange };
+
+      render(<FeedbackBoard {...props} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const firstColumnId = boardWithNotes.columns[0].id;
+      const columnProps = getColumnPropsById(firstColumnId);
+
+      await act(async () => {
+        columnProps?.onColumnNotesChange("Temporary note");
+        await Promise.resolve();
+      });
+
+      expect(onColumnNotesChange).toHaveBeenCalledWith(firstColumnId, "Temporary note");
+
+      await waitFor(() => {
+        expect(appInsights.trackException).toHaveBeenCalledWith(
+          persistenceError,
+          expect.objectContaining({
+            action: "updateColumnNotes",
+            boardId: props.board.id,
+            columnId: firstColumnId,
+          }),
+        );
+      });
+
+      await waitFor(() => {
+        const latestCallForColumn = getLatestColumnPropsById(firstColumnId);
+        expect(latestCallForColumn?.columnNotes).toBe("Persisted note");
       });
     });
   });

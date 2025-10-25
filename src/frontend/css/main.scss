@@ -14,11 +14,8 @@
 @use "feedbackCarousel.scss";
 @use "addActionItem.scss";
 @use "boardSummary.scss";
-@use "extensionSettingsMenu.scss";
 @use "contextualMenu.scss";
 @use "selectorCombo.scss";
-@use "_mobile.scss";
-@use "_highContrast.scss";
 @use "retrospectiveSummary.scss";
 
 @import "../node_modules/react-toastify/dist/ReactToastify.css";
@@ -48,8 +45,4 @@ button:focus:not(.ms-Button) {
   .hide-mobile {
     display: initial !important;
   }
-}
-
-.custom-pivot-content {
-  width: 100%;
 }

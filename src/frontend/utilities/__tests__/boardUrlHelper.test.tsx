@@ -1,3 +1,4 @@
+import { WorkflowPhase } from "../../interfaces/workItem";
 import { getBoardUrl } from "../boardUrlHelper";
 import { getHostBaseUrl, getProjectName } from "../servicesHelper";
 
@@ -26,10 +27,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
       expect(mockGetHostBaseUrl).toHaveBeenCalledTimes(1);
       expect(mockGetProjectName).toHaveBeenCalledTimes(1);
@@ -46,10 +47,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
     });
 
@@ -64,10 +65,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
     });
 
@@ -82,10 +83,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
     });
 
@@ -100,10 +101,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
     });
 
@@ -118,10 +119,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
     });
   });
@@ -137,7 +138,7 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue("MyProject");
 
       // Act & Assert
-      await expect(getBoardUrl(teamId, boardId)).rejects.toThrow("Failed to get host base URL");
+      await expect(getBoardUrl(teamId, boardId, WorkflowPhase.Collect)).rejects.toThrow("Failed to get host base URL");
       expect(mockGetHostBaseUrl).toHaveBeenCalledTimes(1);
     });
 
@@ -151,7 +152,7 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockRejectedValue(error);
 
       // Act & Assert
-      await expect(getBoardUrl(teamId, boardId)).rejects.toThrow("Failed to get project name");
+      await expect(getBoardUrl(teamId, boardId, WorkflowPhase.Collect)).rejects.toThrow("Failed to get project name");
       expect(mockGetHostBaseUrl).toHaveBeenCalledTimes(1);
       expect(mockGetProjectName).toHaveBeenCalledTimes(1);
     });
@@ -166,7 +167,7 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockRejectedValue(new Error("Failed to get project name"));
 
       // Act & Assert
-      await expect(getBoardUrl(teamId, boardId)).rejects.toThrow("Failed to get host base URL");
+      await expect(getBoardUrl(teamId, boardId, WorkflowPhase.Collect)).rejects.toThrow("Failed to get host base URL");
       expect(mockGetHostBaseUrl).toHaveBeenCalledTimes(1);
     });
   });
@@ -181,10 +182,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(undefined as unknown as string);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `nullundefined/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `nullundefined/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
     });
 
@@ -199,10 +200,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
       expect(result.length).toBeGreaterThan(2000);
     });
@@ -218,10 +219,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
     });
 
@@ -236,10 +237,10 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
-      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}`;
+      const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
     });
   });
@@ -256,7 +257,7 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
       expect(result).toContain("team%20with%20spaces");
@@ -276,7 +277,7 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
       expect(() => new URL(result)).not.toThrow();
@@ -294,7 +295,7 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
 
       // Assert
       expect(result).toContain("teamId=team#with@special$chars");
@@ -316,7 +317,7 @@ describe("getBoardUrl", () => {
       mockGetProjectName.mockResolvedValue(projectName);
 
       // Act
-      const [result1, result2] = await Promise.all([getBoardUrl(teamId1, boardId1), getBoardUrl(teamId2, boardId2)]);
+      const [result1, result2] = await Promise.all([getBoardUrl(teamId1, boardId1, WorkflowPhase.Collect), getBoardUrl(teamId2, boardId2, WorkflowPhase.Collect)]);
 
       // Assert
       expect(result1).toContain("teamId=team1&boardId=board1");
@@ -337,7 +338,7 @@ describe("getBoardUrl", () => {
 
       // Act
       const startTime = Date.now();
-      const result = await getBoardUrl(teamId, boardId);
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
       const endTime = Date.now();
 
       // Assert

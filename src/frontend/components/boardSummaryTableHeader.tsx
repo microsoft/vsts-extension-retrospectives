@@ -1,60 +1,54 @@
 import React from "react";
-import { flexRender } from "@tanstack/react-table";
-import type { Header, HeaderGroup, SortDirection } from "@tanstack/table-core";
-import type { IBoardSummaryTableItem } from "./boardSummaryTable";
+import type { ISimpleColumn } from "./boardSummaryTable";
+
+type SortDirection = "asc" | "desc" | false;
 
 interface BoardSummaryTableHeaderProps {
-  headerGroups: HeaderGroup<IBoardSummaryTableItem>[];
+  columns: ISimpleColumn[];
+  sortColumn: string;
+  sortDirection: SortDirection;
+  onSort: (columnId: string, sortDescFirst?: boolean) => void;
 }
 
-const getThProps = (header: Header<IBoardSummaryTableItem, unknown>) => {
-  const sortDirection: false | SortDirection = header.column.getIsSorted();
-  let sortClassName = "";
-  let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
+const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ columns, sortColumn, sortDirection, onSort }) => {
+  const getSortProps = (column: ISimpleColumn) => {
+    if (!column.sortable) {
+      return {};
+    }
 
-  if (sortDirection === "asc") {
-    sortClassName = sortDirection;
-    ariaSort = "ascending";
-  } else if (sortDirection === "desc") {
-    sortClassName = sortDirection;
-    ariaSort = "descending";
-  }
+    const isCurrentSort = sortColumn === column.id;
+    let sortClassName = "";
+    let ariaSort: "none" | "ascending" | "descending" | "other" = "none";
 
-  return {
-    "key": header.id,
-    "role": "columnheader",
-    "aria-sort": ariaSort,
-    "style": {
-      minWidth: header.getSize(),
-      width: header.getSize(),
-    },
-    "className": sortClassName,
-    "onClick": header.column.getToggleSortingHandler(),
+    if (isCurrentSort) {
+      if (sortDirection === "asc") {
+        sortClassName = "asc";
+        ariaSort = "ascending";
+      } else if (sortDirection === "desc") {
+        sortClassName = "desc";
+        ariaSort = "descending";
+      }
+    }
+
+    return {
+      "className": sortClassName,
+      "aria-sort": ariaSort,
+      "onClick": () => onSort(column.id, column.sortDescFirst),
+      "style": { cursor: "pointer" },
+    };
   };
-};
 
-const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ headerGroups }) => (
-  <thead role="rowgroup">
-    {headerGroups.map(headerGroup => (
-      <tr key={headerGroup.id} role="row">
-        {headerGroup.headers.map(header => (
-          <th key={header.id} {...getThProps(header)}>
-            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-            <div
-              {...{
-                onMouseDown: header.getResizeHandler(),
-                onTouchStart: header.getResizeHandler(),
-                className: `
-                  ${header.column.getCanResize() ? "resizer" : ""}
-                  ${header.column.getIsResizing() ? "isResizing" : ""}
-                `,
-              }}
-            />
+  return (
+    <thead role="rowgroup">
+      <tr role="row">
+        {columns.map(column => (
+          <th key={column.id} role="columnheader" {...getSortProps(column)}>
+            {typeof column.header === "function" ? column.header() : column.header}
           </th>
         ))}
       </tr>
-    ))}
-  </thead>
-);
+    </thead>
+  );
+};
 
 export default BoardSummaryTableHeader;

@@ -8,6 +8,7 @@ import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { copyToClipboard } from "../../utilities/clipboardHelper";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
+import { WorkflowPhase } from "../../interfaces/workItem";
 
 // Mock dependencies
 jest.mock("../../utilities/telemetryClient", () => ({
@@ -138,7 +139,7 @@ describe("FeedbackBoardPreviewEmail", () => {
       render(<FeedbackBoardPreviewEmail {...defaultProps} />);
 
       await waitFor(() => {
-        expect(mockGetBoardUrl).toHaveBeenCalledWith("team-456", "board-123");
+        expect(mockGetBoardUrl).toHaveBeenCalledWith("team-456", "board-123", WorkflowPhase.Collect);
       });
     });
 
@@ -321,7 +322,7 @@ describe("FeedbackBoardPreviewEmail", () => {
       render(<FeedbackBoardPreviewEmail {...defaultProps} teamId="different-team-789" />);
 
       await waitFor(() => {
-        expect(mockGetBoardUrl).toHaveBeenCalledWith("different-team-789", "board-123");
+        expect(mockGetBoardUrl).toHaveBeenCalledWith("different-team-789", "board-123", WorkflowPhase.Collect);
       });
     });
 

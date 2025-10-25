@@ -1,16 +1,23 @@
-﻿const webpack = require("webpack");
-const path = require("path");
+﻿import webpack from "webpack";
+import { resolve as _resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+import { createRequire } from "module";
+import TerserPlugin from "terser-webpack-plugin";
 
-const ESLintPlugin = require("eslint-webpack-plugin");
+import ESLintPlugin from "eslint-webpack-plugin";
 
-const CompressionPlugin = require("compression-webpack-plugin");
+import CompressionPlugin from "compression-webpack-plugin";
 
-const { codecovWebpackPlugin } = require("@codecov/webpack-plugin");
+import { codecovWebpackPlugin } from "@codecov/webpack-plugin";
 
-const BUILD_DIR = path.resolve(__dirname, "dist");
-const APP_DIR = path.resolve(__dirname, "");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const require = createRequire(import.meta.url);
 
-module.exports = (env, argv) => {
+const BUILD_DIR = _resolve(__dirname, "dist");
+const APP_DIR = _resolve(__dirname, "");
+
+export default (env, argv) => {
   const mode = argv.mode || "production";
 
   return {
@@ -60,6 +67,16 @@ module.exports = (env, argv) => {
     },
     optimization: {
       minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              drop_console: mode === "production",
+              pure_funcs: mode === "production" ? ["console.info", "console.debug", "console.warn"] : [],
+            },
+          },
+        }),
+      ],
       usedExports: true,
       sideEffects: false,
       splitChunks: false,

@@ -6,6 +6,14 @@
 @theme {
 }
 
+.extension-settings-menu {
+  @apply mt-3 mr-3;
+}
+
+.extension-settings-menu .ms-Button-label {
+  @apply text-xs;
+}
+
 .ms-Button--primary {
   background-color: #fff;
   color: rgb(0, 120, 212);
@@ -58,4 +66,71 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .ms-ContextualMenu-divider {
   opacity: 0.2;
+}
+
+.carousel-container {
+  @apply relative w-full flex flex-col items-center gap-4;
+}
+
+.carousel-track {
+  @apply flex overflow-x-auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  @apply w-full relative;
+}
+
+.carousel-track::-webkit-scrollbar {
+  @apply hidden; /* Chrome/Safari */
+}
+
+.carousel-slide {
+  @apply flex-none w-full relative flex items-center justify-center;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  min-width: 100%;
+  padding: 0 60px; /* Space for arrows */
+}
+
+.carousel-viewport {
+  @apply w-full flex items-center justify-center;
+}
+
+.carousel-slide .feedback-carousel-item {
+  @apply w-full;
+  max-width: 600px;
+}
+
+.carousel-arrow {
+  @apply absolute top-1/2 z-10 flex items-center justify-center cursor-pointer transition-all duration-200 ease-in-out;
+  @apply bg-white/90 border border-gray-300 rounded-full w-10 h-10;
+  @apply shadow-sm no-underline;
+  transform: translateY(-50%);
+}
+
+.carousel-arrow:hover {
+  @apply bg-white shadow-md;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-arrow:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+.carousel-arrow-prev {
+  @apply left-2.5;
+}
+
+.carousel-arrow-next {
+  @apply right-2.5;
+}
+
+.carousel-arrow i {
+  @apply text-base text-gray-800;
+}
+
+.feedback-carousel-pivot-item .carousel-container {
+  @apply min-h-96;
 }

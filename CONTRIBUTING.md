@@ -120,7 +120,7 @@ Read more about the [Python pre-commit framework](https://pre-commit.com/). To d
 
 The Retrospectives Extension can be built, developed and tested in several development environments. This section highlights three of the primary environments in order of relevance.
 
-All of the development prerequisites, such as [Webpack](https://webpack.js.org/) and [NodeJS](https://nodejs.org/en/download/) are listed in the [Dockerfile](.devcontainer/Dockerfile). This file can be opened in a text editor and the install commands can be used to configure the prerequisites outside of a [dev container](#dev-containers).
+All of the development prerequisites, are listed in the [DevContainer Configuration](.devcontainer/devcontainer.json). This file can be opened in a text editor and the tools and extensions can be used to configure the prerequisites outside of a [dev container](#dev-containers).
 
 ### Dev Containers
 
@@ -162,9 +162,7 @@ All of the development prerequisites, such as [Webpack](https://webpack.js.org/)
 
 7. If VSCode does not recognize the WSL on its own, in the top right hand corner of the terminal window, select the down arrow to "Launch Profile..." and select the name of the distribution in use to create a new WSL terminal.
 
-8. Perform the commands listed in the [Dockerfile](.devcontainer/Dockerfile) to globally install required packages such as dotnet core.
-
-9. Follow the steps outlined in the [Build](#build) section to build, test, and deploy development versions of the extension.
+8. Follow the steps outlined in the [Build](#build) section to build, test, and deploy development versions of the extension.
 
 ---
 
@@ -402,30 +400,6 @@ To automatically generate the test coverage report, add the `--coverage` flag to
 - Mocks which are shared by the majority of tests should be initialized in the [test setup file](src/frontend/components/__tests__/setupTests.tsx).
 
 ---
-
-#### Snapshots
-
-To ensure proper rendering of components, snapshots tests are being used to compare expected component rendering state against its actual state.  Snapshot tests will fail when changes are made to components that are not accounted for through updates to these stored snapshots.
-
-To update snapshots, delete the snapshot for the component you are testing, (located in the [snapshots folder](src/frontend/components/__tests__/__snapshots__)) and run the test command. On test run completion, new snapshots should be created. Please check the newly created snapshot file, to ensure that the expected changes are present, and include the snapshot in your pull request.
-
-To enable real time updates from your test extension you will need to deploy the backend to Azure specifying your publisher ID and the unique key of your extension. **Note:** If you are part of a team working on the retro tool you can deploy a single backend to support multiple developer test extensions.
-
-1. Copy `/deploy/.env.template` to `/deploy/.env` and make the following changes:
-   - Add the Service Principal values used by the `env_setup.sh` script.
-     [Instructions on how to create a Service Principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli#password-based-authentication).
-   - Add the `RESOURCE_NAME_SUFFIX` value. This will be used for naming all Azure resources including the App Service name - `https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
-     **Note:** The app name must be globally unique so select something accordingly.
-   - Add the `LOCATION` value i.e., "eastus", "westus", etc.
-1. Copy `/allowed_origins.json.template` to `/allowed_origins.json` and replace the `<publisher id>` with your publisher ID. This ID uniquely identifies your publisher in the Visual Studio Marketplace. If you are part of a team working on the retro tool you can add additional allowed origins. There should be two allowed origins per publisher ID. Remember to increment the name index as you add additional origins.
-1. Copy `/dev_certs.json.template` to `/dev_certs.json` and replace the `<extension secret>` with your secret. [Instructions on how to download the unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key).  If you are part of a team working on the retro tool you can add additional secrets. Remember to increment the name index to add additional secrets.
-1. Run the `deploy/env_setup.sh` script.
-1. Once the script completes, it will output the URL of the backend service. You can navigate to the [Azure Portal](https://portal.azure.com) and validate that the `rg-<RESOURCE_NAME_SUFFIX>` resource group exists and contains the App Service, App Service Plan and SignalR resources.
-1. Update the `src/frontend/config/environment.tsx` to reflect changes to:
-   - `CollaborationStateServiceUrl` value to the App Service URL -
-     `https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
-   - `AppInsightsInstrumentKey` value to Application Insights' Instrumentation Key for the resource `ai-<RESOURCE_NAME_SUFFIX>`.
-1. After updating the above values redeploy the extension.
 
 ## Backend Development
 

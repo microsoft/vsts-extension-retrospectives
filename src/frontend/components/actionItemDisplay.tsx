@@ -17,6 +17,7 @@ import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import ActionItem from "./actionItem";
+import { WorkflowPhase } from "../interfaces/workItem";
 
 export interface ActionItemDisplayProps extends IButtonProps {
   feedbackItemId: string;
@@ -66,7 +67,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
   private addActionItemButtonWrapper: HTMLElement | null;
 
   private readonly createAndLinkActionItem = async (workItemTypeName: string) => {
-    const boardUrl = await getBoardUrl(this.props.team.id, this.props.boardId);
+    const boardUrl = await getBoardUrl(this.props.team.id, this.props.boardId, WorkflowPhase.Collect);
     const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
 
     // Account for any users who are no longer a part of the org

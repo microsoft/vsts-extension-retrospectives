@@ -2,13 +2,24 @@ import { IFeedbackItemDocument, IFeedbackBoardDocument, IFeedbackColumn } from "
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../dal/itemDataService";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
-import { saveAs } from "file-saver";
+
+// Native browser download function to replace file-saver
+function downloadFile(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
 
 class ShareBoardHelper {
   // Builds CSV content which lists the given board's feedback and work items
   public generateCSVContent = async (board: IFeedbackBoardDocument) => {
     const feedbackItems: IFeedbackItemDocument[] = await itemDataService.getFeedbackItemsForBoard(board.id);
-    const boardUrl = await getBoardUrl(board.teamId, board.id);
+    const boardUrl = await getBoardUrl(board.teamId, board.id, board.activePhase);
 
     /* eslint-disable  no-useless-escape */
     let content: string = `\"Retrospectives Summary for '${board.title}' (${boardUrl})\"\n`;
@@ -68,7 +79,7 @@ class ShareBoardHelper {
     }
 
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, "retro.csv");
+    downloadFile(blob, "retro.csv");
   };
 
   // Builds an email message which lists the given board's feedback and work items

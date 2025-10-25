@@ -4,20 +4,91 @@ import { WorkflowPhase } from "../../interfaces/workItem";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../../dal/itemDataService";
 import { getBoardUrl } from "../../utilities/boardUrlHelper";
-import { saveAs } from "file-saver";
 
 jest.mock("../../dal/azureDevOpsWorkItemService");
 jest.mock("../../dal/itemDataService");
 jest.mock("../../utilities/boardUrlHelper");
-jest.mock("file-saver");
 
 const mockWorkItemService = workItemService as jest.Mocked<typeof workItemService>;
 const mockItemDataService = itemDataService as jest.Mocked<typeof itemDataService>;
 const mockGetBoardUrl = getBoardUrl as jest.MockedFunction<typeof getBoardUrl>;
-const mockSaveAs = saveAs as jest.MockedFunction<typeof saveAs>;
+
+// Mock native browser APIs for file download
+const mockCreateObjectURL = jest.fn();
+const mockRevokeObjectURL = jest.fn();
+const mockClick = jest.fn();
+const mockAppendChild = jest.fn();
+const mockRemoveChild = jest.fn();
+
+global.URL.createObjectURL = mockCreateObjectURL;
+global.URL.revokeObjectURL = mockRevokeObjectURL;
+
+// Mock document.createElement for <a> element
+const originalCreateElement = document.createElement.bind(document);
+document.createElement = jest.fn((tagName: string) => {
+  if (tagName === "a") {
+    const link = originalCreateElement(tagName);
+    link.click = mockClick;
+    return link;
+  }
+  return originalCreateElement(tagName);
+});
+
+document.body.appendChild = mockAppendChild;
+document.body.removeChild = mockRemoveChild;
 
 describe("ShareBoardHelper", () => {
   const mockBoardUrl = "https://dev.azure.com/test-org/test-project/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=team1&boardId=board1";
+
+  // Helper to capture the downloaded blob
+  let capturedBlob: Blob | null = null;
+  let capturedFilename: string | null = null;
+
+  beforeEach(() => {
+    capturedBlob = null;
+    capturedFilename = null;
+
+    mockCreateObjectURL.mockReturnValue("blob:mock-url");
+    mockCreateObjectURL.mockClear();
+    mockRevokeObjectURL.mockClear();
+    mockClick.mockClear();
+    mockAppendChild.mockClear();
+    mockRemoveChild.mockClear();
+
+    // Capture the blob and filename when createElement is called
+    (document.createElement as jest.Mock).mockImplementation((tagName: string) => {
+      if (tagName === "a") {
+        const link = originalCreateElement(tagName);
+        const originalHrefSetter = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, "href")?.set;
+        const originalDownloadSetter = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, "download")?.set;
+
+        Object.defineProperty(link, "href", {
+          set: (value: string) => {
+            originalHrefSetter?.call(link, value);
+          },
+          get: () => link.getAttribute("href"),
+        });
+
+        Object.defineProperty(link, "download", {
+          set: (value: string) => {
+            capturedFilename = value;
+            originalDownloadSetter?.call(link, value);
+          },
+          get: () => link.getAttribute("download"),
+        });
+
+        link.click = mockClick;
+        return link;
+      }
+      return originalCreateElement(tagName);
+    });
+
+    // Capture blob when createObjectURL is called
+    mockCreateObjectURL.mockImplementation((blob: Blob) => {
+      capturedBlob = blob;
+      return "blob:mock-url";
+    });
+  });
 
   const mockBoard = {
     id: "board1",
@@ -110,7 +181,7 @@ describe("ShareBoardHelper", () => {
       createdDate: new Date("2023-01-01T11:00:00Z"),
       userIdRef: "user1",
       timerSecs: 0,
-      timerstate: false,
+      timerState: false,
       childFeedbackItemIds: ["item4", "item5", "item6"],
     },
     {
@@ -129,7 +200,7 @@ describe("ShareBoardHelper", () => {
       createdDate: new Date("2023-01-01T11:15:00Z"),
       userIdRef: "user2",
       timerSecs: 0,
-      timerstate: false,
+      timerState: false,
       parentFeedbackItemId: "item3",
     },
     {
@@ -148,7 +219,7 @@ describe("ShareBoardHelper", () => {
       createdDate: new Date("2023-01-01T11:30:00Z"),
       userIdRef: "user1",
       timerSecs: 0,
-      timerstate: false,
+      timerState: false,
       parentFeedbackItemId: "item3",
     },
   ] as IFeedbackItemDocument[];
@@ -201,19 +272,17 @@ describe("ShareBoardHelper", () => {
     it("should generate CSV content with feedback items and work items", async () => {
       await shareBoardHelper.generateCSVContent(mockBoard);
 
-      expect(mockGetBoardUrl).toHaveBeenCalledWith("team1", "board1");
+      expect(mockGetBoardUrl).toHaveBeenCalledWith("team1", "board1", WorkflowPhase.Collect);
       expect(mockItemDataService.getFeedbackItemsForBoard).toHaveBeenCalledWith("board1");
       expect(mockWorkItemService.getWorkItemsByIds).toHaveBeenCalledWith([123, 456]);
-      expect(mockSaveAs).toHaveBeenCalled();
 
-      const saveAsCall = mockSaveAs.mock.calls[0];
-      const blob = saveAsCall[0] as Blob;
-      const filename = saveAsCall[1] as string;
+      expect(mockCreateObjectURL).toHaveBeenCalled();
+      expect(mockClick).toHaveBeenCalled();
+      expect(capturedFilename).toBe("retro.csv");
+      expect(capturedBlob).toBeTruthy();
+      expect(capturedBlob!.type).toBe("text/plain;charset=utf-8");
 
-      expect(filename).toBe("retro.csv");
-      expect(blob.type).toBe("text/plain;charset=utf-8");
-
-      const text = await blob.text();
+      const text = await capturedBlob!.text();
 
       expect(text).toContain("\"Retrospectives Summary for 'Test Retrospective Board' (https://dev.azure.com/test-org/test-project/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=team1&boardId=board1)\"");
       expect(text).toContain("Feedback Items");
@@ -241,11 +310,11 @@ describe("ShareBoardHelper", () => {
       await shareBoardHelper.generateCSVContent(mockBoard);
 
       expect(mockWorkItemService.getWorkItemsByIds).not.toHaveBeenCalled();
-      expect(mockSaveAs).toHaveBeenCalled();
+      expect(mockCreateObjectURL).toHaveBeenCalled();
 
-      const saveAsCall = mockSaveAs.mock.calls[0];
-      const blob = saveAsCall[0] as Blob;
-      const text = await blob.text();
+      // Use capturedBlob instead
+      // Use capturedBlob instead
+      const text = await capturedBlob!.text();
 
       expect(text).toContain("Work Items");
       expect(text).toContain("Feedback Description,Work Item Title,Work Item Type,Work Item Id,Url");
@@ -266,9 +335,9 @@ describe("ShareBoardHelper", () => {
     it("should filter out non-existent child feedback items", async () => {
       await shareBoardHelper.generateCSVContent(mockBoard);
 
-      const saveAsCall = mockSaveAs.mock.calls[0];
-      const blob = saveAsCall[0] as Blob;
-      const text = await blob.text();
+      // Use capturedBlob instead
+      // Use capturedBlob instead
+      const text = await capturedBlob!.text();
 
       expect(text).toContain('"What went well","Grouped child item 1",0');
       expect(text).toContain('"What went well","Grouped child item 2",1');
@@ -286,9 +355,9 @@ describe("ShareBoardHelper", () => {
 
       await shareBoardHelper.generateCSVContent(mockBoard);
 
-      const saveAsCall = mockSaveAs.mock.calls[0];
-      const blob = saveAsCall[0] as Blob;
-      const text = await blob.text();
+      // Use capturedBlob instead
+      // Use capturedBlob instead
+      const text = await capturedBlob!.text();
 
       expect(text).toContain('"What went well","Great teamwork",3');
       expect(text).toContain('"undefined"');
@@ -305,9 +374,9 @@ describe("ShareBoardHelper", () => {
 
       await shareBoardHelper.generateCSVContent(mockBoard);
 
-      const saveAsCall = mockSaveAs.mock.calls[0];
-      const blob = saveAsCall[0] as Blob;
-      const text = await blob.text();
+      // Use capturedBlob instead
+      // Use capturedBlob instead
+      const text = await capturedBlob!.text();
 
       expect(text).toContain('"What went well","Great teamwork",3');
       expect(text).not.toContain("non-existent-1");
@@ -327,9 +396,9 @@ describe("ShareBoardHelper", () => {
 
       await shareBoardHelper.generateCSVContent(mockBoard);
 
-      const saveAsCall = mockSaveAs.mock.calls[0];
-      const blob = saveAsCall[0] as Blob;
-      const text = await blob.text();
+      // Use capturedBlob instead
+      // Use capturedBlob instead
+      const text = await capturedBlob!.text();
 
       expect(text).toContain('"What went well","Grouped child item 1",0');
       expect(text).toContain('"undefined"');

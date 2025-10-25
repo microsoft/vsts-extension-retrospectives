@@ -1,5 +1,5 @@
 import React from "react";
-import classNames from "classnames";
+import { cn } from "../utilities/classNameHelper";
 import { ActionButton, PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
 import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
 import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
@@ -48,7 +48,6 @@ export interface IFeedbackItemProps {
   groupedItemProps?: IGroupedFeedbackItemProps;
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
-  isInteractable: boolean;
   shouldHaveFocus: boolean;
   hideFeedbackItems: boolean;
   userIdRef: string;
@@ -563,14 +562,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           }
         }}
       >
-        <i
-          className={classNames("fa", {
-            "fa-angle-double-down": isFocusButton && this.state.isShowingGroupedChildrenTitles,
-            "fa-angle-double-right": isFocusButton && !this.state.isShowingGroupedChildrenTitles,
-            "fa-chevron-down": !isFocusButton && this.props.groupedItemProps.isGroupExpanded,
-            "fa-chevron-right": !isFocusButton && !this.props.groupedItemProps.isGroupExpanded,
-          })}
-        />
+        <i className={cn("fa", isFocusButton && this.state.isShowingGroupedChildrenTitles && "fa-angle-double-down", isFocusButton && !this.state.isShowingGroupedChildrenTitles && "fa-angle-double-right", !isFocusButton && this.props.groupedItemProps.isGroupExpanded && "fa-chevron-down", !isFocusButton && !this.props.groupedItemProps.isGroupExpanded && "fa-chevron-right")} />
         &nbsp;
         {isFocusButton ? `${this.props.groupCount + 1} Items` : `${groupItemsCount} Items`}
         {isFocusButton && <i className="far fa-comments" />}
@@ -590,7 +582,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         aria-label={buttonAriaLabel}
         tabIndex={0}
         disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-        className={classNames("feedback-action-button", "feedback-add-vote", { voteAnimation: this.state.showVotedAnimation })}
+        className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
         onClick={e => {
           e.preventDefault();
           e.stopPropagation();
@@ -651,10 +643,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     }
 
     // Group, Vote, Act (and Focus) Options
-    const isDraggable = this.props.isInteractable && workflowState.isGroupPhase && !this.state.isMarkedForDeletion;
+    const isDraggable = workflowState.isGroupPhase && !this.state.isMarkedForDeletion;
     const showVoteButton = workflowState.isVotePhase;
-    const showAddActionItem = workflowState.isActPhase;
-    const showVotes = showVoteButton || showAddActionItem;
+    const showVotes = showVoteButton || workflowState.isActPhase;
 
     const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
     const ariaLabel = isNotGroupedItem ? "Feedback item." : !isMainItem ? "Feedback group item." : `Feedback group main item. Group has ${groupItemsCount} items.`;
@@ -664,33 +655,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
 
     return (
-      <div
-        ref={this.itemElementRef}
-        tabIndex={0}
-        aria-live="polite"
-        aria-label={ariaLabel}
-        className={classNames({
-          feedbackItem: isNotGroupedItem,
-          feedbackItemGroupItem: !isNotGroupedItem,
-          feedbackItemGroupGroupedItem: !isNotGroupedItem && !isMainItem,
-          newFeedbackItem: this.props.showAddedAnimation,
-          removeFeedbackItem: this.state.isMarkedForDeletion,
-          hideFeedbackItem: hideFeedbackItems,
-        })}
-        draggable={isDraggable}
-        onDragStart={this.dragFeedbackItemStart}
-        onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null}
-        onDragEnd={this.dragFeedbackItemEnd}
-        onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null}
-        onAnimationEnd={this.onAnimationEnd}
-      >
+      <div ref={this.itemElementRef} tabIndex={0} aria-live="polite" aria-label={ariaLabel} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
         <div className="document-card-wrapper">
-          <DocumentCard
-            className={classNames({
-              mainItemCard: isMainItem,
-              groupedItemCard: !isMainItem,
-            })}
-          >
+          <DocumentCard className={cn(isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")}>
             <div
               className="card-integral-part"
               style={{
@@ -707,12 +674,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   mainGroupedItemNotInFocusMode && this.renderGroupButton(groupItemsCount, false)
                 }
                 {
-                  showVotes && this.props.isInteractable && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, true) // render voting button
+                  showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, true) // render voting button
                 }
                 {
-                  showVotes && this.props.isInteractable && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, false) // render unvoting button
+                  showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, false) // render unvoting button
                 }
-                {!this.props.newlyCreated && this.props.isInteractable && (
+                {!this.props.newlyCreated && (
                   <div className="item-actions-menu">
                     <DefaultButton
                       className="contextual-menu-button hide-mobile"
@@ -771,14 +738,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 )}
               </div>
               <div className="card-content">
-                <div id="actionTimer" className="card-action-timer hide-mobile">
-                  {showAddActionItem && (
+                {workflowState.isActPhase && (
+                  <div className="card-action-timer hide-mobile">
                     <button
                       title="Timer"
                       aria-live="polite"
                       aria-label={"Start/stop"}
                       tabIndex={0}
-                      className={classNames("feedback-action-button")}
+                      className="feedback-action-button"
                       onClick={e => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -788,26 +755,21 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
                       <span> {this.formatTimer(this.props.timerSecs)} elapsed</span>
                     </button>
-                  )}
-                </div>
-                {this.props.isInteractable && <EditableDocumentCardTitle isMultiline={true} title={this.props.title} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
-                {!this.props.isInteractable && (
-                  <div className="non-editable-text-container">
-                    <p className="non-editable-text">{this.props.title}</p>
                   </div>
                 )}
+                {<EditableDocumentCardTitle isMultiline={true} title={this.props.title} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
                 {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
                   <div className="original-column-info hide-mobile">
                     Original Column: <br />
                     {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
                   </div>
                 )}
-                {showVoteButton && this.props.isInteractable && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
+                {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
               </div>
               {this.feedbackCreationInformationContent()}
-              <div className="card-id">#{this.props.columns[this.props.columnId].columnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1}</div>
+              <div className="card-id">#{this.props.columns[this.props.columnId]?.columnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1}</div>
             </div>
-            <div className="card-action-item-part">{showAddActionItem && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={this.props.title} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
+            <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={this.props.title} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
               <div className="group-child-feedback-stack">
                 <div className="related-feedback-header">
@@ -919,7 +881,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           <div className="output-container">
             {!this.state.searchedFeedbackItems.length && this.state.searchTerm && <p className="no-matching-feedback-message">No feedback with title containing your input.</p>}
             {this.state.searchedFeedbackItems.map((searchItem, index) => {
-              // Making feedbackItemsProps by hand since we are looking across all columns
               const feedbackItemProps: IFeedbackItemProps = {
                 id: searchItem.id,
                 title: searchItem.title,
@@ -939,17 +900,16 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 boardTitle: this.props.boardTitle,
                 defaultActionItemAreaPath: this.props.defaultActionItemAreaPath,
                 defaultActionItemIteration: this.props.defaultActionItemIteration,
-                actionItems: [], // Since this is just for grouping, we don't _need_ these
+                actionItems: [],
                 showAddedAnimation: this.props.showAddedAnimation,
                 newlyCreated: this.props.newlyCreated,
                 nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
                 allWorkItemTypes: this.props.allWorkItemTypes,
-                isInteractable: false,
                 shouldHaveFocus: this.props.shouldHaveFocus,
                 hideFeedbackItems: this.props.hideFeedbackItems,
                 userIdRef: searchItem.userIdRef,
                 timerSecs: searchItem.timerSecs,
-                timerState: searchItem.timerstate,
+                timerState: searchItem.timerState,
                 timerId: searchItem.timerId,
                 groupCount: searchItem.childFeedbackItemIds?.length,
                 groupIds: searchItem.childFeedbackItemIds ?? [],
