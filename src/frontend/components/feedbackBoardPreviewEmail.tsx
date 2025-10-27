@@ -46,7 +46,7 @@ class FeedbackBoardPreviewEmail extends React.Component<IFeedbackBoardPreviewEma
     this.props.onCopy();
   };
 
-  public render(): JSX.Element {
+  public render(): React.JSX.Element {
     if (!this.state.emailContent) {
       return <Spinner className="preview-email-spinner" size={SpinnerSize.large} label="Loading..." ariaLive="assertive" />;
     }

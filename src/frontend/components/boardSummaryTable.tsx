@@ -125,9 +125,9 @@ export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClic
 // Simple column definition interface
 export interface ISimpleColumn {
   id: string;
-  header: string | (() => JSX.Element) | null;
+  header: string | (() => React.JSX.Element) | null;
   accessor?: keyof IBoardSummaryTableItem;
-  cell: (item: IBoardSummaryTableItem) => JSX.Element | string | number;
+  cell: (item: IBoardSummaryTableItem) => React.JSX.Element | string | number;
   sortable?: boolean;
   sortDescFirst?: boolean;
 }
@@ -313,7 +313,7 @@ export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[])
   };
 }
 
-function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
+function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.Element {
   const [openDialogBoardId, setOpenDialogBoardId] = useState<string | null>(null);
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({

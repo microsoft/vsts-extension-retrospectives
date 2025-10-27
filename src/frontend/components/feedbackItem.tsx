@@ -546,7 +546,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
-  private renderGroupButton(groupItemsCount: number, isFocusButton: boolean): JSX.Element | null {
+  private renderGroupButton(groupItemsCount: number, isFocusButton: boolean): React.JSX.Element | null {
     return (
       <button
         className={isFocusButton ? "feedback-expand-group-focus" : "feedback-expand-group"}
@@ -601,7 +601,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
-  public render(): JSX.Element {
+  public render(): React.JSX.Element {
     const workflowState = {
       isCollectPhase: this.props.workflowPhase === WorkflowPhase.Collect,
       isGroupPhase: this.props.workflowPhase === WorkflowPhase.Group,

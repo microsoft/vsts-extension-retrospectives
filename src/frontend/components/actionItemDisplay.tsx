@@ -105,7 +105,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     this.createAndLinkActionItem(workItemTypeName);
   };
 
-  private readonly onRenderWorkItemTypeIcon = (iconLocation: string, workItemType: string): JSX.Element => {
+  private readonly onRenderWorkItemTypeIcon = (iconLocation: string, workItemType: string): React.JSX.Element => {
     return <Image src={iconLocation} className="work-item-icon" aria-label={`icon for work item type ${workItemType}`} />;
   };
 
@@ -191,17 +191,17 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     });
   };
 
-  public render(): JSX.Element {
+  public render(): React.JSX.Element {
     const { disabled, checked } = this.props;
     return (
       <div className="action-items">
         {this.props.allowAddNewActionItem && (
           <div className="add-action-item-wrapper">
             <div className="feedback-spacer" aria-hidden />
-            <div className="add-action-item-section" ref={div => (this.addActionItemButtonWrapper = div)}>
+            <div className="add-action-item-section" ref={div => { this.addActionItemButtonWrapper = div; }}>
               <ActionButton
                 // @ts-ignore TS2769
-                componentRef={(actionButton: HTMLElement) => (this.addActionItemButton = actionButton)}
+                componentRef={(actionButton: HTMLElement) => { this.addActionItemButton = actionButton; }}
                 className="add-action-item-button"
                 ariaLabel="Add work item"
                 data-automation-id="actionItemDataAutomation"

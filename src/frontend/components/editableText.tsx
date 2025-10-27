@@ -156,7 +156,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     }
   };
 
-  public render(): JSX.Element {
+  public render(): React.JSX.Element {
     if (this.state.isEditing) {
       return (
         <div

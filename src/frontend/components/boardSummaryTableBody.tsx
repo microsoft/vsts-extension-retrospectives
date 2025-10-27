@@ -5,7 +5,7 @@ interface BoardSummaryTableBodyProps {
   columns: ISimpleColumn[];
   data: IBoardSummaryTableItem[];
   expandedRows: Set<string>;
-  boardRowSummary: (item: IBoardSummaryTableItem) => JSX.Element | null;
+  boardRowSummary: (item: IBoardSummaryTableItem) => React.JSX.Element | null;
 }
 
 const getTdProps = (item: IBoardSummaryTableItem, columnId: string) => {
