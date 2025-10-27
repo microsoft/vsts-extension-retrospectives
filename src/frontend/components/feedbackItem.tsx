@@ -571,8 +571,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   private renderVoteActionButton(isMainItem: boolean, isBoldItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
+    const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
+    const titleForAria = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
     const buttonTitle = isUpvote ? "Vote" : "Unvote";
-    const buttonAriaLabel = isUpvote ? `Click to vote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}` : `Click to unvote on feedback with title ${this.props.title}. Current vote count is ${this.props.upvotes}`;
+    const buttonAriaLabel = isUpvote ? `Click to vote on feedback with title ${titleForAria}. Current vote count is ${this.props.upvotes}` : `Click to unvote on feedback with title ${titleForAria}. Current vote count is ${this.props.upvotes}`;
     const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
 
     return (
@@ -651,8 +653,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const ariaLabel = isNotGroupedItem ? "Feedback item." : !isMainItem ? "Feedback group item." : `Feedback group main item. Group has ${groupItemsCount} items.`;
     const curTimerState = this.props.timerState;
 
-    // Universal Flag
     const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
+
+    const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
 
     return (
       <div ref={this.itemElementRef} tabIndex={0} aria-live="polite" aria-label={ariaLabel} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
@@ -757,7 +760,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     </button>
                   </div>
                 )}
-                {<EditableDocumentCardTitle isMultiline={true} title={this.props.title} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
+                {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
                 {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
                   <div className="original-column-info hide-mobile">
                     Original Column: <br />
@@ -769,7 +772,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               {this.feedbackCreationInformationContent()}
               <div className="card-id">#{this.props.columns[this.props.columnId]?.columnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1}</div>
             </div>
-            <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={this.props.title} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
+            <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
               <div className="group-child-feedback-stack">
                 <div className="related-feedback-header">
@@ -781,6 +784,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   {childrenIds.map((id: string) => {
                     const childCard: IColumnItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
                     const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
+                    const childItemHidden = childCard && this.props.hideFeedbackItems && childCard.feedbackItem.userIdRef !== getUserIdentity().id;
+                    const childDisplayTitle = childItemHidden ? "[Hidden Feedback]" : childCard?.feedbackItem.title;
 
                     return (
                       childCard && (
@@ -788,8 +793,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                           <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}>
                             <i className="fa-solid fa-quote-left" />
                           </span>
-                          <span className="related-feedback-title" aria-label={"Title of the feedback is " + childCard.feedbackItem.title} title={childCard.feedbackItem.title}>
-                            {childCard.feedbackItem.title}
+                          <span className="related-feedback-title" aria-label={"Title of the feedback is " + childDisplayTitle} title={childDisplayTitle}>
+                            {childDisplayTitle}
                           </span>
                           {this.props.columnId !== originalColumn?.columnProperties?.id && (
                             <div className="original-column-info hide-mobile">
@@ -812,7 +817,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           dialogContentProps={{
             type: DialogType.close,
             title: "Delete Feedback",
-            subText: `Are you sure you want to delete the feedback "${this.props.title}"?
+            subText: `Are you sure you want to delete the feedback "${displayTitle}"?
               ${!isNotGroupedItem && isMainItem ? "Any feedback grouped underneath this one will be ungrouped." : ""}`,
           }}
           modalProps={{
@@ -936,7 +941,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           dialogContentProps={{
             type: DialogType.close,
             title: "Remove Feedback from Group",
-            subText: `Are you sure you want to remove the feedback "${this.props.title}" from its current group?`,
+            subText: `Are you sure you want to remove the feedback "${displayTitle}" from its current group?`,
           }}
           modalProps={{
             isBlocking: true,

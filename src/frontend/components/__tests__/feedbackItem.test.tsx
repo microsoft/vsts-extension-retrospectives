@@ -450,6 +450,74 @@ describe("Feedback Item", () => {
       const { container } = render(<FeedbackItem {...props} />);
       expect(container.querySelector(".hideFeedbackItem")).toBeTruthy();
     });
+
+    test("replaces title with placeholder text when hideFeedbackItems is true", () => {
+      const props: any = {
+        id: "test-hidden-text",
+        title: "Secret Feedback Content",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "different-user",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+      };
+      const { container, queryByText } = render(<FeedbackItem {...props} />);
+
+      // Should show placeholder text
+      expect(container.textContent).toContain("[Hidden Feedback]");
+
+      // Should NOT show the actual title
+      expect(queryByText("Secret Feedback Content")).not.toBeInTheDocument();
+    });
+
+    test("shows actual title when user is the owner", () => {
+      const props: any = {
+        id: "test-owner",
+        title: "My Feedback",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "test-user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+      };
+      const { container, getByText } = render(<FeedbackItem {...props} />);
+
+      // Should show actual title since user is the owner
+      expect(getByText("My Feedback")).toBeInTheDocument();
+
+      // Should NOT have hidden class
+      expect(container.querySelector(".hideFeedbackItem")).not.toBeInTheDocument();
+    });
   });
 
   describe("Animation and styling", () => {
