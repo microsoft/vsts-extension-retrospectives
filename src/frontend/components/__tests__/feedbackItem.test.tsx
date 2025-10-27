@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import FeedbackItem from "../feedbackItem";
 import { testColumns, testBoardId, testColumnUuidOne, testColumnIds } from "../__mocks__/mocked_components/mockedFeedbackColumn";
@@ -1804,6 +1804,117 @@ describe("Feedback Item", () => {
       };
       const { container } = render(<FeedbackItem {...props} />);
       expect(container.firstChild).toBeTruthy();
+    });
+
+    test("prevents drag over when item is being dragged itself", () => {
+      const props: any = {
+        id: "test-drag-over-self",
+        title: "Drag Self Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+      };
+      
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItem = container.querySelector('.feedbackItem');
+      expect(feedbackItem).toBeTruthy();
+      
+      // Simulate drag start to set isBeingDragged to true
+      fireEvent.dragStart(feedbackItem!, {
+        dataTransfer: {
+          effectAllowed: 'linkMove',
+          setData: jest.fn(),
+        },
+      });
+      
+      // Now try drag over - preventDefault should not be called when item is being dragged
+      const dragOverEvent = {
+        preventDefault: jest.fn(),
+        stopPropagation: jest.fn(),
+        dataTransfer: {
+          dropEffect: '',
+        },
+      };
+      fireEvent.dragOver(feedbackItem!, dragOverEvent);
+      
+      // preventDefault should NOT be called when item is being dragged
+      expect(dragOverEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    test("calls setIsGroupBeingDragged on drag start when groupedItemProps exists", () => {
+      const mockSetIsGroupBeingDragged = jest.fn();
+      const props: any = {
+        id: "test-group-drag",
+        title: "Group Drag Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: ["child1"],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        groupedItemProps: {
+          isMainItem: true,
+          isGroupExpanded: false,
+          groupedCount: 1,
+          parentItemId: "",
+          setIsGroupBeingDragged: mockSetIsGroupBeingDragged,
+          toggleGroupExpand: jest.fn(),
+        },
+      };
+      
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItem = container.querySelector('.feedbackItemGroupItem');
+      expect(feedbackItem).toBeTruthy();
+      
+      // Simulate drag start
+      fireEvent.dragStart(feedbackItem!, {
+        dataTransfer: {
+          effectAllowed: 'linkMove',
+          setData: jest.fn(),
+        },
+      });
+      
+      // Check that setIsGroupBeingDragged was called with true
+      expect(mockSetIsGroupBeingDragged).toHaveBeenCalledWith(true);
+      
+      // Simulate drag end
+      fireEvent.dragEnd(feedbackItem!);
+      
+      // Check that setIsGroupBeingDragged was called with false
+      expect(mockSetIsGroupBeingDragged).toHaveBeenCalledWith(false);
     });
   });
 
