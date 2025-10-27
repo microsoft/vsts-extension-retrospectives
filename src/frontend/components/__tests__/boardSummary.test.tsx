@@ -1,7 +1,5 @@
 import React from "react";
-import { render, fireEvent, waitFor, screen } from "@testing-library/react";
-import { DetailsList } from "@fluentui/react/lib/DetailsList";
-import { Image } from "@fluentui/react/lib/Image";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import { getService } from "azure-devops-extension-sdk";
 import { mockWorkItem, mockWorkItemType } from "../__mocks__/mocked_components/mockedWorkItemTracking";
 import BoardSummary from "../boardSummary";

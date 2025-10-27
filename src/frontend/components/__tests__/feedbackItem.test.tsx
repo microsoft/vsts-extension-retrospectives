@@ -1832,29 +1832,29 @@ describe("Feedback Item", () => {
         isGroupedCarouselItem: false,
         workflowPhase: "Group",
       };
-      
+
       const { container } = render(<FeedbackItem {...props} />);
-      const feedbackItem = container.querySelector('.feedbackItem');
+      const feedbackItem = container.querySelector(".feedbackItem");
       expect(feedbackItem).toBeTruthy();
-      
+
       // Simulate drag start to set isBeingDragged to true
       fireEvent.dragStart(feedbackItem!, {
         dataTransfer: {
-          effectAllowed: 'linkMove',
+          effectAllowed: "linkMove",
           setData: jest.fn(),
         },
       });
-      
+
       // Now try drag over - preventDefault should not be called when item is being dragged
       const dragOverEvent = {
         preventDefault: jest.fn(),
         stopPropagation: jest.fn(),
         dataTransfer: {
-          dropEffect: '',
+          dropEffect: "",
         },
       };
       fireEvent.dragOver(feedbackItem!, dragOverEvent);
-      
+
       // preventDefault should NOT be called when item is being dragged
       expect(dragOverEvent.preventDefault).not.toHaveBeenCalled();
     });
@@ -1894,25 +1894,25 @@ describe("Feedback Item", () => {
           toggleGroupExpand: jest.fn(),
         },
       };
-      
+
       const { container } = render(<FeedbackItem {...props} />);
-      const feedbackItem = container.querySelector('.feedbackItemGroupItem');
+      const feedbackItem = container.querySelector(".feedbackItemGroupItem");
       expect(feedbackItem).toBeTruthy();
-      
+
       // Simulate drag start
       fireEvent.dragStart(feedbackItem!, {
         dataTransfer: {
-          effectAllowed: 'linkMove',
+          effectAllowed: "linkMove",
           setData: jest.fn(),
         },
       });
-      
+
       // Check that setIsGroupBeingDragged was called with true
       expect(mockSetIsGroupBeingDragged).toHaveBeenCalledWith(true);
-      
+
       // Simulate drag end
       fireEvent.dragEnd(feedbackItem!);
-      
+
       // Check that setIsGroupBeingDragged was called with false
       expect(mockSetIsGroupBeingDragged).toHaveBeenCalledWith(false);
     });
