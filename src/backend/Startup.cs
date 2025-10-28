@@ -53,9 +53,9 @@ namespace CollaborationStateService
         options.TokenValidationParameters = new TokenValidationParameters
         {
           LifetimeValidator = (before, expires, token, param) => { return expires > DateTime.UtcNow; },
-          ValidateAudience = false,
-          ValidateIssuer = false,
-          ValidateActor = false,
+          ValidateAudience = true,
+          ValidateIssuer = true,
+          ValidateActor = true,
           ValidateLifetime = true,
           RequireSignedTokens = true,
           RequireExpirationTime = true,
