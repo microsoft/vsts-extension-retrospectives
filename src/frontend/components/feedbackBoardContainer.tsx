@@ -5,7 +5,6 @@ import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react
 import { MessageBar, MessageBarType } from "@fluentui/react/lib/MessageBar";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
-import { MobileWidthBreakpoint } from "../config/constants";
 import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
 import BoardDataService from "../dal/boardDataService";
@@ -89,8 +88,6 @@ export interface FeedbackBoardContainerState {
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
-  isDesktop: boolean;
-  isAutoResizeEnabled: boolean;
   allowCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: { id: string; name: string; imageUrl: string }[];
@@ -108,6 +105,8 @@ export interface FeedbackBoardContainerState {
   boardColumns: IFeedbackColumn[];
   questionIdForDiscussAndActBoardUpdate: number;
   activeTab: "Board" | "History";
+  boardTimerSeconds: number;
+  isBoardTimerRunning: boolean;
 }
 
 export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
@@ -138,7 +137,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       hasToggledArchive: false,
       isAllTeamsLoaded: false,
       isAppInitialized: false,
-      isAutoResizeEnabled: true,
       isBackendServiceConnected: false,
       isBoardCreationDialogHidden: true,
       isBoardDuplicateDialogHidden: true,
@@ -146,7 +144,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isCarouselDialogHidden: true,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isArchiveBoardConfirmationDialogHidden: true,
-      isDesktop: true,
       isDropIssueInEdgeMessageBarVisible: true,
       isLiveSyncInTfsIssueMessageBarVisible: true,
       isMobileBoardActionsDialogHidden: true,
@@ -176,8 +173,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       boardColumns: [],
       questionIdForDiscussAndActBoardUpdate: -1,
       activeTab: "Board",
+      boardTimerSeconds: 0,
+      isBoardTimerRunning: false,
     };
   }
+
+  private boardTimerIntervalId?: number;
 
   public async componentDidMount() {
     let initialCurrentTeam: WebApiTeam | undefined;
@@ -268,23 +269,97 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       if (this.state.currentTeam && this.state.currentBoard) {
         this.updateFeedbackItemsAndContributors(this.state.currentTeam, this.state.currentBoard);
       }
+      if (prevState.currentBoard?.id !== this.state.currentBoard?.id) {
+        this.resetBoardTimer();
+      }
+    }
+    if (prevState.activeTab !== this.state.activeTab && this.state.activeTab !== "Board") {
+      this.pauseBoardTimer();
     }
   }
 
   public componentWillUnmount() {
-    window.removeEventListener("resize", this.handleResolutionChange);
     reflectBackendService.removeOnReceiveNewBoard(this.handleBoardCreated);
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
+    this.clearBoardTimerInterval();
   }
 
+  private readonly clearBoardTimerInterval = () => {
+    if (this.boardTimerIntervalId !== undefined) {
+      window.clearInterval(this.boardTimerIntervalId);
+      this.boardTimerIntervalId = undefined;
+    }
+  };
+
+  private readonly startBoardTimer = () => {
+    if (this.boardTimerIntervalId !== undefined) {
+      return;
+    }
+
+    this.boardTimerIntervalId = window.setInterval(() => {
+      this.setState(previousState => ({ boardTimerSeconds: previousState.boardTimerSeconds + 1 }));
+    }, 1000);
+
+    if (!this.state.isBoardTimerRunning) {
+      this.setState({ isBoardTimerRunning: true });
+    }
+  };
+
+  private readonly pauseBoardTimer = () => {
+    const wasRunning = this.state.isBoardTimerRunning;
+    const hadInterval = this.boardTimerIntervalId !== undefined;
+    this.clearBoardTimerInterval();
+
+    if (wasRunning || hadInterval) {
+      this.setState({ isBoardTimerRunning: false });
+    }
+  };
+
+  private readonly resetBoardTimer = () => {
+    const shouldReset = this.state.boardTimerSeconds !== 0 || this.state.isBoardTimerRunning || this.boardTimerIntervalId !== undefined;
+
+    if (!shouldReset) {
+      return;
+    }
+
+    this.clearBoardTimerInterval();
+    this.setState({ boardTimerSeconds: 0, isBoardTimerRunning: false });
+  };
+
+  private readonly handleBoardTimerToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (this.state.isBoardTimerRunning) {
+      this.pauseBoardTimer();
+      return;
+    }
+
+    this.startBoardTimer();
+  };
+
+  private readonly handleBoardTimerReset = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.resetBoardTimer();
+  };
+
+  private readonly formatBoardTimer = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
+    const currentPhase = this.getCurrentBoardPhase();
     getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
-      service.setHash(`teamId=${teamId}&boardId=${boardId}`);
+      service.setHash(`teamId=${teamId}&boardId=${boardId}&phase=${currentPhase}`);
     });
   }
 
-  private async parseUrlForBoardAndTeamInformation(): Promise<{ teamId: string; boardId: string }> {
+  private async parseUrlForBoardAndTeamInformation(): Promise<{ teamId: string; boardId: string; phase?: WorkflowPhase }> {
     const service = await getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
     let hash = await service.getHash();
     if (hash.startsWith("#")) {
@@ -293,8 +368,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const hashParams = new URLSearchParams(hash);
     const teamId = hashParams.get("teamId");
     const boardId = hashParams.get("boardId");
+    const phase = hashParams.get("phase") as WorkflowPhase;
 
-    return { teamId, boardId };
+    return { teamId, boardId, phase };
   }
 
   private async updateFeedbackItemsAndContributors(currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) {
@@ -333,23 +409,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       currentVoteCount: currentUserVoteCount,
     });
   }
-
-  private readonly setScreenViewMode = (isDesktop: boolean) => {
-    this.setState({
-      isAutoResizeEnabled: false,
-      isDesktop,
-    });
-  };
-
-  private readonly handleResolutionChange = () => {
-    const isDesktop = window.innerWidth >= MobileWidthBreakpoint;
-
-    if (this.state.isAutoResizeEnabled && this.state.isDesktop != isDesktop) {
-      this.setState({
-        isDesktop: isDesktop,
-      });
-    }
-  };
 
   private readonly numberFormatter = (value: number) => {
     const formatter = new Intl.NumberFormat("en-US", { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -550,7 +609,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, { Members: [], Teams: [] });
 
-      parent.location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id);
+      parent.location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id, newBoard.activePhase);
     }
 
     const info = await this.parseUrlForBoardAndTeamInformation();
@@ -647,6 +706,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
         matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
       }
+
+      // Set the active phase from URL if provided
+      if (info.phase) {
+        matchedBoard.activePhase = info.phase;
+      }
+
       return {
         ...queryParamTeamAndDefaultBoardState,
         currentBoard: matchedBoard,
@@ -729,7 +794,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             )
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
         }
-        const currentBoard = boardsForTeam?.length > 0 ? boardsForTeam.at(0) : null;
+        const currentBoard = boardsForTeam?.length > 0 ? boardsForTeam[0] : null;
 
         const recentVisitState = {
           boards: boardsForTeam,
@@ -1067,7 +1132,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly showBoardUrlCopiedToast = () => {
-    toast(`The link to retrospective ${this.state.currentBoard.title} has been copied to your clipboard.`);
+    const currentPhase = this.getCurrentBoardPhase();
+    const phaseText = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
+    toast(`The link to retrospective ${this.state.currentBoard.title} (${phaseText} phase) has been copied to your clipboard.`);
   };
 
   private readonly showEmailCopiedToast = () => {
@@ -1095,7 +1162,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly copyBoardUrl = async () => {
-    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id);
+    const currentPhase = this.getCurrentBoardPhase();
+    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, currentPhase);
     copyToClipboard(boardDeepLinkUrl);
   };
 
@@ -1161,90 +1229,117 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardMetadataUpdated, properties: { boardId: updatedBoard.id } });
   };
 
-  private readonly boardActionContexualMenuItems: IContextualMenuItem[] = [
-    {
-      key: "createBoard",
-      className: "hide-mobile",
-      iconProps: { iconName: "Add" },
-      onClick: this.showBoardCreationDialog,
-      text: "Create new retrospective",
-      title: "Create new retrospective",
-    },
-    {
-      key: "duplicateBoard",
-      className: "hide-mobile",
-      iconProps: { iconName: "Copy" },
-      onClick: this.showBoardDuplicateDialog,
-      text: "Create copy of retrospective",
-      title: "Create copy of retrospective",
-    },
-    {
-      key: "editBoard",
-      iconProps: { iconName: "Edit" },
-      onClick: this.showBoardUpdateDialog,
-      text: "Edit retrospective",
-      title: "Edit retrospective",
-    },
-    {
-      key: "seperator",
-      itemType: ContextualMenuItemType.Divider,
-    },
-    {
-      key: "copyLink",
-      iconProps: { iconName: "Link" },
-      onClick: async () => {
-        await this.copyBoardUrl();
-        this.showBoardUrlCopiedToast();
+  private readonly persistColumnNotes = async (columnId: string, notes: string): Promise<void> => {
+    if (!this.state.currentTeam || !this.state.currentBoard) {
+      return;
+    }
+
+    const updatedColumns = this.state.currentBoard.columns.map(column => (column.id === columnId ? { ...column, notes } : column));
+
+    try {
+      const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.maxVotesPerUser, this.state.currentBoard.title, updatedColumns, this.state.currentBoard.permissions);
+
+      if (!updatedBoard) {
+        throw new Error("Failed to update board with new column notes.");
+      }
+
+      this.replaceBoard(updatedBoard);
+      reflectBackendService.broadcastUpdatedBoard(this.state.currentTeam.id, updatedBoard.id);
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "updateColumnNotes",
+        boardId: this.state.currentBoard?.id,
+        columnId,
+      });
+
+      throw error;
+    }
+  };
+
+  private readonly getBoardActionContextualMenuItems = (): IContextualMenuItem[] => {
+    const currentPhase = this.getCurrentBoardPhase();
+    const phaseText = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
+
+    return [
+      {
+        key: "createBoard",
+        iconProps: { iconName: "Add" },
+        onClick: this.showBoardCreationDialog,
+        text: "Create new retrospective",
+        title: "Create new retrospective",
       },
-      text: "Copy retrospective link",
-      title: "Copy retrospective link",
-    },
-    {
-      key: "seperator",
-      itemType: ContextualMenuItemType.Divider,
-    },
-    {
-      key: "exportCSV",
-      className: "hide-mobile",
-      iconProps: { iconName: "DownloadDocument" },
-      onClick: () => {
-        shareBoardHelper.generateCSVContent(this.state.currentBoard);
+      {
+        key: "duplicateBoard",
+        iconProps: { iconName: "Copy" },
+        onClick: this.showBoardDuplicateDialog,
+        text: "Create copy of retrospective",
+        title: "Create copy of retrospective",
       },
-      text: "Export CSV content",
-      title: "Export CSV content",
-    },
-    {
-      key: "emailPreview",
-      className: "hide-mobile",
-      iconProps: { iconName: "Mail" },
-      onClick: this.showPreviewEmailDialog,
-      text: "Create email summary",
-      title: "Create email summary",
-    },
-    {
-      key: "seperator",
-      itemType: ContextualMenuItemType.Divider,
-    },
-    {
-      key: "retroSummary",
-      className: "hide-mobile",
-      iconProps: { iconName: "ReportDocument" },
-      onClick: this.showRetroSummaryDialog,
-      text: "Show retrospective summary",
-      title: "Show retrospective summary",
-    },
-    {
-      key: "seperator",
-      itemType: ContextualMenuItemType.Divider,
-    },
-    {
-      key: "archiveBoard",
-      iconProps: { iconName: "Archive" },
-      onClick: this.showArchiveBoardConfirmationDialog,
-      text: "Archive retrospective",
-      title: "Archive retrospective",
-    },
-  ];
+      {
+        key: "editBoard",
+        iconProps: { iconName: "Edit" },
+        onClick: this.showBoardUpdateDialog,
+        text: "Edit retrospective",
+        title: "Edit retrospective",
+      },
+      {
+        key: "seperator",
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: "copyLink",
+        iconProps: { iconName: "Link" },
+        onClick: async () => {
+          await this.copyBoardUrl();
+          this.showBoardUrlCopiedToast();
+        },
+        text: `Copy retrospective link (for ${phaseText} phase)`,
+        title: `Copy retrospective link (for ${phaseText} phase)`,
+      },
+      {
+        key: "seperator",
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: "exportCSV",
+        iconProps: { iconName: "DownloadDocument" },
+        onClick: () => {
+          shareBoardHelper.generateCSVContent(this.state.currentBoard);
+        },
+        text: "Export CSV content",
+        title: "Export CSV content",
+      },
+      {
+        key: "emailPreview",
+        iconProps: { iconName: "Mail" },
+        onClick: this.showPreviewEmailDialog,
+        text: "Create email summary",
+        title: "Create email summary",
+      },
+      {
+        key: "seperator",
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: "retroSummary",
+        iconProps: { iconName: "ReportDocument" },
+        onClick: this.showRetroSummaryDialog,
+        text: "Show retrospective summary",
+        title: "Show retrospective summary",
+      },
+      {
+        key: "seperator",
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: "archiveBoard",
+        iconProps: { iconName: "Archive" },
+        onClick: this.showArchiveBoardConfirmationDialog,
+        text: "Archive retrospective",
+        title: "Archive retrospective",
+      },
+    ];
+  };
 
   private readonly hideMobileBoardActionsDialog = () => {
     this.setState({
@@ -1387,17 +1482,17 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           </h1>
           <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="users" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
           <div style={{ flexGrow: 1 }}></div>
-          <ExtensionSettingsMenu isDesktop={this.state.isDesktop} onScreenViewModeChanged={this.setScreenViewMode} />
+          <ExtensionSettingsMenu />
         </div>
         <div className="flex items-center justify-start flex-shrink-0">
           <div className="w-full">
-            <div className="flex items-center justify-start mt-2 ml-2">
-              <button className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
+            <div className="flex items-center justify-start mt-2 ml-4">
+              <div className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "Board" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
-              </button>
-              <button className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
+              </div>
+              <div className={`h-10 w-20 cursor-pointer flex items-center justify-center mr-3 rounded-t-md outline-none border-t border-l border-r border-solid border-[var(--nav-header-active-item-background)] px-4 text-sm font-normal transition-colors duration-100 ease-in-out ${this.state.activeTab === "History" ? "bg-[var(--nav-header-active-item-background)] text-[#0078d4]" : "bg-transparent text-[#605e5c]"}`} onClick={() => this.handlePivotClick("History")}>
                 History
-              </button>
+              </div>
               <div className="mx-4 vertical-tab-separator" />
               <div className="flex items-center justify-start">
                 <div className="board-selector">
@@ -1410,7 +1505,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     title="Board Actions"
                     menuProps={{
                       className: "board-actions-menu",
-                      items: this.boardActionContexualMenuItems,
+                      items: this.getBoardActionContextualMenuItems(),
                     }}
                   >
                     <span className="ms-Button-icon">
@@ -1428,12 +1523,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     }}
                   >
                     <div className="mobile-contextual-menu-list">
-                      {this.boardActionContexualMenuItems.map(boardAction => (
+                      {this.getBoardActionContextualMenuItems().map((boardAction: IContextualMenuItem) => (
                         <ActionButton
                           key={boardAction.key}
                           className={boardAction.className}
                           iconProps={boardAction.iconProps}
-                          aria-label="User Settings Menu"
+                          aria-label="Board Actions Menu"
                           onClick={() => {
                             this.hideMobileBoardActionsDialog();
                             boardAction.onClick();
@@ -1451,87 +1546,88 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </div>
               {this.state.activeTab === "Board" && (
                 <div className="flex items-center justify-start">
-                  {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                    <div className="border border-solid border-[var(--nav-header-active-item-background)] rounded-lg ml-2 mr-2">
-                      <Dialog
-                        hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
-                        onDismiss={() => {
-                          this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                        }}
-                        dialogContentProps={{
-                          type: DialogType.close,
-                        }}
-                        minWidth={640}
-                        modalProps={{
-                          isBlocking: true,
-                          containerClassName: "team-effectiveness-dialog",
-                          className: "retrospectives-dialog-modal",
-                        }}
-                      >
-                        <DialogContent>
-                          <div className="team-effectiveness-section-information">
-                            <i className="fa fa-info-circle" />
-                            &nbsp;All answers will be saved anonymously
-                          </div>
-                          <table className="team-effectiveness-measurement-table">
-                            <thead>
-                              <tr>
-                                <th></th>
-                                <th></th>
-                                <th colSpan={6} className="team-effectiveness-favorability-label">
-                                  Unfavorable
-                                </th>
-                                <th colSpan={2} className="team-effectiveness-favorability-label">
-                                  Neutral
-                                </th>
-                                <th colSpan={2} className="team-effectiveness-favorability-label">
-                                  Favorable
-                                </th>
-                              </tr>
-                              <tr>
-                                <th></th>
-                                <th></th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
-                                <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
-                                <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
-                                <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
-                                <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
-                                <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {questions.map(question => {
-                                return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
-                              })}
-                            </tbody>
-                          </table>
-                        </DialogContent>
-                        <DialogFooter>
-                          <PrimaryButton
-                            className="team-effectiveness-submit-button"
-                            onClick={() => {
-                              saveTeamEffectivenessMeasurement();
-                            }}
-                            text="Submit"
-                          />
-                          <DefaultButton
-                            onClick={() => {
-                              this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                            }}
-                            text="Cancel"
-                          />
-                        </DialogFooter>
-                      </Dialog>
-                      <TooltipHost content="Team Assessment" calloutProps={{ gapSpace: 0 }}>
+                  <div className="flex flex-row items-center workflow-stage-header 3">
+                    {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+                      <div className="border border-solid border-[var(--nav-header-active-item-background)] rounded-lg">
+                        <Dialog
+                          hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                          onDismiss={() => {
+                            this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                          }}
+                          dialogContentProps={{
+                            type: DialogType.close,
+                          }}
+                          minWidth={640}
+                          modalProps={{
+                            isBlocking: true,
+                            containerClassName: "team-effectiveness-dialog",
+                            className: "retrospectives-dialog-modal",
+                          }}
+                        >
+                          <DialogContent>
+                            <div className="team-effectiveness-section-information">
+                              <i className="fa fa-info-circle" />
+                              &nbsp;All answers will be saved anonymously
+                            </div>
+                            <table className="team-effectiveness-measurement-table">
+                              <thead>
+                                <tr>
+                                  <th></th>
+                                  <th></th>
+                                  <th colSpan={6} className="team-effectiveness-favorability-label">
+                                    Unfavorable
+                                  </th>
+                                  <th colSpan={2} className="team-effectiveness-favorability-label">
+                                    Neutral
+                                  </th>
+                                  <th colSpan={2} className="team-effectiveness-favorability-label">
+                                    Favorable
+                                  </th>
+                                </tr>
+                                <tr>
+                                  <th></th>
+                                  <th></th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
+                                  <th className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
+                                  <th className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
+                                  <th className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
+                                  <th className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
+                                  <th className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {questions.map(question => {
+                                  return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                                })}
+                              </tbody>
+                            </table>
+                          </DialogContent>
+                          <DialogFooter>
+                            <PrimaryButton
+                              className="team-effectiveness-submit-button"
+                              onClick={() => {
+                                saveTeamEffectivenessMeasurement();
+                              }}
+                              text="Submit"
+                            />
+                            <DefaultButton
+                              onClick={() => {
+                                this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                              }}
+                              text="Cancel"
+                            />
+                          </DialogFooter>
+                        </Dialog>
                         <button
                           className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
                           onClick={() => {
                             this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
                           }}
+                          title="Team Assessment"
                           aria-label="Team Assessment"
                           type="button"
                         >
@@ -1540,29 +1636,38 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           </span>
                           <span>Team Assessment</span>
                         </button>
-                      </TooltipHost>
+                      </div>
+                    )}
+                    <div className="flex flex-row gap-3" role="tablist">
+                      <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
+                      <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
+                      <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
+                      <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
                     </div>
-                  )}
-                  <div className="flex flex-row" role="tablist">
-                    <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
-                    <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
-                    <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
-                    <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
+                    <div className="workflow-stage-timer" role="status" aria-live="polite">
+                      <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} facilitation timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed.`} onClick={this.handleBoardTimerToggle}>
+                        <i className={this.state.isBoardTimerRunning ? "fa fa-stop-circle" : "fa fa-play-circle"} />
+                        <span> {this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed</span>
+                      </button>
+                      <button type="button" className="workflow-stage-timer-reset" title="Reset timer" aria-label="Reset facilitation timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
+                        <i className="fa fa-undo" />
+                      </button>
+                    </div>
+                    {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
+                      <div className="feedback-maxvotes-per-user">
+                        Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}
+                      </div>
+                    )}
+                    {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
+                      <button className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
+                        <span className="inline-flex items-center justify-center mr-1">
+                          <i className="fas fa-bullseye"></i>
+                        </span>
+                        <span>Focus Mode</span>
+                      </button>
+                    )}
                   </div>
                 </div>
-              )}
-              {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
-                <div className="feedback-maxvotes-per-user">Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}</div>
-              )}
-              {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                <TooltipHost content="Focus Mode allows your team to focus on one feedback item at a time. Try it!" calloutProps={{ gapSpace: 0 }}>
-                  <button type="button" onClick={this.showCarouselDialog} className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none" aria-label="Focus Mode">
-                    <span className="inline-flex items-center justify-center mr-2">
-                      <i className="fas fa-bullseye"></i>
-                    </span>
-                    Focus Mode
-                  </button>
-                </TooltipHost>
               )}
             </div>
             {this.state.activeTab === "Board" && (
@@ -1623,7 +1728,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </MessageBar>
                     )}
                     <div className="feedback-board-container">
-                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} />
+                      <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} onColumnNotesChange={this.persistColumnNotes} />
                     </div>
                     <Dialog
                       hidden={this.state.isArchiveBoardConfirmationDialogHidden}
@@ -1684,10 +1789,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </div>
             )}
             {this.state.activeTab === "History" && (
-              <div className="custom-pivot-content flex-1 min-h-0 overflow-auto">
-                <div className="pivot-content-wrapper">
-                  <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
-                </div>
+              <div className="pivot-content-wrapper flex-1 min-h-0 overflow-auto">
+                <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
               </div>
             )}
           </div>
@@ -1821,7 +1924,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </>
           )}
         </Dialog>
-        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" bodyClassName="retrospective-notification-toast-body" progressClassName="retrospective-notification-toast-progress-bar" />
+        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }

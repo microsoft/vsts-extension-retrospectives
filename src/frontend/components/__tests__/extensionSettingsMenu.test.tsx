@@ -39,12 +39,6 @@ jest.mock("../extensionSettingsMenuDialogContent", () => ({
   )),
 }));
 
-jest.mock("react-markdown", () => {
-  return function ReactMarkdown({ children }: { children: string }) {
-    return <div data-testid="markdown-content">{children}</div>;
-  };
-});
-
 jest.mock("../../dal/boardDataService", () => ({
   default: {
     getBoardsForTeam: jest.fn().mockResolvedValue([]),
@@ -71,11 +65,9 @@ jest.mock("../../utilities/servicesHelper", () => ({
 }));
 
 describe("ExtensionSettingsMenu", () => {
-  let mockCallback: jest.Mock;
   let windowOpenSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    mockCallback = jest.fn();
     windowOpenSpy = jest.spyOn(window, "open").mockImplementation(() => null);
 
     Object.defineProperty(window.screen, "availWidth", {
@@ -110,49 +102,48 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("renders component", () => {
-    const { container } = render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    const { container } = render(<ExtensionSettingsMenu />);
     expect(container.querySelector(".extension-settings-menu")).toBeInTheDocument();
   });
 
   it("renders all buttons", () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     expect(screen.getByTitle("Prime Directive")).toBeInTheDocument();
-    expect(screen.getByTitle("Export Import")).toBeInTheDocument();
+    expect(screen.getByTitle("Data Import/Export")).toBeInTheDocument();
     expect(screen.getByTitle("Retrospective Help")).toBeInTheDocument();
-    expect(screen.getByTitle("User Settings")).toBeInTheDocument();
+    expect(screen.queryByTitle("User Settings")).not.toBeInTheDocument();
   });
 
   it("shows labels when wide", () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     expect(screen.getByText("Directive")).toBeInTheDocument();
     expect(screen.getByText("Data")).toBeInTheDocument();
     expect(screen.getByText("Help")).toBeInTheDocument();
-    expect(screen.getByText("Settings")).toBeInTheDocument();
   });
 
   it("hides labels when narrow", () => {
     Object.defineProperty(window, "outerWidth", { value: 800, writable: true, configurable: true });
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });
 
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     expect(screen.queryByText("Directive")).not.toBeInTheDocument();
   });
 
   it("opens Prime Directive dialog", () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));
     expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
   });
 
   it("opens retrospective wiki", () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));
     fireEvent.click(screen.getByText("Open Retrospective Wiki"));
     expect(windowOpenSpy).toHaveBeenCalledWith("https://retrospectivewiki.org/", "_blank");
   });
 
   it("opens What's New dialog", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("What's new"));
@@ -163,7 +154,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens User Guide dialog", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("User guide"));
@@ -174,7 +165,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens Volunteer dialog", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("Volunteer"));
@@ -185,7 +176,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens GitHub issues", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("Contact us"));
@@ -193,41 +184,23 @@ describe("ExtensionSettingsMenu", () => {
     expect(windowOpenSpy).toHaveBeenCalledWith("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank");
   });
 
-  it("switches to mobile view", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
-    fireEvent.click(screen.getByTitle("User Settings"));
-    await waitFor(() => {
-      fireEvent.click(screen.getByText("Switch to mobile view"));
-    });
-    expect(mockCallback).toHaveBeenCalledWith(false);
-  });
-
-  it("switches to desktop view", async () => {
-    render(<ExtensionSettingsMenu isDesktop={false} onScreenViewModeChanged={mockCallback} />);
-    fireEvent.click(screen.getByTitle("User Settings"));
-    await waitFor(() => {
-      fireEvent.click(screen.getByText("Switch to desktop view"));
-    });
-    expect(mockCallback).toHaveBeenCalledWith(true);
-  });
-
   it("adds resize listener on mount", () => {
     const spy = jest.spyOn(window, "addEventListener");
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     expect(spy).toHaveBeenCalledWith("resize", expect.any(Function));
     spy.mockRestore();
   });
 
   it("removes resize listener on unmount", () => {
     const spy = jest.spyOn(window, "removeEventListener");
-    const { unmount } = render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    const { unmount } = render(<ExtensionSettingsMenu />);
     unmount();
     expect(spy).toHaveBeenCalledWith("resize", expect.any(Function));
     spy.mockRestore();
   });
 
   it("closes Prime Directive dialog", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));
     expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
     const closeButtons = screen.getAllByText("Close");
@@ -238,7 +211,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes What's New dialog", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("What's new"));
@@ -254,7 +227,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens changelog from What's New", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("What's new"));
@@ -266,7 +239,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens readme from User Guide", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("User guide"));
@@ -278,7 +251,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes User Guide dialog", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("User guide"));
@@ -294,7 +267,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens contributing from Volunteer", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("Volunteer"));
@@ -306,7 +279,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes Volunteer dialog", async () => {
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByText("Volunteer"));
@@ -321,30 +294,24 @@ describe("ExtensionSettingsMenu", () => {
     });
   });
 
-  it("hides Settings label in mobile mode", () => {
-    render(<ExtensionSettingsMenu isDesktop={false} onScreenViewModeChanged={mockCallback} />);
-    expect(screen.getByText("Directive")).toBeInTheDocument();
-    expect(screen.queryByText("Settings")).not.toBeInTheDocument();
-  });
-
   it("handles tall narrow window", () => {
     Object.defineProperty(window, "outerWidth", { value: 1728, writable: true, configurable: true });
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });
     Object.defineProperty(window, "innerHeight", { value: 1200, writable: true, configurable: true });
 
-    render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    render(<ExtensionSettingsMenu />);
     expect(screen.queryByText("Directive")).not.toBeInTheDocument();
   });
 
   it("updates state on window resize", async () => {
-    const { rerender } = render(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    const { rerender } = render(<ExtensionSettingsMenu />);
     expect(screen.getByText("Directive")).toBeInTheDocument();
 
     Object.defineProperty(window, "outerWidth", { value: 800, writable: true, configurable: true });
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });
 
     fireEvent(window, new Event("resize"));
-    rerender(<ExtensionSettingsMenu isDesktop={true} onScreenViewModeChanged={mockCallback} />);
+    rerender(<ExtensionSettingsMenu />);
 
     await waitFor(() => {
       expect(screen.queryByText("Directive")).not.toBeInTheDocument();
@@ -370,13 +337,8 @@ describe("ContextualMenuButton", () => {
     expect(onClick).toHaveBeenCalled();
   });
 
-  it("applies hide-mobile by default", () => {
+  it("applies contextual menu button class", () => {
     render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="Test" showLabel={true} />);
-    expect(screen.getByTitle("Test")).toHaveClass("hide-mobile");
-  });
-
-  it("does not apply hide-mobile when hideMobile false", () => {
-    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="Test" hideMobile={false} showLabel={true} />);
-    expect(screen.getByTitle("Test")).not.toHaveClass("hide-mobile");
+    expect(screen.getByTitle("Test")).toHaveClass("contextual-menu-button");
   });
 });

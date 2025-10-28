@@ -54,7 +54,7 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
     this.setState({ isBeingDragged });
   };
 
-  public render(): JSX.Element {
+  public render(): React.JSX.Element {
     return (
       <div className={`feedback-item-group ${this.state.isGroupExpanded ? "feedback-item-group-expanded" : ""}`} onDragOver={this.dragFeedbackItemOverFeedbackItemGroup} onDrop={this.dropFeedbackItemOnFeedbackItemGroup}>
         <div className="item-cards" aria-label="Group Feedback Items">

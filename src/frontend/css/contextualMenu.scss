@@ -50,6 +50,10 @@
 
   .ms-Dialog-content {
     color: var(--text-primary-color);
+
+    .ms-Label {
+      color: var(--text-primary-color);
+    }
   }
 
   p.ms-Dialog-subText {

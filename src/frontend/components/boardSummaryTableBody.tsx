@@ -1,19 +1,15 @@
 import React, { Fragment } from "react";
-import { flexRender } from "@tanstack/react-table";
-import type { Cell, Row } from "@tanstack/table-core";
-import type { IBoardSummaryTableItem } from "./boardSummaryTable";
+import type { IBoardSummaryTableItem, ISimpleColumn } from "./boardSummaryTable";
 
 interface BoardSummaryTableBodyProps {
-  rows: Row<IBoardSummaryTableItem>[];
-  boardRowSummary: (row: Row<IBoardSummaryTableItem>) => JSX.Element;
+  columns: ISimpleColumn[];
+  data: IBoardSummaryTableItem[];
+  expandedRows: Set<string>;
+  boardRowSummary: (item: IBoardSummaryTableItem) => React.JSX.Element | null;
 }
 
-const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
-  const hasPendingItems = cell.row.original.pendingWorkItemsCount > 0;
-  const columnId = cell.column.id as keyof IBoardSummaryTableItem | undefined;
-  const cellValue = cell.row.original[columnId];
-
-  const ariaLabel = columnId && cellValue ? `${columnId} ${cellValue}` : "";
+const getTdProps = (item: IBoardSummaryTableItem, columnId: string) => {
+  const hasPendingItems = item.pendingWorkItemsCount > 0;
 
   let workItemsClass = "";
   switch (columnId) {
@@ -32,6 +28,10 @@ const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
       break;
   }
 
+  const columnKey = columnId as keyof IBoardSummaryTableItem;
+  const cellValue = item[columnKey];
+  const ariaLabel = cellValue ? `${columnId} ${cellValue}` : "";
+
   return {
     "className": `${workItemsClass}`,
     "aria-label": ariaLabel,
@@ -39,36 +39,38 @@ const getTdProps = (cell: Cell<IBoardSummaryTableItem, unknown>) => {
   };
 };
 
-const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({ rows, boardRowSummary }) => (
+const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({ columns, data, expandedRows, boardRowSummary }) => (
   <tbody>
-    {rows.map(row => (
-      <Fragment key={row.id}>
-        <tr
-          tabIndex={0}
-          aria-label="Board summary row. Click expand row icon to view more statistics for this board."
-          onKeyPress={(e: React.KeyboardEvent) => {
-            if (e.key === "Enter") row.toggleExpanded();
-          }}
-          onClick={event => {
-            const firstCell = event.currentTarget.cells[0];
-            const clickedCell = (event.target as HTMLElement).closest("td");
-            if (clickedCell !== firstCell) return;
-            row.toggleExpanded();
-          }}
-        >
-          {row.getVisibleCells().map(cell => (
-            <td key={cell.id} {...getTdProps(cell)}>
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </td>
-          ))}
-        </tr>
-        {row.getIsExpanded() && (
-          <tr>
-            <td colSpan={row.getVisibleCells().length}>{boardRowSummary(row)}</td>
+    {data.map(item => {
+      const isExpanded = expandedRows.has(item.id);
+      return (
+        <Fragment key={item.id}>
+          <tr
+            tabIndex={0}
+            aria-label="Board summary row. Click expand row icon to view more statistics for this board."
+            onKeyPress={(e: React.KeyboardEvent) => {
+              if (e.key === "Enter") {
+                const expandColumn = columns[0];
+                if (expandColumn) {
+                  expandColumn.cell(item);
+                }
+              }
+            }}
+          >
+            {columns.map(column => (
+              <td key={column.id} {...getTdProps(item, column.id)}>
+                {column.cell(item)}
+              </td>
+            ))}
           </tr>
-        )}
-      </Fragment>
-    ))}
+          {isExpanded && (
+            <tr>
+              <td colSpan={columns.length}>{boardRowSummary(item)}</td>
+            </tr>
+          )}
+        </Fragment>
+      );
+    })}
   </tbody>
 );
 

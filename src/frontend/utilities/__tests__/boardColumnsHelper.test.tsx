@@ -28,18 +28,21 @@ describe("boardColumnsHelper", () => {
           iconClass: "far fa-circle-play",
           id: "uuid-1",
           title: "Start",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
           iconClass: "far fa-circle-stop",
           id: "uuid-2",
           title: "Stop",
+          notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
           iconClass: "far fa-circle-dot",
           id: "uuid-3",
           title: "Continue",
+          notes: "",
         });
       });
     });
@@ -54,24 +57,28 @@ describe("boardColumnsHelper", () => {
           iconClass: "far fa-smile",
           id: "uuid-1",
           title: "Good",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
           iconClass: "far fa-frown",
           id: "uuid-2",
           title: "Improve",
+          notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
           iconClass: "far fa-question",
           id: "uuid-3",
           title: "Ideas",
+          notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#0078d4",
           iconClass: "far fa-exclamation",
           id: "uuid-4",
           title: "Thanks",
+          notes: "",
         });
       });
     });
@@ -86,18 +93,21 @@ describe("boardColumnsHelper", () => {
           iconClass: "far fa-angry",
           id: "uuid-1",
           title: "Mad",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#f6af08",
           iconClass: "far fa-frown",
           id: "uuid-2",
           title: "Sad",
+          notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#008000",
           iconClass: "far fa-smile",
           id: "uuid-3",
           title: "Glad",
+          notes: "",
         });
       });
     });
@@ -112,24 +122,28 @@ describe("boardColumnsHelper", () => {
           iconClass: "far fa-thumbs-up",
           id: "uuid-1",
           title: "Liked",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#0078d4",
           iconClass: "far fa-lightbulb",
           id: "uuid-2",
           title: "Learned",
+          notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#cc293d",
           iconClass: "far fa-thumbs-down",
           id: "uuid-3",
           title: "Lacked",
+          notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
           iconClass: "far fa-star",
           id: "uuid-4",
           title: "Longed for",
+          notes: "",
         });
       });
     });
@@ -144,24 +158,28 @@ describe("boardColumnsHelper", () => {
           iconClass: "fas fa-trash",
           id: "uuid-1",
           title: "Drop",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#008000",
           iconClass: "fas fa-cart-plus",
           id: "uuid-2",
           title: "Add",
+          notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#0078d4",
           iconClass: "fas fa-lock",
           id: "uuid-3",
           title: "Keep",
+          notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
           iconClass: "fas fa-wrench",
           id: "uuid-4",
           title: "Improve",
+          notes: "",
         });
       });
     });
@@ -176,24 +194,28 @@ describe("boardColumnsHelper", () => {
           iconClass: "far fa-square-check",
           id: "uuid-1",
           title: "Keep",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#008000",
           iconClass: "far fa-square-plus",
           id: "uuid-2",
           title: "Add",
+          notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
           iconClass: "far fa-circle-down",
           id: "uuid-3",
           title: "Less",
+          notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#8063bf",
           iconClass: "far fa-circle-up",
           id: "uuid-4",
           title: "More",
+          notes: "",
         });
       });
     });
@@ -208,24 +230,28 @@ describe("boardColumnsHelper", () => {
           iconClass: "fas fa-star",
           id: "uuid-1",
           title: "Went Well",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#8063bf",
           iconClass: "fas fa-book",
           id: "uuid-2",
           title: "Learned",
+          notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#0078d4",
           iconClass: "fas fa-rocket",
           id: "uuid-3",
           title: "Accelerators",
+          notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#cc293d",
           iconClass: "fas fa-exclamation-triangle",
           id: "uuid-4",
           title: "Impediments",
+          notes: "",
         });
       });
     });
@@ -240,24 +266,28 @@ describe("boardColumnsHelper", () => {
           iconClass: "fas fa-scale-unbalanced",
           id: "uuid-1",
           title: "Good",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#f6af08",
           iconClass: "fas fa-scale-balanced",
           id: "uuid-2",
           title: "So-so",
+          notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#cc293d",
           iconClass: "fas fa-scale-unbalanced-flip",
           id: "uuid-3",
           title: "Not-so-good",
+          notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#8063bf",
           iconClass: "fas fa-birthday-cake",
           id: "uuid-4",
           title: "Done",
+          notes: "",
         });
       });
     });
@@ -272,24 +302,28 @@ describe("boardColumnsHelper", () => {
           iconClass: "fas fa-fan",
           id: "uuid-1",
           title: "Propellors",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#0078d4",
           iconClass: "fas fa-life-ring",
           id: "uuid-2",
           title: "Lifesavers",
+          notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#cc293d",
           iconClass: "fas fa-anchor",
           id: "uuid-3",
           title: "Anchors",
+          notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
           iconClass: "fas fa-skull-crossbones",
           id: "uuid-4",
           title: "Rocks",
+          notes: "",
         });
       });
     });
@@ -305,18 +339,21 @@ describe("boardColumnsHelper", () => {
             iconClass: "far fa-smile",
             id: "uuid-1",
             title: "What provides clarity?",
+            notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "far fa-frown",
             id: "uuid-2",
             title: "What obstructs clarity?",
+            notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
             iconClass: "far fa-circle-check",
             id: "uuid-3",
             title: "One action to try next.",
+            notes: "",
           });
         });
       });
@@ -331,18 +368,21 @@ describe("boardColumnsHelper", () => {
             iconClass: "far fa-smile",
             id: "uuid-1",
             title: "What boosts energy?",
+            notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "far fa-frown",
             id: "uuid-2",
             title: "What drains energy?",
+            notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
             iconClass: "far fa-circle-check",
             id: "uuid-3",
             title: "One action to try next.",
+            notes: "",
           });
         });
       });
@@ -357,18 +397,21 @@ describe("boardColumnsHelper", () => {
             iconClass: "far fa-smile",
             id: "uuid-1",
             title: "What fosters psychological safety?",
+            notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "far fa-frown",
             id: "uuid-2",
             title: "What undermines pyschological safety?",
+            notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
             iconClass: "far fa-circle-check",
             id: "uuid-3",
             title: "One action to try next.",
+            notes: "",
           });
         });
       });
@@ -383,18 +426,21 @@ describe("boardColumnsHelper", () => {
             iconClass: "far fa-smile",
             id: "uuid-1",
             title: "What helps work-life balance?",
+            notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "far fa-frown",
             id: "uuid-2",
             title: "What hinders work-life balance?",
+            notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
             iconClass: "far fa-circle-check",
             id: "uuid-3",
             title: "One action to try next.",
+            notes: "",
           });
         });
       });
@@ -409,18 +455,21 @@ describe("boardColumnsHelper", () => {
             iconClass: "far fa-smile",
             id: "uuid-1",
             title: "What enhances confidence in team?",
+            notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "far fa-frown",
             id: "uuid-2",
             title: "What reduces confidence in team?",
+            notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
             iconClass: "far fa-circle-check",
             id: "uuid-3",
             title: "One action to try next.",
+            notes: "",
           });
         });
       });
@@ -435,18 +484,21 @@ describe("boardColumnsHelper", () => {
             iconClass: "far fa-smile",
             id: "uuid-1",
             title: "What increases efficiency?",
+            notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "far fa-frown",
             id: "uuid-2",
             title: "What decreases efficiency?",
+            notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
             iconClass: "far fa-circle-check",
             id: "uuid-3",
             title: "One action to try next.",
+            notes: "",
           });
         });
       });
@@ -462,12 +514,14 @@ describe("boardColumnsHelper", () => {
           iconClass: "far fa-smile",
           id: "uuid-1",
           title: "What went well?",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
           iconClass: "far fa-frown",
           id: "uuid-2",
           title: "What didn't go well?",
+          notes: "",
         });
       });
 
@@ -480,12 +534,14 @@ describe("boardColumnsHelper", () => {
           iconClass: "far fa-smile",
           id: "uuid-1",
           title: "What went well?",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
           iconClass: "far fa-frown",
           id: "uuid-2",
           title: "What didn't go well?",
+          notes: "",
         });
       });
 
@@ -498,12 +554,14 @@ describe("boardColumnsHelper", () => {
           iconClass: "far fa-smile",
           id: "uuid-1",
           title: "What went well?",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
           iconClass: "far fa-frown",
           id: "uuid-2",
           title: "What didn't go well?",
+          notes: "",
         });
       });
 
@@ -516,12 +574,14 @@ describe("boardColumnsHelper", () => {
           iconClass: "far fa-smile",
           id: "uuid-1",
           title: "What went well?",
+          notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
           iconClass: "far fa-frown",
           id: "uuid-2",
           title: "What didn't go well?",
+          notes: "",
         });
       });
     });

@@ -44,7 +44,7 @@ const baseFeedbackItem: IFeedbackItemDocument = {
   groupIds: [],
   isGroupedCarouselItem: false,
   timerSecs: 0,
-  timerstate: false,
+  timerState: false,
   timerId: null,
 };
 
@@ -448,17 +448,32 @@ describe("ItemDataService - flipTimer", () => {
   it("should flip timer state from false to true", async () => {
     const mockFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
-      timerstate: false,
+      timerState: false,
       timerId: null,
     };
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
-    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerstate: true, timerId: "timer-123" });
+    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerState: true, timerId: "timer-123" });
 
     const result = await itemDataService.flipTimer("board-1", "item-1", "timer-123");
 
-    expect(result.timerstate).toBe(true);
+    expect(result.timerState).toBe(true);
     expect(result.timerId).toBe("timer-123");
+  });
+
+  it("should flip timer state from true to false", async () => {
+    const mockFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      timerState: true,
+      timerId: "timer-123",
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
+    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerState: false, timerId: "timer-123" });
+
+    const result = await itemDataService.flipTimer("board-1", "item-1", "timer-123");
+
+    expect(result.timerState).toBe(false);
   });
 
   it("should return undefined when feedback item not found", async () => {
@@ -573,6 +588,54 @@ describe("ItemDataService - removeAssociatedActionItem", () => {
 
     expect(result).toBeDefined();
   });
+
+  it("should handle error when getting feedback item", async () => {
+    jest.spyOn(itemDataService, "getFeedbackItem").mockRejectedValue(new Error("Database error"));
+
+    const result = await itemDataService.removeAssociatedActionItem("board-1", "item-1", 123);
+
+    expect(result).toBeUndefined();
+  });
+});
+
+describe("ItemDataService - getAssociatedActionItemIds", () => {
+  it("should return associated action item IDs", async () => {
+    const mockFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      associatedActionItemIds: [123, 456],
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
+
+    const result = await itemDataService.getAssociatedActionItemIds("board-1", "item-1");
+
+    expect(result).toEqual([123, 456]);
+  });
+
+  it("should return empty array when no associated items", async () => {
+    const mockFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      associatedActionItemIds: undefined,
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
+
+    const result = await itemDataService.getAssociatedActionItemIds("board-1", "item-1");
+
+    expect(result).toEqual([]);
+  });
+
+  it("should throw error when feedback item not found", async () => {
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(null);
+
+    await expect(itemDataService.getAssociatedActionItemIds("board-1", "item-1")).rejects.toThrow("Feedback item with id: item-1 not found.");
+  });
+
+  it("should throw error when getFeedbackItem throws", async () => {
+    jest.spyOn(itemDataService, "getFeedbackItem").mockRejectedValue(new Error("Database error"));
+
+    await expect(itemDataService.getAssociatedActionItemIds("board-1", "item-1")).rejects.toThrow("Failed to read Feedback item with id: item-1.");
+  });
 });
 
 describe("ItemDataService - removeAssociatedItemIfNotExistsInVsts", () => {
@@ -622,5 +685,457 @@ describe("ItemDataService - removeAssociatedItemIfNotExistsInVsts", () => {
     const result = await itemDataService.removeAssociatedItemIfNotExistsInVsts("board-1", "item-1", 123);
 
     expect(result.associatedActionItemIds).not.toContain(123);
+  });
+});
+
+describe("ItemDataService - getFeedbackItemsForBoard", () => {
+  it("should return empty array when readDocuments throws error", async () => {
+    (dataService.readDocuments as jest.Mock).mockRejectedValue(new Error("Database error"));
+
+    const result = await itemDataService.getFeedbackItemsForBoard("board-1");
+
+    expect(result).toEqual([]);
+  });
+
+  it("should return feedback items for board", async () => {
+    const mockItems = [baseFeedbackItem];
+    (dataService.readDocuments as jest.Mock).mockResolvedValue(mockItems);
+
+    const result = await itemDataService.getFeedbackItemsForBoard("board-1");
+
+    expect(result).toEqual(mockItems);
+  });
+
+  it("should handle DocumentCollectionDoesNotExistException gracefully", async () => {
+    const mockError = {
+      serverError: {
+        typeKey: "DocumentCollectionDoesNotExistException",
+      },
+    };
+    (dataService.readDocuments as jest.Mock).mockRejectedValue(mockError);
+
+    const result = await itemDataService.getFeedbackItemsForBoard("board-1");
+
+    expect(result).toEqual([]);
+  });
+
+  it("should track exception for non-DocumentCollection errors", async () => {
+    const mockError = new Error("Unexpected error");
+    (dataService.readDocuments as jest.Mock).mockRejectedValue(mockError);
+
+    const result = await itemDataService.getFeedbackItemsForBoard("board-1");
+
+    expect(result).toEqual([]);
+  });
+});
+
+describe("ItemDataService - getFeedbackItemsByIds", () => {
+  it("should filter items by IDs", async () => {
+    const item1 = { ...baseFeedbackItem, id: "item-1" };
+    const item2 = { ...baseFeedbackItem, id: "item-2" };
+    const item3 = { ...baseFeedbackItem, id: "item-3" };
+
+    jest.spyOn(itemDataService, "getFeedbackItemsForBoard").mockResolvedValue([item1, item2, item3]);
+
+    const result = await itemDataService.getFeedbackItemsByIds("board-1", ["item-1", "item-3"]);
+
+    expect(result).toHaveLength(2);
+    expect(result.map(i => i.id)).toEqual(["item-1", "item-3"]);
+  });
+
+  it("should return empty array when no matching IDs", async () => {
+    jest.spyOn(itemDataService, "getFeedbackItemsForBoard").mockResolvedValue([baseFeedbackItem]);
+
+    const result = await itemDataService.getFeedbackItemsByIds("board-1", ["non-existent"]);
+
+    expect(result).toEqual([]);
+  });
+});
+
+describe("ItemDataService - createItemForBoard", () => {
+  it("should create feedback item with correct fields", async () => {
+    const mockUserIdentity = {
+      id: "user-123",
+      displayName: "Test User",
+      uniqueName: "test@example.com",
+    };
+
+    (userIdentityHelper.getUserIdentity as jest.Mock).mockReturnValue(mockUserIdentity);
+    (dataService.createDocument as jest.Mock).mockImplementation(async (boardId, item) => ({
+      ...item,
+      voteCollection: {},
+    }));
+
+    const result = await itemDataService.createItemForBoard("board-1", "Test Title", "col-1");
+
+    expect(result.title).toBe("Test Title");
+    expect(result.columnId).toBe("col-1");
+    expect(result.userIdRef).toBe("user-123");
+    expect(result.voteCollection).toEqual({});
+    expect(result.upvotes).toBe(0);
+  });
+
+  it("should create anonymous feedback item by default", async () => {
+    const mockUserIdentity = {
+      id: "user-123",
+      displayName: "Test User",
+      uniqueName: "test@example.com",
+    };
+
+    (userIdentityHelper.getUserIdentity as jest.Mock).mockReturnValue(mockUserIdentity);
+    (dataService.createDocument as jest.Mock).mockImplementation(async (boardId, item) => ({
+      ...item,
+      voteCollection: {},
+    }));
+
+    const result = await itemDataService.createItemForBoard("board-1", "Test Title", "col-1", true);
+
+    expect(result.createdBy).toBeNull();
+  });
+
+  it("should create non-anonymous feedback item when specified", async () => {
+    const mockUserIdentity = {
+      id: "user-123",
+      displayName: "Test User",
+      uniqueName: "test@example.com",
+    };
+
+    (userIdentityHelper.getUserIdentity as jest.Mock).mockReturnValue(mockUserIdentity);
+    (dataService.createDocument as jest.Mock).mockImplementation(async (boardId, item) => ({
+      ...item,
+      voteCollection: {},
+    }));
+
+    const result = await itemDataService.createItemForBoard("board-1", "Test Title", "col-1", false);
+
+    expect(result.createdBy).toEqual(mockUserIdentity);
+  });
+});
+
+describe("ItemDataService - deleteFeedbackItem", () => {
+  it("should return undefined when feedback item has upvotes", async () => {
+    const mockFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      upvotes: 5,
+    };
+
+    (dataService.readDocument as jest.Mock).mockResolvedValue(mockFeedbackItem);
+
+    const result = await itemDataService.deleteFeedbackItem("board-1", "item-1");
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should delete item without parent or children", async () => {
+    const feedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "item-1",
+      upvotes: 0,
+      parentFeedbackItemId: null,
+      childFeedbackItemIds: undefined,
+    };
+
+    (dataService.readDocument as jest.Mock).mockResolvedValue(feedbackItem);
+    (dataService.deleteDocument as jest.Mock).mockResolvedValue(undefined);
+
+    const result = await itemDataService.deleteFeedbackItem("board-1", "item-1");
+
+    expect(result.updatedParentFeedbackItem).toBeNull();
+    expect(result.updatedChildFeedbackItems).toEqual([]);
+    expect(dataService.deleteDocument).toHaveBeenCalledWith("board-1", "item-1");
+  });
+
+  it("should delete item and update parent when item has parent", async () => {
+    const childItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "child-1",
+      parentFeedbackItemId: "parent-1",
+      upvotes: 0,
+    };
+
+    const parentItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "parent-1",
+      childFeedbackItemIds: ["child-1", "child-2"],
+    };
+
+    (dataService.readDocument as jest.Mock).mockResolvedValueOnce(childItem).mockResolvedValueOnce(parentItem);
+
+    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...parentItem, childFeedbackItemIds: ["child-2"] });
+    (dataService.deleteDocument as jest.Mock).mockResolvedValue(undefined);
+
+    const result = await itemDataService.deleteFeedbackItem("board-1", "child-1");
+
+    expect(result.updatedParentFeedbackItem).toBeDefined();
+    expect(result.updatedParentFeedbackItem.childFeedbackItemIds).toEqual(["child-2"]);
+  });
+
+  it("should delete item and update children when item has children", async () => {
+    const parentItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "parent-1",
+      childFeedbackItemIds: ["child-1", "child-2"],
+      upvotes: 0,
+    };
+
+    const child1: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "child-1",
+      parentFeedbackItemId: "parent-1",
+    };
+
+    const child2: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "child-2",
+      parentFeedbackItemId: "parent-1",
+    };
+
+    (dataService.readDocument as jest.Mock).mockResolvedValueOnce(parentItem).mockResolvedValueOnce(child1).mockResolvedValueOnce(child2);
+
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...child1, parentFeedbackItemId: null }).mockResolvedValueOnce({ ...child2, parentFeedbackItemId: null });
+
+    (dataService.deleteDocument as jest.Mock).mockResolvedValue(undefined);
+
+    const result = await itemDataService.deleteFeedbackItem("board-1", "parent-1");
+
+    expect(result.updatedChildFeedbackItems).toHaveLength(2);
+  });
+});
+
+describe("ItemDataService - addFeedbackItemAsChild", () => {
+  it("should return undefined when parent or child not found", async () => {
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(null).mockResolvedValueOnce(baseFeedbackItem);
+
+    const result = await itemDataService.addFeedbackItemAsChild("board-1", "parent-1", "child-1");
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should return undefined when parent is already a child of another item", async () => {
+    const parentItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "parent-1",
+      parentFeedbackItemId: "grandparent-1",
+    };
+
+    const childItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "child-1",
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(parentItem).mockResolvedValueOnce(childItem);
+
+    const result = await itemDataService.addFeedbackItemAsChild("board-1", "parent-1", "child-1");
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should add child to parent when parent has no existing children", async () => {
+    const parentItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "parent-1",
+      columnId: "col-1",
+      childFeedbackItemIds: undefined,
+    };
+
+    const childItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "child-1",
+      columnId: "col-2",
+      childFeedbackItemIds: undefined,
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(parentItem).mockResolvedValueOnce(childItem);
+
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce(parentItem).mockResolvedValueOnce({ ...childItem, parentFeedbackItemId: "parent-1", columnId: "col-1" });
+
+    const result = await itemDataService.addFeedbackItemAsChild("board-1", "parent-1", "child-1");
+
+    expect(result.updatedParentFeedbackItem).toBeDefined();
+    expect(result.updatedChildFeedbackItem).toBeDefined();
+  });
+
+  it("should add child to parent and update old parent", async () => {
+    const parentItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "parent-1",
+      columnId: "col-1",
+      childFeedbackItemIds: [],
+    };
+
+    const childItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "child-1",
+      columnId: "col-2",
+      parentFeedbackItemId: "old-parent-1",
+      childFeedbackItemIds: [],
+    };
+
+    const oldParentItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "old-parent-1",
+      childFeedbackItemIds: ["child-1", "other-child"],
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(parentItem).mockResolvedValueOnce(childItem).mockResolvedValueOnce(oldParentItem);
+
+    (dataService.updateDocument as jest.Mock)
+      .mockResolvedValueOnce({ ...oldParentItem, childFeedbackItemIds: ["other-child"] })
+      .mockResolvedValueOnce(parentItem)
+      .mockResolvedValueOnce({ ...childItem, parentFeedbackItemId: "parent-1", columnId: "col-1" });
+
+    const result = await itemDataService.addFeedbackItemAsChild("board-1", "parent-1", "child-1");
+
+    expect(result.updatedParentFeedbackItem).toBeDefined();
+    expect(result.updatedChildFeedbackItem).toBeDefined();
+    expect(result.updatedOldParentFeedbackItem).toBeDefined();
+  });
+
+  it("should handle child with grandchildren", async () => {
+    const parentItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "parent-1",
+      columnId: "col-1",
+      childFeedbackItemIds: [],
+    };
+
+    const childItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "child-1",
+      columnId: "col-2",
+      childFeedbackItemIds: ["grandchild-1"],
+    };
+
+    const grandchildItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "grandchild-1",
+      columnId: "col-2",
+      parentFeedbackItemId: "child-1",
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(parentItem).mockResolvedValueOnce(childItem).mockResolvedValueOnce(grandchildItem);
+
+    (dataService.updateDocument as jest.Mock)
+      .mockResolvedValueOnce(parentItem)
+      .mockResolvedValueOnce({ ...childItem, parentFeedbackItemId: "parent-1", columnId: "col-1", childFeedbackItemIds: [] })
+      .mockResolvedValueOnce({ ...grandchildItem, parentFeedbackItemId: "parent-1", columnId: "col-1" });
+
+    const result = await itemDataService.addFeedbackItemAsChild("board-1", "parent-1", "child-1");
+
+    expect(result.updatedGrandchildFeedbackItems).toHaveLength(1);
+  });
+});
+
+describe("ItemDataService - addFeedbackItemAsMainItemToColumn", () => {
+  it("should return undefined when feedback item not found", async () => {
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(null);
+
+    const result = await itemDataService.addFeedbackItemAsMainItemToColumn("board-1", "item-1", "col-1");
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should return undefined when parent not found", async () => {
+    const feedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "item-1",
+      parentFeedbackItemId: "parent-1",
+      columnId: "col-1",
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(feedbackItem).mockResolvedValueOnce(null);
+
+    const result = await itemDataService.addFeedbackItemAsMainItemToColumn("board-1", "item-1", "col-2");
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should update item and remove from old parent", async () => {
+    const feedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "item-1",
+      parentFeedbackItemId: "parent-1",
+      columnId: "col-1",
+    };
+
+    const parentItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "parent-1",
+      childFeedbackItemIds: ["item-1", "item-2"],
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(feedbackItem).mockResolvedValueOnce(parentItem);
+
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...parentItem, childFeedbackItemIds: ["item-2"] }).mockResolvedValueOnce({ ...feedbackItem, parentFeedbackItemId: null, columnId: "col-2" });
+
+    const result = await itemDataService.addFeedbackItemAsMainItemToColumn("board-1", "item-1", "col-2");
+
+    expect(result.updatedFeedbackItem).toBeDefined();
+    expect(result.updatedOldParentFeedbackItem).toBeDefined();
+  });
+
+  it("should update children when moving to different column", async () => {
+    const feedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "item-1",
+      columnId: "col-1",
+      childFeedbackItemIds: ["child-1"],
+    };
+
+    const childItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "child-1",
+      columnId: "col-1",
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValueOnce(feedbackItem).mockResolvedValueOnce(childItem);
+
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...childItem, columnId: "col-2" }).mockResolvedValueOnce({ ...feedbackItem, columnId: "col-2" });
+
+    const result = await itemDataService.addFeedbackItemAsMainItemToColumn("board-1", "item-1", "col-2");
+
+    expect(result.updatedChildFeedbackItems).toHaveLength(1);
+  });
+
+  it("should not update children when moving within same column", async () => {
+    const feedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: "item-1",
+      columnId: "col-1",
+      childFeedbackItemIds: ["child-1"],
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(feedbackItem);
+
+    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...feedbackItem, parentFeedbackItemId: null });
+
+    const result = await itemDataService.addFeedbackItemAsMainItemToColumn("board-1", "item-1", "col-1");
+
+    expect(result.updatedChildFeedbackItems).toEqual([]);
+  });
+});
+
+describe("ItemDataService - updateTeamEffectivenessMeasurement", () => {
+  it("should return undefined when board not found", async () => {
+    jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(undefined);
+
+    const result = await itemDataService.updateTeamEffectivenessMeasurement("board-1", "team-1", "user-1", []);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should initialize teamEffectivenessMeasurementVoteCollection when undefined", async () => {
+    const mockBoard: IFeedbackBoardDocument = {
+      id: "board-1",
+      teamEffectivenessMeasurementVoteCollection: undefined,
+      boardVoteCollection: { "user-1": 2 },
+    } as any;
+
+    jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(mockBoard);
+    (dataService.updateDocument as jest.Mock).mockResolvedValue(mockBoard);
+
+    const result = await itemDataService.updateTeamEffectivenessMeasurement("board-1", "team-1", "user-1", [{ userId: "user-1", responses: [{ questionId: 1, selection: 5 }] }]);
+
+    expect(result).toBeDefined();
   });
 });

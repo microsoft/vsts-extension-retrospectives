@@ -27,7 +27,7 @@
 .board-summary-table-container {
   min-width: 1000px;
   overflow: auto;
-  height: calc(100vh - #{variables.$extension_header_height} - #{variables.$second_level_header_height});
+  height: calc(100vh - 104px);
 
   th,
   td {

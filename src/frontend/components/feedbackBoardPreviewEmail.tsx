@@ -30,7 +30,7 @@ class FeedbackBoardPreviewEmail extends React.Component<IFeedbackBoardPreviewEma
   }
 
   public async componentDidMount() {
-    const url = await getBoardUrl(this.props.teamId, this.props.board.id);
+    const url = await getBoardUrl(this.props.teamId, this.props.board.id, this.props.board.activePhase);
     const previewContent: string = await shareBoardHelper.generateEmailText(this.props.board, url, false);
     this.setState({ emailContent: previewContent });
   }
@@ -46,7 +46,7 @@ class FeedbackBoardPreviewEmail extends React.Component<IFeedbackBoardPreviewEma
     this.props.onCopy();
   };
 
-  public render(): JSX.Element {
+  public render(): React.JSX.Element {
     if (!this.state.emailContent) {
       return <Spinner className="preview-email-spinner" size={SpinnerSize.large} label="Loading..." ariaLive="assertive" />;
     }

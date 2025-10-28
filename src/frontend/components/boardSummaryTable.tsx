@@ -3,7 +3,6 @@ import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extensi
 import { DefaultButton } from "@fluentui/react/lib/Button";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
-import { useReactTable } from "@tanstack/react-table";
 
 import DeleteBoardDialog from "./deleteBoardDialog";
 import BoardSummary from "./boardSummary";
@@ -16,8 +15,6 @@ import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetr
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import BoardSummaryTableHeader from "./boardSummaryTableHeader";
 import BoardSummaryTableBody from "./boardSummaryTableBody";
-
-import { createColumnHelper, getCoreRowModel, getExpandedRowModel, getSortedRowModel, type CellContext, type HeaderContext, type OnChangeFn, type Row, type SortingState, type Table, type TableOptions } from "@tanstack/table-core";
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -125,129 +122,118 @@ export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClic
   );
 }
 
-function getTable(tableData: IBoardSummaryTableItem[], sortingState: SortingState, onSortingChange: OnChangeFn<SortingState>, onArchiveToggle: () => void, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>, currentUserId: string, currentUserIsTeamAdmin: boolean): Table<IBoardSummaryTableItem> {
-  const columnHelper = createColumnHelper<IBoardSummaryTableItem>();
-  const defaultFooter = (info: HeaderContext<IBoardSummaryTableItem, unknown>) => info.column.id;
+// Simple column definition interface
+export interface ISimpleColumn {
+  id: string;
+  header: string | (() => React.JSX.Element) | null;
+  accessor?: keyof IBoardSummaryTableItem;
+  cell: (item: IBoardSummaryTableItem) => React.JSX.Element | string | number;
+  sortable?: boolean;
+  sortDescFirst?: boolean;
+}
 
-  const columns = [
-    columnHelper.accessor("id", {
+// Simple sorting types
+type SortDirection = "asc" | "desc" | false;
+
+export interface ITableData {
+  columns: ISimpleColumn[];
+  data: IBoardSummaryTableItem[];
+  sorting: { columnId: string; direction: SortDirection };
+  expandedRows: Set<string>;
+}
+
+function getColumns(onArchiveToggle: () => void, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>, currentUserId: string, currentUserIsTeamAdmin: boolean, expandedRows: Set<string>, toggleExpanded: (id: string) => void): ISimpleColumn[] {
+  const dateFormatter = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" });
+
+  return [
+    {
+      id: "expand",
       header: null,
-      footer: defaultFooter,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, string>) => {
-        return cellContext.row.getCanExpand() ? (
-          <DefaultButton className="contextual-menu-button" aria-label="Expand Row" title="Expand Row">
-            <span className="ms-Button-icon">
-              <i className={`fas ${cellContext.row.getIsExpanded() ? "fa-caret-down" : "fa-caret-right"}`}></i>
-            </span>
-          </DefaultButton>
-        ) : (
-          ""
-        );
-      },
-      enableResizing: false,
-      enableSorting: false,
-    }),
-    columnHelper.accessor("boardName", {
+      cell: (item: IBoardSummaryTableItem) => (
+        <DefaultButton className="contextual-menu-button" aria-label="Expand Row" title="Expand Row" onClick={() => toggleExpanded(item.id)}>
+          <span className="ms-Button-icon">
+            <i className={`fas ${expandedRows.has(item.id) ? "fa-caret-down" : "fa-caret-right"}`}></i>
+          </span>
+        </DefaultButton>
+      ),
+      sortable: false,
+    },
+    {
+      id: "boardName",
       header: "Retrospective Name",
-      footer: defaultFooter,
-    }),
-    columnHelper.accessor("createdDate", {
+      accessor: "boardName",
+      cell: (item: IBoardSummaryTableItem) => item.boardName,
+      sortable: true,
+    },
+    {
+      id: "createdDate",
       header: "Created Date",
-      footer: defaultFooter,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date>) => {
-        return dateFormatter.format(cellContext.row.original.createdDate);
-      },
-      size: 100,
+      accessor: "createdDate",
+      cell: (item: IBoardSummaryTableItem) => dateFormatter.format(item.createdDate),
+      sortable: true,
       sortDescFirst: true,
-    }),
-    columnHelper.accessor("isArchived", {
+    },
+    {
+      id: "isArchived",
       header: "Archived",
-      footer: defaultFooter,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, boolean | undefined>) => {
-        const boardId = cellContext.row.original.id;
-        const teamId = cellContext.row.original.teamId;
-        const isArchived = cellContext.row.original.isArchived;
-
-        return (
-          <div
-            onClick={event => event.stopPropagation()} // Prevent click propagation
-            className="centered-cell"
-          >
-            <input
-              type="checkbox"
-              checked={!!isArchived} // Ensure boolean value
-              onChange={event => {
-                const toggleIsArchived = event.target.checked;
-                handleArchiveToggle(teamId, boardId, toggleIsArchived, setTableData, onArchiveToggle);
-              }}
-            />
-          </div>
-        );
-      },
-      size: 30,
+      accessor: "isArchived",
+      cell: (item: IBoardSummaryTableItem) => (
+        <div onClick={event => event.stopPropagation()} className="centered-cell">
+          <input
+            type="checkbox"
+            checked={!!item.isArchived}
+            onChange={event => {
+              handleArchiveToggle(item.teamId, item.id, event.target.checked, setTableData, onArchiveToggle);
+            }}
+          />
+        </div>
+      ),
+      sortable: true,
       sortDescFirst: true,
-    }),
-    columnHelper.accessor("archivedDate", {
+    },
+    {
+      id: "archivedDate",
       header: "Archived Date",
-      footer: defaultFooter,
-      cell: (cellContext: CellContext<IBoardSummaryTableItem, Date | undefined>) => {
-        const archivedDate = cellContext.row.original.archivedDate;
-        return archivedDate ? dateFormatter.format(archivedDate) : "";
-      },
-      size: 100,
+      accessor: "archivedDate",
+      cell: (item: IBoardSummaryTableItem) => (item.archivedDate ? dateFormatter.format(item.archivedDate) : ""),
+      sortable: true,
       sortDescFirst: true,
-    }),
-    columnHelper.accessor("feedbackItemsCount", {
+    },
+    {
+      id: "feedbackItemsCount",
       header: "Feedback Items",
-      footer: defaultFooter,
-      size: 80,
-    }),
-    columnHelper.accessor("totalWorkItemsCount", {
+      accessor: "feedbackItemsCount",
+      cell: (item: IBoardSummaryTableItem) => item.feedbackItemsCount,
+      sortable: true,
+    },
+    {
+      id: "totalWorkItemsCount",
       header: "Total Work Items",
-      footer: defaultFooter,
-      size: 80,
-    }),
-    columnHelper.display({
+      accessor: "totalWorkItemsCount",
+      cell: (item: IBoardSummaryTableItem) => item.totalWorkItemsCount,
+      sortable: true,
+    },
+    {
       id: "trash",
       header: () => (
         <div className="centered-cell trash-icon-header">
           <i className="fas fa-trash-alt" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin."></i>
         </div>
       ),
-      cell: cellContext => (
+      cell: (item: IBoardSummaryTableItem) => (
         <TrashIcon
-          board={cellContext.row.original}
+          board={item}
           currentUserId={currentUserId}
           currentUserIsTeamAdmin={currentUserIsTeamAdmin}
           onClick={event => {
             event.stopPropagation();
-            setOpenDialogBoardId(cellContext.row.original.id);
+            setOpenDialogBoardId(item.id);
           }}
         />
       ),
-      size: 45,
-    }),
-  ];
-
-  const tableOptions: TableOptions<IBoardSummaryTableItem> = {
-    data: tableData,
-    columns,
-    columnResizeMode: "onChange",
-    onSortingChange: onSortingChange,
-    getSortedRowModel: getSortedRowModel(),
-    getCoreRowModel: getCoreRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: () => true,
-    state: {
-      pagination: {
-        pageSize: tableData.length,
-        pageIndex: 0,
-      },
-      sorting: sortingState,
+      sortable: false,
     },
-  };
-
-  return useReactTable(tableOptions);
+  ];
 }
 
 export async function handleConfirmDelete(openDialogBoardId: string | null, tableData: IBoardSummaryTableItem[], teamId: string, setOpenDialogBoardId: (id: string | null) => void, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, setRefreshKey: (value: boolean) => void) {
@@ -327,7 +313,7 @@ export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[])
   };
 }
 
-function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Element {
+function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.Element {
   const [openDialogBoardId, setOpenDialogBoardId] = useState<string | null>(null);
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
@@ -338,7 +324,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     allDataLoaded: false,
   });
 
-  const [sorting, setSorting] = useState<SortingState>([{ id: "createdDate", desc: true }]);
+  // Simple sorting state
+  const [sortColumn, setSortColumn] = useState<string>("createdDate");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
   const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]);
   useEffect(() => {
     setTableData(boardSummaryState.boardsTableItems);
@@ -346,7 +336,70 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
 
   const [refreshKey, setRefreshKey] = useState(false);
 
-  const table: Table<IBoardSummaryTableItem> = getTable(tableData, sorting, setSorting, props.onArchiveToggle, setTableData, setOpenDialogBoardId, props.currentUserId, props.currentUserIsTeamAdmin);
+  // Toggle sort function
+  const toggleSort = (columnId: string, sortDescFirst?: boolean) => {
+    if (sortColumn === columnId) {
+      // Toggle direction
+      if (sortDirection === "asc") {
+        setSortDirection("desc");
+      } else if (sortDirection === "desc") {
+        setSortDirection(false);
+      } else {
+        setSortDirection(sortDescFirst ? "desc" : "asc");
+      }
+    } else {
+      // New column
+      setSortColumn(columnId);
+      setSortDirection(sortDescFirst ? "desc" : "asc");
+    }
+  };
+
+  // Toggle row expansion
+  const toggleExpanded = (rowId: string) => {
+    setExpandedRows(prev => {
+      const next = new Set(prev);
+      if (next.has(rowId)) {
+        next.delete(rowId);
+      } else {
+        next.add(rowId);
+      }
+      return next;
+    });
+  };
+
+  // Get sorted data
+  const getSortedData = (): IBoardSummaryTableItem[] => {
+    if (!sortDirection) return tableData;
+
+    const sorted = [...tableData].sort((a, b) => {
+      let aVal: Date | string | number | boolean | null | undefined;
+      let bVal: Date | string | number | boolean | null | undefined;
+
+      if (sortColumn === "createdDate" || sortColumn === "archivedDate") {
+        aVal = a[sortColumn as keyof IBoardSummaryTableItem];
+        bVal = b[sortColumn as keyof IBoardSummaryTableItem];
+        if (!aVal) return 1;
+        if (!bVal) return -1;
+        const aTime = new Date(aVal as Date).getTime();
+        const bTime = new Date(bVal as Date).getTime();
+        return sortDirection === "asc" ? (aTime < bTime ? -1 : 1) : aTime < bTime ? 1 : -1;
+      } else {
+        aVal = a[sortColumn as keyof IBoardSummaryTableItem];
+        bVal = b[sortColumn as keyof IBoardSummaryTableItem];
+      }
+
+      if (aVal == null || aVal === undefined) return 1;
+      if (bVal == null || bVal === undefined) return -1;
+      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return sorted;
+  };
+
+  // Get columns
+  const columns = getColumns(props.onArchiveToggle, setTableData, setOpenDialogBoardId, props.currentUserId, props.currentUserIsTeamAdmin, expandedRows, toggleExpanded);
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
     const newState = buildBoardSummaryState(boardDocuments);
@@ -431,8 +484,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
     });
   };
 
-  const boardRowSummary = (row: Row<IBoardSummaryTableItem>) => {
-    const currentBoard = boardSummaryState.boardsTableItems.find(board => board.id === row.original.id);
+  const boardRowSummary = (item: IBoardSummaryTableItem) => {
+    const currentBoard = boardSummaryState.boardsTableItems.find(board => board.id === item.id);
+    if (!currentBoard) return null;
     const actionItems = boardSummaryState.actionItemsByBoard[currentBoard.id];
     return <BoardSummary actionItems={actionItems?.actionItems} pendingWorkItemsCount={currentBoard?.pendingWorkItemsCount} resolvedActionItemsCount={currentBoard?.totalWorkItemsCount - currentBoard?.pendingWorkItemsCount} boardName={currentBoard?.boardName} feedbackItemsCount={currentBoard?.feedbackItemsCount} supportedWorkItemTypes={props.supportedWorkItemTypes} />;
   };
@@ -459,13 +513,14 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): JSX.Elemen
   }
 
   const selectedBoardForDelete = tableData.find(board => board.id === openDialogBoardId);
+  const sortedData = getSortedData();
 
   return (
     <div className="board-summary-table-container">
       <DeleteBoardDialog board={selectedBoardForDelete} hidden={!openDialogBoardId} onConfirm={() => handleConfirmDelete(openDialogBoardId, tableData, props.teamId, setOpenDialogBoardId, setTableData, setRefreshKey)} onCancel={() => setOpenDialogBoardId(null)} />
       <table>
-        <BoardSummaryTableHeader headerGroups={table.getHeaderGroups()} />
-        <BoardSummaryTableBody rows={table.getRowModel().rows} boardRowSummary={boardRowSummary} />
+        <BoardSummaryTableHeader columns={columns} sortColumn={sortColumn} sortDirection={sortDirection} onSort={toggleSort} />
+        <BoardSummaryTableBody columns={columns} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
       </table>
     </div>
   );

@@ -1,229 +1,162 @@
 import React from "react";
-import { render } from "@testing-library/react";
-import { fireEvent } from "@testing-library/dom";
+import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import BoardSummaryTableBody from "../boardSummaryTableBody";
-import type { IBoardSummaryTableItem } from "../boardSummaryTable";
+import type { IBoardSummaryTableItem, ISimpleColumn } from "../boardSummaryTable";
 
-const mockSummary = jest.fn().mockReturnValue(<div>Mock summary</div>);
+const mockColumns: ISimpleColumn[] = [
+  {
+    id: "expand",
+    header: null,
+    cell: (item: IBoardSummaryTableItem) => <button>Expand {item.id}</button>,
+    sortable: false,
+  },
+  {
+    id: "boardName",
+    header: "Retrospective Name",
+    accessor: "boardName",
+    cell: (item: IBoardSummaryTableItem) => item.boardName,
+    sortable: true,
+  },
+  {
+    id: "feedbackItemsCount",
+    header: "Feedback Items",
+    accessor: "feedbackItemsCount",
+    cell: (item: IBoardSummaryTableItem) => item.feedbackItemsCount,
+    sortable: true,
+  },
+];
 
-const createMockCell = (id: string, value: any): any => {
-  const column = {
-    id,
-    columnDef: {
-      id,
-      accessorFn: () => value,
-      cell: () => <span>{value}</span>,
-    },
-  };
-
-  const cell = {
-    id: `cell-${id}`,
-    column: column,
-    getContext: jest.fn(),
-    getValue: () => value,
-  };
-
-  return cell;
-};
-
-const createMockRow = ({
-  id = "row-1",
-  visibleCells = [],
-  isExpanded = false,
-  toggleExpanded = jest.fn(),
-  original = {} as IBoardSummaryTableItem,
-}: {
-  id?: string;
-  visibleCells?: any[];
-  isExpanded?: boolean;
-  toggleExpanded?: () => void;
-  original?: IBoardSummaryTableItem;
-} = {}): any => {
-  const row = {
-    id,
-    getVisibleCells: () => visibleCells,
-    getIsExpanded: () => isExpanded,
-    toggleExpanded,
-    original,
-  };
-
-  visibleCells.forEach((cell: any) => {
-    cell.row = row;
-  });
-
-  return row;
+const mockItem: IBoardSummaryTableItem = {
+  id: "board-1",
+  boardName: "Sprint 1 Retro",
+  createdDate: new Date("2023-01-01"),
+  isArchived: false,
+  archivedDate: null,
+  pendingWorkItemsCount: 3,
+  totalWorkItemsCount: 10,
+  feedbackItemsCount: 15,
+  teamId: "team-1",
+  ownerId: "owner-1",
 };
 
 describe("BoardSummaryTableBody", () => {
-  it("renders rows and their cells", () => {
-    const cell1 = createMockCell("totalWorkItemsCount", 2);
-    const cell2 = createMockCell("pendingWorkItemsCount", 1);
-    const row = createMockRow({
-      visibleCells: [cell1, cell2],
-      original: {
-        feedbackItemsCount: 10,
-        totalWorkItemsCount: 2,
-        pendingWorkItemsCount: 1,
-      } as IBoardSummaryTableItem,
-    });
-
+  it("renders table body with data correctly", () => {
+    const mockSummary = jest.fn(() => <div>Summary</div>);
     const { container } = render(
       <table>
-        <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
+        <BoardSummaryTableBody columns={mockColumns} data={[mockItem]} expandedRows={new Set()} boardRowSummary={mockSummary} />
       </table>,
     );
-
+    expect(container.querySelectorAll("tbody")).toHaveLength(1);
     expect(container.querySelectorAll("tr")).toHaveLength(1);
-    expect(container.querySelectorAll("td")).toHaveLength(2);
+    expect(container.querySelectorAll("td")).toHaveLength(mockColumns.length);
   });
 
-  it("applies correct classes and ARIA attributes to <td>", () => {
-    const cell = createMockCell("pendingWorkItemsCount", 2);
-    const row = createMockRow({
-      visibleCells: [cell],
-      original: {
-        pendingWorkItemsCount: 2,
-      } as IBoardSummaryTableItem,
-    });
+  it("displays cell content correctly", () => {
+    const mockSummary = jest.fn(() => <div>Summary</div>);
+    const { getByText } = render(
+      <table>
+        <BoardSummaryTableBody columns={mockColumns} data={[mockItem]} expandedRows={new Set()} boardRowSummary={mockSummary} />
+      </table>,
+    );
+    expect(getByText("Sprint 1 Retro")).toBeInTheDocument();
+    expect(getByText("15")).toBeInTheDocument();
+  });
+
+  it("renders expanded row summary when row is expanded", () => {
+    const mockSummary = jest.fn(() => <div>Expanded Summary</div>);
+    const expandedRows = new Set(["board-1"]);
+    const { getByText } = render(
+      <table>
+        <BoardSummaryTableBody columns={mockColumns} data={[mockItem]} expandedRows={expandedRows} boardRowSummary={mockSummary} />
+      </table>,
+    );
+    expect(getByText("Expanded Summary")).toBeInTheDocument();
+    expect(mockSummary).toHaveBeenCalledWith(mockItem);
+  });
+
+  it("does not render expanded row when row is not expanded", () => {
+    const mockSummary = jest.fn(() => <div>Expanded Summary</div>);
+    const { queryByText } = render(
+      <table>
+        <BoardSummaryTableBody columns={mockColumns} data={[mockItem]} expandedRows={new Set()} boardRowSummary={mockSummary} />
+      </table>,
+    );
+    expect(queryByText("Expanded Summary")).not.toBeInTheDocument();
+    expect(mockSummary).not.toHaveBeenCalled();
+  });
+
+  it("invokes the expand column cell when Enter is pressed on a row", () => {
+    const expandCell = jest.fn();
+    const columns: ISimpleColumn[] = [
+      {
+        id: "expand",
+        header: null,
+        cell: expandCell,
+        sortable: false,
+      },
+    ];
 
     const { container } = render(
       <table>
-        <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
+        <BoardSummaryTableBody columns={columns} data={[mockItem]} expandedRows={new Set()} boardRowSummary={() => null} />
       </table>,
     );
 
-    const td = container.querySelector("td");
-    expect(td).toHaveClass("pending-action-item-count");
-    expect(td).toHaveAttribute("aria-label", "pendingWorkItemsCount 2");
+    const row = container.querySelector("tbody tr");
+    expect(row).toBeTruthy();
+
+    fireEvent.keyPress(row!, { key: "Enter", charCode: 13 });
+
+    expect(expandCell).toHaveBeenCalledWith(mockItem);
   });
 
-  it("expands row when first cell is clicked", () => {
-    const toggleExpanded = jest.fn();
-    const cell = createMockCell("totalWorkItemsCount", 2);
-    const row = createMockRow({
-      visibleCells: [cell],
-      toggleExpanded,
-      original: {
-        totalWorkItemsCount: 2,
-        pendingWorkItemsCount: 0,
-      } as IBoardSummaryTableItem,
-    });
+  it("applies pending work item styling when pending items exist", () => {
+    const columns: ISimpleColumn[] = [{ id: "pendingWorkItemsCount", header: null, cell: item => item.pendingWorkItemsCount, sortable: false }];
 
-    const { container } = render(
+    const itemWithPending: IBoardSummaryTableItem = { ...mockItem, pendingWorkItemsCount: 2 };
+    const { getByLabelText } = render(
       <table>
-        <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
+        <BoardSummaryTableBody columns={columns} data={[itemWithPending]} expandedRows={new Set()} boardRowSummary={() => null} />
       </table>,
     );
 
-    const tr = container.querySelector("tr")!;
-    const firstTd = container.querySelector("td")!;
-
-    Object.defineProperty(tr, "cells", {
-      value: [firstTd],
-      configurable: true,
-    });
-
-    firstTd.closest = jest.fn(() => firstTd);
-
-    fireEvent.click(firstTd);
-
-    expect(toggleExpanded).toHaveBeenCalled();
+    const cell = getByLabelText("pendingWorkItemsCount 2");
+    expect(cell).toHaveClass("workItemsCount");
+    expect(cell).toHaveClass("pending-action-item-count");
   });
 
-  it("does not expand row when a cell other than the first is clicked", () => {
-    const toggleExpanded = jest.fn();
-    const cells = [createMockCell("totalWorkItemsCount", 2), createMockCell("pendingWorkItemsCount", 1)];
-    const row = createMockRow({ visibleCells: cells, toggleExpanded });
+  it("omits pending styling when there are no pending items", () => {
+    const columns: ISimpleColumn[] = [
+      { id: "pendingWorkItemsCount", header: null, cell: item => item.pendingWorkItemsCount, sortable: false },
+      { id: "totalWorkItemsCount", header: null, cell: item => item.totalWorkItemsCount, sortable: false },
+    ];
 
-    const { container } = render(
+    const itemWithoutPending: IBoardSummaryTableItem = { ...mockItem, pendingWorkItemsCount: 0 };
+    const { container, getByLabelText } = render(
       <table>
-        <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
+        <BoardSummaryTableBody columns={columns} data={[itemWithoutPending]} expandedRows={new Set()} boardRowSummary={() => null} />
       </table>,
     );
 
-    const tr = container.querySelector("tr")!;
-    const tds = container.querySelectorAll("td");
-    const firstTd = tds[0];
-    const secondTd = tds[1];
+    const pendingCell = container.querySelectorAll("td")[0];
+    expect(pendingCell).toHaveClass("workItemsCount");
+    expect(pendingCell).not.toHaveClass("pending-action-item-count");
 
-    Object.defineProperty(tr, "cells", {
-      value: [firstTd, secondTd],
-      configurable: true,
-    });
-
-    secondTd.closest = jest.fn(() => secondTd);
-
-    fireEvent.click(secondTd);
-
-    expect(toggleExpanded).not.toHaveBeenCalled();
+    const totalCell = getByLabelText("totalWorkItemsCount 10");
+    expect(totalCell).toHaveClass("workItemsCount");
+    expect(totalCell).toHaveClass("total-work-item-count");
   });
 
-  it("expands row when Enter key is pressed", () => {
-    const toggleExpanded = jest.fn();
-    const cells = [createMockCell("totalWorkItemsCount", 2)];
-    const row = createMockRow({ visibleCells: cells, toggleExpanded });
-
+  it("handles empty data array", () => {
+    const mockSummary = jest.fn(() => <div>Summary</div>);
     const { container } = render(
       <table>
-        <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
+        <BoardSummaryTableBody columns={mockColumns} data={[]} expandedRows={new Set()} boardRowSummary={mockSummary} />
       </table>,
     );
-
-    const tr = container.querySelector("tr")!;
-
-    fireEvent.keyPress(tr, { key: "Enter", code: "Enter", charCode: 13 });
-
-    expect(toggleExpanded).toHaveBeenCalled();
-  });
-
-  it("renders boardRowSummary when row is expanded", () => {
-    const row = {
-      id: "row1",
-      getIsExpanded: () => true,
-      toggleExpanded: jest.fn(),
-      original: {
-        id: "board1",
-        boardName: "Board A",
-        feedbackItemsCount: 10,
-        totalWorkItemsCount: 2,
-        pendingWorkItemsCount: 1,
-        createdDate: new Date(),
-        teamId: "team1",
-        ownerId: "owner1",
-      } as IBoardSummaryTableItem,
-    } as any;
-
-    const mockCells = [createMockCell("boardName", "Board A"), createMockCell("totalWorkItemsCount", 2)];
-
-    mockCells.forEach((cell: any) => {
-      cell.row = row;
-    });
-
-    (row as any).getVisibleCells = () => mockCells;
-
-    const mockSummary = jest.fn(() => <div>Mock summary</div>);
-
-    const { container } = render(
-      <table>
-        <BoardSummaryTableBody rows={[row]} boardRowSummary={mockSummary} />
-      </table>,
-    );
-
-    expect(container.textContent).toContain("Mock summary");
-
-    const trs = container.querySelectorAll("tr");
-    const lastTr = trs[trs.length - 1];
-    const expandedTd = lastTr.querySelector("td");
-    expect(expandedTd).toHaveAttribute("colSpan", mockCells.length.toString());
-  });
-
-  it("renders nothing when rows is empty", () => {
-    const { container } = render(
-      <table>
-        <BoardSummaryTableBody rows={[]} boardRowSummary={mockSummary} />
-      </table>,
-    );
+    expect(container.querySelectorAll("tbody")).toHaveLength(1);
     expect(container.querySelectorAll("tr")).toHaveLength(0);
   });
 });

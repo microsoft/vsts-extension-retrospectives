@@ -27,7 +27,7 @@
   }
 
   .ms-DocumentCard-details {
-    padding-right: 16px;
+    flex: 1;
 
     &:hover {
       cursor: pointer;
@@ -42,8 +42,9 @@
     line-height: 10px;
     white-space: nowrap;
     overflow: hidden;
-    font-size: 14px;
+    font-size: 10px;
     color: var(--text-primary-color);
+    align-content: center;
   }
 
   &.resolved-border-right {
@@ -89,13 +90,15 @@
 }
 
 .action-items {
+  border-left: 1px solid #605e5c;
+
   .work-item-type-icon-container {
     background-color: var(--background-color);
   }
 
   .ms-DocumentCard {
     .ms-DocumentCardActions {
-      padding: 0 4px 0 0;
+      padding: 0 5px 0 0;
 
       .ms-DocumentCardActions-action {
         height: 30px;
@@ -118,6 +121,10 @@
       }
     }
   }
+
+  .ms-DocumentCardPreview {
+    border-right: 1px solid #605e5c;
+  }
 }
 
 .add-action-item-callout {
@@ -138,6 +145,7 @@
         cursor: pointer;
         padding-left: 8px;
         align-items: center;
+        justify-content: flex-start;
         background-color: inherit;
         width: 100%;
         border: 0px hidden;

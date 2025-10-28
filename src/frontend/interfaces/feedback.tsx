@@ -75,6 +75,7 @@ export interface IFeedbackColumn {
   title: string;
   iconClass: string;
   accentColor: string;
+  notes?: string;
 }
 
 export interface IFeedbackItemDocument {
@@ -96,7 +97,7 @@ export interface IFeedbackItemDocument {
   modifiedBy?: IdentityRef;
   userIdRef: string;
   timerSecs: number;
-  timerstate: boolean;
+  timerState: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   timerId: any;
   groupIds: string[];

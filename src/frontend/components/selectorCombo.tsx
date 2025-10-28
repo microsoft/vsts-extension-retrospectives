@@ -1,5 +1,5 @@
 import React from "react";
-import classNames from "classnames";
+import { cn } from "../utilities/classNameHelper";
 import { FocusTrapCallout, DirectionalHint } from "@fluentui/react/lib/Callout";
 import { List } from "@fluentui/react/lib/List";
 import { Shimmer } from "@fluentui/react/lib/Shimmer";
@@ -51,19 +51,19 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
     };
   }
 
-  public render(): JSX.Element {
+  public render(): React.JSX.Element {
     const selectorButtonText: string = this.props.nameGetter(this.props.currentValue);
 
     return (
       <div className={this.props.className}>
-        <div className="selector-button" aria-label={"Click to search and select " + this.props.title + ". Current selection is " + selectorButtonText} aria-expanded={this.state.isSelectorCalloutVisible} aria-haspopup="true" role="button" ref={selectorButton => (this.selectorButton = selectorButton)} onClick={this.toggleSelectorCallout} tabIndex={0} onKeyDown={this.handleKeyPressSelectorButton}>
+        <div className="selector-button" aria-label={"Click to search and select " + this.props.title + ". Current selection is " + selectorButtonText} aria-expanded={this.state.isSelectorCalloutVisible} aria-haspopup="true" role="button" ref={selectorButton => { this.selectorButton = selectorButton; }} onClick={this.toggleSelectorCallout} tabIndex={0} onKeyDown={this.handleKeyPressSelectorButton}>
           <i className={"selector-button-icon fa-solid fa-" + this.props.iconName}></i>
           <span className="selector-button-text-wrapper">
             <div className="selector-button-text">{selectorButtonText}</div>
           </span>
           <i className={"selector-button-chevron fas fa-chevron-down"}></i>
         </div>
-        <FocusTrapCallout className={classNames("selector-callout", this.props.className)} target={this.selectorButton} directionalHint={DirectionalHint.bottomLeftEdge} gapSpace={0} focusTrapProps={{ isClickableOutsideFocusTrap: true }} isBeakVisible={false} onDismiss={this.hideSelectorCallout} hidden={!this.state.isSelectorCalloutVisible}>
+        <FocusTrapCallout className={cn("selector-callout", this.props.className)} target={this.selectorButton} directionalHint={DirectionalHint.bottomLeftEdge} gapSpace={0} focusTrapProps={{ isClickableOutsideFocusTrap: true }} isBeakVisible={false} onDismiss={this.hideSelectorCallout} hidden={!this.state.isSelectorCalloutVisible}>
           {this.renderSelectorCombo(this.getFilteredValues(), true)}
         </FocusTrapCallout>
       </div>

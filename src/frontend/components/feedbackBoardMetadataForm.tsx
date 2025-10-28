@@ -6,7 +6,7 @@ import { Checkbox } from "@fluentui/react/lib/Checkbox";
 import { List } from "@fluentui/react/lib/List";
 import { DocumentCardType, DocumentCard } from "@fluentui/react/lib/DocumentCard";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
-import classNames from "classnames";
+import { cn } from "../utilities/classNameHelper";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 
 import BoardDataService from "../dal/boardDataService";
@@ -333,7 +333,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
         <Pivot>
           <PivotItem headerText={"General"} aria-label="Board General Settings">
             <div className="board-metadata-form">
-              <section className="board-metadata-edit-column-settings hide-mobile">
+              <section className="board-metadata-edit-column-settings">
                 <h2 className="board-metadata-form-section-header">Board Settings</h2>
                 <div className="board-metadata-form-section-subheader">
                   <label htmlFor="title-input-container">
@@ -366,7 +366,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   <Checkbox id="feedback-display-names-checkbox" label="Do not display names in feedback" ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation." boxSide="start" checked={this.state.isBoardAnonymous} disabled={!this.props.isNewBoardCreation} onChange={this.handleIsAnonymousCheckboxChange} />
                 </div>
               </section>
-              <section className="board-metadata-edit-column-settings hide-mobile">
+              <section className="board-metadata-edit-column-settings">
                 <h2 className="board-metadata-form-section-header">Column Settings</h2>
                 <div className="board-metadata-form-section-information">
                   <i className="fas fa-exclamation-circle"></i>&nbsp;You can create a maximum of {this.maxColumnCount} columns in a retrospective.
@@ -405,13 +405,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   items={this.state.columnCards}
                   onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
                     return (
-                      <DocumentCard
-                        className={classNames({
-                          "feedback-column-card": true,
-                          "marked-for-deletion": columnCard.markedForDeletion,
-                        })}
-                        type={DocumentCardType.compact}
-                      >
+                      <DocumentCard className={cn("feedback-column-card", columnCard.markedForDeletion && "marked-for-deletion")} type={DocumentCardType.compact}>
                         <div className="flex grow items-center">
                           <DefaultButton
                             className="feedback-column-card-icon-button"
@@ -425,7 +419,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                               });
                             }}
                           >
-                            <i className={classNames("feedback-column-card-icon", columnCard.column.iconClass)} />
+                            <i className={cn("feedback-column-card-icon", columnCard.column.iconClass)} />
                           </DefaultButton>
                           <DefaultButton
                             className="feedback-column-card-accent-color-button"
@@ -439,7 +433,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                               });
                             }}
                           >
-                            <i className={classNames("feedback-column-card-accent-color", "fas fa-square")} style={{ color: columnCard.column.accentColor }} />
+                            <i className={cn("feedback-column-card-accent-color", "fas fa-square")} style={{ color: columnCard.column.accentColor }} />
                           </DefaultButton>
                           <EditableDocumentCardTitle
                             isDisabled={columnCard.markedForDeletion}
@@ -536,6 +530,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                           title: "New Column",
                           iconClass: this.getRandomArrayElement(this.allIconClassNames).iconClass,
                           accentColor: this.getRandomArrayElement(this.allAccentColors).colorCode,
+                          notes: "",
                         },
                         markedForDeletion: false,
                       });
