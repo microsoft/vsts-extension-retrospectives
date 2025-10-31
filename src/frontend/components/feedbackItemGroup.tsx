@@ -82,8 +82,9 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
   };
 
   public render(): React.JSX.Element {
+    const groupTitle = this.props.mainFeedbackItem.title || "Untitled feedback";
     return (
-      <div ref={this.groupRef} className={`feedback-item-group ${this.state.isGroupExpanded ? "feedback-item-group-expanded" : ""}`} onDragOver={this.dragFeedbackItemOverFeedbackItemGroup} onDrop={this.dropFeedbackItemOnFeedbackItemGroup} role="group" aria-label={`Feedback group with ${this.props.groupedWorkItems.length + 1} items${this.state.isGroupExpanded ? ", expanded" : ", collapsed"}`}>
+      <div ref={this.groupRef} className={`feedback-item-group ${this.state.isGroupExpanded ? "feedback-item-group-expanded" : ""}`} onDragOver={this.dragFeedbackItemOverFeedbackItemGroup} onDrop={this.dropFeedbackItemOnFeedbackItemGroup} role="group" aria-label={`${groupTitle}. Feedback group with ${this.props.groupedWorkItems.length + 1} items${this.state.isGroupExpanded ? ", expanded" : ", collapsed"}`}>
         <div className="item-cards" aria-label="Group Feedback Items">
           <FeedbackItem
             {...this.props.mainFeedbackItem}

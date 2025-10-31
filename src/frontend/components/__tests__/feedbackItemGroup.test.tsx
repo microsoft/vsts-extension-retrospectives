@@ -277,4 +277,93 @@ describe("FeedbackItemGroup", () => {
 
     expect(groupDiv?.getAttribute("aria-label")).toContain("Feedback group with 3 items, expanded");
   });
+
+  describe("Accessibility - Group aria-label includes feedback title", () => {
+    it("should include the main feedback item title in group aria-label", () => {
+      const mainItemWithTitle = {
+        ...mockMainItem,
+        title: "Improve performance",
+      };
+
+      const { container } = render(<FeedbackItemGroup mainFeedbackItem={mainItemWithTitle} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Vote} />);
+
+      const groupDiv = container.querySelector(".feedback-item-group");
+      const ariaLabel = groupDiv?.getAttribute("aria-label");
+
+      expect(ariaLabel).toContain("Improve performance");
+      expect(ariaLabel).toContain("Feedback group with 2 items");
+      expect(ariaLabel).toContain("collapsed");
+    });
+
+    it("should show 'Untitled feedback' when main item has no title", () => {
+      const mainItemNoTitle = {
+        ...mockMainItem,
+        title: "",
+      };
+
+      const { container } = render(<FeedbackItemGroup mainFeedbackItem={mainItemNoTitle} groupedWorkItems={[]} workflowState={WorkflowPhase.Collect} />);
+
+      const groupDiv = container.querySelector(".feedback-item-group");
+      const ariaLabel = groupDiv?.getAttribute("aria-label");
+
+      expect(ariaLabel).toContain("Untitled feedback");
+    });
+
+    it("should update aria-label to show 'expanded' when group is expanded", () => {
+      const mainItemWithTitle = {
+        ...mockMainItem,
+        title: "Fix bugs",
+      };
+
+      const { container, getByTestId } = render(<FeedbackItemGroup mainFeedbackItem={mainItemWithTitle} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Group} />);
+
+      const groupDiv = container.querySelector(".feedback-item-group");
+      let ariaLabel = groupDiv?.getAttribute("aria-label");
+      expect(ariaLabel).toContain("collapsed");
+
+      const toggleButton = getByTestId("toggle-expand");
+      fireEvent.click(toggleButton);
+
+      ariaLabel = groupDiv?.getAttribute("aria-label");
+      expect(ariaLabel).toContain("Fix bugs");
+      expect(ariaLabel).toContain("expanded");
+      expect(ariaLabel).not.toContain("collapsed");
+    });
+
+    it("should show correct item count in aria-label", () => {
+      const mainItemWithTitle = {
+        ...mockMainItem,
+        title: "Add new feature",
+      };
+
+      const multipleGroupedItems = [
+        { ...mockGroupedItem, id: "grouped-1", title: "Sub-item 1" },
+        { ...mockGroupedItem, id: "grouped-2", title: "Sub-item 2" },
+        { ...mockGroupedItem, id: "grouped-3", title: "Sub-item 3" },
+      ];
+
+      const { container } = render(<FeedbackItemGroup mainFeedbackItem={mainItemWithTitle} groupedWorkItems={multipleGroupedItems} workflowState={WorkflowPhase.Vote} />);
+
+      const groupDiv = container.querySelector(".feedback-item-group");
+      const ariaLabel = groupDiv?.getAttribute("aria-label");
+
+      expect(ariaLabel).toContain("Add new feature");
+      expect(ariaLabel).toContain("Feedback group with 4 items");
+    });
+
+    it("should announce group with single item correctly", () => {
+      const mainItemWithTitle = {
+        ...mockMainItem,
+        title: "Single feedback",
+      };
+
+      const { container } = render(<FeedbackItemGroup mainFeedbackItem={mainItemWithTitle} groupedWorkItems={[]} workflowState={WorkflowPhase.Vote} />);
+
+      const groupDiv = container.querySelector(".feedback-item-group");
+      const ariaLabel = groupDiv?.getAttribute("aria-label");
+
+      expect(ariaLabel).toContain("Single feedback");
+      expect(ariaLabel).toContain("Feedback group with 1 items");
+    });
+  });
 });

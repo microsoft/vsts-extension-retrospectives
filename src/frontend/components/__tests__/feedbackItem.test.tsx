@@ -2635,4 +2635,234 @@ describe("Feedback Item", () => {
       expect(voteButton).toBeNull();
     });
   });
+
+  describe("Accessibility - Simplified vote button labels (Issue #1199)", () => {
+    test("vote up button should have simplified aria-label without feedback title", () => {
+      const votePhaseProps: any = {
+        id: "vote-test-1",
+        title: "Improve performance",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 5,
+        voteCount: 5,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...votePhaseProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteUpButton = voteButtons[0];
+
+      const ariaLabel = voteUpButton.getAttribute("aria-label");
+
+      // Should NOT contain the feedback title
+      expect(ariaLabel).not.toContain("Improve performance");
+      expect(ariaLabel).not.toContain("Click to vote on feedback with title");
+
+      // Should contain simplified text
+      expect(ariaLabel).toContain("Vote up");
+      expect(ariaLabel).toContain("Current vote count is 5");
+    });
+
+    test("vote down button should have simplified aria-label without feedback title", () => {
+      const votePhaseProps: any = {
+        id: "vote-test-2",
+        title: "Fix bugs quickly",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 3,
+        voteCount: 3,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...votePhaseProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteDownButton = voteButtons[1];
+
+      const ariaLabel = voteDownButton.getAttribute("aria-label");
+
+      // Should NOT contain the feedback title
+      expect(ariaLabel).not.toContain("Fix bugs quickly");
+      expect(ariaLabel).not.toContain("Click to unvote on feedback with title");
+
+      // Should contain simplified text
+      expect(ariaLabel).toContain("Vote down");
+      expect(ariaLabel).toContain("Current vote count is 3");
+    });
+
+    test("vote buttons should reflect current vote count accurately", () => {
+      const votePhaseProps: any = {
+        id: "vote-test-3",
+        title: "Add new feature",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 12,
+        voteCount: 12,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...votePhaseProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteUpButton = voteButtons[0];
+      const voteDownButton = voteButtons[1];
+
+      expect(voteUpButton.getAttribute("aria-label")).toContain("Current vote count is 12");
+      expect(voteDownButton.getAttribute("aria-label")).toContain("Current vote count is 12");
+    });
+
+    test("vote buttons should work with zero votes", () => {
+      const votePhaseProps: any = {
+        id: "vote-test-4",
+        title: "New suggestion",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        voteCount: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...votePhaseProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteUpButton = voteButtons[0];
+
+      const ariaLabel = voteUpButton.getAttribute("aria-label");
+      expect(ariaLabel).toContain("Vote up");
+      expect(ariaLabel).toContain("Current vote count is 0");
+    });
+
+    test("vote buttons should not include title even for hidden feedback items", () => {
+      const hiddenFeedbackProps: any = {
+        id: "vote-test-5",
+        title: "Hidden feedback title",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 7,
+        voteCount: 7,
+        groupIds: [],
+        userIdRef: "different-user",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...hiddenFeedbackProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteUpButton = voteButtons[0];
+
+      const ariaLabel = voteUpButton.getAttribute("aria-label");
+
+      // Should not contain the title or [Hidden Feedback]
+      expect(ariaLabel).not.toContain("Hidden feedback title");
+      expect(ariaLabel).not.toContain("[Hidden Feedback]");
+
+      // Should contain simplified text
+      expect(ariaLabel).toContain("Vote up");
+      expect(ariaLabel).toContain("Current vote count is 7");
+    });
+  });
 });

@@ -713,9 +713,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
   private renderVoteActionButton(isMainItem: boolean, isBoldItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
     const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
-    const titleForAria = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
     const buttonTitle = isUpvote ? "Vote" : "Unvote";
-    const buttonAriaLabel = isUpvote ? `Click to vote on feedback with title ${titleForAria}. Current vote count is ${this.props.upvotes}` : `Click to unvote on feedback with title ${titleForAria}. Current vote count is ${this.props.upvotes}`;
+    const buttonAriaLabel = isUpvote ? `Vote up. Current vote count is ${this.props.upvotes}` : `Vote down. Current vote count is ${this.props.upvotes}`;
     const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
 
     return (
