@@ -255,4 +255,81 @@ describe("Editable Text Component", () => {
 
     expect(document.body.textContent).toContain("This cannot be empty.");
   });
+
+  describe("Accessibility - Fix double character announcement (Issue #1261)", () => {
+    it("should not have aria-live on the editable text container", () => {
+      render(<EditableText {...mockedTestProps} />);
+
+      const container = document.querySelector(".editable-text-container") as HTMLElement;
+      expect(container).toBeTruthy();
+      expect(container.getAttribute("aria-live")).toBeNull();
+    });
+
+    it("should have aria-live only on error message when validation fails", async () => {
+      render(<EditableText {...mockedTestProps} />);
+
+      const input = document.querySelector('[aria-label="Please enter feedback title"]') as HTMLElement;
+      await userEvent.clear(input);
+      await userEvent.type(input, " ");
+      await userEvent.clear(input);
+
+      const errorMessage = document.querySelector(".input-validation-message") as HTMLElement;
+      expect(errorMessage).toBeTruthy();
+      expect(errorMessage.getAttribute("aria-live")).toBe("assertive");
+      expect(errorMessage.getAttribute("role")).toBe("alert");
+    });
+
+    it("should not announce character input twice during typing", async () => {
+      const propsWithText = { ...mockedTestProps, text: "Initial" };
+      render(<EditableText {...propsWithText} />);
+
+      const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+      await userEvent.click(clickableElement);
+
+      const container = document.querySelector(".editable-text-container") as HTMLElement;
+      const input = document.querySelector("input, textarea") as HTMLElement;
+
+      // Verify container does not have aria-live while editing
+      expect(container.getAttribute("aria-live")).toBeNull();
+
+      // Type characters and verify no aria-live on container
+      await userEvent.type(input, " Text");
+      expect(container.getAttribute("aria-live")).toBeNull();
+    });
+
+    it("should properly announce errors without double character echo", async () => {
+      render(<EditableText {...mockedTestProps} text="" />);
+
+      const input = document.querySelector('[aria-label="Please enter feedback title"]') as HTMLElement;
+
+      // Type and clear to trigger error
+      await userEvent.type(input, "a");
+      await userEvent.clear(input);
+
+      const container = document.querySelector(".editable-text-container") as HTMLElement;
+      const errorMessage = document.querySelector(".input-validation-message") as HTMLElement;
+
+      // Container should not have aria-live
+      expect(container.getAttribute("aria-live")).toBeNull();
+
+      // Only error message should have aria-live
+      expect(errorMessage.getAttribute("aria-live")).toBe("assertive");
+      expect(errorMessage.getAttribute("role")).toBe("alert");
+    });
+
+    it("should maintain proper ARIA attributes during edit mode", async () => {
+      const propsWithText = { ...mockedTestProps, text: "Test" };
+      render(<EditableText {...propsWithText} />);
+
+      const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+      await userEvent.click(clickableElement);
+
+      const input = document.querySelector('[aria-label="Please enter feedback title"]') as HTMLElement;
+      const container = document.querySelector(".editable-text-container") as HTMLElement;
+
+      // Verify input has proper ARIA but container doesn't have aria-live
+      expect(input.getAttribute("aria-label")).toBe("Please enter feedback title");
+      expect(container.getAttribute("aria-live")).toBeNull();
+    });
+  });
 });

@@ -164,7 +164,6 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
           ref={element => {
             this.editableTextRef = element;
           }}
-          aria-live="assertive"
         >
           <TextField
             autoFocus
@@ -183,7 +182,11 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
               e.stopPropagation();
             }}
           />
-          {this.state.hasErrors && <span className="input-validation-message">This cannot be empty.</span>}
+          {this.state.hasErrors && (
+            <span className="input-validation-message" role="alert" aria-live="assertive">
+              This cannot be empty.
+            </span>
+          )}
         </div>
       );
     }
