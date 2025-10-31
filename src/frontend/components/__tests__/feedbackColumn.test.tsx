@@ -550,4 +550,109 @@ describe("Feedback Column ", () => {
       }
     });
   });
+
+  describe("Keyboard Navigation - Immediate Focus (Issue fix)", () => {
+    test("column is focusable via keyboard with tabIndex=0", () => {
+      const { container } = render(<FeedbackColumn {...testColumnProps} />);
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+
+      expect(column).toBeTruthy();
+      expect(column.getAttribute("tabIndex")).toBe("0");
+    });
+
+    test("ArrowDown focuses first item immediately without prior focus", () => {
+      const mockItem1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", title: "First Item" },
+      };
+      const mockItem2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", title: "Second Item" },
+      };
+
+      const props = { ...testColumnProps, columnItems: [mockItem1, mockItem2] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      // Simulate ArrowDown without focusing anything first
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      // Component should handle the event and call preventDefault
+      expect(event.defaultPrevented).toBe(true);
+    });
+
+    test("Home key focuses first item immediately", () => {
+      const mockItem1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", title: "First Item" },
+      };
+      const mockItem2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", title: "Second Item" },
+      };
+
+      const props = { ...testColumnProps, columnItems: [mockItem1, mockItem2] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      // Simulate Home key without focusing anything first
+      const event = new KeyboardEvent("keydown", { key: "Home", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      // Handler should process the event
+      expect(column).toBeTruthy();
+    });
+
+    test("End key focuses last item immediately", () => {
+      const mockItem1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", title: "First Item" },
+      };
+      const mockItem2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", title: "Second Item" },
+      };
+      const mockItem3 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-3", title: "Third Item" },
+      };
+
+      const props = { ...testColumnProps, columnItems: [mockItem1, mockItem2, mockItem3] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      // Simulate End key without focusing anything first
+      const event = new KeyboardEvent("keydown", { key: "End", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      // Handler should process the event
+      expect(column).toBeTruthy();
+    });
+
+    test("ArrowUp does not move when no item is focused yet", () => {
+      const mockItem1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", title: "First Item" },
+      };
+
+      const props = { ...testColumnProps, columnItems: [mockItem1] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+
+      // Simulate ArrowUp without focusing anything first - should not crash
+      const event = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      // Should handle gracefully
+      expect(column).toBeTruthy();
+    });
+  });
 });

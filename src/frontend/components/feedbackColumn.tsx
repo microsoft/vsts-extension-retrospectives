@@ -258,7 +258,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         newIndex = this.state.focusedItemIndex < 0 ? 0 : Math.min(this.state.focusedItemIndex + 1, visibleItems.length - 1);
         break;
       case "prev":
-        newIndex = this.state.focusedItemIndex <= 0 ? 0 : this.state.focusedItemIndex - 1;
+        newIndex = this.state.focusedItemIndex < 0 ? -1 : this.state.focusedItemIndex <= 0 ? 0 : this.state.focusedItemIndex - 1;
         break;
       case "first":
         newIndex = 0;
@@ -266,6 +266,10 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       case "last":
         newIndex = visibleItems.length - 1;
         break;
+    }
+
+    if (newIndex < 0) {
+      return;
     }
 
     this.setState({ focusedItemIndex: newIndex });
@@ -467,7 +471,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
   public render() {
     return (
-      <div ref={this.columnRef} className="feedback-column" role="region" aria-label={`${this.props.columnName} column with ${this.props.columnItems.length} feedback items`} tabIndex={-1} onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
+      <div ref={this.columnRef} className="feedback-column" role="region" aria-label={`${this.props.columnName} column with ${this.props.columnItems.length} feedback items`} tabIndex={0} onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
         <div className="feedback-column-header">
           <div className="feedback-column-title" aria-label={`${this.props.columnName} (${this.props.columnItems.length} feedback items)`}>
             <i className={cn(this.props.iconClass, "feedback-column-icon")} />
