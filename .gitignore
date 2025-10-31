@@ -180,3 +180,5 @@ obj/
 TestResults/
 test-report.xml
 dist/
+
+.playwright-mcp

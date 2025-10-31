@@ -41,6 +41,7 @@ export interface FeedbackColumnProps {
   showColumnEditButton: boolean;
   columnNotes: string;
   onColumnNotesChange: (notes: string) => void;
+  registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
 
   addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
   removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
@@ -53,10 +54,13 @@ export interface FeedbackColumnState {
   isEditDialogOpen: boolean;
   isInfoDialogOpen: boolean;
   columnNotesDraft: string;
+  focusedItemIndex: number;
 }
 
 export default class FeedbackColumn extends React.Component<FeedbackColumnProps, FeedbackColumnState> {
   private createFeedbackButton: IButton;
+  private columnRef: React.RefObject<HTMLDivElement> = React.createRef();
+  private itemRefs: Map<string, HTMLElement> = new Map();
 
   constructor(props: FeedbackColumnProps) {
     super(props);
@@ -66,23 +70,142 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       isEditDialogOpen: false,
       isInfoDialogOpen: false,
       columnNotesDraft: "",
+      focusedItemIndex: -1,
     };
-  }
-
-  public componentDidUpdate() {
-    this.props.shouldFocusOnCreateFeedback && this.createFeedbackButton && this.createFeedbackButton.focus();
   }
 
   public componentDidMount() {
     this.props.shouldFocusOnCreateFeedback && this.createFeedbackButton && this.createFeedbackButton.focus();
+
+    if (this.columnRef.current) {
+      this.columnRef.current.addEventListener("keydown", this.handleColumnKeyDown);
+    }
   }
+
+  public componentWillUnmount() {
+    if (this.columnRef.current) {
+      this.columnRef.current.removeEventListener("keydown", this.handleColumnKeyDown);
+    }
+  }
+
+  private handleColumnKeyDown = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || document.querySelector('[role="dialog"]')) {
+      return;
+    }
+
+    const visibleItems = this.getVisibleColumnItems();
+
+    switch (e.key) {
+      case "ArrowUp":
+        e.preventDefault();
+        this.navigateItems("prev", visibleItems);
+        break;
+      case "ArrowDown":
+        e.preventDefault();
+        this.navigateItems("next", visibleItems);
+        break;
+      case "Home":
+        e.preventDefault();
+        this.navigateItems("first", visibleItems);
+        break;
+      case "End":
+        e.preventDefault();
+        this.navigateItems("last", visibleItems);
+        break;
+      case "n":
+      case "N":
+      case "Insert":
+        if (this.props.workflowPhase === WorkflowPhase.Collect) {
+          e.preventDefault();
+          this.createEmptyFeedbackItem();
+        }
+        break;
+      case "e":
+      case "E":
+        if (this.props.showColumnEditButton) {
+          e.preventDefault();
+          this.openEditDialog();
+        }
+        break;
+      case "i":
+      case "I":
+        e.preventDefault();
+        this.openInfoDialog();
+        break;
+    }
+  };
+
+  private getVisibleColumnItems = (): IColumnItem[] => {
+    return this.props.columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId);
+  };
+
+  private navigateItems = (direction: "next" | "prev" | "first" | "last", visibleItems: IColumnItem[]) => {
+    if (visibleItems.length === 0) {
+      if (this.props.workflowPhase === WorkflowPhase.Collect && this.createFeedbackButton) {
+        this.createFeedbackButton.focus();
+      }
+      return;
+    }
+
+    let newIndex = this.state.focusedItemIndex;
+
+    switch (direction) {
+      case "next":
+        newIndex = this.state.focusedItemIndex < 0 ? 0 : Math.min(this.state.focusedItemIndex + 1, visibleItems.length - 1);
+        break;
+      case "prev":
+        newIndex = this.state.focusedItemIndex <= 0 ? 0 : this.state.focusedItemIndex - 1;
+        break;
+      case "first":
+        newIndex = 0;
+        break;
+      case "last":
+        newIndex = visibleItems.length - 1;
+        break;
+    }
+
+    this.setState({ focusedItemIndex: newIndex });
+    const itemId = visibleItems[newIndex]?.feedbackItem.id;
+    if (itemId) {
+      const itemElement = this.itemRefs.get(itemId);
+      if (itemElement) {
+        itemElement.focus();
+      }
+    }
+  };
+
+  public focusColumn = () => {
+    if (this.columnRef.current) {
+      this.columnRef.current.focus();
+
+      const visibleItems = this.getVisibleColumnItems();
+      if (visibleItems.length > 0) {
+        this.setState({ focusedItemIndex: 0 });
+        const firstItemId = visibleItems[0].feedbackItem.id;
+        const itemElement = this.itemRefs.get(firstItemId);
+        if (itemElement) {
+          itemElement.focus();
+        }
+      } else if (this.props.workflowPhase === WorkflowPhase.Collect && this.createFeedbackButton) {
+        this.createFeedbackButton.focus();
+      }
+    }
+  };
+
+  public registerItemRef = (itemId: string, element: HTMLElement | null) => {
+    if (element) {
+      this.itemRefs.set(itemId, element);
+    } else {
+      this.itemRefs.delete(itemId);
+    }
+  };
 
   public createEmptyFeedbackItem = () => {
     if (this.props.workflowPhase !== WorkflowPhase.Collect) return;
 
     const item = this.props.columnItems.find(x => x.feedbackItem.id === "emptyFeedbackItem");
     if (item) {
-      // Don't create another empty feedback item if one already exists.
       return;
     }
 
@@ -241,7 +364,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
   public render() {
     return (
-      <div className="feedback-column" role="application" onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
+      <div ref={this.columnRef} className="feedback-column" role="region" aria-label={`${this.props.columnName} column with ${this.props.columnItems.length} feedback items`} tabIndex={-1} onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
         <div className="feedback-column-header">
           <div className="feedback-column-title" aria-label={`${this.props.columnName} (${this.props.columnItems.length} feedback items)`}>
             <i className={cn(this.props.iconClass, "feedback-column-icon")} />

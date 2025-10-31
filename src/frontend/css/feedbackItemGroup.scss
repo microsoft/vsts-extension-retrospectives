@@ -4,6 +4,18 @@
 .feedback-item-group {
   @extend .feedbackItem;
 
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    .mainItemCard {
+      outline: 3px solid #0078d4;
+      outline-offset: 2px;
+      box-shadow: 0 0 8px rgba(0, 120, 212, 0.3);
+    }
+  }
+
   .item-cards {
     display: flex;
     flex-direction: column;
@@ -42,6 +54,12 @@
             margin-left: 2px;
             line-height: inherit;
             margin-right: -4px;
+          }
+
+          &:focus-visible {
+            outline: 2px solid #0078d4;
+            outline-offset: 2px;
+            border-radius: 3px;
           }
         }
       }
