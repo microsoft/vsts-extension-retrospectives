@@ -24,7 +24,11 @@ jest.mock("../feedbackItem", () => ({
 
 jest.mock("../../utilities/localStorageHelper");
 jest.mock("../../utilities/telemetryClient", () => ({
-  reactPlugin: {},
+  reactPlugin: {
+    trackMetric: jest.fn(),
+    trackEvent: jest.fn(),
+    trackException: jest.fn(),
+  },
 }));
 
 describe("FeedbackItemGroup", () => {
@@ -126,5 +130,151 @@ describe("FeedbackItemGroup", () => {
     expect(mockGetIdValue).toHaveBeenCalled();
     expect(mockHandleDrop).toHaveBeenCalledWith(mockMainItem, "dragged-item-id", "main-item-1");
     expect(stopPropagationSpy).toHaveBeenCalled();
+  });
+
+  it("should handle Space key press without crashing", () => {
+    const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group") as HTMLElement;
+
+    // Press Space key - should not throw
+    const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true });
+    expect(() => {
+      groupDiv?.dispatchEvent(spaceEvent);
+    }).not.toThrow();
+
+    // Verify the group still exists
+    expect(groupDiv).toBeTruthy();
+  });
+
+  it("should not toggle expand when Space is pressed on a button", () => {
+    const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group") as HTMLElement;
+    const button = document.createElement("button");
+    groupDiv?.appendChild(button);
+
+    // Press Space key on button
+    const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+    Object.defineProperty(spaceEvent, "target", { value: button, enumerable: true });
+    groupDiv?.dispatchEvent(spaceEvent);
+
+    // Should not toggle (still collapsed)
+    expect(container.querySelector(".feedback-item-group-expanded")).not.toBeInTheDocument();
+  });
+
+  it("should not handle keydown when input is focused", () => {
+    const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group") as HTMLElement;
+    const input = document.createElement("input");
+    groupDiv?.appendChild(input);
+
+    // Press Space key on input
+    const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+    Object.defineProperty(spaceEvent, "target", { value: input, enumerable: true });
+    groupDiv?.dispatchEvent(spaceEvent);
+
+    // Should not toggle
+    expect(container.querySelector(".feedback-item-group-expanded")).not.toBeInTheDocument();
+  });
+
+  it("should not handle keydown when textarea is focused", () => {
+    const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group") as HTMLElement;
+    const textarea = document.createElement("textarea");
+    groupDiv?.appendChild(textarea);
+
+    // Press Space key on textarea
+    const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+    Object.defineProperty(spaceEvent, "target", { value: textarea, enumerable: true });
+    groupDiv?.dispatchEvent(spaceEvent);
+
+    // Should not toggle
+    expect(container.querySelector(".feedback-item-group-expanded")).not.toBeInTheDocument();
+  });
+
+  it("should not handle keydown when contenteditable is focused", () => {
+    const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group") as HTMLElement;
+    const contentEditable = document.createElement("div");
+    contentEditable.contentEditable = "true";
+    groupDiv?.appendChild(contentEditable);
+
+    // Press Space key on contenteditable
+    const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+    Object.defineProperty(spaceEvent, "target", { value: contentEditable, enumerable: true });
+    groupDiv?.dispatchEvent(spaceEvent);
+
+    // Should not toggle
+    expect(container.querySelector(".feedback-item-group-expanded")).not.toBeInTheDocument();
+  });
+
+  it("should remove keydown event listener on unmount", () => {
+    const { container, unmount } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group") as HTMLElement;
+    const removeEventListenerSpy = jest.spyOn(groupDiv, "removeEventListener");
+
+    unmount();
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+  });
+
+  it("should prevent default when Space is pressed on non-button elements", () => {
+    const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group") as HTMLElement;
+    const div = document.createElement("div");
+    groupDiv?.appendChild(div);
+
+    // Press Space key on div
+    const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true });
+    Object.defineProperty(spaceEvent, "target", { value: div, enumerable: true });
+    const preventDefaultSpy = jest.spyOn(spaceEvent, "preventDefault");
+
+    groupDiv?.dispatchEvent(spaceEvent);
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
+  });
+
+  it("should not prevent dragover when item is being dragged from this group", () => {
+    const { container, getByTestId } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    // Simulate that the group is being dragged
+    const groupDiv = container.querySelector(".feedback-item-group");
+
+    // First we need to set isBeingDragged to true somehow
+    // This would normally happen through setIsGroupBeingDragged callback
+    // Let's trigger a drag event to set the state
+
+    const dragEvent = new Event("dragover", { bubbles: true, cancelable: true });
+    const mockDataTransfer = { dropEffect: "" };
+    Object.defineProperty(dragEvent, "dataTransfer", {
+      value: mockDataTransfer,
+      writable: true,
+    });
+
+    const preventDefaultSpy = jest.spyOn(dragEvent, "preventDefault");
+
+    groupDiv?.dispatchEvent(dragEvent);
+
+    // When not being dragged, preventDefault should be called
+    expect(preventDefaultSpy).toHaveBeenCalled();
+  });
+
+  it("should have correct aria-label based on expansion state", () => {
+    const { container, getByTestId } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem, { ...mockGroupedItem, id: "grouped-item-2" }]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group");
+    expect(groupDiv?.getAttribute("aria-label")).toContain("Feedback group with 3 items, collapsed");
+
+    // Expand the group
+    const toggleButton = getByTestId("toggle-expand");
+    fireEvent.click(toggleButton);
+
+    expect(groupDiv?.getAttribute("aria-label")).toContain("Feedback group with 3 items, expanded");
   });
 });

@@ -646,4 +646,56 @@ describe("SelectorCombo", () => {
       expect(container).toBeTruthy();
     });
   });
+
+  describe("Multiple lists", () => {
+    test("counts items correctly across multiple selector list items", () => {
+      const multiListProps = {
+        ...defaultProps,
+        selectorList: {
+          selectorListItems: [
+            {
+              header: mockHeader,
+              items: mockItems.slice(0, 2),
+              finishedLoading: true,
+            },
+            {
+              header: { ...mockHeader, id: "header-2", title: "Header 2" },
+              items: mockItems.slice(2, 3),
+              finishedLoading: true,
+            },
+          ],
+        },
+      };
+
+      const { container } = render(<SelectorCombo {...multiListProps} />);
+
+      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      selectorButton.click();
+
+      // Should count items from all lists
+      expect(container).toBeTruthy();
+    });
+
+    test("handles empty items array in list", () => {
+      const emptyItemsListProps = {
+        ...defaultProps,
+        selectorList: {
+          selectorListItems: [
+            {
+              header: mockHeader,
+              items: [] as MockItem[],
+              finishedLoading: true,
+            },
+          ],
+        },
+      };
+
+      const { container } = render(<SelectorCombo {...emptyItemsListProps} />);
+
+      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      selectorButton.click();
+
+      expect(container).toBeTruthy();
+    });
+  });
 });

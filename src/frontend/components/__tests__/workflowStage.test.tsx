@@ -96,4 +96,18 @@ describe("Workflow Stage", () => {
     // clickEventCallback should not have been called for these keys
     expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
   });
+
+  it("returns early when non-Enter key is pressed", async () => {
+    const user = userEvent.setup();
+    render(<WorkflowStage {...mockedProps} />);
+
+    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
+    element.focus();
+
+    // Press arrow key
+    await user.keyboard("{ArrowDown}");
+
+    // Should return early without calling callback
+    expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
+  });
 });

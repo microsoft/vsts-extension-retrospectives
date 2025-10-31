@@ -244,4 +244,15 @@ describe("Editable Text Component", () => {
 
     removeEventListenerSpy.mockRestore();
   });
+
+  it("shows error when trying to add newline with Ctrl+Enter on empty text", async () => {
+    const propsMultiline = { ...mockedTestProps, text: "", isMultiline: true };
+    render(<EditableText {...propsMultiline} />);
+
+    const textarea = document.querySelector("textarea") as HTMLElement;
+    await userEvent.clear(textarea);
+    await userEvent.type(textarea, "{Control>}{Enter}{/Control}");
+
+    expect(document.body.textContent).toContain("This cannot be empty.");
+  });
 });
