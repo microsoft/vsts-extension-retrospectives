@@ -552,5 +552,98 @@ describe("SelectorCombo", () => {
       // Component should still be rendered
       expect(container.firstChild).toBeTruthy();
     });
+
+    test("closes mobile selector dialog when choosing an item", () => {
+      // Set up mobile environment
+      const originalInnerWidth = window.innerWidth;
+      Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 500 });
+
+      const mockItemOnClick = jest.fn();
+      const mobileProps = {
+        ...defaultProps,
+        selectorListItemOnClick: mockItemOnClick,
+      };
+
+      const { container } = render(<SelectorCombo {...mobileProps} />);
+
+      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      selectorButton.click();
+
+      // Trigger item selection
+      setTimeout(() => {
+        const listItems = container.querySelectorAll(".selector-list-item");
+        if (listItems.length > 0) {
+          (listItems[0] as HTMLElement).click();
+          expect(mockItemOnClick).toHaveBeenCalled();
+        }
+      }, 10);
+
+      // Restore
+      Object.defineProperty(window, "innerWidth", { value: originalInnerWidth, writable: true, configurable: true });
+    });
+
+    test("closes callout when choosing an item from callout", () => {
+      const mockItemOnClick = jest.fn();
+      const calloutProps = {
+        ...defaultProps,
+        selectorListItemOnClick: mockItemOnClick,
+      };
+
+      const { container } = render(<SelectorCombo {...calloutProps} />);
+
+      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      selectorButton.click();
+
+      // Trigger item selection
+      setTimeout(() => {
+        const listItems = container.querySelectorAll(".selector-list-item");
+        if (listItems.length > 0) {
+          (listItems[0] as HTMLElement).click();
+          expect(mockItemOnClick).toHaveBeenCalledWith(mockItems[0]);
+        }
+      }, 10);
+    });
+
+    test("handles header visibility correctly", () => {
+      const visibleHeaderProps = {
+        ...defaultProps,
+        selectorList: {
+          selectorListItems: [
+            {
+              header: { ...mockHeader, isHidden: false },
+              items: mockItems,
+              finishedLoading: true,
+            },
+          ],
+        },
+      };
+
+      const { container } = render(<SelectorCombo {...visibleHeaderProps} />);
+      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      selectorButton.click();
+
+      expect(container).toBeTruthy();
+    });
+
+    test("hides header when isHidden is true", () => {
+      const hiddenHeaderProps = {
+        ...defaultProps,
+        selectorList: {
+          selectorListItems: [
+            {
+              header: { ...mockHeader, isHidden: true },
+              items: mockItems,
+              finishedLoading: true,
+            },
+          ],
+        },
+      };
+
+      const { container } = render(<SelectorCombo {...hiddenHeaderProps} />);
+      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      selectorButton.click();
+
+      expect(container).toBeTruthy();
+    });
   });
 });

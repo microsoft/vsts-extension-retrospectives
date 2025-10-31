@@ -163,4 +163,85 @@ describe("Editable Text Component", () => {
     // Text should be updated in display mode
     expect(document.body.textContent).toContain("Updated from props");
   });
+
+  it("saves text and exits edit mode when clicking outside with valid text", async () => {
+    const { container } = render(<EditableText {...mockedTestProps} text="Initial" />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const input = document.querySelector("input, textarea") as HTMLElement;
+    await userEvent.clear(input);
+    await userEvent.type(input, "New Text");
+
+    // Create an outside element and click it
+    const outsideDiv = document.createElement("div");
+    document.body.appendChild(outsideDiv);
+
+    const mouseDownEvent = new MouseEvent("mousedown", { bubbles: true });
+    Object.defineProperty(mouseDownEvent, "target", { value: outsideDiv, enumerable: true });
+    document.dispatchEvent(mouseDownEvent);
+
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    expect(mockOnSave).toHaveBeenCalledWith("New Text");
+
+    document.body.removeChild(outsideDiv);
+  });
+
+  it("saves empty string when clicking outside with empty text", async () => {
+    const { container } = render(<EditableText {...mockedTestProps} text="Initial" />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const input = document.querySelector("input, textarea") as HTMLElement;
+    await userEvent.clear(input);
+
+    // Create an outside element and click it
+    const outsideDiv = document.createElement("div");
+    document.body.appendChild(outsideDiv);
+
+    const mouseDownEvent = new MouseEvent("mousedown", { bubbles: true });
+    Object.defineProperty(mouseDownEvent, "target", { value: outsideDiv, enumerable: true });
+    document.dispatchEvent(mouseDownEvent);
+
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    expect(mockOnSave).toHaveBeenCalledWith("");
+
+    document.body.removeChild(outsideDiv);
+  });
+
+  it("does not save when clicking inside the editable text component", async () => {
+    const { container } = render(<EditableText {...mockedTestProps} text="Initial" />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const input = document.querySelector("input, textarea") as HTMLElement;
+    await userEvent.clear(input);
+    await userEvent.type(input, "New Text");
+
+    // Click inside the component
+    const mouseDownEvent = new MouseEvent("mousedown", { bubbles: true });
+    Object.defineProperty(mouseDownEvent, "target", { value: input, enumerable: true });
+    document.dispatchEvent(mouseDownEvent);
+
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    // Should not save yet, still in edit mode
+    expect(document.querySelector("input, textarea")).toBeTruthy();
+  });
+
+  it("cleans up event listener on unmount", () => {
+    const removeEventListenerSpy = jest.spyOn(document, "removeEventListener");
+    const { unmount } = render(<EditableText {...mockedTestProps} text="Test" />);
+
+    unmount();
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith("mousedown", expect.any(Function));
+
+    removeEventListenerSpy.mockRestore();
+  });
 });

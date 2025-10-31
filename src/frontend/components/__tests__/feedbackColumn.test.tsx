@@ -291,11 +291,11 @@ describe("Feedback Column ", () => {
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
       const createButton = container.querySelector(".feedback-column-add-button") as HTMLElement;
-      
+
       if (column && createButton) {
         const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true });
         column.dispatchEvent(event);
-        
+
         expect(column).toBeTruthy();
       }
     });
@@ -334,7 +334,7 @@ describe("Feedback Column ", () => {
       contentEditable.contentEditable = "true";
       contentEditable.textContent = "Test content";
       contentEditable.setAttribute("data-feedback-item-id", testColumnProps.columnItems[0].feedbackItem.id);
-      
+
       const feedbackCard = container.querySelector("[data-feedback-item-id]");
       if (feedbackCard) {
         feedbackCard.appendChild(contentEditable);
@@ -354,7 +354,7 @@ describe("Feedback Column ", () => {
       const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
       if (feedbackCard) {
         feedbackCard.focus();
-        
+
         const updatedProps = { ...props, columnItems: [...props.columnItems] };
         rerender(<FeedbackColumn {...updatedProps} />);
       }
@@ -401,7 +401,7 @@ describe("Feedback Column ", () => {
       const { getByRole, getByLabelText } = render(<FeedbackColumn {...props} />);
 
       fireEvent.click(getByRole("button", { name: `Edit column ${props.columnName}` }));
-      
+
       const notesInput = getByLabelText("Column notes") as HTMLInputElement;
       fireEvent.change(notesInput, { target: { value: "New notes" } });
 
@@ -422,7 +422,7 @@ describe("Feedback Column ", () => {
       const { getByRole, queryByRole, getAllByRole } = render(<FeedbackColumn {...props} />);
 
       fireEvent.click(getByRole("button", { name: `View notes for ${props.columnName}` }));
-      
+
       // Find close button in dialog
       const closeButtons = getAllByRole("button").filter(btn => btn.textContent === "Close");
       if (closeButtons.length > 0) {
@@ -484,7 +484,7 @@ describe("Feedback Column ", () => {
       if (ref.current) {
         const mockElement = document.createElement("div");
         ref.current.registerItemRef("test-item-id", mockElement);
-        
+
         // Should not throw error
         expect(ref.current).toBeTruthy();
       }
@@ -499,7 +499,7 @@ describe("Feedback Column ", () => {
         const mockElement = document.createElement("div");
         ref.current.registerItemRef("test-item-id", mockElement);
         ref.current.registerItemRef("test-item-id", null);
-        
+
         // Should not throw error
         expect(ref.current).toBeTruthy();
       }
@@ -515,7 +515,7 @@ describe("Feedback Column ", () => {
 
       if (ref.current) {
         ref.current.createEmptyFeedbackItem();
-        
+
         expect(addFeedbackItems).toHaveBeenCalled();
       }
     });
@@ -528,7 +528,7 @@ describe("Feedback Column ", () => {
 
       if (ref.current) {
         ref.current.createEmptyFeedbackItem();
-        
+
         expect(addFeedbackItems).not.toHaveBeenCalled();
       }
     });
@@ -545,7 +545,7 @@ describe("Feedback Column ", () => {
 
       if (ref.current) {
         ref.current.createEmptyFeedbackItem();
-        
+
         expect(addFeedbackItems).not.toHaveBeenCalled();
       }
     });
