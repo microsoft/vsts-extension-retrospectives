@@ -831,7 +831,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const curTimerState = this.props.timerState;
 
     return (
-      <div ref={this.itemElementRef} data-feedback-item-id={this.props.id} tabIndex={0} aria-live="polite" aria-label={ariaLabel} role="article" aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
+      <div ref={this.itemElementRef} data-feedback-item-id={this.props.id} tabIndex={0} aria-live="polite" aria-label={ariaLabel} aria-hidden={hideFeedbackItems || undefined} role="article" aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
         <div className="document-card-wrapper">
           <DocumentCard className={cn(isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")}>
             <div
@@ -966,7 +966,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                           <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}>
                             <i className="fa-solid fa-quote-left" aria-hidden="true" />
                           </span>
-                          <span className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} title={childDisplayTitle}>
+                          <span className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
                             {childDisplayTitle}
                           </span>
                           {this.props.columnId !== originalColumn?.columnProperties?.id && (

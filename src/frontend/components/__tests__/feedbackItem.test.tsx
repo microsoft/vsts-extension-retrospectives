@@ -35,6 +35,17 @@ jest.mock("azure-devops-extension-sdk", () => ({
   getExtensionContext: () => ({ id: "test-extension-id" }),
 }));
 
+jest.mock("../../utilities/userIdentityHelper", () => ({
+  getUserIdentity: () => ({
+    id: "test-user-id",
+    displayName: "Test User",
+    uniqueName: "testuser@example.com",
+    imageUrl: "https://example.com/avatar.jpg",
+  }),
+  encrypt: (id: string) => id,
+  decrypt: (id: string) => id,
+}));
+
 jest.mock("../../utilities/servicesHelper", () => ({
   getService: jest.fn(),
   getHostAuthority: jest.fn().mockResolvedValue("dev.azure.com"),
@@ -2219,6 +2230,271 @@ describe("Feedback Item", () => {
       };
       const { container } = render(<FeedbackItem {...props} />);
       expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("Accessibility - Obscured feedback (Issue #1318)", () => {
+    test("adds aria-hidden='true' to obscured feedback items", () => {
+      const props: any = {
+        id: "test-obscured-aria",
+        title: "Hidden Feedback",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "other-user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        currentUserId: "current-user-id",
+        currentTeamId: "team-1",
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-obscured-aria"]');
+
+      expect(feedbackItemElement).toHaveAttribute("aria-hidden", "true");
+    });
+
+    test("does not add aria-hidden when feedback is not obscured", () => {
+      const props: any = {
+        id: "test-visible-aria",
+        title: "Visible Feedback",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        currentUserId: "user-id",
+        currentTeamId: "team-1",
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-visible-aria"]');
+
+      expect(feedbackItemElement).not.toHaveAttribute("aria-hidden");
+    });
+
+    test("does not add aria-hidden when user is the owner of obscured feedback", () => {
+      const props: any = {
+        id: "test-owner-aria",
+        title: "My Hidden Feedback",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "test-user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        currentUserId: "test-user-id",
+        currentTeamId: "team-1",
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-owner-aria"]');
+
+      expect(feedbackItemElement).not.toHaveAttribute("aria-hidden");
+    });
+
+    test("adds aria-hidden to obscured child feedback items in groups", () => {
+      const mainItemId = "main-item-obscured";
+      const childItemId = "child-item-obscured";
+
+      const childFeedbackItem = {
+        ...testFeedbackItem,
+        id: childItemId,
+        title: "Hidden Child Feedback",
+        userIdRef: "other-user-id",
+        parentFeedbackItemId: mainItemId,
+        originalColumnId: testColumnUuidOne,
+      };
+
+      const mainFeedbackItem = {
+        ...testFeedbackItem,
+        id: mainItemId,
+        title: "Main Item",
+        userIdRef: "test-user-id",
+        groupIds: [childItemId],
+        originalColumnId: testColumnUuidOne,
+      };
+
+      const columnsWithGroup = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            {
+              feedbackItem: mainFeedbackItem,
+              actionItems: [],
+            },
+            {
+              feedbackItem: childFeedbackItem,
+              actionItems: [],
+            },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: mainItemId,
+        title: "Main Item",
+        columnId: testColumnUuidOne,
+        columns: columnsWithGroup,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [childItemId],
+        userIdRef: "test-user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: true,
+        workflowPhase: "Collect",
+        currentUserId: "test-user-id",
+        currentTeamId: "team-1",
+        groupedItemProps: {
+          isMainItem: true,
+          isGroupExpanded: false,
+          groupedCount: 1,
+        },
+      };
+
+      const { container, rerender } = render(<FeedbackItem {...props} />);
+
+      // Main item should NOT be hidden because the user is the owner (userIdRef matches getUserIdentity().id)
+      const mainFeedbackItemElement = container.querySelector('[data-feedback-item-id="main-item-obscured"]');
+      expect(mainFeedbackItemElement).not.toHaveAttribute("aria-hidden");
+    });
+
+    test("does not add aria-hidden to visible child feedback items in groups", () => {
+      const mainItemId = "main-item-visible";
+      const childItemId = "child-item-visible";
+
+      const childFeedbackItem = {
+        ...testFeedbackItem,
+        id: childItemId,
+        title: "Visible Child Feedback",
+        userIdRef: "user-id",
+        parentFeedbackItemId: mainItemId,
+        originalColumnId: testColumnUuidOne,
+      };
+
+      const mainFeedbackItem = {
+        ...testFeedbackItem,
+        id: mainItemId,
+        title: "Main Item",
+        userIdRef: "user-id",
+        groupIds: [childItemId],
+        originalColumnId: testColumnUuidOne,
+      };
+
+      const columnsWithGroup = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            {
+              feedbackItem: mainFeedbackItem,
+              actionItems: [],
+            },
+            {
+              feedbackItem: childFeedbackItem,
+              actionItems: [],
+            },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: mainItemId,
+        title: "Main Item",
+        columnId: testColumnUuidOne,
+        columns: columnsWithGroup,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [childItemId],
+        userIdRef: "user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: true,
+        workflowPhase: "Group",
+        currentUserId: "user-id",
+        currentTeamId: "team-1",
+        groupedItemProps: {
+          isMainItem: true,
+          isGroupExpanded: false,
+          groupedCount: 1,
+        },
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+
+      // Verify the main item is visible (no aria-hidden)
+      const mainFeedbackItemElement = container.querySelector('[data-feedback-item-id="main-item-visible"]');
+      expect(mainFeedbackItemElement).not.toHaveAttribute("aria-hidden");
     });
   });
 
