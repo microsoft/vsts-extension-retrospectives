@@ -9,6 +9,12 @@
   &:focus {
     outline: none;
   }
+
+  &:focus-within {
+    .feedback-column-header {
+      background-color: rgba(0, 120, 212, 0.03);
+    }
+  }
 }
 
 .feedback-column:last-child {
@@ -28,10 +34,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-
-  &:focus-within {
-    background-color: rgba(0, 120, 212, 0.03);
-  }
 
   .feedback-column-title {
     display: flex;
