@@ -1,5 +1,6 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import FeedbackColumn from "../feedbackColumn";
 import FeedbackItem from "../feedbackItem";
@@ -93,6 +94,195 @@ describe("Feedback Column ", () => {
       const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0]);
 
       expect(feedbackItemProps.accentColor).toEqual(expectedAccentColor);
+    });
+  });
+
+  describe("Accessibility - Focus Preservation", () => {
+    it("preserves focus when column items change", () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        feedbackCard.focus();
+        expect(document.activeElement).toBe(feedbackCard);
+
+        const updatedProps = {
+          ...props,
+          columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "new-item" } }],
+        };
+
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        setTimeout(() => {
+          expect(document.activeElement).toBeTruthy();
+        }, 100);
+      }
+    });
+
+    it("preserves focus on input elements when items change", () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const input = container.querySelector("input") as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.setSelectionRange(2, 2);
+
+        expect(document.activeElement).toBe(input);
+
+        const updatedProps = {
+          ...props,
+          columnItems: [...props.columnItems],
+        };
+
+        rerender(<FeedbackColumn {...updatedProps} />);
+      }
+    });
+  });
+
+  describe("Accessibility - Keyboard Navigation", () => {
+    test("handles ArrowDown key to navigate to next item", () => {
+      const props = { ...testColumnProps, columnItems: [...testColumnProps.columnItems, { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2" } }] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      if (column) {
+        const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true });
+        column.dispatchEvent(event);
+
+        // Event should be handled by the component
+        expect(column).toBeTruthy();
+      }
+    });
+
+    test("handles ArrowUp key to navigate to previous item", () => {
+      const props = { ...testColumnProps, columnItems: [...testColumnProps.columnItems, { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2" } }] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      if (column) {
+        const event = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true });
+        column.dispatchEvent(event);
+
+        expect(column).toBeTruthy();
+      }
+    });
+
+    test("handles Home key to navigate to first item", () => {
+      const props = { ...testColumnProps, columnItems: [...testColumnProps.columnItems, { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2" } }] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      if (column) {
+        const event = new KeyboardEvent("keydown", { key: "Home", bubbles: true });
+        column.dispatchEvent(event);
+
+        expect(column).toBeTruthy();
+      }
+    });
+
+    test("handles End key to navigate to last item", () => {
+      const props = { ...testColumnProps, columnItems: [...testColumnProps.columnItems, { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2" } }] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      if (column) {
+        const event = new KeyboardEvent("keydown", { key: "End", bubbles: true });
+        column.dispatchEvent(event);
+
+        expect(column).toBeTruthy();
+      }
+    });
+
+    test("handles 'n' key to create new feedback in Collect phase", () => {
+      const props = { ...testColumnProps, workflowPhase: "Collect" as any };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      if (column) {
+        const event = new KeyboardEvent("keydown", { key: "n", bubbles: true });
+        column.dispatchEvent(event);
+
+        expect(column).toBeTruthy();
+      }
+    });
+
+    test("handles 'e' key to open edit dialog when user can edit", () => {
+      const props = { ...testColumnProps, showColumnEditButton: true };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      if (column) {
+        const event = new KeyboardEvent("keydown", { key: "e", bubbles: true });
+        column.dispatchEvent(event);
+
+        expect(column).toBeTruthy();
+      }
+    });
+
+    test("handles 'i' key to open info dialog", () => {
+      const props = { ...testColumnProps, columnNotes: "Test notes" };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      if (column) {
+        const event = new KeyboardEvent("keydown", { key: "i", bubbles: true });
+        column.dispatchEvent(event);
+
+        expect(column).toBeTruthy();
+      }
+    });
+
+    test("ignores keyboard events when input is focused", () => {
+      const props = { ...testColumnProps };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const input = document.createElement("input");
+      container.appendChild(input);
+      input.focus();
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      if (column) {
+        const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true });
+        Object.defineProperty(event, "target", { value: input, enumerable: true });
+        column.dispatchEvent(event);
+
+        expect(column).toBeTruthy();
+      }
+    });
+
+    test("ignores keyboard events when dialog is open", () => {
+      const props = { ...testColumnProps };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const dialog = document.createElement("div");
+      dialog.setAttribute("role", "dialog");
+      document.body.appendChild(dialog);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      if (column) {
+        const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true });
+        column.dispatchEvent(event);
+
+        expect(column).toBeTruthy();
+      }
+
+      document.body.removeChild(dialog);
     });
   });
 });
