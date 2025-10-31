@@ -761,23 +761,42 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const itemPosition = this.props.columns[this.props.columnId]?.columnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1;
     const totalItemsInColumn = this.props.columns[this.props.columnId]?.columnItems.length || 0;
 
-    let ariaLabel = `Feedback item ${itemPosition} of ${totalItemsInColumn}.`;
+    const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
+    const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
+
+    let ariaLabel = `Feedback item ${itemPosition} of ${totalItemsInColumn}. `;
+
     if (!isNotGroupedItem) {
       if (isMainItem) {
-        ariaLabel = `Feedback group main item ${itemPosition} of ${totalItemsInColumn}. Group has ${groupItemsCount} items.`;
+        ariaLabel = `Feedback group main item ${itemPosition} of ${totalItemsInColumn}. Group has ${groupItemsCount} items. `;
       } else {
-        ariaLabel = `Grouped feedback item.`;
+        ariaLabel = `Grouped feedback item. `;
       }
     }
+
+    ariaLabel += `Title: ${displayTitle}. `;
+
+    if (this.props.createdBy && !hideFeedbackItems) {
+      ariaLabel += `Created by ${this.props.createdBy}. `;
+    }
+
+    if (this.props.createdDate) {
+      const creationDate = new Intl.DateTimeFormat("default", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(this.props.createdDate));
+      ariaLabel += `Created on ${creationDate}. `;
+    }
+
     if (showVotes) {
-      ariaLabel += ` ${totalVotes} votes.`;
+      ariaLabel += `${totalVotes} total votes.`;
+      if (showVoteButton) {
+        ariaLabel += ` You have ${votesByUser} votes on this item.`;
+      }
     }
 
     const curTimerState = this.props.timerState;
-
-    const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
-
-    const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
 
     return (
       <div ref={this.itemElementRef} tabIndex={0} aria-live="polite" aria-label={ariaLabel} role="article" aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
