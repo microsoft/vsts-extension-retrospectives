@@ -61,6 +61,14 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   private createFeedbackButton: IButton;
   private columnRef: React.RefObject<HTMLDivElement> = React.createRef();
   private itemRefs: Map<string, HTMLElement> = new Map();
+  private previousItemCount: number = 0;
+  private focusPreservation: {
+    elementId: string | null;
+    selectionStart: number | null;
+    selectionEnd: number | null;
+    isContentEditable: boolean;
+    cursorPosition: number | null;
+  } | null = null;
 
   constructor(props: FeedbackColumnProps) {
     super(props);
@@ -80,6 +88,26 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     if (this.columnRef.current) {
       this.columnRef.current.addEventListener("keydown", this.handleColumnKeyDown);
     }
+
+    this.previousItemCount = this.props.columnItems.length;
+  }
+
+  public componentDidUpdate(prevProps: FeedbackColumnProps) {
+    const itemCountChanged = prevProps.columnItems.length !== this.props.columnItems.length;
+
+    if (itemCountChanged && this.focusPreservation) {
+      this.restoreFocus();
+      this.focusPreservation = null;
+    }
+
+    this.previousItemCount = this.props.columnItems.length;
+  }
+
+  public getSnapshotBeforeUpdate(prevProps: FeedbackColumnProps): null {
+    if (prevProps.columnItems.length !== this.props.columnItems.length) {
+      this.preserveFocus();
+    }
+    return null;
   }
 
   public componentWillUnmount() {
@@ -87,6 +115,81 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       this.columnRef.current.removeEventListener("keydown", this.handleColumnKeyDown);
     }
   }
+
+  private preserveFocus = () => {
+    const activeElement = document.activeElement as HTMLElement;
+
+    if (this.columnRef.current && this.columnRef.current.contains(activeElement)) {
+      const feedbackCard = activeElement.closest("[data-feedback-item-id]") as HTMLElement;
+      const elementId = feedbackCard?.getAttribute("data-feedback-item-id") || activeElement.id;
+
+      this.focusPreservation = {
+        elementId: elementId || null,
+        selectionStart: null,
+        selectionEnd: null,
+        isContentEditable: activeElement.isContentEditable,
+        cursorPosition: null,
+      };
+
+      if (activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA") {
+        const inputElement = activeElement as HTMLInputElement | HTMLTextAreaElement;
+        this.focusPreservation.selectionStart = inputElement.selectionStart;
+        this.focusPreservation.selectionEnd = inputElement.selectionEnd;
+      } else if (activeElement.isContentEditable) {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          this.focusPreservation.cursorPosition = range.startOffset;
+        }
+      }
+    }
+  };
+
+  private restoreFocus = () => {
+    if (!this.focusPreservation) {
+      return;
+    }
+
+    setTimeout(() => {
+      if (!this.focusPreservation) {
+        return;
+      }
+
+      let elementToFocus: HTMLElement | null = null;
+
+      if (this.focusPreservation.elementId) {
+        const feedbackCard = this.columnRef.current?.querySelector(`[data-feedback-item-id="${this.focusPreservation.elementId}"]`) as HTMLElement;
+        if (feedbackCard) {
+          elementToFocus = feedbackCard.querySelector('input, textarea, [contenteditable="true"]') as HTMLElement;
+          if (!elementToFocus) {
+            elementToFocus = feedbackCard;
+          }
+        }
+      }
+
+      if (elementToFocus) {
+        elementToFocus.focus();
+
+        if ((elementToFocus.tagName === "INPUT" || elementToFocus.tagName === "TEXTAREA") && this.focusPreservation.selectionStart !== null) {
+          const inputElement = elementToFocus as HTMLInputElement | HTMLTextAreaElement;
+          inputElement.setSelectionRange(this.focusPreservation.selectionStart, this.focusPreservation.selectionEnd || this.focusPreservation.selectionStart);
+        } else if (elementToFocus.isContentEditable && this.focusPreservation.cursorPosition !== null) {
+          try {
+            const range = document.createRange();
+            const selection = window.getSelection();
+            if (elementToFocus.firstChild && selection) {
+              range.setStart(elementToFocus.firstChild, Math.min(this.focusPreservation.cursorPosition, elementToFocus.firstChild.textContent?.length || 0));
+              range.collapse(true);
+              selection.removeAllRanges();
+              selection.addRange(range);
+            }
+          } catch (error) {
+            console.warn("Failed to restore cursor position:", error);
+          }
+        }
+      }
+    }, 0);
+  };
 
   private handleColumnKeyDown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
