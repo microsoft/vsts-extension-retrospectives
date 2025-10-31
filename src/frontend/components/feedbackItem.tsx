@@ -178,6 +178,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isMainItem = !this.props.groupedItemProps || this.props.groupedItemProps.isMainItem;
 
     switch (key) {
+      case "arrowup":
+      case "arrowdown":
+        e.preventDefault();
+        this.navigateToAdjacentCard(key === "arrowup" ? "prev" : "next");
+        break;
       case "delete":
       case "backspace":
         if (target.tagName !== "BUTTON") {
@@ -250,6 +255,34 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           this.hideRemoveFeedbackItemFromGroupConfirmationDialog();
         }
         break;
+    }
+  };
+
+  private navigateToAdjacentCard = (direction: "prev" | "next") => {
+    const columnItems = this.props.columns[this.props.columnId]?.columnItems || [];
+    const visibleItems = columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId);
+
+    const currentIndex = visibleItems.findIndex(item => item.feedbackItem.id === this.props.id);
+
+    if (currentIndex === -1) {
+      return;
+    }
+
+    let nextIndex: number;
+    if (direction === "prev") {
+      nextIndex = currentIndex > 0 ? currentIndex - 1 : currentIndex;
+    } else {
+      nextIndex = currentIndex < visibleItems.length - 1 ? currentIndex + 1 : currentIndex;
+    }
+
+    if (nextIndex !== currentIndex) {
+      const nextItemId = visibleItems[nextIndex]?.feedbackItem.id;
+      if (nextItemId) {
+        const nextItemElement = document.querySelector(`[data-feedback-item-id="${nextItemId}"]`) as HTMLElement;
+        if (nextItemElement) {
+          nextItemElement.focus();
+        }
+      }
     }
   };
 
