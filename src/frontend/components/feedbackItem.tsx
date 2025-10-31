@@ -142,11 +142,149 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
     reflectBackendService.onReceiveDeletedItem(this.receiveDeletedItemHandler);
     this.props.shouldHaveFocus && this.itemElement && this.itemElement.focus();
+
+    if (this.itemElement) {
+      this.itemElement.addEventListener("keydown", this.handleItemKeyDown);
+    }
+
+    if (this.props.columnProps?.registerItemRef) {
+      this.props.columnProps.registerItemRef(this.props.id, this.itemElement);
+    }
   }
 
   public componentWillUnmount() {
     reflectBackendService.removeOnReceiveDeletedItem(this.receiveDeletedItemHandler);
+
+    if (this.itemElement) {
+      this.itemElement.removeEventListener("keydown", this.handleItemKeyDown);
+    }
+
+    if (this.props.columnProps?.registerItemRef) {
+      this.props.columnProps.registerItemRef(this.props.id, null);
+    }
   }
+
+  private handleItemKeyDown = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      return;
+    }
+
+    if (document.querySelector('[role="dialog"]')) {
+      return;
+    }
+
+    const key = e.key.toLowerCase();
+    const isMainItem = !this.props.groupedItemProps || this.props.groupedItemProps.isMainItem;
+
+    switch (key) {
+      case "arrowup":
+      case "arrowdown":
+        e.preventDefault();
+        this.navigateToAdjacentCard(key === "arrowup" ? "prev" : "next");
+        break;
+      case "delete":
+      case "backspace":
+        if (target.tagName !== "BUTTON") {
+          e.preventDefault();
+          this.deleteFeedbackItem();
+        }
+        break;
+      case "enter":
+        if (target.tagName !== "BUTTON" && target.tagName !== "A") {
+          e.preventDefault();
+          const titleElement = this.itemElement?.querySelector(".non-editable-text-container, .editable-text-container");
+          if (titleElement) {
+            (titleElement as HTMLElement).focus();
+            (titleElement as HTMLElement).click();
+          }
+        }
+        break;
+      case " ":
+        if (target.tagName !== "BUTTON" && this.props.groupedItemProps) {
+          e.preventDefault();
+          this.props.groupedItemProps.toggleGroupExpand();
+        }
+        break;
+      case "v":
+        if (this.props.workflowPhase === WorkflowPhase.Vote && isMainItem) {
+          e.preventDefault();
+          const isUpvote = this.state.userVotes === "0";
+          this.onVote(this.props.id, !isUpvote).then(() => this.props.onVoteCasted());
+        }
+        break;
+      case "g":
+        if (this.props.workflowPhase === WorkflowPhase.Group && !this.state.isDeletionDisabled) {
+          e.preventDefault();
+          this.showGroupFeedbackItemDialog();
+        }
+        break;
+      case "m":
+        if (this.props.workflowPhase === WorkflowPhase.Group && !this.state.isDeletionDisabled) {
+          e.preventDefault();
+          this.showMoveFeedbackItemDialog();
+        }
+        break;
+      case "a":
+        if (this.props.workflowPhase === WorkflowPhase.Act && isMainItem) {
+          e.preventDefault();
+          const addActionButton = this.itemElement?.querySelector('[aria-label*="Add action item"]');
+          if (addActionButton) {
+            (addActionButton as HTMLElement).click();
+          }
+        }
+        break;
+      case "t":
+        if (this.props.workflowPhase === WorkflowPhase.Act) {
+          e.preventDefault();
+          this.timerSwitch(this.props.id);
+        }
+        break;
+      case "escape":
+        if (!this.state.isDeleteItemConfirmationDialogHidden) {
+          e.preventDefault();
+          this.hideDeleteItemConfirmationDialog();
+        } else if (!this.state.isMoveFeedbackItemDialogHidden) {
+          e.preventDefault();
+          this.hideMoveFeedbackItemDialog();
+        } else if (!this.state.isGroupFeedbackItemDialogHidden) {
+          e.preventDefault();
+          this.hideGroupFeedbackItemDialog();
+        } else if (!this.state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden) {
+          e.preventDefault();
+          this.hideRemoveFeedbackItemFromGroupConfirmationDialog();
+        }
+        break;
+    }
+  };
+
+  private navigateToAdjacentCard = (direction: "prev" | "next") => {
+    const columnItems = this.props.columns[this.props.columnId]?.columnItems || [];
+    const visibleItems = columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId);
+
+    const currentIndex = visibleItems.findIndex(item => item.feedbackItem.id === this.props.id);
+
+    if (currentIndex === -1) {
+      return;
+    }
+
+    let nextIndex: number;
+    if (direction === "prev") {
+      nextIndex = currentIndex > 0 ? currentIndex - 1 : currentIndex;
+    } else {
+      nextIndex = currentIndex < visibleItems.length - 1 ? currentIndex + 1 : currentIndex;
+    }
+
+    if (nextIndex !== currentIndex) {
+      const nextItemId = visibleItems[nextIndex]?.feedbackItem.id;
+      if (nextItemId) {
+        const nextItemElement = document.querySelector(`[data-feedback-item-id="${nextItemId}"]`) as HTMLElement;
+        if (nextItemElement) {
+          nextItemElement.focus();
+        }
+      }
+    }
+  };
 
   private readonly receiveDeletedItemHandler = (columnId: string, feedbackItemId: string) => {
     if (feedbackItemId === this.props.id && !this.state.isMarkedForDeletion) {
@@ -547,11 +685,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   };
 
   private renderGroupButton(groupItemsCount: number, isFocusButton: boolean): React.JSX.Element | null {
+    const isExpanded = this.props.groupedItemProps && (isFocusButton ? this.state.isShowingGroupedChildrenTitles : this.props.groupedItemProps.isGroupExpanded);
     return (
       <button
         className={isFocusButton ? "feedback-expand-group-focus" : "feedback-expand-group"}
         aria-live="polite"
-        aria-label={this.props.groupedItemProps && !this.props.groupedItemProps.isGroupExpanded ? `Expand Feedback Group button. Group has ${groupItemsCount} items.` : `Collapse Feedback Group button. Group has ${groupItemsCount} items.`}
+        aria-expanded={isExpanded}
+        aria-label={isExpanded ? `Collapse group. Group has ${groupItemsCount} items.` : `Expand group. Group has ${groupItemsCount} items.`}
+        aria-controls={isFocusButton ? `group-children-${this.props.id}` : undefined}
         style={!isFocusButton ? { color: this.props.accentColor } : undefined}
         onClick={e => {
           e.stopPropagation();
@@ -572,9 +713,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
   private renderVoteActionButton(isMainItem: boolean, isBoldItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
     const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
-    const titleForAria = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
     const buttonTitle = isUpvote ? "Vote" : "Unvote";
-    const buttonAriaLabel = isUpvote ? `Click to vote on feedback with title ${titleForAria}. Current vote count is ${this.props.upvotes}` : `Click to unvote on feedback with title ${titleForAria}. Current vote count is ${this.props.upvotes}`;
+    const buttonAriaLabel = isUpvote ? `Vote up. Current vote count is ${this.props.upvotes}` : `Vote down. Current vote count is ${this.props.upvotes}`;
     const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
 
     return (
@@ -650,15 +790,48 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const showVotes = showVoteButton || workflowState.isActPhase;
 
     const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
-    const ariaLabel = isNotGroupedItem ? "Feedback item." : !isMainItem ? "Feedback group item." : `Feedback group main item. Group has ${groupItemsCount} items.`;
-    const curTimerState = this.props.timerState;
+    const itemPosition = this.props.columns[this.props.columnId]?.columnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1;
+    const totalItemsInColumn = this.props.columns[this.props.columnId]?.columnItems.length || 0;
 
     const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
-
     const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
 
+    let ariaLabel = `Feedback item ${itemPosition} of ${totalItemsInColumn}. `;
+
+    if (!isNotGroupedItem) {
+      if (isMainItem) {
+        ariaLabel = `Feedback group main item ${itemPosition} of ${totalItemsInColumn}. Group has ${groupItemsCount} items. `;
+      } else {
+        ariaLabel = `Grouped feedback item. `;
+      }
+    }
+
+    ariaLabel += `Title: ${displayTitle}. `;
+
+    if (this.props.createdBy && !hideFeedbackItems) {
+      ariaLabel += `Created by ${this.props.createdBy}. `;
+    }
+
+    if (this.props.createdDate) {
+      const creationDate = new Intl.DateTimeFormat("default", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(this.props.createdDate));
+      ariaLabel += `Created on ${creationDate}. `;
+    }
+
+    if (showVotes) {
+      ariaLabel += `${totalVotes} total votes.`;
+      if (showVoteButton) {
+        ariaLabel += ` You have ${votesByUser} votes on this item.`;
+      }
+    }
+
+    const curTimerState = this.props.timerState;
+
     return (
-      <div ref={this.itemElementRef} tabIndex={0} aria-live="polite" aria-label={ariaLabel} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
+      <div ref={this.itemElementRef} data-feedback-item-id={this.props.id} tabIndex={0} aria-live="polite" aria-label={ariaLabel} aria-hidden={hideFeedbackItems || undefined} role="article" aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
         <div className="document-card-wrapper">
           <DocumentCard className={cn(isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")}>
             <div
@@ -774,13 +947,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             </div>
             <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
-              <div className="group-child-feedback-stack">
+              <div className="group-child-feedback-stack" id={`group-children-${this.props.id}`}>
                 <div className="related-feedback-header">
                   {" "}
                   <i className="far fa-comments" />
                   &nbsp;Related Feedback
                 </div>
-                <ul className="fa-ul" aria-label="List of Related Feedback">
+                <ul className="fa-ul" aria-label="List of Related Feedback" role="list">
                   {childrenIds.map((id: string) => {
                     const childCard: IColumnItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
                     const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
@@ -789,11 +962,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
                     return (
                       childCard && (
-                        <li key={id}>
+                        <li key={id} role="listitem">
                           <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}>
-                            <i className="fa-solid fa-quote-left" />
+                            <i className="fa-solid fa-quote-left" aria-hidden="true" />
                           </span>
-                          <span className="related-feedback-title" aria-label={"Title of the feedback is " + childDisplayTitle} title={childDisplayTitle}>
+                          <span className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
                             {childDisplayTitle}
                           </span>
                           {this.props.columnId !== originalColumn?.columnProperties?.id && (

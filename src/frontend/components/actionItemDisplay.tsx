@@ -65,6 +65,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
   }
 
   private addActionItemButtonWrapper: HTMLElement | null;
+  private addActionItemButton: HTMLElement;
 
   private readonly createAndLinkActionItem = async (workItemTypeName: string) => {
     const boardUrl = await getBoardUrl(this.props.team.id, this.props.boardId, WorkflowPhase.Collect);
@@ -198,10 +199,17 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
         {this.props.allowAddNewActionItem && (
           <div className="add-action-item-wrapper">
             <div className="feedback-spacer" aria-hidden />
-            <div className="add-action-item-section" ref={div => { this.addActionItemButtonWrapper = div; }}>
+            <div
+              className="add-action-item-section"
+              ref={div => {
+                this.addActionItemButtonWrapper = div;
+              }}
+            >
               <ActionButton
                 // @ts-ignore TS2769
-                componentRef={(actionButton: HTMLElement) => { this.addActionItemButton = actionButton; }}
+                componentRef={(actionButton: HTMLElement) => {
+                  this.addActionItemButton = actionButton;
+                }}
                 className="add-action-item-button"
                 ariaLabel="Add work item"
                 data-automation-id="actionItemDataAutomation"

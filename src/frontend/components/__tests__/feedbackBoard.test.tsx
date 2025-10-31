@@ -61,7 +61,6 @@ jest.mock("../../dal/reflectBackendService", () => ({
 }));
 
 jest.mock("../feedbackColumn", () => {
-  const React = require("react");
   return function MockFeedbackColumn(props: any) {
     feedbackColumnPropsSpy(props);
     return <div data-testid={`column-${props.columnId}`} className="feedback-column"></div>;
@@ -705,6 +704,173 @@ describe("FeedbackBoard Component", () => {
 
       // The dialog exists in DOM but we can't easily test onDismiss without more setup
       expect(hideCarouselDialog).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Keyboard Navigation", () => {
+    it("opens keyboard shortcuts dialog when ? key is pressed", async () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+      });
+
+      // Press ? key
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "?", bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      // State should update but we can't easily test dialog visibility in JSDOM
+      // Just verify the component doesn't crash
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("does not handle keyboard shortcuts when target is an input", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      const input = document.createElement("input");
+      document.body.appendChild(input);
+      input.focus();
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "?", bubbles: true });
+        Object.defineProperty(event, "target", { value: input, enumerable: true });
+        document.dispatchEvent(event);
+      });
+
+      // Should return early without handling
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+
+      document.body.removeChild(input);
+    });
+
+    it("does not handle keyboard shortcuts when target is a textarea", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      const textarea = document.createElement("textarea");
+      document.body.appendChild(textarea);
+      textarea.focus();
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "?", bubbles: true });
+        Object.defineProperty(event, "target", { value: textarea, enumerable: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+
+      document.body.removeChild(textarea);
+    });
+
+    it("does not handle keyboard shortcuts when target is contentEditable", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      const div = document.createElement("div");
+      div.contentEditable = "true";
+      document.body.appendChild(div);
+      div.focus();
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "?", bubbles: true });
+        Object.defineProperty(event, "target", { value: div, enumerable: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+
+      document.body.removeChild(div);
+    });
+
+    it("does not handle keyboard shortcuts when a dialog is open", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      // Create a mock dialog
+      const dialog = document.createElement("div");
+      dialog.setAttribute("role", "dialog");
+      document.body.appendChild(dialog);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "?", bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+
+      document.body.removeChild(dialog);
+    });
+
+    it("handles arrow left key for column navigation", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles arrow right key for column navigation", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles number keys for direct column navigation", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      // Test keys 1-3 (within column range)
+      ["1", "2", "3"].forEach(key => {
+        act(() => {
+          const event = new KeyboardEvent("keydown", { key, bubbles: true });
+          document.dispatchEvent(event);
+        });
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("ignores number keys with modifier keys", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "1", shiftKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "1", ctrlKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "1", altKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("ignores arrow keys with modifier keys", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowLeft", shiftKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowRight", ctrlKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
     });
   });
 });

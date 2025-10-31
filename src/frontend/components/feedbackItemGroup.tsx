@@ -19,6 +19,8 @@ export interface RetrospectiveItemGroupState {
 }
 
 class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, RetrospectiveItemGroupState> {
+  private groupRef: React.RefObject<HTMLDivElement> = React.createRef();
+
   constructor(props: IFeedbackItemGroupProps) {
     super(props);
     this.state = {
@@ -27,6 +29,31 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
       itemCardsStackHeight: 0,
     };
   }
+
+  public componentDidMount() {
+    if (this.groupRef.current) {
+      this.groupRef.current.addEventListener("keydown", this.handleGroupKeyDown);
+    }
+  }
+
+  public componentWillUnmount() {
+    if (this.groupRef.current) {
+      this.groupRef.current.removeEventListener("keydown", this.handleGroupKeyDown);
+    }
+  }
+
+  private handleGroupKeyDown = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement;
+
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      return;
+    }
+
+    if (e.key === " " && target.tagName !== "BUTTON") {
+      e.preventDefault();
+      this.toggleGroupExpand();
+    }
+  };
 
   private dragFeedbackItemOverFeedbackItemGroup = (e: React.DragEvent<HTMLDivElement>) => {
     // Allow if the item being dragged is not from this group.
@@ -55,8 +82,9 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
   };
 
   public render(): React.JSX.Element {
+    const groupTitle = this.props.mainFeedbackItem.title || "Untitled feedback";
     return (
-      <div className={`feedback-item-group ${this.state.isGroupExpanded ? "feedback-item-group-expanded" : ""}`} onDragOver={this.dragFeedbackItemOverFeedbackItemGroup} onDrop={this.dropFeedbackItemOnFeedbackItemGroup}>
+      <div ref={this.groupRef} className={`feedback-item-group ${this.state.isGroupExpanded ? "feedback-item-group-expanded" : ""}`} onDragOver={this.dragFeedbackItemOverFeedbackItemGroup} onDrop={this.dropFeedbackItemOnFeedbackItemGroup} role="group" aria-label={`${groupTitle}. Feedback group with ${this.props.groupedWorkItems.length + 1} items${this.state.isGroupExpanded ? ", expanded" : ", collapsed"}`}>
         <div className="item-cards" aria-label="Group Feedback Items">
           <FeedbackItem
             {...this.props.mainFeedbackItem}

@@ -213,5 +213,39 @@ describe("EffectivenessMeasurementRow", () => {
         expect(button?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
       }
     });
+
+    it("handles votes with undefined responses array", () => {
+      const votesWithoutResponses: ITeamEffectivenessMeasurementVoteCollection[] = [
+        {
+          userId: "encrypted-test-user-id",
+          responses: undefined as any,
+        },
+      ];
+      const props = { ...defaultProps, votes: votesWithoutResponses };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      // Should default to no selection (0)
+      for (let i = 1; i <= 10; i++) {
+        const button = container.querySelector(`button[aria-label="${i}"]`);
+        expect(button?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+      }
+    });
+
+    it("handles user vote with empty responses array", () => {
+      const votesWithEmptyResponses: ITeamEffectivenessMeasurementVoteCollection[] = [
+        {
+          userId: "encrypted-test-user-id",
+          responses: [],
+        },
+      ];
+      const props = { ...defaultProps, votes: votesWithEmptyResponses };
+      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+
+      // Should default to no selection (0)
+      for (let i = 1; i <= 10; i++) {
+        const button = container.querySelector(`button[aria-label="${i}"]`);
+        expect(button?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+      }
+    });
   });
 });

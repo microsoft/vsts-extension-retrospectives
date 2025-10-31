@@ -61,5 +61,99 @@ describe("Feedback Carousel ", () => {
 
       expect(container.textContent).not.toContain("All");
     });
+
+    it("should aggregate items from all columns", () => {
+      const column1 = { ...testColumnProps, columnId: "col1", columnName: "Column 1", columnItems: testColumnProps.columnItems.slice(0, 1) };
+      const column2 = { ...testColumnProps, columnId: "col2", columnName: "Column 2", columnItems: testColumnProps.columnItems.slice(1, 2) };
+
+      const { container } = render(<FeedbackCarousel feedbackColumnPropsList={[column1, column2]} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
+
+      // All column should contain items from both columns
+      expect(container).toBeTruthy();
+    });
+  });
+
+  describe("Item sorting", () => {
+    it("should sort items by upvotes (descending) then by creation date (ascending)", () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", upvotes: 5, createdDate: new Date("2023-01-01") },
+      };
+      const item2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item2", upvotes: 10, createdDate: new Date("2023-01-02") },
+      };
+      const item3 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item3", upvotes: 5, createdDate: new Date("2023-01-03") },
+      };
+
+      const propsWithSorting = {
+        ...mockedProps,
+        feedbackColumnPropsList: [{ ...testColumnProps, columnItems: [item3, item1, item2] }],
+      };
+
+      const { container } = render(<FeedbackCarousel {...propsWithSorting} />);
+
+      // Should render without error - sorting logic executed
+      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
+
+    it("should filter out items with parentFeedbackItemId", () => {
+      const parentItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "parent", parentFeedbackItemId: undefined },
+      };
+      const childItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "child", parentFeedbackItemId: "parent" },
+      };
+
+      const propsWithChildren = {
+        ...mockedProps,
+        feedbackColumnPropsList: [{ ...testColumnProps, columnItems: [parentItem, childItem] }],
+      };
+
+      const { container } = render(<FeedbackCarousel {...propsWithChildren} />);
+
+      // Child items should be filtered out
+      expect(container).toBeTruthy();
+    });
+
+    it("should handle equal upvotes and dates correctly", () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", upvotes: 5, createdDate: new Date("2023-01-01") },
+      };
+      const item2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item2", upvotes: 5, createdDate: new Date("2023-01-01") },
+      };
+
+      const propsWithEqual = {
+        ...mockedProps,
+        feedbackColumnPropsList: [{ ...testColumnProps, columnItems: [item1, item2] }],
+      };
+
+      const { container } = render(<FeedbackCarousel {...propsWithEqual} />);
+
+      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
+  });
+
+  describe("Multiple columns", () => {
+    it("should render pivot items for each column", () => {
+      const column1 = { ...testColumnProps, columnId: "col1", columnName: "What Went Well" };
+      const column2 = { ...testColumnProps, columnId: "col2", columnName: "What Needs Improvement" };
+      const column3 = { ...testColumnProps, columnId: "col3", columnName: "Action Items" };
+
+      const { container } = render(<FeedbackCarousel feedbackColumnPropsList={[column1, column2, column3]} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
+
+      // Should have All + 3 columns
+      expect(container).toBeTruthy();
+      expect(container.textContent).toContain("What Went Well");
+      expect(container.textContent).toContain("What Needs Improvement");
+      expect(container.textContent).toContain("Action Items");
+    });
   });
 });

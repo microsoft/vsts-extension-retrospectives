@@ -163,4 +163,173 @@ describe("Editable Text Component", () => {
     // Text should be updated in display mode
     expect(document.body.textContent).toContain("Updated from props");
   });
+
+  it("saves text and exits edit mode when clicking outside with valid text", async () => {
+    const { container } = render(<EditableText {...mockedTestProps} text="Initial" />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const input = document.querySelector("input, textarea") as HTMLElement;
+    await userEvent.clear(input);
+    await userEvent.type(input, "New Text");
+
+    // Create an outside element and click it
+    const outsideDiv = document.createElement("div");
+    document.body.appendChild(outsideDiv);
+
+    const mouseDownEvent = new MouseEvent("mousedown", { bubbles: true });
+    Object.defineProperty(mouseDownEvent, "target", { value: outsideDiv, enumerable: true });
+    document.dispatchEvent(mouseDownEvent);
+
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    expect(mockOnSave).toHaveBeenCalledWith("New Text");
+
+    document.body.removeChild(outsideDiv);
+  });
+
+  it("saves empty string when clicking outside with empty text", async () => {
+    const { container } = render(<EditableText {...mockedTestProps} text="Initial" />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const input = document.querySelector("input, textarea") as HTMLElement;
+    await userEvent.clear(input);
+
+    // Create an outside element and click it
+    const outsideDiv = document.createElement("div");
+    document.body.appendChild(outsideDiv);
+
+    const mouseDownEvent = new MouseEvent("mousedown", { bubbles: true });
+    Object.defineProperty(mouseDownEvent, "target", { value: outsideDiv, enumerable: true });
+    document.dispatchEvent(mouseDownEvent);
+
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    expect(mockOnSave).toHaveBeenCalledWith("");
+
+    document.body.removeChild(outsideDiv);
+  });
+
+  it("does not save when clicking inside the editable text component", async () => {
+    const { container } = render(<EditableText {...mockedTestProps} text="Initial" />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const input = document.querySelector("input, textarea") as HTMLElement;
+    await userEvent.clear(input);
+    await userEvent.type(input, "New Text");
+
+    // Click inside the component
+    const mouseDownEvent = new MouseEvent("mousedown", { bubbles: true });
+    Object.defineProperty(mouseDownEvent, "target", { value: input, enumerable: true });
+    document.dispatchEvent(mouseDownEvent);
+
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    // Should not save yet, still in edit mode
+    expect(document.querySelector("input, textarea")).toBeTruthy();
+  });
+
+  it("cleans up event listener on unmount", () => {
+    const removeEventListenerSpy = jest.spyOn(document, "removeEventListener");
+    const { unmount } = render(<EditableText {...mockedTestProps} text="Test" />);
+
+    unmount();
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith("mousedown", expect.any(Function));
+
+    removeEventListenerSpy.mockRestore();
+  });
+
+  it("shows error when trying to add newline with Ctrl+Enter on empty text", async () => {
+    const propsMultiline = { ...mockedTestProps, text: "", isMultiline: true };
+    render(<EditableText {...propsMultiline} />);
+
+    const textarea = document.querySelector("textarea") as HTMLElement;
+    await userEvent.clear(textarea);
+    await userEvent.type(textarea, "{Control>}{Enter}{/Control}");
+
+    expect(document.body.textContent).toContain("This cannot be empty.");
+  });
+
+  describe("Accessibility - Fix double character announcement (Issue #1261)", () => {
+    it("should not have aria-live on the editable text container", () => {
+      render(<EditableText {...mockedTestProps} />);
+
+      const container = document.querySelector(".editable-text-container") as HTMLElement;
+      expect(container).toBeTruthy();
+      expect(container.getAttribute("aria-live")).toBeNull();
+    });
+
+    it("should have aria-live only on error message when validation fails", async () => {
+      render(<EditableText {...mockedTestProps} />);
+
+      const input = document.querySelector('[aria-label="Please enter feedback title"]') as HTMLElement;
+      await userEvent.clear(input);
+      await userEvent.type(input, " ");
+      await userEvent.clear(input);
+
+      const errorMessage = document.querySelector(".input-validation-message") as HTMLElement;
+      expect(errorMessage).toBeTruthy();
+      expect(errorMessage.getAttribute("aria-live")).toBe("assertive");
+      expect(errorMessage.getAttribute("role")).toBe("alert");
+    });
+
+    it("should not announce character input twice during typing", async () => {
+      const propsWithText = { ...mockedTestProps, text: "Initial" };
+      render(<EditableText {...propsWithText} />);
+
+      const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+      await userEvent.click(clickableElement);
+
+      const container = document.querySelector(".editable-text-container") as HTMLElement;
+      const input = document.querySelector("input, textarea") as HTMLElement;
+
+      // Verify container does not have aria-live while editing
+      expect(container.getAttribute("aria-live")).toBeNull();
+
+      // Type characters and verify no aria-live on container
+      await userEvent.type(input, " Text");
+      expect(container.getAttribute("aria-live")).toBeNull();
+    });
+
+    it("should properly announce errors without double character echo", async () => {
+      render(<EditableText {...mockedTestProps} text="" />);
+
+      const input = document.querySelector('[aria-label="Please enter feedback title"]') as HTMLElement;
+
+      // Type and clear to trigger error
+      await userEvent.type(input, "a");
+      await userEvent.clear(input);
+
+      const container = document.querySelector(".editable-text-container") as HTMLElement;
+      const errorMessage = document.querySelector(".input-validation-message") as HTMLElement;
+
+      // Container should not have aria-live
+      expect(container.getAttribute("aria-live")).toBeNull();
+
+      // Only error message should have aria-live
+      expect(errorMessage.getAttribute("aria-live")).toBe("assertive");
+      expect(errorMessage.getAttribute("role")).toBe("alert");
+    });
+
+    it("should maintain proper ARIA attributes during edit mode", async () => {
+      const propsWithText = { ...mockedTestProps, text: "Test" };
+      render(<EditableText {...propsWithText} />);
+
+      const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+      await userEvent.click(clickableElement);
+
+      const input = document.querySelector('[aria-label="Please enter feedback title"]') as HTMLElement;
+      const container = document.querySelector(".editable-text-container") as HTMLElement;
+
+      // Verify input has proper ARIA but container doesn't have aria-live
+      expect(input.getAttribute("aria-label")).toBe("Please enter feedback title");
+      expect(container.getAttribute("aria-live")).toBeNull();
+    });
+  });
 });

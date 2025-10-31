@@ -21,6 +21,10 @@
     display: table-row;
 
     background-color: rgba(var(--palette-neutral-2, 248, 248, 248), 1);
+
+    &:focus {
+      outline: none;
+    }
   }
 
   .feedback-maxvotes-per-user {
@@ -29,6 +33,21 @@
 
     span {
       margin: 1em;
+    }
+  }
+}
+
+.keyboard-shortcuts-dialog {
+  background-color: var(--background-color);
+
+  .ms-Dialog-title,
+  .ms-Dialog-subText {
+    color: var(--text-primary-color);
+  }
+
+  table {
+    tr:hover {
+      background-color: var(--border-subtle-color);
     }
   }
 }

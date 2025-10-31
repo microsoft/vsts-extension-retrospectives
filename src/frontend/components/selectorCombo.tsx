@@ -56,7 +56,19 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
 
     return (
       <div className={this.props.className}>
-        <div className="selector-button" aria-label={"Click to search and select " + this.props.title + ". Current selection is " + selectorButtonText} aria-expanded={this.state.isSelectorCalloutVisible} aria-haspopup="true" role="button" ref={selectorButton => { this.selectorButton = selectorButton; }} onClick={this.toggleSelectorCallout} tabIndex={0} onKeyDown={this.handleKeyPressSelectorButton}>
+        <div
+          className="selector-button"
+          aria-label={"Click to search and select " + this.props.title + ". Current selection is " + selectorButtonText}
+          aria-expanded={this.state.isSelectorCalloutVisible}
+          aria-haspopup="true"
+          role="button"
+          ref={selectorButton => {
+            this.selectorButton = selectorButton;
+          }}
+          onClick={this.toggleSelectorCallout}
+          tabIndex={0}
+          onKeyDown={this.handleKeyPressSelectorButton}
+        >
           <i className={"selector-button-icon fa-solid fa-" + this.props.iconName}></i>
           <span className="selector-button-text-wrapper">
             <div className="selector-button-text">{selectorButtonText}</div>

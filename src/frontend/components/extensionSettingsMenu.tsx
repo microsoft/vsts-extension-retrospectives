@@ -11,6 +11,8 @@ import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/feedback";
 import { Slide, toast, ToastContainer } from "react-toastify";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
+import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
+import { WorkflowPhase } from "../interfaces/workItem";
 
 import { RETRO_URLS, PRIME_DIRECTIVE_CONTENT, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, WHATISNEW_CONTENT, renderContent, WHATISNEW_MARKDOWN } from "./extensionSettingsMenuDialogContent";
 
@@ -19,6 +21,7 @@ interface IExtensionSettingsMenuState {
   isWhatsNewDialogHidden: boolean;
   isGetHelpDialogHidden: boolean;
   isPleaseJoinUsDialogHidden: boolean;
+  isKeyboardShortcutsDialogHidden: boolean;
   isWindowWide: boolean;
 }
 
@@ -101,6 +104,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
 
     this.state = {
       isPrimeDirectiveDialogHidden: true,
+      isKeyboardShortcutsDialogHidden: true,
       isWhatsNewDialogHidden: true,
       isGetHelpDialogHidden: true,
       isPleaseJoinUsDialogHidden: true,
@@ -272,6 +276,13 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
       title: "What's new",
     },
     {
+      key: "keyboardShortcuts",
+      iconProps: { iconName: "Keyboard" },
+      onClick: () => this.setState({ isKeyboardShortcutsDialogHidden: false }),
+      text: "Keyboard shortcuts",
+      title: "Keyboard shortcuts",
+    },
+    {
       key: "userGuide",
       iconProps: { iconName: "BookAnswers" },
       onClick: () => this.setState({ isGetHelpDialogHidden: false }),
@@ -324,6 +335,8 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
         <ExtensionDialog hidden={this.state.isPleaseJoinUsDialogHidden} onDismiss={this.hidePleaseJoinUsDialog} title="Volunteer" onDefaultClick={this.onContributingClicked} defaultButtonText="Open contributing guidelines" containerClassName="volunteer-dialog">
           {renderContent(VOLUNTEER_CONTENT)}
         </ExtensionDialog>
+
+        <KeyboardShortcutsDialog isOpen={!this.state.isKeyboardShortcutsDialogHidden} onClose={() => this.setState({ isKeyboardShortcutsDialogHidden: true })} currentWorkflowPhase={WorkflowPhase.Collect} />
 
         <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
