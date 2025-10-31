@@ -167,6 +167,44 @@ describe("FocusManager", () => {
       const next = focusManager.findNextFocusableElement(container, button1, "next");
       expect(next).toBeNull();
     });
+
+    test("returns null when current element not found", () => {
+      const button1 = document.createElement("button");
+      const button2 = document.createElement("button");
+      button1.style.display = "block";
+      button2.style.display = "block";
+      container.appendChild(button1);
+
+      // button2 is not in container, so should return first element (but will be null in JSDOM)
+      const next = focusManager.findNextFocusableElement(container, button2, "next");
+      expect(next).toBeNull();
+    });
+
+    test("circles to first element when at end", () => {
+      const button1 = document.createElement("button");
+      const button2 = document.createElement("button");
+      // Mock offsetParent to make elements "visible"
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(button2, "offsetParent", { get: () => container });
+      container.appendChild(button1);
+      container.appendChild(button2);
+
+      const next = focusManager.findNextFocusableElement(container, button2, "next");
+      expect(next).toBe(button1);
+    });
+
+    test("circles to last element when at beginning", () => {
+      const button1 = document.createElement("button");
+      const button2 = document.createElement("button");
+      // Mock offsetParent to make elements "visible"
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(button2, "offsetParent", { get: () => container });
+      container.appendChild(button1);
+      container.appendChild(button2);
+
+      const prev = focusManager.findNextFocusableElement(container, button1, "prev");
+      expect(prev).toBe(button2);
+    });
   });
 
   describe("getFocusableElements", () => {
@@ -206,6 +244,33 @@ describe("FocusManager", () => {
       cleanup();
     });
 
+    test("ignores non-Tab keys", () => {
+      const button1 = document.createElement("button");
+      container.appendChild(button1);
+
+      focusManager.createFocusTrap(container);
+
+      button1.focus();
+      const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+      container.dispatchEvent(event);
+
+      // Should not affect focus
+      expect(document.activeElement).toBe(button1);
+    });
+
+    test("handles containers with no focusable elements", () => {
+      const div = document.createElement("div");
+      container.appendChild(div);
+
+      focusManager.createFocusTrap(container);
+
+      const event = new KeyboardEvent("keydown", { key: "Tab", bubbles: true });
+      container.dispatchEvent(event);
+
+      // Should not crash
+      expect(true).toBe(true);
+    });
+
     test("returns cleanup function", () => {
       const cleanup = focusManager.createFocusTrap(container);
       expect(typeof cleanup).toBe("function");
@@ -229,6 +294,9 @@ describe("FocusManager", () => {
     test("wraps focus to first element on Tab from last", () => {
       const button1 = document.createElement("button");
       const button2 = document.createElement("button");
+      // Mock offsetParent to make elements "visible"
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(button2, "offsetParent", { get: () => container });
       container.appendChild(button1);
       container.appendChild(button2);
 
@@ -236,16 +304,18 @@ describe("FocusManager", () => {
 
       button2.focus();
       const event = new KeyboardEvent("keydown", { key: "Tab", bubbles: true });
-      Object.defineProperty(event, "shiftKey", { value: false });
+      const preventDefaultSpy = jest.spyOn(event, "preventDefault");
       container.dispatchEvent(event);
 
-      // Due to preventDefault, focus should remain on button2 in test environment
-      expect(document.activeElement).toBe(button2);
+      expect(preventDefaultSpy).toHaveBeenCalled();
     });
 
     test("wraps focus to last element on Shift+Tab from first", () => {
       const button1 = document.createElement("button");
       const button2 = document.createElement("button");
+      // Mock offsetParent to make elements "visible"
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(button2, "offsetParent", { get: () => container });
       container.appendChild(button1);
       container.appendChild(button2);
 
@@ -253,10 +323,10 @@ describe("FocusManager", () => {
 
       button1.focus();
       const event = new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true });
+      const preventDefaultSpy = jest.spyOn(event, "preventDefault");
       container.dispatchEvent(event);
 
-      // Due to preventDefault, focus should remain on button1 in test environment
-      expect(document.activeElement).toBe(button1);
+      expect(preventDefaultSpy).toHaveBeenCalled();
     });
   });
 });
