@@ -29,7 +29,7 @@
     "@microsoft/applicationinsights-react-js": "18.3.6",
     "@microsoft/applicationinsights-web": "3.3.10",
     "@microsoft/signalr": "9.0.6",
-    "azure-devops-extension-api": "1.152.0",
+    "azure-devops-extension-api": "4.262.0",
     "azure-devops-extension-sdk": "2.0.11",
     "react": "19.2.0",
     "react-dom": "19.2.0",
