@@ -26,10 +26,9 @@ class WorkflowStage extends React.Component<IWorkflowStageProps, IWorkflowStageS
 
   public render() {
     const classes = cn("retrospective-workflowState", this.props.isActive && "active");
-    const ariaLabel = this.props.isActive ? "Selected " + this.props.display + " workflow stage" : "Not selected " + this.props.display + " workflow stage";
 
     return (
-      <div className={classes} aria-setsize={4} aria-posinset={this.props.ariaPosInSet} aria-label={ariaLabel} role="tab" onClick={e => this.clickWorkflowState(e, this.props.value)} onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.handleKeyPressWorkFlowState(e, this.props.value)} tabIndex={0}>
+      <div className={classes} aria-setsize={4} aria-posinset={this.props.ariaPosInSet} aria-label={this.props.display} aria-selected={this.props.isActive} role="tab" onClick={e => this.clickWorkflowState(e, this.props.value)} onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.handleKeyPressWorkFlowState(e, this.props.value)} tabIndex={0}>
         <p className="stage-text">{this.props.display}</p>
       </div>
     );

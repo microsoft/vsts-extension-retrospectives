@@ -1638,7 +1638,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </button>
                       </div>
                     )}
-                    <div className="flex flex-row gap-3" role="tablist">
+                    <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
                       <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
                       <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />

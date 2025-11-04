@@ -2,7 +2,7 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import FeedbackItem from "../feedbackItem";
-import { testColumns, testBoardId, testColumnUuidOne, testColumnIds } from "../__mocks__/mocked_components/mockedFeedbackColumn";
+import { testColumns, testBoardId, testColumnUuidOne, testColumnIds, testFeedbackItem } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   trackTrace: jest.fn(),
@@ -33,6 +33,17 @@ jest.mock("azure-devops-extension-sdk", () => ({
   getUser: () => ({ id: "test-user-id", name: "Test User", displayName: "Test User" }),
   getAccessToken: jest.fn().mockResolvedValue("mock-access-token"),
   getExtensionContext: () => ({ id: "test-extension-id" }),
+}));
+
+jest.mock("../../utilities/userIdentityHelper", () => ({
+  getUserIdentity: () => ({
+    id: "test-user-id",
+    displayName: "Test User",
+    uniqueName: "testuser@example.com",
+    imageUrl: "https://example.com/avatar.jpg",
+  }),
+  encrypt: (id: string) => id,
+  decrypt: (id: string) => id,
 }));
 
 jest.mock("../../utilities/servicesHelper", () => ({
@@ -2222,6 +2233,271 @@ describe("Feedback Item", () => {
     });
   });
 
+  describe("Accessibility - Obscured feedback (Issue #1318)", () => {
+    test("adds aria-hidden='true' to obscured feedback items", () => {
+      const props: any = {
+        id: "test-obscured-aria",
+        title: "Hidden Feedback",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "other-user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        currentUserId: "current-user-id",
+        currentTeamId: "team-1",
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-obscured-aria"]');
+
+      expect(feedbackItemElement).toHaveAttribute("aria-hidden", "true");
+    });
+
+    test("does not add aria-hidden when feedback is not obscured", () => {
+      const props: any = {
+        id: "test-visible-aria",
+        title: "Visible Feedback",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        currentUserId: "user-id",
+        currentTeamId: "team-1",
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-visible-aria"]');
+
+      expect(feedbackItemElement).not.toHaveAttribute("aria-hidden");
+    });
+
+    test("does not add aria-hidden when user is the owner of obscured feedback", () => {
+      const props: any = {
+        id: "test-owner-aria",
+        title: "My Hidden Feedback",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "test-user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        currentUserId: "test-user-id",
+        currentTeamId: "team-1",
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-owner-aria"]');
+
+      expect(feedbackItemElement).not.toHaveAttribute("aria-hidden");
+    });
+
+    test("adds aria-hidden to obscured child feedback items in groups", () => {
+      const mainItemId = "main-item-obscured";
+      const childItemId = "child-item-obscured";
+
+      const childFeedbackItem = {
+        ...testFeedbackItem,
+        id: childItemId,
+        title: "Hidden Child Feedback",
+        userIdRef: "other-user-id",
+        parentFeedbackItemId: mainItemId,
+        originalColumnId: testColumnUuidOne,
+      };
+
+      const mainFeedbackItem = {
+        ...testFeedbackItem,
+        id: mainItemId,
+        title: "Main Item",
+        userIdRef: "test-user-id",
+        groupIds: [childItemId],
+        originalColumnId: testColumnUuidOne,
+      };
+
+      const columnsWithGroup = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            {
+              feedbackItem: mainFeedbackItem,
+              actionItems: [],
+            },
+            {
+              feedbackItem: childFeedbackItem,
+              actionItems: [],
+            },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: mainItemId,
+        title: "Main Item",
+        columnId: testColumnUuidOne,
+        columns: columnsWithGroup,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [childItemId],
+        userIdRef: "test-user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: true,
+        workflowPhase: "Collect",
+        currentUserId: "test-user-id",
+        currentTeamId: "team-1",
+        groupedItemProps: {
+          isMainItem: true,
+          isGroupExpanded: false,
+          groupedCount: 1,
+        },
+      };
+
+      const { container, rerender } = render(<FeedbackItem {...props} />);
+
+      // Main item should NOT be hidden because the user is the owner (userIdRef matches getUserIdentity().id)
+      const mainFeedbackItemElement = container.querySelector('[data-feedback-item-id="main-item-obscured"]');
+      expect(mainFeedbackItemElement).not.toHaveAttribute("aria-hidden");
+    });
+
+    test("does not add aria-hidden to visible child feedback items in groups", () => {
+      const mainItemId = "main-item-visible";
+      const childItemId = "child-item-visible";
+
+      const childFeedbackItem = {
+        ...testFeedbackItem,
+        id: childItemId,
+        title: "Visible Child Feedback",
+        userIdRef: "user-id",
+        parentFeedbackItemId: mainItemId,
+        originalColumnId: testColumnUuidOne,
+      };
+
+      const mainFeedbackItem = {
+        ...testFeedbackItem,
+        id: mainItemId,
+        title: "Main Item",
+        userIdRef: "user-id",
+        groupIds: [childItemId],
+        originalColumnId: testColumnUuidOne,
+      };
+
+      const columnsWithGroup = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            {
+              feedbackItem: mainFeedbackItem,
+              actionItems: [],
+            },
+            {
+              feedbackItem: childFeedbackItem,
+              actionItems: [],
+            },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: mainItemId,
+        title: "Main Item",
+        columnId: testColumnUuidOne,
+        columns: columnsWithGroup,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [childItemId],
+        userIdRef: "user-id",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: true,
+        workflowPhase: "Group",
+        currentUserId: "user-id",
+        currentTeamId: "team-1",
+        groupedItemProps: {
+          isMainItem: true,
+          isGroupExpanded: false,
+          groupedCount: 1,
+        },
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+
+      // Verify the main item is visible (no aria-hidden)
+      const mainFeedbackItemElement = container.querySelector('[data-feedback-item-id="main-item-visible"]');
+      expect(mainFeedbackItemElement).not.toHaveAttribute("aria-hidden");
+    });
+  });
+
   describe("User identification", () => {
     test("renders item with user reference", () => {
       const props: any = {
@@ -2285,6 +2561,584 @@ describe("Feedback Item", () => {
       };
       const { container } = render(<FeedbackItem {...props} />);
       expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("Accessibility - Enhanced ARIA labels", () => {
+    test("includes comprehensive information in aria-label", () => {
+      const testFeedbackItemWithVotes = {
+        ...testFeedbackItem,
+        id: "test-aria",
+        title: "Test Feedback Item",
+        createdBy: "John Doe",
+        createdDate: new Date("2023-06-15T10:00:00Z"),
+        voteCollection: { "user-1": 2, "user-2": 3 },
+      };
+
+      const testColumnsWithVotes = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            {
+              feedbackItem: testFeedbackItemWithVotes,
+              actionItems: [],
+            },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: "test-aria",
+        title: "Test Feedback Item",
+        columnId: testColumnUuidOne,
+        columns: testColumnsWithVotes,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date("2023-06-15T10:00:00Z"),
+        createdBy: "John Doe",
+        upvotes: 5,
+        voteCount: 5,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: { "user-1": 2, "user-2": 3 },
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-aria"]');
+
+      expect(feedbackItemElement).toBeTruthy();
+      const ariaLabel = feedbackItemElement?.getAttribute("aria-label");
+
+      expect(ariaLabel).toContain("Test Feedback Item");
+      expect(ariaLabel).toContain("5 total votes");
+      expect(ariaLabel).toContain("John Doe");
+      expect(ariaLabel).toContain("June 15, 2023");
+    });
+
+    test("aria-label in Act phase shows votes", () => {
+      const testFeedbackItemActPhase = {
+        ...testFeedbackItem,
+        id: "test-aria-act",
+        title: "Act Phase Item",
+        voteCollection: { "user-1": 1, "user-2": 2 },
+      };
+
+      const testColumnsActPhase = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            {
+              feedbackItem: testFeedbackItemActPhase,
+              actionItems: [],
+            },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: "test-aria-act",
+        title: "Act Phase Item",
+        columnId: testColumnUuidOne,
+        columns: testColumnsActPhase,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 3,
+        voteCount: 3,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [
+          {
+            id: "action-1",
+            title: "Action 1",
+            fields: {
+              "System.Title": "Action 1",
+              "System.State": "Active",
+            },
+          },
+          {
+            id: "action-2",
+            title: "Action 2",
+            fields: {
+              "System.Title": "Action 2",
+              "System.State": "Active",
+            },
+          },
+        ],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Act",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: { "user-1": 1, "user-2": 2 },
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-aria-act"]');
+
+      const ariaLabel = feedbackItemElement?.getAttribute("aria-label");
+      expect(ariaLabel).toContain("3 total votes");
+    });
+
+    test("aria-label indicates grouped items", () => {
+      const props: any = {
+        id: "test-aria-group",
+        title: "Grouped Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        voteCount: 0,
+        groupIds: ["child-1", "child-2"],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: false,
+          isMainItem: true,
+          parentItemId: "",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-aria-group"]');
+
+      const ariaLabel = feedbackItemElement?.getAttribute("aria-label");
+      expect(ariaLabel).toContain("Group has 2 items");
+    });
+
+    test("has data-feedback-item-id attribute for keyboard navigation", () => {
+      const props: any = {
+        id: "test-data-attr",
+        title: "Test Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        voteCount: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-data-attr"]');
+
+      expect(feedbackItemElement).toHaveAttribute("data-feedback-item-id", "test-data-attr");
+      expect(feedbackItemElement).toHaveAttribute("tabindex", "0");
+    });
+
+    test("has proper role and aria-roledescription", () => {
+      const props: any = {
+        id: "test-role",
+        title: "Test Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        voteCount: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-role"]');
+
+      expect(feedbackItemElement).toHaveAttribute("role", "article");
+      expect(feedbackItemElement).toHaveAttribute("aria-roledescription", "feedback item");
+    });
+  });
+
+  describe("Accessibility - Voting interactions", () => {
+    test("vote button is visible in Vote phase", () => {
+      const props: any = {
+        id: "test-vote-button",
+        title: "Test Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        voteCount: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const voteButton = container.querySelector('button[title="Vote"]');
+
+      expect(voteButton).toBeTruthy();
+    });
+
+    test("vote button is not visible in Collect phase", () => {
+      const props: any = {
+        id: "test-no-vote-button",
+        title: "Test Item",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        voteCount: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const voteButton = container.querySelector('button[title="Vote"]');
+
+      expect(voteButton).toBeNull();
+    });
+  });
+
+  describe("Accessibility - Simplified vote button labels (Issue #1199)", () => {
+    test("vote up button should have simplified aria-label without feedback title", () => {
+      const votePhaseProps: any = {
+        id: "vote-test-1",
+        title: "Improve performance",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 5,
+        voteCount: 5,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...votePhaseProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteUpButton = voteButtons[0];
+
+      const ariaLabel = voteUpButton.getAttribute("aria-label");
+
+      // Should NOT contain the feedback title
+      expect(ariaLabel).not.toContain("Improve performance");
+      expect(ariaLabel).not.toContain("Click to vote on feedback with title");
+
+      // Should contain simplified text
+      expect(ariaLabel).toContain("Vote up");
+      expect(ariaLabel).toContain("Current vote count is 5");
+    });
+
+    test("vote down button should have simplified aria-label without feedback title", () => {
+      const votePhaseProps: any = {
+        id: "vote-test-2",
+        title: "Fix bugs quickly",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 3,
+        voteCount: 3,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...votePhaseProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteDownButton = voteButtons[1];
+
+      const ariaLabel = voteDownButton.getAttribute("aria-label");
+
+      // Should NOT contain the feedback title
+      expect(ariaLabel).not.toContain("Fix bugs quickly");
+      expect(ariaLabel).not.toContain("Click to unvote on feedback with title");
+
+      // Should contain simplified text
+      expect(ariaLabel).toContain("Vote down");
+      expect(ariaLabel).toContain("Current vote count is 3");
+    });
+
+    test("vote buttons should reflect current vote count accurately", () => {
+      const votePhaseProps: any = {
+        id: "vote-test-3",
+        title: "Add new feature",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 12,
+        voteCount: 12,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...votePhaseProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteUpButton = voteButtons[0];
+      const voteDownButton = voteButtons[1];
+
+      expect(voteUpButton.getAttribute("aria-label")).toContain("Current vote count is 12");
+      expect(voteDownButton.getAttribute("aria-label")).toContain("Current vote count is 12");
+    });
+
+    test("vote buttons should work with zero votes", () => {
+      const votePhaseProps: any = {
+        id: "vote-test-4",
+        title: "New suggestion",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        voteCount: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...votePhaseProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteUpButton = voteButtons[0];
+
+      const ariaLabel = voteUpButton.getAttribute("aria-label");
+      expect(ariaLabel).toContain("Vote up");
+      expect(ariaLabel).toContain("Current vote count is 0");
+    });
+
+    test("vote buttons should not include title even for hidden feedback items", () => {
+      const hiddenFeedbackProps: any = {
+        id: "vote-test-5",
+        title: "Hidden feedback title",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 7,
+        voteCount: 7,
+        groupIds: [],
+        userIdRef: "different-user",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        currentUserId: "user-1",
+        currentTeamId: "team-1",
+        voteCollection: {},
+        isIncluded: true,
+      };
+
+      const { container } = render(<FeedbackItem {...hiddenFeedbackProps} />);
+
+      const voteButtons = container.querySelectorAll(".feedback-add-vote");
+      const voteUpButton = voteButtons[0];
+
+      const ariaLabel = voteUpButton.getAttribute("aria-label");
+
+      // Should not contain the title or [Hidden Feedback]
+      expect(ariaLabel).not.toContain("Hidden feedback title");
+      expect(ariaLabel).not.toContain("[Hidden Feedback]");
+
+      // Should contain simplified text
+      expect(ariaLabel).toContain("Vote up");
+      expect(ariaLabel).toContain("Current vote count is 7");
     });
   });
 });

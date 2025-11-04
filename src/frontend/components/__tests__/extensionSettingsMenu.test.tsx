@@ -64,6 +64,17 @@ jest.mock("../../utilities/servicesHelper", () => ({
   getProjectId: jest.fn().mockResolvedValue("test-project-id"),
 }));
 
+jest.mock("../keyboardShortcutsDialog", () => ({
+  __esModule: true,
+  default: ({ isOpen, onClose }: any) =>
+    isOpen ? (
+      <div data-testid="keyboard-shortcuts-dialog">
+        <h2>Keyboard Shortcuts</h2>
+        <button onClick={onClose}>Close</button>
+      </div>
+    ) : null,
+}));
+
 describe("ExtensionSettingsMenu", () => {
   let windowOpenSpy: jest.SpyInstance;
 
@@ -172,6 +183,34 @@ describe("ExtensionSettingsMenu", () => {
     });
     await waitFor(() => {
       expect(screen.getByText("Volunteer")).toBeInTheDocument();
+    });
+  });
+
+  it("opens Keyboard Shortcuts dialog", async () => {
+    render(<ExtensionSettingsMenu />);
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    await waitFor(() => {
+      fireEvent.click(screen.getByText("Keyboard shortcuts"));
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("keyboard-shortcuts-dialog")).toBeInTheDocument();
+      expect(screen.getByText("Keyboard Shortcuts")).toBeInTheDocument();
+    });
+  });
+
+  it("closes Keyboard Shortcuts dialog", async () => {
+    render(<ExtensionSettingsMenu />);
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    await waitFor(() => {
+      fireEvent.click(screen.getByText("Keyboard shortcuts"));
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("keyboard-shortcuts-dialog")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Close"));
+    await waitFor(() => {
+      expect(screen.queryByTestId("keyboard-shortcuts-dialog")).not.toBeInTheDocument();
     });
   });
 

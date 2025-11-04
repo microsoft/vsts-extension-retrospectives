@@ -15,6 +15,8 @@ import FeedbackCarousel from "./feedbackCarousel";
 import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
+import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
+import { useGlobalKeyboardShortcuts } from "../utilities/useKeyboardNavigation";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -56,9 +58,13 @@ export interface FeedbackBoardState {
   defaultActionItemIteration: string;
   defaultActionItemAreaPath: string;
   columnNotes: { [columnId: string]: string };
+  focusedColumnIndex: number;
+  isKeyboardShortcutsDialogOpen: boolean;
 }
 
 class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
+  private columnRefs: React.RefObject<FeedbackColumn>[] = [];
+
   constructor(props: FeedbackBoardProps) {
     super(props);
 
@@ -70,6 +76,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       hasItems: false,
       isDataLoaded: false,
       columnNotes: {},
+      focusedColumnIndex: 0,
+      isKeyboardShortcutsDialogOpen: false,
     };
   }
 
@@ -81,7 +89,80 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     // listen for signals for work item updates.
     reflectBackendService.onReceiveNewItem(this.receiveNewItemHandler);
     reflectBackendService.onReceiveUpdatedItem(this.receiveUpdatedItemHandler);
+
+    this.setupKeyboardShortcuts();
   }
+
+  private setupKeyboardShortcuts = () => {
+    document.addEventListener("keydown", this.handleBoardKeyDown);
+  };
+
+  private handleBoardKeyDown = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || document.querySelector('[role="dialog"]')) {
+      return;
+    }
+
+    switch (e.key) {
+      case "?":
+        e.preventDefault();
+        this.setState({ isKeyboardShortcutsDialogOpen: true });
+        break;
+      case "ArrowLeft":
+        if (!e.shiftKey && !e.ctrlKey && !e.altKey) {
+          e.preventDefault();
+          this.navigateToColumn("prev");
+        }
+        break;
+      case "ArrowRight":
+        if (!e.shiftKey && !e.ctrlKey && !e.altKey) {
+          e.preventDefault();
+          this.navigateToColumn("next");
+        }
+        break;
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
+        if (!e.shiftKey && !e.ctrlKey && !e.altKey) {
+          const columnIndex = parseInt(e.key, 10) - 1;
+          if (columnIndex < this.state.columnIds.length) {
+            e.preventDefault();
+            this.navigateToColumnByIndex(columnIndex);
+          }
+        }
+        break;
+    }
+  };
+
+  private navigateToColumn = (direction: "next" | "prev") => {
+    const { focusedColumnIndex, columnIds } = this.state;
+    let newIndex = focusedColumnIndex;
+
+    if (direction === "next") {
+      newIndex = (focusedColumnIndex + 1) % columnIds.length;
+    } else {
+      newIndex = (focusedColumnIndex - 1 + columnIds.length) % columnIds.length;
+    }
+
+    this.navigateToColumnByIndex(newIndex);
+  };
+
+  private navigateToColumnByIndex = (index: number) => {
+    if (index >= 0 && index < this.columnRefs.length && this.columnRefs[index]?.current) {
+      this.setState({ focusedColumnIndex: index });
+      this.columnRefs[index].current?.focusColumn();
+    }
+  };
+
+  private closeKeyboardShortcutsDialog = () => {
+    this.setState({ isKeyboardShortcutsDialogOpen: false });
+  };
 
   public async componentDidUpdate(prevProps: FeedbackBoardProps) {
     if (prevProps.board.id !== this.props.board.id) {
@@ -108,9 +189,9 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   }
 
   public async componentWillUnmount() {
-    // Remove event listeners.
     reflectBackendService.removeOnReceiveNewItem(this.receiveNewItemHandler);
     reflectBackendService.removeOnReceiveUpdatedItem(this.receiveUpdatedItemHandler);
+    document.removeEventListener("keydown", this.handleBoardKeyDown);
   }
 
   private readonly receiveNewItemHandler = async (columnId: string, feedbackItemId: string) => {
@@ -129,6 +210,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     const stateColumns: { [id: string]: IColumn } = {};
     const columnIds: string[] = new Array<string>();
     const columnNotes: { [columnId: string]: string } = {};
+
+    this.columnRefs = columnProperties.map(() => React.createRef<FeedbackColumn>());
 
     columnProperties.forEach(col => {
       if (!col.iconClass) {
@@ -431,9 +514,10 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
     const canCurrentUserEditBoard = this.props.board.createdBy?.id === this.props.userId;
 
-    const feedbackColumnPropsList = this.state.columnIds.map(columnId => {
+    const feedbackColumnPropsList = this.state.columnIds.map((columnId, index) => {
       return {
         key: columnId,
+        ref: this.columnRefs[index],
         columns: this.state.columns,
         columnIds: this.state.columnIds,
         columnName: this.state.columns[columnId].columnProperties.title,
@@ -461,6 +545,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         showColumnEditButton: !!canCurrentUserEditBoard,
         columnNotes: this.state.columnNotes[columnId] ?? "",
         onColumnNotesChange: (notes: string) => this.handleColumnNotesChange(columnId, notes),
+        registerItemRef: this.columnRefs[index]?.current?.registerItemRef,
         onVoteCasted: () => {
           if (this.props.onVoteCasted) {
             this.props.onVoteCasted();
@@ -471,7 +556,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
     return (
       <div className="feedback-board">
-        <div className="feedback-columns-container">
+        <div className="feedback-columns-container" role="main" aria-label="Feedback board with columns">
           {this.state.isDataLoaded &&
             feedbackColumnPropsList.map(columnProps => {
               return <FeedbackColumn {...columnProps} />;
@@ -494,6 +579,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         >
           <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
         </Dialog>
+        <KeyboardShortcutsDialog isOpen={this.state.isKeyboardShortcutsDialogOpen} onClose={this.closeKeyboardShortcutsDialog} currentWorkflowPhase={this.props.workflowPhase} />
       </div>
     );
   }

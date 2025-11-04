@@ -9,6 +9,18 @@
   width: 100%;
   min-width: 260px;
 
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    .mainItemCard {
+      outline: 3px solid #0078d4;
+      outline-offset: 2px;
+      box-shadow: 0 0 8px rgba(0, 120, 212, 0.3);
+    }
+  }
+
   &.newFeedbackItem {
     .ms-DocumentCard {
       animation: fadeInFromGreen 1000ms ease-in 1;
@@ -77,6 +89,12 @@
             border: none;
           }
 
+          &:focus-visible {
+            outline: 2px solid #0078d4;
+            outline-offset: 2px;
+            border-radius: 3px;
+          }
+
           &:disabled {
             opacity: 0.5;
             cursor: default;
@@ -102,6 +120,12 @@
             margin-left: 2px;
             line-height: inherit;
             margin-right: -4px;
+          }
+
+          &:focus-visible {
+            outline: 2px solid #0078d4;
+            outline-offset: 2px;
+            border-radius: 3px;
           }
         }
 
@@ -137,6 +161,11 @@
           .contextual-menu-button {
             min-width: 25px;
             width: 25px;
+
+            &:focus-visible {
+              outline: 2px solid #0078d4;
+              outline-offset: 2px;
+            }
           }
         }
       }
