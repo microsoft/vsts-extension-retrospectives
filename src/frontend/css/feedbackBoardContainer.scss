@@ -166,6 +166,26 @@ $team_selector_list_item_width: 450px;
   border-radius: 4px;
   color: var(--text-primary-color);
 
+  select {
+    background-color: var(--background-color);
+    color: var(--text-primary-color);
+    border: 1px solid var(--border-subtle-color);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--border-subtle-color);
+      outline-offset: 2px;
+    }
+
+    option {
+      background-color: var(--background-color);
+      color: var(--text-primary-color);
+    }
+  }
+
   button {
     border: none;
     background: transparent;
