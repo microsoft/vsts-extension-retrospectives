@@ -726,7 +726,8 @@ describe("Facilitation timer", () => {
       jest.advanceTimersByTime(2000);
     });
 
-    expect(instance.state.boardTimerSeconds).toBe(2);
+    // Countdown starts at 5 minutes (300 seconds) and counts down
+    expect(instance.state.boardTimerSeconds).toBe(298);
 
     (instance as any).pauseBoardTimer();
     expect(instance.state.isBoardTimerRunning).toBe(false);
@@ -815,7 +816,7 @@ describe("Facilitation timer", () => {
       });
 
       const toggleButtonInitial = screen.getByRole("button", { pressed: false });
-      const resetButton = screen.getByRole("button", { name: "Reset facilitation timer" });
+      const resetButton = screen.getByRole("button", { name: "Reset countdown timer" });
       expect(resetButton).toBeDisabled();
 
       act(() => {
@@ -829,7 +830,8 @@ describe("Facilitation timer", () => {
         jest.advanceTimersByTime(3000);
       });
 
-      expect(componentInstance.state.boardTimerSeconds).toBe(3);
+      // Countdown starts at 5 minutes (300 seconds) and counts down
+      expect(componentInstance.state.boardTimerSeconds).toBe(297);
       expect(resetButton).not.toBeDisabled();
 
       act(() => {
