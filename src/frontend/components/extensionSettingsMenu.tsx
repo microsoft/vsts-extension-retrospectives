@@ -277,7 +277,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     },
     {
       key: "keyboardShortcuts",
-      iconProps: { iconName: "Keyboard" },
+      iconProps: { iconName: "KeyboardRegular" },
       onClick: () => this.setState({ isKeyboardShortcutsDialogHidden: false }),
       text: "Keyboard shortcuts",
       title: "Keyboard shortcuts",

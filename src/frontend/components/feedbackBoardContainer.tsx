@@ -1631,10 +1631,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           aria-label="Team Assessment"
                           type="button"
                         >
-                          <span className="inline-flex items-center justify-center mr-1">
+                          <span className="inline-flex items-center justify-center lg:mr-1">
                             <i className="fas fa-chart-line"></i>
                           </span>
-                          <span>Team Assessment</span>
+                          <span className="hidden lg:inline">Team Assessment</span>
                         </button>
                       </div>
                     )}
