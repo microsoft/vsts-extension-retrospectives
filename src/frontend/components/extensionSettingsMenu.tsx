@@ -22,7 +22,6 @@ interface IExtensionSettingsMenuState {
   isGetHelpDialogHidden: boolean;
   isPleaseJoinUsDialogHidden: boolean;
   isKeyboardShortcutsDialogHidden: boolean;
-  isWindowWide: boolean;
 }
 
 interface IExportImportDataSchema {
@@ -38,10 +37,9 @@ interface ContextualMenuButtonProps {
   label: string;
   onClick?: () => void;
   menuItems?: IContextualMenuItem[];
-  showLabel: boolean;
 }
 
-export const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({ ariaLabel, title, iconClass, label, onClick, menuItems, showLabel }) => {
+export const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({ ariaLabel, title, iconClass, label, onClick, menuItems }) => {
   const buttonClass = "contextual-menu-button";
   const menuProps = menuItems
     ? {
@@ -56,7 +54,7 @@ export const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({ aria
         <i className={iconClass}></i>
       </span>
       &nbsp;
-      {showLabel && <span className="ms-Button-label">{label}</span>}
+      <span className="ms-Button-label hidden lg:inline">{label}</span>
     </DefaultButton>
   );
 };
@@ -69,12 +67,11 @@ interface ExtensionDialogProps {
   onDefaultClick: () => void;
   defaultButtonText: string;
   primaryButtonText?: string;
-  minWidth?: number;
   containerClassName: string;
   subText?: string;
 }
 
-const ExtensionDialog: React.FC<ExtensionDialogProps> = ({ hidden, onDismiss, title, children, onDefaultClick, defaultButtonText, primaryButtonText = "Close", minWidth = 600, containerClassName, subText }) => (
+const ExtensionDialog: React.FC<ExtensionDialogProps> = ({ hidden, onDismiss, title, children, onDefaultClick, defaultButtonText, primaryButtonText = "Close", containerClassName, subText }) => (
   <Dialog
     hidden={hidden}
     onDismiss={onDismiss}
@@ -83,7 +80,7 @@ const ExtensionDialog: React.FC<ExtensionDialogProps> = ({ hidden, onDismiss, ti
       title,
       subText,
     }}
-    minWidth={minWidth}
+    minWidth="600"
     modalProps={{
       isBlocking: true,
       containerClassName,
@@ -108,30 +105,8 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
       isWhatsNewDialogHidden: true,
       isGetHelpDialogHidden: true,
       isPleaseJoinUsDialogHidden: true,
-      isWindowWide: this.checkIfWindowWideOrTall(),
     };
   }
-
-  componentDidMount() {
-    window.addEventListener("resize", this.handleResize);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.handleResize);
-  }
-
-  // Function to check if the window is maximized (90% threshold) or vertical
-  checkIfWindowWideOrTall = () => {
-    const isWide = window.outerWidth >= screen.availWidth * 0.9;
-    const isTallerThanWide = window.innerHeight > window.innerWidth;
-    return isWide && !isTallerThanWide;
-  };
-
-  handleResize = () => {
-    this.setState({
-      isWindowWide: this.checkIfWindowWideOrTall(),
-    });
-  };
 
   private readonly exportData = async () => {
     const toastId = toast("Processing boards...");
@@ -306,13 +281,11 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
   ];
 
   public render() {
-    const { isWindowWide } = this.state;
-
     return (
       <div className="extension-settings-menu">
-        <ContextualMenuButton ariaLabel="Prime Directive" title="Prime Directive" iconClass="fas fa-shield-halved" label="Directive" onClick={this.showPrimeDirectiveDialog} showLabel={isWindowWide} />
-        <ContextualMenuButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} showLabel={isWindowWide} />
-        <ContextualMenuButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} showLabel={isWindowWide} />
+        <ContextualMenuButton ariaLabel="Prime Directive" title="Prime Directive" iconClass="fas fa-shield-halved" label="Directive" onClick={this.showPrimeDirectiveDialog} />
+        <ContextualMenuButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} />
+        <ContextualMenuButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} />
 
         <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog">
           {renderContent(PRIME_DIRECTIVE_CONTENT)}
