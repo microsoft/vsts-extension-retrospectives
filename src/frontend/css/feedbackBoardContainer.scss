@@ -152,29 +152,6 @@ $team_selector_list_item_width: 450px;
   margin-left: 5px;
 }
 
-.retrospective-workflowState {
-  height: 40px;
-  cursor: pointer;
-  display: flex;
-  text-align: center;
-  align-items: center;
-  width: 75px;
-  border-radius: 5px 5px 0 0;
-  border-left: 1px var(--nav-header-active-item-background) solid;
-  border-right: 1px var(--nav-header-active-item-background) solid;
-  border-top: 1px var(--nav-header-active-item-background) solid;
-
-  .stage-text {
-    font-size: 12px;
-    width: 100%;
-  }
-
-  &.active {
-    font-weight: 700;
-    background-color: var(--nav-header-active-item-background);
-  }
-}
-
 .workflow-stage-header {
   display: flex;
   align-items: center;
