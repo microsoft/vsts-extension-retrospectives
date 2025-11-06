@@ -1700,122 +1700,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       )}
                     </div>
                   </div>
-                  <div className="flex-1 min-h-0 flex flex-col">
-                    {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
-                      <>
-                        {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
-                          <MessageBar
-                            className="info-message-bar"
-                            messageBarType={MessageBarType.info}
-                            isMultiline={true}
-                            onDismiss={this.hideLiveSyncInTfsIssueMessageBar}
-                            styles={{
-                              root: {
-                                background: "#cceeff",
-                              },
-                            }}
-                          >
-                            <span>
-                              <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
-                            </span>
-                          </MessageBar>
-                        )}
-                        {!this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected && (
-                          <MessageBar className="info-message-bar" messageBarType={MessageBarType.warning} isMultiline={true} onDismiss={this.hideDropIssueInEdgeMessageBar}>
-                            <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
-                          </MessageBar>
-                        )}
-                        {this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected && (
-                          <MessageBar
-                            className="info-message-bar"
-                            messageBarType={MessageBarType.warning}
-                            isMultiline={true}
-                            actions={
-                              <div className="info-message-bar-action">
-                                {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
-                                {!this.state.isReconnectingToBackendService && (
-                                  <>
-                                    <MessageBarButton className="info-message-bar-action-button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService} text="Reconnect" />
-                                    <IconButton
-                                      className="info-message-bar-action-button"
-                                      onClick={() => {
-                                        this.setState({ isBackendServiceConnected: true });
-                                      }}
-                                      disabled={this.state.isReconnectingToBackendService}
-                                      title="Hide"
-                                    >
-                                      <span className="ms-Button-icon">
-                                        <i className="fas fa-times"></i>
-                                      </span>
-                                    </IconButton>
-                                  </>
-                                )}
-                              </div>
-                            }
-                          >
-                            <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
-                          </MessageBar>
-                        )}
-                        <div className="feedback-board-container">
-                          <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} onColumnNotesChange={this.persistColumnNotes} />
-                        </div>
-                        <Dialog
-                          hidden={this.state.isArchiveBoardConfirmationDialogHidden}
-                          onDismiss={this.hideArchiveBoardConfirmationDialog}
-                          dialogContentProps={{
-                            type: DialogType.close,
-                            title: "Archive Retrospective",
-                          }}
-                          modalProps={{
-                            isBlocking: true,
-                            containerClassName: "retrospectives-archive-board-confirmation-dialog",
-                            className: "retrospectives-dialog-modal",
-                          }}
-                        >
-                          <DialogContent>
-                            <p>
-                              The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
-                            </p>
-                            <br />
-                            <p>
-                              <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-                            </p>
-                          </DialogContent>
-                          <DialogFooter>
-                            <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
-                            <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
-                          </DialogFooter>
-                        </Dialog>
-                      </>
-                    )}
-                    <Dialog
-                      hidden={this.state.isArchiveBoardConfirmationDialogHidden}
-                      onDismiss={this.hideArchiveBoardConfirmationDialog}
-                      dialogContentProps={{
-                        type: DialogType.close,
-                        title: "Archive Retrospective",
-                      }}
-                      modalProps={{
-                        isBlocking: true,
-                        containerClassName: "retrospectives-archive-board-confirmation-dialog",
-                        className: "retrospectives-dialog-modal",
-                      }}
-                    >
-                      <DialogContent>
-                        <p>
-                          The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
-                        </p>
-                        <br />
-                        <p>
-                          <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-                        </p>
-                      </DialogContent>
-                      <DialogFooter>
-                        <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
-                        <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
-                      </DialogFooter>
-                    </Dialog>
-                  </div>
                 </>
               )}
             </div>
@@ -1825,6 +1709,124 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </div>
             )}
           </div>
+          {this.state.activeTab === "Board" && (
+            <div className="flex-1 min-h-0 flex flex-col">
+              {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
+                <>
+                  {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
+                    <MessageBar
+                      className="info-message-bar"
+                      messageBarType={MessageBarType.info}
+                      isMultiline={true}
+                      onDismiss={this.hideLiveSyncInTfsIssueMessageBar}
+                      styles={{
+                        root: {
+                          background: "#cceeff",
+                        },
+                      }}
+                    >
+                      <span>
+                        <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
+                      </span>
+                    </MessageBar>
+                  )}
+                  {!this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected && (
+                    <MessageBar className="info-message-bar" messageBarType={MessageBarType.warning} isMultiline={true} onDismiss={this.hideDropIssueInEdgeMessageBar}>
+                      <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
+                    </MessageBar>
+                  )}
+                  {this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected && (
+                    <MessageBar
+                      className="info-message-bar"
+                      messageBarType={MessageBarType.warning}
+                      isMultiline={true}
+                      actions={
+                        <div className="info-message-bar-action">
+                          {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
+                          {!this.state.isReconnectingToBackendService && (
+                            <>
+                              <MessageBarButton className="info-message-bar-action-button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService} text="Reconnect" />
+                              <IconButton
+                                className="info-message-bar-action-button"
+                                onClick={() => {
+                                  this.setState({ isBackendServiceConnected: true });
+                                }}
+                                disabled={this.state.isReconnectingToBackendService}
+                                title="Hide"
+                              >
+                                <span className="ms-Button-icon">
+                                  <i className="fas fa-times"></i>
+                                </span>
+                              </IconButton>
+                            </>
+                          )}
+                        </div>
+                      }
+                    >
+                      <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
+                    </MessageBar>
+                  )}
+                  <div className="feedback-board-container">
+                    <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} onColumnNotesChange={this.persistColumnNotes} />
+                  </div>
+                  <Dialog
+                    hidden={this.state.isArchiveBoardConfirmationDialogHidden}
+                    onDismiss={this.hideArchiveBoardConfirmationDialog}
+                    dialogContentProps={{
+                      type: DialogType.close,
+                      title: "Archive Retrospective",
+                    }}
+                    modalProps={{
+                      isBlocking: true,
+                      containerClassName: "retrospectives-archive-board-confirmation-dialog",
+                      className: "retrospectives-dialog-modal",
+                    }}
+                  >
+                    <DialogContent>
+                      <p>
+                        The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
+                      </p>
+                      <br />
+                      <p>
+                        <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
+                      </p>
+                    </DialogContent>
+                    <DialogFooter>
+                      <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
+                      <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
+                    </DialogFooter>
+                  </Dialog>
+                </>
+              )}
+              <Dialog
+                hidden={this.state.isArchiveBoardConfirmationDialogHidden}
+                onDismiss={this.hideArchiveBoardConfirmationDialog}
+                dialogContentProps={{
+                  type: DialogType.close,
+                  title: "Archive Retrospective",
+                }}
+                modalProps={{
+                  isBlocking: true,
+                  containerClassName: "retrospectives-archive-board-confirmation-dialog",
+                  className: "retrospectives-dialog-modal",
+                }}
+              >
+                <DialogContent>
+                  <p>
+                    The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
+                  </p>
+                  <br />
+                  <p>
+                    <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
+                  </p>
+                </DialogContent>
+                <DialogFooter>
+                  <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
+                  <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
+                </DialogFooter>
+              </Dialog>
+            </div>
+          )}
         </div>
         {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
         {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
