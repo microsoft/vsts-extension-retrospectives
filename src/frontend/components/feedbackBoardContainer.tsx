@@ -25,7 +25,6 @@ import SelectorCombo, { ISelectorList } from "./selectorCombo";
 import FeedbackBoardPreviewEmail from "./feedbackBoardPreviewEmail";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { TooltipHost } from "@fluentui/react/lib/Tooltip";
 import { shareBoardHelper } from "../utilities/shareBoardHelper";
 import { itemDataService } from "../dal/itemDataService";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
@@ -1647,8 +1646,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <div className="workflow-stage-timer" role="status" aria-live="polite">
                       <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} facilitation timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed.`} onClick={this.handleBoardTimerToggle}>
                         <i className={this.state.isBoardTimerRunning ? "fa fa-stop-circle" : "fa fa-play-circle"} />
-                        <span> {this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed</span>
                       </button>
+                      <span>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
                       <button type="button" className="workflow-stage-timer-reset" title="Reset timer" aria-label="Reset facilitation timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
                         <i className="fa fa-undo" />
                       </button>
