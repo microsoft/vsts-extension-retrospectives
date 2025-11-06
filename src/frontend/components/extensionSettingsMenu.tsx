@@ -225,8 +225,8 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     {
       key: "exportData",
       iconProps: { iconName: "CloudDownload" },
-      onClick: (ev, item) => {
-        this.exportData().catch(console.error); // Ensures async function runs without breaking `onClick`
+      onClick: () => {
+        this.exportData().catch(console.error);
       },
       text: "Export data",
       title: "Export data",
@@ -234,8 +234,8 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     {
       key: "importData",
       iconProps: { iconName: "CloudUpload" },
-      onClick: (ev, item) => {
-        this.importData().catch(console.error); // Ensures async function runs without breaking `onClick`
+      onClick: () => {
+        this.importData().catch(console.error);
       },
       text: "Import data",
       title: "Import data",
@@ -252,7 +252,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     },
     {
       key: "keyboardShortcuts",
-      iconProps: { iconName: "KeyboardRegular" },
+      iconProps: { iconName: "KeyboardClassic" },
       onClick: () => this.setState({ isKeyboardShortcutsDialogHidden: false }),
       text: "Keyboard shortcuts",
       title: "Keyboard shortcuts",
