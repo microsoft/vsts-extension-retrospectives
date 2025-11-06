@@ -175,6 +175,7 @@ $team_selector_list_item_width: 450px;
     font-size: 12px;
     min-width: 60px;
     text-align: center;
+    width: 75px;
   }
 
   select {
@@ -184,6 +185,7 @@ $team_selector_list_item_width: 450px;
     border-radius: 4px;
     padding: 4px 8px;
     font-size: 12px;
+    width: 75px;
     cursor: pointer;
 
     &:focus-visible {
