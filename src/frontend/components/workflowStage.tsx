@@ -35,7 +35,7 @@ class WorkflowStage extends React.Component<IWorkflowStageProps, IWorkflowStageS
   }
 
   private handleKeyPressWorkFlowState = (event: React.KeyboardEvent<HTMLDivElement>, newState: WorkflowPhase) => {
-    if (event.keyCode === 13) {
+    if (event.key === "Enter") {
       this.props.clickEventCallback(event, newState);
     }
     return;
