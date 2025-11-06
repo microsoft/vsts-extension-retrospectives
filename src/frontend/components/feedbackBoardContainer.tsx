@@ -106,6 +106,7 @@ export interface FeedbackBoardContainerState {
   activeTab: "Board" | "History";
   boardTimerSeconds: number;
   isBoardTimerRunning: boolean;
+  countdownDurationMinutes: number;
 }
 
 export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
@@ -174,6 +175,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       activeTab: "Board",
       boardTimerSeconds: 0,
       isBoardTimerRunning: false,
+      countdownDurationMinutes: 5,
     };
   }
 
@@ -296,8 +298,20 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       return;
     }
 
+    // Initialize countdown if starting fresh
+    if (this.state.boardTimerSeconds === 0) {
+      this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60 });
+    }
+
     this.boardTimerIntervalId = window.setInterval(() => {
-      this.setState(previousState => ({ boardTimerSeconds: previousState.boardTimerSeconds + 1 }));
+      this.setState(previousState => {
+        const newSeconds = previousState.boardTimerSeconds - 1;
+        if (newSeconds <= 0) {
+          this.pauseBoardTimer();
+          return { boardTimerSeconds: 0 };
+        }
+        return { boardTimerSeconds: newSeconds };
+      });
     }, 1000);
 
     if (!this.state.isBoardTimerRunning) {
@@ -343,6 +357,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     event.stopPropagation();
 
     this.resetBoardTimer();
+  };
+
+  private readonly handleCountdownDurationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const duration = parseInt(event.target.value, 10);
+    this.setState({ countdownDurationMinutes: duration });
   };
 
   private readonly formatBoardTimer = (timeInSeconds: number) => {
@@ -1644,11 +1663,24 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
                     </div>
                     <div className="workflow-stage-timer" role="status" aria-live="polite">
-                      <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} facilitation timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} elapsed.`} onClick={this.handleBoardTimerToggle}>
-                        <i className={this.state.isBoardTimerRunning ? "fa fa-stop-circle" : "fa fa-play-circle"} />
+                      <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause countdown" : "Start countdown"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} countdown timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} remaining.`} onClick={this.handleBoardTimerToggle}>
+                        <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
                       </button>
-                      <span>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
-                      <button type="button" className="workflow-stage-timer-reset" title="Reset timer" aria-label="Reset facilitation timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
+                      {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
+                        <select
+                          value={this.state.countdownDurationMinutes}
+                          onChange={this.handleCountdownDurationChange}
+                          className="workflow-stage-timer-select"
+                          aria-label="Select countdown duration in minutes"
+                        >
+                          {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
+                            <option key={num} value={num}>{num} min</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
+                      )}
+                      <button type="button" className="workflow-stage-timer-reset" title="Reset countdown" aria-label="Reset countdown timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
                         <i className="fa fa-undo" />
                       </button>
                     </div>
