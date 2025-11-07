@@ -52,7 +52,6 @@ export interface FeedbackColumnState {
   isCollapsed: boolean;
   isCarouselHidden: boolean;
   isEditDialogOpen: boolean;
-  isInfoDialogOpen: boolean;
   columnNotesDraft: string;
   focusedItemIndex: number;
 }
@@ -76,7 +75,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       isCarouselHidden: true,
       isCollapsed: false,
       isEditDialogOpen: false,
-      isInfoDialogOpen: false,
       columnNotesDraft: "",
       focusedItemIndex: -1,
     };
@@ -231,11 +229,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           this.openEditDialog();
         }
         break;
-      case "i":
-      case "I":
-        e.preventDefault();
-        this.openInfoDialog();
-        break;
     }
   };
 
@@ -365,14 +358,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     this.setState({ isEditDialogOpen: false });
   };
 
-  private readonly openInfoDialog = () => {
-    this.setState({ isInfoDialogOpen: true });
-  };
-
-  private readonly closeInfoDialog = () => {
-    this.setState({ isInfoDialogOpen: false });
-  };
-
   private readonly handleColumnNotesDraftChange = (_event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
     this.setState({ columnNotesDraft: newValue ?? "" });
   };
@@ -483,9 +468,11 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
                 <i className="fas fa-comment-medical"></i>
               </button>
             )}
-            <button className="feedback-column-info-button" title="View column notes" aria-label={`View notes for ${this.props.columnName}`} onClick={this.openInfoDialog}>
-              <i className="fas fa-circle-info"></i>
-            </button>
+            {this.props.columnNotes && (
+              <button className="feedback-column-info-button" title={this.props.columnNotes} aria-label={`Column notes: ${this.props.columnNotes}`}>
+                <i className="fas fa-circle-info"></i>
+              </button>
+            )}
           </div>
         </div>
         <div className={cn("feedback-column-content", this.state.isCollapsed && "hide-collapse")}>
@@ -523,24 +510,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           <DialogFooter>
             <PrimaryButton text="Save" onClick={this.saveColumnNotes} />
             <DefaultButton text="Cancel" onClick={this.closeEditDialog} />
-          </DialogFooter>
-        </Dialog>
-        <Dialog
-          hidden={!this.state.isInfoDialogOpen}
-          onDismiss={this.closeInfoDialog}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: "Column info",
-          }}
-          modalProps={{
-            isBlocking: false,
-            containerClassName: "prime-directive-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          <div className="feedback-column-info-dialog-text">{this.props.columnNotes ? this.props.columnNotes : "No notes available for this column."}</div>
-          <DialogFooter>
-            <DefaultButton text="Close" onClick={this.closeInfoDialog} />
           </DialogFooter>
         </Dialog>
       </div>
