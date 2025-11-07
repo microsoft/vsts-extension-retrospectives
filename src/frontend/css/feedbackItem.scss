@@ -7,7 +7,9 @@
   display: inline-block;
   vertical-align: top;
   width: 100%;
+  max-width: 320px;
   min-width: 260px;
+  box-sizing: border-box;
 
   &:focus {
     outline: none;
@@ -43,8 +45,10 @@
   }
 
   .mainItemCard {
-    width: 250px; // For a uniform size
+    width: 100%;
+    max-width: 320px;
     background-color: var(--background-color);
+    box-sizing: border-box;
     border-top: 1px solid rgb(96, 94, 92);
     border-right: 1px solid rgb(96, 94, 92);
     border-bottom: 1px solid rgb(96, 94, 92);

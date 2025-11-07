@@ -84,6 +84,9 @@
 .feedback-column-content {
   padding: 10px;
   padding-left: variables.$header_horizontal_spacing;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .feedback-column-info-dialog-text {
@@ -96,6 +99,9 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 20px 30px;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .create-container {
