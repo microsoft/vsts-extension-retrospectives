@@ -2044,7 +2044,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 const svgWidth = 1100;
                 const svgHeight = 500;
-                const padding = { top: 40, right: 220, bottom: 80, left: 80 };
+                const padding = { top: 40, right: 230, bottom: 80, left: 80 };
                 const chartWidth = svgWidth - padding.left - padding.right;
                 const chartHeight = svgHeight - padding.top - padding.bottom;
 
@@ -2116,7 +2116,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <text x={padding.left - 50} y={svgHeight / 2} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${svgHeight / 2})`}>
                         Average Score
                       </text>
-                      <text x={(padding.left + svgWidth - padding.right) / 2} y={svgHeight - 25} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600">
+                      <text x={(padding.left + svgWidth - padding.right) / 2} y={svgHeight - 40} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600">
                         Retrospective Date
                       </text>
 
@@ -2129,7 +2129,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           <g key={question.id}>
                             <line x1={legendX} y1={legendY} x2={legendX + 30} y2={legendY} stroke={color} strokeWidth="2.5" />
                             <circle cx={legendX + 15} cy={legendY} r="4" fill={color} stroke="#fff" strokeWidth="2" />
-
                             <text x={legendX + 40} y={legendY - 5} fontSize="13" fill="#333" fontWeight="600">
                               <tspan>{question.shortTitle}</tspan>
                             </text>
