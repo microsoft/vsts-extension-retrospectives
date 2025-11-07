@@ -585,8 +585,9 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             try {
               return <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />;
             } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : String(error);
               console.error('[FeedbackBoard] Error creating FeedbackCarousel:', error);
-              alert('Error creating FeedbackCarousel: ' + error.message);
+              alert('Error creating FeedbackCarousel: ' + errorMessage);
               throw error;
             }
           })()}
