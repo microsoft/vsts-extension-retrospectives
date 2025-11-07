@@ -2028,8 +2028,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </div>
           ) : (
             <>
-              <p style={{ marginBottom: "20px" }}>At v2.0.1 and later (scheduled to be published on Jan 1st 2026), there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.</p>
-              <p style={{ marginBottom: "20px" }}>
+              <p style={{ marginBottom: "10px" }}>At v2.0.1 and later (scheduled to be published on Jan 1st 2026), there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.</p>
+              <p style={{ marginBottom: "10px" }}>
                 Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
               </p>
               {(() => {
@@ -2042,9 +2042,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   "#e81123", // Red
                 ];
 
-                const svgWidth = 1000;
+                const svgWidth = 1100;
                 const svgHeight = 500;
-                const padding = { top: 60, right: 250, bottom: 80, left: 80 };
+                const padding = { top: 40, right: 180, bottom: 80, left: 80 };
                 const chartWidth = svgWidth - padding.left - padding.right;
                 const chartHeight = svgHeight - padding.top - padding.bottom;
 
