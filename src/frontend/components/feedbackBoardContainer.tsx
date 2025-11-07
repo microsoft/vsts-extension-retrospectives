@@ -2037,12 +2037,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <p>Create retrospectives with team assessments to see historical trends.</p>
             </div>
           ) : (
-            <div style={{ padding: "20px" }}>
+            <>
+              <p style={{ marginBottom: "20px" }}>
+                At v2.0.1 and later, there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.
+              </p>
               <p style={{ marginBottom: "20px" }}>
                 Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
               </p>
               {(() => {
-                // Define colors for each question
                 const questionColors = [
                   "#0078d4", // Blue
                   "#107c10", // Green
@@ -2052,7 +2054,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   "#e81123", // Red
                 ];
 
-                // SVG dimensions and scales
                 const svgWidth = 1000;
                 const svgHeight = 500;
                 const padding = { top: 60, right: 250, bottom: 80, left: 80 };
@@ -2061,7 +2062,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 const yScale = (value: number) => padding.top + chartHeight - (value / 10) * chartHeight;
 
-                // Get all unique dates across all boards
                 const allDates = this.state.teamAssessmentHistoryData.map(board => new Date(board.createdDate).getTime());
                 const minDate = Math.min(...allDates);
                 const maxDate = Math.max(...allDates);
@@ -2071,7 +2071,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 return (
                   <div>
                     <svg width={svgWidth} height={svgHeight} style={{ maxWidth: "100%", height: "auto" }}>
-                      {/* Y-axis grid lines and labels */}
                       {[0, 2, 4, 6, 8, 10].map(value => (
                         <g key={value}>
                           <line x1={padding.left} y1={yScale(value)} x2={svgWidth - padding.right} y2={yScale(value)} stroke="#e0e0e0" strokeWidth="1" />
@@ -2081,13 +2080,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </g>
                       ))}
 
-                      {/* X-axis */}
                       <line x1={padding.left} y1={svgHeight - padding.bottom} x2={svgWidth - padding.right} y2={svgHeight - padding.bottom} stroke="#666" strokeWidth="2" />
 
-                      {/* Y-axis */}
                       <line x1={padding.left} y1={padding.top} x2={padding.left} y2={svgHeight - padding.bottom} stroke="#666" strokeWidth="2" />
 
-                      {/* Draw lines and points for each question */}
                       {questions.map((question, qIndex) => {
                         const color = questionColors[qIndex % questionColors.length];
                         const dataPoints = this.state.teamAssessmentHistoryData
@@ -2105,10 +2101,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                         return (
                           <g key={question.id}>
-                            {/* Line */}
                             <path d={linePath} fill="none" stroke={color} strokeWidth="2.5" opacity="0.8" />
 
-                            {/* Data points */}
                             {dataPoints.map((point, index) => (
                               <circle key={index} cx={xScale(point.date)} cy={yScale(point.average)} r="4" fill={color} stroke="#fff" strokeWidth="2">
                                 <title>{`${question.shortTitle}\n${point.boardTitle}\nDate: ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(point.date)}\nAverage: ${this.numberFormatter(point.average)}`}</title>
@@ -2118,7 +2112,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         );
                       })}
 
-                      {/* X-axis date labels */}
                       {this.state.teamAssessmentHistoryData.map((board, index) => {
                         const date = new Date(board.createdDate);
                         const shouldShowLabel = index === 0 || index === this.state.teamAssessmentHistoryData.length - 1 || (this.state.teamAssessmentHistoryData.length <= 5) || (this.state.teamAssessmentHistoryData.length > 5 && index % Math.ceil(this.state.teamAssessmentHistoryData.length / 5) === 0);
@@ -2132,7 +2125,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         );
                       })}
 
-                      {/* Axis labels */}
                       <text x={padding.left - 50} y={svgHeight / 2} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${svgHeight / 2})`}>
                         Average Score
                       </text>
@@ -2140,7 +2132,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         Retrospective Date
                       </text>
 
-                      {/* Legend */}
                       {questions.map((question, qIndex) => {
                         const color = questionColors[qIndex % questionColors.length];
                         const legendX = svgWidth - padding.right + 15;
@@ -2148,11 +2139,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                         return (
                           <g key={question.id}>
-                            {/* Legend line */}
                             <line x1={legendX} y1={legendY} x2={legendX + 30} y2={legendY} stroke={color} strokeWidth="2.5" />
                             <circle cx={legendX + 15} cy={legendY} r="4" fill={color} stroke="#fff" strokeWidth="2" />
 
-                            {/* Legend icon and text */}
                             <text x={legendX + 40} y={legendY - 5} fontSize="13" fill="#333" fontWeight="600">
                               <tspan>
                                 {question.shortTitle}
@@ -2168,7 +2157,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   </div>
                 );
               })()}
-            </div>
+            </>
           )}
         </Dialog>
         <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
