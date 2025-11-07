@@ -41,6 +41,9 @@
 .whatsnew-dialog,
 .retro-help-dialog,
 .volunteer-dialog {
+  max-width: none;
+  width: 60%;
+  min-width: 500px;
   background-color: var(--background-color);
 
   div[role="heading"] {
