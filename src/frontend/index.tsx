@@ -11,18 +11,16 @@ import FeedbackBoardContainer, { FeedbackBoardContainerProps } from "./component
 
 // Catch all uncaught errors
 window.onerror = function (message, source, lineno, colno, error) {
-  console.error("[window.onerror] Uncaught error:", {
-    message,
-    source,
-    lineno,
-    colno,
-    error,
-  });
+  const errorMsg = `[window.onerror] ${message} at ${source}:${lineno}:${colno}`;
+  console.error(errorMsg, error);
+  alert(errorMsg);
   return false;
 };
 
 window.addEventListener("unhandledrejection", function (event) {
-  console.error("[unhandledrejection] Unhandled promise rejection:", event.reason);
+  const errorMsg = `[unhandledrejection] ${event.reason}`;
+  console.error(errorMsg, event.reason);
+  alert(errorMsg);
 });
 
 initializeIcons("https://res.cdn.office.net/files/fabric-cdn-prod_20240129.001/assets/icons/");
@@ -38,7 +36,9 @@ sdkInit({ applyTheme: true }).then(() => {
     root.render(
       <AppInsightsErrorBoundary
         onError={error => {
-          console.error("[ErrorBoundary] Caught error:", error);
+          const errorMsg = `[ErrorBoundary] ${error}`;
+          console.error(errorMsg, error);
+          alert(errorMsg);
           return <h1>We detected an error in the application</h1>;
         }}
         appInsights={reactPlugin}

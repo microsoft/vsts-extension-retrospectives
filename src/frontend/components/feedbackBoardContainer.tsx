@@ -1421,6 +1421,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly showCarouselDialog = () => {
+    console.error('[FeedbackBoardContainer] showCarouselDialog called');
+    alert('Focus Mode button clicked - opening dialog');
     this.setState({ isCarouselDialogHidden: false });
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemCarouselLaunched });
   };

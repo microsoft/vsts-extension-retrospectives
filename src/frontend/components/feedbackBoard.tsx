@@ -577,7 +577,19 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             isBlocking: true,
           }}
         >
-          <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
+          {(() => {
+            console.error('[FeedbackBoard] Rendering FeedbackCarousel', {
+              isCarouselDialogHidden: this.props.isCarouselDialogHidden,
+              columnCount: feedbackColumnPropsList.length
+            });
+            try {
+              return <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />;
+            } catch (error) {
+              console.error('[FeedbackBoard] Error creating FeedbackCarousel:', error);
+              alert('Error creating FeedbackCarousel: ' + error.message);
+              throw error;
+            }
+          })()}
         </Dialog>
         <KeyboardShortcutsDialog isOpen={this.state.isKeyboardShortcutsDialogOpen} onClose={this.closeKeyboardShortcutsDialog} currentWorkflowPhase={this.props.workflowPhase} />
       </>
