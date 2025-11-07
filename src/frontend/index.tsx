@@ -37,7 +37,6 @@ sdkInit({ applyTheme: true }).then(() => {
           const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
           const errorStack = error instanceof Error ? error.stack : "";
           console.error("[ErrorBoundary] Caught error:", errorMessage, errorStack);
-          alert(`[ErrorBoundary] ${errorMessage}\n\nStack: ${errorStack}`);
           return <h1>We detected an error in the application</h1>;
         }}
         appInsights={reactPlugin}
