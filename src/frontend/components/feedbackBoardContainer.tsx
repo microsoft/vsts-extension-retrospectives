@@ -1421,7 +1421,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly showCarouselDialog = () => {
-    console.error("[FeedbackBoardContainer] showCarouselDialog called");
     this.setState({ isCarouselDialogHidden: false });
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemCarouselLaunched });
   };

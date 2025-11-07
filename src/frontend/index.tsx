@@ -9,18 +9,6 @@ import { reactPlugin } from "./utilities/telemetryClient";
 import { AppInsightsErrorBoundary } from "@microsoft/applicationinsights-react-js";
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from "./components/feedbackBoardContainer";
 
-// Catch all uncaught errors
-window.onerror = function (message, source, lineno, colno, error) {
-  const errorMsg = `[window.onerror] ${message} at ${source}:${lineno}:${colno}`;
-  console.error(errorMsg, error);
-  return false;
-};
-
-window.addEventListener("unhandledrejection", function (event) {
-  const errorMsg = `[unhandledrejection] ${event.reason}`;
-  console.error(errorMsg, event.reason);
-});
-
 initializeIcons("https://res.cdn.office.net/files/fabric-cdn-prod_20240129.001/assets/icons/");
 
 sdkInit({ applyTheme: true }).then(() => {
