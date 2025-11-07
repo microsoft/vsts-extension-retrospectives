@@ -2028,7 +2028,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </div>
           ) : (
             <>
-              <p style={{ marginBottom: "20px" }}>At v2.0.1 and later, there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.</p>
+              <p style={{ marginBottom: "20px" }}>At v2.0.1 and later (scheduled to be published on Jan 1st 2026), there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.</p>
               <p style={{ marginBottom: "20px" }}>
                 Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
               </p>
