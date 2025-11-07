@@ -13,14 +13,12 @@ import FeedbackBoardContainer, { FeedbackBoardContainerProps } from "./component
 window.onerror = function (message, source, lineno, colno, error) {
   const errorMsg = `[window.onerror] ${message} at ${source}:${lineno}:${colno}`;
   console.error(errorMsg, error);
-  alert(errorMsg);
   return false;
 };
 
 window.addEventListener("unhandledrejection", function (event) {
   const errorMsg = `[unhandledrejection] ${event.reason}`;
   console.error(errorMsg, event.reason);
-  alert(errorMsg);
 });
 
 initializeIcons("https://res.cdn.office.net/files/fabric-cdn-prod_20240129.001/assets/icons/");
@@ -37,7 +35,7 @@ sdkInit({ applyTheme: true }).then(() => {
       <AppInsightsErrorBoundary
         onError={error => {
           const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-          const errorStack = error instanceof Error ? error.stack : '';
+          const errorStack = error instanceof Error ? error.stack : "";
           console.error("[ErrorBoundary] Caught error:", errorMessage, errorStack);
           alert(`[ErrorBoundary] ${errorMessage}\n\nStack: ${errorStack}`);
           return <h1>We detected an error in the application</h1>;
