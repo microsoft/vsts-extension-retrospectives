@@ -583,8 +583,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
               columnCount: feedbackColumnPropsList.length,
               columnsWithItems: feedbackColumnPropsList.map(col => ({
                 name: col.columnName,
-                itemCount: col.columnItems?.length || 0
-              }))
+                itemCount: col.columnItems?.length || 0,
+              })),
             });
             try {
               return <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />;
