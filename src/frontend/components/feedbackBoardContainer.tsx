@@ -1706,12 +1706,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               )}
             </div>
             {this.state.activeTab === "History" && (
-              <div className="pivot-content-wrapper flex-1 min-h-0 overflow-auto">
+              <div className="flex-1 min-h-0 overflow-auto border-t-4 border-[var(--nav-header-active-item-background)]">
                 <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
               </div>
             )}
             {this.state.activeTab === "Board" && (
-              <div className="flex-1 min-h-0 flex flex-col feedback-board-container">
+              <div className="flex-1 min-h-0 flex flex-col feedback-board-container border-t-4 border-[var(--nav-header-active-item-background)]">
                 {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
