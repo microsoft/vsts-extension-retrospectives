@@ -15,18 +15,15 @@
 }
 
 .ms-Button--primary {
-  background-color: #fff;
-  color: rgb(0, 120, 212);
-  border: 1px solid rgb(0, 120, 212);
+  @apply bg-white text-blue-600 border border-blue-600
 }
 
 .ms-Button--primary:hover {
-  background-color: rgb(0, 120, 212);
-  color: #fff;
+  @apply bg-blue-600 text-white;
 }
 
 .ms-Button--default {
-  background-color: #fff;
+  @apply bg-white;
 }
 
 div.ms-Tooltip-content p.ms-Tooltip-subtext a {
@@ -34,12 +31,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .ms-Pivot .ms-Button {
-  color: var(--text-primary-color);
+  @apply text-[var(--text-primary-color)];
 }
 
 .ms-Pivot-link:hover {
-  color: var(--status-info-foreground);
-  background-color: inherit;
+  @apply text-[var(--status-info-foreground)] bg-inherit
 }
 
 .ms-Checkbox.is-disabled {
@@ -59,13 +55,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .is-disabled {
-  background-color: var(--text-disabled-color) !important;
-  border-color: var(--text-disabled-color) !important;
-  color: var(--text-disabled-color) !important;
+  @apply bg-[var(--text-disabled-color)] border-[var(--text-disabled-color)] text-[var(--text-disabled-color)];
 }
 
 .ms-ContextualMenu-divider {
-  opacity: 0.2;
+  @apply opacity-20;
 }
 
 .carousel-container {
@@ -73,13 +67,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .carousel-track {
-  @apply flex overflow-x-auto;
+  @apply flex overflow-x-auto w-full relative;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
-  @apply w-full relative;
 }
 
 .carousel-track::-webkit-scrollbar {
@@ -91,7 +84,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   scroll-snap-align: center;
   scroll-snap-stop: always;
   min-width: 100%;
-  padding: 0 60px; /* Space for arrows */
+  padding: 0 60px;
 }
 
 .carousel-viewport {
@@ -133,4 +126,113 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-carousel-pivot-item .carousel-container {
   @apply min-h-96;
+}
+
+.contextual-menu-button {
+  @apply h-[30px] min-w-[40px] bg-inherit px-1 py-0 border-0 text-[rgba(var(--palette-neutral-80),1)];
+}
+
+.contextual-menu-button i[data-icon-name="ChevronDown"] {
+  @apply hidden;
+}
+
+.contextual-menu-button:hover {
+  @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-[var(--text-primary-color)];
+}
+
+.extended-options-menu {
+  @apply bg-[var(--callout-background-color)] max-h-none;
+}
+
+.extended-options-menu button.ms-ContextualMenu-link {
+  @apply text-[var(--text-primary-color)];
+}
+
+.extended-options-menu button.ms-ContextualMenu-link:hover {
+  @apply bg-[var(--border-subtle-color)] text-[var(--text-primary-color)];
+}
+
+.ms-ContextualMenu-Callout .ms-Callout-main {
+  @apply bg-[var(--callout-background-color)];
+}
+
+.prime-directive-dialog,
+.whatsnew-dialog,
+.retro-help-dialog,
+.volunteer-dialog {
+  @apply max-w-none w-3/5 min-w-[500px] bg-[var(--background-color)];
+}
+
+.prime-directive-dialog div[role="heading"],
+.whatsnew-dialog div[role="heading"],
+.retro-help-dialog div[role="heading"],
+.volunteer-dialog div[role="heading"] {
+  @apply text-[var(--text-primary-color)] pb-2.5;
+}
+
+.prime-directive-dialog .ms-Dialog-content,
+.whatsnew-dialog .ms-Dialog-content,
+.retro-help-dialog .ms-Dialog-content,
+.volunteer-dialog .ms-Dialog-content {
+  @apply text-[var(--text-primary-color)];
+}
+
+.prime-directive-dialog .ms-Dialog-content .ms-Label,
+.whatsnew-dialog .ms-Dialog-content .ms-Label,
+.retro-help-dialog .ms-Dialog-content .ms-Label,
+.volunteer-dialog .ms-Dialog-content .ms-Label {
+  @apply text-[var(--text-primary-color)];
+}
+
+.prime-directive-dialog p.ms-Dialog-subText,
+.whatsnew-dialog p.ms-Dialog-subText,
+.retro-help-dialog p.ms-Dialog-subText,
+.volunteer-dialog p.ms-Dialog-subText {
+  @apply text-[var(--text-primary-color)];
+}
+
+.prime-directive-dialog .ms-Dialog-header button.ms-Dialog-button,
+.whatsnew-dialog .ms-Dialog-header button.ms-Dialog-button,
+.retro-help-dialog .ms-Dialog-header button.ms-Dialog-button,
+.volunteer-dialog .ms-Dialog-header button.ms-Dialog-button {
+  @apply text-[var(--text-primary-color)];
+}
+
+.prime-directive-dialog .ms-Dialog-inner a,
+.whatsnew-dialog .ms-Dialog-inner a,
+.retro-help-dialog .ms-Dialog-inner a,
+.volunteer-dialog .ms-Dialog-inner a {
+  @apply text-[var(--palette-primary-darken-6)] underline;
+}
+
+.editable-document-card-title {
+  @apply overflow-hidden break-words flex-1 flex-col justify-center min-h-[100px] text-[var(--text-primary-color)];
+}
+
+.editable-document-card-title .editable-text {
+  @apply inline-block max-w-full align-middle whitespace-pre-wrap break-words cursor-text text-base;
+}
+
+.editable-document-card-title .editable-text-input-container {
+  @apply inline-block min-w-[75%] w-full resize-none align-middle pt-5;
+}
+
+.editable-document-card-title .editable-text-input-container .editable-text-input.error-border {
+  @apply border border-red-600 -m-px;
+}
+
+.editable-document-card-title .editable-text-input-container .ms-TextField-wrapper .ms-TextField-fieldGroup .editable-text-input {
+  @apply text-base leading-[21px];
+}
+
+.editable-document-card-title .edit-symbol {
+  @apply text-gray-500 inline-block align-middle pl-2.5;
+}
+
+.editable-document-card-title .input-validation-message {
+  @apply float-left text-[rgb(204,41,61)] text-[15px];
+}
+
+.editable-document-card-title .save-symbol {
+  @apply text-gray-500 inline-block align-middle pl-2.5;
 }
