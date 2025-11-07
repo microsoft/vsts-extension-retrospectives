@@ -15,7 +15,7 @@
 }
 
 .ms-Button--primary {
-  @apply bg-white text-blue-600 border border-blue-600
+  @apply bg-white text-blue-600 border border-blue-600;
 }
 
 .ms-Button--primary:hover {
@@ -35,7 +35,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .ms-Pivot-link:hover {
-  @apply text-[var(--status-info-foreground)] bg-inherit
+  @apply text-[var(--status-info-foreground)] bg-inherit;
 }
 
 .ms-Checkbox.is-disabled {
@@ -235,4 +235,263 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .editable-document-card-title .save-symbol {
   @apply text-gray-500 inline-block align-middle pl-2.5;
+}
+
+.ms-FocusZone .ms-Pivot-link {
+  @apply rounded-t-[5px] border-t border-l border-r border-[var(--border-subtle-color)];
+}
+
+.ms-FocusZone .ms-Pivot-link.is-selected {
+  @apply bg-[var(--border-subtle-color)] rounded-t-[5px];
+}
+
+.feedback-board {
+  @apply w-full table table-fixed;
+}
+
+.feedback-board .feedback-columns-container {
+  @apply table-row bg-[rgba(var(--palette-neutral-2,248,248,248),1)];
+}
+
+.feedback-board .feedback-columns-container:focus {
+  @apply outline-none;
+}
+
+.feedback-board .feedback-maxvotes-per-user {
+  @apply text-base my-2 mx-4;
+}
+
+.feedback-board .feedback-maxvotes-per-user span {
+  @apply m-4;
+}
+
+.keyboard-shortcuts-dialog {
+  @apply bg-[var(--background-color)];
+}
+
+.keyboard-shortcuts-dialog .ms-Dialog-title,
+.keyboard-shortcuts-dialog .ms-Dialog-subText {
+  @apply text-[var(--text-primary-color)];
+}
+
+.keyboard-shortcuts-dialog table tr:hover {
+  @apply bg-[var(--border-subtle-color)];
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings {
+  @apply pt-5 border border-[#dadada] p-2.5 mb-1.5;
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings--no-padding {
+  @apply p-0;
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-form-section-information {
+  @apply m-2.5;
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .search-bar {
+  @apply pt-0 px-2.5 pb-2.5;
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table-container {
+  @apply max-h-[350px] overflow-auto;
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table {
+  @apply border-t border-black/10 border-collapse overflow-auto w-full;
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table td,
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table th {
+  @apply text-[var(--text-primary-color)] p-2.5;
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table th {
+  @apply sticky bg-[var(--background-color)] border-b border-[var(--border-subtle-color)] top-0 z-[1];
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table th.cell-checkbox {
+  @apply w-[30px];
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table .option-row td.cell-content {
+  @apply bg-[var(--background-color)];
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table .option-row td.cell-content .content-image {
+  @apply flex pr-2.5;
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table .option-row td.cell-content .content-image .permission-image {
+  @apply w-11 min-w-11 max-w-11 h-11 rounded-full flex items-center justify-center text-[var(--text-primary-color)] bg-[var(--background-color)];
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table .option-row td.cell-content .content-text {
+  @apply text-[var(--text-primary-color)];
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table .option-row td.cell-content .content-text .content-sub-text {
+  @apply text-[var(--text-secondary-color)];
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table .option-row td.cell-content .content-badge {
+  @apply flex justify-center items-center ml-auto;
+}
+
+.board-metadata-form-permissions .board-metadata-form-board-settings .board-metadata-table .option-row td.cell-content .content-badge span {
+  @apply bg-[var(--palette-black-alpha-6)] py-0.5 px-2 rounded-[120px] text-[var(--text-primary-color)] whitespace-nowrap;
+}
+
+.retrospectives-preview-email-dialog {
+  @apply max-w-none w-[800px] h-[500px] bg-[var(--background-color)] border border-[#605e5c];
+}
+
+.retrospectives-preview-email-dialog div[role="heading"] {
+  @apply text-[var(--text-primary-color)];
+}
+
+.retrospectives-preview-email-dialog .copy-email-button {
+  @apply text-[var(--text-primary-color)];
+}
+
+.retrospectives-preview-email-dialog textarea {
+  @apply bg-[rgba(var(--palette-neutral-2,248,248,248),1)] text-[var(--text-primary-color)];
+}
+
+.preview-email-spinner {
+  @apply mt-40;
+}
+
+.feedback-item-group {
+  @apply mx-3 mb-3 mr-0 break-inside-avoid inline-block align-top w-full max-w-80 min-w-[260px] box-border;
+}
+
+.feedback-item-group:focus {
+  @apply outline-none;
+}
+
+.feedback-item-group:focus-visible .mainItemCard {
+  @apply outline-[3px] outline-[#0078d4] outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
+}
+
+.feedback-item-group .item-cards {
+  @apply flex flex-col;
+}
+
+.feedback-item-group .item-cards .feedbackItemGroupItem.removeFeedbackItem .ms-DocumentCard {
+  animation: fadeOutToRed 1000ms ease-in 1 forwards;
+}
+
+.feedback-item-group .item-cards .item-cards-stack {
+  @apply hidden;
+}
+
+.feedback-item-group .item-cards .mainItemCard {
+  @apply z-[1];
+}
+
+.feedback-item-group .item-cards .mainItemCard .card-header .feedback-expand-group {
+  @apply h-[35px] max-w-[150px] z-[1] m-0 mr-auto bg-inherit border-0 flex leading-[35px] text-xs font-semibold;
+}
+
+.feedback-item-group .item-cards .mainItemCard .card-header .feedback-expand-group i {
+  @apply w-9 ml-0.5 -mr-1;
+  line-height: inherit;
+}
+
+.feedback-item-group .item-cards .mainItemCard .card-header .feedback-expand-group:focus-visible {
+  @apply outline-2 outline-[#0078d4] outline-offset-2 rounded-[3px];
+}
+
+.feedback-item-group.feedback-item-group-expanded .feedbackItemGroupGroupedItem {
+  @apply scale-95;
+}
+
+.feedback-item-group.feedback-item-group-expanded .feedbackItemGroupGroupedItem .groupedItemCard {
+  @apply w-full max-w-80 mt-0 bg-[rgba(var(--palette-neutral-10),1)] box-border;
+}
+
+.feedback-item-group.feedback-item-group-expanded .feedbackItemGroupGroupedItem .groupedItemCard .card-integral-part {
+  @apply border-l-[3px] border-solid bg-[var(--background-color)];
+}
+
+.feedback-item-group:not(.feedback-item-group-expanded) .item-cards-stack {
+  @apply bg-white z-0 block ml-2 -mr-[3px] max-w-[315px];
+}
+
+.no-boards-container {
+  @apply pt-[125px] w-full flex justify-center items-center flex-col text-sm text-center;
+}
+
+.no-boards-container .no-boards-text {
+  @apply mt-2.5 mb-[15px] max-w-full text-[28px];
+}
+
+.no-boards-container .no-boards-sub-text {
+  @apply mb-[15px];
+}
+
+.no-boards-container .create-new-board-button {
+  @apply m-2.5;
+}
+
+.no-boards-container img {
+  @apply h-40 mb-[15px];
+}
+
+.selector-list-header {
+  @apply bg-[var(--background-color)] flex h-8 w-[450px] pl-2.5;
+}
+
+.selector-list-header .selector-list-header-text {
+  @apply align-middle text-center leading-8 text-[#0071cd] font-semibold text-sm;
+}
+
+.selector-list-container {
+  @apply max-h-[250px] overflow-auto;
+}
+
+.selector-list-container .selector-list-item {
+  @apply bg-[var(--background-color)] h-8 w-[450px] flex cursor-pointer pl-2 text-[var(--text-primary-color)];
+}
+
+.selector-list-container .selector-list-item:hover {
+  @apply bg-[var(--border-subtle-color)] text-black;
+}
+
+.selector-list-container .selector-list-item-text {
+  @apply align-middle leading-8 mr-[15px] text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis;
+}
+
+.selector-list-container i {
+  @apply align-middle text-center leading-8 mr-2 text-base;
+}
+
+.selector-button {
+  @apply bg-black/5 flex h-8 pl-2 pr-2 cursor-pointer;
+}
+
+.selector-button:hover {
+  @apply text-[var(--text-primary-color)];
+}
+
+.selector-button i.selector-button-icon {
+  @apply text-lg leading-8 mr-1;
+}
+
+.selector-button .selector-button-text-wrapper {
+  @apply max-w-80 overflow-hidden text-ellipsis px-2;
+}
+
+.selector-button .selector-button-text {
+  @apply text-sm leading-8 inline whitespace-nowrap;
+}
+
+.selector-button i.selector-button-chevron {
+  @apply text-xs leading-8;
+}
+
+.list-item-shimmer {
+  @apply py-1.5 px-5;
 }
