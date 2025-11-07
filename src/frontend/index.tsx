@@ -4,10 +4,10 @@ import { createRoot } from "react-dom/client";
 import { init as sdkInit } from "azure-devops-extension-sdk";
 import { isHostedAzureDevOps } from "./utilities/azureDevOpsContextHelper";
 import { getProjectId } from "./utilities/servicesHelper";
-import "./css/main.scss";
 import { reactPlugin } from "./utilities/telemetryClient";
 import { AppInsightsErrorBoundary } from "@microsoft/applicationinsights-react-js";
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from "./components/feedbackBoardContainer";
+import "react-toastify/dist/ReactToastify.css";
 
 initializeIcons("https://res.cdn.office.net/files/fabric-cdn-prod_20240129.001/assets/icons/");
 
