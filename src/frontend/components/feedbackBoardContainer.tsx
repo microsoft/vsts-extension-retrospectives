@@ -2044,7 +2044,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 const svgWidth = 1100;
                 const svgHeight = 500;
-                const padding = { top: 40, right: 200, bottom: 100, left: 80 };
+                const padding = { top: 40, right: 220, bottom: 80, left: 80 };
                 const chartWidth = svgWidth - padding.left - padding.right;
                 const chartHeight = svgHeight - padding.top - padding.bottom;
 
@@ -2116,7 +2116,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <text x={padding.left - 50} y={svgHeight / 2} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${svgHeight / 2})`}>
                         Average Score
                       </text>
-                      <text x={(padding.left + svgWidth - padding.right) / 2} y={svgHeight - 15} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600">
+                      <text x={(padding.left + svgWidth - padding.right) / 2} y={svgHeight - 25} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600">
                         Retrospective Date
                       </text>
 
