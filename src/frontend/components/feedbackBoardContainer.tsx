@@ -906,7 +906,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       // Check if "Board" tab is clicked
       if (this.state.hasToggledArchive) {
         // Reload only if archive was toggled
-        console.log("Reloading boards because archive state was toggled.");
         await this.reloadBoardsForCurrentTeam();
         this.setState({ hasToggledArchive: false }); // Reset the flag after reload
       }

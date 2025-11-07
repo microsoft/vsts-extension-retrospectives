@@ -19,7 +19,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   constructor(props: IFeedbackCarouselProps) {
     super(props);
 
-    console.log("[FeedbackCarousel] Constructor called", {
+    console.error("[FeedbackCarousel] Constructor called", {
       columnCount: this.props.feedbackColumnPropsList.length,
       isFocusModalHidden: this.props.isFocusModalHidden,
     });
@@ -27,14 +27,14 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
     const feedbackColumnPropsList = JSON.parse(JSON.stringify(this.props.feedbackColumnPropsList)) as FeedbackColumnProps[];
 
     if (feedbackColumnPropsList.length > 0) {
-      console.log('[FeedbackCarousel] Creating "All" column');
+      console.error('[FeedbackCarousel] Creating "All" column');
       feedbackColumnPropsList.unshift({
         ...feedbackColumnPropsList[0],
         columnId: "all-columns",
         columnName: "All",
         columnItems: feedbackColumnPropsList.flatMap(col => col.columnItems),
       } as FeedbackColumnProps);
-      console.log("[FeedbackCarousel] All column created with", feedbackColumnPropsList[0].columnItems.length, "items");
+      console.error("[FeedbackCarousel] All column created with", feedbackColumnPropsList[0].columnItems.length, "items");
     }
 
     this.state = {
@@ -43,7 +43,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   }
 
   private renderFeedbackCarouselItems = (columnProps: FeedbackColumnProps) => {
-    console.log("[FeedbackCarousel] renderFeedbackCarouselItems called", {
+    console.error("[FeedbackCarousel] renderFeedbackCarouselItems called", {
       columnId: columnProps.columnId,
       columnName: columnProps.columnName,
       itemCount: columnProps.columnItems.length,
@@ -60,10 +60,10 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       })
       .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId);
 
-    console.log("[FeedbackCarousel] Sorted items count:", sortedItems.length);
+    console.error("[FeedbackCarousel] Sorted items count:", sortedItems.length);
 
     return sortedItems.map(columnItem => {
-      console.log("[FeedbackCarousel] Rendering item", {
+      console.error("[FeedbackCarousel] Rendering item", {
         itemId: columnItem.feedbackItem.id,
         itemColumnId: columnItem.feedbackItem.columnId,
         columnPropsId: columnProps.columnId,
@@ -121,7 +121,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   };
 
   public render() {
-    console.log("[FeedbackCarousel] render() called", {
+    console.error("[FeedbackCarousel] render() called", {
       columnCount: this.state.feedbackColums.length,
     });
 
@@ -129,18 +129,18 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       return (
         <Pivot className="feedback-carousel-pivot">
           {this.state.feedbackColums.map(columnProps => {
-            console.log("[FeedbackCarousel] Mapping column", columnProps.columnName);
+            console.error("[FeedbackCarousel] Mapping column", columnProps.columnName);
 
             try {
               const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
-              console.log("[FeedbackCarousel] Got", feedbackCarouselItems.length, "items for", columnProps.columnName);
+              console.error("[FeedbackCarousel] Got", feedbackCarouselItems.length, "items for", columnProps.columnName);
 
               return (
                 <PivotItem key={columnProps.columnId} headerText={columnProps.columnName} className="feedback-carousel-pivot-item" {...columnProps}>
                   <div className="carousel-container">
                     <ol className="carousel-track" id={`carousel-${columnProps.columnId}`}>
                       {feedbackCarouselItems.map((child, index) => {
-                        console.log("[FeedbackCarousel] Rendering slide", index, "for", columnProps.columnName);
+                        console.error("[FeedbackCarousel] Rendering slide", index, "for", columnProps.columnName);
                         return (
                           <li className="carousel-slide" id={`slide-${columnProps.columnId}-${index}`} key={child.key}>
                             {index > 0 && (

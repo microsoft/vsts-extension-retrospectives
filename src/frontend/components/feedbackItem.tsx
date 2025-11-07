@@ -742,7 +742,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   public render(): React.JSX.Element {
-    console.log("[FeedbackItem] render() START for item:", this.props.id);
+    console.error("[FeedbackItem] render() START for item:", this.props.id);
 
     try {
       const workflowState = {
@@ -760,7 +760,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
       const childrenIds = this.props.groupIds;
 
-      console.log("[FeedbackItem] Rendering item", {
+      console.error("[FeedbackItem] Rendering item", {
         id: this.props.id,
         columnId: this.props.columnId,
         hasColumn: !!this.props.columns[this.props.columnId],
@@ -775,7 +775,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
       // Vote Count Helpers
       const columnItems = this.props.columns[this.props.columnId]?.columnItems;
-      console.log("[FeedbackItem] Getting vote counts", {
+      console.error("[FeedbackItem] Getting vote counts", {
         columnId: this.props.columnId,
         hasColumnItems: !!columnItems,
         columnItemsLength: columnItems?.length,
