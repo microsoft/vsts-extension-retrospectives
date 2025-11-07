@@ -1686,3 +1686,195 @@ describe("FeedbackBoardContainer - Retro Summary Dialog", () => {
     expect(instance.state.isRetroSummaryDialogHidden).toBe(true);
   });
 });
+
+describe("FeedbackBoardContainer - Utility Methods", () => {
+  it("should format numbers correctly", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    expect((instance as any).numberFormatter(5)).toBe("5.0");
+    expect((instance as any).numberFormatter(5.5)).toBe("5.5");
+    expect((instance as any).numberFormatter(10.123)).toBe("10.1");
+  });
+
+  it("should format percentages correctly", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    expect((instance as any).percentageFormatter(50)).toBe("50.0%");
+    expect((instance as any).percentageFormatter(75.5)).toBe("75.5%");
+    expect((instance as any).percentageFormatter(100)).toBe("100.0%");
+  });
+
+  it("should show and hide carousel dialog", () => {
+    const instance = createStandaloneTimerInstance();
+
+    (instance as any).showCarouselDialog();
+    expect(instance.state.isCarouselDialogHidden).toBe(false);
+    expect(appInsights.trackEvent).toHaveBeenCalledWith({ name: TelemetryEvents.FeedbackItemCarouselLaunched });
+
+    (instance as any).hideCarouselDialog();
+    expect(instance.state.isCarouselDialogHidden).toBe(true);
+  });
+
+  it("should hide live sync issue message bar", () => {
+    const instance = createStandaloneTimerInstance();
+
+    instance.setState({ isLiveSyncInTfsIssueMessageBarVisible: true });
+    (instance as any).hideLiveSyncInTfsIssueMessageBar();
+    expect(instance.state.isLiveSyncInTfsIssueMessageBarVisible).toBe(false);
+  });
+
+  it("should hide drop issue in edge message bar", () => {
+    const instance = createStandaloneTimerInstance();
+
+    instance.setState({ isDropIssueInEdgeMessageBarVisible: true });
+    (instance as any).hideDropIssueInEdgeMessageBar();
+    expect(instance.state.isDropIssueInEdgeMessageBarVisible).toBe(false);
+  });
+
+  it("should hide mobile board actions dialog", () => {
+    const instance = createStandaloneTimerInstance();
+
+    instance.setState({ isMobileBoardActionsDialogHidden: false });
+    (instance as any).hideMobileBoardActionsDialog();
+    expect(instance.state.isMobileBoardActionsDialogHidden).toBe(true);
+  });
+});
+
+describe("FeedbackBoardContainer - Board Management", () => {
+  it("should handle board created event", async () => {
+    const instance = createStandaloneTimerInstance();
+    
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const existingBoard: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Existing Board",
+      teamId: "team-1",
+      createdDate: new Date("2025-01-01"),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    const newBoard: IFeedbackBoardDocument = {
+      id: "board-2",
+      title: "New Board",
+      teamId: "team-1",
+      createdDate: new Date("2025-02-01"),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({ 
+      currentTeam: team, 
+      currentBoard: existingBoard,
+      boards: [existingBoard],
+      userTeams: [team],
+      currentUserId: "user-1"
+    });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardForTeamById").mockResolvedValue(newBoard);
+
+    await (instance as any).handleBoardCreated("team-1", "board-2");
+
+    expect(instance.state.boards.length).toBe(2);
+    expect(instance.state.boards.find((b: IFeedbackBoardDocument) => b.id === "board-2")).toBeDefined();
+  });
+
+  it("should not handle board created for different team", async () => {
+    const instance = createStandaloneTimerInstance();
+    
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({ 
+      currentTeam: team, 
+      boards: [board]
+    });
+
+    const initialBoardsLength = instance.state.boards.length;
+    await (instance as any).handleBoardCreated("team-2", "board-2");
+
+    expect(instance.state.boards.length).toBe(initialBoardsLength);
+  });
+
+  it("should archive current board", async () => {
+    const instance = createStandaloneTimerInstance();
+    
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board to Archive",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({ 
+      currentTeam: team, 
+      currentBoard: board,
+      boards: [board],
+      isArchiveBoardConfirmationDialogHidden: false
+    });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "archiveFeedbackBoard").mockResolvedValue(undefined);
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([]);
+
+    const mockBroadcastDeletedBoard = jest.fn();
+    jest.spyOn(reflectBackendService, "broadcastDeletedBoard").mockImplementation(mockBroadcastDeletedBoard);
+
+    await (instance as any).archiveCurrentBoard();
+
+    expect(BoardDataService.archiveFeedbackBoard).toHaveBeenCalledWith("team-1", "board-1");
+    expect(mockBroadcastDeletedBoard).toHaveBeenCalledWith("team-1", "board-1");
+    expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(true);
+    expect(appInsights.trackEvent).toHaveBeenCalledWith({ 
+      name: TelemetryEvents.FeedbackBoardArchived, 
+      properties: { boardId: "board-1" } 
+    });
+  });
+
+  it("should reload boards for current team with no boards", async () => {
+    const instance = createStandaloneTimerInstance();
+    
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    instance.setState({ 
+      currentTeam: team,
+      userTeams: [team],
+      currentUserId: "user-1"
+    });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([]);
+
+    await (instance as any).reloadBoardsForCurrentTeam();
+
+    expect(instance.state.boards).toEqual([]);
+    expect(instance.state.currentBoard).toBeNull();
+    expect(instance.state.isTeamDataLoaded).toBe(true);
+  });
+});
