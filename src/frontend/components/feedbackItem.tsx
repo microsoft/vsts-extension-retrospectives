@@ -742,409 +742,416 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   public render(): React.JSX.Element {
-    const workflowState = {
-      isCollectPhase: this.props.workflowPhase === WorkflowPhase.Collect,
-      isGroupPhase: this.props.workflowPhase === WorkflowPhase.Group,
-      isVotePhase: this.props.workflowPhase === WorkflowPhase.Vote,
-      isActPhase: this.props.workflowPhase === WorkflowPhase.Act,
-      isActPhaseFocusMode: this.props.workflowPhase === WorkflowPhase.Act && !this.props.isFocusModalHidden,
-    };
+    console.log("[FeedbackItem] render() START for item:", this.props.id);
 
-    // Grouped State Booleans and Children
-    const isNotGroupedItem = !this.props.groupedItemProps;
-    const isMainItem = isNotGroupedItem || this.props.groupedItemProps?.isMainItem;
-    const isMainCollapsedItem = !isNotGroupedItem && !this.props.groupedItemProps.isGroupExpanded;
-    const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
-    const childrenIds = this.props.groupIds;
+    try {
+      const workflowState = {
+        isCollectPhase: this.props.workflowPhase === WorkflowPhase.Collect,
+        isGroupPhase: this.props.workflowPhase === WorkflowPhase.Group,
+        isVotePhase: this.props.workflowPhase === WorkflowPhase.Vote,
+        isActPhase: this.props.workflowPhase === WorkflowPhase.Act,
+        isActPhaseFocusMode: this.props.workflowPhase === WorkflowPhase.Act && !this.props.isFocusModalHidden,
+      };
 
-    console.log('[FeedbackItem] Rendering item', {
-      id: this.props.id,
-      columnId: this.props.columnId,
-      hasColumn: !!this.props.columns[this.props.columnId],
-      workflowPhase: this.props.workflowPhase,
-      isFocusModalHidden: this.props.isFocusModalHidden
-    });
+      // Grouped State Booleans and Children
+      const isNotGroupedItem = !this.props.groupedItemProps;
+      const isMainItem = isNotGroupedItem || this.props.groupedItemProps?.isMainItem;
+      const isMainCollapsedItem = !isNotGroupedItem && !this.props.groupedItemProps.isGroupExpanded;
+      const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
+      const childrenIds = this.props.groupIds;
 
-    // Focus Mode Booleans
-    const isFocusModalHidden = this.props.isFocusModalHidden; // for rotating through carousel in focus mode
-    const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
-    const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
+      console.log("[FeedbackItem] Rendering item", {
+        id: this.props.id,
+        columnId: this.props.columnId,
+        hasColumn: !!this.props.columns[this.props.columnId],
+        workflowPhase: this.props.workflowPhase,
+        isFocusModalHidden: this.props.isFocusModalHidden,
+      });
 
-    // Vote Count Helpers
-    const columnItems = this.props.columns[this.props.columnId]?.columnItems;
-    console.log('[FeedbackItem] Getting vote counts', {
-      columnId: this.props.columnId,
-      hasColumnItems: !!columnItems,
-      columnItemsLength: columnItems?.length
-    });
+      // Focus Mode Booleans
+      const isFocusModalHidden = this.props.isFocusModalHidden; // for rotating through carousel in focus mode
+      const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
+      const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
 
-    const mainFeedbackItem = columnItems?.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
-    const groupedFeedbackItems = this.props.groupIds
-      .map(id => {
-        const item = columnItems?.find(c => c.feedbackItem.id === id)?.feedbackItem;
-        return item;
-      })
-      .filter(item => item !== undefined) as IFeedbackItemDocument[];
-    const userId = encrypt(getUserIdentity().id);
+      // Vote Count Helpers
+      const columnItems = this.props.columns[this.props.columnId]?.columnItems;
+      console.log("[FeedbackItem] Getting vote counts", {
+        columnId: this.props.columnId,
+        hasColumnItems: !!columnItems,
+        columnItemsLength: columnItems?.length,
+      });
 
-    // Vote Count Getters
-    const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
-    const votesByUser = this.state.userVotes; // use the direct method since available
-    const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
-    const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
+      const mainFeedbackItem = columnItems?.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
+      const groupedFeedbackItems = this.props.groupIds
+        .map(id => {
+          const item = columnItems?.find(c => c.feedbackItem.id === id)?.feedbackItem;
+          return item;
+        })
+        .filter(item => item !== undefined) as IFeedbackItemDocument[];
+      const userId = encrypt(getUserIdentity().id);
 
-    let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
-    // In focus mode, does not toggle between grouped and ungrouped vote counts, always displays grouped count
-    if (mainGroupedItemInFocusMode) {
-      totalVotes = groupedVotes;
-    }
+      // Vote Count Getters
+      const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
+      const votesByUser = this.state.userVotes; // use the direct method since available
+      const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
+      const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
 
-    // Group, Vote, Act (and Focus) Options
-    const isDraggable = workflowState.isGroupPhase && !this.state.isMarkedForDeletion;
-    const showVoteButton = workflowState.isVotePhase;
-    const showVotes = showVoteButton || workflowState.isActPhase;
-
-    const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
-    const currentColumnItems = this.props.columns[this.props.columnId]?.columnItems;
-    const itemPosition = currentColumnItems ? currentColumnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1 : 0;
-    const totalItemsInColumn = currentColumnItems?.length || 0;
-
-    const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
-    const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
-
-    let ariaLabel = `Feedback item ${itemPosition} of ${totalItemsInColumn}. `;
-
-    if (!isNotGroupedItem) {
-      if (isMainItem) {
-        ariaLabel = `Feedback group main item ${itemPosition} of ${totalItemsInColumn}. Group has ${groupItemsCount} items. `;
-      } else {
-        ariaLabel = `Grouped feedback item. `;
+      let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
+      // In focus mode, does not toggle between grouped and ungrouped vote counts, always displays grouped count
+      if (mainGroupedItemInFocusMode) {
+        totalVotes = groupedVotes;
       }
-    }
 
-    ariaLabel += `Title: ${displayTitle}. `;
+      // Group, Vote, Act (and Focus) Options
+      const isDraggable = workflowState.isGroupPhase && !this.state.isMarkedForDeletion;
+      const showVoteButton = workflowState.isVotePhase;
+      const showVotes = showVoteButton || workflowState.isActPhase;
 
-    if (this.props.createdBy && !hideFeedbackItems) {
-      ariaLabel += `Created by ${this.props.createdBy}. `;
-    }
+      const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
+      const currentColumnItems = this.props.columns[this.props.columnId]?.columnItems;
+      const itemPosition = currentColumnItems ? currentColumnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1 : 0;
+      const totalItemsInColumn = currentColumnItems?.length || 0;
 
-    if (this.props.createdDate) {
-      const creationDate = new Intl.DateTimeFormat("default", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }).format(new Date(this.props.createdDate));
-      ariaLabel += `Created on ${creationDate}. `;
-    }
+      const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
+      const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
 
-    if (showVotes) {
-      ariaLabel += `${totalVotes} total votes.`;
-      if (showVoteButton) {
-        ariaLabel += ` You have ${votesByUser} votes on this item.`;
+      let ariaLabel = `Feedback item ${itemPosition} of ${totalItemsInColumn}. `;
+
+      if (!isNotGroupedItem) {
+        if (isMainItem) {
+          ariaLabel = `Feedback group main item ${itemPosition} of ${totalItemsInColumn}. Group has ${groupItemsCount} items. `;
+        } else {
+          ariaLabel = `Grouped feedback item. `;
+        }
       }
-    }
 
-    const curTimerState = this.props.timerState;
+      ariaLabel += `Title: ${displayTitle}. `;
 
-    return (
-      <div ref={this.itemElementRef} data-feedback-item-id={this.props.id} tabIndex={0} aria-live="polite" aria-label={ariaLabel} aria-hidden={hideFeedbackItems || undefined} role="article" aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
-        <div className="document-card-wrapper">
-          <DocumentCard className={cn(isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")}>
-            <div
-              className="card-integral-part"
-              style={{
-                borderLeftColor: this.props.accentColor,
-              }}
-            >
-              <div className="card-header">
-                {
-                  // Controls the top-level feedback item in a group in focus mode
-                  mainGroupedItemInFocusMode && this.renderGroupButton(groupItemsCount, true)
-                }
-                {
-                  // Controls the top-level feedback item in a group not in focus mode
-                  mainGroupedItemNotInFocusMode && this.renderGroupButton(groupItemsCount, false)
-                }
-                {
-                  showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, true) // render voting button
-                }
-                {
-                  showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, false) // render unvoting button
-                }
-                {!this.props.newlyCreated && (
-                  <div className="item-actions-menu">
-                    <DefaultButton
-                      className="contextual-menu-button hide-mobile"
-                      aria-label="Feedback Options Menu"
-                      iconProps={{ iconName: "MoreVertical" }}
-                      title="Feedback actions"
-                      menuProps={{
-                        className: "feedback-action-menu",
-                        items: this.feedbackItemEllipsisMenuItems
-                          .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
-                          .map(menuItem => {
-                            menuItem.menuItem.disabled = this.state.isDeletionDisabled || menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
-                            return menuItem.menuItem;
-                          }),
-                      }}
-                    />
-                    <Dialog
-                      hidden={this.state.isMobileFeedbackItemActionsDialogHidden}
-                      onDismiss={this.hideMobileFeedbackItemActionsDialog}
-                      modalProps={{
-                        isBlocking: false,
-                        containerClassName: "ms-dialogMainOverride",
-                        className: "retrospectives-dialog-modal",
-                      }}
-                    >
-                      <div className="mobile-contextual-menu-list">
-                        {" "}
-                        {this.feedbackItemEllipsisMenuItems
-                          .filter(menuItem => !menuItem.hideMobile)
-                          .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
-                          .map(menuItem => {
-                            menuItem.menuItem.disabled = this.state.isDeletionDisabled || menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
+      if (this.props.createdBy && !hideFeedbackItems) {
+        ariaLabel += `Created by ${this.props.createdBy}. `;
+      }
 
-                            return (
-                              <ActionButton
-                                key={menuItem.menuItem.key}
-                                className={menuItem.menuItem.className}
-                                iconProps={menuItem.menuItem.iconProps}
-                                disabled={menuItem.menuItem.disabled}
-                                aria-label={menuItem.menuItem.text}
-                                onClick={() => {
-                                  this.hideMobileFeedbackItemActionsDialog();
-                                  menuItem.menuItem.onClick();
-                                }}
-                                text={menuItem.menuItem.text}
-                                title={menuItem.menuItem.title}
-                              />
-                            );
-                          })}
-                      </div>
-                      <DialogFooter>
-                        <DefaultButton onClick={this.hideMobileFeedbackItemActionsDialog} text="Close" />
-                      </DialogFooter>
-                    </Dialog>
-                  </div>
-                )}
-              </div>
-              <div className="card-content">
-                {workflowState.isActPhase && (
-                  <div className="card-action-timer hide-mobile">
-                    <button
-                      title="Timer"
-                      aria-live="polite"
-                      aria-label={"Start/stop"}
-                      tabIndex={0}
-                      className="feedback-action-button"
-                      onClick={e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        this.timerSwitch(this.props.id);
-                      }}
-                    >
-                      <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
-                      <span> {this.formatTimer(this.props.timerSecs)} elapsed</span>
-                    </button>
-                  </div>
-                )}
-                {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
-                {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
-                  <div className="original-column-info hide-mobile">
-                    Original Column: <br />
-                    {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
-                  </div>
-                )}
-                {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
-              </div>
-              {this.feedbackCreationInformationContent()}
-              <div className="card-id">#{itemPosition}</div>
-            </div>
-            <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
-            {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
-              <div className="group-child-feedback-stack" id={`group-children-${this.props.id}`}>
-                <div className="related-feedback-header">
-                  {" "}
-                  <i className="far fa-comments" />
-                  &nbsp;Related Feedback
+      if (this.props.createdDate) {
+        const creationDate = new Intl.DateTimeFormat("default", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(new Date(this.props.createdDate));
+        ariaLabel += `Created on ${creationDate}. `;
+      }
+
+      if (showVotes) {
+        ariaLabel += `${totalVotes} total votes.`;
+        if (showVoteButton) {
+          ariaLabel += ` You have ${votesByUser} votes on this item.`;
+        }
+      }
+
+      const curTimerState = this.props.timerState;
+
+      return (
+        <div ref={this.itemElementRef} data-feedback-item-id={this.props.id} tabIndex={0} aria-live="polite" aria-label={ariaLabel} aria-hidden={hideFeedbackItems || undefined} role="article" aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
+          <div className="document-card-wrapper">
+            <DocumentCard className={cn(isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")}>
+              <div
+                className="card-integral-part"
+                style={{
+                  borderLeftColor: this.props.accentColor,
+                }}
+              >
+                <div className="card-header">
+                  {
+                    // Controls the top-level feedback item in a group in focus mode
+                    mainGroupedItemInFocusMode && this.renderGroupButton(groupItemsCount, true)
+                  }
+                  {
+                    // Controls the top-level feedback item in a group not in focus mode
+                    mainGroupedItemNotInFocusMode && this.renderGroupButton(groupItemsCount, false)
+                  }
+                  {
+                    showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, true) // render voting button
+                  }
+                  {
+                    showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, false) // render unvoting button
+                  }
+                  {!this.props.newlyCreated && (
+                    <div className="item-actions-menu">
+                      <DefaultButton
+                        className="contextual-menu-button hide-mobile"
+                        aria-label="Feedback Options Menu"
+                        iconProps={{ iconName: "MoreVertical" }}
+                        title="Feedback actions"
+                        menuProps={{
+                          className: "feedback-action-menu",
+                          items: this.feedbackItemEllipsisMenuItems
+                            .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
+                            .map(menuItem => {
+                              menuItem.menuItem.disabled = this.state.isDeletionDisabled || menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
+                              return menuItem.menuItem;
+                            }),
+                        }}
+                      />
+                      <Dialog
+                        hidden={this.state.isMobileFeedbackItemActionsDialogHidden}
+                        onDismiss={this.hideMobileFeedbackItemActionsDialog}
+                        modalProps={{
+                          isBlocking: false,
+                          containerClassName: "ms-dialogMainOverride",
+                          className: "retrospectives-dialog-modal",
+                        }}
+                      >
+                        <div className="mobile-contextual-menu-list">
+                          {" "}
+                          {this.feedbackItemEllipsisMenuItems
+                            .filter(menuItem => !menuItem.hideMobile)
+                            .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
+                            .map(menuItem => {
+                              menuItem.menuItem.disabled = this.state.isDeletionDisabled || menuItem.workflowPhases.indexOf(this.props.workflowPhase) === -1;
+
+                              return (
+                                <ActionButton
+                                  key={menuItem.menuItem.key}
+                                  className={menuItem.menuItem.className}
+                                  iconProps={menuItem.menuItem.iconProps}
+                                  disabled={menuItem.menuItem.disabled}
+                                  aria-label={menuItem.menuItem.text}
+                                  onClick={() => {
+                                    this.hideMobileFeedbackItemActionsDialog();
+                                    menuItem.menuItem.onClick();
+                                  }}
+                                  text={menuItem.menuItem.text}
+                                  title={menuItem.menuItem.title}
+                                />
+                              );
+                            })}
+                        </div>
+                        <DialogFooter>
+                          <DefaultButton onClick={this.hideMobileFeedbackItemActionsDialog} text="Close" />
+                        </DialogFooter>
+                      </Dialog>
+                    </div>
+                  )}
                 </div>
-                <ul className="fa-ul" aria-label="List of Related Feedback" role="list">
-                  {childrenIds.map((id: string) => {
-                    const childCard: IColumnItem = columnItems?.find(c => c.feedbackItem.id === id);
-                    const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
-                    const childItemHidden = childCard && this.props.hideFeedbackItems && childCard.feedbackItem.userIdRef !== getUserIdentity().id;
-                    const childDisplayTitle = childItemHidden ? "[Hidden Feedback]" : childCard?.feedbackItem.title;
-
-                    return (
-                      childCard && (
-                        <li key={id} role="listitem">
-                          <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}>
-                            <i className="fa-solid fa-quote-left" aria-hidden="true" />
-                          </span>
-                          <span className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
-                            {childDisplayTitle}
-                          </span>
-                          {this.props.columnId !== originalColumn?.columnProperties?.id && (
-                            <div className="original-column-info hide-mobile">
-                              Original Column: <br />
-                              {originalColumn.columnProperties.title}
-                            </div>
-                          )}
-                        </li>
-                      )
-                    );
-                  })}
-                </ul>
+                <div className="card-content">
+                  {workflowState.isActPhase && (
+                    <div className="card-action-timer hide-mobile">
+                      <button
+                        title="Timer"
+                        aria-live="polite"
+                        aria-label={"Start/stop"}
+                        tabIndex={0}
+                        className="feedback-action-button"
+                        onClick={e => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          this.timerSwitch(this.props.id);
+                        }}
+                      >
+                        <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
+                        <span> {this.formatTimer(this.props.timerSecs)} elapsed</span>
+                      </button>
+                    </div>
+                  )}
+                  {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
+                  {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
+                    <div className="original-column-info hide-mobile">
+                      Original Column: <br />
+                      {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
+                    </div>
+                  )}
+                  {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
+                </div>
+                {this.feedbackCreationInformationContent()}
+                <div className="card-id">#{itemPosition}</div>
               </div>
-            )}
-          </DocumentCard>
-        </div>
-        <Dialog
-          hidden={this.state.isDeleteItemConfirmationDialogHidden}
-          onDismiss={this.hideDeleteItemConfirmationDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: "Delete Feedback",
-            subText: `Are you sure you want to delete the feedback "${displayTitle}"?
-              ${!isNotGroupedItem && isMainItem ? "Any feedback grouped underneath this one will be ungrouped." : ""}`,
-          }}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: "retrospectives-delete-feedback-item-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          <DialogFooter>
-            <PrimaryButton onClick={this.onConfirmDeleteFeedbackItem} text="Delete" />
-            <DefaultButton onClick={this.hideDeleteItemConfirmationDialog} text="Cancel" />
-          </DialogFooter>
-        </Dialog>
-        <Dialog
-          hidden={this.state.isMoveFeedbackItemDialogHidden}
-          maxWidth={500}
-          minWidth={500}
-          onDismiss={this.hideMoveFeedbackItemDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: "Move Feedback to Different Column",
-            subText: "Choose the column you want to move this feedback to",
-          }}
-          modalProps={{
-            isBlocking: false,
-            containerClassName: "retrospectives-move-feedback-item-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          {this.props.columnIds
-            .filter(columnId => columnId != this.props.columnId)
-            .map(columnId => {
-              return (
-                <DefaultButton
-                  key={columnId}
-                  className="move-feedback-item-column-button"
-                  onClick={() => {
-                    this.props.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, this.props.id, columnId);
-                  }}
-                >
-                  <i className={this.props.columns[columnId].columnProperties.iconClass} />
-                  {this.props.columns[columnId].columnProperties.title}
-                </DefaultButton>
-              );
-            })}
-        </Dialog>
-        <Dialog
-          hidden={this.state.isGroupFeedbackItemDialogHidden}
-          maxWidth={600}
-          minWidth={600}
-          onDismiss={this.hideGroupFeedbackItemDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: "Group Feedback",
-          }}
-          modalProps={{
-            isBlocking: false,
-            containerClassName: "retrospectives-group-feedback-item-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          <label className="ms-Dialog-subText" htmlFor="feedback-item-search-input">
-            Search and select the feedback under which to group the current feedback.
-          </label>
-          <SearchBox id="feedback-item-search-input" autoFocus={true} placeholder="Enter the feedback title" aria-label="Enter the feedback title" onChange={this.handleFeedbackItemSearchInputChange} />
-          <div className="output-container">
-            {!this.state.searchedFeedbackItems.length && this.state.searchTerm && <p className="no-matching-feedback-message">No feedback with title containing your input.</p>}
-            {this.state.searchedFeedbackItems.map((searchItem, index) => {
-              const feedbackItemProps: IFeedbackItemProps = {
-                id: searchItem.id,
-                title: searchItem.title,
-                columnProps: this.props.columnProps,
-                columns: this.props.columns,
-                columnIds: this.props.columnIds,
-                lastEditedDate: searchItem.modifiedDate ? searchItem.modifiedDate.toString() : "",
-                createdDate: searchItem.createdDate.toString(),
-                upvotes: searchItem.upvotes,
-                accentColor: this.props.accentColor,
-                iconClass: this.props.iconClass,
-                workflowPhase: this.props.workflowPhase,
-                originalColumnId: searchItem.originalColumnId,
-                team: this.props.team,
-                columnId: searchItem.columnId,
-                boardId: searchItem.boardId,
-                boardTitle: this.props.boardTitle,
-                defaultActionItemAreaPath: this.props.defaultActionItemAreaPath,
-                defaultActionItemIteration: this.props.defaultActionItemIteration,
-                actionItems: [],
-                showAddedAnimation: this.props.showAddedAnimation,
-                newlyCreated: this.props.newlyCreated,
-                nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
-                allWorkItemTypes: this.props.allWorkItemTypes,
-                shouldHaveFocus: this.props.shouldHaveFocus,
-                hideFeedbackItems: this.props.hideFeedbackItems,
-                userIdRef: searchItem.userIdRef,
-                timerSecs: searchItem.timerSecs,
-                timerState: searchItem.timerState,
-                timerId: searchItem.timerId,
-                groupCount: searchItem.childFeedbackItemIds?.length,
-                groupIds: searchItem.childFeedbackItemIds ?? [],
-                isGroupedCarouselItem: searchItem.isGroupedCarouselItem,
-                isShowingGroupedChildrenTitles: false,
-                isFocusModalHidden: true,
-                onVoteCasted: this.props.onVoteCasted,
-                addFeedbackItems: this.props.addFeedbackItems,
-                removeFeedbackItemFromColumn: this.props.removeFeedbackItemFromColumn,
-                refreshFeedbackItems: this.props.refreshFeedbackItems,
-                moveFeedbackItem: this.props.moveFeedbackItem,
-              };
-              return (
-                <button key={searchItem.id} className="feedback-item-search-result-item" onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => this.clickSearchedFeedbackItem(e, feedbackItemProps)} onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => this.pressSearchedFeedbackItem(e, feedbackItemProps)} tabIndex={index}>
-                  <FeedbackItem {...feedbackItemProps}></FeedbackItem>
-                </button>
-              );
-            })}
+              <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
+              {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
+                <div className="group-child-feedback-stack" id={`group-children-${this.props.id}`}>
+                  <div className="related-feedback-header">
+                    {" "}
+                    <i className="far fa-comments" />
+                    &nbsp;Related Feedback
+                  </div>
+                  <ul className="fa-ul" aria-label="List of Related Feedback" role="list">
+                    {childrenIds.map((id: string) => {
+                      const childCard: IColumnItem = columnItems?.find(c => c.feedbackItem.id === id);
+                      const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
+                      const childItemHidden = childCard && this.props.hideFeedbackItems && childCard.feedbackItem.userIdRef !== getUserIdentity().id;
+                      const childDisplayTitle = childItemHidden ? "[Hidden Feedback]" : childCard?.feedbackItem.title;
+
+                      return (
+                        childCard && (
+                          <li key={id} role="listitem">
+                            <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}>
+                              <i className="fa-solid fa-quote-left" aria-hidden="true" />
+                            </span>
+                            <span className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
+                              {childDisplayTitle}
+                            </span>
+                            {this.props.columnId !== originalColumn?.columnProperties?.id && (
+                              <div className="original-column-info hide-mobile">
+                                Original Column: <br />
+                                {originalColumn.columnProperties.title}
+                              </div>
+                            )}
+                          </li>
+                        )
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </DocumentCard>
           </div>
-        </Dialog>
-        <Dialog
-          hidden={this.state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden}
-          onDismiss={this.hideRemoveFeedbackItemFromGroupConfirmationDialog}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: "Remove Feedback from Group",
-            subText: `Are you sure you want to remove the feedback "${displayTitle}" from its current group?`,
-          }}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: "retrospectives-remove-feedback-item-from-group-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          <DialogFooter>
-            <PrimaryButton onClick={this.onConfirmRemoveFeedbackItemFromGroup} text="Remove Feedback from Group" />
-            <DefaultButton onClick={this.hideRemoveFeedbackItemFromGroupConfirmationDialog} text="Cancel" />
-          </DialogFooter>
-        </Dialog>
-      </div>
-    );
+          <Dialog
+            hidden={this.state.isDeleteItemConfirmationDialogHidden}
+            onDismiss={this.hideDeleteItemConfirmationDialog}
+            dialogContentProps={{
+              type: DialogType.close,
+              title: "Delete Feedback",
+              subText: `Are you sure you want to delete the feedback "${displayTitle}"?
+              ${!isNotGroupedItem && isMainItem ? "Any feedback grouped underneath this one will be ungrouped." : ""}`,
+            }}
+            modalProps={{
+              isBlocking: true,
+              containerClassName: "retrospectives-delete-feedback-item-dialog",
+              className: "retrospectives-dialog-modal",
+            }}
+          >
+            <DialogFooter>
+              <PrimaryButton onClick={this.onConfirmDeleteFeedbackItem} text="Delete" />
+              <DefaultButton onClick={this.hideDeleteItemConfirmationDialog} text="Cancel" />
+            </DialogFooter>
+          </Dialog>
+          <Dialog
+            hidden={this.state.isMoveFeedbackItemDialogHidden}
+            maxWidth={500}
+            minWidth={500}
+            onDismiss={this.hideMoveFeedbackItemDialog}
+            dialogContentProps={{
+              type: DialogType.close,
+              title: "Move Feedback to Different Column",
+              subText: "Choose the column you want to move this feedback to",
+            }}
+            modalProps={{
+              isBlocking: false,
+              containerClassName: "retrospectives-move-feedback-item-dialog",
+              className: "retrospectives-dialog-modal",
+            }}
+          >
+            {this.props.columnIds
+              .filter(columnId => columnId != this.props.columnId)
+              .map(columnId => {
+                return (
+                  <DefaultButton
+                    key={columnId}
+                    className="move-feedback-item-column-button"
+                    onClick={() => {
+                      this.props.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, this.props.id, columnId);
+                    }}
+                  >
+                    <i className={this.props.columns[columnId].columnProperties.iconClass} />
+                    {this.props.columns[columnId].columnProperties.title}
+                  </DefaultButton>
+                );
+              })}
+          </Dialog>
+          <Dialog
+            hidden={this.state.isGroupFeedbackItemDialogHidden}
+            maxWidth={600}
+            minWidth={600}
+            onDismiss={this.hideGroupFeedbackItemDialog}
+            dialogContentProps={{
+              type: DialogType.close,
+              title: "Group Feedback",
+            }}
+            modalProps={{
+              isBlocking: false,
+              containerClassName: "retrospectives-group-feedback-item-dialog",
+              className: "retrospectives-dialog-modal",
+            }}
+          >
+            <label className="ms-Dialog-subText" htmlFor="feedback-item-search-input">
+              Search and select the feedback under which to group the current feedback.
+            </label>
+            <SearchBox id="feedback-item-search-input" autoFocus={true} placeholder="Enter the feedback title" aria-label="Enter the feedback title" onChange={this.handleFeedbackItemSearchInputChange} />
+            <div className="output-container">
+              {!this.state.searchedFeedbackItems.length && this.state.searchTerm && <p className="no-matching-feedback-message">No feedback with title containing your input.</p>}
+              {this.state.searchedFeedbackItems.map((searchItem, index) => {
+                const feedbackItemProps: IFeedbackItemProps = {
+                  id: searchItem.id,
+                  title: searchItem.title,
+                  columnProps: this.props.columnProps,
+                  columns: this.props.columns,
+                  columnIds: this.props.columnIds,
+                  lastEditedDate: searchItem.modifiedDate ? searchItem.modifiedDate.toString() : "",
+                  createdDate: searchItem.createdDate.toString(),
+                  upvotes: searchItem.upvotes,
+                  accentColor: this.props.accentColor,
+                  iconClass: this.props.iconClass,
+                  workflowPhase: this.props.workflowPhase,
+                  originalColumnId: searchItem.originalColumnId,
+                  team: this.props.team,
+                  columnId: searchItem.columnId,
+                  boardId: searchItem.boardId,
+                  boardTitle: this.props.boardTitle,
+                  defaultActionItemAreaPath: this.props.defaultActionItemAreaPath,
+                  defaultActionItemIteration: this.props.defaultActionItemIteration,
+                  actionItems: [],
+                  showAddedAnimation: this.props.showAddedAnimation,
+                  newlyCreated: this.props.newlyCreated,
+                  nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
+                  allWorkItemTypes: this.props.allWorkItemTypes,
+                  shouldHaveFocus: this.props.shouldHaveFocus,
+                  hideFeedbackItems: this.props.hideFeedbackItems,
+                  userIdRef: searchItem.userIdRef,
+                  timerSecs: searchItem.timerSecs,
+                  timerState: searchItem.timerState,
+                  timerId: searchItem.timerId,
+                  groupCount: searchItem.childFeedbackItemIds?.length,
+                  groupIds: searchItem.childFeedbackItemIds ?? [],
+                  isGroupedCarouselItem: searchItem.isGroupedCarouselItem,
+                  isShowingGroupedChildrenTitles: false,
+                  isFocusModalHidden: true,
+                  onVoteCasted: this.props.onVoteCasted,
+                  addFeedbackItems: this.props.addFeedbackItems,
+                  removeFeedbackItemFromColumn: this.props.removeFeedbackItemFromColumn,
+                  refreshFeedbackItems: this.props.refreshFeedbackItems,
+                  moveFeedbackItem: this.props.moveFeedbackItem,
+                };
+                return (
+                  <button key={searchItem.id} className="feedback-item-search-result-item" onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => this.clickSearchedFeedbackItem(e, feedbackItemProps)} onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => this.pressSearchedFeedbackItem(e, feedbackItemProps)} tabIndex={index}>
+                    <FeedbackItem {...feedbackItemProps}></FeedbackItem>
+                  </button>
+                );
+              })}
+            </div>
+          </Dialog>
+          <Dialog
+            hidden={this.state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden}
+            onDismiss={this.hideRemoveFeedbackItemFromGroupConfirmationDialog}
+            dialogContentProps={{
+              type: DialogType.close,
+              title: "Remove Feedback from Group",
+              subText: `Are you sure you want to remove the feedback "${displayTitle}" from its current group?`,
+            }}
+            modalProps={{
+              isBlocking: true,
+              containerClassName: "retrospectives-remove-feedback-item-from-group-dialog",
+              className: "retrospectives-dialog-modal",
+            }}
+          >
+            <DialogFooter>
+              <PrimaryButton onClick={this.onConfirmRemoveFeedbackItemFromGroup} text="Remove Feedback from Group" />
+              <DefaultButton onClick={this.hideRemoveFeedbackItemFromGroupConfirmationDialog} text="Cancel" />
+            </DialogFooter>
+          </Dialog>
+        </div>
+      );
+    } catch (error) {
+      console.error("[FeedbackItem] Error in render() for item", this.props.id, error);
+      throw error;
+    }
   }
 }
 

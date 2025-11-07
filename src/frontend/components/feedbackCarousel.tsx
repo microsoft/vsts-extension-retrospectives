@@ -19,9 +19,9 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   constructor(props: IFeedbackCarouselProps) {
     super(props);
 
-    console.log('[FeedbackCarousel] Constructor called', {
+    console.log("[FeedbackCarousel] Constructor called", {
       columnCount: this.props.feedbackColumnPropsList.length,
-      isFocusModalHidden: this.props.isFocusModalHidden
+      isFocusModalHidden: this.props.isFocusModalHidden,
     });
 
     const feedbackColumnPropsList = JSON.parse(JSON.stringify(this.props.feedbackColumnPropsList)) as FeedbackColumnProps[];
@@ -34,7 +34,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         columnName: "All",
         columnItems: feedbackColumnPropsList.flatMap(col => col.columnItems),
       } as FeedbackColumnProps);
-      console.log('[FeedbackCarousel] All column created with', feedbackColumnPropsList[0].columnItems.length, 'items');
+      console.log("[FeedbackCarousel] All column created with", feedbackColumnPropsList[0].columnItems.length, "items");
     }
 
     this.state = {
@@ -43,10 +43,10 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   }
 
   private renderFeedbackCarouselItems = (columnProps: FeedbackColumnProps) => {
-    console.log('[FeedbackCarousel] renderFeedbackCarouselItems called', {
+    console.log("[FeedbackCarousel] renderFeedbackCarouselItems called", {
       columnId: columnProps.columnId,
       columnName: columnProps.columnName,
-      itemCount: columnProps.columnItems.length
+      itemCount: columnProps.columnItems.length,
     });
 
     const sortedItems = columnProps.columnItems
@@ -60,13 +60,13 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       })
       .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId);
 
-    console.log('[FeedbackCarousel] Sorted items count:', sortedItems.length);
+    console.log("[FeedbackCarousel] Sorted items count:", sortedItems.length);
 
     return sortedItems.map(columnItem => {
-      console.log('[FeedbackCarousel] Rendering item', {
+      console.log("[FeedbackCarousel] Rendering item", {
         itemId: columnItem.feedbackItem.id,
         itemColumnId: columnItem.feedbackItem.columnId,
-        columnPropsId: columnProps.columnId
+        columnPropsId: columnProps.columnId,
       });
       const feedbackItemProps: IFeedbackItemProps = {
         id: columnItem.feedbackItem.id,
@@ -121,37 +121,57 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   };
 
   public render() {
-    return (
-      <Pivot className="feedback-carousel-pivot">
-        {this.state.feedbackColums.map(columnProps => {
-          const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
+    console.log("[FeedbackCarousel] render() called", {
+      columnCount: this.state.feedbackColums.length,
+    });
 
-          return (
-            <PivotItem key={columnProps.columnId} headerText={columnProps.columnName} className="feedback-carousel-pivot-item" {...columnProps}>
-              <div className="carousel-container">
-                <ol className="carousel-track" id={`carousel-${columnProps.columnId}`}>
-                  {feedbackCarouselItems.map((child, index) => (
-                    <li className="carousel-slide" id={`slide-${columnProps.columnId}-${index}`} key={child.key}>
-                      {index > 0 && (
-                        <a href={`#slide-${columnProps.columnId}-${index - 1}`} className="carousel-arrow carousel-arrow-prev" aria-label="Previous slide">
-                          <i className="fas fa-chevron-left" />
-                        </a>
-                      )}
-                      <div className="carousel-viewport">{child}</div>
-                      {index < feedbackCarouselItems.length - 1 && (
-                        <a href={`#slide-${columnProps.columnId}-${index + 1}`} className="carousel-arrow carousel-arrow-next" aria-label="Next slide">
-                          <i className="fas fa-chevron-right" />
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </PivotItem>
-          );
-        })}
-      </Pivot>
-    );
+    try {
+      return (
+        <Pivot className="feedback-carousel-pivot">
+          {this.state.feedbackColums.map(columnProps => {
+            console.log("[FeedbackCarousel] Mapping column", columnProps.columnName);
+
+            try {
+              const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
+              console.log("[FeedbackCarousel] Got", feedbackCarouselItems.length, "items for", columnProps.columnName);
+
+              return (
+                <PivotItem key={columnProps.columnId} headerText={columnProps.columnName} className="feedback-carousel-pivot-item" {...columnProps}>
+                  <div className="carousel-container">
+                    <ol className="carousel-track" id={`carousel-${columnProps.columnId}`}>
+                      {feedbackCarouselItems.map((child, index) => {
+                        console.log("[FeedbackCarousel] Rendering slide", index, "for", columnProps.columnName);
+                        return (
+                          <li className="carousel-slide" id={`slide-${columnProps.columnId}-${index}`} key={child.key}>
+                            {index > 0 && (
+                              <a href={`#slide-${columnProps.columnId}-${index - 1}`} className="carousel-arrow carousel-arrow-prev" aria-label="Previous slide">
+                                <i className="fas fa-chevron-left" />
+                              </a>
+                            )}
+                            <div className="carousel-viewport">{child}</div>
+                            {index < feedbackCarouselItems.length - 1 && (
+                              <a href={`#slide-${columnProps.columnId}-${index + 1}`} className="carousel-arrow carousel-arrow-next" aria-label="Next slide">
+                                <i className="fas fa-chevron-right" />
+                              </a>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </div>
+                </PivotItem>
+              );
+            } catch (error) {
+              console.error("[FeedbackCarousel] Error rendering column", columnProps.columnName, error);
+              throw error;
+            }
+          })}
+        </Pivot>
+      );
+    } catch (error) {
+      console.error("[FeedbackCarousel] Error in render()", error);
+      throw error;
+    }
   }
 }
 
