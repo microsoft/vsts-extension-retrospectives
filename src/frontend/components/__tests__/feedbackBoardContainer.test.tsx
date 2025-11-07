@@ -1270,7 +1270,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 
   it("should fetch and process team assessment history data", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const board1: IFeedbackBoardDocument = {
       id: "board-1",
@@ -1334,7 +1334,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
     expect(instance.state.teamAssessmentHistoryData).toHaveLength(2);
     expect(instance.state.teamAssessmentHistoryData[0].boardTitle).toBe("Retro 1");
     expect(instance.state.teamAssessmentHistoryData[1].boardTitle).toBe("Retro 2");
-    
+
     // Check calculated averages for board 1
     const board1Question1Avg = instance.state.teamAssessmentHistoryData[0].questionAverages.find((qa: { questionId: number; average: number }) => qa.questionId === 1);
     expect(board1Question1Avg?.average).toBe(8.5); // (8 + 9) / 2
@@ -1351,7 +1351,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 
   it("should filter out boards without team assessments", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const boardWithAssessment: IFeedbackBoardDocument = {
       id: "board-1",
@@ -1403,11 +1403,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
     instance.setState({ currentTeam: team });
 
     const BoardDataService = require("../../dal/boardDataService").default;
-    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([
-      boardWithAssessment,
-      boardWithoutAssessment,
-      boardWithEmptyVotes,
-    ]);
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([boardWithAssessment, boardWithoutAssessment, boardWithEmptyVotes]);
 
     await (instance as any).showTeamAssessmentHistoryDialog();
 
@@ -1417,7 +1413,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 
   it("should sort boards chronologically in team assessment history", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const boardOld: IFeedbackBoardDocument = {
       id: "board-old",
@@ -1425,9 +1421,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
       teamId: "team-1",
       createdDate: new Date("2024-12-01"),
       isIncludeTeamEffectivenessMeasurement: true,
-      teamEffectivenessMeasurementVoteCollection: [
-        { userId: "user-1", responses: [{ questionId: 1, selection: 7 }] },
-      ],
+      teamEffectivenessMeasurementVoteCollection: [{ userId: "user-1", responses: [{ questionId: 1, selection: 7 }] }],
       columns: [],
       maxVotesPerUser: 5,
       boardVoteCollection: {},
@@ -1441,9 +1435,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
       teamId: "team-1",
       createdDate: new Date("2025-03-01"),
       isIncludeTeamEffectivenessMeasurement: true,
-      teamEffectivenessMeasurementVoteCollection: [
-        { userId: "user-1", responses: [{ questionId: 1, selection: 9 }] },
-      ],
+      teamEffectivenessMeasurementVoteCollection: [{ userId: "user-1", responses: [{ questionId: 1, selection: 9 }] }],
       columns: [],
       maxVotesPerUser: 5,
       boardVoteCollection: {},
@@ -1457,9 +1449,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
       teamId: "team-1",
       createdDate: new Date("2025-01-15"),
       isIncludeTeamEffectivenessMeasurement: true,
-      teamEffectivenessMeasurementVoteCollection: [
-        { userId: "user-1", responses: [{ questionId: 1, selection: 8 }] },
-      ],
+      teamEffectivenessMeasurementVoteCollection: [{ userId: "user-1", responses: [{ questionId: 1, selection: 8 }] }],
       columns: [],
       maxVotesPerUser: 5,
       boardVoteCollection: {},
@@ -1471,11 +1461,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 
     const BoardDataService = require("../../dal/boardDataService").default;
     // Return boards in random order
-    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([
-      boardNew,
-      boardOld,
-      boardMiddle,
-    ]);
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([boardNew, boardOld, boardMiddle]);
 
     await (instance as any).showTeamAssessmentHistoryDialog();
 
@@ -1488,7 +1474,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 
   it("should handle empty team assessment history", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     instance.setState({ currentTeam: team });
 
@@ -1503,7 +1489,7 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 
   it("should calculate averages correctly for multiple questions", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const board: IFeedbackBoardDocument = {
       id: "board-1",
@@ -1552,9 +1538,9 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
     await (instance as any).showTeamAssessmentHistoryDialog();
 
     expect(instance.state.teamAssessmentHistoryData).toHaveLength(1);
-    
+
     const questionAverages = instance.state.teamAssessmentHistoryData[0].questionAverages;
-    
+
     const q1Avg = questionAverages.find((qa: { questionId: number; average: number }) => qa.questionId === 1);
     expect(q1Avg?.average).toBe(9); // (10 + 8 + 9) / 3 = 9
 
@@ -1579,7 +1565,7 @@ describe("FeedbackBoardContainer - Retro Summary Dialog", () => {
 
   it("should calculate effectiveness measurements for retro summary", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const board: IFeedbackBoardDocument = {
       id: "board-1",
@@ -1643,7 +1629,7 @@ describe("FeedbackBoardContainer - Retro Summary Dialog", () => {
 
   it("should handle retro summary with empty vote collection", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const board: IFeedbackBoardDocument = {
       id: "board-1",
@@ -1690,7 +1676,7 @@ describe("FeedbackBoardContainer - Retro Summary Dialog", () => {
 describe("FeedbackBoardContainer - Utility Methods", () => {
   it("should format numbers correctly", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     expect((instance as any).numberFormatter(5)).toBe("5.0");
     expect((instance as any).numberFormatter(5.5)).toBe("5.5");
     expect((instance as any).numberFormatter(10.123)).toBe("10.1");
@@ -1698,7 +1684,7 @@ describe("FeedbackBoardContainer - Utility Methods", () => {
 
   it("should format percentages correctly", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     expect((instance as any).percentageFormatter(50)).toBe("50.0%");
     expect((instance as any).percentageFormatter(75.5)).toBe("75.5%");
     expect((instance as any).percentageFormatter(100)).toBe("100.0%");
@@ -1743,7 +1729,7 @@ describe("FeedbackBoardContainer - Utility Methods", () => {
 describe("FeedbackBoardContainer - Board Management", () => {
   it("should handle board created event", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const existingBoard: IFeedbackBoardDocument = {
       id: "board-1",
@@ -1771,12 +1757,12 @@ describe("FeedbackBoardContainer - Board Management", () => {
       createdBy: {} as IdentityRef,
     };
 
-    instance.setState({ 
-      currentTeam: team, 
+    instance.setState({
+      currentTeam: team,
       currentBoard: existingBoard,
       boards: [existingBoard],
       userTeams: [team],
-      currentUserId: "user-1"
+      currentUserId: "user-1",
     });
 
     const BoardDataService = require("../../dal/boardDataService").default;
@@ -1790,7 +1776,7 @@ describe("FeedbackBoardContainer - Board Management", () => {
 
   it("should not handle board created for different team", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const board: IFeedbackBoardDocument = {
       id: "board-1",
@@ -1805,9 +1791,9 @@ describe("FeedbackBoardContainer - Board Management", () => {
       createdBy: {} as IdentityRef,
     };
 
-    instance.setState({ 
-      currentTeam: team, 
-      boards: [board]
+    instance.setState({
+      currentTeam: team,
+      boards: [board],
     });
 
     const initialBoardsLength = instance.state.boards.length;
@@ -1818,7 +1804,7 @@ describe("FeedbackBoardContainer - Board Management", () => {
 
   it("should archive current board", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
     const board: IFeedbackBoardDocument = {
       id: "board-1",
@@ -1833,11 +1819,11 @@ describe("FeedbackBoardContainer - Board Management", () => {
       createdBy: {} as IdentityRef,
     };
 
-    instance.setState({ 
-      currentTeam: team, 
+    instance.setState({
+      currentTeam: team,
       currentBoard: board,
       boards: [board],
-      isArchiveBoardConfirmationDialogHidden: false
+      isArchiveBoardConfirmationDialogHidden: false,
     });
 
     const BoardDataService = require("../../dal/boardDataService").default;
@@ -1852,20 +1838,20 @@ describe("FeedbackBoardContainer - Board Management", () => {
     expect(BoardDataService.archiveFeedbackBoard).toHaveBeenCalledWith("team-1", "board-1");
     expect(mockBroadcastDeletedBoard).toHaveBeenCalledWith("team-1", "board-1");
     expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(true);
-    expect(appInsights.trackEvent).toHaveBeenCalledWith({ 
-      name: TelemetryEvents.FeedbackBoardArchived, 
-      properties: { boardId: "board-1" } 
+    expect(appInsights.trackEvent).toHaveBeenCalledWith({
+      name: TelemetryEvents.FeedbackBoardArchived,
+      properties: { boardId: "board-1" },
     });
   });
 
   it("should reload boards for current team with no boards", async () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
-    instance.setState({ 
+    instance.setState({
       currentTeam: team,
       userTeams: [team],
-      currentUserId: "user-1"
+      currentUserId: "user-1",
     });
 
     const BoardDataService = require("../../dal/boardDataService").default;

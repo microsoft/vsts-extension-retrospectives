@@ -1118,15 +1118,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private readonly showTeamAssessmentHistoryDialog = async () => {
     const allBoards = await BoardDataService.getBoardsForTeam(this.state.currentTeam.id);
 
-    const boardsWithAssessments = allBoards.filter(board =>
-      board.isIncludeTeamEffectivenessMeasurement &&
-      board.teamEffectivenessMeasurementVoteCollection &&
-      board.teamEffectivenessMeasurementVoteCollection.length > 0
-    );
+    const boardsWithAssessments = allBoards.filter(board => board.isIncludeTeamEffectivenessMeasurement && board.teamEffectivenessMeasurementVoteCollection && board.teamEffectivenessMeasurementVoteCollection.length > 0);
 
-    boardsWithAssessments.sort((a, b) =>
-      new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime()
-    );
+    boardsWithAssessments.sort((a, b) => new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime());
 
     const historyData = boardsWithAssessments.map(board => {
       const measurements: { id: number; selected: number }[] = [];
@@ -1155,7 +1149,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     this.setState({
       teamAssessmentHistoryData: historyData,
-      isTeamAssessmentHistoryDialogHidden: false
+      isTeamAssessmentHistoryDialogHidden: false,
     });
 
     appInsights.trackEvent({ name: TelemetryEvents.TeamAssessmentHistoryViewed });
@@ -1731,14 +1725,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
                           </button>
                           {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
-                            <select
-                              value={this.state.countdownDurationMinutes}
-                              onChange={this.handleCountdownDurationChange}
-                              className="workflow-stage-timer-select"
-                              aria-label="Select countdown duration in minutes"
-                            >
+                            <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
                               {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
-                                <option key={num} value={num}>{num} min</option>
+                                <option key={num} value={num}>
+                                  {num} min
+                                </option>
                               ))}
                             </select>
                           ) : (
@@ -2038,9 +2029,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </div>
           ) : (
             <>
-              <p style={{ marginBottom: "20px" }}>
-                At v2.0.1 and later, there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.
-              </p>
+              <p style={{ marginBottom: "20px" }}>At v2.0.1 and later, there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.</p>
               <p style={{ marginBottom: "20px" }}>
                 Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
               </p>
@@ -2114,7 +2103,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                       {this.state.teamAssessmentHistoryData.map((board, index) => {
                         const date = new Date(board.createdDate);
-                        const shouldShowLabel = index === 0 || index === this.state.teamAssessmentHistoryData.length - 1 || (this.state.teamAssessmentHistoryData.length <= 5) || (this.state.teamAssessmentHistoryData.length > 5 && index % Math.ceil(this.state.teamAssessmentHistoryData.length / 5) === 0);
+                        const shouldShowLabel = index === 0 || index === this.state.teamAssessmentHistoryData.length - 1 || this.state.teamAssessmentHistoryData.length <= 5 || (this.state.teamAssessmentHistoryData.length > 5 && index % Math.ceil(this.state.teamAssessmentHistoryData.length / 5) === 0);
 
                         if (!shouldShowLabel) return null;
 
@@ -2143,12 +2132,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             <circle cx={legendX + 15} cy={legendY} r="4" fill={color} stroke="#fff" strokeWidth="2" />
 
                             <text x={legendX + 40} y={legendY - 5} fontSize="13" fill="#333" fontWeight="600">
-                              <tspan>
-                                {question.shortTitle}
-                              </tspan>
+                              <tspan>{question.shortTitle}</tspan>
                             </text>
                             <text x={legendX + 40} y={legendY + 10} fontSize="10" fill="#666">
-                              <tspan>{question.title.substring(0, 25)}{question.title.length > 25 ? "..." : ""}</tspan>
+                              <tspan>
+                                {question.title.substring(0, 25)}
+                                {question.title.length > 25 ? "..." : ""}
+                              </tspan>
                             </text>
                           </g>
                         );

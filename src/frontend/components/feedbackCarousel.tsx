@@ -66,7 +66,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         columnProps: columnProps,
         columns: columnProps.columns,
         columnIds: columnProps.columnIds,
-        columnId: columnProps.columnId,
+        columnId: columnItem.feedbackItem.columnId,
         originalColumnId: columnItem.feedbackItem.originalColumnId,
         boardId: columnProps.boardId,
         boardTitle: columnProps.boardTitle,
@@ -89,7 +89,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         groupIds: [],
         isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
         isShowingGroupedChildrenTitles: false,
-        isFocusModalHidden: true,
+        isFocusModalHidden: this.props.isFocusModalHidden,
       };
 
       return (
