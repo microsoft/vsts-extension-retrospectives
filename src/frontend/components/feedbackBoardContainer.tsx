@@ -2041,86 +2041,133 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <p style={{ marginBottom: "20px" }}>
                 Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
               </p>
-              {questions.map(question => {
-                const dataPoints = this.state.teamAssessmentHistoryData
-                  .map(board => {
-                    const questionData = board.questionAverages.find(qa => qa.questionId === question.id);
-                    return questionData ? { date: new Date(board.createdDate), average: questionData.average, boardTitle: board.boardTitle } : null;
-                  })
-                  .filter(Boolean);
+              {(() => {
+                // Define colors for each question
+                const questionColors = [
+                  "#0078d4", // Blue
+                  "#107c10", // Green
+                  "#d83b01", // Orange-Red
+                  "#8764b8", // Purple
+                  "#00b7c3", // Cyan
+                  "#e81123", // Red
+                ];
 
-                if (dataPoints.length === 0) {
-                  return null;
-                }
-
-                const svgWidth = 800;
-                const svgHeight = 300;
-                const padding = { top: 40, right: 40, bottom: 60, left: 60 };
+                // SVG dimensions and scales
+                const svgWidth = 1000;
+                const svgHeight = 500;
+                const padding = { top: 60, right: 250, bottom: 80, left: 80 };
                 const chartWidth = svgWidth - padding.left - padding.right;
                 const chartHeight = svgHeight - padding.top - padding.bottom;
 
                 const yScale = (value: number) => padding.top + chartHeight - (value / 10) * chartHeight;
 
-                const minDate = dataPoints[0].date.getTime();
-                const maxDate = dataPoints[dataPoints.length - 1].date.getTime();
+                // Get all unique dates across all boards
+                const allDates = this.state.teamAssessmentHistoryData.map(board => new Date(board.createdDate).getTime());
+                const minDate = Math.min(...allDates);
+                const maxDate = Math.max(...allDates);
                 const dateRange = maxDate - minDate || 1;
                 const xScale = (date: Date) => padding.left + ((date.getTime() - minDate) / dateRange) * chartWidth;
 
-                const linePath = dataPoints.map((point, index) => `${index === 0 ? "M" : "L"} ${xScale(point.date)} ${yScale(point.average)}`).join(" ");
-
                 return (
-                  <div key={question.id} style={{ marginBottom: "40px", borderBottom: "1px solid #e0e0e0", paddingBottom: "20px" }}>
-                    <h3 style={{ marginBottom: "10px", display: "flex", alignItems: "center" }}>
-                      <i className={question.fontAwesomeClass} style={{ marginRight: "10px" }} />
-                      {question.shortTitle}
-                    </h3>
-                    <p style={{ fontSize: "0.9em", color: "#666", marginBottom: "15px" }}>{question.title}</p>
+                  <div>
                     <svg width={svgWidth} height={svgHeight} style={{ maxWidth: "100%", height: "auto" }}>
+                      {/* Y-axis grid lines and labels */}
                       {[0, 2, 4, 6, 8, 10].map(value => (
                         <g key={value}>
                           <line x1={padding.left} y1={yScale(value)} x2={svgWidth - padding.right} y2={yScale(value)} stroke="#e0e0e0" strokeWidth="1" />
-                          <text x={padding.left - 10} y={yScale(value)} textAnchor="end" fontSize="12" fill="#666" dominantBaseline="middle">
+                          <text x={padding.left - 10} y={yScale(value)} textAnchor="end" fontSize="14" fill="#666" dominantBaseline="middle">
                             {value}
                           </text>
                         </g>
                       ))}
 
+                      {/* X-axis */}
                       <line x1={padding.left} y1={svgHeight - padding.bottom} x2={svgWidth - padding.right} y2={svgHeight - padding.bottom} stroke="#666" strokeWidth="2" />
 
+                      {/* Y-axis */}
                       <line x1={padding.left} y1={padding.top} x2={padding.left} y2={svgHeight - padding.bottom} stroke="#666" strokeWidth="2" />
 
-                      <path d={linePath} fill="none" stroke="#0078d4" strokeWidth="3" />
+                      {/* Draw lines and points for each question */}
+                      {questions.map((question, qIndex) => {
+                        const color = questionColors[qIndex % questionColors.length];
+                        const dataPoints = this.state.teamAssessmentHistoryData
+                          .map(board => {
+                            const questionData = board.questionAverages.find(qa => qa.questionId === question.id);
+                            return questionData ? { date: new Date(board.createdDate), average: questionData.average, boardTitle: board.boardTitle } : null;
+                          })
+                          .filter(Boolean);
 
-                      {dataPoints.map((point, index) => (
-                        <g key={index}>
-                          <circle cx={xScale(point.date)} cy={yScale(point.average)} r="5" fill="#0078d4" stroke="#fff" strokeWidth="2">
-                            <title>{`${point.boardTitle}\nDate: ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(point.date)}\nAverage: ${this.numberFormatter(point.average)}`}</title>
-                          </circle>
-                        </g>
-                      ))}
+                        if (dataPoints.length === 0) {
+                          return null;
+                        }
 
-                      {dataPoints.map((point, index) => {
-                        const shouldShowLabel = index === 0 || index === dataPoints.length - 1 || (dataPoints.length <= 5 && index % 1 === 0) || (dataPoints.length > 5 && index % Math.ceil(dataPoints.length / 5) === 0);
+                        const linePath = dataPoints.map((point, index) => `${index === 0 ? "M" : "L"} ${xScale(point.date)} ${yScale(point.average)}`).join(" ");
+
+                        return (
+                          <g key={question.id}>
+                            {/* Line */}
+                            <path d={linePath} fill="none" stroke={color} strokeWidth="2.5" opacity="0.8" />
+
+                            {/* Data points */}
+                            {dataPoints.map((point, index) => (
+                              <circle key={index} cx={xScale(point.date)} cy={yScale(point.average)} r="4" fill={color} stroke="#fff" strokeWidth="2">
+                                <title>{`${question.shortTitle}\n${point.boardTitle}\nDate: ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(point.date)}\nAverage: ${this.numberFormatter(point.average)}`}</title>
+                              </circle>
+                            ))}
+                          </g>
+                        );
+                      })}
+
+                      {/* X-axis date labels */}
+                      {this.state.teamAssessmentHistoryData.map((board, index) => {
+                        const date = new Date(board.createdDate);
+                        const shouldShowLabel = index === 0 || index === this.state.teamAssessmentHistoryData.length - 1 || (this.state.teamAssessmentHistoryData.length <= 5) || (this.state.teamAssessmentHistoryData.length > 5 && index % Math.ceil(this.state.teamAssessmentHistoryData.length / 5) === 0);
 
                         if (!shouldShowLabel) return null;
 
                         return (
-                          <text key={index} x={xScale(point.date)} y={svgHeight - padding.bottom + 20} textAnchor="middle" fontSize="11" fill="#666" transform={`rotate(-45 ${xScale(point.date)} ${svgHeight - padding.bottom + 20})`}>
-                            {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(point.date)}
+                          <text key={index} x={xScale(date)} y={svgHeight - padding.bottom + 20} textAnchor="end" fontSize="12" fill="#666" transform={`rotate(-45 ${xScale(date)} ${svgHeight - padding.bottom + 20})`}>
+                            {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "2-digit" }).format(date)}
                           </text>
                         );
                       })}
 
-                      <text x={padding.left - 40} y={svgHeight / 2} textAnchor="middle" fontSize="14" fill="#666" transform={`rotate(-90 ${padding.left - 40} ${svgHeight / 2})`}>
+                      {/* Axis labels */}
+                      <text x={padding.left - 50} y={svgHeight / 2} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${svgHeight / 2})`}>
                         Average Score
                       </text>
-                      <text x={svgWidth / 2} y={svgHeight - 10} textAnchor="middle" fontSize="14" fill="#666">
+                      <text x={(padding.left + svgWidth - padding.right) / 2} y={svgHeight - 15} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600">
                         Retrospective Date
                       </text>
+
+                      {/* Legend */}
+                      {questions.map((question, qIndex) => {
+                        const color = questionColors[qIndex % questionColors.length];
+                        const legendX = svgWidth - padding.right + 15;
+                        const legendY = padding.top + qIndex * 70;
+
+                        return (
+                          <g key={question.id}>
+                            {/* Legend line */}
+                            <line x1={legendX} y1={legendY} x2={legendX + 30} y2={legendY} stroke={color} strokeWidth="2.5" />
+                            <circle cx={legendX + 15} cy={legendY} r="4" fill={color} stroke="#fff" strokeWidth="2" />
+
+                            {/* Legend icon and text */}
+                            <text x={legendX + 40} y={legendY - 5} fontSize="13" fill="#333" fontWeight="600">
+                              <tspan>
+                                {question.shortTitle}
+                              </tspan>
+                            </text>
+                            <text x={legendX + 40} y={legendY + 10} fontSize="10" fill="#666">
+                              <tspan>{question.title.substring(0, 25)}{question.title.length > 25 ? "..." : ""}</tspan>
+                            </text>
+                          </g>
+                        );
+                      })}
                     </svg>
                   </div>
                 );
-              })}
+              })()}
             </div>
           )}
         </Dialog>
