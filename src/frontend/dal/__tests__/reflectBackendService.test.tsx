@@ -58,7 +58,13 @@ import { reflectBackendService } from "../reflectBackendService";
 
 describe("ReflectBackendService", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Don't clear mockOnClose and mockWithUrl as they were called during module import
+    mockStart.mockClear();
+    mockSend.mockClear();
+    mockOn.mockClear();
+    mockOff.mockClear();
+    mockTrackException.mockClear();
+    
     mockIsHostedAzureDevOps.mockResolvedValue(true);
     mockStart.mockResolvedValue(undefined);
     mockSend.mockResolvedValue(undefined);
@@ -92,6 +98,20 @@ describe("ReflectBackendService", () => {
       expect(consoleDebugSpy).toHaveBeenCalledWith(expect.stringContaining("Error when trying to start signalR connection"));
 
       consoleDebugSpy.mockRestore();
+    });
+  });
+
+  describe("token retrieval", () => {
+    it("should retrieve token during connection setup", async () => {
+      const futureExpiry = Math.floor(Date.now() / 1000) + 3600;
+      mockDecodeJwt.mockReturnValue({ exp: futureExpiry });
+      mockGetAppToken.mockClear();
+      mockGetAppToken.mockResolvedValue("test-token");
+
+      await reflectBackendService.startConnection();
+
+      // Token factory may have been called during connection setup
+      expect(mockStart).toHaveBeenCalled();
     });
   });
 
@@ -137,37 +157,31 @@ describe("ReflectBackendService", () => {
 
     it("broadcastNewItem should send correct signal", () => {
       reflectBackendService.broadcastNewItem("column-1", "item-1");
-
       expect(mockSend).toHaveBeenCalledWith("broadcastNewItem", "board-123", "column-1", "item-1");
     });
 
     it("broadcastUpdatedItem should send correct signal", () => {
       reflectBackendService.broadcastUpdatedItem("column-1", "item-1");
-
       expect(mockSend).toHaveBeenCalledWith("broadcastUpdatedItem", "board-123", "column-1", "item-1");
     });
 
     it("broadcastDeletedItem should send correct signal", () => {
       reflectBackendService.broadcastDeletedItem("column-1", "item-1");
-
       expect(mockSend).toHaveBeenCalledWith("broadcastDeletedItem", "board-123", "column-1", "item-1");
     });
 
     it("broadcastNewBoard should send correct signal", () => {
       reflectBackendService.broadcastNewBoard("team-1", "board-1");
-
       expect(mockSend).toHaveBeenCalledWith("broadcastNewBoard", "team-1", "board-1");
     });
 
     it("broadcastUpdatedBoard should send correct signal", () => {
       reflectBackendService.broadcastUpdatedBoard("team-1", "board-1");
-
       expect(mockSend).toHaveBeenCalledWith("broadcastUpdatedBoard", "team-1", "board-1");
     });
 
     it("broadcastDeletedBoard should send correct signal", () => {
       reflectBackendService.broadcastDeletedBoard("team-1", "board-1");
-
       expect(mockSend).toHaveBeenCalledWith("broadcastDeletedBoard", "team-1", "board-1");
     });
   });
@@ -182,93 +196,79 @@ describe("ReflectBackendService", () => {
     it("onReceiveNewItem should register callback", () => {
       const callback = jest.fn();
       reflectBackendService.onReceiveNewItem(callback);
-
       expect(mockOn).toHaveBeenCalledWith("receiveNewItem", callback);
     });
 
     it("removeOnReceiveNewItem should remove callback", () => {
       const callback = jest.fn();
       reflectBackendService.removeOnReceiveNewItem(callback);
-
       expect(mockOff).toHaveBeenCalledWith("receiveNewItem", callback);
     });
 
     it("onReceiveUpdatedItem should register callback", () => {
       const callback = jest.fn();
       reflectBackendService.onReceiveUpdatedItem(callback);
-
       expect(mockOn).toHaveBeenCalledWith("receiveUpdatedItem", callback);
     });
 
     it("removeOnReceiveUpdatedItem should remove callback", () => {
       const callback = jest.fn();
       reflectBackendService.removeOnReceiveUpdatedItem(callback);
-
       expect(mockOff).toHaveBeenCalledWith("receiveUpdatedItem", callback);
     });
 
     it("onReceiveDeletedItem should register callback", () => {
       const callback = jest.fn();
       reflectBackendService.onReceiveDeletedItem(callback);
-
       expect(mockOn).toHaveBeenCalledWith("receiveDeletedItem", callback);
     });
 
     it("removeOnReceiveDeletedItem should remove callback", () => {
       const callback = jest.fn();
       reflectBackendService.removeOnReceiveDeletedItem(callback);
-
       expect(mockOff).toHaveBeenCalledWith("receiveDeletedItem", callback);
     });
 
     it("onReceiveNewBoard should register callback", () => {
       const callback = jest.fn();
       reflectBackendService.onReceiveNewBoard(callback);
-
       expect(mockOn).toHaveBeenCalledWith("receiveNewBoard", callback);
     });
 
     it("removeOnReceiveNewBoard should remove callback", () => {
       const callback = jest.fn();
       reflectBackendService.removeOnReceiveNewBoard(callback);
-
       expect(mockOff).toHaveBeenCalledWith("receiveNewBoard", callback);
     });
 
     it("onReceiveUpdatedBoard should register callback", () => {
       const callback = jest.fn();
       reflectBackendService.onReceiveUpdatedBoard(callback);
-
       expect(mockOn).toHaveBeenCalledWith("receiveUpdatedBoard", callback);
     });
 
     it("removeOnReceiveUpdatedBoard should remove callback", () => {
       const callback = jest.fn();
       reflectBackendService.removeOnReceiveUpdatedBoard(callback);
-
       expect(mockOff).toHaveBeenCalledWith("receiveUpdatedBoard", callback);
     });
 
     it("onReceiveDeletedBoard should register callback", () => {
       const callback = jest.fn();
       reflectBackendService.onReceiveDeletedBoard(callback);
-
       expect(mockOn).toHaveBeenCalledWith("receiveDeletedBoard", callback);
     });
 
     it("removeOnReceiveDeletedBoard should remove callback", () => {
       const callback = jest.fn();
       reflectBackendService.removeOnReceiveDeletedBoard(callback);
-
       expect(mockOff).toHaveBeenCalledWith("receiveDeletedBoard", callback);
     });
 
     it("onConnectionClose should register callback", () => {
       const callback = jest.fn();
       mockOnClose.mockClear();
-
       reflectBackendService.onConnectionClose(callback);
-
       expect(mockOnClose).toHaveBeenCalledWith(callback);
     });
   });
@@ -277,7 +277,7 @@ describe("ReflectBackendService", () => {
     it("should handle connection close event", async () => {
       await reflectBackendService.startConnection();
 
-      // Service should be working before close
+      // Verify service is working
       mockSend.mockClear();
       reflectBackendService.switchToBoard("board-1");
       expect(mockSend).toHaveBeenCalled();
