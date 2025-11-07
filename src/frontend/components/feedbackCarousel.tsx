@@ -24,17 +24,20 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       isFocusModalHidden: this.props.isFocusModalHidden,
     });
 
-    const feedbackColumnPropsList = JSON.parse(JSON.stringify(this.props.feedbackColumnPropsList)) as FeedbackColumnProps[];
+    // Create a shallow copy of the array to avoid mutating props
+    const feedbackColumnPropsList = [...this.props.feedbackColumnPropsList];
 
     if (feedbackColumnPropsList.length > 0) {
       console.error('[FeedbackCarousel] Creating "All" column');
+      // Create the "All" column by combining all column items
+      const allColumnItems = feedbackColumnPropsList.flatMap(col => col.columnItems);
       feedbackColumnPropsList.unshift({
         ...feedbackColumnPropsList[0],
         columnId: "all-columns",
         columnName: "All",
-        columnItems: feedbackColumnPropsList.flatMap(col => col.columnItems),
+        columnItems: allColumnItems,
       } as FeedbackColumnProps);
-      console.error("[FeedbackCarousel] All column created with", feedbackColumnPropsList[0].columnItems.length, "items");
+      console.error("[FeedbackCarousel] All column created with", allColumnItems.length, "items");
     }
 
     this.state = {
