@@ -763,10 +763,11 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
 
     // Vote Count Helpers
-    const mainFeedbackItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
+    const columnItems = this.props.columns[this.props.columnId]?.columnItems;
+    const mainFeedbackItem = columnItems?.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
     const groupedFeedbackItems = this.props.groupIds
       .map(id => {
-        const item = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id)?.feedbackItem;
+        const item = columnItems?.find(c => c.feedbackItem.id === id)?.feedbackItem;
         return item;
       })
       .filter(item => item !== undefined) as IFeedbackItemDocument[];
@@ -790,8 +791,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const showVotes = showVoteButton || workflowState.isActPhase;
 
     const groupItemsCount = this.props?.groupedItemProps?.groupedCount + 1;
-    const itemPosition = this.props.columns[this.props.columnId]?.columnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1;
-    const totalItemsInColumn = this.props.columns[this.props.columnId]?.columnItems.length || 0;
+    const currentColumnItems = this.props.columns[this.props.columnId]?.columnItems;
+    const itemPosition = currentColumnItems ? currentColumnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1 : 0;
+    const totalItemsInColumn = currentColumnItems?.length || 0;
 
     const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
     const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
@@ -943,7 +945,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
               </div>
               {this.feedbackCreationInformationContent()}
-              <div className="card-id">#{this.props.columns[this.props.columnId]?.columnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1}</div>
+              <div className="card-id">#{itemPosition}</div>
             </div>
             <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
@@ -955,7 +957,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 </div>
                 <ul className="fa-ul" aria-label="List of Related Feedback" role="list">
                   {childrenIds.map((id: string) => {
-                    const childCard: IColumnItem = this.props.columns[this.props.columnId]?.columnItems.find(c => c.feedbackItem.id === id);
+                    const childCard: IColumnItem = columnItems?.find(c => c.feedbackItem.id === id);
                     const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
                     const childItemHidden = childCard && this.props.hideFeedbackItems && childCard.feedbackItem.userIdRef !== getUserIdentity().id;
                     const childDisplayTitle = childItemHidden ? "[Hidden Feedback]" : childCard?.feedbackItem.title;
