@@ -20,7 +20,13 @@ sdkInit({ applyTheme: true }).then(() => {
 
     const root = createRoot(document.getElementById("root"));
     root.render(
-      <AppInsightsErrorBoundary onError={() => <h1>We detected an error in the application</h1>} appInsights={reactPlugin}>
+      <AppInsightsErrorBoundary 
+        onError={(error) => {
+          console.error('[ErrorBoundary] Caught error:', error);
+          return <h1>We detected an error in the application</h1>;
+        }} 
+        appInsights={reactPlugin}
+      >
         <FeedbackBoardContainer {...feedbackBoardContainerProps} />
       </AppInsightsErrorBoundary>,
     );

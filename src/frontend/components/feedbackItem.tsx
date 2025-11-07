@@ -757,6 +757,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const childrenIds = this.props.groupIds;
 
+    console.log('[FeedbackItem] Rendering item', {
+      id: this.props.id,
+      columnId: this.props.columnId,
+      hasColumn: !!this.props.columns[this.props.columnId],
+      workflowPhase: this.props.workflowPhase,
+      isFocusModalHidden: this.props.isFocusModalHidden
+    });
+
     // Focus Mode Booleans
     const isFocusModalHidden = this.props.isFocusModalHidden; // for rotating through carousel in focus mode
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
@@ -764,6 +772,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
     // Vote Count Helpers
     const columnItems = this.props.columns[this.props.columnId]?.columnItems;
+    console.log('[FeedbackItem] Getting vote counts', {
+      columnId: this.props.columnId,
+      hasColumnItems: !!columnItems,
+      columnItemsLength: columnItems?.length
+    });
+
     const mainFeedbackItem = columnItems?.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
     const groupedFeedbackItems = this.props.groupIds
       .map(id => {

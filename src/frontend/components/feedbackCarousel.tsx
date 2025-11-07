@@ -19,15 +19,22 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   constructor(props: IFeedbackCarouselProps) {
     super(props);
 
+    console.log('[FeedbackCarousel] Constructor called', {
+      columnCount: this.props.feedbackColumnPropsList.length,
+      isFocusModalHidden: this.props.isFocusModalHidden
+    });
+
     const feedbackColumnPropsList = JSON.parse(JSON.stringify(this.props.feedbackColumnPropsList)) as FeedbackColumnProps[];
 
     if (feedbackColumnPropsList.length > 0) {
+      console.log('[FeedbackCarousel] Creating "All" column');
       feedbackColumnPropsList.unshift({
         ...feedbackColumnPropsList[0],
         columnId: "all-columns",
         columnName: "All",
         columnItems: feedbackColumnPropsList.flatMap(col => col.columnItems),
       } as FeedbackColumnProps);
+      console.log('[FeedbackCarousel] All column created with', feedbackColumnPropsList[0].columnItems.length, 'items');
     }
 
     this.state = {
@@ -36,6 +43,12 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   }
 
   private renderFeedbackCarouselItems = (columnProps: FeedbackColumnProps) => {
+    console.log('[FeedbackCarousel] renderFeedbackCarouselItems called', {
+      columnId: columnProps.columnId,
+      columnName: columnProps.columnName,
+      itemCount: columnProps.columnItems.length
+    });
+
     const sortedItems = columnProps.columnItems
       .sort((a, b) => {
         if (b.feedbackItem.upvotes !== a.feedbackItem.upvotes) {
@@ -47,7 +60,14 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       })
       .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId);
 
+    console.log('[FeedbackCarousel] Sorted items count:', sortedItems.length);
+
     return sortedItems.map(columnItem => {
+      console.log('[FeedbackCarousel] Rendering item', {
+        itemId: columnItem.feedbackItem.id,
+        itemColumnId: columnItem.feedbackItem.columnId,
+        columnPropsId: columnProps.columnId
+      });
       const feedbackItemProps: IFeedbackItemProps = {
         id: columnItem.feedbackItem.id,
         title: columnItem.feedbackItem.title,
