@@ -193,3 +193,34 @@
     }
   }
 }
+
+.retrospectives-team-assessment-history-dialog {
+  max-width: none;
+  width: 80%;
+  display: flex;
+  align-items: center;
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
+
+  .ms-Dialog-title {
+    text-align: left;
+    color: var(--text-primary-color);
+  }
+
+  svg {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #fafafa;
+  }
+
+  h3 {
+    color: var(--text-primary-color);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  circle:hover {
+    r: 7;
+    cursor: pointer;
+  }
+}

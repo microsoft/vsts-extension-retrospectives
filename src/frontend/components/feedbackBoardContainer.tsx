@@ -85,6 +85,7 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogTitle: string;
   isCarouselDialogHidden: boolean;
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
+  isTeamAssessmentHistoryDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
   allowCrossColumnGroups: boolean;
@@ -94,10 +95,6 @@ export interface FeedbackBoardContainerState {
   effectivenessMeasurementChartData: { questionId: number; red: number; yellow: number; green: number }[];
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
-  /**
-   * Members of all the teams that the current user access to. This may not be all the team
-   * members within the organization.
-   */
   allMembers: TeamMember[];
   castedVoteCount: number;
   currentVoteCount: string;
@@ -107,6 +104,12 @@ export interface FeedbackBoardContainerState {
   boardTimerSeconds: number;
   isBoardTimerRunning: boolean;
   countdownDurationMinutes: number;
+  teamAssessmentHistoryData: {
+    boardTitle: string;
+    boardId: string;
+    createdDate: Date;
+    questionAverages: { questionId: number; average: number }[];
+  }[];
 }
 
 export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
@@ -143,6 +146,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
+      isTeamAssessmentHistoryDialogHidden: true,
       isArchiveBoardConfirmationDialogHidden: true,
       isDropIssueInEdgeMessageBarVisible: true,
       isLiveSyncInTfsIssueMessageBarVisible: true,
@@ -176,6 +180,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       boardTimerSeconds: 0,
       isBoardTimerRunning: false,
       countdownDurationMinutes: 5,
+      teamAssessmentHistoryData: [],
     };
   }
 
@@ -1110,6 +1115,56 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isRetroSummaryDialogHidden: true });
   };
 
+  private readonly showTeamAssessmentHistoryDialog = async () => {
+    const allBoards = await BoardDataService.getBoardsForTeam(this.state.currentTeam.id);
+
+    const boardsWithAssessments = allBoards.filter(board =>
+      board.isIncludeTeamEffectivenessMeasurement &&
+      board.teamEffectivenessMeasurementVoteCollection &&
+      board.teamEffectivenessMeasurementVoteCollection.length > 0
+    );
+
+    boardsWithAssessments.sort((a, b) =>
+      new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime()
+    );
+
+    const historyData = boardsWithAssessments.map(board => {
+      const measurements: { id: number; selected: number }[] = [];
+      const voteCollection = board.teamEffectivenessMeasurementVoteCollection || [];
+
+      voteCollection.forEach(vote => {
+        vote?.responses?.forEach(response => {
+          measurements.push({ id: response.questionId, selected: response.selection });
+        });
+      });
+
+      const questionAverages: { questionId: number; average: number }[] = [];
+      [...new Set(measurements.map(item => item.id))].forEach(questionId => {
+        const responsesForQuestion = measurements.filter(m => m.id === questionId);
+        const average = responsesForQuestion.reduce((sum, m) => sum + m.selected, 0) / responsesForQuestion.length;
+        questionAverages.push({ questionId, average });
+      });
+
+      return {
+        boardTitle: board.title,
+        boardId: board.id,
+        createdDate: board.createdDate,
+        questionAverages,
+      };
+    });
+
+    this.setState({
+      teamAssessmentHistoryData: historyData,
+      isTeamAssessmentHistoryDialogHidden: false
+    });
+
+    appInsights.trackEvent({ name: TelemetryEvents.TeamAssessmentHistoryViewed });
+  };
+
+  private readonly hideTeamAssessmentHistoryDialog = (): void => {
+    this.setState({ isTeamAssessmentHistoryDialogHidden: true });
+  };
+
   private readonly updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
     const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
 
@@ -1344,6 +1399,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         onClick: this.showRetroSummaryDialog,
         text: "Show retrospective summary",
         title: "Show retrospective summary",
+      },
+      {
+        key: "teamAssessmentHistory",
+        iconProps: { iconName: "TimelineProgress" },
+        onClick: this.showTeamAssessmentHistoryDialog,
+        text: "Team assessment history",
+        title: "Team assessment history",
       },
       {
         key: "seperator",
@@ -1955,6 +2017,111 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 </section>
               )}
             </>
+          )}
+        </Dialog>
+        <Dialog
+          hidden={this.state.isTeamAssessmentHistoryDialogHidden}
+          onDismiss={this.hideTeamAssessmentHistoryDialog}
+          dialogContentProps={{
+            type: DialogType.normal,
+            title: "Team Assessment History",
+          }}
+          modalProps={{
+            containerClassName: "retrospectives-team-assessment-history-dialog",
+            className: "retrospectives-dialog-modal",
+          }}
+        >
+          {this.state.teamAssessmentHistoryData.length === 0 ? (
+            <div style={{ padding: "20px", textAlign: "center" }}>
+              <p>No team assessment history available.</p>
+              <p>Create retrospectives with team assessments to see historical trends.</p>
+            </div>
+          ) : (
+            <div style={{ padding: "20px" }}>
+              <p style={{ marginBottom: "20px" }}>
+                Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
+              </p>
+              {questions.map(question => {
+                const dataPoints = this.state.teamAssessmentHistoryData
+                  .map(board => {
+                    const questionData = board.questionAverages.find(qa => qa.questionId === question.id);
+                    return questionData ? { date: new Date(board.createdDate), average: questionData.average, boardTitle: board.boardTitle } : null;
+                  })
+                  .filter(Boolean);
+
+                if (dataPoints.length === 0) {
+                  return null;
+                }
+
+                const svgWidth = 800;
+                const svgHeight = 300;
+                const padding = { top: 40, right: 40, bottom: 60, left: 60 };
+                const chartWidth = svgWidth - padding.left - padding.right;
+                const chartHeight = svgHeight - padding.top - padding.bottom;
+
+                const yScale = (value: number) => padding.top + chartHeight - (value / 10) * chartHeight;
+
+                const minDate = dataPoints[0].date.getTime();
+                const maxDate = dataPoints[dataPoints.length - 1].date.getTime();
+                const dateRange = maxDate - minDate || 1;
+                const xScale = (date: Date) => padding.left + ((date.getTime() - minDate) / dateRange) * chartWidth;
+
+                const linePath = dataPoints.map((point, index) => `${index === 0 ? "M" : "L"} ${xScale(point.date)} ${yScale(point.average)}`).join(" ");
+
+                return (
+                  <div key={question.id} style={{ marginBottom: "40px", borderBottom: "1px solid #e0e0e0", paddingBottom: "20px" }}>
+                    <h3 style={{ marginBottom: "10px", display: "flex", alignItems: "center" }}>
+                      <i className={question.fontAwesomeClass} style={{ marginRight: "10px" }} />
+                      {question.shortTitle}
+                    </h3>
+                    <p style={{ fontSize: "0.9em", color: "#666", marginBottom: "15px" }}>{question.title}</p>
+                    <svg width={svgWidth} height={svgHeight} style={{ maxWidth: "100%", height: "auto" }}>
+                      {[0, 2, 4, 6, 8, 10].map(value => (
+                        <g key={value}>
+                          <line x1={padding.left} y1={yScale(value)} x2={svgWidth - padding.right} y2={yScale(value)} stroke="#e0e0e0" strokeWidth="1" />
+                          <text x={padding.left - 10} y={yScale(value)} textAnchor="end" fontSize="12" fill="#666" dominantBaseline="middle">
+                            {value}
+                          </text>
+                        </g>
+                      ))}
+
+                      <line x1={padding.left} y1={svgHeight - padding.bottom} x2={svgWidth - padding.right} y2={svgHeight - padding.bottom} stroke="#666" strokeWidth="2" />
+
+                      <line x1={padding.left} y1={padding.top} x2={padding.left} y2={svgHeight - padding.bottom} stroke="#666" strokeWidth="2" />
+
+                      <path d={linePath} fill="none" stroke="#0078d4" strokeWidth="3" />
+
+                      {dataPoints.map((point, index) => (
+                        <g key={index}>
+                          <circle cx={xScale(point.date)} cy={yScale(point.average)} r="5" fill="#0078d4" stroke="#fff" strokeWidth="2">
+                            <title>{`${point.boardTitle}\nDate: ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(point.date)}\nAverage: ${this.numberFormatter(point.average)}`}</title>
+                          </circle>
+                        </g>
+                      ))}
+
+                      {dataPoints.map((point, index) => {
+                        const shouldShowLabel = index === 0 || index === dataPoints.length - 1 || (dataPoints.length <= 5 && index % 1 === 0) || (dataPoints.length > 5 && index % Math.ceil(dataPoints.length / 5) === 0);
+
+                        if (!shouldShowLabel) return null;
+
+                        return (
+                          <text key={index} x={xScale(point.date)} y={svgHeight - padding.bottom + 20} textAnchor="middle" fontSize="11" fill="#666" transform={`rotate(-45 ${xScale(point.date)} ${svgHeight - padding.bottom + 20})`}>
+                            {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(point.date)}
+                          </text>
+                        );
+                      })}
+
+                      <text x={padding.left - 40} y={svgHeight / 2} textAnchor="middle" fontSize="14" fill="#666" transform={`rotate(-90 ${padding.left - 40} ${svgHeight / 2})`}>
+                        Average Score
+                      </text>
+                      <text x={svgWidth / 2} y={svgHeight - 10} textAnchor="middle" fontSize="14" fill="#666">
+                        Retrospective Date
+                      </text>
+                    </svg>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </Dialog>
         <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
