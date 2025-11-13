@@ -818,7 +818,7 @@ describe("Facilitation timer", () => {
       });
 
       const toggleButtonInitial = screen.getByRole("button", { pressed: false });
-      const resetButton = screen.getByRole("button", { name: "Reset countdown timer" });
+      const resetButton = screen.getByRole("button", { name: "Reset timer" });
       expect(resetButton).toBeDisabled();
 
       act(() => {
