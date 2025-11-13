@@ -329,6 +329,38 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-[var(--border-subtle-color)];
 }
 
+.keyboard-shortcuts-content {
+  @apply max-h-[60vh] overflow-y-auto flex flex-col gap-5;
+}
+
+.keyboard-shortcuts-category-title {
+  @apply text-sm font-semibold mb-2.5 text-[var(--text-primary-color)] border-b border-[var(--border-subtle-color)] pb-1.5;
+}
+
+.keyboard-shortcuts-table {
+  @apply w-full border-collapse;
+}
+
+.keyboard-shortcuts-table tbody tr {
+  @apply border-b border-[var(--border-subtle-color)];
+}
+
+.keyboard-shortcuts-table tbody tr td:first-child {
+  @apply py-2 px-3 text-left align-middle w-[40%];
+}
+
+.keyboard-shortcuts-table tbody tr td:last-child {
+  @apply py-2 px-3 text-[var(--text-primary-color)] align-middle;
+}
+
+.keyboard-shortcuts-key-separator {
+  @apply mx-1 text-[var(--text-secondary-color)];
+}
+
+kbd {
+  @apply py-0.5 px-1.5 mx-0.5 border border-[#ccc] rounded-[3px] bg-[#f7f7f7] font-mono text-xs shadow-[0_1px_2px_rgba(0,0,0,0.1)];
+}
+
 .board-metadata-form-permissions .board-metadata-form-board-settings {
   @apply pt-5 border border-[#dadada] p-2.5 mb-1.5;
 }
@@ -932,6 +964,34 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .board-summary-initialization-spinner {
   @apply absolute top-1/2 left-1/2 -mt-[50px] -ml-[50px];
+}
+
+.flex-grow-spacer {
+  @apply flex-1;
+}
+
+.team-assessment-no-data {
+  @apply p-5 text-center;
+}
+
+.team-assessment-info-text {
+  @apply mb-2.5;
+}
+
+.team-assessment-history-svg {
+  @apply max-w-full h-auto;
+}
+
+.chart-legend-color-unfavorable {
+  @apply bg-[#d6201f];
+}
+
+.chart-legend-color-neutral {
+  @apply bg-[#ffd302];
+}
+
+.chart-legend-color-favorable {
+  @apply bg-[#006b3d];
 }
 
 .feedback-carousel-pivot > div {

@@ -1554,7 +1554,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             Retrospectives
           </h1>
           <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="users" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
-          <div style={{ flexGrow: 1 }}></div>
+          <div className="flex-grow-spacer"></div>
           <ExtensionSettingsMenu />
         </div>
         <div className="flex items-center justify-start flex-shrink-0">
@@ -1989,15 +1989,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <div className="chart-legend-section">
                         <div className="chart-legend-group">
                           <section>
-                            <div style={{ backgroundColor: "#d6201f" }}></div>
+                            <div className="chart-legend-color-unfavorable"></div>
                             <span>Unfavorable</span>
                           </section>
                           <section>
-                            <div style={{ backgroundColor: "#ffd302" }}></div>
+                            <div className="chart-legend-color-neutral"></div>
                             <span>Neutral</span>
                           </section>
                           <section>
-                            <div style={{ backgroundColor: "#006b3d" }}></div>
+                            <div className="chart-legend-color-favorable"></div>
                             <span>Favorable</span>
                           </section>
                         </div>
@@ -2022,14 +2022,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           }}
         >
           {this.state.teamAssessmentHistoryData.length === 0 ? (
-            <div style={{ padding: "20px", textAlign: "center" }}>
+            <div className="team-assessment-no-data">
               <p>No team assessment history available.</p>
               <p>Create retrospectives with team assessments to see historical trends.</p>
             </div>
           ) : (
             <>
-              <p style={{ marginBottom: "10px" }}>At v2.0.1 and later (scheduled to be published on Jan 1st 2026), there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.</p>
-              <p style={{ marginBottom: "10px" }}>
+              <p className="team-assessment-info-text">At v2.0.1 and later (scheduled to be published on Jan 1st 2026), there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.</p>
+              <p className="team-assessment-info-text">
                 Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
               </p>
               {(() => {
@@ -2058,7 +2058,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 return (
                   <div>
-                    <svg width={svgWidth} height={svgHeight} style={{ maxWidth: "100%", height: "auto" }}>
+                    <svg width={svgWidth} height={svgHeight} className="team-assessment-history-svg">
                       {[0, 2, 4, 6, 8, 10].map(value => (
                         <g key={value}>
                           <line x1={padding.left} y1={yScale(value)} x2={svgWidth - padding.right} y2={yScale(value)} stroke="#e0e0e0" strokeWidth="1" />
