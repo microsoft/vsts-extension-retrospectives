@@ -61,7 +61,7 @@ describe("KeyboardShortcutsDialog", () => {
     test("displays Esc shortcut", () => {
       const { getByText } = render(<KeyboardShortcutsDialog isOpen={true} onClose={jest.fn()} currentWorkflowPhase={WorkflowPhase.Collect} />);
 
-      expect(getByText("Close dialogs / Cancel actions")).toBeInTheDocument();
+      expect(getByText("Close dialogs or cancel actions")).toBeInTheDocument();
     });
 
     test("displays column navigation shortcut", () => {

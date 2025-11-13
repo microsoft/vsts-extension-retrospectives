@@ -19,7 +19,7 @@ interface KeyboardShortcutsDialogProps {
 const keyboardShortcuts: KeyboardShortcut[] = [
   // Global shortcuts
   { keys: ["?"], description: "Show keyboard shortcuts", category: "Global" },
-  { keys: ["Esc"], description: "Close dialogs / Cancel actions", category: "Global" },
+  { keys: ["Esc"], description: "Close dialogs or cancel actions", category: "Global" },
   { keys: ["1-9"], description: "Jump to column by number", category: "Global" },
 
   // Column navigation
