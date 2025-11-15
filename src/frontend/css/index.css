@@ -2121,7 +2121,8 @@ kbd {
   color: var(--text-secondary-color);
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-header {
+.feedbackItem .mainItemCard .card-integral-part .card-header,
+.feedback-item-group .groupedItemCard .card-integral-part .card-header {
   height: 34px;
   display: inline-flex;
   width: 100%;
