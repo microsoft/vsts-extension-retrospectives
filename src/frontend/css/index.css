@@ -447,7 +447,8 @@ kbd {
 }
 
 .feedback-item-group {
-  @apply mx-3 mb-3 mr-0 break-inside-avoid inline-block align-top w-full max-w-80 min-w-[260px] box-border;
+  @apply mb-3 break-inside-avoid inline-block align-top w-full max-w-80 min-w-[260px] box-border;
+  margin-right: 12px;
 }
 
 .feedback-item-group:focus {
@@ -477,6 +478,12 @@ kbd {
 .feedback-item-group .item-cards .mainItemCard {
   @apply z-[1];
   background-color: transparent;
+}
+
+.feedback-item-group .item-cards .mainItemCard .card-integral-part {
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: inherit;
 }
 
 .feedback-item-group .item-cards .mainItemCard .card-header .feedback-expand-group {
