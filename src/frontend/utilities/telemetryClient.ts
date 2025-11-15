@@ -47,6 +47,7 @@ export const TelemetryEvents = {
   FeedbackItemUpvoted: "Feedback item upvoted",
   ExtensionLaunched: "Extension launched",
   FeedbackItemCarouselLaunched: "Feedback item carousel launched",
+  TeamAssessmentHistoryViewed: "Team assessment history viewed",
 };
 
 export { reactPlugin, appInsights };

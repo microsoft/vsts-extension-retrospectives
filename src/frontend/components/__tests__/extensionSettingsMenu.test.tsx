@@ -132,12 +132,14 @@ describe("ExtensionSettingsMenu", () => {
     expect(screen.getByText("Help")).toBeInTheDocument();
   });
 
-  it("hides labels when narrow", () => {
+  it("renders labels with responsive visibility classes", () => {
     Object.defineProperty(window, "outerWidth", { value: 800, writable: true, configurable: true });
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });
 
     render(<ExtensionSettingsMenu />);
-    expect(screen.queryByText("Directive")).not.toBeInTheDocument();
+    // Labels are in DOM but hidden with Tailwind classes
+    const label = screen.getByText("Directive");
+    expect(label).toHaveClass("hidden", "lg:inline");
   });
 
   it("opens Prime Directive dialog", () => {
@@ -223,22 +225,7 @@ describe("ExtensionSettingsMenu", () => {
     expect(windowOpenSpy).toHaveBeenCalledWith("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank");
   });
 
-  it("adds resize listener on mount", () => {
-    const spy = jest.spyOn(window, "addEventListener");
-    render(<ExtensionSettingsMenu />);
-    expect(spy).toHaveBeenCalledWith("resize", expect.any(Function));
-    spy.mockRestore();
-  });
-
-  it("removes resize listener on unmount", () => {
-    const spy = jest.spyOn(window, "removeEventListener");
-    const { unmount } = render(<ExtensionSettingsMenu />);
-    unmount();
-    expect(spy).toHaveBeenCalledWith("resize", expect.any(Function));
-    spy.mockRestore();
-  });
-
-  it("closes Prime Directive dialog", async () => {
+  it("handles keyboard shortcuts", async () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));
     expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
@@ -339,13 +326,19 @@ describe("ExtensionSettingsMenu", () => {
     Object.defineProperty(window, "innerHeight", { value: 1200, writable: true, configurable: true });
 
     render(<ExtensionSettingsMenu />);
-    expect(screen.queryByText("Directive")).not.toBeInTheDocument();
+    // Labels are in DOM with Tailwind responsive classes
+    const label = screen.getByText("Directive");
+    expect(label).toHaveClass("hidden", "lg:inline");
   });
 
-  it("updates state on window resize", async () => {
+  it("uses Tailwind responsive classes for label visibility", async () => {
     const { rerender } = render(<ExtensionSettingsMenu />);
-    expect(screen.getByText("Directive")).toBeInTheDocument();
+    const label = screen.getByText("Directive");
+    expect(label).toBeInTheDocument();
+    expect(label).toHaveClass("hidden", "lg:inline");
 
+    // Tailwind classes handle responsive visibility via CSS media queries
+    // Labels remain in DOM regardless of window size
     Object.defineProperty(window, "outerWidth", { value: 800, writable: true, configurable: true });
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });
 
@@ -353,31 +346,32 @@ describe("ExtensionSettingsMenu", () => {
     rerender(<ExtensionSettingsMenu />);
 
     await waitFor(() => {
-      expect(screen.queryByText("Directive")).not.toBeInTheDocument();
+      expect(screen.getByText("Directive")).toHaveClass("hidden", "lg:inline");
     });
   });
 });
 
 describe("ContextualMenuButton", () => {
   it("renders with label", () => {
-    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="TestLabel" showLabel={true} />);
+    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="TestLabel" />);
     expect(screen.getByText("TestLabel")).toBeInTheDocument();
   });
 
-  it("hides label when showLabel false", () => {
-    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="TestLabel" showLabel={false} />);
-    expect(screen.queryByText("TestLabel")).not.toBeInTheDocument();
+  it("renders label with responsive visibility classes", () => {
+    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="TestLabel" />);
+    const label = screen.getByText("TestLabel");
+    expect(label).toHaveClass("hidden", "lg:inline");
   });
 
   it("calls onClick", () => {
     const onClick = jest.fn();
-    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="Test" onClick={onClick} showLabel={true} />);
+    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="Test" onClick={onClick} />);
     fireEvent.click(screen.getByTitle("Test"));
     expect(onClick).toHaveBeenCalled();
   });
 
   it("applies contextual menu button class", () => {
-    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="Test" showLabel={true} />);
+    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="Test" />);
     expect(screen.getByTitle("Test")).toHaveClass("contextual-menu-button");
   });
 });

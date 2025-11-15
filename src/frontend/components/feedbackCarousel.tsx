@@ -19,14 +19,15 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   constructor(props: IFeedbackCarouselProps) {
     super(props);
 
-    const feedbackColumnPropsList = JSON.parse(JSON.stringify(this.props.feedbackColumnPropsList)) as FeedbackColumnProps[];
+    const feedbackColumnPropsList = [...this.props.feedbackColumnPropsList];
 
     if (feedbackColumnPropsList.length > 0) {
+      const allColumnItems = feedbackColumnPropsList.flatMap(col => col.columnItems);
       feedbackColumnPropsList.unshift({
         ...feedbackColumnPropsList[0],
         columnId: "all-columns",
         columnName: "All",
-        columnItems: feedbackColumnPropsList.flatMap(col => col.columnItems),
+        columnItems: allColumnItems,
       } as FeedbackColumnProps);
     }
 
@@ -66,7 +67,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         columnProps: columnProps,
         columns: columnProps.columns,
         columnIds: columnProps.columnIds,
-        columnId: columnProps.columnId,
+        columnId: columnItem.feedbackItem.columnId,
         originalColumnId: columnItem.feedbackItem.originalColumnId,
         boardId: columnProps.boardId,
         boardTitle: columnProps.boardTitle,
@@ -89,7 +90,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         groupIds: [],
         isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
         isShowingGroupedChildrenTitles: false,
-        isFocusModalHidden: true,
+        isFocusModalHidden: this.props.isFocusModalHidden,
       };
 
       return (
@@ -110,21 +111,23 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
             <PivotItem key={columnProps.columnId} headerText={columnProps.columnName} className="feedback-carousel-pivot-item" {...columnProps}>
               <div className="carousel-container">
                 <ol className="carousel-track" id={`carousel-${columnProps.columnId}`}>
-                  {feedbackCarouselItems.map((child, index) => (
-                    <li className="carousel-slide" id={`slide-${columnProps.columnId}-${index}`} key={child.key}>
-                      {index > 0 && (
-                        <a href={`#slide-${columnProps.columnId}-${index - 1}`} className="carousel-arrow carousel-arrow-prev" aria-label="Previous slide">
-                          <i className="fas fa-chevron-left" />
-                        </a>
-                      )}
-                      <div className="carousel-viewport">{child}</div>
-                      {index < feedbackCarouselItems.length - 1 && (
-                        <a href={`#slide-${columnProps.columnId}-${index + 1}`} className="carousel-arrow carousel-arrow-next" aria-label="Next slide">
-                          <i className="fas fa-chevron-right" />
-                        </a>
-                      )}
-                    </li>
-                  ))}
+                  {feedbackCarouselItems.map((child, index) => {
+                    return (
+                      <li className="carousel-slide" id={`slide-${columnProps.columnId}-${index}`} key={child.key}>
+                        {index > 0 && (
+                          <a href={`#slide-${columnProps.columnId}-${index - 1}`} className="carousel-arrow carousel-arrow-prev" aria-label="Previous slide">
+                            <i className="fas fa-chevron-left" />
+                          </a>
+                        )}
+                        <div className="carousel-viewport">{child}</div>
+                        {index < feedbackCarouselItems.length - 1 && (
+                          <a href={`#slide-${columnProps.columnId}-${index + 1}`} className="carousel-arrow carousel-arrow-next" aria-label="Next slide">
+                            <i className="fas fa-chevron-right" />
+                          </a>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ol>
               </div>
             </PivotItem>

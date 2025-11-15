@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { mocked } from "jest-mock";
@@ -31,30 +31,29 @@ describe("Workflow Stage", () => {
     const activeProps = { ...mockedProps, isActive: true };
     render(<WorkflowStage {...activeProps} />);
 
-    const element = document.querySelector(".retrospective-workflowState");
-    expect(element?.getAttribute("aria-label")).toBe("Sample Workflow Stage Text");
-    expect(element?.getAttribute("aria-selected")).toBe("true");
-    expect(document.querySelector(".retrospective-workflowState.active")).toBeTruthy();
+    const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+    expect(element).toHaveAttribute("aria-label", "Sample Workflow Stage Text");
+    expect(element).toHaveAttribute("aria-selected", "true");
+    expect(element).toHaveClass("font-bold", "border-b-2", "border-[#0078d4]");
   });
 
   it("renders as inactive when isActive is false", () => {
     const inactiveProps = { ...mockedProps, isActive: false };
     render(<WorkflowStage {...inactiveProps} />);
 
-    const element = document.querySelector(".retrospective-workflowState");
-    expect(element?.getAttribute("aria-label")).toBe("Sample Workflow Stage Text");
-    expect(element?.getAttribute("aria-selected")).toBe("false");
-    expect(document.querySelector(".retrospective-workflowState.active")).toBeFalsy();
-    expect(document.querySelector(".retrospective-workflowState")).toBeTruthy();
+    const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+    expect(element).toHaveAttribute("aria-label", "Sample Workflow Stage Text");
+    expect(element).toHaveAttribute("aria-selected", "false");
+    expect(element).not.toHaveClass("font-bold");
+    expect(element).toBeInTheDocument();
   });
 
   it("calls clickEventCallback when the Enter key is pressed", async () => {
     const user = userEvent.setup();
     render(<WorkflowStage {...mockedProps} />);
 
-    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
-
-    await user.click(element);
+    const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+    element.focus();
 
     await user.keyboard("{Enter}");
 
@@ -64,7 +63,7 @@ describe("Workflow Stage", () => {
   it("calls clickEventCallback when the component is clicked", async () => {
     render(<WorkflowStage {...mockedProps} />);
 
-    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
+    const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
     await userEvent.click(element);
 
     expect(mockedProps.clickEventCallback).toHaveBeenCalledTimes(1);
@@ -79,18 +78,18 @@ describe("Workflow Stage", () => {
   it("has correct ARIA attributes", () => {
     render(<WorkflowStage {...mockedProps} />);
 
-    const element = document.querySelector(".retrospective-workflowState");
-    expect(element?.getAttribute("role")).toBe("tab");
-    expect(element?.getAttribute("aria-setsize")).toBe("4");
-    expect(element?.getAttribute("aria-posinset")).toBe("1");
-    expect(element?.getAttribute("tabindex")).toBe("0");
+    const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+    expect(element).toHaveAttribute("role", "tab");
+    expect(element).toHaveAttribute("aria-setsize", "4");
+    expect(element).toHaveAttribute("aria-posinset", "1");
+    expect(element).toHaveAttribute("tabindex", "0");
   });
 
   it("does not call clickEventCallback for non-Enter key presses", async () => {
     const user = userEvent.setup();
     render(<WorkflowStage {...mockedProps} />);
 
-    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
+    const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
     element.focus();
 
     await user.keyboard("{Space}");
@@ -105,7 +104,7 @@ describe("Workflow Stage", () => {
     const user = userEvent.setup();
     render(<WorkflowStage {...mockedProps} />);
 
-    const element = document.querySelector(".retrospective-workflowState") as HTMLElement;
+    const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
     element.focus();
 
     // Press arrow key
@@ -120,8 +119,8 @@ describe("Workflow Stage", () => {
       const activeProps = { ...mockedProps, isActive: true };
       render(<WorkflowStage {...activeProps} />);
 
-      const element = document.querySelector(".retrospective-workflowState");
-      const ariaLabel = element?.getAttribute("aria-label");
+      const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+      const ariaLabel = element.getAttribute("aria-label");
 
       // Should only contain the display text
       expect(ariaLabel).toBe("Sample Workflow Stage Text");
@@ -136,75 +135,75 @@ describe("Workflow Stage", () => {
       const activeProps = { ...mockedProps, isActive: true };
       const { rerender } = render(<WorkflowStage {...activeProps} />);
 
-      let element = document.querySelector(".retrospective-workflowState");
-      expect(element?.getAttribute("aria-selected")).toBe("true");
+      let element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+      expect(element).toHaveAttribute("aria-selected", "true");
 
       // Change to inactive
       const inactiveProps = { ...mockedProps, isActive: false };
       rerender(<WorkflowStage {...inactiveProps} />);
 
-      element = document.querySelector(".retrospective-workflowState");
-      expect(element?.getAttribute("aria-selected")).toBe("false");
+      element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+      expect(element).toHaveAttribute("aria-selected", "false");
     });
 
     it("has simplified aria-labels for each workflow phase", () => {
       const collectProps = { ...mockedProps, display: "Collect", value: WorkflowPhase.Collect };
       const { rerender } = render(<WorkflowStage {...collectProps} />);
 
-      let element = document.querySelector(".retrospective-workflowState");
-      expect(element?.getAttribute("aria-label")).toBe("Collect");
+      let element = screen.getByRole("tab", { name: "Collect" });
+      expect(element).toHaveAttribute("aria-label", "Collect");
 
       // Test Group
       const groupProps = { ...mockedProps, display: "Group", value: WorkflowPhase.Group };
       rerender(<WorkflowStage {...groupProps} />);
-      element = document.querySelector(".retrospective-workflowState");
-      expect(element?.getAttribute("aria-label")).toBe("Group");
+      element = screen.getByRole("tab", { name: "Group" });
+      expect(element).toHaveAttribute("aria-label", "Group");
 
       // Test Vote
       const voteProps = { ...mockedProps, display: "Vote", value: WorkflowPhase.Vote };
       rerender(<WorkflowStage {...voteProps} />);
-      element = document.querySelector(".retrospective-workflowState");
-      expect(element?.getAttribute("aria-label")).toBe("Vote");
+      element = screen.getByRole("tab", { name: "Vote" });
+      expect(element).toHaveAttribute("aria-label", "Vote");
 
       // Test Act
       const actProps = { ...mockedProps, display: "Act", value: WorkflowPhase.Act };
       rerender(<WorkflowStage {...actProps} />);
-      element = document.querySelector(".retrospective-workflowState");
-      expect(element?.getAttribute("aria-label")).toBe("Act");
+      element = screen.getByRole("tab", { name: "Act" });
+      expect(element).toHaveAttribute("aria-label", "Act");
     });
 
     it("maintains proper tab role and ARIA attributes", () => {
       render(<WorkflowStage {...mockedProps} />);
 
-      const element = document.querySelector(".retrospective-workflowState");
+      const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
 
       // Verify all required ARIA attributes for tabs
-      expect(element?.getAttribute("role")).toBe("tab");
-      expect(element?.getAttribute("aria-label")).toBeTruthy();
-      expect(element?.getAttribute("aria-selected")).toBeTruthy();
-      expect(element?.getAttribute("aria-setsize")).toBe("4");
-      expect(element?.getAttribute("aria-posinset")).toBeTruthy();
-      expect(element?.getAttribute("tabindex")).toBe("0");
+      expect(element).toHaveAttribute("role", "tab");
+      expect(element).toHaveAttribute("aria-label");
+      expect(element).toHaveAttribute("aria-selected");
+      expect(element).toHaveAttribute("aria-setsize", "4");
+      expect(element).toHaveAttribute("aria-posinset");
+      expect(element).toHaveAttribute("tabindex", "0");
     });
 
     it("correctly announces state changes when toggling between active/inactive", () => {
       const { rerender } = render(<WorkflowStage {...mockedProps} />);
 
-      let element = document.querySelector(".retrospective-workflowState");
-      expect(element?.getAttribute("aria-selected")).toBe("true");
-      expect(element?.classList.contains("active")).toBe(true);
+      let element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+      expect(element).toHaveAttribute("aria-selected", "true");
+      expect(element).toHaveClass("font-bold", "border-b-2");
 
       // Toggle to inactive
       rerender(<WorkflowStage {...mockedProps} isActive={false} />);
-      element = document.querySelector(".retrospective-workflowState");
-      expect(element?.getAttribute("aria-selected")).toBe("false");
-      expect(element?.classList.contains("active")).toBe(false);
+      element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+      expect(element).toHaveAttribute("aria-selected", "false");
+      expect(element).not.toHaveClass("font-bold");
 
       // Toggle back to active
       rerender(<WorkflowStage {...mockedProps} isActive={true} />);
-      element = document.querySelector(".retrospective-workflowState");
-      expect(element?.getAttribute("aria-selected")).toBe("true");
-      expect(element?.classList.contains("active")).toBe(true);
+      element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
+      expect(element).toHaveAttribute("aria-selected", "true");
+      expect(element).toHaveClass("font-bold", "border-b-2");
     });
   });
 });

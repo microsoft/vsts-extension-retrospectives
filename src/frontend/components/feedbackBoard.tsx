@@ -555,8 +555,8 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     });
 
     return (
-      <div className="feedback-board">
-        <div className="feedback-columns-container" role="main" aria-label="Feedback board with columns">
+      <>
+        <div className="feedback-board feedback-columns-container" role="main" aria-label="Feedback board with columns">
           {this.state.isDataLoaded &&
             feedbackColumnPropsList.map(columnProps => {
               return <FeedbackColumn {...columnProps} />;
@@ -580,7 +580,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
           <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
         </Dialog>
         <KeyboardShortcutsDialog isOpen={this.state.isKeyboardShortcutsDialogOpen} onClose={this.closeKeyboardShortcutsDialog} currentWorkflowPhase={this.props.workflowPhase} />
-      </div>
+      </>
     );
   }
 }

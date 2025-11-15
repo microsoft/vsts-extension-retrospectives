@@ -19,10 +19,10 @@ interface KeyboardShortcutsDialogProps {
 const keyboardShortcuts: KeyboardShortcut[] = [
   // Global shortcuts
   { keys: ["?"], description: "Show keyboard shortcuts", category: "Global" },
-  { keys: ["Esc"], description: "Close dialogs / Cancel actions", category: "Global" },
-  { keys: ["1-9"], description: "Jump to column by number", category: "Global" },
-
+  { keys: ["Esc"], description: "Close dialogs or cancel actions", category: "Global" },
+  
   // Column navigation
+  { keys: ["1-5"], description: "Jump to column by number", category: "Navigation" },
   { keys: ["←", "→"], description: "Navigate between columns", category: "Navigation" },
   { keys: ["Tab"], description: "Move focus to next element", category: "Navigation" },
   { keys: ["Shift", "Tab"], description: "Move focus to previous element", category: "Navigation" },
@@ -72,23 +72,7 @@ const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsDialogProps> = ({ isOpe
     {} as { [key: string]: KeyboardShortcut[] },
   );
 
-  const renderKey = (key: string) => (
-    <kbd
-      key={key}
-      style={{
-        padding: "2px 6px",
-        margin: "0 2px",
-        border: "1px solid #ccc",
-        borderRadius: "3px",
-        backgroundColor: "#f7f7f7",
-        fontFamily: "monospace",
-        fontSize: "12px",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-      }}
-    >
-      {key}
-    </kbd>
-  );
+  const renderKey = (key: string) => <kbd key={key}>{key}</kbd>;
 
   return (
     <Dialog
@@ -104,51 +88,25 @@ const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsDialogProps> = ({ isOpe
         containerClassName: "keyboard-shortcuts-dialog",
         className: "retrospectives-dialog-modal",
       }}
-      minWidth={600}
+      minWidth={660}
     >
-      <div style={{ maxHeight: "60vh", overflowY: "auto" }}>
+      <div className="keyboard-shortcuts-content">
         {Object.entries(groupedShortcuts).map(([category, shortcuts]) => (
-          <div key={category} style={{ marginBottom: "20px" }}>
-            <h3
-              style={{
-                fontSize: "14px",
-                fontWeight: 600,
-                marginBottom: "10px",
-                color: "var(--text-primary-color)",
-                borderBottom: "1px solid var(--border-subtle-color)",
-                paddingBottom: "5px",
-              }}
-            >
-              {category}
-            </h3>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div key={category}>
+            <h3 className="keyboard-shortcuts-category-title">{category}</h3>
+            <table className="keyboard-shortcuts-table">
               <tbody>
                 {shortcuts.map((shortcut, index) => (
-                  <tr key={index} style={{ borderBottom: "1px solid var(--border-subtle-color)" }}>
-                    <td
-                      style={{
-                        padding: "8px 12px",
-                        textAlign: "left",
-                        verticalAlign: "middle",
-                        width: "40%",
-                      }}
-                    >
+                  <tr key={index}>
+                    <td>
                       {shortcut.keys.map((key, idx) => (
                         <React.Fragment key={idx}>
-                          {idx > 0 && <span style={{ margin: "0 4px", color: "var(--text-secondary-color)" }}>+</span>}
+                          {idx > 0 && <span className="keyboard-shortcuts-key-separator">+</span>}
                           {renderKey(key)}
                         </React.Fragment>
                       ))}
                     </td>
-                    <td
-                      style={{
-                        padding: "8px 12px",
-                        color: "var(--text-primary-color)",
-                        verticalAlign: "middle",
-                      }}
-                    >
-                      {shortcut.description}
-                    </td>
+                    <td>{shortcut.description}</td>
                   </tr>
                 ))}
               </tbody>

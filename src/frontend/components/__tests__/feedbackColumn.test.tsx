@@ -47,22 +47,21 @@ describe("Feedback Column ", () => {
   });
 
   describe("info button", () => {
-    it("shows the stored notes when clicked", () => {
+    it("shows the info icon with notes in tooltip when notes exist", () => {
       const props = { ...testColumnProps, columnNotes: "Saved notes", showColumnEditButton: false };
-      const { getByRole, getByText } = render(<FeedbackColumn {...props} />);
+      const { getByRole } = render(<FeedbackColumn {...props} />);
 
-      fireEvent.click(getByRole("button", { name: `View notes for ${props.columnName}` }));
-
-      expect(getByText("Saved notes")).toBeInTheDocument();
+      const infoButton = getByRole("button", { name: `Column notes: ${props.columnNotes}` });
+      expect(infoButton).toBeInTheDocument();
+      expect(infoButton).toHaveAttribute("title", "Saved notes");
     });
 
-    it("shows a fallback message when no notes exist", () => {
+    it("does not show info button when no notes exist", () => {
       const props = { ...testColumnProps, columnNotes: "", showColumnEditButton: false };
-      const { getByRole, getByText } = render(<FeedbackColumn {...props} />);
+      const { queryByRole } = render(<FeedbackColumn {...props} />);
 
-      fireEvent.click(getByRole("button", { name: `View notes for ${props.columnName}` }));
-
-      expect(getByText("No notes available for this column.")).toBeInTheDocument();
+      const infoButton = queryByRole("button", { name: /Column notes:/ });
+      expect(infoButton).not.toBeInTheDocument();
     });
   });
 
@@ -406,32 +405,6 @@ describe("Feedback Column ", () => {
       fireEvent.change(notesInput, { target: { value: "New notes" } });
 
       expect(notesInput.value).toBe("New notes");
-    });
-
-    test("opens info dialog when info button is clicked", () => {
-      const props = { ...testColumnProps, columnNotes: "Test notes" };
-      const { getByRole } = render(<FeedbackColumn {...props} />);
-
-      fireEvent.click(getByRole("button", { name: `View notes for ${props.columnName}` }));
-
-      expect(getByRole("dialog")).toBeInTheDocument();
-    });
-
-    test("closes info dialog when close button is clicked", () => {
-      const props = { ...testColumnProps, columnNotes: "Test notes" };
-      const { getByRole, queryByRole, getAllByRole } = render(<FeedbackColumn {...props} />);
-
-      fireEvent.click(getByRole("button", { name: `View notes for ${props.columnName}` }));
-
-      // Find close button in dialog
-      const closeButtons = getAllByRole("button").filter(btn => btn.textContent === "Close");
-      if (closeButtons.length > 0) {
-        fireEvent.click(closeButtons[0]);
-      }
-
-      setTimeout(() => {
-        expect(queryByRole("dialog")).not.toBeInTheDocument();
-      }, 100);
     });
   });
 
