@@ -470,8 +470,13 @@ kbd {
   @apply hidden;
 }
 
+.feedback-item-group .item-cards .card-header {
+  @apply flex;
+}
+
 .feedback-item-group .item-cards .mainItemCard {
   @apply z-[1];
+  background-color: transparent;
 }
 
 .feedback-item-group .item-cards .mainItemCard .card-header .feedback-expand-group {
