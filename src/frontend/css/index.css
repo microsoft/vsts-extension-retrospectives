@@ -2090,7 +2090,8 @@ kbd {
   animation: fadeOutToRed 1000ms ease-in 1 forwards;
 }
 
-.feedbackItem.hideFeedbackItem .card-content {
+.feedbackItem.hideFeedbackItem .card-content,
+.feedback-item-group.hideFeedbackItem .card-content {
   filter: blur(5px);
   pointer-events: none;
 }
@@ -2228,7 +2229,8 @@ kbd {
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-content,
-.feedback-item-group .mainItemCard .card-integral-part .card-content {
+.feedback-item-group .mainItemCard .card-integral-part .card-content,
+.feedback-item-group .groupedItemCard .card-integral-part .card-content {
   display: flex;
   flex-direction: column;
   margin-right: 16px;
@@ -2252,7 +2254,8 @@ kbd {
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-id,
-.feedback-item-group .mainItemCard .card-integral-part .card-id {
+.feedback-item-group .mainItemCard .card-integral-part .card-id,
+.feedback-item-group .groupedItemCard .card-integral-part .card-id {
   margin-left: 16px;
   padding-bottom: 8px;
   color: var(--text-secondary-color);
