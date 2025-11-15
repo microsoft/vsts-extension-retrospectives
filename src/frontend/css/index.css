@@ -474,7 +474,8 @@ kbd {
   @apply flex;
 }
 
-.feedback-item-group .item-cards .mainItemCard {
+.feedback-item-group .item-cards .mainItemCard,
+.feedback-item-group .item-cards .groupedItemCard {
   @apply z-[1] border-[#605e5c];
   background-color: transparent;
 }
