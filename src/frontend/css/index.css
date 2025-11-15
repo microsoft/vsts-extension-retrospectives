@@ -4,6 +4,18 @@
 @source "./components/**/*.{js,jsx,ts,tsx}";
 
 @theme {
+  --color-primary: #0078d4;
+  --color-border-gray: #605e5c;
+  --color-error: rgb(204, 41, 61);
+  --color-success: rgb(51, 153, 51);
+  --color-task-yellow: rgb(242, 203, 29);
+  --color-bug-red: rgb(204, 41, 61);
+  --color-gray-light: #f4f4f4;
+  --color-gray-medium: #dadada;
+  --color-gray-dark: #dcdcdc;
+  --color-unfavorable: #d6201f;
+  --color-neutral: #ffd302;
+  --color-favorable: #006b3d;
 }
 
 @keyframes fadeInFromGreen {
@@ -455,7 +467,7 @@ kbd {
 }
 
 .feedback-item-group:focus-visible .mainItemCard {
-  @apply outline-[3px] outline-[#0078d4] outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
+  @apply outline-[3px] outline-[var(--color-primary)] outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
 }
 
 .feedback-item-group .item-cards {
@@ -494,7 +506,7 @@ kbd {
 }
 
 .feedback-item-group .item-cards .mainItemCard .card-header .feedback-expand-group:focus-visible {
-  @apply outline-2 outline-[#0078d4] outline-offset-2 rounded-[3px];
+  @apply outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
 }
 
 .feedback-item-group.feedback-item-group-expanded .feedbackItemGroupGroupedItem {
@@ -610,7 +622,7 @@ kbd {
 }
 
 .related-task-sub-card .ms-Button--icon .ms-Button-icon:hover {
-  @apply text-[#0078d4];
+  @apply text-[var(--color-primary)];
 }
 
 .related-task-sub-card .ms-DocumentCard-details {
@@ -678,7 +690,7 @@ kbd {
 }
 
 .action-items .ms-DocumentCard .ms-DocumentCardActions .ms-DocumentCardActions-action .ms-Button .ms-Button-flexContainer i {
-  @apply text-[#0078d4] text-xs;
+  @apply text-[var(--color-primary)] text-xs;
 }
 
 .action-items .ms-DocumentCard .ms-DocumentCardActions .ms-DocumentCardActions-action .ms-Button:hover:not(:disabled) i {
@@ -771,7 +783,7 @@ kbd {
 }
 
 .board-summary-table-container table thead {
-  @apply bg-[#0078d4] text-white;
+  @apply bg-[var(--color-primary)] text-white;
 }
 
 .board-summary-table-container table thead tr th {
@@ -2092,7 +2104,7 @@ kbd {
 }
 
 .feedbackItem.hideFeedbackItem .card-content,
-.feedback-item-group.hideFeedbackItem .card-content {
+.feedbackItemGroupItem.hideFeedbackItem .card-content {
   filter: blur(5px);
   pointer-events: none;
 }
@@ -2342,10 +2354,10 @@ kbd {
   line-height: 1.2;
   font-size: 0.95em;
   display: -webkit-box;
-  -webkit-box-orient: vertical;
+  box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .retrospectives-move-feedback-item-dialog {
