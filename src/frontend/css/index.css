@@ -78,17 +78,16 @@
 }
 
 body {
-  overflow: hidden;
+  @apply overflow-hidden;
 }
 
 button:hover:not(.ms-Button),
 button:focus:not(.ms-Button) {
-  border: none;
+  @apply border-none;
 }
 
 #vss_1 {
-  max-width: 400px;
-  min-height: 30px;
+  @apply max-w-[400px] min-h-[30px];
 }
 
 .extension-settings-menu {
@@ -1368,32 +1367,27 @@ kbd {
 }
 
 .board-metadata-form {
-  text-align: center;
-  margin-top: 1em;
+  @apply text-center mt-4;
 }
 
 .board-metadata-form hr {
-  border: 0.5px solid var(--color-primary);
+  @apply border-[0.5px] border-solid border-[var(--color-primary)];
 }
 
 .board-metadata-form .board-metadata-form-section-information {
-  border: 3px var(--color-gray-medium) solid;
-  background-color: var(--color-gray-medium);
-  margin: 5px 0 10px 0;
-  padding: 0.2em;
+  @apply border-[3px] border-solid border-[var(--color-gray-medium)] bg-[var(--color-gray-medium)] my-[5px] mx-0 mb-2.5 p-[0.2em];
 }
 
 .board-metadata-form .board-metadata-form-section-information.warning-information {
-  background-color: #f6a608;
-  border: none;
+  @apply bg-[#f6a608] border-none;
 }
 
 .board-metadata-form .board-metadata-form-setting-label {
-  display: flex;
+  @apply flex;
 }
 
 .board-metadata-form .board-metadata-form-anonymous-feedback-section {
-  margin: 20px 40px;
+  @apply my-5 mx-10;
 }
 
 .board-metadata-form .board-metadata-form-section-header {
@@ -1411,8 +1405,7 @@ kbd {
 }
 
 .board-metadata-form .board-metadata-edit-column-settings {
-  border: var(--color-gray-medium) 1px solid;
-  padding: 10px;
+  @apply border border-solid border-[var(--color-gray-medium)] p-2.5;
 }
 
 .board-metadata-form .board-metadata-form-section-subheader {
@@ -1692,86 +1685,55 @@ kbd {
 }
 
 .feedback-board-container {
-  display: flex;
-  height: calc(100vh - 100px);
-  overflow-y: auto;
-  overflow-x: hidden;
+  @apply flex h-[calc(100vh-100px)] overflow-y-auto overflow-x-hidden;
 }
 
 .initialization-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -50px;
-  margin-left: -50px;
+  @apply absolute top-1/2 left-1/2 -mt-[50px] -ml-[50px];
 }
 
 .feedback-board-container-header-spacer {
-  background: #1f1f1f;
-  height: 1px;
-  z-index: 2;
-  width: 100%;
-  position: fixed;
-  margin-top: 40px;
+  @apply bg-[#1f1f1f] h-px z-[2] w-full fixed mt-10;
 }
 
 .extension-header-spacer {
-  padding-bottom: 45px;
+  @apply pb-[45px];
 }
 
 .team-filter-container .ms-TextField {
-  margin: 8px 6px;
+  @apply my-2 mx-1.5;
 }
 
 #extension-header {
-  display: flex;
-  z-index: 2;
-  width: 100%;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 10px 15px;
+  @apply flex z-[2] w-full items-center justify-start py-2.5 px-[15px];
 }
 
 #extension-header .extension-title-text {
-  font-size: 26px;
-  line-height: 40px;
-  letter-spacing: -0.04em;
-  font-weight: 500;
+  @apply text-[26px] leading-10 tracking-[-0.04em] font-medium;
 }
 
 #extension-header .contact-us-button {
-  margin-top: 5px;
-  margin-left: auto;
-  margin-right: 20px;
+  @apply mt-[5px] ml-auto mr-5;
 }
 
 #extension-header .contact-us-button .ms-Button {
-  min-width: 40px;
+  @apply min-w-10;
 }
 
 #extension-header .contact-us-button:hover {
-  background-color: #eeeeee;
+  @apply bg-[#eeeeee];
 }
 
 #extension-header .contact-us-button i {
-  color: black;
+  @apply text-black;
 }
 
 #extension-header .team-selector {
-  font-weight: 400;
-  display: flex;
-  align-items: baseline;
-  margin: 0 25px;
-  padding-top: 4px;
+  @apply font-normal flex items-baseline my-0 mx-[25px] pt-1;
 }
 
 .pivot-container {
-  position: fixed;
-  top: 45px;
-  z-index: 2;
-  width: 100%;
-  align-items: center;
-  justify-content: flex-start;
+  @apply fixed top-[45px] z-[2] w-full items-center justify-start;
 }
 
 .pivot-container .ms-Pivot {
@@ -1788,113 +1750,71 @@ kbd {
 }
 
 .vertical-tab-separator {
-  width: 2px;
-  display: flex;
-  height: 24px;
-  background: var(--color-gray-dark);
+  @apply w-0.5 flex h-6 bg-[var(--color-gray-dark)];
 }
 
 .menu-button {
-  margin-left: 5px;
-  margin-right: 20px;
-  background-color: var(--color-gray-light);
+  @apply ml-[5px] mr-5 bg-[var(--color-gray-light)];
 }
 
 .board-selector-group {
-  display: flex;
-  padding-top: 12px;
-  align-items: center;
+  @apply flex pt-3 items-center;
 }
 
 .board-selector-group .board-selector {
-  font-size: 16px;
-  display: flex;
-  align-items: baseline;
+  @apply text-base flex items-baseline;
 }
 
 .board-selector-group .board-selector .selector-button {
-  margin-left: -8px;
+  @apply -ml-2;
 }
 
 .board-actions-menu {
-  margin-left: 5px;
+  @apply ml-[5px];
 }
 
 .workflow-stage-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  @apply flex items-center gap-3 flex-wrap;
 }
 
 .workflow-stage-timer {
-  display: inline-flex;
-  align-items: center;
-  background-color: var(--nav-header-active-item-background);
-  border-radius: 4px;
-  color: var(--text-primary-color);
+  @apply inline-flex items-center bg-[var(--nav-header-active-item-background)] rounded text-[var(--text-primary-color)];
 }
 
 .workflow-stage-timer > span {
-  background-color: var(--background-color);
-  color: var(--text-primary-color);
-  border: 1px solid var(--border-subtle-color);
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 12px;
-  min-width: 60px;
-  text-align: center;
-  width: 75px;
+  @apply bg-[var(--background-color)] text-[var(--text-primary-color)] border border-[var(--border-subtle-color)] rounded py-1 px-2 text-xs min-w-[60px] text-center w-[75px];
 }
 
 .workflow-stage-timer select {
-  background-color: var(--background-color);
-  color: var(--text-primary-color);
-  border: 1px solid var(--border-subtle-color);
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 12px;
-  width: 75px;
-  cursor: pointer;
+  @apply bg-[var(--background-color)] text-[var(--text-primary-color)] border border-[var(--border-subtle-color)] rounded py-1 px-2 text-xs w-[75px] cursor-pointer;
 }
 
 .workflow-stage-timer select:focus-visible {
-  outline: 2px solid var(--border-subtle-color);
-  outline-offset: 2px;
+  @apply outline-2 outline-[var(--border-subtle-color)] outline-offset-2;
 }
 
 .workflow-stage-timer select option {
-  background-color: var(--background-color);
-  color: var(--text-primary-color);
+  @apply bg-[var(--background-color)] text-[var(--text-primary-color)];
 }
 
 .workflow-stage-timer button {
-  border: none;
-  background: transparent;
-  color: inherit;
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  font: inherit;
-  padding: 2px 6px;
+  @apply border-none bg-transparent text-inherit inline-flex items-center cursor-pointer font-[inherit] py-0.5 px-1.5;
 }
 
 .workflow-stage-timer button i {
-  font-size: 14px;
+  @apply text-sm;
 }
 
 .workflow-stage-timer button:focus-visible {
-  outline: 2px solid var(--border-subtle-color);
-  outline-offset: 2px;
+  @apply outline-2 outline-[var(--border-subtle-color)] outline-offset-2;
 }
 
 .workflow-stage-timer button:disabled {
-  cursor: default;
-  opacity: 0.6;
+  @apply cursor-default opacity-60;
 }
 
 .workflow-stage-timer .workflow-stage-timer-toggle {
-  gap: 6px;
+  @apply gap-1.5;
 }
 
 .feedback-workflow-wrapper-background {
@@ -1922,23 +1842,16 @@ kbd {
 }
 
 .team-effectiveness-section-information {
-  border-radius: 5px;
-  background-color: var(--border-subtle-color);
-  font-weight: 700;
-  margin: 5px auto 10px auto;
-  padding: 3px;
-  text-align: center;
-  width: 350px;
+  @apply rounded-[5px] bg-[var(--border-subtle-color)] font-bold my-[5px_auto_10px_auto] p-[3px] text-center w-[350px];
 }
 
 .team-effectiveness-measurement-table {
-  width: 100%;
-  border-collapse: separate;
+  @apply w-full border-separate;
   border-spacing: 0 0.5em;
 }
 
 .team-effectiveness-measurement-table thead {
-  text-align: center;
+  @apply text-center;
 }
 
 .team-effectiveness-measurement-table thead .team-effectiveness-favorability-label {
@@ -1947,7 +1860,7 @@ kbd {
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index {
-  color: #ffffff;
+  @apply text-white;
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable {
