@@ -49,7 +49,6 @@ body {
 button:hover:not(.ms-Button),
 button:focus:not(.ms-Button) {
   border: none;
-  font-weight: normal !important;
 }
 
 #vss_1 {
@@ -2228,7 +2227,8 @@ kbd {
   outline-offset: 2px;
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-content {
+.feedbackItem .mainItemCard .card-integral-part .card-content,
+.feedback-item-group .mainItemCard .card-integral-part .card-content {
   display: flex;
   flex-direction: column;
   margin-right: 16px;
@@ -2251,7 +2251,8 @@ kbd {
   font-weight: 500;
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-id {
+.feedbackItem .mainItemCard .card-integral-part .card-id,
+.feedback-item-group .mainItemCard .card-integral-part .card-id {
   margin-left: 16px;
   padding-bottom: 8px;
   color: var(--text-secondary-color);
