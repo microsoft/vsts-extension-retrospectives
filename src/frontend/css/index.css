@@ -1163,6 +1163,10 @@ kbd {
   @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-[30px] overflow-hidden w-full box-border;
 }
 
+.feedback-items-container > div {
+  @apply contents;
+}
+
 .create-container {
   @apply inline-flex;
 }
