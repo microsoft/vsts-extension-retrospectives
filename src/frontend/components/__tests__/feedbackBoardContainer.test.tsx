@@ -413,9 +413,59 @@ describe("Vote Count Display", () => {
   it("should format vote count display correctly", () => {
     const currentVoteCount = "3";
     const maxVotesPerUser = 5;
-    const displayText = `Votes Used: ${currentVoteCount} / ${maxVotesPerUser}`;
+    const teamVotesUsed = 9;
+    const teamVoteCapacity = 15;
+    const displayText = `Votes Used: ${currentVoteCount} / ${maxVotesPerUser} (me), ${teamVotesUsed} / ${teamVoteCapacity} (team)`;
 
-    expect(displayText).toBe("Votes Used: 3 / 5");
+    expect(displayText).toBe("Votes Used: 3 / 5 (me), 9 / 15 (team)");
+  });
+});
+
+describe("vote metrics state", () => {
+  type TestableContainer = InstanceType<typeof FeedbackBoardContainer> & {
+    getVoteMetricsState: (board: IFeedbackBoardDocument | undefined) => Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity">;
+  };
+
+  const createContainer = (): TestableContainer => {
+    return new FeedbackBoardContainer(feedbackBoardContainerProps) as TestableContainer;
+  };
+
+  const baseBoard: Partial<IFeedbackBoardDocument> = {
+    id: "board-1",
+    title: "Test Board",
+    teamId: "team-1",
+    projectId: "proj-1",
+    createdBy: mockUserIdentity as IdentityRef,
+    createdDate: new Date("2024-01-01"),
+    columns: [],
+    activePhase: WorkflowPhase.Vote,
+    teamEffectivenessMeasurementVoteCollection: [],
+    boardVoteCollection: {},
+    maxVotesPerUser: 5,
+  };
+
+  it("returns zeroed metrics when board is undefined", () => {
+    const instance = createContainer();
+    const metrics = instance.getVoteMetricsState(undefined);
+
+    expect(metrics).toEqual({ castedVoteCount: 0, currentVoteCount: "0", teamVoteCapacity: 0 });
+  });
+
+  it("derives counts for current user and team", () => {
+    const instance = createContainer();
+    const board = {
+      ...baseBoard,
+      boardVoteCollection: {
+        "encrypted-data": 3,
+        "other-user": 2,
+      },
+    } as IFeedbackBoardDocument;
+
+    const metrics = instance.getVoteMetricsState(board);
+
+    expect(metrics.castedVoteCount).toBe(5);
+    expect(metrics.currentVoteCount).toBe("3");
+    expect(metrics.teamVoteCapacity).toBe(10);
   });
 });
 

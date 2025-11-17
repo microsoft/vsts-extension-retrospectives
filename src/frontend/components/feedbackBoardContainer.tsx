@@ -98,6 +98,7 @@ export interface FeedbackBoardContainerState {
   allMembers: TeamMember[];
   castedVoteCount: number;
   currentVoteCount: string;
+  teamVoteCapacity: number;
   boardColumns: IFeedbackColumn[];
   questionIdForDiscussAndActBoardUpdate: number;
   activeTab: "Board" | "History";
@@ -174,6 +175,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       allMembers: [],
       castedVoteCount: 0,
       currentVoteCount: "0",
+      teamVoteCapacity: 0,
       boardColumns: [],
       questionIdForDiscussAndActBoardUpdate: -1,
       activeTab: "Board",
@@ -230,9 +232,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      const votes = Object.values(initialCurrentBoard?.boardVoteCollection || []);
-
-      this.setState({ castedVoteCount: votes !== null && votes.length > 0 ? votes.reduce((a, b) => a + b, 0) : 0 });
+      this.setState(this.getVoteMetricsState(initialCurrentBoard));
     } catch (error) {
       appInsights.trackException(error, {
         action: "votes",
@@ -425,20 +425,44 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       })
       .filter((v, i, a) => a.indexOf(v) === i);
 
-    const votes = Object.values(board.boardVoteCollection || []);
-
-    // Calculate current user's vote count
-    const userId = encrypt(this.state.currentUserId);
-    const currentUserVoteCount = board.boardVoteCollection?.[userId]?.toString() || "0";
+    const voteMetricsState = this.getVoteMetricsState(board);
 
     this.setState({
       actionItemIds: actionItemIds.filter(item => item !== undefined),
       feedbackItems,
       contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
-      castedVoteCount: votes !== null && votes.length > 0 ? votes.reduce((a, b) => a + b, 0) : 0,
-      currentVoteCount: currentUserVoteCount,
+      ...voteMetricsState,
     });
   }
+
+  private readonly getVoteMetricsState = (
+    board: IFeedbackBoardDocument | undefined,
+  ): Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity"> => {
+    if (!board || !this.state.currentUserId) {
+      return {
+        castedVoteCount: 0,
+        currentVoteCount: "0",
+        teamVoteCapacity: 0,
+      };
+    }
+
+    const voteCollection = board.boardVoteCollection || {};
+    const votes = Object.values(voteCollection);
+    const totalVotesUsed = votes.length > 0 ? votes.reduce((sum, vote) => sum + vote, 0) : 0;
+
+    const userIdKey = encrypt(this.state.currentUserId);
+    const currentUserVotes = voteCollection[userIdKey]?.toString() || "0";
+
+    const voterCount = Object.keys(voteCollection).length;
+    const maxVotesPerUser = board.maxVotesPerUser ?? 0;
+    const teamVoteCapacity = voterCount > 0 && maxVotesPerUser > 0 ? voterCount * maxVotesPerUser : 0;
+
+    return {
+      castedVoteCount: totalVotesUsed,
+      currentVoteCount: currentUserVotes,
+      teamVoteCapacity,
+    };
+  };
 
   private readonly numberFormatter = (value: number) => {
     const formatter = new Intl.NumberFormat("en-US", { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -1283,11 +1307,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private readonly updateCurrentVoteCount = async () => {
     const boardItem = await itemDataService.getBoardItem(this.state.currentTeam.id, this.state.currentBoard.id);
-    const voteCollection = boardItem?.boardVoteCollection || {};
-    const userId = encrypt(this.state.currentUserId);
-    const currentVoteCount = voteCollection[userId]?.toString() || "0";
+    if (!boardItem) {
+      return;
+    }
 
-    this.setState({ currentVoteCount });
+    this.setState(this.getVoteMetricsState(boardItem));
   };
 
   private readonly updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
@@ -1745,8 +1769,23 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </button>
                       </div>
                       {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
-                        <div className="feedback-maxvotes-per-user">
-                          Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}
+                        <div className="feedback-maxvotes-per-user" role="status" aria-live="polite">
+                          <span className="feedback-maxvotes-label">Votes Used:</span>
+                          <span
+                            className="feedback-maxvotes-entry"
+                            aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}
+                          >
+                            <strong>{this.state.currentVoteCount}</strong> / {this.state.currentBoard.maxVotesPerUser?.toString() || "0"} (me)
+                          </span>
+                          <span className="feedback-maxvotes-separator" aria-hidden="true">
+                            ,
+                          </span>
+                          <span
+                            className="feedback-maxvotes-entry"
+                            aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}
+                          >
+                            <strong>{this.state.castedVoteCount}</strong> / {this.state.teamVoteCapacity} (team)
+                          </span>
                         </div>
                       )}
                       {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
