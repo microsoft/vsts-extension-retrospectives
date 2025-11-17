@@ -66,7 +66,7 @@ export default (env, argv) => {
       ],
     },
     optimization: {
-      minimize: true,
+      /*      minimize: true,
       minimizer: [
         new TerserPlugin({
           terserOptions: {
@@ -76,7 +76,7 @@ export default (env, argv) => {
             },
           },
         }),
-      ],
+      ],*/
       usedExports: true,
       sideEffects: false,
       splitChunks: false,

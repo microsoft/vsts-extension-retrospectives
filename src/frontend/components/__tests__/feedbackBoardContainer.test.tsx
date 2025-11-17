@@ -11,6 +11,7 @@ import { IdentityRef } from "azure-devops-extension-api/WebApi";
 import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
 import { reflectBackendService } from "../../dal/reflectBackendService";
 import { userDataService } from "../../dal/userDataService";
+import { itemDataService } from "../../dal/itemDataService";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -38,6 +39,7 @@ jest.mock("../../utilities/telemetryClient", () => ({
   TelemetryEvents: {
     TeamSelectionChanged: "TeamSelectionChanged",
     FeedbackBoardSelectionChanged: "FeedbackBoardSelectionChanged",
+    TeamAssessmentHistoryViewed: "TeamAssessmentHistoryViewed",
   },
   TelemetryExceptions: {},
 }));
@@ -726,7 +728,8 @@ describe("Facilitation timer", () => {
       jest.advanceTimersByTime(2000);
     });
 
-    expect(instance.state.boardTimerSeconds).toBe(2);
+    // Countdown starts at 5 minutes (300 seconds) and counts down
+    expect(instance.state.boardTimerSeconds).toBe(298);
 
     (instance as any).pauseBoardTimer();
     expect(instance.state.isBoardTimerRunning).toBe(false);
@@ -815,7 +818,7 @@ describe("Facilitation timer", () => {
       });
 
       const toggleButtonInitial = screen.getByRole("button", { pressed: false });
-      const resetButton = screen.getByRole("button", { name: "Reset facilitation timer" });
+      const resetButton = screen.getByRole("button", { name: "Reset timer" });
       expect(resetButton).toBeDisabled();
 
       act(() => {
@@ -829,7 +832,8 @@ describe("Facilitation timer", () => {
         jest.advanceTimersByTime(3000);
       });
 
-      expect(componentInstance.state.boardTimerSeconds).toBe(3);
+      // Countdown starts at 5 minutes (300 seconds) and counts down
+      expect(componentInstance.state.boardTimerSeconds).toBe(297);
       expect(resetButton).not.toBeDisabled();
 
       act(() => {
@@ -1251,5 +1255,612 @@ describe("FeedbackBoardContainer - Team and Board selection", () => {
 
     // Should not change team if it doesn't exist
     expect(instance.state.currentTeam?.id).toBe("team-1");
+  });
+});
+
+describe("FeedbackBoardContainer - Team Assessment History", () => {
+  it("should show and hide team assessment history dialog", () => {
+    const instance = createStandaloneTimerInstance();
+
+    expect(instance.state.isTeamAssessmentHistoryDialogHidden).toBe(true);
+
+    (instance as any).hideTeamAssessmentHistoryDialog();
+    expect(instance.state.isTeamAssessmentHistoryDialogHidden).toBe(true);
+  });
+
+  it("should fetch and process team assessment history data", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board1: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Retro 1",
+      teamId: "team-1",
+      createdDate: new Date("2025-01-01"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [
+        {
+          userId: "user-1",
+          responses: [
+            { questionId: 1, selection: 8 },
+            { questionId: 2, selection: 7 },
+          ],
+        },
+        {
+          userId: "user-2",
+          responses: [
+            { questionId: 1, selection: 9 },
+            { questionId: 2, selection: 8 },
+          ],
+        },
+      ],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    const board2: IFeedbackBoardDocument = {
+      id: "board-2",
+      title: "Retro 2",
+      teamId: "team-1",
+      createdDate: new Date("2025-02-01"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [
+        {
+          userId: "user-1",
+          responses: [
+            { questionId: 1, selection: 9 },
+            { questionId: 2, selection: 9 },
+          ],
+        },
+      ],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({ currentTeam: team });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([board1, board2]);
+
+    await (instance as any).showTeamAssessmentHistoryDialog();
+
+    expect(instance.state.isTeamAssessmentHistoryDialogHidden).toBe(false);
+    expect(instance.state.teamAssessmentHistoryData).toHaveLength(2);
+    expect(instance.state.teamAssessmentHistoryData[0].boardTitle).toBe("Retro 1");
+    expect(instance.state.teamAssessmentHistoryData[1].boardTitle).toBe("Retro 2");
+
+    // Check calculated averages for board 1
+    const board1Question1Avg = instance.state.teamAssessmentHistoryData[0].questionAverages.find((qa: { questionId: number; average: number }) => qa.questionId === 1);
+    expect(board1Question1Avg?.average).toBe(8.5); // (8 + 9) / 2
+
+    const board1Question2Avg = instance.state.teamAssessmentHistoryData[0].questionAverages.find((qa: { questionId: number; average: number }) => qa.questionId === 2);
+    expect(board1Question2Avg?.average).toBe(7.5); // (7 + 8) / 2
+
+    // Check calculated averages for board 2
+    const board2Question1Avg = instance.state.teamAssessmentHistoryData[1].questionAverages.find((qa: { questionId: number; average: number }) => qa.questionId === 1);
+    expect(board2Question1Avg?.average).toBe(9); // 9 / 1
+
+    expect(appInsights.trackEvent).toHaveBeenCalledWith({ name: TelemetryEvents.TeamAssessmentHistoryViewed });
+  });
+
+  it("should filter out boards without team assessments", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const boardWithAssessment: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Retro With Assessment",
+      teamId: "team-1",
+      createdDate: new Date("2025-01-01"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [
+        {
+          userId: "user-1",
+          responses: [{ questionId: 1, selection: 8 }],
+        },
+      ],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    const boardWithoutAssessment: IFeedbackBoardDocument = {
+      id: "board-2",
+      title: "Retro Without Assessment",
+      teamId: "team-1",
+      createdDate: new Date("2025-02-01"),
+      isIncludeTeamEffectivenessMeasurement: false,
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    const boardWithEmptyVotes: IFeedbackBoardDocument = {
+      id: "board-3",
+      title: "Retro With Empty Votes",
+      teamId: "team-1",
+      createdDate: new Date("2025-03-01"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({ currentTeam: team });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([boardWithAssessment, boardWithoutAssessment, boardWithEmptyVotes]);
+
+    await (instance as any).showTeamAssessmentHistoryDialog();
+
+    expect(instance.state.teamAssessmentHistoryData).toHaveLength(1);
+    expect(instance.state.teamAssessmentHistoryData[0].boardId).toBe("board-1");
+  });
+
+  it("should sort boards chronologically in team assessment history", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const boardOld: IFeedbackBoardDocument = {
+      id: "board-old",
+      title: "Old Retro",
+      teamId: "team-1",
+      createdDate: new Date("2024-12-01"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [{ userId: "user-1", responses: [{ questionId: 1, selection: 7 }] }],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    const boardNew: IFeedbackBoardDocument = {
+      id: "board-new",
+      title: "New Retro",
+      teamId: "team-1",
+      createdDate: new Date("2025-03-01"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [{ userId: "user-1", responses: [{ questionId: 1, selection: 9 }] }],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    const boardMiddle: IFeedbackBoardDocument = {
+      id: "board-middle",
+      title: "Middle Retro",
+      teamId: "team-1",
+      createdDate: new Date("2025-01-15"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [{ userId: "user-1", responses: [{ questionId: 1, selection: 8 }] }],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({ currentTeam: team });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    // Return boards in random order
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([boardNew, boardOld, boardMiddle]);
+
+    await (instance as any).showTeamAssessmentHistoryDialog();
+
+    expect(instance.state.teamAssessmentHistoryData).toHaveLength(3);
+    // Should be sorted oldest to newest
+    expect(instance.state.teamAssessmentHistoryData[0].boardId).toBe("board-old");
+    expect(instance.state.teamAssessmentHistoryData[1].boardId).toBe("board-middle");
+    expect(instance.state.teamAssessmentHistoryData[2].boardId).toBe("board-new");
+  });
+
+  it("should handle empty team assessment history", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    instance.setState({ currentTeam: team });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([]);
+
+    await (instance as any).showTeamAssessmentHistoryDialog();
+
+    expect(instance.state.isTeamAssessmentHistoryDialogHidden).toBe(false);
+    expect(instance.state.teamAssessmentHistoryData).toHaveLength(0);
+  });
+
+  it("should calculate averages correctly for multiple questions", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Multi Question Retro",
+      teamId: "team-1",
+      createdDate: new Date("2025-01-01"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [
+        {
+          userId: "user-1",
+          responses: [
+            { questionId: 1, selection: 10 },
+            { questionId: 2, selection: 8 },
+            { questionId: 3, selection: 6 },
+          ],
+        },
+        {
+          userId: "user-2",
+          responses: [
+            { questionId: 1, selection: 8 },
+            { questionId: 2, selection: 10 },
+            { questionId: 3, selection: 4 },
+          ],
+        },
+        {
+          userId: "user-3",
+          responses: [
+            { questionId: 1, selection: 9 },
+            { questionId: 2, selection: 9 },
+            { questionId: 3, selection: 5 },
+          ],
+        },
+      ],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({ currentTeam: team });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([board]);
+
+    await (instance as any).showTeamAssessmentHistoryDialog();
+
+    expect(instance.state.teamAssessmentHistoryData).toHaveLength(1);
+
+    const questionAverages = instance.state.teamAssessmentHistoryData[0].questionAverages;
+
+    const q1Avg = questionAverages.find((qa: { questionId: number; average: number }) => qa.questionId === 1);
+    expect(q1Avg?.average).toBe(9); // (10 + 8 + 9) / 3 = 9
+
+    const q2Avg = questionAverages.find((qa: { questionId: number; average: number }) => qa.questionId === 2);
+    expect(q2Avg?.average).toBe(9); // (8 + 10 + 9) / 3 = 9
+
+    const q3Avg = questionAverages.find((qa: { questionId: number; average: number }) => qa.questionId === 3);
+    expect(q3Avg?.average).toBe(5); // (6 + 4 + 5) / 3 = 5
+  });
+});
+
+describe("FeedbackBoardContainer - Retro Summary Dialog", () => {
+  it("should show and hide preview email dialog", () => {
+    const instance = createStandaloneTimerInstance();
+
+    (instance as any).showPreviewEmailDialog();
+    expect(instance.state.isPreviewEmailDialogHidden).toBe(false);
+
+    (instance as any).hidePreviewEmailDialog();
+    expect(instance.state.isPreviewEmailDialogHidden).toBe(true);
+  });
+
+  it("should calculate effectiveness measurements for retro summary", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Test Board",
+      teamId: "team-1",
+      createdDate: new Date("2025-01-01"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [
+        {
+          userId: "user-1",
+          responses: [
+            { questionId: 1, selection: 5 },
+            { questionId: 2, selection: 7 },
+            { questionId: 3, selection: 9 },
+          ],
+        },
+        {
+          userId: "user-2",
+          responses: [
+            { questionId: 1, selection: 7 },
+            { questionId: 2, selection: 8 },
+            { questionId: 3, selection: 10 },
+          ],
+        },
+      ],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({ currentTeam: team, currentBoard: board });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardForTeamById").mockResolvedValue(board);
+
+    jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(board);
+    jest.spyOn(itemDataService, "getFeedbackItemsForBoard").mockResolvedValue([]);
+
+    const mockNavigationService = {
+      setHash: jest.fn().mockResolvedValue(undefined),
+    };
+    jest.spyOn(require("azure-devops-extension-sdk"), "getService").mockResolvedValue(mockNavigationService);
+
+    await (instance as any).showRetroSummaryDialog();
+
+    expect(instance.state.isRetroSummaryDialogHidden).toBe(false);
+    expect(instance.state.effectivenessMeasurementSummary.length).toBeGreaterThan(0);
+    expect(instance.state.effectivenessMeasurementChartData.length).toBeGreaterThan(0);
+
+    // Verify chart data categorization (red <= 6, yellow <= 8, green > 8)
+    const q1Chart = instance.state.effectivenessMeasurementChartData.find((c: { questionId: number; red: number; yellow: number; green: number }) => c.questionId === 1);
+    expect(q1Chart?.red).toBe(1); // selection 5
+    expect(q1Chart?.yellow).toBe(1); // selection 7
+    expect(q1Chart?.green).toBe(0);
+
+    const q3Chart = instance.state.effectivenessMeasurementChartData.find((c: { questionId: number; red: number; yellow: number; green: number }) => c.questionId === 3);
+    expect(q3Chart?.green).toBe(2); // selections 9 and 10
+  });
+
+  it("should handle retro summary with empty vote collection", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Empty Board",
+      teamId: "team-1",
+      createdDate: new Date("2025-01-01"),
+      isIncludeTeamEffectivenessMeasurement: true,
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({ currentTeam: team, currentBoard: board });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardForTeamById").mockResolvedValue(board);
+
+    jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(board);
+    jest.spyOn(itemDataService, "getFeedbackItemsForBoard").mockResolvedValue([]);
+
+    const mockNavigationService = {
+      setHash: jest.fn().mockResolvedValue(undefined),
+    };
+    jest.spyOn(require("azure-devops-extension-sdk"), "getService").mockResolvedValue(mockNavigationService);
+
+    await (instance as any).showRetroSummaryDialog();
+
+    expect(instance.state.isRetroSummaryDialogHidden).toBe(false);
+    expect(instance.state.effectivenessMeasurementSummary).toEqual([]);
+  });
+
+  it("should hide retro summary dialog", () => {
+    const instance = createStandaloneTimerInstance();
+
+    instance.setState({ isRetroSummaryDialogHidden: false });
+    (instance as any).hideRetroSummaryDialog();
+    expect(instance.state.isRetroSummaryDialogHidden).toBe(true);
+  });
+});
+
+describe("FeedbackBoardContainer - Utility Methods", () => {
+  it("should format numbers correctly", () => {
+    const instance = createStandaloneTimerInstance();
+
+    expect((instance as any).numberFormatter(5)).toBe("5.0");
+    expect((instance as any).numberFormatter(5.5)).toBe("5.5");
+    expect((instance as any).numberFormatter(10.123)).toBe("10.1");
+  });
+
+  it("should format percentages correctly", () => {
+    const instance = createStandaloneTimerInstance();
+
+    expect((instance as any).percentageFormatter(50)).toBe("50.0%");
+    expect((instance as any).percentageFormatter(75.5)).toBe("75.5%");
+    expect((instance as any).percentageFormatter(100)).toBe("100.0%");
+  });
+
+  it("should show and hide carousel dialog", () => {
+    const instance = createStandaloneTimerInstance();
+
+    (instance as any).showCarouselDialog();
+    expect(instance.state.isCarouselDialogHidden).toBe(false);
+    expect(appInsights.trackEvent).toHaveBeenCalledWith({ name: TelemetryEvents.FeedbackItemCarouselLaunched });
+
+    (instance as any).hideCarouselDialog();
+    expect(instance.state.isCarouselDialogHidden).toBe(true);
+  });
+
+  it("should hide live sync issue message bar", () => {
+    const instance = createStandaloneTimerInstance();
+
+    instance.setState({ isLiveSyncInTfsIssueMessageBarVisible: true });
+    (instance as any).hideLiveSyncInTfsIssueMessageBar();
+    expect(instance.state.isLiveSyncInTfsIssueMessageBarVisible).toBe(false);
+  });
+
+  it("should hide drop issue in edge message bar", () => {
+    const instance = createStandaloneTimerInstance();
+
+    instance.setState({ isDropIssueInEdgeMessageBarVisible: true });
+    (instance as any).hideDropIssueInEdgeMessageBar();
+    expect(instance.state.isDropIssueInEdgeMessageBarVisible).toBe(false);
+  });
+
+  it("should hide mobile board actions dialog", () => {
+    const instance = createStandaloneTimerInstance();
+
+    instance.setState({ isMobileBoardActionsDialogHidden: false });
+    (instance as any).hideMobileBoardActionsDialog();
+    expect(instance.state.isMobileBoardActionsDialogHidden).toBe(true);
+  });
+});
+
+describe("FeedbackBoardContainer - Board Management", () => {
+  it("should handle board created event", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const existingBoard: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Existing Board",
+      teamId: "team-1",
+      createdDate: new Date("2025-01-01"),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    const newBoard: IFeedbackBoardDocument = {
+      id: "board-2",
+      title: "New Board",
+      teamId: "team-1",
+      createdDate: new Date("2025-02-01"),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: existingBoard,
+      boards: [existingBoard],
+      userTeams: [team],
+      currentUserId: "user-1",
+    });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardForTeamById").mockResolvedValue(newBoard);
+
+    await (instance as any).handleBoardCreated("team-1", "board-2");
+
+    expect(instance.state.boards.length).toBe(2);
+    expect(instance.state.boards.find((b: IFeedbackBoardDocument) => b.id === "board-2")).toBeDefined();
+  });
+
+  it("should not handle board created for different team", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      boards: [board],
+    });
+
+    const initialBoardsLength = instance.state.boards.length;
+    await (instance as any).handleBoardCreated("team-2", "board-2");
+
+    expect(instance.state.boards.length).toBe(initialBoardsLength);
+  });
+
+  it("should archive current board", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board to Archive",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board,
+      boards: [board],
+      isArchiveBoardConfirmationDialogHidden: false,
+    });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "archiveFeedbackBoard").mockResolvedValue(undefined);
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([]);
+
+    const mockBroadcastDeletedBoard = jest.fn();
+    jest.spyOn(reflectBackendService, "broadcastDeletedBoard").mockImplementation(mockBroadcastDeletedBoard);
+
+    await (instance as any).archiveCurrentBoard();
+
+    expect(BoardDataService.archiveFeedbackBoard).toHaveBeenCalledWith("team-1", "board-1");
+    expect(mockBroadcastDeletedBoard).toHaveBeenCalledWith("team-1", "board-1");
+    expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(true);
+    expect(appInsights.trackEvent).toHaveBeenCalledWith({
+      name: TelemetryEvents.FeedbackBoardArchived,
+      properties: { boardId: "board-1" },
+    });
+  });
+
+  it("should reload boards for current team with no boards", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    instance.setState({
+      currentTeam: team,
+      userTeams: [team],
+      currentUserId: "user-1",
+    });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([]);
+
+    await (instance as any).reloadBoardsForCurrentTeam();
+
+    expect(instance.state.boards).toEqual([]);
+    expect(instance.state.currentBoard).toBeNull();
+    expect(instance.state.isTeamDataLoaded).toBe(true);
   });
 });
