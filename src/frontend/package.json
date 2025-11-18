@@ -50,7 +50,7 @@
     "@types/node": "24.10.1",
     "@types/react": "19.2.5",
     "@types/react-dom": "19.2.3",
-    "@typescript-eslint/eslint-plugin": "8.46.4",
+    "@typescript-eslint/eslint-plugin": "8.47.0",
     "@typescript-eslint/parser": "8.47.0",
     "compression-webpack-plugin": "11.1.0",
     "fast-check": "4.3.0",
