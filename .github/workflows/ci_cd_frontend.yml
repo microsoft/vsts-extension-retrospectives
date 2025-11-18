@@ -159,5 +159,6 @@ jobs:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
         run: >
           npm run publish:d
