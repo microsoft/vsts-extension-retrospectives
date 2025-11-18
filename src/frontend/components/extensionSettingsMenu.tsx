@@ -9,7 +9,7 @@ import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { getProjectId } from "../utilities/servicesHelper";
 import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/feedback";
-import { Slide, toast, ToastContainer } from "react-toastify";
+import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
 import { WorkflowPhase } from "../interfaces/workItem";
@@ -311,7 +311,6 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
 
         <KeyboardShortcutsDialog isOpen={!this.state.isKeyboardShortcutsDialogHidden} onClose={() => this.setState({ isKeyboardShortcutsDialogHidden: true })} currentWorkflowPhase={WorkflowPhase.Collect} />
 
-        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }

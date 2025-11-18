@@ -36,7 +36,6 @@ export default (env, argv) => {
         crypto: require.resolve("crypto-browserify"),
         process: "process/browser",
         stream: require.resolve("stream-browserify"),
-        util: require.resolve("util"),
       },
       extensions: [".ts", ".js", ".jsx", ".tsx"],
     },

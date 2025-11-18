@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import SelectorCombo, { ISelectorComboProps, ISelectorList, ISelectorListItem, ISelectorListItemHeader } from "../selectorCombo";
 
@@ -399,6 +399,67 @@ describe("SelectorCombo", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
       expect(getSelectorButton(container)).toBeTruthy();
+    });
+  });
+
+  describe("Interactive behavior", () => {
+    test("toggles callout visibility and clears filter when closed", () => {
+      const comboRef = React.createRef<SelectorCombo<MockItem>>();
+      const { getByTestId, getByPlaceholderText } = render(<SelectorCombo {...defaultProps} ref={comboRef} />);
+
+      const selectorButton = getByTestId("selector-button");
+      fireEvent.click(selectorButton);
+      const searchInput = getByPlaceholderText("Search") as HTMLInputElement;
+      fireEvent.change(searchInput, { target: { value: "Item" } });
+      expect(comboRef.current?.state.isSelectorCalloutVisible).toBe(true);
+      expect(comboRef.current?.state.currentFilterText).toBe("Item");
+
+      fireEvent.click(selectorButton);
+      expect(comboRef.current?.state.isSelectorCalloutVisible).toBe(false);
+      expect(comboRef.current?.state.currentFilterText).toBe("");
+    });
+
+    test("filters list items based on search input", () => {
+      const { getByTestId, getByPlaceholderText } = render(<SelectorCombo {...defaultProps} />);
+      fireEvent.click(getByTestId("selector-button"));
+      const searchInput = getByPlaceholderText("Search");
+      fireEvent.change(searchInput, { target: { value: "Another" } });
+
+      const listContainer = document.body.querySelector(".selector-list-container") as HTMLElement;
+      expect(within(listContainer).getByText("Another Item")).toBeInTheDocument();
+      expect(within(listContainer).queryByText("Item One")).toBeNull();
+    });
+
+    test("invokes selectorListItemOnClick when a list item is clicked", () => {
+      const clickSpy = jest.fn();
+      const { getByTestId } = render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} />);
+
+      fireEvent.click(getByTestId("selector-button"));
+      const firstListItem = document.body.querySelector(".selector-list-item") as HTMLElement;
+      fireEvent.click(firstListItem);
+
+      expect(clickSpy).toHaveBeenCalledWith(mockItems[0]);
+    });
+
+    test("handles keyboard selection on list items", () => {
+      const clickSpy = jest.fn();
+      const { getByTestId } = render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} />);
+
+      fireEvent.click(getByTestId("selector-button"));
+      const firstListItem = document.body.querySelector(".selector-list-item") as HTMLElement;
+      fireEvent.keyDown(firstListItem, { key: "Enter", keyCode: 13, which: 13 });
+
+      expect(clickSpy).toHaveBeenCalledWith(mockItems[0]);
+    });
+
+    test("supports keyboard toggling on selector button", () => {
+      const comboRef = React.createRef<SelectorCombo<MockItem>>();
+      const { getByTestId } = render(<SelectorCombo {...defaultProps} ref={comboRef} />);
+
+      const selectorButton = getByTestId("selector-button");
+      fireEvent.keyDown(selectorButton, { key: "Enter", keyCode: 13, which: 13 });
+
+      expect(comboRef.current?.state.isSelectorCalloutVisible).toBe(true);
     });
   });
 

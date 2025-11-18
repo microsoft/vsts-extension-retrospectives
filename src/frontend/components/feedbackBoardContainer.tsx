@@ -23,7 +23,7 @@ import { userDataService } from "../dal/userDataService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
 import SelectorCombo, { ISelectorList } from "./selectorCombo";
 import FeedbackBoardPreviewEmail from "./feedbackBoardPreviewEmail";
-import { ToastContainer, toast, Slide } from "react-toastify";
+import { ToastContainer, toast } from "./toastNotifications";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { shareBoardHelper } from "../utilities/shareBoardHelper";
 import { itemDataService } from "../dal/itemDataService";
@@ -2185,7 +2185,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </>
           )}
         </Dialog>
-        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
+        <ToastContainer className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }
