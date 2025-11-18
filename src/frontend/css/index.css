@@ -24,7 +24,8 @@
   }
 
   .feedback-card-surface {
-    @apply z-[1] border-[var(--color-border-gray)] bg-transparent;
+    @apply z-[1] border border-[var(--color-border-gray)];
+    background-color: transparent !important;
   }
 }
 

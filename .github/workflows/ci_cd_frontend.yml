@@ -153,21 +153,11 @@ jobs:
           cat <<< $(jq ".contributions[0].properties.name = \"Retrospectives (Dev)\"" $ext_file) > $ext_file
 
       - if: steps.changes.outputs.src == 'true'
-        name: "Prepare extension package"
+        name: "Publish extension to dev environment"
         working-directory: 'src/frontend'
         env:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: |
-          npm run build
-          npm run pack:d
-
-      - if: steps.changes.outputs.src == 'true'
-        name: "Publish extension to dev environment"
-        working-directory: 'src/frontend'
         run: >
-          npx tfx extension publish
-          --manifests vss-extension-dev.json
-          --vsix ./dist/*.vsix
-          --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+          npm run publish:d
