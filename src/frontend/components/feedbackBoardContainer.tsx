@@ -1770,21 +1770,19 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </div>
                       {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
                         <div className="feedback-maxvotes-per-user" role="status" aria-live="polite">
-                          Votes Used:
+                          <span className="hidden lg:inline">Votes Used:</span>
                           <span
                             className="feedback-maxvotes-entry"
                             aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}
                           >
-                            {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString() || "0"} (me)
+                            {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"} (me)
                           </span>
-                          <span className="feedback-maxvotes-separator" aria-hidden="true">
-                            ,
-                          </span>
+                          <span className="feedback-maxvotes-separator" aria-hidden="true"> , </span>
                           <span
                             className="feedback-maxvotes-entry"
                             aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}
                           >
-                            {this.state.castedVoteCount} / {this.state.teamVoteCapacity} (team)
+                            {this.state.castedVoteCount}/{this.state.teamVoteCapacity} (team)
                           </span>
                         </div>
                       )}
