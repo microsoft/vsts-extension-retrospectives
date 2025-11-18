@@ -1987,7 +1987,8 @@ kbd {
   @apply py-2 px-4 block text-sm font-light leading-[18px] overflow-hidden [word-wrap:break-word] h-[45px];
 }
 
-.feedbackItem .mainItemCard .card-action-timer {
+.feedbackItem .mainItemCard .card-action-timer,
+.feedbackItemGroupItem .mainItemCard .card-action-timer {
   @apply mb-2.5 text-[var(--text-primary-color)] bg-[var(--nav-header-active-item-background)] py-0.5 px-1.5;
 }
 

@@ -112,7 +112,7 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
                 }}
               />
             ))}
-          <div className="item-cards-stack hide-mobile" style={{ height: this.state.itemCardsStackHeight - 2, marginTop: 5 - this.state.itemCardsStackHeight }} />
+          <div className="item-cards-stack" style={{ height: this.state.itemCardsStackHeight - 2, marginTop: 5 - this.state.itemCardsStackHeight }} />
         </div>
       </div>
     );

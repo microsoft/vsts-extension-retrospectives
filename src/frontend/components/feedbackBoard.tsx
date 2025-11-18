@@ -573,7 +573,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
           }}
           modalProps={{
             containerClassName: "retrospectives-carousel-dialog",
-            className: "retrospectives-carousel-dialog-modal hide-mobile",
+            className: "retrospectives-carousel-dialog-modal",
             isBlocking: true,
           }}
         >

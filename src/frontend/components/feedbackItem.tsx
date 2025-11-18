@@ -855,7 +855,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 {!this.props.newlyCreated && (
                   <div className="item-actions-menu">
                     <DefaultButton
-                      className="contextual-menu-button hide-mobile"
+                      className="contextual-menu-button"
                       aria-label="Feedback Options Menu"
                       iconProps={{ iconName: "MoreVertical" }}
                       title="Feedback actions"
@@ -912,7 +912,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               </div>
               <div className="card-content">
                 {workflowState.isActPhase && (
-                  <div className="card-action-timer hide-mobile">
+                  <div className="card-action-timer">
                     <button
                       title="Timer"
                       aria-live="polite"
@@ -932,7 +932,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 )}
                 {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
                 {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
-                  <div className="original-column-info hide-mobile">
+                  <div className="original-column-info">
                     Original Column: <br />
                     {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
                   </div>
@@ -967,7 +967,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                             {childDisplayTitle}
                           </span>
                           {this.props.columnId !== originalColumn?.columnProperties?.id && (
-                            <div className="original-column-info hide-mobile">
+                            <div className="original-column-info">
                               Original Column: <br />
                               {originalColumn.columnProperties.title}
                             </div>
