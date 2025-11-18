@@ -1793,7 +1793,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           <span className="inline-flex items-center justify-center mr-1">
                             <i className="fas fa-bullseye"></i>
                           </span>
-                          <span>Focus Mode</span>
+                          <span className="hidden lg:inline">Focus Mode</span>
                         </button>
                       )}
                     </div>
