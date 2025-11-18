@@ -87,6 +87,8 @@ const defaultProps: ISelectorComboProps<MockItem> = {
   selectorListItemOnClick: onClickMock,
 };
 
+const getSelectorButton = (container: HTMLElement) => container.querySelector("[data-testid='selector-button']");
+
 describe("SelectorCombo", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -97,7 +99,7 @@ describe("SelectorCombo", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
       expect(container.querySelector(".test-selector")).toBeTruthy();
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
       expect(container.firstChild).toBeTruthy();
     });
 
@@ -110,7 +112,7 @@ describe("SelectorCombo", () => {
     test("renders selector button with correct title attribute", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      const button = container.querySelector(".selector-button");
+      const button = getSelectorButton(container);
       expect(button).toBeTruthy();
       expect(button?.getAttribute("aria-label")).toContain("Test Selector");
     });
@@ -118,7 +120,7 @@ describe("SelectorCombo", () => {
     test("renders selector button with correct aria attributes", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      const button = container.querySelector(".selector-button");
+      const button = getSelectorButton(container);
       expect(button).toBeTruthy();
       expect(button?.getAttribute("aria-label")).toContain("Test Selector");
       expect(button?.getAttribute("aria-expanded")).toBe("false");
@@ -134,7 +136,7 @@ describe("SelectorCombo", () => {
     test("renders callout with correct props when hidden", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
       expect(container.querySelector("[data-is-visible='true']")).toBeFalsy();
     });
   });
@@ -144,14 +146,14 @@ describe("SelectorCombo", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
       expect(container.firstChild).toBeTruthy();
-      const button = container.querySelector(".selector-button");
+      const button = getSelectorButton(container);
       expect(button?.getAttribute("aria-expanded")).toBe("false");
     });
 
     test("updates aria-expanded when callout visibility changes", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      const button = container.querySelector(".selector-button");
+      const button = getSelectorButton(container);
       expect(button).toBeTruthy();
 
       expect(button?.getAttribute("aria-expanded")).toBe("false");
@@ -165,7 +167,7 @@ describe("SelectorCombo", () => {
     test("toggles callout visibility when selector button is clicked", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      const selectorButton = container.querySelector(".selector-button");
+      const selectorButton = getSelectorButton(container);
       expect(selectorButton).toBeTruthy();
 
       expect(container.querySelector("[data-is-visible='true']")).toBeFalsy();
@@ -176,7 +178,7 @@ describe("SelectorCombo", () => {
     test("handles keyboard interaction on selector button", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      const selectorButton = container.querySelector(".selector-button");
+      const selectorButton = getSelectorButton(container);
       expect(selectorButton).toBeTruthy();
 
       expect(selectorButton).not.toBeNull();
@@ -186,7 +188,7 @@ describe("SelectorCombo", () => {
     test("selector button has proper accessibility attributes", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      const selectorButton = container.querySelector(".selector-button");
+      const selectorButton = getSelectorButton(container);
       expect(selectorButton).toBeTruthy();
 
       expect(selectorButton).toBeInstanceOf(HTMLElement);
@@ -211,7 +213,7 @@ describe("SelectorCombo", () => {
     test("handles callout visibility state", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
   });
 
@@ -226,7 +228,7 @@ describe("SelectorCombo", () => {
     test("handles filter text state management", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
 
     test("supports case-insensitive filtering", () => {
@@ -259,7 +261,7 @@ describe("SelectorCombo", () => {
     test("updates aria labels based on search results count", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
 
     test("handles aria labels when no filter is applied", () => {
@@ -287,7 +289,7 @@ describe("SelectorCombo", () => {
       const { container } = render(<SelectorCombo {...propsWithVisibleHeader} />);
 
       expect(container.firstChild).toBeTruthy();
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
 
     test("does not render list header when hidden", () => {
@@ -342,7 +344,7 @@ describe("SelectorCombo", () => {
 
       expect(container.firstChild).toBeTruthy();
       expect(container.querySelector(".test-selector")).toBeTruthy();
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
 
     test("configures list virtualization correctly", () => {
@@ -351,7 +353,7 @@ describe("SelectorCombo", () => {
       expect(container.firstChild).toBeTruthy();
       expect(container.querySelector(".test-selector")).toBeTruthy();
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
   });
 
@@ -378,7 +380,7 @@ describe("SelectorCombo", () => {
     test("provides correct accessibility labels for list items", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
 
     test("handles accessibility labels for hidden headers", () => {
@@ -396,7 +398,7 @@ describe("SelectorCombo", () => {
     test("provides title attributes for list item text", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
   });
 
@@ -417,7 +419,7 @@ describe("SelectorCombo", () => {
     test("handles mobile dialog interactions", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
 
     test("maintains proper state when dialog is hidden", () => {
@@ -438,7 +440,7 @@ describe("SelectorCombo", () => {
     test("calculates item counts across multiple lists", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
   });
 
@@ -471,7 +473,7 @@ describe("SelectorCombo", () => {
 
       const { container } = render(<SelectorCombo {...emptyItemsProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
 
     test("handles undefined properties gracefully", () => {
@@ -485,7 +487,7 @@ describe("SelectorCombo", () => {
     test("manages selector button refs properly", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
       expect(container.firstChild).toBeTruthy();
     });
   });
@@ -495,7 +497,7 @@ describe("SelectorCombo", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
       expect(container.querySelector(".test-selector")).toBeTruthy();
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
 
     test("handles scrollable list attributes", () => {
@@ -509,21 +511,21 @@ describe("SelectorCombo", () => {
     test("opens callout when Enter key is pressed on selector button", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      const selectorButton = getSelectorButton(container) as HTMLElement;
 
       // Simulate Enter key press (keyCode 13)
       const enterEvent = new KeyboardEvent("keydown", { keyCode: 13, bubbles: true });
       selectorButton.dispatchEvent(enterEvent);
 
       // Component should still be rendered after key press
-      expect(container.querySelector(".selector-button")).toBeTruthy();
+      expect(getSelectorButton(container)).toBeTruthy();
     });
 
     test("handles key press on list item", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
       // Open the callout first
-      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      const selectorButton = getSelectorButton(container) as HTMLElement;
       selectorButton.click();
 
       // Find a list item
@@ -543,7 +545,7 @@ describe("SelectorCombo", () => {
     test("does not trigger action for non-Enter key presses", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      const selectorButton = getSelectorButton(container) as HTMLElement;
 
       // Simulate Space key press (keyCode 32)
       const spaceEvent = new KeyboardEvent("keydown", { keyCode: 32, bubbles: true });
@@ -566,7 +568,7 @@ describe("SelectorCombo", () => {
 
       const { container } = render(<SelectorCombo {...mobileProps} />);
 
-      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      const selectorButton = getSelectorButton(container) as HTMLElement;
       selectorButton.click();
 
       // Trigger item selection
@@ -591,7 +593,7 @@ describe("SelectorCombo", () => {
 
       const { container } = render(<SelectorCombo {...calloutProps} />);
 
-      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      const selectorButton = getSelectorButton(container) as HTMLElement;
       selectorButton.click();
 
       // Trigger item selection
@@ -619,7 +621,7 @@ describe("SelectorCombo", () => {
       };
 
       const { container } = render(<SelectorCombo {...visibleHeaderProps} />);
-      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      const selectorButton = getSelectorButton(container) as HTMLElement;
       selectorButton.click();
 
       expect(container).toBeTruthy();
@@ -640,7 +642,7 @@ describe("SelectorCombo", () => {
       };
 
       const { container } = render(<SelectorCombo {...hiddenHeaderProps} />);
-      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      const selectorButton = getSelectorButton(container) as HTMLElement;
       selectorButton.click();
 
       expect(container).toBeTruthy();
@@ -669,7 +671,7 @@ describe("SelectorCombo", () => {
 
       const { container } = render(<SelectorCombo {...multiListProps} />);
 
-      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      const selectorButton = getSelectorButton(container) as HTMLElement;
       selectorButton.click();
 
       // Should count items from all lists
@@ -692,7 +694,7 @@ describe("SelectorCombo", () => {
 
       const { container } = render(<SelectorCombo {...emptyItemsListProps} />);
 
-      const selectorButton = container.querySelector(".selector-button") as HTMLElement;
+      const selectorButton = getSelectorButton(container) as HTMLElement;
       selectorButton.click();
 
       expect(container).toBeTruthy();

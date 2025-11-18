@@ -102,6 +102,9 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   };
 
   public render() {
+    const arrowBaseClasses = "absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center cursor-pointer transition-transform duration-200 ease-in-out bg-white/90 border border-gray-300 rounded-full w-10 h-10 shadow-sm no-underline hover:bg-white hover:shadow-md hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2";
+    const arrowIconClasses = "text-base text-gray-800";
+
     return (
       <Pivot className="feedback-carousel-pivot">
         {this.state.feedbackColums.map(columnProps => {
@@ -115,14 +118,14 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
                     return (
                       <li className="carousel-slide" id={`slide-${columnProps.columnId}-${index}`} key={child.key}>
                         {index > 0 && (
-                          <a href={`#slide-${columnProps.columnId}-${index - 1}`} className="carousel-arrow carousel-arrow-prev" aria-label="Previous slide">
-                            <i className="fas fa-chevron-left" />
+                          <a href={`#slide-${columnProps.columnId}-${index - 1}`} className={`${arrowBaseClasses} left-2.5`} aria-label="Previous slide">
+                            <i className={`fas fa-chevron-left ${arrowIconClasses}`} />
                           </a>
                         )}
                         <div className="carousel-viewport">{child}</div>
                         {index < feedbackCarouselItems.length - 1 && (
-                          <a href={`#slide-${columnProps.columnId}-${index + 1}`} className="carousel-arrow carousel-arrow-next" aria-label="Next slide">
-                            <i className="fas fa-chevron-right" />
+                          <a href={`#slide-${columnProps.columnId}-${index + 1}`} className={`${arrowBaseClasses} right-2.5`} aria-label="Next slide">
+                            <i className={`fas fa-chevron-right ${arrowIconClasses}`} />
                           </a>
                         )}
                       </li>

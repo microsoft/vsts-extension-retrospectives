@@ -53,15 +53,17 @@ class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelector
 
   public render(): React.JSX.Element {
     const selectorButtonText: string = this.props.nameGetter(this.props.currentValue);
+    const selectorButtonClasses = "bg-black/5 flex h-8 items-center pl-2 pr-2 cursor-pointer hover:text-[var(--text-primary-color)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]";
 
     return (
       <div className={this.props.className}>
         <div
-          className="selector-button"
+          className={cn("selector-button", selectorButtonClasses)}
           aria-label={"Click to search and select " + this.props.title + ". Current selection is " + selectorButtonText}
           aria-expanded={this.state.isSelectorCalloutVisible}
           aria-haspopup="true"
           role="button"
+          data-testid="selector-button"
           ref={selectorButton => {
             this.selectorButton = selectorButton;
           }}

@@ -502,7 +502,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           }}
           modalProps={{
             isBlocking: false,
-            containerClassName: "prime-directive-dialog",
+            containerClassName: "prime-directive-dialog retro-dialog-shell",
             className: "retrospectives-dialog-modal",
           }}
         >

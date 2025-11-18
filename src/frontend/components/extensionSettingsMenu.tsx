@@ -287,10 +287,10 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
         <ContextualMenuButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} />
         <ContextualMenuButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} />
 
-        <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog">
+        <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog retro-dialog-shell">
           {renderContent(PRIME_DIRECTIVE_CONTENT)}
         </ExtensionDialog>
-        <ExtensionDialog hidden={this.state.isWhatsNewDialogHidden} onDismiss={this.hideWhatsNewDialog} title="What's New" onDefaultClick={this.onChangeLogClicked} defaultButtonText="Open change log" containerClassName="whatsnew-dialog">
+        <ExtensionDialog hidden={this.state.isWhatsNewDialogHidden} onDismiss={this.hideWhatsNewDialog} title="What's New" onDefaultClick={this.onChangeLogClicked} defaultButtonText="Open change log" containerClassName="whatsnew-dialog retro-dialog-shell">
           {renderContent(WHATISNEW_CONTENT)}
         </ExtensionDialog>
         <ExtensionDialog
@@ -301,11 +301,11 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           title="Retrospectives User Guide"
           onDefaultClick={this.onGetHelpClicked}
           defaultButtonText="Open user guide"
-          containerClassName="retro-help-dialog"
+          containerClassName="retro-help-dialog retro-dialog-shell"
         >
           {renderContent(RETRO_HELP_CONTENT)}
         </ExtensionDialog>
-        <ExtensionDialog hidden={this.state.isPleaseJoinUsDialogHidden} onDismiss={this.hidePleaseJoinUsDialog} title="Volunteer" onDefaultClick={this.onContributingClicked} defaultButtonText="Open contributing guidelines" containerClassName="volunteer-dialog">
+        <ExtensionDialog hidden={this.state.isPleaseJoinUsDialogHidden} onDismiss={this.hidePleaseJoinUsDialog} title="Volunteer" onDefaultClick={this.onContributingClicked} defaultButtonText="Open contributing guidelines" containerClassName="volunteer-dialog retro-dialog-shell">
           {renderContent(VOLUNTEER_CONTENT)}
         </ExtensionDialog>
 
