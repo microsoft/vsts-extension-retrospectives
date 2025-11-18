@@ -4,6 +4,8 @@
 @source "./components/**/*.{js,jsx,ts,tsx}";
 
 @theme {
+  --breakpoint-lg: 1200px;
+
   --color-primary: #0078d4;
   --color-border-gray: #605e5c;
   --color-error: rgb(204, 41, 61);
