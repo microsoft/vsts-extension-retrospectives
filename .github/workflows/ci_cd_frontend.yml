@@ -78,7 +78,7 @@ jobs:
 
       - name: "Spell check"
         run: |
-          wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/1c88835c52ca5e53dbfef3f6ef4dcf6c76c5cb06/dictionaries/base.txt
+          wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/ddb8f07599b5b15147168d3bcd8bbede0df8d2c7/dictionaries/base.txt
           echo "" >> base.txt
           echo "emailable" >> base.txt
           echo "anonymize" >> base.txt
