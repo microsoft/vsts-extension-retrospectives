@@ -287,10 +287,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-base my-2 mx-4 flex flex-wrap items-center gap-4;
 }
 
-.feedback-board .feedback-maxvotes-per-user .feedback-maxvotes-label {
-  @apply font-semibold;
-}
-
 .feedback-board .feedback-maxvotes-per-user .feedback-maxvotes-entry {
   @apply flex items-center gap-2 text-sm text-[var(--text-secondary-color)];
 }
