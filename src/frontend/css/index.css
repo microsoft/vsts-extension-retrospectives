@@ -220,12 +220,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-[var(--text-primary-color)] pb-2.5;
 }
 
-:is(
-    .prime-directive-dialog,
-    .whatsnew-dialog,
-    .retro-help-dialog,
-    .volunteer-dialog
-  ) :is(.ms-Dialog-content, .ms-Dialog-content .ms-Label, p.ms-Dialog-subText, .ms-Dialog-header button.ms-Dialog-button) {
+:is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) :is(.ms-Dialog-content, .ms-Dialog-content .ms-Label, p.ms-Dialog-subText, .ms-Dialog-header button.ms-Dialog-button) {
   @apply text-[var(--text-primary-color)];
 }
 

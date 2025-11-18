@@ -312,7 +312,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.boardTimerIntervalId = window.setInterval(() => {
       this.setState(previousState => {
         const isActPhase = this.getCurrentBoardPhase() === WorkflowPhase.Act;
-        
+
         if (isActPhase) {
           return { boardTimerSeconds: previousState.boardTimerSeconds + 1 };
         } else {
@@ -435,9 +435,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   }
 
-  private readonly getVoteMetricsState = (
-    board: IFeedbackBoardDocument | undefined,
-  ): Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity"> => {
+  private readonly getVoteMetricsState = (board: IFeedbackBoardDocument | undefined): Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity"> => {
     if (!board || !this.state.currentUserId) {
       return {
         castedVoteCount: 0,
@@ -1771,17 +1769,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
                         <div className="feedback-maxvotes-per-user" role="status" aria-live="polite">
                           <span className="hidden lg:inline">Votes Used:</span>
-                          <span
-                            className="feedback-maxvotes-entry"
-                            aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}
-                          >
+                          <span className="feedback-maxvotes-entry" aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
                             {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"} (me)
                           </span>
-                          <span className="feedback-maxvotes-separator" aria-hidden="true"> , </span>
-                          <span
-                            className="feedback-maxvotes-entry"
-                            aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}
-                          >
+                          <span className="feedback-maxvotes-separator" aria-hidden="true">
+                            {" "}
+                            ,{" "}
+                          </span>
+                          <span className="feedback-maxvotes-entry" aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
                             {this.state.castedVoteCount}/{this.state.teamVoteCapacity} (team)
                           </span>
                         </div>
