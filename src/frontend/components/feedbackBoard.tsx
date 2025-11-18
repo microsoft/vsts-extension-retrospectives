@@ -60,6 +60,7 @@ export interface FeedbackBoardState {
   columnNotes: { [columnId: string]: string };
   focusedColumnIndex: number;
   isKeyboardShortcutsDialogOpen: boolean;
+  activeTimerFeedbackItemId: string | null;
 }
 
 class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
@@ -78,6 +79,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       columnNotes: {},
       focusedColumnIndex: 0,
       isKeyboardShortcutsDialogOpen: false,
+      activeTimerFeedbackItemId: null,
     };
   }
 
@@ -172,13 +174,14 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         columnIds: [],
         hasItems: false,
         columnNotes: {},
+        activeTimerFeedbackItemId: null,
       });
       this.initColumns();
       await this.getAllBoardFeedbackItems();
     }
 
     if (prevProps.board.modifiedDate !== this.props.board.modifiedDate) {
-      this.setState({ columnNotes: {} });
+      this.setState({ columnNotes: {}, activeTimerFeedbackItemId: null });
       this.initColumns();
       await this.getAllBoardFeedbackItems();
     }
@@ -234,7 +237,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       columnNotes[col.id] = col.notes ?? "";
     });
 
-    this.setState({ columns: stateColumns, columnIds: columnIds, columnNotes });
+    this.setState({ columns: stateColumns, columnIds: columnIds, columnNotes, activeTimerFeedbackItemId: null });
   };
 
   private readonly handleColumnNotesChange = (columnId: string, notes: string) => {
@@ -299,7 +302,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     const feedbackItems = await itemDataService.getFeedbackItemsForBoard(this.props.board.id);
 
     if (!feedbackItems) {
-      this.setState({ isDataLoaded: true });
+      this.setState({ isDataLoaded: true, activeTimerFeedbackItemId: null });
       return;
     }
 
@@ -322,10 +325,13 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         }
       });
 
+      const activeTimerFeedbackItemId = this.findActiveTimerFeedbackItemId(prevState.columns);
+
       return {
         columns: prevState.columns,
         hasItems: true,
         isDataLoaded: true,
+        activeTimerFeedbackItemId,
       };
     });
   };
@@ -363,6 +369,100 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     return resetFocusForStateColumns;
   };
 
+  private readonly findActiveTimerFeedbackItemId = (columns: { [id: string]: IColumn }): string | null => {
+    for (const columnId of Object.keys(columns)) {
+      const column = columns[columnId];
+      if (!column) {
+        continue;
+      }
+
+      const activeItem = column.columnItems.find(columnItem => columnItem.feedbackItem.timerState);
+      if (activeItem) {
+        return activeItem.feedbackItem.id;
+      }
+    }
+
+    return null;
+  };
+
+  private readonly findColumnItemById = (feedbackItemId: string): IColumnItem | undefined => {
+    for (const columnId of this.state.columnIds) {
+      const column = this.state.columns[columnId];
+      if (!column) {
+        continue;
+      }
+
+      const columnItem = column.columnItems.find(item => item.feedbackItem.id === feedbackItemId);
+      if (columnItem) {
+        return columnItem;
+      }
+    }
+
+    return undefined;
+  };
+
+  private readonly stopTimerById = async (feedbackItemId: string): Promise<void> => {
+    const columnItem = this.findColumnItemById(feedbackItemId);
+
+    if (!columnItem || !columnItem.feedbackItem.timerState) {
+      this.setState(previousState => {
+        if (previousState.activeTimerFeedbackItemId === feedbackItemId) {
+          return { activeTimerFeedbackItemId: null } as Pick<FeedbackBoardState, "activeTimerFeedbackItemId">;
+        }
+        return null;
+      });
+      return;
+    }
+
+    if (columnItem.feedbackItem.timerId !== null && columnItem.feedbackItem.timerId !== undefined) {
+      window.clearInterval(columnItem.feedbackItem.timerId as number);
+    }
+
+    try {
+      const updatedFeedbackItem = await itemDataService.flipTimer(this.props.board.id, feedbackItemId, null);
+      if (updatedFeedbackItem) {
+        await this.refreshFeedbackItems([updatedFeedbackItem], true);
+      }
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "stopTimer",
+        boardId: this.props.board.id,
+        feedbackItemId,
+      });
+    } finally {
+      this.setState(previousState => {
+        if (previousState.activeTimerFeedbackItemId === feedbackItemId) {
+          return { activeTimerFeedbackItemId: null } as Pick<FeedbackBoardState, "activeTimerFeedbackItemId">;
+        }
+        return null;
+      });
+    }
+  };
+
+  private readonly requestTimerStart = async (feedbackItemId: string): Promise<boolean> => {
+    try {
+      if (this.state.activeTimerFeedbackItemId && this.state.activeTimerFeedbackItemId !== feedbackItemId) {
+        await this.stopTimerById(this.state.activeTimerFeedbackItemId);
+      }
+
+      this.setState({ activeTimerFeedbackItemId: feedbackItemId });
+      return true;
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "requestTimerStart",
+        boardId: this.props.board.id,
+        feedbackItemId,
+      });
+      return false;
+    }
+  };
+
+  private readonly handleTimerStopped = (feedbackItemId: string) => {
+    if (this.state.activeTimerFeedbackItemId === feedbackItemId) {
+      this.setState({ activeTimerFeedbackItemId: null });
+    }
+  };
+
   private readonly addFeedbackItems = (columnId: string, feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => {
     this.setState(previousState => {
       const firstAddedItemId = feedbackItems.length && feedbackItems[0].id;
@@ -393,10 +493,12 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
       const newColumns = { ...resetFocusForStateColumns };
       newColumns[columnId].columnItems = updatedColumnItems;
+      const activeTimerFeedbackItemId = this.findActiveTimerFeedbackItemId(newColumns);
 
       return {
         columns: newColumns,
         isDataLoaded: true,
+        activeTimerFeedbackItemId,
       };
     });
 
@@ -433,15 +535,18 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
       const resetFocusForStateColumns = this.getColumnsWithReleasedFocus(previousState);
 
-      return {
-        columns: {
-          ...resetFocusForStateColumns,
-          [columnId]: {
-            ...resetFocusForStateColumns[columnId],
-            columnItems: updatedColumnItemsWithActiveFocus,
-            shouldFocusOnCreateFeedback,
-          },
+      const newColumns = {
+        ...resetFocusForStateColumns,
+        [columnId]: {
+          ...resetFocusForStateColumns[columnId],
+          columnItems: updatedColumnItemsWithActiveFocus,
+          shouldFocusOnCreateFeedback,
         },
+      };
+
+      return {
+        columns: newColumns,
+        activeTimerFeedbackItemId: this.findActiveTimerFeedbackItemId(newColumns),
       };
     });
   };
@@ -496,6 +601,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
         return {
           columns: newColumns,
+          activeTimerFeedbackItemId: this.findActiveTimerFeedbackItemId(newColumns),
         };
       });
     }
@@ -551,6 +657,9 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             this.props.onVoteCasted();
           }
         },
+        activeTimerFeedbackItemId: this.state.activeTimerFeedbackItemId,
+        requestTimerStart: this.requestTimerStart,
+        notifyTimerStopped: this.handleTimerStopped,
       };
     });
 

@@ -42,6 +42,9 @@ export interface FeedbackColumnProps {
   columnNotes: string;
   onColumnNotesChange: (notes: string) => void;
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
+  activeTimerFeedbackItemId: string | null;
+  requestTimerStart: (feedbackItemId: string) => Promise<boolean>;
+  notifyTimerStopped: (feedbackItemId: string) => void;
 
   addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
   removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
@@ -426,6 +429,9 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
       isShowingGroupedChildrenTitles: false,
       isFocusModalHidden: true,
+      activeTimerFeedbackItemId: columnProps.activeTimerFeedbackItemId,
+      requestTimerStart: columnProps.requestTimerStart,
+      notifyTimerStopped: columnProps.notifyTimerStopped,
     };
   };
 

@@ -61,6 +61,9 @@ export interface IFeedbackItemProps {
   isShowingGroupedChildrenTitles: boolean;
   isFocusModalHidden: boolean;
   onVoteCasted: () => void;
+  activeTimerFeedbackItemId: string | null;
+  requestTimerStart: (feedbackItemId: string) => Promise<boolean>;
+  notifyTimerStopped: (feedbackItemId: string) => void;
 
   addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
 
@@ -533,6 +536,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     let updatedFeedbackItem;
     const boardId: string = this.props.boardId;
 
+    if (!this.props.timerState) {
+      const canStartTimer = await this.props.requestTimerStart(feedbackItemId);
+      if (!canStartTimer) {
+        return;
+      }
+    }
+
     // function to handle timer count update
     const incTimer = async () => {
       if (this.props.timerState === true) {
@@ -567,6 +577,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       if (updatedFeedbackItem) {
         this.props.refreshFeedbackItems([updatedFeedbackItem], true);
       }
+      this.props.notifyTimerStopped(feedbackItemId);
     }
   };
 
@@ -1092,6 +1103,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 isShowingGroupedChildrenTitles: false,
                 isFocusModalHidden: true,
                 onVoteCasted: this.props.onVoteCasted,
+                activeTimerFeedbackItemId: this.props.activeTimerFeedbackItemId,
+                requestTimerStart: this.props.requestTimerStart,
+                notifyTimerStopped: this.props.notifyTimerStopped,
                 addFeedbackItems: this.props.addFeedbackItems,
                 removeFeedbackItemFromColumn: this.props.removeFeedbackItemFromColumn,
                 refreshFeedbackItems: this.props.refreshFeedbackItems,
