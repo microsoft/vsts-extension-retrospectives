@@ -1874,7 +1874,9 @@ kbd {
   @apply border-l-[3px];
 }
 
-.feedbackItem .mainItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span {
+.feedbackItem .mainItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span,
+.feedback-item-group .mainItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span {
   @apply text-[var(--text-secondary-color)];
 }
 
