@@ -1721,8 +1721,7 @@ kbd {
 }
 
 .team-assessment-score-button-selected .team-assessment-score-circle {
-  background-color: var(--nav-header-active-item-background);
-  border-color: var(--nav-header-active-item-background);
+  background-color: var(--color-primary);
 }
 
 .team-effectiveness-measurement-table thead {
