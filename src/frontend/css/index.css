@@ -22,7 +22,9 @@
 
 @layer components {
   .retro-dialog-shell {
-    @apply max-w-none w-3/5 min-w-[500px];
+    max-width: none !important;
+    min-width: 500px !important;
+    width: 60% !important;
     background-color: var(--background-color) !important;
   }
 
