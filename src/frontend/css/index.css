@@ -22,7 +22,8 @@
 
 @layer components {
   .retro-dialog-shell {
-    @apply max-w-none w-3/5 min-w-[500px] bg-[var(--background-color)];
+    @apply max-w-none w-3/5 min-w-[500px];
+    background-color: var(--background-color) !important;
   }
 
   .feedback-card-surface {
