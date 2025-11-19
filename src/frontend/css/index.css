@@ -1692,6 +1692,39 @@ kbd {
   @apply w-full border-separate [border-spacing:0_0.5em];
 }
 
+.team-assessment-score-button {
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  padding: calc(var(--spacing) * 0.5);
+}
+
+.team-assessment-score-button:focus-visible {
+  outline: 2px solid var(--nav-header-active-item-background);
+  outline-offset: 2px;
+}
+
+.team-assessment-score-circle {
+  border: 2px solid var(--nav-header-active-item-background);
+  border-radius: 9999px;
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.team-assessment-score-button:hover .team-assessment-score-circle {
+  border-color: var(--color-primary);
+}
+
+.team-assessment-score-button-selected .team-assessment-score-circle {
+  background-color: var(--nav-header-active-item-background);
+  border-color: var(--nav-header-active-item-background);
+}
+
 .team-effectiveness-measurement-table thead {
   @apply text-center;
 }
@@ -1786,8 +1819,8 @@ kbd {
   @apply py-2.5 pr-0 pb-2.5 pl-2.5;
 }
 
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectivemess-measurement-voting-button {
-  color: var(--color-primary) !important;
+.team-effectiveness-measurement-table tbody .effectiveness-measurement-row .team-assessment-score-button {
+  color: var(--color-primary);
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {

@@ -42,7 +42,7 @@ interface IActionItemsTableProps {
   onActionItemClick: (id: number) => void;
 }
 
-class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryState> {
+export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSummaryState> {
   constructor(props: IBoardSummaryProps) {
     super(props);
 

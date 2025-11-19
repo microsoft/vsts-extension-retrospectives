@@ -22,6 +22,8 @@ export interface EffectivenessMeasurementRowState {
 }
 
 export default class EffectivenessMeasurementRow extends React.Component<EffectivenessMeasurementRowProps, EffectivenessMeasurementRowState> {
+  private readonly votingScale = Array.from({ length: 10 }, (_, index) => index + 1);
+
   constructor(props: EffectivenessMeasurementRowProps) {
     super(props);
     const currentUserId = encrypt(getUserIdentity().id);
@@ -36,6 +38,23 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
   updateSelected = (selected: number) => {
     this.setState({ selected });
     this.props.onSelectedChange(selected);
+  };
+
+  private readonly renderVotingButton = (value: number) => {
+    const isSelected = this.state.selected === value;
+    return (
+      <td key={value}>
+        <button
+          type="button"
+          className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`}
+          aria-label={`${value}`}
+          aria-pressed={isSelected}
+          onClick={() => this.updateSelected(value)}
+        >
+          <span className="team-assessment-score-circle" />
+        </button>
+      </td>
+    );
   };
 
   public render() {
@@ -53,36 +72,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
             <DefaultButton className="contextual-menu-button" iconProps={{ iconName: "Error" }} />
           </TooltipHost>
         </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="1" onClick={() => this.updateSelected(1)} iconProps={{ iconName: this.state.selected === 1 ? "CircleFill" : "CircleRing" }} />
-        </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="2" onClick={() => this.updateSelected(2)} iconProps={{ iconName: this.state.selected === 2 ? "CircleFill" : "CircleRing" }} />
-        </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="3" onClick={() => this.updateSelected(3)} iconProps={{ iconName: this.state.selected === 3 ? "CircleFill" : "CircleRing" }} />
-        </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="4" onClick={() => this.updateSelected(4)} iconProps={{ iconName: this.state.selected === 4 ? "CircleFill" : "CircleRing" }} />
-        </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="5" onClick={() => this.updateSelected(5)} iconProps={{ iconName: this.state.selected === 5 ? "CircleFill" : "CircleRing" }} />
-        </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="6" onClick={() => this.updateSelected(6)} iconProps={{ iconName: this.state.selected === 6 ? "CircleFill" : "CircleRing" }} />
-        </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="7" onClick={() => this.updateSelected(7)} iconProps={{ iconName: this.state.selected === 7 ? "CircleFill" : "CircleRing" }} />
-        </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="8" onClick={() => this.updateSelected(8)} iconProps={{ iconName: this.state.selected === 8 ? "CircleFill" : "CircleRing" }} />
-        </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="9" onClick={() => this.updateSelected(9)} iconProps={{ iconName: this.state.selected === 9 ? "CircleFill" : "CircleRing" }} />
-        </td>
-        <td>
-          <DefaultButton className="contextual-menu-button effectivemess-measurement-voting-button" aria-label="10" onClick={() => this.updateSelected(10)} iconProps={{ iconName: this.state.selected === 10 ? "CircleFill" : "CircleRing" }} />
-        </td>
+        {this.votingScale.map(this.renderVotingButton)}
       </tr>
     );
   }

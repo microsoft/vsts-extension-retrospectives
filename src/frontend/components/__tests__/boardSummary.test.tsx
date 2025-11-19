@@ -2,8 +2,7 @@ import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import { getService } from "azure-devops-extension-sdk";
 import { mockWorkItem, mockWorkItemType } from "../__mocks__/mocked_components/mockedWorkItemTracking";
-import BoardSummary from "../boardSummary";
-import { IBoardSummaryProps } from "../boardSummary";
+import BoardSummary, { BoardSummary as BoardSummaryComponent, IBoardSummaryProps } from "../boardSummary";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
@@ -90,6 +89,19 @@ const mockedPropsWithActionItems: IBoardSummaryProps = {
   feedbackItemsCount: 5,
   supportedWorkItemTypes: [mockBugWorkItemType, mockTaskWorkItemType],
 };
+
+const createActionItem = (overrides: Partial<Record<string, unknown>> = {}) => ({
+  icon: { name: "Bug", class: "bug-icon", url: "bug.svg" },
+  title: "Default Title",
+  state: "New",
+  type: "Bug",
+  changedDate: "2023-01-01T00:00:00Z",
+  assignedTo: "user@example.com",
+  priority: "1",
+  id: 0,
+  onActionItemClick: jest.fn(),
+  ...overrides,
+});
 
 describe("Board Summary", () => {
   beforeEach(() => {
@@ -548,5 +560,42 @@ describe("Board Summary", () => {
         { timeout: 1000 },
       );
     }
+  });
+
+  describe("sortActionItemsByColumn", () => {
+    const createBoardSummaryInstance = () => new BoardSummaryComponent(mockedPropsWithActionItems);
+
+    it("sorts ascending values", () => {
+      const instance = createBoardSummaryInstance();
+      const items = [
+        createActionItem({ id: 2, title: "Zulu" }),
+        createActionItem({ id: 1, title: "Alpha" }),
+      ];
+
+      const sorted = (instance as any).sortActionItemsByColumn(items.slice(), "title");
+      expect(sorted.map((item: any) => item.id)).toEqual([1, 2]);
+    });
+
+    it("sorts descending values", () => {
+      const instance = createBoardSummaryInstance();
+      const items = [
+        createActionItem({ id: 1, state: "Active" }),
+        createActionItem({ id: 2, state: "Resolved" }),
+      ];
+
+      const sorted = (instance as any).sortActionItemsByColumn(items.slice(), "state", true);
+      expect(sorted.map((item: any) => item.id)).toEqual([2, 1]);
+    });
+
+    it("returns stable ordering when values are equal", () => {
+      const instance = createBoardSummaryInstance();
+      const items = [
+        createActionItem({ id: 1, priority: "2" }),
+        createActionItem({ id: 2, priority: "2" }),
+      ];
+
+      const sorted = (instance as any).sortActionItemsByColumn(items.slice(), "priority");
+      expect(sorted.map((item: any) => item.id)).toEqual([1, 2]);
+    });
   });
 });
