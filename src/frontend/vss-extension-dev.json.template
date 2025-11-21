@@ -74,7 +74,7 @@
       "addressable": true
     },
     {
-      "path": "css/bundle.css",
+      "path": "src/bundle.css",
       "addressable": true
     },
     {
