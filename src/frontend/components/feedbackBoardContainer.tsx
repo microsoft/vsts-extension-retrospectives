@@ -181,7 +181,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       activeTab: "Board",
       boardTimerSeconds: 0,
       isBoardTimerRunning: false,
-      countdownDurationMinutes: 5,
+      countdownDurationMinutes: 0,
       teamAssessmentHistoryData: [],
     };
   }
@@ -380,6 +380,53 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  private readonly renderWorkflowTimerControls = () => {
+    if (!this.state.currentBoard) {
+      return null;
+    }
+
+    return (
+      <div className="workflow-stage-timer" role="status" aria-live="polite">
+        <button
+          type="button"
+          className="workflow-stage-timer-toggle"
+          title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"}
+          aria-pressed={this.state.isBoardTimerRunning}
+          aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.getCurrentBoardPhase() === WorkflowPhase.Act ? "elapsed" : "remaining"}.`}
+          onClick={this.handleBoardTimerToggle}
+        >
+          <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
+        </button>
+        {this.getCurrentBoardPhase() !== WorkflowPhase.Act && !this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
+          <select
+            value={this.state.countdownDurationMinutes}
+            onChange={this.handleCountdownDurationChange}
+            className="workflow-stage-timer-select"
+            aria-label="Select countdown duration in minutes"
+          >
+            {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
+              <option key={num} value={num}>
+                {num} min
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
+        )}
+        <button
+          type="button"
+          className="workflow-stage-timer-reset"
+          title="Reset timer"
+          aria-label="Reset timer"
+          disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning}
+          onClick={this.handleBoardTimerReset}
+        >
+          <i className="fa fa-undo" />
+        </button>
+      </div>
+    );
   };
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
@@ -1584,7 +1631,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           </h1>
           <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="users" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
           <div className="flex-grow-spacer"></div>
-          <ExtensionSettingsMenu />
+          <div className="header-menu-with-timer">
+            {this.renderWorkflowTimerControls()}
+            <ExtensionSettingsMenu />
+          </div>
         </div>
         <div className="flex items-center justify-start flex-shrink-0">
           <div className="w-full">
@@ -1746,25 +1796,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
                         <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
                         <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
-                      </div>
-                      <div className="workflow-stage-timer" role="status" aria-live="polite">
-                        <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.getCurrentBoardPhase() === WorkflowPhase.Act ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
-                          <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
-                        </button>
-                        {this.getCurrentBoardPhase() !== WorkflowPhase.Act && !this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
-                          <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
-                            {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
-                              <option key={num} value={num}>
-                                {num} min
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <span>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
-                        )}
-                        <button type="button" className="workflow-stage-timer-reset" title="Reset timer" aria-label="Reset timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
-                          <i className="fa fa-undo" />
-                        </button>
                       </div>
                       {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
                         <div className="feedback-maxvotes-per-user" role="status" aria-live="polite">
