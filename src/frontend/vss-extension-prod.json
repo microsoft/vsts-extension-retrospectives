@@ -60,10 +60,6 @@
       "addressable": true
     },
     {
-      "path": "src/bundle.css",
-      "addressable": true
-    },
-    {
       "path": "dist/reflect-bundle.js",
       "addressable": true
     },
