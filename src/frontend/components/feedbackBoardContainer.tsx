@@ -306,6 +306,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const isTimerMode = this.state.countdownDurationMinutes === 0;
 
     if (this.state.boardTimerSeconds === 0 && !isTimerMode) {
+      this.playStartChime();
       this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60 }, () => {
         this.boardTimerIntervalId = window.setInterval(() => {
           this.setState(previousState => {
@@ -320,6 +321,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         }, 1000);
       });
     } else {
+      this.playStartChime();
       this.boardTimerIntervalId = window.setInterval(() => {
         this.setState(previousState => {
           const isTimerMode = this.state.countdownDurationMinutes === 0;
@@ -400,6 +402,32 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const now = audioContext.currentTime;
 
     const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5 (C major chord)
+
+    frequencies.forEach((freq, index) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.value = freq;
+
+      const delay = index * 0.05;
+      gainNode.gain.setValueAtTime(0, now + delay);
+      gainNode.gain.linearRampToValueAtTime(0.3, now + delay + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.3);
+
+      oscillator.start(now + delay);
+      oscillator.stop(now + delay + 0.3);
+    });
+  };
+
+  private readonly playStartChime = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const now = audioContext.currentTime;
+
+    const frequencies = [783.99, 659.25, 523.25]; // G5, E5, C5 (descending)
 
     frequencies.forEach((freq, index) => {
       const oscillator = audioContext.createOscillator();
@@ -1632,7 +1660,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return (
       <div className="flex flex-col h-screen">
-        <div className="flex items-center flex-shrink-0 mt-2 ml-4">
+        <div className="flex items-center flex-shrink-0 ml-4">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
             onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
