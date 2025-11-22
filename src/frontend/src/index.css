@@ -725,7 +725,7 @@ kbd {
 }
 
 .board-summary-table-container {
-  @apply min-w-[1000px] overflow-auto h-[calc(100vh-104px)];
+  @apply min-w-[1000px] overflow-auto h-[calc(100vh-92px)];
 }
 
 .board-summary-table-container th,
