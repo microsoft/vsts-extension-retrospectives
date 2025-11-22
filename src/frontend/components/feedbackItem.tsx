@@ -856,11 +856,49 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   // Controls the top-level feedback item in a group not in focus mode
                   mainGroupedItemNotInFocusMode && this.renderGroupButton(groupItemsCount, false)
                 }
-                {
-                  showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, true) // render voting button
-                }
-                {
-                  showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, false) // render unvoting button
+                { showVotes && (
+                  <>
+                    <button
+                      title="Vote"
+                      aria-live="polite"
+                      aria-label={`Vote up. Current vote count is ${this.props.upvotes}`}
+                      tabIndex={0}
+                      disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+                      className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
+                      onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.setState({ showVotedAnimation: true });
+                        this.onVote(this.props.id, false).then(() => this.props.onVoteCasted());
+                      }}
+                      onAnimationEnd={() => {
+                        this.setState({ showVotedAnimation: false });
+                      }}
+                    >
+                      <i className="fas fa-arrow-circle-up" />
+                    </button>
+                    <span className="feedback-upvote-count">{totalVotes.toString()}</span>
+                    <button
+                      title="Unvote"
+                      aria-live="polite"
+                      aria-label={`Vote down. Current vote count is ${this.props.upvotes}`}
+                      tabIndex={0}
+                      disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+                      className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
+                      onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.setState({ showVotedAnimation: true });
+                        this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
+                      }}
+                      onAnimationEnd={() => {
+                        this.setState({ showVotedAnimation: false });
+                      }}
+                    >
+                      <i className="fas fa-arrow-circle-down" />
+                    </button>
+                  </>
+                  )
                 }
                 {!this.props.newlyCreated && (
                   <div className="item-actions-menu">
