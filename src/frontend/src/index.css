@@ -1919,6 +1919,10 @@ kbd {
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button {
   @apply h-[25px] min-w-[25px] max-w-[100px] z-[1] py-0 px-0.5 items-center my-0 mx-0.5 bg-inherit border-none flex justify-center;
+
+  & i {
+    color:red;
+  }
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button i {
@@ -1968,7 +1972,7 @@ kbd {
 .feedbackItemGroupItem .mainItemCard .card-integral-part .card-header .feedback-vote-count,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-vote-count,
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-vote-count {
-  @apply text-[var(--text-secondary-color)] leading-5 ml-[5px];
+  @apply text-[var(--text-secondary-color)] flex items-center;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .item-actions-menu {
