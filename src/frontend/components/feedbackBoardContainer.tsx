@@ -398,7 +398,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly playStopChime = () => {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     const now = audioContext.currentTime;
 
     const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5 (C major chord)
@@ -424,7 +424,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly playStartChime = () => {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     const now = audioContext.currentTime;
 
     const frequencies = [783.99, 659.25, 523.25]; // G5, E5, C5 (descending)
