@@ -1965,12 +1965,8 @@ kbd {
   color: var(--color-primary) !important;
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote .feedback-upvote-count {
+.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote .feedback-vote-count {
   @apply text-[var(--text-secondary-color)] leading-5 ml-[5px];
-}
-
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote .feedback-upvote-count.bold {
-  @apply font-semibold;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .item-actions-menu {

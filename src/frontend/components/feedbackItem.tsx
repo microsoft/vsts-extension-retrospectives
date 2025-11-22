@@ -722,35 +722,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
-  private renderVoteActionButton(isMainItem: boolean, isBoldItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
-    const buttonTitle = isUpvote ? "Vote" : "Unvote";
-    const buttonAriaLabel = isUpvote ? `Vote up. Current vote count is ${this.props.upvotes}` : `Vote down. Current vote count is ${this.props.upvotes}`;
-    const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
-
-    return (
-      <button
-        title={buttonTitle}
-        aria-live="polite"
-        aria-label={buttonAriaLabel}
-        tabIndex={0}
-        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-        className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
-        onClick={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.setState({ showVotedAnimation: true });
-          this.onVote(this.props.id, !isUpvote).then(() => this.props.onVoteCasted());
-        }}
-        onAnimationEnd={() => {
-          this.setState({ showVotedAnimation: false });
-        }}
-      >
-        <i className={buttonIconClass} />
-        {isUpvote && <span className={isMainItem && isBoldItem ? "feedback-upvote-count bold" : "feedback-upvote-count"}> {totalVotes.toString()}</span>}
-      </button>
-    );
-  }
-
   public render(): React.JSX.Element {
     const workflowState = {
       isCollectPhase: this.props.workflowPhase === WorkflowPhase.Collect,
@@ -877,7 +848,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     >
                       <i className="fas fa-arrow-circle-up" />
                     </button>
-                    <span className="feedback-upvote-count">{totalVotes.toString()}</span>
+                    <span className="feedback-vote-count">{totalVotes.toString()}</span>
                     <button
                       title="Unvote"
                       aria-live="polite"
