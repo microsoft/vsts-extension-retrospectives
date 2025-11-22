@@ -1965,6 +1965,8 @@ kbd {
   color: var(--color-primary) !important;
 }
 
+.feedbackItemGroupItem .mainItemCard .card-integral-part .card-header .feedback-add-vote .feedback-vote-count,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-add-vote .feedback-vote-count,
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote .feedback-vote-count {
   @apply text-[var(--text-secondary-color)] leading-5 ml-[5px];
 }
