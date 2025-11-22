@@ -312,6 +312,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             const newSeconds = previousState.boardTimerSeconds - 1;
             if (newSeconds <= 0) {
               this.pauseBoardTimer();
+              this.playChime();
               return { boardTimerSeconds: 0 };
             }
             return { boardTimerSeconds: newSeconds };
@@ -329,6 +330,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             const newSeconds = previousState.boardTimerSeconds - 1;
             if (newSeconds <= 0) {
               this.pauseBoardTimer();
+              this.playChime();
               return { boardTimerSeconds: 0 };
             }
             return { boardTimerSeconds: newSeconds };
@@ -391,6 +393,32 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  private readonly playChime = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const now = audioContext.currentTime;
+
+    const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5 (C major chord)
+
+    frequencies.forEach((freq, index) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.value = freq;
+
+      const delay = index * 0.05;
+      gainNode.gain.setValueAtTime(0, now + delay);
+      gainNode.gain.linearRampToValueAtTime(0.3, now + delay + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.3);
+
+      oscillator.start(now + delay);
+      oscillator.stop(now + delay + 0.3);
+    });
   };
 
   private readonly renderWorkflowTimerControls = () => {

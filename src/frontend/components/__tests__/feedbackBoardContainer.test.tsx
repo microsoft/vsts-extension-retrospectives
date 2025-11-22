@@ -30,6 +30,49 @@ jest.mock("../../utilities/userIdentityHelper", () => ({
   encrypt: () => "encrypted-data",
 }));
 
+// Mock Web Audio API globally
+const mockOscillator = {
+  connect: jest.fn(),
+  start: jest.fn(),
+  stop: jest.fn(),
+  type: 'sine' as OscillatorType,
+  frequency: { value: 0 },
+};
+
+const mockGainNode = {
+  connect: jest.fn(),
+  gain: {
+    setValueAtTime: jest.fn(),
+    linearRampToValueAtTime: jest.fn(),
+    exponentialRampToValueAtTime: jest.fn(),
+  },
+};
+
+const createMockOscillator = jest.fn(() => mockOscillator);
+const createMockGain = jest.fn(() => mockGainNode);
+
+const mockAudioContext = {
+  createOscillator: createMockOscillator,
+  createGain: createMockGain,
+  currentTime: 0,
+  destination: {},
+};
+
+(global as any).AudioContext = jest.fn(() => ({
+  createOscillator: createMockOscillator,
+  createGain: createMockGain,
+  currentTime: 0,
+  destination: {},
+}));
+(global as any).webkitAudioContext = jest.fn(() => ({
+  createOscillator: createMockOscillator,
+  createGain: createMockGain,
+  currentTime: 0,
+  destination: {},
+}));
+(window as any).AudioContext = (global as any).AudioContext;
+(window as any).webkitAudioContext = (global as any).webkitAudioContext;
+
 jest.mock("../../utilities/telemetryClient", () => ({
   appInsights: {
     trackEvent: jest.fn(),
@@ -947,6 +990,9 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
     
+    // Spy on playChime method to prevent AudioContext errors
+    const playChimeSpy = jest.spyOn(instance as any, 'playChime').mockImplementation(() => {});
+    
     act(() => {
       instance.setState({
         countdownDurationMinutes: 3, // 3 minute countdown
@@ -988,6 +1034,10 @@ describe("Facilitation timer", () => {
     expect(instance.state.boardTimerSeconds).toBe(0);
     expect(instance.state.isBoardTimerRunning).toBe(false);
 
+    // Verify chime was played
+    expect(playChimeSpy).toHaveBeenCalledTimes(1);
+
+    playChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1048,6 +1098,88 @@ describe("Facilitation timer", () => {
     // Should count up in timer mode
     expect(instance.state.boardTimerSeconds).toBe(15);
 
+    jest.clearAllTimers();
+  });
+
+  it("plays chime sound when countdown reaches zero", () => {
+    jest.useFakeTimers();
+    
+    const instance = createStandaloneTimerInstance();
+    
+    // Spy on playChime method
+    const playChimeSpy = jest.spyOn(instance as any, 'playChime').mockImplementation(() => {});
+    
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 1, // 1 minute countdown
+        boardTimerSeconds: 0, // Start at 0 (will initialize to 60)
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(60); // Should initialize to 60 seconds
+
+    // Advance to 1 second remaining
+    act(() => {
+      jest.advanceTimersByTime(59000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(1);
+    expect(playChimeSpy).not.toHaveBeenCalled();
+
+    // Advance one more second to trigger countdown completion and chime
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    // Should have stopped at 0 and played chime
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+    
+    // Verify chime was played
+    expect(playChimeSpy).toHaveBeenCalledTimes(1);
+
+    playChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("does not play chime when timer mode reaches arbitrary value", () => {
+    jest.useFakeTimers();
+    
+    const instance = createStandaloneTimerInstance();
+    
+    // Spy on playChime method
+    const playChimeSpy = jest.spyOn(instance as any, 'playChime').mockImplementation(() => {});
+    
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 0, // Timer mode
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    // Advance 60 seconds in timer mode
+    act(() => {
+      jest.advanceTimersByTime(60000);
+    });
+
+    // Timer should count up and NOT play chime
+    expect(instance.state.boardTimerSeconds).toBe(60);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    expect(playChimeSpy).not.toHaveBeenCalled();
+
+    playChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 });
