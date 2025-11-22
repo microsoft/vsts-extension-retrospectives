@@ -903,6 +903,153 @@ describe("Facilitation timer", () => {
       componentDidUpdateSpy.mockRestore();
     }
   });
+
+  it("timer mode (0 minutes) counts up from zero", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+    
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 0, // Timer mode
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    expect(instance.state.boardTimerSeconds).toBe(0);
+
+    // Advance 5 seconds
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    // Timer should count UP in timer mode
+    expect(instance.state.boardTimerSeconds).toBe(5);
+
+    // Advance 10 more seconds
+    act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(15);
+    expect(instance.state.isBoardTimerRunning).toBe(true); // Should keep running
+
+    jest.clearAllTimers();
+  });
+
+  it("countdown mode (non-zero minutes) counts down to zero", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+    
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 3, // 3 minute countdown
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    expect(instance.state.boardTimerSeconds).toBe(180); // 3 * 60
+
+    // Advance 30 seconds
+    act(() => {
+      jest.advanceTimersByTime(30000);
+    });
+
+    // Countdown should count DOWN
+    expect(instance.state.boardTimerSeconds).toBe(150); // 180 - 30
+
+    // Advance to near end (145 more seconds to reach 5 seconds remaining)
+    act(() => {
+      jest.advanceTimersByTime(145000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(5);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+
+    // Advance past zero
+    act(() => {
+      jest.advanceTimersByTime(6000);
+    });
+
+    // Should stop at 0 and auto-pause
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+
+    jest.clearAllTimers();
+  });
+
+  it("switching between timer and countdown modes works correctly", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+    
+    // Start with countdown mode (5 minutes)
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 5,
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start countdown
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(300); // 5 * 60
+
+    // Advance 10 seconds
+    act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(290); // Counting down
+
+    // Pause the timer
+    act(() => {
+      (instance as any).pauseBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+
+    // Switch to timer mode (0 minutes)
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 0,
+        boardTimerSeconds: 0,
+      });
+    });
+
+    // Start timer mode
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(0);
+
+    // Advance 15 seconds
+    act(() => {
+      jest.advanceTimersByTime(15000);
+    });
+
+    // Should count up in timer mode
+    expect(instance.state.boardTimerSeconds).toBe(15);
+
+    jest.clearAllTimers();
+  });
 });
 
 describe("componentDidUpdate", () => {

@@ -303,7 +303,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       return;
     }
 
-    if (this.state.boardTimerSeconds === 0) {
+    const isTimerMode = this.state.countdownDurationMinutes === 0;
+
+    if (this.state.boardTimerSeconds === 0 && !isTimerMode) {
       this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60 }, () => {
         this.boardTimerIntervalId = window.setInterval(() => {
           this.setState(previousState => {
@@ -319,12 +321,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     } else {
       this.boardTimerIntervalId = window.setInterval(() => {
         this.setState(previousState => {
-          const newSeconds = previousState.boardTimerSeconds - 1;
-          if (newSeconds <= 0) {
-            this.pauseBoardTimer();
-            return { boardTimerSeconds: 0 };
+          const isTimerMode = this.state.countdownDurationMinutes === 0;
+          
+          if (isTimerMode) {
+            return { boardTimerSeconds: previousState.boardTimerSeconds + 1 };
+          } else {
+            const newSeconds = previousState.boardTimerSeconds - 1;
+            if (newSeconds <= 0) {
+              this.pauseBoardTimer();
+              return { boardTimerSeconds: 0 };
+            }
+            return { boardTimerSeconds: newSeconds };
           }
-          return { boardTimerSeconds: newSeconds };
         });
       }, 1000);
     }
@@ -397,7 +405,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           className="workflow-stage-timer-toggle"
           title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"}
           aria-pressed={this.state.isBoardTimerRunning}
-          aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} remaining.`}
+          aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`}
           onClick={this.handleBoardTimerToggle}
         >
           <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
@@ -409,6 +417,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             className="workflow-stage-timer-select"
             aria-label="Select countdown duration in minutes"
           >
+            <option value={0}>Timer</option>
             {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
               <option key={num} value={num}>
                 {num} min
