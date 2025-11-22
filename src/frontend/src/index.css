@@ -104,14 +104,6 @@ button:focus:not(.ms-Button) {
   @apply max-w-[400px] min-h-[30px];
 }
 
-.extension-settings-menu .ms-Button-label {
-  @apply text-xs;
-}
-
-.header-menu-with-timer {
-  @apply flex items-center gap-3;
-}
-
 .ms-Button--primary {
   @apply bg-white text-blue-600 border border-blue-600;
 }
@@ -160,6 +152,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply opacity-20;
 }
 
+.header-menu-with-timer {
+  @apply flex items-center gap-3;
+}
+
+.extension-settings-menu .ms-Button-label {
+  @apply text-xs;
+}
+
 .carousel-container {
   @apply relative w-full flex flex-col items-center gap-4;
 }
@@ -193,26 +193,26 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .contextual-menu-button {
   @apply h-[30px] min-w-[40px] bg-inherit px-1 py-0 border-0 text-[rgba(var(--palette-neutral-80),1)];
-}
 
-.contextual-menu-button i[data-icon-name="ChevronDown"] {
-  @apply hidden;
-}
+  & i[data-icon-name="ChevronDown"] {
+    @apply hidden;
+  }
 
-.contextual-menu-button:hover {
-  @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-[var(--text-primary-color)];
+  &:hover {
+    @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-[var(--text-primary-color)];
+  }
 }
 
 .extended-options-menu {
   @apply bg-[var(--callout-background-color)] max-h-none;
-}
 
-.extended-options-menu button.ms-ContextualMenu-link {
-  @apply text-[var(--text-primary-color)];
-}
+  & button.ms-ContextualMenu-link {
+    @apply text-[var(--text-primary-color)];
 
-.extended-options-menu button.ms-ContextualMenu-link:hover {
-  @apply bg-[var(--border-subtle-color)] text-[var(--text-primary-color)];
+      &:hover {
+        @apply bg-[var(--border-subtle-color)] text-[var(--text-primary-color)];
+      }
+  }
 }
 
 .ms-ContextualMenu-Callout .ms-Callout-main {
@@ -233,34 +233,34 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .editable-document-card-title {
   @apply overflow-hidden break-words flex-1 flex-col justify-center min-h-[100px] text-[var(--text-primary-color)];
-}
 
-.editable-document-card-title .editable-text {
-  @apply inline-block max-w-full align-middle whitespace-pre-wrap break-words cursor-text text-base;
-}
+  & .editable-text {
+    @apply inline-block max-w-full align-middle whitespace-pre-wrap break-words cursor-text text-base;
+  }
 
-.editable-document-card-title .editable-text-input-container {
-  @apply inline-block min-w-[75%] w-full resize-none align-middle pt-5;
-}
+  & .editable-text-input-container {
+    @apply inline-block min-w-[75%] w-full resize-none align-middle pt-5;
 
-.editable-document-card-title .editable-text-input-container .editable-text-input.error-border {
-  @apply border border-red-600 -m-px;
-}
+      & .editable-text-input.error-border {
+        @apply border border-red-600 -m-px;
+      }
 
-.editable-document-card-title .editable-text-input-container .ms-TextField-wrapper .ms-TextField-fieldGroup .editable-text-input {
-  @apply text-base leading-[21px];
-}
+      & .ms-TextField-wrapper .ms-TextField-fieldGroup .editable-text-input {
+        @apply text-base leading-[21px];
+      }
+  }
 
-.editable-document-card-title .edit-symbol {
-  @apply text-gray-500 inline-block align-middle pl-2.5;
-}
+  & .edit-symbol {
+    @apply text-gray-500 inline-block align-middle pl-2.5;
+  }
 
-.editable-document-card-title .input-validation-message {
-  @apply float-left text-[rgb(204,41,61)] text-[15px];
-}
+  & .input-validation-message {
+    @apply float-left text-[rgb(204,41,61)] text-[15px];
+  }
 
-.editable-document-card-title .save-symbol {
-  @apply text-gray-500 inline-block align-middle pl-2.5;
+  & .save-symbol {
+    @apply text-gray-500 inline-block align-middle pl-2.5;
+  }
 }
 
 .ms-FocusZone .ms-Pivot-link {
@@ -273,43 +273,43 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-board {
   @apply w-full table table-fixed;
-}
 
-.feedback-board .feedback-columns-container {
-  @apply table-row bg-[rgba(var(--palette-neutral-2,248,248,248),1)];
-}
+  & .feedback-columns-container {
+    @apply table-row bg-[rgba(var(--palette-neutral-2,248,248,248),1)];
 
-.feedback-board .feedback-columns-container:focus {
-  @apply outline-none;
-}
+      &:focus {
+        @apply outline-none;
+      }
+  }
 
-.feedback-board .feedback-maxvotes-per-user {
-  @apply text-base my-2 mx-4 flex flex-wrap items-center gap-4;
-}
+  & .feedback-maxvotes-per-user {
+    @apply text-base my-2 mx-4 flex flex-wrap items-center gap-4;
 
-.feedback-board .feedback-maxvotes-per-user .feedback-maxvotes-entry {
-  @apply flex items-center gap-2 text-sm text-[var(--text-secondary-color)];
-}
+      & .feedback-maxvotes-entry {
+        @apply flex items-center gap-2 text-sm text-[var(--text-secondary-color)];
 
-.feedback-board .feedback-maxvotes-per-user .feedback-maxvotes-entry strong {
-  @apply text-[var(--text-primary-color)];
-}
+              & strong {
+                @apply text-[var(--text-primary-color)];
+              }
+      }
 
-.feedback-board .feedback-maxvotes-per-user .feedback-maxvotes-separator {
-  @apply flex items-center text-base text-[var(--text-secondary-color)];
+      & .feedback-maxvotes-separator {
+        @apply flex items-center text-base text-[var(--text-secondary-color)];
+      }
+  }
 }
 
 .keyboard-shortcuts-dialog {
   @apply bg-[var(--background-color)];
-}
 
-.keyboard-shortcuts-dialog .ms-Dialog-title,
-.keyboard-shortcuts-dialog .ms-Dialog-subText {
-  @apply text-[var(--text-primary-color)];
-}
+  & .ms-Dialog-title,
+  & .ms-Dialog-subText {
+    @apply text-[var(--text-primary-color)];
+  }
 
-.keyboard-shortcuts-dialog table tr:hover {
-  @apply bg-[var(--border-subtle-color)];
+  & table tr:hover {
+    @apply bg-[var(--border-subtle-color)];
+  }
 }
 
 .keyboard-shortcuts-content {
@@ -322,18 +322,18 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .keyboard-shortcuts-table {
   @apply w-full border-collapse;
-}
 
-.keyboard-shortcuts-table tbody tr {
-  @apply border-b border-[var(--border-subtle-color)];
-}
+  & tbody tr {
+    @apply border-b border-[var(--border-subtle-color)];
 
-.keyboard-shortcuts-table tbody tr td:first-child {
-  @apply py-2 px-3 text-left align-middle w-[40%];
-}
+      &:first-child {
+        @apply py-2 px-3 text-left align-middle w-[40%];
+      }
 
-.keyboard-shortcuts-table tbody tr td:last-child {
-  @apply py-2 px-3 text-[var(--text-primary-color)] align-middle;
+      &:last-child {
+        @apply py-2 px-3 text-[var(--text-primary-color)] align-middle;
+      }
+  }
 }
 
 .keyboard-shortcuts-key-separator {
@@ -1917,32 +1917,30 @@ kbd {
   @apply h-[34px] inline-flex w-full justify-end items-center mb-2.5;
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button {
+.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button,
+.feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-action-button,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-action-button {
   @apply h-[25px] min-w-[25px] max-w-[100px] z-[1] py-0 px-0.5 items-center my-0 mx-0.5 bg-inherit border-none flex justify-center;
 
-  & i {
-    color:red;
+  &:focus {
+    @apply border-none;
   }
-}
 
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button i {
-  @apply leading-5 text-[var(--text-secondary-color)] text-sm;
-}
+  &:focus-visible {
+    @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
+  }
 
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button:focus {
-  @apply border-none;
+  &:disabled {
+    @apply opacity-50 cursor-default;
+  }
+
+  & i {
+    @apply leading-5 text-[var(--text-secondary-color)] text-sm;
+  }
 }
 
 .focus-outline-primary {
   @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
-}
-
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button:focus-visible {
-  @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
-}
-
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button:disabled {
-  @apply opacity-50 cursor-default;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus {
