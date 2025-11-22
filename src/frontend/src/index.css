@@ -1537,7 +1537,7 @@ kbd {
 }
 
 .feedback-board-container {
-  @apply flex h-[calc(100vh-100px)] overflow-y-auto overflow-x-hidden;
+  @apply flex h-[calc(100vh-88px)] overflow-y-auto overflow-x-hidden;
 }
 
 .initialization-spinner {
@@ -1699,7 +1699,7 @@ kbd {
   cursor: pointer;
   display: inline-flex;
   justify-content: center;
-  padding: calc(var(--spacing) * 0.5);
+  padding: 5px;
 }
 
 .team-assessment-score-button:focus-visible {
