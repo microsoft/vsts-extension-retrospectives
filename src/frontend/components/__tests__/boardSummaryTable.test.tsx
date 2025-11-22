@@ -404,14 +404,7 @@ describe("BoardSummaryTable, additional coverage", () => {
         ownerId: "user-1",
       };
 
-      const { container } = render(
-        <TrashIcon
-          board={recentlyArchivedBoard}
-          currentUserId="user-1"
-          currentUserIsTeamAdmin={false}
-          onClick={jest.fn()}
-        />
-      );
+      const { container } = render(<TrashIcon board={recentlyArchivedBoard} currentUserId="user-1" currentUserIsTeamAdmin={false} onClick={jest.fn()} />);
 
       expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
     });
@@ -431,14 +424,7 @@ describe("BoardSummaryTable, additional coverage", () => {
       };
 
       const onClick = jest.fn();
-      const { container } = render(
-        <TrashIcon
-          board={oldArchivedBoard}
-          currentUserId="user-1"
-          currentUserIsTeamAdmin={false}
-          onClick={onClick}
-        />
-      );
+      const { container } = render(<TrashIcon board={oldArchivedBoard} currentUserId="user-1" currentUserIsTeamAdmin={false} onClick={onClick} />);
 
       expect(container.querySelector(".trash-icon")).toBeTruthy();
     });
@@ -456,14 +442,7 @@ describe("BoardSummaryTable, additional coverage", () => {
         ownerId: "user-1",
       };
 
-      const { container } = render(
-        <TrashIcon
-          board={activeBoard}
-          currentUserId="user-1"
-          currentUserIsTeamAdmin={false}
-          onClick={jest.fn()}
-        />
-      );
+      const { container } = render(<TrashIcon board={activeBoard} currentUserId="user-1" currentUserIsTeamAdmin={false} onClick={jest.fn()} />);
 
       expect(container.querySelector(".centered-cell")).toBeTruthy();
       expect(container.querySelector(".trash-icon")).toBeFalsy();
@@ -483,14 +462,7 @@ describe("BoardSummaryTable, additional coverage", () => {
         ownerId: "other-user",
       };
 
-      const { container } = render(
-        <TrashIcon
-          board={archivedBoard}
-          currentUserId="user-1"
-          currentUserIsTeamAdmin={false}
-          onClick={jest.fn()}
-        />
-      );
+      const { container } = render(<TrashIcon board={archivedBoard} currentUserId="user-1" currentUserIsTeamAdmin={false} onClick={jest.fn()} />);
 
       expect(container.querySelector(".centered-cell")).toBeTruthy();
       expect(container.querySelector(".trash-icon")).toBeFalsy();
@@ -510,14 +482,7 @@ describe("BoardSummaryTable, additional coverage", () => {
         ownerId: "other-user",
       };
 
-      const { container } = render(
-        <TrashIcon
-          board={archivedBoard}
-          currentUserId="user-1"
-          currentUserIsTeamAdmin={true}
-          onClick={jest.fn()}
-        />
-      );
+      const { container } = render(<TrashIcon board={archivedBoard} currentUserId="user-1" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
 
       expect(container.querySelector(".trash-icon")).toBeTruthy();
     });
@@ -606,7 +571,7 @@ describe("BoardSummaryTable, additional coverage", () => {
           boardId,
           teamId,
           action: "archive",
-        })
+        }),
       );
     });
 

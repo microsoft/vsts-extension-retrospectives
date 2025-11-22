@@ -3576,8 +3576,8 @@ describe("Feedback Item", () => {
     test("handles description with special characters", () => {
       const props: any = {
         id: "test-special-chars",
-        title: "Test <>&\" Title",
-        description: "Description with <html> & special \"chars\"",
+        title: 'Test <>&" Title',
+        description: 'Description with <html> & special "chars"',
         columnId: testColumnUuidOne,
         columns: testColumns,
         columnIds: testColumnIds,

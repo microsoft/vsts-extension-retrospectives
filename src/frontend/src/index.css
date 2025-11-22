@@ -209,9 +209,9 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & button.ms-ContextualMenu-link {
     @apply text-[var(--text-primary-color)];
 
-      &:hover {
-        @apply bg-[var(--border-subtle-color)] text-[var(--text-primary-color)];
-      }
+    &:hover {
+      @apply bg-[var(--border-subtle-color)] text-[var(--text-primary-color)];
+    }
   }
 }
 
@@ -241,13 +241,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .editable-text-input-container {
     @apply inline-block min-w-[75%] w-full resize-none align-middle pt-5;
 
-      & .editable-text-input.error-border {
-        @apply border border-red-600 -m-px;
-      }
+    & .editable-text-input.error-border {
+      @apply border border-red-600 -m-px;
+    }
 
-      & .ms-TextField-wrapper .ms-TextField-fieldGroup .editable-text-input {
-        @apply text-base leading-[21px];
-      }
+    & .ms-TextField-wrapper .ms-TextField-fieldGroup .editable-text-input {
+      @apply text-base leading-[21px];
+    }
   }
 
   & .edit-symbol {
@@ -277,25 +277,25 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .feedback-columns-container {
     @apply table-row bg-[rgba(var(--palette-neutral-2,248,248,248),1)];
 
-      &:focus {
-        @apply outline-none;
-      }
+    &:focus {
+      @apply outline-none;
+    }
   }
 
   & .feedback-maxvotes-per-user {
     @apply text-base my-2 mx-4 flex flex-wrap items-center gap-4;
 
-      & .feedback-maxvotes-entry {
-        @apply flex items-center gap-2 text-sm text-[var(--text-secondary-color)];
+    & .feedback-maxvotes-entry {
+      @apply flex items-center gap-2 text-sm text-[var(--text-secondary-color)];
 
-              & strong {
-                @apply text-[var(--text-primary-color)];
-              }
+      & strong {
+        @apply text-[var(--text-primary-color)];
       }
+    }
 
-      & .feedback-maxvotes-separator {
-        @apply flex items-center text-base text-[var(--text-secondary-color)];
-      }
+    & .feedback-maxvotes-separator {
+      @apply flex items-center text-base text-[var(--text-secondary-color)];
+    }
   }
 }
 
@@ -326,13 +326,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & tbody tr {
     @apply border-b border-[var(--border-subtle-color)];
 
-      &:first-child {
-        @apply py-2 px-3 text-left align-middle w-[40%];
-      }
+    &:first-child {
+      @apply py-2 px-3 text-left align-middle w-[40%];
+    }
 
-      &:last-child {
-        @apply py-2 px-3 text-[var(--text-primary-color)] align-middle;
-      }
+    &:last-child {
+      @apply py-2 px-3 text-[var(--text-primary-color)] align-middle;
+    }
   }
 }
 
@@ -366,45 +366,45 @@ kbd {
   & .board-metadata-table {
     @apply border-t border-black/10 border-collapse overflow-auto w-full;
 
-      & :is(td, th) {
-        @apply text-[var(--text-primary-color)] p-2.5;
+    & :is(td, th) {
+      @apply text-[var(--text-primary-color)] p-2.5;
+    }
+
+    & th {
+      @apply sticky bg-[var(--background-color)] border-b border-[var(--border-subtle-color)] top-0 z-[1];
+
+      &.cell-checkbox {
+        @apply w-[30px];
+      }
+    }
+
+    & .option-row td.cell-content {
+      @apply bg-[var(--background-color)];
+
+      & .content-image {
+        @apply flex pr-2.5;
+
+        & .permission-image {
+          @apply w-11 min-w-11 max-w-11 h-11 rounded-full flex items-center justify-center text-[var(--text-primary-color)] bg-[var(--background-color)];
+        }
       }
 
-      & th {
-        @apply sticky bg-[var(--background-color)] border-b border-[var(--border-subtle-color)] top-0 z-[1];
+      & .content-text {
+        @apply text-[var(--text-primary-color)];
 
-        &.cell-checkbox {
-          @apply w-[30px];
+        & .content-sub-text {
+          @apply text-[var(--text-secondary-color)];
         }
       }
 
-      & .option-row td.cell-content {
-        @apply bg-[var(--background-color)];
+      & .content-badge {
+        @apply flex justify-center items-center ml-auto;
 
-        & .content-image {
-          @apply flex pr-2.5;
-
-          & .permission-image {
-            @apply w-11 min-w-11 max-w-11 h-11 rounded-full flex items-center justify-center text-[var(--text-primary-color)] bg-[var(--background-color)];
-          }
-        }
-
-        & .content-text {
-          @apply text-[var(--text-primary-color)];
-
-          & .content-sub-text {
-            @apply text-[var(--text-secondary-color)];
-          }
-        }
-
-        & .content-badge {
-          @apply flex justify-center items-center ml-auto;
-
-          & span {
-            @apply bg-[var(--palette-black-alpha-6)] py-0.5 px-2 rounded-[120px] text-[var(--text-primary-color)] whitespace-nowrap;
-          }
+        & span {
+          @apply bg-[var(--palette-black-alpha-6)] py-0.5 px-2 rounded-[120px] text-[var(--text-primary-color)] whitespace-nowrap;
         }
       }
+    }
   }
 }
 
@@ -490,50 +490,50 @@ kbd {
 
 .no-boards-container {
   @apply pt-[125px] w-full flex justify-center items-center flex-col text-sm text-center;
-}
 
-.no-boards-container .no-boards-text {
-  @apply mt-2.5 mb-[15px] max-w-full text-[28px];
-}
+  & .no-boards-text {
+    @apply mt-2.5 mb-[15px] max-w-full text-[28px];
+  }
 
-.no-boards-container .no-boards-sub-text {
-  @apply mb-[15px];
-}
+  & .no-boards-sub-text {
+    @apply mb-[15px];
+  }
 
-.no-boards-container .create-new-board-button {
-  @apply m-2.5;
-}
+  & .create-new-board-button {
+    @apply m-2.5;
+  }
 
-.no-boards-container img {
-  @apply h-40 mb-[15px];
+  & img {
+    @apply h-40 mb-[15px];
+  }
 }
 
 .selector-list-header {
   @apply bg-[var(--background-color)] flex h-8 w-[450px] pl-2.5;
-}
 
-.selector-list-header .selector-list-header-text {
-  @apply align-middle text-center leading-8 text-[#0071cd] font-semibold text-sm;
+  & .selector-list-header-text {
+    @apply align-middle text-center leading-8 text-[#0071cd] font-semibold text-sm;
+  }
 }
 
 .selector-list-container {
   @apply max-h-[250px] overflow-auto;
-}
 
-.selector-list-container .selector-list-item {
-  @apply bg-[var(--background-color)] h-8 w-[450px] flex cursor-pointer pl-2 text-[var(--text-primary-color)];
-}
+  & .selector-list-item {
+    @apply bg-[var(--background-color)] h-8 w-[450px] flex cursor-pointer pl-2 text-[var(--text-primary-color)];
 
-.selector-list-container .selector-list-item:hover {
-  @apply bg-[var(--border-subtle-color)] text-black;
-}
+    &:hover {
+      @apply bg-[var(--border-subtle-color)] text-black;
+    }
+  }
 
-.selector-list-container .selector-list-item-text {
-  @apply align-middle leading-8 mr-[15px] text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis;
-}
+  & .selector-list-item-text {
+    @apply align-middle leading-8 mr-[15px] text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis;
+  }
 
-.selector-list-container i {
-  @apply align-middle text-center leading-8 mr-2 text-base;
+  & i {
+    @apply align-middle text-center leading-8 mr-2 text-base;
+  }
 }
 
 .selector-button-icon {
@@ -1713,7 +1713,9 @@ kbd {
   display: inline-block;
   height: 24px;
   width: 24px;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .team-assessment-score-button:hover .team-assessment-score-circle {

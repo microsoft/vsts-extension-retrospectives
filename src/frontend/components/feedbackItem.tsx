@@ -827,7 +827,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   // Controls the top-level feedback item in a group not in focus mode
                   mainGroupedItemNotInFocusMode && this.renderGroupButton(groupItemsCount, false)
                 }
-                { showVotes && (
+                {showVotes && (
                   <>
                     <button
                       title="Vote"
@@ -869,8 +869,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       <i className="fas fa-arrow-circle-down" />
                     </button>
                   </>
-                  )
-                }
+                )}
                 {!this.props.newlyCreated && (
                   <div className="item-actions-menu">
                     <DefaultButton
