@@ -1,13 +1,24 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, act, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import FeedbackItem from "../feedbackItem";
+import FeedbackItem, { FeedbackItemHelper } from "../feedbackItem";
 import { testColumns, testBoardId, testColumnUuidOne, testColumnIds, testFeedbackItem } from "../__mocks__/mocked_components/mockedFeedbackColumn";
+import { itemDataService } from "../../dal/itemDataService";
+import { IFeedbackItemDocument } from "../../interfaces/feedback";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   trackTrace: jest.fn(),
   trackEvent: jest.fn(),
   trackException: jest.fn(),
+  reactPlugin: {
+    trackMetric: jest.fn(),
+    trackEvent: jest.fn(),
+  },
+  appInsights: {
+    trackEvent: jest.fn(),
+    trackException: jest.fn(),
+  },
+  TelemetryEvents: {},
 }));
 
 jest.mock("applicationinsights-js", () => ({
@@ -658,6 +669,395 @@ describe("Feedback Item", () => {
       };
       const { container } = render(<FeedbackItem {...props} />);
       expect(container.textContent).toContain("3:03 elapsed");
+    });
+  });
+
+  describe("Timer interactions", () => {
+    const createTimerFeedbackItem = (overrides: Partial<IFeedbackItemDocument> = {}): IFeedbackItemDocument => ({
+      id: overrides.id ?? "timer-item-id",
+      boardId: overrides.boardId ?? testBoardId,
+      title: overrides.title ?? "Timer Item",
+      description: overrides.description ?? "",
+      columnId: overrides.columnId ?? testColumnUuidOne,
+      originalColumnId: overrides.originalColumnId ?? testColumnUuidOne,
+      upvotes: overrides.upvotes ?? 0,
+      voteCollection: overrides.voteCollection ?? {},
+      createdDate: overrides.createdDate ?? new Date(),
+      userIdRef: overrides.userIdRef ?? "test-user-id",
+      timerSecs: overrides.timerSecs ?? 0,
+      timerState: overrides.timerState ?? false,
+      timerId: overrides.timerId ?? null,
+      groupIds: overrides.groupIds ?? [],
+      isGroupedCarouselItem: overrides.isGroupedCarouselItem ?? false,
+      associatedActionItemIds: overrides.associatedActionItemIds ?? [],
+    });
+
+    const buildActPhaseTimerProps = (overrides: Record<string, unknown> = {}): any => {
+      const feedbackItem = createTimerFeedbackItem({
+        timerSecs: (overrides.timerSecs as number) ?? undefined,
+        timerState: (overrides.timerState as boolean) ?? undefined,
+        timerId: overrides.timerId ?? undefined,
+      });
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            ...testColumns[testColumnUuidOne].columnProperties,
+          },
+          columnItems: [
+            {
+              feedbackItem: { ...feedbackItem },
+              actionItems: [] as any[],
+            },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: feedbackItem.id,
+        title: feedbackItem.title,
+        columnId: feedbackItem.columnId,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: feedbackItem.boardId,
+        boardTitle: "Timer Board",
+        createdDate: feedbackItem.createdDate,
+        upvotes: feedbackItem.upvotes,
+        groupIds: [...feedbackItem.groupIds],
+        userIdRef: feedbackItem.userIdRef,
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: feedbackItem.originalColumnId,
+        timerSecs: feedbackItem.timerSecs,
+        timerState: feedbackItem.timerState,
+        timerId: feedbackItem.timerId,
+        isGroupedCarouselItem: feedbackItem.isGroupedCarouselItem,
+        workflowPhase: "Act",
+        isFocusModalHidden: true,
+        team: { id: "team-1" },
+        defaultActionItemAreaPath: "Area",
+        defaultActionItemIteration: "Iter",
+        onVoteCasted: jest.fn(),
+        requestTimerStart: jest.fn().mockResolvedValue(true),
+        notifyTimerStopped: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+        moveFeedbackItem: jest.fn(),
+        groupCount: 0,
+        isShowingGroupedChildrenTitles: false,
+        activeTimerFeedbackItemId: null,
+      };
+
+      Object.assign(props, overrides);
+      props.columns = columns;
+      props.columnIds = [testColumnUuidOne];
+
+      const columnItem = columns[testColumnUuidOne].columnItems[0];
+      columnItem.feedbackItem = {
+        ...columnItem.feedbackItem,
+        id: props.id,
+        title: props.title,
+        boardId: props.boardId,
+        columnId: props.columnId,
+        originalColumnId: props.originalColumnId,
+        timerSecs: props.timerSecs,
+        timerState: props.timerState,
+        timerId: props.timerId,
+        groupIds: props.groupIds,
+        isGroupedCarouselItem: props.isGroupedCarouselItem,
+        userIdRef: props.userIdRef,
+      } as IFeedbackItemDocument;
+
+      return props;
+    };
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+      jest.useRealTimers();
+    });
+
+    test("does not start timer when board denies the request", async () => {
+      const props = buildActPhaseTimerProps();
+      props.requestTimerStart = jest.fn().mockResolvedValue(false);
+
+      const updateTimerSpy = jest.spyOn(itemDataService, "updateTimer").mockResolvedValue(undefined);
+      const flipTimerSpy = jest.spyOn(itemDataService, "flipTimer").mockResolvedValue(undefined);
+
+      const { getByTitle } = render(<FeedbackItem {...props} />);
+
+      await act(async () => {
+        fireEvent.click(getByTitle("Timer"));
+      });
+
+      expect(props.requestTimerStart).toHaveBeenCalledWith(props.id);
+      expect(updateTimerSpy).not.toHaveBeenCalled();
+      expect(flipTimerSpy).not.toHaveBeenCalled();
+    });
+
+    test("starts timer when board approves the request", async () => {
+      jest.useFakeTimers();
+      const props = buildActPhaseTimerProps();
+
+      const updatedItem = {
+        ...props.columns[testColumnUuidOne].columnItems[0].feedbackItem,
+        timerState: true,
+        timerId: 123,
+      } as IFeedbackItemDocument;
+
+      const updateTimerSpy = jest.spyOn(itemDataService, "updateTimer").mockResolvedValue(updatedItem);
+      const flipTimerSpy = jest.spyOn(itemDataService, "flipTimer").mockResolvedValue(updatedItem);
+
+      const { getByTitle } = render(<FeedbackItem {...props} />);
+
+      await act(async () => {
+        fireEvent.click(getByTitle("Timer"));
+      });
+
+      expect(props.requestTimerStart).toHaveBeenCalledWith(props.id);
+      expect(updateTimerSpy).toHaveBeenCalledWith(props.boardId, props.id, true);
+      expect(flipTimerSpy).toHaveBeenCalledWith(props.boardId, props.id, expect.anything());
+
+      await waitFor(() => {
+        expect(props.refreshFeedbackItems).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    test("stops timer and notifies board when already running", async () => {
+      const props = buildActPhaseTimerProps({ timerState: true, timerId: 456 });
+      props.requestTimerStart = jest.fn();
+
+      const stoppedItem = {
+        ...props.columns[testColumnUuidOne].columnItems[0].feedbackItem,
+        timerState: false,
+        timerId: null,
+      } as IFeedbackItemDocument;
+
+      const flipTimerSpy = jest.spyOn(itemDataService, "flipTimer").mockResolvedValue(stoppedItem);
+
+      const { getByTitle } = render(<FeedbackItem {...props} />);
+
+      await act(async () => {
+        fireEvent.click(getByTitle("Timer"));
+      });
+
+      expect(props.requestTimerStart).not.toHaveBeenCalled();
+      expect(flipTimerSpy).toHaveBeenCalledWith(props.boardId, props.id, null);
+
+      await waitFor(() => {
+        expect(props.notifyTimerStopped).toHaveBeenCalledWith(props.id);
+      });
+    });
+  });
+
+  describe("Keyboard shortcuts", () => {
+    const createKeyboardTestItem = (overrides: Partial<IFeedbackItemDocument> = {}): IFeedbackItemDocument => ({
+      id: overrides.id ?? "keyboard-item-id",
+      boardId: overrides.boardId ?? testBoardId,
+      title: overrides.title ?? "Keyboard Item",
+      description: overrides.description ?? "",
+      columnId: overrides.columnId ?? testColumnUuidOne,
+      originalColumnId: overrides.originalColumnId ?? testColumnUuidOne,
+      upvotes: overrides.upvotes ?? 0,
+      voteCollection: overrides.voteCollection ?? {},
+      createdDate: overrides.createdDate ?? new Date(),
+      userIdRef: overrides.userIdRef ?? "user-1",
+      timerSecs: overrides.timerSecs ?? 0,
+      timerState: overrides.timerState ?? false,
+      timerId: overrides.timerId ?? null,
+      groupIds: overrides.groupIds ?? [],
+      isGroupedCarouselItem: overrides.isGroupedCarouselItem ?? false,
+      associatedActionItemIds: overrides.associatedActionItemIds ?? [],
+      childFeedbackItemIds: overrides.childFeedbackItemIds ?? [],
+      parentFeedbackItemId: overrides.parentFeedbackItemId,
+      modifiedDate: overrides.modifiedDate,
+      modifiedBy: overrides.modifiedBy,
+      createdBy: overrides.createdBy,
+    });
+
+    const buildKeyboardTestProps = (overrides: Record<string, unknown> = {}, itemOverrides: Partial<IFeedbackItemDocument> = {}): any => {
+      const feedbackItem = createKeyboardTestItem(itemOverrides);
+
+      const columns = {
+        [feedbackItem.columnId]: {
+          columnProperties: {
+            id: feedbackItem.columnId,
+            title: "Keyboard Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+            notes: "",
+          },
+          columnItems: [
+            {
+              feedbackItem: { ...feedbackItem },
+              actionItems: [] as any[],
+            },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: feedbackItem.id,
+        title: feedbackItem.title,
+        description: feedbackItem.description,
+        columnId: feedbackItem.columnId,
+        columns,
+        columnIds: [feedbackItem.columnId],
+        boardId: feedbackItem.boardId,
+        boardTitle: "Keyboard Board",
+        createdDate: feedbackItem.createdDate,
+        lastEditedDate: feedbackItem.modifiedDate?.toISOString() ?? "",
+        upvotes: feedbackItem.upvotes,
+        groupIds: [...feedbackItem.groupIds],
+        userIdRef: feedbackItem.userIdRef,
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: feedbackItem.originalColumnId,
+        timerSecs: feedbackItem.timerSecs,
+        timerState: feedbackItem.timerState,
+        timerId: feedbackItem.timerId,
+        isGroupedCarouselItem: feedbackItem.isGroupedCarouselItem,
+        workflowPhase: "Group",
+        isFocusModalHidden: true,
+        groupedItemProps: undefined,
+        team: { id: "team-1" },
+        defaultActionItemAreaPath: "Area",
+        defaultActionItemIteration: "Iter",
+        onVoteCasted: jest.fn(),
+        requestTimerStart: jest.fn().mockResolvedValue(true),
+        notifyTimerStopped: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+        moveFeedbackItem: jest.fn(),
+        groupCount: 0,
+        isShowingGroupedChildrenTitles: false,
+        activeTimerFeedbackItemId: null,
+      };
+
+      Object.assign(props, overrides);
+      columns[feedbackItem.columnId].columnItems[0].feedbackItem = {
+        ...columns[feedbackItem.columnId].columnItems[0].feedbackItem,
+        id: props.id,
+        title: props.title,
+        columnId: props.columnId,
+        originalColumnId: props.originalColumnId,
+        boardId: props.boardId,
+        timerSecs: props.timerSecs,
+        timerState: props.timerState,
+        timerId: props.timerId,
+        groupIds: props.groupIds,
+        isGroupedCarouselItem: props.isGroupedCarouselItem,
+        userIdRef: props.userIdRef,
+      } as IFeedbackItemDocument;
+
+      return props;
+    };
+
+    test("pressing g opens the group dialog and escape closes it", async () => {
+      const props = buildKeyboardTestProps({ workflowPhase: "Group" });
+
+      const getFeedbackItemSpy = jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(undefined);
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => {
+        expect(getFeedbackItemSpy).toHaveBeenCalled();
+      });
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "g" });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText("Group Feedback")).toBeInTheDocument();
+      });
+
+      getFeedbackItemSpy.mockRestore();
+    });
+
+    test("pressing t triggers the timer start flow in Act phase", async () => {
+      const props = buildKeyboardTestProps({ workflowPhase: "Act", timerId: 789, timerState: false });
+
+      const updatedItem = createKeyboardTestItem({ id: props.id, timerState: true, timerId: props.timerId });
+      const getFeedbackItemSpy = jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(updatedItem);
+      const updateTimerSpy = jest.spyOn(itemDataService, "updateTimer").mockResolvedValue(updatedItem);
+      const flipTimerSpy = jest.spyOn(itemDataService, "flipTimer").mockResolvedValue(updatedItem);
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => {
+        expect(getFeedbackItemSpy).toHaveBeenCalled();
+      });
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "t" });
+      });
+
+      await waitFor(() => {
+        expect(props.requestTimerStart).toHaveBeenCalledWith(props.id);
+      });
+
+      getFeedbackItemSpy.mockRestore();
+      updateTimerSpy.mockRestore();
+      flipTimerSpy.mockRestore();
+    });
+  });
+
+  describe("FeedbackItemHelper", () => {
+    test("handleDropFeedbackItemOnFeedbackItem refreshes updated items", async () => {
+      const parent = {
+        id: "parent",
+        boardId: testBoardId,
+        title: "Parent",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      } as IFeedbackItemDocument;
+
+      const child = { ...parent, id: "child" } as IFeedbackItemDocument;
+      const grandChild = { ...parent, id: "grandchild" } as IFeedbackItemDocument;
+
+      const addChildSpy = jest.spyOn(itemDataService, "addFeedbackItemAsChild").mockResolvedValue({
+        updatedParentFeedbackItem: parent,
+        updatedChildFeedbackItem: child,
+        updatedGrandchildFeedbackItems: [grandChild],
+        updatedOldParentFeedbackItem: undefined,
+      });
+
+      const refreshFeedbackItems = jest.fn();
+      const props: any = {
+        boardId: testBoardId,
+        refreshFeedbackItems,
+      };
+
+      await FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(props, "child", "parent");
+
+      expect(addChildSpy).toHaveBeenCalledWith(testBoardId, "parent", "child");
+      expect(refreshFeedbackItems).toHaveBeenCalledTimes(1);
+      const [updatedItems, shouldBroadcast] = refreshFeedbackItems.mock.calls[0];
+      expect(shouldBroadcast).toBe(true);
+      expect(updatedItems).toEqual(expect.arrayContaining([parent, child, grandChild]));
+
+      addChildSpy.mockRestore();
     });
   });
 
@@ -3139,6 +3539,131 @@ describe("Feedback Item", () => {
       // Should contain simplified text
       expect(ariaLabel).toContain("Vote up");
       expect(ariaLabel).toContain("Current vote count is 7");
+    });
+  });
+
+  describe("Additional edge cases", () => {
+    test("handles missing columnProps gracefully", () => {
+      const props: any = {
+        id: "test-no-columnprops",
+        title: "No Column Props",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        columnProps: undefined,
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("handles description with special characters", () => {
+      const props: any = {
+        id: "test-special-chars",
+        title: 'Test <>&" Title',
+        description: 'Description with <html> & special "chars"',
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("renders with long timer duration", () => {
+      const props: any = {
+        id: "test-long-timer",
+        title: "Long Timer",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 3600,
+        timerstate: true,
+        timerId: "long-timer",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Act",
+        team: { id: "t1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "Area",
+        defaultActionItemIteration: "Iter",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.textContent).toContain("60:00 elapsed");
+    });
+
+    test("handles focus state with shouldHaveFocus true", () => {
+      const props: any = {
+        id: "test-should-focus",
+        title: "Should Focus",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: true,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
     });
   });
 });

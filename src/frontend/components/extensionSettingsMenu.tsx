@@ -9,7 +9,7 @@ import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { getProjectId } from "../utilities/servicesHelper";
 import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/feedback";
-import { Slide, toast, ToastContainer } from "react-toastify";
+import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
 import { WorkflowPhase } from "../interfaces/workItem";
@@ -287,10 +287,10 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
         <ContextualMenuButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} />
         <ContextualMenuButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} />
 
-        <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog">
+        <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog retro-dialog-shell">
           {renderContent(PRIME_DIRECTIVE_CONTENT)}
         </ExtensionDialog>
-        <ExtensionDialog hidden={this.state.isWhatsNewDialogHidden} onDismiss={this.hideWhatsNewDialog} title="What's New" onDefaultClick={this.onChangeLogClicked} defaultButtonText="Open change log" containerClassName="whatsnew-dialog">
+        <ExtensionDialog hidden={this.state.isWhatsNewDialogHidden} onDismiss={this.hideWhatsNewDialog} title="What's New" onDefaultClick={this.onChangeLogClicked} defaultButtonText="Open change log" containerClassName="whatsnew-dialog retro-dialog-shell">
           {renderContent(WHATISNEW_CONTENT)}
         </ExtensionDialog>
         <ExtensionDialog
@@ -301,17 +301,15 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           title="Retrospectives User Guide"
           onDefaultClick={this.onGetHelpClicked}
           defaultButtonText="Open user guide"
-          containerClassName="retro-help-dialog"
+          containerClassName="retro-help-dialog retro-dialog-shell"
         >
           {renderContent(RETRO_HELP_CONTENT)}
         </ExtensionDialog>
-        <ExtensionDialog hidden={this.state.isPleaseJoinUsDialogHidden} onDismiss={this.hidePleaseJoinUsDialog} title="Volunteer" onDefaultClick={this.onContributingClicked} defaultButtonText="Open contributing guidelines" containerClassName="volunteer-dialog">
+        <ExtensionDialog hidden={this.state.isPleaseJoinUsDialogHidden} onDismiss={this.hidePleaseJoinUsDialog} title="Volunteer" onDefaultClick={this.onContributingClicked} defaultButtonText="Open contributing guidelines" containerClassName="volunteer-dialog retro-dialog-shell">
           {renderContent(VOLUNTEER_CONTENT)}
         </ExtensionDialog>
 
         <KeyboardShortcutsDialog isOpen={!this.state.isKeyboardShortcutsDialogHidden} onClose={() => this.setState({ isKeyboardShortcutsDialogHidden: true })} currentWorkflowPhase={WorkflowPhase.Collect} />
-
-        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }

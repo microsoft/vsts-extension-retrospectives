@@ -64,7 +64,7 @@ describe("ReflectBackendService", () => {
     mockOn.mockClear();
     mockOff.mockClear();
     mockTrackException.mockClear();
-    
+
     mockIsHostedAzureDevOps.mockResolvedValue(true);
     mockStart.mockResolvedValue(undefined);
     mockSend.mockResolvedValue(undefined);

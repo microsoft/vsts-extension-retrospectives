@@ -20,7 +20,7 @@ const keyboardShortcuts: KeyboardShortcut[] = [
   // Global shortcuts
   { keys: ["?"], description: "Show keyboard shortcuts", category: "Global" },
   { keys: ["Esc"], description: "Close dialogs or cancel actions", category: "Global" },
-  
+
   // Column navigation
   { keys: ["1-5"], description: "Jump to column by number", category: "Navigation" },
   { keys: ["←", "→"], description: "Navigate between columns", category: "Navigation" },

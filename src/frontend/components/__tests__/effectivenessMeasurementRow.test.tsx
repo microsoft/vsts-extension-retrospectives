@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import EffectivenessMeasurementRow, { EffectivenessMeasurementRowProps } from "../effectivenessMeasurementRow";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../../interfaces/feedback";
@@ -82,7 +82,7 @@ describe("EffectivenessMeasurementRow", () => {
     it("renders all 10 voting buttons", () => {
       const { container } = render(<EffectivenessMeasurementRow {...defaultProps} />);
 
-      const votingButtons = container.querySelectorAll(".effectivemess-measurement-voting-button");
+      const votingButtons = container.querySelectorAll(".team-assessment-score-button");
       expect(votingButtons).toHaveLength(10);
     });
 
@@ -143,33 +143,34 @@ describe("EffectivenessMeasurementRow", () => {
       });
     });
 
-    it("shows CircleFill icon for selected value and CircleRing for others", () => {
+    it("marks selected values with the selected class", () => {
       const props = { ...defaultProps, votes: mockVotes };
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
       // Button 5 should be selected (from mockVotes)
       const button5 = container.querySelector('button[aria-label="5"]');
-      expect(button5?.querySelector('[data-icon-name="CircleFill"]')).toBeInTheDocument();
+      expect(button5).toHaveClass("team-assessment-score-button-selected");
 
       // Other buttons should have CircleRing
       const button1 = container.querySelector('button[aria-label="1"]');
-      expect(button1?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+      expect(button1).not.toHaveClass("team-assessment-score-button-selected");
     });
 
-    it("updates icon when selection changes", () => {
+    it("updates selection class when a button is clicked", async () => {
       const mockOnSelectedChange = jest.fn();
       const props = { ...defaultProps, onSelectedChange: mockOnSelectedChange };
-      const { container } = render(<EffectivenessMeasurementRow {...props} />);
+      const { getByLabelText } = render(<EffectivenessMeasurementRow {...props} />);
 
-      // Initially button 1 should have CircleRing
-      const button1 = container.querySelector('button[aria-label="1"]');
-      expect(button1?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+      const button1 = getByLabelText("1");
+      expect(button1).not.toHaveClass("team-assessment-score-button-selected");
 
-      // Click button 1
-      (button1 as HTMLButtonElement).click();
+      fireEvent.click(button1);
 
-      // After click, verify callback was called
       expect(mockOnSelectedChange).toHaveBeenCalledWith(1);
+
+      await waitFor(() => {
+        expect(getByLabelText("1")).toHaveClass("team-assessment-score-button-selected");
+      });
     });
   });
 
@@ -180,7 +181,7 @@ describe("EffectivenessMeasurementRow", () => {
 
       // User's vote for question 1 is 5, so button 5 should show CircleFill
       const button5 = container.querySelector('button[aria-label="5"]');
-      expect(button5?.querySelector('[data-icon-name="CircleFill"]')).toBeInTheDocument();
+      expect(button5).toHaveClass("team-assessment-score-button-selected");
     });
 
     it("initializes with different vote for different question", () => {
@@ -189,7 +190,7 @@ describe("EffectivenessMeasurementRow", () => {
 
       // User's vote for question 2 is 8, so button 8 should show CircleFill
       const button8 = container.querySelector('button[aria-label="8"]');
-      expect(button8?.querySelector('[data-icon-name="CircleFill"]')).toBeInTheDocument();
+      expect(button8).toHaveClass("team-assessment-score-button-selected");
     });
 
     it("initializes with no selection when no votes exist", () => {
@@ -199,7 +200,7 @@ describe("EffectivenessMeasurementRow", () => {
       // All buttons should have CircleRing when no vote exists
       for (let i = 1; i <= 10; i++) {
         const button = container.querySelector(`button[aria-label="${i}"]`);
-        expect(button?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+        expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
 
@@ -210,7 +211,7 @@ describe("EffectivenessMeasurementRow", () => {
       // All buttons should have CircleRing when user hasn't voted on this question
       for (let i = 1; i <= 10; i++) {
         const button = container.querySelector(`button[aria-label="${i}"]`);
-        expect(button?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+        expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
 
@@ -227,7 +228,7 @@ describe("EffectivenessMeasurementRow", () => {
       // Should default to no selection (0)
       for (let i = 1; i <= 10; i++) {
         const button = container.querySelector(`button[aria-label="${i}"]`);
-        expect(button?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+        expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
 
@@ -244,7 +245,7 @@ describe("EffectivenessMeasurementRow", () => {
       // Should default to no selection (0)
       for (let i = 1; i <= 10; i++) {
         const button = container.querySelector(`button[aria-label="${i}"]`);
-        expect(button?.querySelector('[data-icon-name="CircleRing"]')).toBeInTheDocument();
+        expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
   });
