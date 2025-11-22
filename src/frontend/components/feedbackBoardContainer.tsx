@@ -313,7 +313,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             const newSeconds = previousState.boardTimerSeconds - 1;
             if (newSeconds <= 0) {
               this.pauseBoardTimer();
-              this.playChime();
+              this.playStopChime();
               return { boardTimerSeconds: 0 };
             }
             return { boardTimerSeconds: newSeconds };
@@ -332,7 +332,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             const newSeconds = previousState.boardTimerSeconds - 1;
             if (newSeconds <= 0) {
               this.pauseBoardTimer();
-              this.playChime();
+              this.playStopChime();
               return { boardTimerSeconds: 0 };
             }
             return { boardTimerSeconds: newSeconds };
@@ -397,7 +397,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
-  private readonly playChime = () => {
+  private readonly playStopChime = () => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const now = audioContext.currentTime;
 
@@ -1660,7 +1660,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return (
       <div className="flex flex-col h-screen">
-        <div className="flex items-center flex-shrink-0 ml-4">
+        <div className="flex items-center flex-shrink-0 mt-2 ml-4">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
             onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
