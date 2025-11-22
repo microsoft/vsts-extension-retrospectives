@@ -181,7 +181,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       activeTab: "Board",
       boardTimerSeconds: 0,
       isBoardTimerRunning: false,
-      countdownDurationMinutes: 0,
+      countdownDurationMinutes: 5,
       teamAssessmentHistoryData: [],
     };
   }
@@ -303,28 +303,31 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       return;
     }
 
-    const isActPhase = this.getCurrentBoardPhase() === WorkflowPhase.Act;
-
-    if (!isActPhase && this.state.boardTimerSeconds === 0) {
-      this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60 });
-    }
-
-    this.boardTimerIntervalId = window.setInterval(() => {
-      this.setState(previousState => {
-        const isActPhase = this.getCurrentBoardPhase() === WorkflowPhase.Act;
-
-        if (isActPhase) {
-          return { boardTimerSeconds: previousState.boardTimerSeconds + 1 };
-        } else {
+    if (this.state.boardTimerSeconds === 0) {
+      this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60 }, () => {
+        this.boardTimerIntervalId = window.setInterval(() => {
+          this.setState(previousState => {
+            const newSeconds = previousState.boardTimerSeconds - 1;
+            if (newSeconds <= 0) {
+              this.pauseBoardTimer();
+              return { boardTimerSeconds: 0 };
+            }
+            return { boardTimerSeconds: newSeconds };
+          });
+        }, 1000);
+      });
+    } else {
+      this.boardTimerIntervalId = window.setInterval(() => {
+        this.setState(previousState => {
           const newSeconds = previousState.boardTimerSeconds - 1;
           if (newSeconds <= 0) {
             this.pauseBoardTimer();
             return { boardTimerSeconds: 0 };
           }
           return { boardTimerSeconds: newSeconds };
-        }
-      });
-    }, 1000);
+        });
+      }, 1000);
+    }
 
     if (!this.state.isBoardTimerRunning) {
       this.setState({ isBoardTimerRunning: true });
@@ -394,12 +397,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           className="workflow-stage-timer-toggle"
           title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"}
           aria-pressed={this.state.isBoardTimerRunning}
-          aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.getCurrentBoardPhase() === WorkflowPhase.Act ? "elapsed" : "remaining"}.`}
+          aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} remaining.`}
           onClick={this.handleBoardTimerToggle}
         >
           <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
         </button>
-        {this.getCurrentBoardPhase() !== WorkflowPhase.Act && !this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
+        {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
           <select
             value={this.state.countdownDurationMinutes}
             onChange={this.handleCountdownDurationChange}
