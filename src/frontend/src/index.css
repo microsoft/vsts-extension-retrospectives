@@ -2012,6 +2012,7 @@ kbd {
 }
 
 .feedbackItemGroupItem .mainItemCard .card-integral-part .anonymous-created-date,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .anonymous-created-date,
 .feedbackItem .mainItemCard .card-integral-part .anonymous-created-date {
   @apply py-2 px-4 block text-sm font-light leading-[18px] overflow-hidden [word-wrap:break-word] h-[45px];
 }
