@@ -44,13 +44,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
     const isSelected = this.state.selected === value;
     return (
       <td key={value}>
-        <button
-          type="button"
-          className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`}
-          aria-label={`${value}`}
-          aria-pressed={isSelected}
-          onClick={() => this.updateSelected(value)}
-        >
+        <button type="button" className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`} aria-label={`${value}`} aria-pressed={isSelected} onClick={() => this.updateSelected(value)}>
           <span className="team-assessment-score-circle" />
         </button>
       </td>

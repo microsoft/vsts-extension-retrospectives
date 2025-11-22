@@ -310,7 +310,6 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
         </ExtensionDialog>
 
         <KeyboardShortcutsDialog isOpen={!this.state.isKeyboardShortcutsDialogHidden} onClose={() => this.setState({ isKeyboardShortcutsDialogHidden: true })} currentWorkflowPhase={WorkflowPhase.Collect} />
-
       </div>
     );
   }

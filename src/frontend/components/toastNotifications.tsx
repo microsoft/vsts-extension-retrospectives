@@ -174,17 +174,10 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ className, toast
     <div className={classNames("retro-toast-container", className)}>
       {records.map(record => (
         <div key={record.id} className={classNames("retro-toast", toastClassName)}>
-          <MessageBar
-            messageBarType={mapIntentToMessageBarType(record.intent)}
-            isMultiline
-            onDismiss={() => toast.dismiss(record.id)}
-            dismissButtonAriaLabel="Dismiss notification"
-          >
+          <MessageBar messageBarType={mapIntentToMessageBarType(record.intent)} isMultiline onDismiss={() => toast.dismiss(record.id)} dismissButtonAriaLabel="Dismiss notification">
             {record.content}
           </MessageBar>
-          {typeof record.autoClose === "number" && record.autoClose > 0 ? (
-            <div className={classNames("retro-toast-progress", progressClassName)} style={{ animationDuration: `${record.autoClose}ms` }} />
-          ) : null}
+          {typeof record.autoClose === "number" && record.autoClose > 0 ? <div className={classNames("retro-toast-progress", progressClassName)} style={{ animationDuration: `${record.autoClose}ms` }} /> : null}
         </div>
       ))}
     </div>

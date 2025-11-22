@@ -16,9 +16,6 @@ jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: (_plugin: any, component: any) => component,
 }));
 
-
-
-
 jest.mock("../extensionSettingsMenuDialogContent", () => ({
   RETRO_URLS: {
     retrospectivewiki: "https://retrospectivewiki.org/",

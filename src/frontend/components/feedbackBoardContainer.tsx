@@ -325,7 +325,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       this.boardTimerIntervalId = window.setInterval(() => {
         this.setState(previousState => {
           const isTimerMode = this.state.countdownDurationMinutes === 0;
-          
+
           if (isTimerMode) {
             return { boardTimerSeconds: previousState.boardTimerSeconds + 1 };
           } else {
@@ -410,7 +410,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      oscillator.type = 'sine';
+      oscillator.type = "sine";
       oscillator.frequency.value = freq;
 
       const delay = index * 0.05;
@@ -436,7 +436,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      oscillator.type = 'sine';
+      oscillator.type = "sine";
       oscillator.frequency.value = freq;
 
       const delay = index * 0.05;
@@ -456,23 +456,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
-        <button
-          type="button"
-          className="workflow-stage-timer-toggle"
-          title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"}
-          aria-pressed={this.state.isBoardTimerRunning}
-          aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`}
-          onClick={this.handleBoardTimerToggle}
-        >
+        <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
           <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
         </button>
         {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
-          <select
-            value={this.state.countdownDurationMinutes}
-            onChange={this.handleCountdownDurationChange}
-            className="workflow-stage-timer-select"
-            aria-label="Select countdown duration in minutes"
-          >
+          <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
             <option value={0}>Timer</option>
             {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
               <option key={num} value={num}>
@@ -483,14 +471,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         ) : (
           <span>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
         )}
-        <button
-          type="button"
-          className="workflow-stage-timer-reset"
-          title="Reset timer"
-          aria-label="Reset timer"
-          disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning}
-          onClick={this.handleBoardTimerReset}
-        >
+        <button type="button" className="workflow-stage-timer-reset" title="Reset timer" aria-label="Reset timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
           <i className="fa fa-undo" />
         </button>
       </div>
@@ -2166,7 +2147,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <>
               <p className="team-assessment-info-text">Starting with version v2.0.1 (scheduled for publication on January 1st, 2026), a widget will be available that you can add to your Azure DevOps dashboard to see team assessment trends over time.</p>
               <p className="team-assessment-info-text">Please check your Extensions configuration to ensure the Retrospective Extension is updated to the latest version.</p>
-              <p className="team-assessment-info-text">Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.</p>
+              <p className="team-assessment-info-text">
+                Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
+              </p>
               {(() => {
                 const questionColors = [
                   "#0078d4", // Blue

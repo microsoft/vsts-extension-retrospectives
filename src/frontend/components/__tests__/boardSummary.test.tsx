@@ -567,10 +567,7 @@ describe("Board Summary", () => {
 
     it("sorts ascending values", () => {
       const instance = createBoardSummaryInstance();
-      const items = [
-        createActionItem({ id: 2, title: "Zulu" }),
-        createActionItem({ id: 1, title: "Alpha" }),
-      ];
+      const items = [createActionItem({ id: 2, title: "Zulu" }), createActionItem({ id: 1, title: "Alpha" })];
 
       const sorted = (instance as any).sortActionItemsByColumn(items.slice(), "title");
       expect(sorted.map((item: any) => item.id)).toEqual([1, 2]);
@@ -578,10 +575,7 @@ describe("Board Summary", () => {
 
     it("sorts descending values", () => {
       const instance = createBoardSummaryInstance();
-      const items = [
-        createActionItem({ id: 1, state: "Active" }),
-        createActionItem({ id: 2, state: "Resolved" }),
-      ];
+      const items = [createActionItem({ id: 1, state: "Active" }), createActionItem({ id: 2, state: "Resolved" })];
 
       const sorted = (instance as any).sortActionItemsByColumn(items.slice(), "state", true);
       expect(sorted.map((item: any) => item.id)).toEqual([2, 1]);
@@ -589,10 +583,7 @@ describe("Board Summary", () => {
 
     it("returns stable ordering when values are equal", () => {
       const instance = createBoardSummaryInstance();
-      const items = [
-        createActionItem({ id: 1, priority: "2" }),
-        createActionItem({ id: 2, priority: "2" }),
-      ];
+      const items = [createActionItem({ id: 1, priority: "2" }), createActionItem({ id: 2, priority: "2" })];
 
       const sorted = (instance as any).sortActionItemsByColumn(items.slice(), "priority");
       expect(sorted.map((item: any) => item.id)).toEqual([1, 2]);
