@@ -1541,7 +1541,7 @@ kbd {
 }
 
 .feedback-board-container {
-  @apply flex h-[calc(100vh-100px)] overflow-y-auto overflow-x-hidden;
+  @apply flex h-[calc(100vh-84px)] overflow-y-auto overflow-x-hidden;
 }
 
 .initialization-spinner {
