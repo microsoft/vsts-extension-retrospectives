@@ -388,4 +388,244 @@ describe("BoardSummaryTable, additional coverage", () => {
       expect(appInsights.trackException).toHaveBeenCalledWith(error);
     });
   });
+
+  describe("Additional Coverage Tests", () => {
+    it("TrashIcon shows disabled icon before delete delay passes", () => {
+      const recentlyArchivedBoard: IBoardSummaryTableItem = {
+        id: "board-recent",
+        boardName: "Recently Archived",
+        teamId: "team-1",
+        createdDate: new Date(),
+        isArchived: true,
+        archivedDate: new Date(Date.now() - 60000), // 1 minute ago (less than 2 minutes)
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+        ownerId: "user-1",
+      };
+
+      const { container } = render(
+        <TrashIcon
+          board={recentlyArchivedBoard}
+          currentUserId="user-1"
+          currentUserIsTeamAdmin={false}
+          onClick={jest.fn()}
+        />
+      );
+
+      expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
+    });
+
+    it("TrashIcon shows enabled icon after delete delay passes", () => {
+      const oldArchivedBoard: IBoardSummaryTableItem = {
+        id: "board-old",
+        boardName: "Old Archived",
+        teamId: "team-1",
+        createdDate: new Date(),
+        isArchived: true,
+        archivedDate: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago (more than 2 minutes)
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+        ownerId: "user-1",
+      };
+
+      const onClick = jest.fn();
+      const { container } = render(
+        <TrashIcon
+          board={oldArchivedBoard}
+          currentUserId="user-1"
+          currentUserIsTeamAdmin={false}
+          onClick={onClick}
+        />
+      );
+
+      expect(container.querySelector(".trash-icon")).toBeTruthy();
+    });
+
+    it("TrashIcon doesn't show for non-archived boards", () => {
+      const activeBoard: IBoardSummaryTableItem = {
+        id: "board-active",
+        boardName: "Active Board",
+        teamId: "team-1",
+        createdDate: new Date(),
+        isArchived: false,
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+        ownerId: "user-1",
+      };
+
+      const { container } = render(
+        <TrashIcon
+          board={activeBoard}
+          currentUserId="user-1"
+          currentUserIsTeamAdmin={false}
+          onClick={jest.fn()}
+        />
+      );
+
+      expect(container.querySelector(".centered-cell")).toBeTruthy();
+      expect(container.querySelector(".trash-icon")).toBeFalsy();
+    });
+
+    it("TrashIcon doesn't show for non-owner unless admin", () => {
+      const archivedBoard: IBoardSummaryTableItem = {
+        id: "board-owned",
+        boardName: "Owned Board",
+        teamId: "team-1",
+        createdDate: new Date(),
+        isArchived: true,
+        archivedDate: new Date(Date.now() - 5 * 60 * 1000),
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+        ownerId: "other-user",
+      };
+
+      const { container } = render(
+        <TrashIcon
+          board={archivedBoard}
+          currentUserId="user-1"
+          currentUserIsTeamAdmin={false}
+          onClick={jest.fn()}
+        />
+      );
+
+      expect(container.querySelector(".centered-cell")).toBeTruthy();
+      expect(container.querySelector(".trash-icon")).toBeFalsy();
+    });
+
+    it("TrashIcon shows for admin even if not owner", () => {
+      const archivedBoard: IBoardSummaryTableItem = {
+        id: "board-admin",
+        boardName: "Admin Can Delete",
+        teamId: "team-1",
+        createdDate: new Date(),
+        isArchived: true,
+        archivedDate: new Date(Date.now() - 5 * 60 * 1000),
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+        ownerId: "other-user",
+      };
+
+      const { container } = render(
+        <TrashIcon
+          board={archivedBoard}
+          currentUserId="user-1"
+          currentUserIsTeamAdmin={true}
+          onClick={jest.fn()}
+        />
+      );
+
+      expect(container.querySelector(".trash-icon")).toBeTruthy();
+    });
+
+    it("isTrashEnabled returns false for non-archived board", () => {
+      const activeBoard: IBoardSummaryTableItem = {
+        id: "board-1",
+        boardName: "Active",
+        teamId: "team-1",
+        createdDate: new Date(),
+        isArchived: false,
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+        ownerId: "user-1",
+      };
+
+      expect(isTrashEnabled(activeBoard)).toBe(false);
+    });
+
+    it("isTrashEnabled returns false for archived board without archivedDate", () => {
+      const legacyArchivedBoard: IBoardSummaryTableItem = {
+        id: "board-legacy",
+        boardName: "Legacy Archived",
+        teamId: "team-1",
+        createdDate: new Date(),
+        isArchived: true,
+        archivedDate: undefined,
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+        ownerId: "user-1",
+      };
+
+      expect(isTrashEnabled(legacyArchivedBoard)).toBe(false);
+    });
+
+    it("isTrashEnabled returns false before delay passes", () => {
+      const recentBoard: IBoardSummaryTableItem = {
+        id: "board-recent",
+        boardName: "Recent",
+        teamId: "team-1",
+        createdDate: new Date(),
+        isArchived: true,
+        archivedDate: new Date(Date.now() - 60000), // 1 minute ago
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+        ownerId: "user-1",
+      };
+
+      expect(isTrashEnabled(recentBoard)).toBe(false);
+    });
+
+    it("isTrashEnabled returns true after delay passes", () => {
+      const oldBoard: IBoardSummaryTableItem = {
+        id: "board-old",
+        boardName: "Old",
+        teamId: "team-1",
+        createdDate: new Date(),
+        isArchived: true,
+        archivedDate: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+        ownerId: "user-1",
+      };
+
+      expect(isTrashEnabled(oldBoard)).toBe(true);
+    });
+
+    it("handleArchiveToggle handles errors gracefully", async () => {
+      const boardId = "error-board";
+      const teamId = "team-1";
+      const setTableData = jest.fn();
+      const onArchiveToggle = jest.fn();
+      const mockError = new Error("Archive failed");
+
+      (BoardDataService.archiveFeedbackBoard as jest.Mock).mockRejectedValueOnce(mockError);
+
+      await handleArchiveToggle(teamId, boardId, true, setTableData, onArchiveToggle);
+
+      expect(appInsights.trackException).toHaveBeenCalledWith(
+        mockError,
+        expect.objectContaining({
+          boardId,
+          teamId,
+          action: "archive",
+        })
+      );
+    });
+
+    it("handleArchiveToggle restores archived board", async () => {
+      const boardId = "restore-board";
+      const teamId = "team-1";
+      const setTableData = jest.fn();
+      const onArchiveToggle = jest.fn();
+
+      (BoardDataService.restoreArchivedFeedbackBoard as jest.Mock).mockResolvedValueOnce(undefined);
+
+      await handleArchiveToggle(teamId, boardId, false, setTableData, onArchiveToggle);
+
+      expect(BoardDataService.restoreArchivedFeedbackBoard).toHaveBeenCalledWith(teamId, boardId);
+      expect(appInsights.trackEvent).toHaveBeenCalledWith({
+        name: TelemetryEvents.FeedbackBoardRestored,
+        properties: { boardId },
+      });
+      expect(onArchiveToggle).toHaveBeenCalled();
+    });
+  });
 });

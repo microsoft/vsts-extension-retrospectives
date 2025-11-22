@@ -3541,4 +3541,129 @@ describe("Feedback Item", () => {
       expect(ariaLabel).toContain("Current vote count is 7");
     });
   });
+
+  describe("Additional edge cases", () => {
+    test("handles missing columnProps gracefully", () => {
+      const props: any = {
+        id: "test-no-columnprops",
+        title: "No Column Props",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+        columnProps: undefined,
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("handles description with special characters", () => {
+      const props: any = {
+        id: "test-special-chars",
+        title: "Test <>&\" Title",
+        description: "Description with <html> & special \"chars\"",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("renders with long timer duration", () => {
+      const props: any = {
+        id: "test-long-timer",
+        title: "Long Timer",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 3600,
+        timerstate: true,
+        timerId: "long-timer",
+        isGroupedCarouselItem: false,
+        workflowPhase: "Act",
+        team: { id: "t1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "Area",
+        defaultActionItemIteration: "Iter",
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.textContent).toContain("60:00 elapsed");
+    });
+
+    test("handles focus state with shouldHaveFocus true", () => {
+      const props: any = {
+        id: "test-should-focus",
+        title: "Should Focus",
+        columnId: testColumnUuidOne,
+        columns: testColumns,
+        columnIds: testColumnIds,
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: true,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerstate: false,
+        timerId: "",
+        isGroupedCarouselItem: false,
+      };
+      const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
 });
