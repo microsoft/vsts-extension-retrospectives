@@ -1961,15 +1961,24 @@ kbd {
   @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote:hover:not(:disabled) i {
+.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote:hover:not(:disabled) i,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-add-vote:hover:not(:disabled) i,
+.feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-add-vote:hover:not(:disabled) i,
+.feedback-item-group .groupedItemCard .card-integral-part .card-header .feedback-add-vote:hover:not(:disabled) i {
   @apply text-[var(--color-primary)];
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation {
+.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation,
+.feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation,
+.feedback-item-group .groupedItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation {
   @apply [animation:push_0.3s_linear_1];
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation i {
+.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation i,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation i,
+.feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation i,
+.feedback-item-group .groupedItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation i {
   color: var(--color-primary) !important;
 }
 
