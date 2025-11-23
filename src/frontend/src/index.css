@@ -192,7 +192,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .contextual-menu-button {
-  @apply h-[30px] min-w-[40px] bg-inherit px-1 py-0 border-0 text-[rgba(var(--palette-neutral-80),1)];
+  @apply w-[25px] min-w-[25px] h-[30px] bg-inherit px-1 py-0 border-0 text-[rgba(var(--palette-neutral-80),1)];
 
   & i[data-icon-name="ChevronDown"] {
     @apply hidden;
@@ -200,6 +200,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   &:hover {
     @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-[var(--text-primary-color)];
+  }
+
+  &:focus-visible {
+    @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
   }
 }
 
@@ -451,7 +455,7 @@ kbd {
     }
 
     & .card-header {
-      @apply flex;
+      @apply flex items-center;
     }
 
     & .mainItemCard .card-integral-part {
@@ -1977,14 +1981,6 @@ kbd {
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .item-actions-menu {
   @apply pr-[3px];
-}
-
-.feedbackItem .mainItemCard .card-integral-part .card-header .item-actions-menu .contextual-menu-button {
-  @apply min-w-[25px] w-[25px];
-}
-
-.feedbackItem .mainItemCard .card-integral-part .card-header .item-actions-menu .contextual-menu-button:focus-visible {
-  @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-content,
