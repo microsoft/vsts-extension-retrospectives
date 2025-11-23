@@ -558,46 +558,46 @@ kbd {
 
 .related-task-sub-card {
   @apply h-[35px] m-0 max-w-full border-0 bg-[var(--background-color)] text-[var(--text-primary-color)];
-}
 
-.related-task-sub-card .task-yellow {
-  @apply text-[var(--color-task-yellow)];
-}
+  & .task-yellow {
+    @apply text-[var(--color-task-yellow)];
+  }
 
-.related-task-sub-card .bug-red {
-  @apply text-[var(--color-bug-red)];
-}
+  & .bug-red {
+    @apply text-[var(--color-bug-red)];
+  }
 
-.related-task-sub-card .ms-Image-image {
-  @apply w-4;
-}
+  & .ms-Image-image {
+    @apply w-4;
+  }
 
-.related-task-sub-card .ms-Button--icon {
-  @apply bg-[var(--background-color)];
-}
+  & .ms-Button--icon {
+    @apply bg-[var(--background-color)];
 
-.related-task-sub-card .ms-Button--icon .ms-Button-icon:hover {
-  @apply text-[var(--color-primary)];
-}
+    & .ms-Button-icon:hover {
+      @apply text-[var(--color-primary)];
+    }
+  }
 
-.related-task-sub-card .ms-DocumentCard-details {
-  @apply flex-1 cursor-pointer;
-}
+  & .ms-DocumentCard-details {
+    @apply flex-1 cursor-pointer;
+  }
 
-.related-task-sub-card .ms-DocumentCardPreview-iconContainer2 {
-  @apply w-[30px];
-}
+  & .ms-DocumentCardPreview-iconContainer2 {
+    @apply w-[30px];
+  }
 
-.related-task-sub-card .ms-DocumentCardTitle {
-  @apply leading-[10px] whitespace-nowrap overflow-hidden text-[10px] text-[var(--text-primary-color)] content-center;
-}
+  & .ms-DocumentCardTitle {
+    @apply leading-[10px] whitespace-nowrap overflow-hidden text-[10px] text-[var(--text-primary-color)] content-center;
+  }
 
-.related-task-sub-card.resolved-border-right {
-  @apply border-r-[3px] border-[var(--color-success)];
-}
+  &.resolved-border-right {
+    @apply border-r-[3px] border-[var(--color-success)];
 
-.related-task-sub-card.resolved-border-right:hover {
-  border-right-color: var(--color-success);
+    &:hover {
+      border-right-color: var(--color-success);
+    }
+  }
 }
 
 .work-item-icon {
@@ -614,14 +614,14 @@ kbd {
 
 .add-action-item-wrapper {
   @apply flex max-w-full bg-[var(--nav-vertical-background-color)];
-}
 
-.add-action-item-wrapper .feedback-spacer {
-  @apply flex-1;
-}
+  & .feedback-spacer {
+    @apply flex-1;
+  }
 
-.add-action-item-wrapper .add-action-item-section .add-action-item-button {
-  @apply h-8 text-[var(--text-primary-color)];
+  & .add-action-item-section .add-action-item-button {
+    @apply h-8 text-[var(--text-primary-color)];
+  }
 }
 
 .add-action-item-list-items .ms-List-cell:hover {
@@ -630,86 +630,86 @@ kbd {
 
 .action-items {
   @apply border-l border-[var(--color-border-gray)];
-}
 
-.action-items .work-item-type-icon-container {
-  @apply bg-[var(--background-color)];
-}
+  & .work-item-type-icon-container {
+    @apply bg-[var(--background-color)];
+  }
 
-.action-items .ms-DocumentCard .ms-DocumentCardActions {
-  @apply p-0 pr-1.5;
-}
+  & .ms-DocumentCard .ms-DocumentCardActions {
+    @apply p-0 pr-1.5;
 
-.action-items .ms-DocumentCard .ms-DocumentCardActions .ms-DocumentCardActions-action {
-  @apply h-[30px] w-[25px];
-}
+    & .ms-DocumentCardActions-action {
+      @apply h-[30px] w-[25px];
 
-.action-items .ms-DocumentCard .ms-DocumentCardActions .ms-DocumentCardActions-action .ms-Button .ms-Button-flexContainer i {
-  @apply text-[var(--color-primary)] text-xs;
-}
+      & .ms-Button .ms-Button-flexContainer i {
+        @apply text-[var(--color-primary)] text-xs;
+      }
 
-.action-items .ms-DocumentCard .ms-DocumentCardActions .ms-DocumentCardActions-action .ms-Button:hover:not(:disabled) i {
-  @apply font-bold;
-}
+      & .ms-Button:hover:not(:disabled) i {
+        @apply font-bold;
+      }
+    }
+  }
 
-.action-items .ms-DocumentCardPreview {
-  @apply border-r border-[var(--color-border-gray)];
+  & .ms-DocumentCardPreview {
+    @apply border-r border-[var(--color-border-gray)];
+  }
 }
 
 .add-action-item-callout .ms-Callout-main {
   @apply max-h-[90vh];
-}
 
-.add-action-item-callout .ms-Callout-main .work-item-list-divider {
-  @apply border border-[rgb(234,234,234)];
-}
+  & .work-item-list-divider {
+    @apply border border-[rgb(234,234,234)];
+  }
 
-.add-action-item-callout .ms-Callout-main .add-action-item-list-container {
-  @apply bg-[var(--background-color)];
-}
+  & .add-action-item-list-container {
+    @apply bg-[var(--background-color)];
 
-.add-action-item-callout .ms-Callout-main .add-action-item-list-container .add-action-item-list-item {
-  @apply flex cursor-pointer pl-2 items-center justify-start bg-inherit w-full border-0 overflow-hidden;
-}
+    & .add-action-item-list-item {
+      @apply flex cursor-pointer pl-2 items-center justify-start bg-inherit w-full border-0 overflow-hidden;
 
-.add-action-item-callout .ms-Callout-main .add-action-item-list-container .add-action-item-list-item .work-item-icon.fas.fa-link {
-  @apply text-[var(--border-subtle-color)];
-}
+      & .work-item-icon {
+        @apply mr-2 w-4;
 
-.add-action-item-callout .ms-Callout-main .add-action-item-list-container .add-action-item-list-item .work-item-icon {
-  @apply mr-2 w-4;
-}
+        &.fas.fa-link {
+          @apply text-[var(--border-subtle-color)];
+        }
+      }
 
-.add-action-item-callout .ms-Callout-main .add-action-item-list-container .add-action-item-list-item .add-action-item-list-item-text {
-  @apply leading-8 mr-[15px] text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis text-[var(--text-primary-color)];
+      & .add-action-item-list-item-text {
+        @apply leading-8 mr-[15px] text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis text-[var(--text-primary-color)];
+      }
+    }
+  }
 }
 
 .retrospectives-link-existing-work-item-dialog {
   @apply w-[500px] h-[250px] max-w-[500px];
-}
 
-.retrospectives-link-existing-work-item-dialog .error-container {
-  @apply h-5;
-}
+  & .error-container {
+    @apply h-5;
+  }
 
-.retrospectives-link-existing-work-item-dialog .output-container {
-  @apply h-10;
-}
+  & .output-container {
+    @apply h-10;
+  }
 
-.retrospectives-link-existing-work-item-dialog .related-task-sub-card {
-  @apply w-full;
-}
+  & .related-task-sub-card {
+    @apply w-full;
+  }
 
-.retrospectives-link-existing-work-item-dialog .work-item-not-found {
-  @apply w-full;
-}
+  & .work-item-not-found {
+    @apply w-full;
+  }
 
-.retrospectives-link-existing-work-item-dialog .input-validation-message {
-  @apply text-[var(--color-error)];
-}
+  & .input-validation-message {
+    @apply text-[var(--color-error)];
+  }
 
-.retrospectives-link-existing-work-item-dialog .work-item-id-input {
-  @apply w-full;
+  & .work-item-id-input {
+    @apply w-full;
+  }
 }
 
 #feedback-board-summary-table-header {
@@ -1993,16 +1993,16 @@ kbd {
   @apply flex flex-col mr-4 ml-4;
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-content .original-column-info {
+.feedbackItem .mainItemCard .card-integral-part .card-content .original-column-info,
+.feedback-item-group .mainItemCard .card-integral-part .card-content .original-column-info,
+.feedback-item-group .groupedItemCard .card-integral-part .card-content .original-column-info {
   @apply text-right font-light italic text-[0.75em] text-[var(--text-secondary-color)];
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-content .feedback-yourvote-count {
+.feedbackItem .mainItemCard .card-integral-part .card-content .feedback-yourvote-count,
+.feedback-item-group .mainItemCard .card-integral-part .card-content .feedback-yourvote-count,
+.feedback-item-group .groupedItemCard .card-integral-part .card-content .feedback-yourvote-count {
   @apply text-[0.85em];
-}
-
-.feedbackItem .mainItemCard .card-integral-part .card-content .feedback-yourvote-count.bold {
-  @apply font-medium;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-id,
