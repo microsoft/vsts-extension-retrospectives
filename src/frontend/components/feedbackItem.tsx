@@ -834,7 +834,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       aria-live="polite"
                       aria-label={`Vote up. Current vote count is ${this.props.upvotes}`}
                       tabIndex={0}
-                      disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+                      disabled={!showVoteButton || this.state.showVotedAnimation}
                       className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
                       onClick={e => {
                         e.preventDefault();
@@ -854,7 +854,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       aria-live="polite"
                       aria-label={`Vote down. Current vote count is ${this.props.upvotes}`}
                       tabIndex={0}
-                      disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
+                      disabled={!showVoteButton || this.state.showVotedAnimation}
                       className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
                       onClick={e => {
                         e.preventDefault();
