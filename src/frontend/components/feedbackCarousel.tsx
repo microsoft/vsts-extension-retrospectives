@@ -19,21 +19,33 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   constructor(props: IFeedbackCarouselProps) {
     super(props);
 
-    const feedbackColumnPropsList = [...this.props.feedbackColumnPropsList];
+    this.state = {
+      feedbackColums: this.buildFeedbackColumns(props.feedbackColumnPropsList),
+    };
+  }
 
-    if (feedbackColumnPropsList.length > 0) {
-      const allColumnItems = feedbackColumnPropsList.flatMap(col => col.columnItems);
-      feedbackColumnPropsList.unshift({
-        ...feedbackColumnPropsList[0],
+  private buildFeedbackColumns = (feedbackColumnPropsList: FeedbackColumnProps[]): FeedbackColumnProps[] => {
+    const columnsList = [...feedbackColumnPropsList];
+
+    if (columnsList.length > 0) {
+      const allColumnItems = columnsList.flatMap(col => col.columnItems);
+      columnsList.unshift({
+        ...columnsList[0],
         columnId: "all-columns",
         columnName: "All",
         columnItems: allColumnItems,
       } as FeedbackColumnProps);
     }
 
-    this.state = {
-      feedbackColums: feedbackColumnPropsList,
-    };
+    return columnsList;
+  };
+
+  public componentDidUpdate(prevProps: IFeedbackCarouselProps) {
+    if (prevProps.feedbackColumnPropsList !== this.props.feedbackColumnPropsList) {
+      this.setState({
+        feedbackColums: this.buildFeedbackColumns(this.props.feedbackColumnPropsList),
+      });
+    }
   }
 
   private renderFeedbackCarouselItems = (columnProps: FeedbackColumnProps) => {
@@ -86,8 +98,8 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         hideFeedbackItems: columnProps.hideFeedbackItems,
         userIdRef: columnItem.feedbackItem.userIdRef,
         onVoteCasted: columnProps.onVoteCasted,
-        groupCount: 0,
-        groupIds: [],
+        groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
+        groupIds: columnItem.feedbackItem.childFeedbackItemIds ?? [],
         isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
         isShowingGroupedChildrenTitles: false,
         isFocusModalHidden: this.props.isFocusModalHidden,
