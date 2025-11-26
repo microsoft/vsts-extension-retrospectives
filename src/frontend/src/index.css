@@ -718,229 +718,231 @@ kbd {
 
 #feedback-board-summary-table-header {
   @apply flex w-full h-[65px] items-center px-8 py-0;
-}
 
-#feedback-board-summary-table-header .menu-button {
-  @apply ml-1.5 mr-5 bg-[var(--color-gray-light)];
-}
+  & .menu-button {
+    @apply ml-1.5 mr-5 bg-[var(--color-gray-light)];
+  }
 
-#feedback-board-summary-table-header .board-summary-table-title {
-  @apply leading-10 tracking-[-0.04em] text-lg font-semibold text-left text-[rgb(51,51,51)];
+  & .board-summary-table-title {
+    @apply leading-10 tracking-[-0.04em] text-lg font-semibold text-left text-[rgb(51,51,51)];
+  }
 }
 
 .board-summary-table-container {
   @apply min-w-[1000px] overflow-auto h-[calc(100vh-92px)];
-}
 
-.board-summary-table-container th,
-.board-summary-table-container td {
-  @apply border border-black/[0.02] whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer;
-}
+  & th,
+  & td {
+    @apply border border-black/[0.02] whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer;
+  }
 
-.board-summary-table-container table {
-  @apply border border-black/10 border-collapse overflow-auto w-full;
-}
+  & table {
+    @apply border border-black/10 border-collapse overflow-auto w-full;
 
-.board-summary-table-container table thead {
-  @apply bg-[var(--color-primary)] text-white;
-}
+    & thead {
+      @apply bg-[var(--color-primary)] text-white;
 
-.board-summary-table-container table thead tr th {
-  @apply bg-[#0078d4] font-normal h-[30px] leading-[30px] sticky p-1.5 top-0 z-[1];
-}
+      & tr th {
+        @apply bg-[#0078d4] font-normal h-[30px] leading-[30px] sticky p-1.5 top-0 z-[1];
+      }
 
-.board-summary-table-container table thead tr th .resizer {
-  @apply absolute right-0 top-0 h-full w-1.5 cursor-col-resize select-none touch-none;
-}
+      & tr th .resizer {
+        @apply absolute right-0 top-0 h-full w-1.5 cursor-col-resize select-none touch-none;
+      }
 
-.board-summary-table-container table thead tr th:first-of-type {
-  width: 35px !important;
-  max-width: 35px !important;
-  min-width: 35px !important;
-}
+      & tr th:first-of-type {
+        width: 35px !important;
+        max-width: 35px !important;
+        min-width: 35px !important;
+      }
 
-.board-summary-table-container table thead tr th.asc {
-  @apply shadow-[inset_0_3px_0_0_rgba(0,0,0,0.6)];
-}
+      & tr th.asc {
+        @apply shadow-[inset_0_3px_0_0_rgba(0,0,0,0.6)];
+      }
 
-.board-summary-table-container table thead tr th.desc {
-  @apply shadow-[inset_0_-2px_0_0_rgba(var(--palette-neutral-100,0,0,0),1)];
-}
+      & tr th.desc {
+        @apply shadow-[inset_0_-2px_0_0_rgba(var(--palette-neutral-100,0,0,0),1)];
+      }
+    }
 
-.board-summary-table-container table tbody tr td {
-  @apply items-center text-sm font-normal h-[45px] py-1.5 px-1.5;
-}
+    & tbody {
+      & tr td {
+        @apply items-center text-sm font-normal h-[45px] py-1.5 px-1.5;
 
-.board-summary-table-container table tbody tr td:first-of-type {
-  @apply p-0;
-}
+        &:first-of-type {
+          @apply p-0;
+        }
+      }
 
-.board-summary-table-container table tbody tr:nth-child(even) {
-  @apply bg-[var(--border-subtle-color)];
-}
+      & tr:nth-child(even) {
+        @apply bg-[var(--border-subtle-color)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container {
-  @apply flex justify-center;
-}
+      & tr .board-summary-container {
+        @apply flex justify-center;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .rt-tr.-odd,
-.board-summary-table-container table tbody tr .board-summary-container .rt-tr.-even {
-  @apply h-[35px];
-}
+      & tr .board-summary-container .rt-tr.-odd,
+      & tr .board-summary-container .rt-tr.-even {
+        @apply h-[35px];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card,
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card {
-  @apply my-2 mx-1.5 bg-[var(--background-color)] min-h-[285px];
-}
+      & tr .board-summary-container .board-summary-card,
+      & tr .board-summary-container .action-items-summary-card {
+        @apply my-2 mx-1.5 bg-[var(--background-color)] min-h-[285px];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card .items-stats-container,
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .items-stats-container {
-  @apply flex my-2.5 mx-0;
-}
+      & tr .board-summary-container .board-summary-card .items-stats-container,
+      & tr .board-summary-container .action-items-summary-card .items-stats-container {
+        @apply flex my-2.5 mx-0;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card .items-stats-container .pending-action-item-color,
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .items-stats-container .pending-action-item-color {
-  @apply text-[var(--status-warning-text)];
-}
+      & tr .board-summary-container .board-summary-card .items-stats-container .pending-action-item-color,
+      & tr .board-summary-container .action-items-summary-card .items-stats-container .pending-action-item-color {
+        @apply text-[var(--status-warning-text)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card .items-stats-container .count-and-text,
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .items-stats-container .count-and-text {
-  @apply my-0 mx-8 ml-4 mr-8;
-}
+      & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text,
+      & tr .board-summary-container .action-items-summary-card .items-stats-container .count-and-text {
+        @apply my-0 mx-8 ml-4 mr-8;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card .items-stats-container .count-and-text .count,
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .items-stats-container .count-and-text .count {
-  @apply font-semibold text-[15px];
-}
+      & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text .count,
+      & tr .board-summary-container .action-items-summary-card .items-stats-container .count-and-text .count {
+        @apply font-semibold text-[15px];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card .items-stats-container .count-and-text .text,
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .items-stats-container .count-and-text .text {
-  @apply text-xs text-[var(--text-primary-color)];
-}
+      & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text .text,
+      & tr .board-summary-container .action-items-summary-card .items-stats-container .count-and-text .text {
+        @apply text-xs text-[var(--text-primary-color)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card .items-stats-container .stats-icon,
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .items-stats-container .stats-icon {
-  @apply h-8 w-8 text-base p-2;
-}
+      & tr .board-summary-container .board-summary-card .items-stats-container .stats-icon,
+      & tr .board-summary-container .action-items-summary-card .items-stats-container .stats-icon {
+        @apply h-8 w-8 text-base p-2;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card {
-  @apply w-4/5 max-w-[800px] overflow-y-auto;
-}
+      & tr .board-summary-container .action-items-summary-card {
+        @apply w-4/5 max-w-[800px] overflow-y-auto;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card div[role="row"] {
-  @apply bg-[var(--background-color)] text-[var(--text-primary-color)] pt-0 border-0;
-}
+      & tr .board-summary-container .action-items-summary-card div[role="row"] {
+        @apply bg-[var(--background-color)] text-[var(--text-primary-color)] pt-0 border-0;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card div[role="row"]:nth-child(even) {
-  @apply bg-[var(--border-subtle-color)];
-}
+      & tr .board-summary-container .action-items-summary-card div[role="row"]:nth-child(even) {
+        @apply bg-[var(--border-subtle-color)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .ms-DetailsList-headerWrapper {
-  @apply border-b-[3px] border-[var(--border-subtle-color)];
-}
+      & tr .board-summary-container .action-items-summary-card .ms-DetailsList-headerWrapper {
+        @apply border-b-[3px] border-[var(--border-subtle-color)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"] {
-  @apply bg-[var(--background-color)] text-[var(--text-primary-color)] border-b border-white;
-}
+      & tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"] {
+        @apply bg-[var(--background-color)] text-[var(--text-primary-color)] border-b border-white;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"]:hover {
-  @apply text-[var(--text-primary-color)];
-}
+      & tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"]:hover {
+        @apply text-[var(--text-primary-color)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .overflow-ellipsis {
-  @apply text-ellipsis overflow-hidden whitespace-nowrap block w-full;
-}
+      & tr .board-summary-container .action-items-summary-card .overflow-ellipsis {
+        @apply text-ellipsis overflow-hidden whitespace-nowrap block w-full;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .ms-Viewport {
-  @apply h-full;
-}
+      & tr .board-summary-container .action-items-summary-card .ms-Viewport {
+        @apply h-full;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .ms-Viewport .ms-DetailsList {
-  @apply h-full;
-}
+      & tr .board-summary-container .action-items-summary-card .ms-Viewport .ms-DetailsList {
+        @apply h-full;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .ms-Viewport .ms-DetailsRow {
-  @apply border-0;
-}
+      & tr .board-summary-container .action-items-summary-card .ms-Viewport .ms-DetailsRow {
+        @apply border-0;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .ms-List-cell {
-  @apply text-sm;
-}
+      & tr .board-summary-container .action-items-summary-card .ms-List-cell {
+        @apply text-sm;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .task-yellow {
-  @apply text-[var(--color-task-yellow)];
-}
+      & tr .board-summary-container .action-items-summary-card .task-yellow {
+        @apply text-[var(--color-task-yellow)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .bug-red {
-  @apply text-[var(--color-bug-red)];
-}
+      & tr .board-summary-container .action-items-summary-card .bug-red {
+        @apply text-[var(--color-bug-red)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .work-item-title {
-  @apply cursor-pointer text-start;
-}
+      & tr .board-summary-container .action-items-summary-card .work-item-title {
+        @apply cursor-pointer text-start;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .action-items-summary-card .no-action-items {
-  @apply text-[15px] relative top-1/2 -translate-y-1/2 text-center;
-}
+      & tr .board-summary-container .action-items-summary-card .no-action-items {
+        @apply text-[15px] relative top-1/2 -translate-y-1/2 text-center;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card {
-  @apply p-5 w-1/5 min-w-[270px] border border-[var(--text-primary-color)] rounded;
-}
+      & tr .board-summary-container .board-summary-card {
+        @apply p-5 w-1/5 min-w-[270px] border border-[var(--text-primary-color)] rounded;
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card .resolved-green {
-  @apply text-[var(--status-success-text)];
-}
+      & tr .board-summary-container .board-summary-card .resolved-green {
+        @apply text-[var(--status-success-text)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card .board-summary-card-title {
-  @apply text-lg border-b-[3px] border-[var(--color-primary)];
-}
+      & tr .board-summary-container .board-summary-card .board-summary-card-title {
+        @apply text-lg border-b-[3px] border-[var(--color-primary)];
+      }
 
-.board-summary-table-container table tbody tr .board-summary-container .board-summary-card .board-summary-card-title .ms-DocumentCardTitle {
-  @apply font-semibold p-0 mb-5 h-auto text-[var(--text-primary-color)];
-}
+      & tr .board-summary-container .board-summary-card .board-summary-card-title .ms-DocumentCardTitle {
+        @apply font-semibold p-0 mb-5 h-auto text-[var(--text-primary-color)];
+      }
+    }
+  }
 
-.board-summary-table-container .centered-cell {
-  @apply flex justify-center items-center h-full;
-}
+  & .centered-cell {
+    @apply flex justify-center items-center h-full;
+  }
 
-.board-summary-table-container .workItemsCount {
-  @apply text-center;
-}
+  & .workItemsCount {
+    @apply text-center;
+  }
 
-.board-summary-table-container .pending-action-item-count {
-  @apply text-[var(--status-warning-text)] font-semibold;
-}
+  & .pending-action-item-count {
+    @apply text-[var(--status-warning-text)] font-semibold;
+  }
 
-.board-summary-table-container .trash-icon-header {
-  @apply text-white cursor-pointer;
-}
+  & .trash-icon-header {
+    @apply text-white cursor-pointer;
 
-.board-summary-table-container .trash-icon-header i {
-  @apply text-inherit;
-}
+    & i {
+      @apply text-inherit;
+    }
+  }
 
-.board-summary-table-container .trash-icon-disabled {
-  @apply text-[#b0b0b0] cursor-not-allowed;
-}
+  & .trash-icon-disabled {
+    @apply text-[#b0b0b0] cursor-not-allowed;
 
-.board-summary-table-container .trash-icon-disabled i {
-  @apply text-inherit;
-}
+    & i {
+      @apply text-inherit;
+    }
+  }
 
-.board-summary-table-container .trash-icon {
-  @apply flex justify-center items-center cursor-default;
-}
+  & .trash-icon {
+    @apply flex justify-center items-center cursor-default;
 
-.board-summary-table-container .trash-icon:hover {
-  @apply text-red-600;
+    &:hover {
+      @apply text-red-600;
+    }
+  }
 }
 
 .warning-text {
   @apply text-red-600;
-}
 
-.warning-text i {
-  @apply mr-1.5;
+  & i {
+    @apply mr-1.5;
+  }
 }
 
 .board-summary-initialization-spinner {
@@ -979,12 +981,12 @@ kbd {
   @apply flex;
 }
 
-.feedback-carousel-pivot-item {
-  @apply w-full;
-}
-
 .feedback-carousel-pivot > .ms-Pivot .ms-Button {
   @apply bg-[var(--background-color)] text-[var(--text-primary-color)];
+}
+
+.feedback-carousel-pivot-item {
+  @apply w-full;
 }
 
 .retrospectives-carousel-dialog-modal .ms-Overlay {
@@ -2209,6 +2211,12 @@ kbd {
   @apply bg-[var(--color-primary)] text-white;
 }
 
+.retro-toast {
+  pointer-events: auto;
+  min-width: 18rem;
+  max-width: 22rem;
+}
+
 .retro-toast-container {
   position: fixed;
   top: 1.5rem;
@@ -2218,12 +2226,6 @@ kbd {
   flex-direction: column;
   gap: 0.5rem;
   pointer-events: none;
-}
-
-.retro-toast {
-  pointer-events: auto;
-  min-width: 18rem;
-  max-width: 22rem;
 }
 
 .retro-toast-progress {
