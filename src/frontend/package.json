@@ -26,7 +26,7 @@
   "author": "Microsoft",
   "license": "MIT",
   "dependencies": {
-    "@fluentui/react": "8.125.1",
+    "@fluentui/react": "8.125.2",
     "@microsoft/applicationinsights-react-js": "19.3.8",
     "@microsoft/applicationinsights-web": "3.3.10",
     "@microsoft/signalr": "10.0.0",
