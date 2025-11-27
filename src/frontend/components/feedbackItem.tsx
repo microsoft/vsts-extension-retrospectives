@@ -543,9 +543,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       }
     }
 
-    // function to handle timer count update
     const incTimer = async () => {
-      if (this.props.timerState === true) {
+      const currentItem = await itemDataService.getFeedbackItem(boardId, feedbackItemId);
+      if (currentItem && currentItem.timerState === true) {
         updatedFeedbackItem = await itemDataService.updateTimer(boardId, feedbackItemId);
         if (updatedFeedbackItem) {
           this.props.refreshFeedbackItems([updatedFeedbackItem], true);
