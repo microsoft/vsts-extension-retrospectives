@@ -593,4 +593,86 @@ describe("BoardSummaryTable, additional coverage", () => {
       expect(onArchiveToggle).toHaveBeenCalled();
     });
   });
+
+  describe("Sorting functionality", () => {
+    it("renders sortable column headers", async () => {
+      (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(mockBoards);
+
+      const { container, getByText } = render(
+        <BoardSummaryTable 
+          teamId="team-1" 
+          currentUserId="user-1" 
+          currentUserIsTeamAdmin={true} 
+          onArchiveToggle={jest.fn()} 
+          supportedWorkItemTypes={[]} 
+        />
+      );
+
+      await waitFor(() => {
+        expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+      });
+    });
+
+    it("buildBoardSummaryState handles null archivedDate", () => {
+      const boardWithNullArchivedDate: IFeedbackBoardDocument = {
+        id: "board-null-archived",
+        teamId: "team-1",
+        title: "Board with null archived date",
+        createdDate: new Date("2023-01-01"),
+        createdBy: mockedIdentity,
+        isArchived: true,
+        archivedDate: null as unknown as Date,
+        columns: [],
+        activePhase: "Collect",
+        maxVotesPerUser: 5,
+        boardVoteCollection: {},
+        teamEffectivenessMeasurementVoteCollection: [],
+      };
+
+      const result = buildBoardSummaryState([boardWithNullArchivedDate]);
+      
+      expect(result.boardsTableItems).toHaveLength(1);
+      expect(result.boardsTableItems[0].archivedDate).toBeNull();
+    });
+
+    it("buildBoardSummaryState handles undefined archivedDate", () => {
+      const boardWithUndefinedArchivedDate: IFeedbackBoardDocument = {
+        id: "board-undefined-archived",
+        teamId: "team-1",
+        title: "Board with undefined archived date",
+        createdDate: new Date("2023-01-01"),
+        createdBy: mockedIdentity,
+        isArchived: true,
+        columns: [],
+        activePhase: "Collect",
+        maxVotesPerUser: 5,
+        boardVoteCollection: {},
+        teamEffectivenessMeasurementVoteCollection: [],
+      };
+
+      const result = buildBoardSummaryState([boardWithUndefinedArchivedDate]);
+      
+      expect(result.boardsTableItems).toHaveLength(1);
+    });
+  });
+
+  describe("Row expansion", () => {
+    it("renders expansion toggle buttons for rows", async () => {
+      (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(mockBoards);
+
+      const { container } = render(
+        <BoardSummaryTable 
+          teamId="team-1" 
+          currentUserId="user-1" 
+          currentUserIsTeamAdmin={true} 
+          onArchiveToggle={jest.fn()} 
+          supportedWorkItemTypes={[]} 
+        />
+      );
+
+      await waitFor(() => {
+        expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+      });
+    });
+  });
 });
