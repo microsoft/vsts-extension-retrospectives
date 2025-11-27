@@ -458,9 +458,9 @@ describe("Vote Count Display", () => {
     const maxVotesPerUser = 5;
     const teamVotesUsed = 9;
     const teamVoteCapacity = 15;
-    const displayText = `My Vote: ${currentVoteCount}/${maxVotesPerUser} Team Votes: ${teamVotesUsed}/${teamVoteCapacity}`;
+    const displayText = `My Votes: ${currentVoteCount}/${maxVotesPerUser} Team Votes: ${teamVotesUsed}/${teamVoteCapacity}`;
 
-    expect(displayText).toBe("My Vote: 3/5 Team Votes: 9/15");
+    expect(displayText).toBe("My Votes: 3/5 Team Votes: 9/15");
   });
 });
 
