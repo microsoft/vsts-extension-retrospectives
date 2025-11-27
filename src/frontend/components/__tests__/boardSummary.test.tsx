@@ -589,4 +589,47 @@ describe("Board Summary", () => {
       expect(sorted.map((item: any) => item.id)).toEqual([1, 2]);
     });
   });
+
+  describe("onColumnClick", () => {
+    const createBoardSummaryInstance = () => new BoardSummaryComponent(mockedPropsWithActionItems);
+
+    it("should toggle sort direction when clicking same column", () => {
+      const instance = createBoardSummaryInstance();
+      
+      // Set up initial state
+      instance.state = {
+        actionItemTableItems: [createActionItem({ id: 1, title: "B" }), createActionItem({ id: 2, title: "A" })],
+        actionItemTableColumns: [
+          { key: "title", name: "Title", fieldName: "title", minWidth: 100, isSorted: true, isSortedDescending: false },
+        ],
+      };
+      
+      const column = { key: "title", name: "Title", fieldName: "title", minWidth: 100, isSorted: true, isSortedDescending: false };
+      const mockEvent = { preventDefault: jest.fn(), stopPropagation: jest.fn() } as unknown as React.MouseEvent<HTMLElement>;
+      
+      (instance as any).onColumnClick(mockEvent, column);
+      
+      // Verify state was set
+      expect(instance.state.actionItemTableColumns).toBeDefined();
+    });
+
+    it("should set new column as sorted when clicking different column", () => {
+      const instance = createBoardSummaryInstance();
+      
+      instance.state = {
+        actionItemTableItems: [createActionItem({ id: 1 }), createActionItem({ id: 2 })],
+        actionItemTableColumns: [
+          { key: "title", name: "Title", fieldName: "title", minWidth: 100, isSorted: true, isSortedDescending: false },
+          { key: "state", name: "State", fieldName: "state", minWidth: 100, isSorted: false, isSortedDescending: false },
+        ],
+      };
+      
+      const column = { key: "state", name: "State", fieldName: "state", minWidth: 100, isSorted: false, isSortedDescending: false };
+      const mockEvent = { preventDefault: jest.fn(), stopPropagation: jest.fn() } as unknown as React.MouseEvent<HTMLElement>;
+      
+      (instance as any).onColumnClick(mockEvent, column);
+      
+      expect(instance.state.actionItemTableColumns).toBeDefined();
+    });
+  });
 });

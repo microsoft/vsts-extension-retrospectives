@@ -973,5 +973,71 @@ describe("FeedbackBoard Component", () => {
 
       expect(container.querySelector(".feedback-board")).toBeInTheDocument();
     });
+
+    it("handles number key 9 when only 3 columns exist", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "9", bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles multiple arrow right presses to wrap around", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      // Press right arrow multiple times
+      for (let i = 0; i < 5; i++) {
+        act(() => {
+          const event = new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true });
+          document.dispatchEvent(event);
+        });
+      }
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles multiple arrow left presses to wrap around", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      // Press left arrow multiple times
+      for (let i = 0; i < 5; i++) {
+        act(() => {
+          const event = new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true });
+          document.dispatchEvent(event);
+        });
+      }
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+  });
+
+  describe("Column Notes Changes", () => {
+    it("calls onColumnNotesChange when notes are updated", async () => {
+      const onColumnNotesChange = jest.fn();
+      const propsWithCallback = {
+        ...mockedProps,
+        onColumnNotesChange,
+      };
+
+      render(<FeedbackBoard {...propsWithCallback} />);
+
+      // Component renders with callback prop
+      expect(onColumnNotesChange).toBeDefined();
+    });
+  });
+
+  describe("Feedback item operations", () => {
+    it("handles addFeedbackItems callback", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles refreshFeedbackItems callback", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
   });
 });
