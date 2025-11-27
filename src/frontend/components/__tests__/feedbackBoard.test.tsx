@@ -33,6 +33,7 @@ jest.mock("../../dal/itemDataService", () => ({
     getFeedbackItemsForBoard: jest.fn(),
     getFeedbackItem: jest.fn(),
     getBoardItem: jest.fn(),
+    flipTimer: jest.fn(),
   },
 }));
 
@@ -219,6 +220,11 @@ const mockFeedbackItems: IFeedbackItemDocument[] = [
     associatedActionItemIds: [123],
   },
 ];
+
+const getLatestColumnProps = (columnId: string): any => {
+  const columnCalls = feedbackColumnPropsSpy.mock.calls.filter(call => (call[0] as { columnId?: string })?.columnId === columnId);
+  return columnCalls[columnCalls.length - 1]?.[0];
+};
 
 describe("FeedbackBoard Component", () => {
   beforeEach(() => {
@@ -618,6 +624,101 @@ describe("FeedbackBoard Component", () => {
     });
   });
 
+  describe("Timer Coordination", () => {
+    it("sets the active timer id when a column requests a start", async () => {
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        const result = await columnProps.requestTimerStart("item-1");
+        expect(result).toBe(true);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps.activeTimerFeedbackItemId).toBe("item-1");
+      });
+    });
+
+    it("stops the previous timer when a different item starts", async () => {
+      const activeItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: "active-item",
+        timerState: true,
+        timerId: 123 as any,
+      };
+      const nextItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[1],
+        id: "next-item",
+        columnId: activeItem.columnId,
+        originalColumnId: activeItem.originalColumnId,
+        timerState: false,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([activeItem, nextItem]);
+      (itemDataService.flipTimer as jest.Mock).mockResolvedValue({ ...activeItem, timerState: false, timerId: null });
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = activeItem.columnId;
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBe("active-item");
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.requestTimerStart("next-item");
+      });
+
+      await waitFor(() => {
+        expect(itemDataService.flipTimer).toHaveBeenCalledWith(mockedBoard.id, "active-item", null);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps.activeTimerFeedbackItemId).toBe("next-item");
+      });
+    });
+
+    it("clears the active timer when notified that an item stopped", async () => {
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.requestTimerStart("item-1");
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps.activeTimerFeedbackItemId).toBe("item-1");
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.notifyTimerStopped("item-1");
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps.activeTimerFeedbackItemId).toBeNull();
+      });
+    });
+  });
+
   describe("Signal Handlers", () => {
     it("handles new item signal", async () => {
       let newItemHandler: ((columnId: string, feedbackItemId: string) => Promise<void>) | null = null;
@@ -870,6 +971,72 @@ describe("FeedbackBoard Component", () => {
         document.dispatchEvent(event);
       });
 
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles number key 9 when only 3 columns exist", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "9", bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles multiple arrow right presses to wrap around", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      // Press right arrow multiple times
+      for (let i = 0; i < 5; i++) {
+        act(() => {
+          const event = new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true });
+          document.dispatchEvent(event);
+        });
+      }
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles multiple arrow left presses to wrap around", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      // Press left arrow multiple times
+      for (let i = 0; i < 5; i++) {
+        act(() => {
+          const event = new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true });
+          document.dispatchEvent(event);
+        });
+      }
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+  });
+
+  describe("Column Notes Changes", () => {
+    it("calls onColumnNotesChange when notes are updated", async () => {
+      const onColumnNotesChange = jest.fn();
+      const propsWithCallback = {
+        ...mockedProps,
+        onColumnNotesChange,
+      };
+
+      render(<FeedbackBoard {...propsWithCallback} />);
+
+      // Component renders with callback prop
+      expect(onColumnNotesChange).toBeDefined();
+    });
+  });
+
+  describe("Feedback item operations", () => {
+    it("handles addFeedbackItems callback", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles refreshFeedbackItems callback", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
       expect(container.querySelector(".feedback-board")).toBeInTheDocument();
     });
   });

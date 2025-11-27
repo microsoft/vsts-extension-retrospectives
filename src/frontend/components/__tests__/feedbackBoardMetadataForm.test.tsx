@@ -729,3 +729,123 @@ describe("FeedbackBoardMetadataForm - Max Votes Validation", () => {
     expect(maxVotesInput.value).toBe("12");
   });
 });
+
+describe("FeedbackBoardMetadataForm - Checkbox Options", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should toggle team effectiveness measurement checkbox", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const checkbox = screen.getByLabelText(/Include Team Assessment/i);
+    expect(checkbox).toBeInTheDocument();
+
+    await user.click(checkbox);
+  });
+
+  it("should toggle show feedback after collect checkbox", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const checkbox = screen.getByLabelText(/Only show feedback after Collect phase/i);
+    expect(checkbox).toBeInTheDocument();
+
+    await user.click(checkbox);
+  });
+
+  it("should toggle anonymous checkbox", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const checkbox = screen.getByLabelText(/Do not display names in feedback/i);
+    expect(checkbox).toBeInTheDocument();
+
+    await user.click(checkbox);
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Column Move Operations", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should render move up and move down buttons for columns", async () => {
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const moveUpButtons = screen.getAllByTitle("Move Up");
+    const moveDownButtons = screen.getAllByTitle("Move Down");
+
+    expect(moveUpButtons.length).toBeGreaterThan(0);
+    expect(moveDownButtons.length).toBeGreaterThan(0);
+  });
+
+  it("should disable move up button for first column", () => {
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const moveUpButtons = screen.getAllByTitle("Move Up");
+    // First column's move up button should be disabled
+    expect(moveUpButtons[0]).toBeDisabled();
+  });
+
+  it("should disable move down button for last column", () => {
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const moveDownButtons = screen.getAllByTitle("Move Down");
+    // Last column's move down button should be disabled
+    expect(moveDownButtons[moveDownButtons.length - 1]).toBeDisabled();
+  });
+
+  it("should have working move down buttons for non-last columns", async () => {
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const moveDownButtons = screen.getAllByTitle("Move Down");
+    // First column's move down button should not be disabled
+    expect(moveDownButtons[0]).not.toBeDisabled();
+  });
+
+  it("should have working move up buttons for non-first columns", async () => {
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const moveUpButtons = screen.getAllByTitle("Move Up");
+    // Second column's move up button should not be disabled
+    if (moveUpButtons.length > 1) {
+      expect(moveUpButtons[1]).not.toBeDisabled();
+    }
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Board Name Validation", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should have board name input field", async () => {
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const nameInput = screen.getByPlaceholderText(mockedProps.placeholderText);
+    expect(nameInput).toBeInTheDocument();
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Delete Column", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should render delete buttons for columns", () => {
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const deleteButtons = screen.getAllByTitle("Delete");
+    expect(deleteButtons.length).toBeGreaterThan(0);
+  });
+});

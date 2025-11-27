@@ -145,6 +145,9 @@ export const testColumnProps = mocked({
   addFeedbackItems: jest.fn(() => {}),
   removeFeedbackItemFromColumn: jest.fn(() => {}),
   refreshFeedbackItems: jest.fn(() => {}),
+  activeTimerFeedbackItemId: null,
+  requestTimerStart: jest.fn().mockResolvedValue(true),
+  notifyTimerStopped: jest.fn(() => {}),
 });
 
 // Grouped Column Mocks below
@@ -340,4 +343,7 @@ export const testGroupColumnProps = mocked({
   addFeedbackItems: jest.fn(() => {}),
   removeFeedbackItemFromColumn: jest.fn(() => {}),
   refreshFeedbackItems: jest.fn(() => {}),
+  activeTimerFeedbackItemId: null,
+  requestTimerStart: jest.fn().mockResolvedValue(true),
+  notifyTimerStopped: jest.fn(() => {}),
 });

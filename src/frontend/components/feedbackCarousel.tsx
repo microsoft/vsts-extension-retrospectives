@@ -19,21 +19,33 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   constructor(props: IFeedbackCarouselProps) {
     super(props);
 
-    const feedbackColumnPropsList = [...this.props.feedbackColumnPropsList];
+    this.state = {
+      feedbackColums: this.buildFeedbackColumns(props.feedbackColumnPropsList),
+    };
+  }
 
-    if (feedbackColumnPropsList.length > 0) {
-      const allColumnItems = feedbackColumnPropsList.flatMap(col => col.columnItems);
-      feedbackColumnPropsList.unshift({
-        ...feedbackColumnPropsList[0],
+  private buildFeedbackColumns = (feedbackColumnPropsList: FeedbackColumnProps[]): FeedbackColumnProps[] => {
+    const columnsList = [...feedbackColumnPropsList];
+
+    if (columnsList.length > 0) {
+      const allColumnItems = columnsList.flatMap(col => col.columnItems);
+      columnsList.unshift({
+        ...columnsList[0],
         columnId: "all-columns",
         columnName: "All",
         columnItems: allColumnItems,
       } as FeedbackColumnProps);
     }
 
-    this.state = {
-      feedbackColums: feedbackColumnPropsList,
-    };
+    return columnsList;
+  };
+
+  public componentDidUpdate(prevProps: IFeedbackCarouselProps) {
+    if (prevProps.feedbackColumnPropsList !== this.props.feedbackColumnPropsList) {
+      this.setState({
+        feedbackColums: this.buildFeedbackColumns(this.props.feedbackColumnPropsList),
+      });
+    }
   }
 
   private renderFeedbackCarouselItems = (columnProps: FeedbackColumnProps) => {
@@ -86,11 +98,14 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         hideFeedbackItems: columnProps.hideFeedbackItems,
         userIdRef: columnItem.feedbackItem.userIdRef,
         onVoteCasted: columnProps.onVoteCasted,
-        groupCount: 0,
-        groupIds: [],
+        groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
+        groupIds: columnItem.feedbackItem.childFeedbackItemIds ?? [],
         isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
         isShowingGroupedChildrenTitles: false,
         isFocusModalHidden: this.props.isFocusModalHidden,
+        activeTimerFeedbackItemId: columnProps.activeTimerFeedbackItemId,
+        requestTimerStart: columnProps.requestTimerStart,
+        notifyTimerStopped: columnProps.notifyTimerStopped,
       };
 
       return (
@@ -102,6 +117,9 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
   };
 
   public render() {
+    const arrowBaseClasses = "absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center cursor-pointer transition-transform duration-200 ease-in-out bg-white/90 border border-gray-300 rounded-full w-10 h-10 shadow-sm no-underline hover:bg-white hover:shadow-md hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2";
+    const arrowIconClasses = "text-base text-gray-800";
+
     return (
       <Pivot className="feedback-carousel-pivot">
         {this.state.feedbackColums.map(columnProps => {
@@ -115,14 +133,14 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
                     return (
                       <li className="carousel-slide" id={`slide-${columnProps.columnId}-${index}`} key={child.key}>
                         {index > 0 && (
-                          <a href={`#slide-${columnProps.columnId}-${index - 1}`} className="carousel-arrow carousel-arrow-prev" aria-label="Previous slide">
-                            <i className="fas fa-chevron-left" />
+                          <a href={`#slide-${columnProps.columnId}-${index - 1}`} className={`${arrowBaseClasses} left-2.5`} aria-label="Previous slide">
+                            <i className={`fas fa-chevron-left ${arrowIconClasses}`} />
                           </a>
                         )}
                         <div className="carousel-viewport">{child}</div>
                         {index < feedbackCarouselItems.length - 1 && (
-                          <a href={`#slide-${columnProps.columnId}-${index + 1}`} className="carousel-arrow carousel-arrow-next" aria-label="Next slide">
-                            <i className="fas fa-chevron-right" />
+                          <a href={`#slide-${columnProps.columnId}-${index + 1}`} className={`${arrowBaseClasses} right-2.5`} aria-label="Next slide">
+                            <i className={`fas fa-chevron-right ${arrowIconClasses}`} />
                           </a>
                         )}
                       </li>

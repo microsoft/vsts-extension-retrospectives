@@ -6,7 +6,7 @@ reports/
 
 *.min.js
 *.min.css
-bundle.css
+src/bundle.css
 
 package-lock.json
 yarn.lock

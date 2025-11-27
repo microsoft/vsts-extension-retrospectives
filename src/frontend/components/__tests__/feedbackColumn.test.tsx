@@ -627,5 +627,61 @@ describe("Feedback Column ", () => {
       // Should handle gracefully
       expect(column).toBeTruthy();
     });
+
+    test("handles navigation in empty column", () => {
+      const props = { ...testColumnProps, columnItems: [] as IColumnItem[] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+
+      // ArrowDown in empty column should focus create button
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      expect(column).toBeTruthy();
+    });
+  });
+
+  describe("Static Methods", () => {
+    test("createFeedbackItemProps creates proper props object", () => {
+      const props = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0]);
+      
+      expect(props).toHaveProperty("id");
+      expect(props).toHaveProperty("title");
+      expect(props).toHaveProperty("boardId");
+      expect(props).toHaveProperty("columnId");
+      expect(props).toHaveProperty("accentColor");
+    });
+
+    test("createFeedbackItemProps uses original column accent color when moved", () => {
+      const itemInDifferentColumn = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          originalColumnId: "different-column-id",
+        },
+      };
+
+      const columnsWithDifferent = {
+        ...testColumnProps.columns,
+        "different-column-id": {
+          columnProperties: {
+            id: "different-column-id",
+            title: "Different Column",
+            accentColor: "#ff0000",
+          },
+        },
+      };
+
+      const propsWithDifferent = {
+        ...testColumnProps,
+        columns: columnsWithDifferent,
+      };
+
+      const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(propsWithDifferent, itemInDifferentColumn);
+      
+      expect(feedbackItemProps.accentColor).toBe("#ff0000");
+    });
   });
 });
