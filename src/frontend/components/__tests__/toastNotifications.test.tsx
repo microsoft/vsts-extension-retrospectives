@@ -89,4 +89,65 @@ describe("toastNotifications", () => {
 
     expect(container.querySelectorAll(".retro-toast").length).toBe(0);
   });
+
+  describe("toast intents", () => {
+    it("renders warning toast correctly", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast("Warning message", { intent: "warning", autoClose: null });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+    });
+
+    it("renders error toast correctly", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast("Error message", { intent: "error", autoClose: null });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+    });
+
+    it("renders info toast by default", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast("Info message", { intent: "info", autoClose: null });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+    });
+
+    it("renders success toast correctly", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast("Success message", { intent: "success", autoClose: null });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+    });
+  });
+
+  describe("update functionality", () => {
+    it("ignores update if toast id does not exist", () => {
+      const { container } = render(<ToastContainer />);
+
+      let existingId = "";
+      act(() => {
+        existingId = toast("Existing toast", { autoClose: null });
+      });
+
+      // Try to update a non-existent toast
+      act(() => {
+        toast.update("non-existent-id", { render: "Updated" });
+      });
+
+      // Original toast should still be there
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+    });
+  });
 });
