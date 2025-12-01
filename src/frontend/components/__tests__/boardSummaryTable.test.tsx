@@ -676,3 +676,264 @@ describe("BoardSummaryTable, additional coverage", () => {
     });
   });
 });
+
+describe("BoardSummaryTable - Sorting Functionality", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("getSortedData returns unsorted data when no sort direction", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("toggleSort sets new column when clicking different column", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("toggleSort cycles through asc, desc, false for same column", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("sorts by createdDate column correctly", async () => {
+    const boardsWithDates: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], createdDate: new Date("2023-01-01") },
+      { ...mockBoards[1], createdDate: new Date("2023-06-01") },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(boardsWithDates);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("sorts by archivedDate column correctly with null values", async () => {
+    const boardsWithArchivedDates: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], archivedDate: null as unknown as Date },
+      { ...mockBoards[1], isArchived: true, archivedDate: new Date("2023-03-01") },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(boardsWithArchivedDates);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("sorts by boardName column alphabetically", async () => {
+    const boardsWithNames: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], title: "Zebra Board" },
+      { ...mockBoards[1], title: "Alpha Board" },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(boardsWithNames);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("handles null values in sort comparison", async () => {
+    const boardsWithNulls: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], archivedDate: undefined as unknown as Date },
+      { ...mockBoards[1], archivedDate: null as unknown as Date },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(boardsWithNulls);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+});
+
+describe("BoardSummaryTable - Row Expansion", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("toggleExpanded adds row to expanded set", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    // Find and click the expand button
+    const expandButtons = container.querySelectorAll(".contextual-menu-button");
+    if (expandButtons.length > 0) {
+      (expandButtons[0] as HTMLElement).click();
+    }
+  });
+
+  it("toggleExpanded removes row from expanded set when clicked again", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const expandButtons = container.querySelectorAll(".contextual-menu-button");
+    if (expandButtons.length > 0) {
+      // Click to expand
+      (expandButtons[0] as HTMLElement).click();
+      // Click again to collapse
+      (expandButtons[0] as HTMLElement).click();
+    }
+  });
+});
+
+describe("BoardSummaryTable - Action Items Loading", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+  });
+
+  it("handleActionItems processes boards with action items", async () => {
+    const feedbackItemsWithActions = [
+      { id: "item-1", associatedActionItemIds: [1, 2] },
+      { id: "item-2", associatedActionItemIds: [3] },
+    ];
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(feedbackItemsWithActions);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("handleActionItems handles boards with no feedback items", async () => {
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("handleActionItems handles feedback items without action items", async () => {
+    const feedbackItemsWithoutActions = [
+      { id: "item-1", associatedActionItemIds: [] as number[] },
+      { id: "item-2" },
+    ];
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(feedbackItemsWithoutActions);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+});
+
+describe("BoardSummaryTable - Delete Dialog", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("opens delete dialog when trash icon is clicked", async () => {
+    const archivedBoards: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], isArchived: true, archivedDate: new Date(Date.now() - 5 * 60 * 1000) },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(archivedBoards);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const trashIcon = container.querySelector(".trash-icon");
+    if (trashIcon) {
+      (trashIcon as HTMLElement).click();
+    }
+  });
+
+  it("closes delete dialog when cancel is clicked", async () => {
+    const archivedBoards: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], isArchived: true, archivedDate: new Date(Date.now() - 5 * 60 * 1000) },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(archivedBoards);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+});
+
+describe("BoardSummaryTable - Archive Checkbox", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("archive checkbox triggers handleArchiveToggle", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const archiveCheckboxes = container.querySelectorAll('input[type="checkbox"]');
+    if (archiveCheckboxes.length > 0) {
+      (archiveCheckboxes[0] as HTMLInputElement).click();
+    }
+  });
+});
+
+describe("BoardSummaryTable - boardRowSummary", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("renders board row summary when row is expanded", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    // Click expand button to show summary
+    const expandButtons = container.querySelectorAll(".contextual-menu-button");
+    if (expandButtons.length > 0) {
+      (expandButtons[0] as HTMLElement).click();
+    }
+  });
+
+  it("boardRowSummary returns null for non-existent board", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+});

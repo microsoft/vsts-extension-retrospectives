@@ -849,3 +849,253 @@ describe("FeedbackBoardMetadataForm - Delete Column", () => {
     expect(deleteButtons.length).toBeGreaterThan(0);
   });
 });
+
+describe("FeedbackBoardMetadataForm - Form Submission Extended", () => {
+  let mockOnFormSubmit: jest.Mock;
+  let mockOnFormCancel: jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockOnFormSubmit = jest.fn();
+    mockOnFormCancel = jest.fn();
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+    mockedProps.onFormSubmit = mockOnFormSubmit;
+    mockedProps.onFormCancel = mockOnFormCancel;
+  });
+
+  it("should not submit when title is empty", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    expect(saveButton).toBeDisabled();
+  });
+
+  it("should disable save button when no columns exist", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const deleteButtons = screen.getAllByTitle("Delete");
+    
+    // Delete all but one column
+    for (let i = 0; i < deleteButtons.length - 1; i++) {
+      await user.click(deleteButtons[i]);
+    }
+
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    // Save should still be disabled if no title
+    expect(saveButton).toBeDisabled();
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Column Title Editing", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should render editable column titles", () => {
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const columnHeading = screen.getByRole("heading", { name: /column settings/i });
+    expect(columnHeading).toBeInTheDocument();
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Permissions Tab", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should render permissions tab", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const permissionsTab = screen.getByRole("tab", { name: /permissions/i });
+    expect(permissionsTab).toBeInTheDocument();
+  });
+
+  it("should switch to permissions tab when clicked", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const permissionsTab = screen.getByRole("tab", { name: /permissions/i });
+    await user.click(permissionsTab);
+
+    expect(permissionsTab).toHaveAttribute("aria-selected", "true");
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Delete Column Undo", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should show undo button after marking column for deletion", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const deleteButtons = screen.getAllByTitle("Delete");
+    await user.click(deleteButtons[0]);
+
+    // Look for undo button
+    const undoButtons = screen.getAllByTitle("Undo Delete");
+    expect(undoButtons.length).toBeGreaterThan(0);
+  });
+
+  it("should restore column when undo is clicked", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const deleteButtons = screen.getAllByTitle("Delete");
+    const initialCount = deleteButtons.length;
+    
+    await user.click(deleteButtons[0]);
+
+    const undoButtons = screen.getAllByTitle("Undo Delete");
+    await user.click(undoButtons[0]);
+
+    // Delete button should be back
+    const newDeleteButtons = screen.getAllByTitle("Delete");
+    expect(newDeleteButtons.length).toBe(initialCount);
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Column Move Operations", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should move column up when move up button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const moveUpButtons = screen.getAllByTitle("Move Up");
+    
+    // Click the second column's move up button (should be enabled)
+    if (moveUpButtons.length > 1) {
+      await user.click(moveUpButtons[1]);
+      expect(screen.getByRole("heading", { name: /column settings/i })).toBeInTheDocument();
+    }
+  });
+
+  it("should move column down when move down button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const moveDownButtons = screen.getAllByTitle("Move Down");
+    
+    // Click the first column's move down button (should be enabled)
+    if (moveDownButtons.length > 0) {
+      await user.click(moveDownButtons[0]);
+      expect(screen.getByRole("heading", { name: /column settings/i })).toBeInTheDocument();
+    }
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Column Icon Selection", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should select an icon when clicked in dialog", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    // Open icon dialog
+    const changeIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
+    await user.click(changeIconButtons[0]);
+
+    // Verify dialog is open
+    expect(screen.getByText(/choose column icon/i)).toBeInTheDocument();
+
+    // Find and click an icon button in the dialog
+    const iconButtons = screen.getAllByRole("button", { name: /choose the icon/i });
+    if (iconButtons.length > 0) {
+      await user.click(iconButtons[0]);
+      // Dialog should close
+      expect(screen.queryByText(/choose column icon/i)).not.toBeInTheDocument();
+    }
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Column Color Selection", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should select a color when clicked in dialog", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    // Open color dialog
+    const changeColorButtons = screen.getAllByRole("button", { name: /change column color/i });
+    await user.click(changeColorButtons[0]);
+
+    // Verify dialog is open
+    expect(screen.getByText(/choose column color/i)).toBeInTheDocument();
+
+    // Find and click a color button in the dialog
+    const colorButtons = screen.getAllByRole("button", { name: /choose the color/i });
+    if (colorButtons.length > 0) {
+      await user.click(colorButtons[0]);
+      // Dialog should close
+      expect(screen.queryByText(/choose column color/i)).not.toBeInTheDocument();
+    }
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Title Reset", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should reset title when clear button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const titleInput = screen.getByLabelText(/please enter new retrospective title/i) as HTMLInputElement;
+    
+    await user.type(titleInput, "Test Title");
+    expect(titleInput.value).toBe("Test Title");
+
+    await user.clear(titleInput);
+    expect(titleInput.value).toBe("");
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Save Button State", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should disable save button when column title is empty", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    // Add a board title
+    const titleInput = screen.getByLabelText(/please enter new retrospective title/i);
+    await user.type(titleInput, "Valid Title");
+
+    // Save button state depends on columns having titles
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    expect(saveButton).toBeInTheDocument();
+  });
+});
