@@ -223,12 +223,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &:focus-visible {
-    @apply outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
+    @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
   }
 }
 
 .extended-options-menu {
-  @apply bg-[var(--callout-background-color)] max-h-none;
+  @apply bg-(--callout-background-color) max-h-none;
 
   & button.ms-ContextualMenu-link {
     @apply text-(--text-primary-color);
@@ -433,7 +433,7 @@ kbd {
 }
 
 .retrospectives-preview-email-dialog {
-  @apply max-w-none w-[800px] h-[500px] bg-(--background-color) border border-(--color-border-gray);
+  @apply max-w-none w-[800px] h-[500px] bg-(--background-color) border border-border-gray;
 
   & div[role="heading"] {
     @apply text-(--text-primary-color);
@@ -460,14 +460,14 @@ kbd {
   }
 
   &:focus-visible .mainItemCard {
-    @apply outline-[3px] outline-(--color-primary) outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
+    @apply outline-[3px] outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
   }
 
   & .item-cards {
     @apply flex flex-col;
 
     & .feedbackItemGroupItem.removeFeedbackItem .ms-DocumentCard {
-      @apply [animation:fadeOutToRed_1000ms_ease-in_1_forwards];
+      @apply animate-[fadeOutToRed_1000ms_ease-in_1_forwards];
     }
 
     & .mainItemCard .card-integral-part {
@@ -475,15 +475,15 @@ kbd {
     }
 
     & .mainItemCard .card-header .feedback-expand-group {
-      @apply h-[35px] max-w-[150px] z-[1] m-0 mr-auto bg-inherit border-0 flex leading-[35px] text-xs font-semibold;
+      @apply h-[35px] max-w-[150px] z-1 m-0 mr-auto bg-inherit border-0 flex leading-[35px] text-xs font-semibold;
     }
 
     & .mainItemCard .card-header .feedback-expand-group i {
-      @apply w-9 ml-0.5 -mr-1 [line-height:inherit];
+      @apply w-9 ml-0.5 -mr-1 leading-[inherit];
     }
 
     & .mainItemCard .card-header .feedback-expand-group:focus-visible {
-      @apply outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
+      @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
     }
   }
 
@@ -496,7 +496,7 @@ kbd {
   }
 
   &.feedback-item-group-expanded .feedbackItemGroupGroupedItem .groupedItemCard .card-integral-part {
-    @apply border-l-[3px] border-solid bg-[var(--background-color)];
+    @apply border-l-[3px] border-solid bg-(--background-color);
   }
 }
 
