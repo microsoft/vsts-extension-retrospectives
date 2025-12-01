@@ -30,7 +30,7 @@ interface IExportImportDataSchema {
   items: IFeedbackItemDocument[];
 }
 
-interface ContextualMenuButtonProps {
+interface ExtensionSettingsButtonProps {
   ariaLabel: string;
   title: string;
   iconClass: string;
@@ -39,8 +39,8 @@ interface ContextualMenuButtonProps {
   menuItems?: IContextualMenuItem[];
 }
 
-export const ContextualMenuButton: React.FC<ContextualMenuButtonProps> = ({ ariaLabel, title, iconClass, label, onClick, menuItems }) => {
-  const buttonClass = "contextual-menu-button";
+export const ExtensionSettingsButton: React.FC<ExtensionSettingsButtonProps> = ({ ariaLabel, title, iconClass, label, onClick, menuItems }) => {
+  const buttonClass = "extension-settings-button";
   const menuProps = menuItems
     ? {
         items: menuItems,
@@ -283,9 +283,9 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
   public render() {
     return (
       <div className="extension-settings-menu">
-        <ContextualMenuButton ariaLabel="Prime Directive" title="Prime Directive" iconClass="fas fa-shield-halved" label="Directive" onClick={this.showPrimeDirectiveDialog} />
-        <ContextualMenuButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} />
-        <ContextualMenuButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} />
+        <ExtensionSettingsButton ariaLabel="Prime Directive" title="Prime Directive" iconClass="fas fa-shield-halved" label="Directive" onClick={this.showPrimeDirectiveDialog} />
+        <ExtensionSettingsButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} />
+        <ExtensionSettingsButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} />
 
         <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog retro-dialog-shell">
           {renderContent(PRIME_DIRECTIVE_CONTENT)}
