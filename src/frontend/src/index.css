@@ -296,7 +296,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-votes-count {
-  @apply text-base my-2 mx-4 flex flex-wrap items-center gap-4;
+  @apply text-base my-2 mx-4 flex flex-wrap items-center gap-3;
 
   & .entry {
     @apply flex items-center gap-2 text-sm text-[var(--text-secondary-color)];
