@@ -164,7 +164,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .extension-settings-button {
-    @apply bg-inherit border-0 min-w-0 my-2 text-[rgba(var(--palette-neutral-80),1)];
+    @apply bg-inherit border-0 min-w-0 mx-2 p-0 text-[rgba(var(--palette-neutral-80),1)];
 
     & i[data-icon-name="ChevronDown"] {
       @apply hidden;
