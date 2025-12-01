@@ -275,6 +275,22 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-[var(--border-subtle-color)] rounded-t-[5px];
 }
 
+.feedback-votes-count {
+  @apply text-base my-2 mx-4 flex flex-wrap items-center gap-4;
+
+  & .entry {
+    @apply flex items-center gap-2 text-sm text-[var(--text-secondary-color)];
+
+    & strong {
+      @apply text-[var(--text-primary-color)];
+    }
+  }
+
+  & .separator {
+    @apply flex items-center text-base text-[var(--text-secondary-color)];
+  }
+}
+
 .feedback-board {
   @apply w-full table table-fixed;
 
@@ -283,22 +299,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
     &:focus {
       @apply outline-none;
-    }
-  }
-
-  & .feedback-maxvotes-per-user {
-    @apply text-base my-2 mx-4 flex flex-wrap items-center gap-4;
-
-    & .feedback-maxvotes-entry {
-      @apply flex items-center gap-2 text-sm text-[var(--text-secondary-color)];
-
-      & strong {
-        @apply text-[var(--text-primary-color)];
-      }
-    }
-
-    & .feedback-maxvotes-separator {
-      @apply flex items-center text-base text-[var(--text-secondary-color)];
     }
   }
 }
