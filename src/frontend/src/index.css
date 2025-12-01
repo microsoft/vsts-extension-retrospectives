@@ -29,30 +29,30 @@
   }
 
   .feedback-card-surface {
-    @apply z-[1];
+    @apply z-1;
     background-color: transparent !important;
     border: 1px solid var(--color-border-gray) !important;
   }
 }
 
 .work-item-task-color {
-  @apply text-[var(--color-task-yellow)];
+  @apply text-task-yellow;
 }
 
 .work-item-bug-color {
-  @apply text-[var(--color-bug-red)];
+  @apply text-(--color-bug-red);
 }
 
 .focus-outline-standard {
-  @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
+  @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
 }
 
 .button-primary {
-  @apply bg-[var(--color-primary)] text-white;
+  @apply bg-primary text-white;
 }
 
 .dialog-text-primary {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 @keyframes fadeInFromGreen {
@@ -121,11 +121,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .ms-Pivot .ms-Button {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .ms-Pivot-link:hover {
-  @apply text-[var(--status-info-foreground)] bg-inherit;
+  @apply text-(--status-info-foreground) bg-inherit;
 }
 
 .ms-Checkbox.is-disabled {
@@ -145,7 +145,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .is-disabled {
-  @apply bg-[var(--text-disabled-color)] border-[var(--text-disabled-color)] text-[var(--text-disabled-color)];
+  @apply bg-(--text-disabled-color) border-(--text-disabled-color) text-(--text-disabled-color);
 }
 
 .ms-ContextualMenu-divider {
@@ -171,11 +171,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     &:hover {
-      @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-[var(--text-primary-color)];
+      @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-(--text-primary-color);
     }
 
     &:focus-visible {
-      @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
+      @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
     }
   }
 }
@@ -186,7 +186,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .carousel-track {
   @apply flex overflow-x-auto w-full relative;
-  @apply [scroll-snap-type:x_mandatory] [scroll-behavior:smooth] [-webkit-overflow-scrolling:touch];
+  @apply [scroll-snap-type:x_mandatory] scroll-smooth [-webkit-overflow-scrolling:touch];
   @apply [scrollbar-width:none] [-ms-overflow-style:none];
 }
 
@@ -196,7 +196,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .carousel-slide {
   @apply flex-none w-full relative flex items-center justify-center;
-  @apply [scroll-snap-align:center] [scroll-snap-stop:always] min-w-full py-0 px-[60px];
+  @apply snap-center snap-always min-w-full py-0 px-[60px];
 
   & .feedback-carousel-item {
     @apply w-full max-w-[600px];
@@ -219,11 +219,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &:hover {
-    @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-[var(--text-primary-color)];
+    @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-(--text-primary-color);
   }
 
   &:focus-visible {
-    @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
+    @apply outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
   }
 }
 
@@ -231,35 +231,35 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-[var(--callout-background-color)] max-h-none;
 
   & button.ms-ContextualMenu-link {
-    @apply text-[var(--text-primary-color)];
+    @apply text-(--text-primary-color);
 
     &:hover {
-      @apply bg-[var(--border-subtle-color)] text-[var(--text-primary-color)];
+      @apply bg-(--border-subtle-color) text-(--text-primary-color);
     }
   }
 }
 
 .ms-ContextualMenu-Callout .ms-Callout-main {
-  @apply bg-[var(--callout-background-color)];
+  @apply bg-(--callout-background-color);
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) div[role="heading"] {
-  @apply text-[var(--text-primary-color)] pb-2.5;
+  @apply text-(--text-primary-color) pb-2.5;
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) :is(.ms-Dialog-content, .ms-Dialog-content .ms-Label, p.ms-Dialog-subText, .ms-Dialog-header button.ms-Dialog-button) {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) .ms-Dialog-inner a {
-  @apply text-[var(--palette-primary-darken-6)] underline;
+  @apply text-(--palette-primary-darken-6) underline;
 }
 
 .editable-document-card-title {
-  @apply overflow-hidden break-words flex-1 flex-col justify-center min-h-[100px] text-[var(--text-primary-color)];
+  @apply overflow-hidden wrap-break-word flex-1 flex-col justify-center min-h-[100px] text-(--text-primary-color);
 
   & .editable-text {
-    @apply inline-block max-w-full align-middle whitespace-pre-wrap break-words cursor-text text-base;
+    @apply inline-block max-w-full align-middle whitespace-pre-wrap wrap-break-word cursor-text text-base;
   }
 
   & .editable-text-input-container {
@@ -288,26 +288,26 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .ms-FocusZone .ms-Pivot-link {
-  @apply rounded-t-[5px] border-t border-l border-r border-[var(--border-subtle-color)];
+  @apply rounded-t-[5px] border-t border-l border-r border-(--border-subtle-color);
 }
 
 .ms-FocusZone .ms-Pivot-link.is-selected {
-  @apply bg-[var(--border-subtle-color)] rounded-t-[5px];
+  @apply bg-(--border-subtle-color) rounded-t-[5px];
 }
 
 .feedback-votes-count {
   @apply text-base my-2 mx-4 flex flex-wrap items-center gap-3;
 
   & .entry {
-    @apply flex items-center gap-2 text-sm text-[var(--text-secondary-color)];
+    @apply flex items-center gap-2 text-sm text-(--text-secondary-color);
 
     & strong {
-      @apply text-[var(--text-primary-color)];
+      @apply text-(--text-primary-color);
     }
   }
 
   & .separator {
-    @apply flex items-center text-base text-[var(--text-secondary-color)];
+    @apply flex items-center text-base text-(--text-secondary-color);
   }
 }
 
@@ -324,15 +324,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .keyboard-shortcuts-dialog {
-  @apply bg-[var(--background-color)];
+  @apply bg-(--background-color);
 
   & .ms-Dialog-title,
   & .ms-Dialog-subText {
-    @apply text-[var(--text-primary-color)];
+    @apply text-(--text-primary-color);
   }
 
   & table tr:hover {
-    @apply bg-[var(--border-subtle-color)];
+    @apply bg-(--border-subtle-color);
   }
 }
 
@@ -341,27 +341,27 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .keyboard-shortcuts-category-title {
-  @apply text-sm font-semibold mb-2.5 text-[var(--text-primary-color)] border-b border-[var(--border-subtle-color)] pb-1.5;
+  @apply text-sm font-semibold mb-2.5 text-(--text-primary-color) border-b border-(--border-subtle-color) pb-1.5;
 }
 
 .keyboard-shortcuts-table {
   @apply w-full border-collapse;
 
   & tbody tr {
-    @apply border-b border-[var(--border-subtle-color)];
+    @apply border-b border-(--border-subtle-color);
 
     &:first-child {
       @apply py-2 px-3 text-left align-middle w-[40%];
     }
 
     &:last-child {
-      @apply py-2 px-3 text-[var(--text-primary-color)] align-middle;
+      @apply py-2 px-3 text-(--text-primary-color) align-middle;
     }
   }
 }
 
 .keyboard-shortcuts-key-separator {
-  @apply mx-1 text-[var(--text-secondary-color)];
+  @apply mx-1 text-(--text-secondary-color);
 }
 
 kbd {
@@ -369,7 +369,7 @@ kbd {
 }
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
-  @apply pt-5 border border-[#dadada] p-2.5 mb-1.5;
+  @apply pt-5 border border-gray-medium p-2.5 mb-1.5;
 
   .board-metadata-form-permissions .board-metadata-form-board-settings--no-padding {
     @apply p-0;
@@ -391,11 +391,11 @@ kbd {
     @apply border-t border-black/10 border-collapse overflow-auto w-full;
 
     & :is(td, th) {
-      @apply text-[var(--text-primary-color)] p-2.5;
+      @apply text-(--text-primary-color) p-2.5;
     }
 
     & th {
-      @apply sticky bg-[var(--background-color)] border-b border-[var(--border-subtle-color)] top-0 z-[1];
+      @apply sticky bg-(--background-color) border-b border-(--border-subtle-color) top-0 z-1;
 
       &.cell-checkbox {
         @apply w-[30px];
@@ -403,21 +403,21 @@ kbd {
     }
 
     & .option-row td.cell-content {
-      @apply bg-[var(--background-color)];
+      @apply bg-(--background-color);
 
       & .content-image {
         @apply flex pr-2.5;
 
         & .permission-image {
-          @apply w-11 min-w-11 max-w-11 h-11 rounded-full flex items-center justify-center text-[var(--text-primary-color)] bg-[var(--background-color)];
+          @apply w-11 min-w-11 max-w-11 h-11 rounded-full flex items-center justify-center text-(--text-primary-color) bg-(--background-color);
         }
       }
 
       & .content-text {
-        @apply text-[var(--text-primary-color)];
+        @apply text-(--text-primary-color);
 
         & .content-sub-text {
-          @apply text-[var(--text-secondary-color)];
+          @apply text-(--text-secondary-color);
         }
       }
 
@@ -425,7 +425,7 @@ kbd {
         @apply flex justify-center items-center ml-auto;
 
         & span {
-          @apply bg-[var(--palette-black-alpha-6)] py-0.5 px-2 rounded-[120px] text-[var(--text-primary-color)] whitespace-nowrap;
+          @apply bg-(--palette-black-alpha-6) py-0.5 px-2 rounded-[120px] text-(--text-primary-color) whitespace-nowrap;
         }
       }
     }
@@ -433,18 +433,18 @@ kbd {
 }
 
 .retrospectives-preview-email-dialog {
-  @apply max-w-none w-[800px] h-[500px] bg-[var(--background-color)] border border-[var(--color-border-gray)];
+  @apply max-w-none w-[800px] h-[500px] bg-(--background-color) border border-(--color-border-gray);
 
   & div[role="heading"] {
-    @apply text-[var(--text-primary-color)];
+    @apply text-(--text-primary-color);
   }
 
   & .copy-email-button {
-    @apply text-[var(--text-primary-color)];
+    @apply text-(--text-primary-color);
   }
 
   & textarea {
-    @apply bg-[rgba(var(--palette-neutral-2,248,248,248),1)] text-[var(--text-primary-color)];
+    @apply bg-[rgba(var(--palette-neutral-2,248,248,248),1)] text-(--text-primary-color);
   }
 }
 
@@ -460,7 +460,7 @@ kbd {
   }
 
   &:focus-visible .mainItemCard {
-    @apply outline-[3px] outline-[var(--color-primary)] outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
+    @apply outline-[3px] outline-(--color-primary) outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
   }
 
   & .item-cards {
