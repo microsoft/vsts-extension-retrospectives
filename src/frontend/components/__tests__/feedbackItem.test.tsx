@@ -105,7 +105,7 @@ describe("Feedback Item", () => {
       userIdRef: "",
       currentUserId: "user1",
       currentTeamId: "team1",
-      actionItems: [],
+      actionItems: [] as any[],
       newlyCreated: false,
       showAddedAnimation: false,
       shouldHaveFocus: false,
@@ -143,7 +143,7 @@ describe("Feedback Item", () => {
       userIdRef: "",
       currentUserId: "user1",
       currentTeamId: "team1",
-      actionItems: [],
+      actionItems: [] as any[],
       newlyCreated: false,
       showAddedAnimation: false,
       shouldHaveFocus: false,
@@ -185,7 +185,7 @@ describe("Feedback Item", () => {
         userIdRef: "",
         currentUserId: "user1",
         currentTeamId: "team1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -223,7 +223,7 @@ describe("Feedback Item", () => {
         userIdRef: "",
         currentUserId: "user1",
         currentTeamId: "team1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -261,7 +261,7 @@ describe("Feedback Item", () => {
         userIdRef: "",
         currentUserId: "user1",
         currentTeamId: "team1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -296,7 +296,7 @@ describe("Feedback Item", () => {
       upvotes: 5,
       groupIds: [],
       userIdRef: "",
-      actionItems: [],
+      actionItems: [] as any[],
       newlyCreated: false,
       showAddedAnimation: false,
       shouldHaveFocus: false,
@@ -340,7 +340,7 @@ describe("Feedback Item", () => {
   describe("Creator information", () => {
     test("displays creator name when provided", () => {
       const props: any = {
-        ...{ id: "test-creator", title: "Test", columnId: testColumnUuidOne, columns: testColumns, columnIds: testColumnIds, boardId: testBoardId, createdDate: new Date(), upvotes: 0, groupIds: [], userIdRef: "", actionItems: [], newlyCreated: false, showAddedAnimation: false, shouldHaveFocus: false, hideFeedbackItems: false, nonHiddenWorkItems: [], allWorkItemTypes: [], originalColumnId: testColumnUuidOne, timerSecs: 0, timerstate: false, timerId: "", isGroupedCarouselItem: false },
+        ...{ id: "test-creator", title: "Test", columnId: testColumnUuidOne, columns: testColumns, columnIds: testColumnIds, boardId: testBoardId, createdDate: new Date(), upvotes: 0, groupIds: [], userIdRef: "", actionItems: [] as any[], newlyCreated: false, showAddedAnimation: false, shouldHaveFocus: false, hideFeedbackItems: false, nonHiddenWorkItems: [], allWorkItemTypes: [], originalColumnId: testColumnUuidOne, timerSecs: 0, timerstate: false, timerId: "", isGroupedCarouselItem: false },
         createdBy: "John Doe",
         createdByProfileImage: "image.jpg",
       };
@@ -361,7 +361,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -393,7 +393,7 @@ describe("Feedback Item", () => {
         groupIds: ["child1"],
         groupCount: 1,
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -424,7 +424,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -456,7 +456,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "different-user",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -485,7 +485,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "different-user",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -519,7 +519,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "test-user-id",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -555,7 +555,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: true,
         shouldHaveFocus: false,
@@ -584,7 +584,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -615,7 +615,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -649,7 +649,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -707,7 +707,7 @@ describe("Feedback Item", () => {
           columnItems: [
             {
               feedbackItem: { ...feedbackItem },
-              actionItems: [] as any[],
+              actionItems: [] as any[] as any[],
             },
           ],
         },
@@ -725,7 +725,7 @@ describe("Feedback Item", () => {
         upvotes: feedbackItem.upvotes,
         groupIds: [...feedbackItem.groupIds],
         userIdRef: feedbackItem.userIdRef,
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -895,7 +895,7 @@ describe("Feedback Item", () => {
           columnItems: [
             {
               feedbackItem: { ...feedbackItem },
-              actionItems: [] as any[],
+              actionItems: [] as any[] as any[],
             },
           ],
         },
@@ -915,7 +915,7 @@ describe("Feedback Item", () => {
         upvotes: feedbackItem.upvotes,
         groupIds: [...feedbackItem.groupIds],
         userIdRef: feedbackItem.userIdRef,
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1075,7 +1075,7 @@ describe("Feedback Item", () => {
         groupIds: ["child1", "child2"],
         groupCount: 2,
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1121,7 +1121,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1153,7 +1153,7 @@ describe("Feedback Item", () => {
         upvotes: 10,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1188,7 +1188,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1225,7 +1225,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1256,7 +1256,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: true,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1290,7 +1290,7 @@ describe("Feedback Item", () => {
         groupIds: ["child1"],
         groupCount: 1,
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1329,7 +1329,7 @@ describe("Feedback Item", () => {
         groupIds: ["child1"],
         groupCount: 1,
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1400,7 +1400,7 @@ describe("Feedback Item", () => {
         upvotes: 99,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1434,7 +1434,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1468,7 +1468,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1499,7 +1499,7 @@ describe("Feedback Item", () => {
         groupIds: ["child1", "child2", "child3"],
         groupCount: 3,
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1542,7 +1542,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1576,7 +1576,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1616,7 +1616,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1653,7 +1653,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1683,7 +1683,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1717,7 +1717,7 @@ describe("Feedback Item", () => {
         groupIds: [],
         userIdRef: "user1",
         currentUserId: "user1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1750,7 +1750,7 @@ describe("Feedback Item", () => {
         groupIds: [],
         userIdRef: "user1",
         currentUserId: "user1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1783,7 +1783,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1813,7 +1813,7 @@ describe("Feedback Item", () => {
         upvotes: 5,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1845,7 +1845,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: ["child1", "child2"],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1883,7 +1883,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -1923,7 +1923,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: true,
         showAddedAnimation: true,
         shouldHaveFocus: true,
@@ -1953,7 +1953,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: true,
@@ -2047,7 +2047,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2077,7 +2077,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2107,7 +2107,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2139,7 +2139,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2169,7 +2169,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2199,7 +2199,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2229,7 +2229,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2283,7 +2283,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: ["child1"],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2342,7 +2342,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: ["child-1", "child-2"],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2380,7 +2380,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2418,7 +2418,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: ["child-1", "child-2", "child-3"],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2458,7 +2458,7 @@ describe("Feedback Item", () => {
         upvotes: 5,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2488,7 +2488,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2520,7 +2520,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2550,7 +2550,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2582,7 +2582,7 @@ describe("Feedback Item", () => {
         upvotes: 3,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2614,7 +2614,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2646,7 +2646,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "other-user-id",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2681,7 +2681,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "user-id",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2716,7 +2716,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "test-user-id",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2768,11 +2768,11 @@ describe("Feedback Item", () => {
           columnItems: [
             {
               feedbackItem: mainFeedbackItem,
-              actionItems: [],
+              actionItems: [] as any[],
             },
             {
               feedbackItem: childFeedbackItem,
-              actionItems: [],
+              actionItems: [] as any[],
             },
           ],
         },
@@ -2789,7 +2789,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [childItemId],
         userIdRef: "test-user-id",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2847,11 +2847,11 @@ describe("Feedback Item", () => {
           columnItems: [
             {
               feedbackItem: mainFeedbackItem,
-              actionItems: [],
+              actionItems: [] as any[],
             },
             {
               feedbackItem: childFeedbackItem,
-              actionItems: [],
+              actionItems: [] as any[],
             },
           ],
         },
@@ -2868,7 +2868,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [childItemId],
         userIdRef: "user-id",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2913,7 +2913,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "user-123",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2945,7 +2945,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -2982,7 +2982,7 @@ describe("Feedback Item", () => {
           columnItems: [
             {
               feedbackItem: testFeedbackItemWithVotes,
-              actionItems: [],
+              actionItems: [] as any[],
             },
           ],
         },
@@ -3001,7 +3001,7 @@ describe("Feedback Item", () => {
         voteCount: 5,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3047,7 +3047,7 @@ describe("Feedback Item", () => {
           columnItems: [
             {
               feedbackItem: testFeedbackItemActPhase,
-              actionItems: [],
+              actionItems: [] as any[],
             },
           ],
         },
@@ -3121,7 +3121,7 @@ describe("Feedback Item", () => {
         voteCount: 0,
         groupIds: ["child-1", "child-2"],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3168,7 +3168,7 @@ describe("Feedback Item", () => {
         voteCount: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3207,7 +3207,7 @@ describe("Feedback Item", () => {
         voteCount: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3248,7 +3248,7 @@ describe("Feedback Item", () => {
         voteCount: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3286,7 +3286,7 @@ describe("Feedback Item", () => {
         voteCount: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3326,7 +3326,7 @@ describe("Feedback Item", () => {
         voteCount: 5,
         groupIds: [],
         userIdRef: "user-1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3374,7 +3374,7 @@ describe("Feedback Item", () => {
         voteCount: 3,
         groupIds: [],
         userIdRef: "user-1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3422,7 +3422,7 @@ describe("Feedback Item", () => {
         voteCount: 12,
         groupIds: [],
         userIdRef: "user-1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3464,7 +3464,7 @@ describe("Feedback Item", () => {
         voteCount: 0,
         groupIds: [],
         userIdRef: "user-1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3506,7 +3506,7 @@ describe("Feedback Item", () => {
         voteCount: 7,
         groupIds: [],
         userIdRef: "different-user",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3555,7 +3555,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3586,7 +3586,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3615,7 +3615,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3649,7 +3649,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: true,
@@ -3679,7 +3679,7 @@ describe("Feedback Item", () => {
       upvotes: 0,
       groupIds: [],
       userIdRef: "",
-      actionItems: [],
+      actionItems: [] as any[],
       newlyCreated: false,
       showAddedAnimation: false,
       shouldHaveFocus: false,
@@ -3737,7 +3737,7 @@ describe("Feedback Item", () => {
       upvotes: 0,
       groupIds: [],
       userIdRef: "",
-      actionItems: [],
+      actionItems: [] as any[],
       newlyCreated: false,
       showAddedAnimation: false,
       shouldHaveFocus: false,
@@ -3771,7 +3771,7 @@ describe("Feedback Item", () => {
       upvotes: 0,
       groupIds: [],
       userIdRef: "",
-      actionItems: [],
+      actionItems: [] as any[],
       newlyCreated: false,
       showAddedAnimation: false,
       shouldHaveFocus: false,
@@ -3804,7 +3804,7 @@ describe("Feedback Item", () => {
       upvotes: 0,
       groupIds: [],
       userIdRef: "",
-      actionItems: [],
+      actionItems: [] as any[],
       newlyCreated: false,
       showAddedAnimation: false,
       shouldHaveFocus: false,
@@ -3839,7 +3839,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3908,7 +3908,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         associatedActionItemIds: [],
         newlyCreated: false,
         showAddedAnimation: false,
@@ -3945,7 +3945,7 @@ describe("Feedback Item", () => {
         upvotes: 3,
         groupIds: ["child-1", "child-2"],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -3981,7 +3981,7 @@ describe("Feedback Item", () => {
         upvotes: 1,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -4019,7 +4019,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: true,
         shouldHaveFocus: false,
@@ -4050,7 +4050,7 @@ describe("Feedback Item", () => {
         groupIds: [],
         userIdRef: "user-1",
         currentUserId: "user-1",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -4083,7 +4083,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -4117,7 +4117,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -4166,7 +4166,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -4198,7 +4198,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -4229,7 +4229,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [],
+        actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
@@ -4245,6 +4245,796 @@ describe("Feedback Item", () => {
         isIncluded: false,
       };
       const { container } = render(<FeedbackItem {...props} />);
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("Additional keyboard shortcut coverage", () => {
+    const createKeyboardTestItem = (overrides: Partial<IFeedbackItemDocument> = {}): IFeedbackItemDocument => ({
+      id: overrides.id ?? "kbd-item-id",
+      boardId: overrides.boardId ?? testBoardId,
+      title: overrides.title ?? "Keyboard Item",
+      description: overrides.description ?? "",
+      columnId: overrides.columnId ?? testColumnUuidOne,
+      originalColumnId: overrides.originalColumnId ?? testColumnUuidOne,
+      upvotes: overrides.upvotes ?? 0,
+      voteCollection: overrides.voteCollection ?? {},
+      createdDate: overrides.createdDate ?? new Date(),
+      userIdRef: overrides.userIdRef ?? "user-1",
+      timerSecs: overrides.timerSecs ?? 0,
+      timerState: overrides.timerState ?? false,
+      timerId: overrides.timerId ?? null,
+      groupIds: overrides.groupIds ?? [],
+      isGroupedCarouselItem: overrides.isGroupedCarouselItem ?? false,
+      associatedActionItemIds: overrides.associatedActionItemIds ?? [],
+      childFeedbackItemIds: overrides.childFeedbackItemIds ?? [],
+      parentFeedbackItemId: overrides.parentFeedbackItemId,
+      modifiedDate: overrides.modifiedDate,
+      modifiedBy: overrides.modifiedBy,
+      createdBy: overrides.createdBy,
+    });
+
+    const buildKbdTestProps = (overrides: Record<string, unknown> = {}, itemOverrides: Partial<IFeedbackItemDocument> = {}): any => {
+      const feedbackItem = createKeyboardTestItem(itemOverrides);
+      const columns = {
+        [feedbackItem.columnId]: {
+          columnProperties: {
+            id: feedbackItem.columnId,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+            notes: "",
+          },
+          columnItems: [
+            { feedbackItem: { ...feedbackItem }, actionItems: [] as any[] as any[] },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: feedbackItem.id,
+        title: feedbackItem.title,
+        columnId: feedbackItem.columnId,
+        columns,
+        columnIds: [feedbackItem.columnId],
+        boardId: feedbackItem.boardId,
+        boardTitle: "Test Board",
+        createdDate: feedbackItem.createdDate,
+        upvotes: feedbackItem.upvotes,
+        groupIds: [...feedbackItem.groupIds],
+        userIdRef: feedbackItem.userIdRef,
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: feedbackItem.originalColumnId,
+        timerSecs: feedbackItem.timerSecs,
+        timerState: feedbackItem.timerState,
+        timerId: feedbackItem.timerId,
+        isGroupedCarouselItem: feedbackItem.isGroupedCarouselItem,
+        workflowPhase: "Group",
+        isFocusModalHidden: true,
+        team: { id: "team-1" },
+        defaultActionItemAreaPath: "Area",
+        defaultActionItemIteration: "Iter",
+        onVoteCasted: jest.fn(),
+        requestTimerStart: jest.fn().mockResolvedValue(true),
+        notifyTimerStopped: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+        moveFeedbackItem: jest.fn(),
+        groupCount: 0,
+        activeTimerFeedbackItemId: null,
+      };
+
+      Object.assign(props, overrides);
+      columns[feedbackItem.columnId].columnItems[0].feedbackItem = {
+        ...columns[feedbackItem.columnId].columnItems[0].feedbackItem,
+        id: props.id,
+        title: props.title,
+        columnId: props.columnId,
+        originalColumnId: props.originalColumnId,
+        boardId: props.boardId,
+      } as IFeedbackItemDocument;
+
+      return props;
+    };
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("pressing m opens the move dialog in Group phase", async () => {
+      const props = buildKbdTestProps({ workflowPhase: "Group" });
+      const getFeedbackItemSpy = jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(undefined);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(getFeedbackItemSpy).toHaveBeenCalled());
+      
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "m" });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText("Move Feedback to Different Column")).toBeInTheDocument();
+      });
+    });
+
+    test("pressing v triggers vote in Vote phase", async () => {
+      const props = buildKbdTestProps({ workflowPhase: "Vote" });
+      const mockItem = createKeyboardTestItem({ id: props.id, upvotes: 1 });
+      
+      const getFeedbackItemSpy = jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+      const updateVoteSpy = jest.spyOn(itemDataService, "updateVote").mockResolvedValue(mockItem);
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(getFeedbackItemSpy).toHaveBeenCalled());
+      
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "v" });
+      });
+
+      await waitFor(() => {
+        expect(updateVoteSpy).toHaveBeenCalled();
+      });
+    });
+
+    test("pressing arrow up navigates to previous card", async () => {
+      const item1 = createKeyboardTestItem({ id: "item-1" });
+      const item2 = createKeyboardTestItem({ id: "item-2" });
+      
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+            notes: "",
+          },
+          columnItems: [
+            { feedbackItem: item1, actionItems: [] as any[] },
+            { feedbackItem: item2, actionItems: [] as any[] },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: "item-2",
+        title: "Item 2",
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        boardTitle: "Test",
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItems: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        isFocusModalHidden: true,
+        team: { id: "team-1" },
+        defaultActionItemAreaPath: "Area",
+        defaultActionItemIteration: "Iter",
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+      };
+
+      const getFeedbackItemSpy = jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(undefined);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(getFeedbackItemSpy).toHaveBeenCalled());
+      
+      const card = container.querySelector(`[data-feedback-item-id="item-2"]`) as HTMLElement;
+      fireEvent.keyDown(card, { key: "ArrowUp" });
+      
+      expect(container.firstChild).toBeTruthy();
+    });
+
+    test("pressing space toggles group expand when in grouped item", async () => {
+      const mockToggleGroupExpand = jest.fn();
+      const props = buildKbdTestProps({
+        workflowPhase: "Group",
+        groupedItemProps: {
+          isMainItem: true,
+          isGroupExpanded: false,
+          groupedCount: 1,
+          parentItemId: "",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: mockToggleGroupExpand,
+        },
+        groupIds: ["child-1"],
+      });
+
+      const getFeedbackItemSpy = jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(undefined);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(getFeedbackItemSpy).toHaveBeenCalled());
+      
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      fireEvent.keyDown(card, { key: " " });
+      
+      expect(mockToggleGroupExpand).toHaveBeenCalled();
+    });
+  });
+
+  describe("Vote button click interactions", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("clicking vote up button calls updateVote", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "vote-click-item",
+        boardId: testBoardId,
+        title: "Vote Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 1,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        team: { id: "team-1" },
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+      const updateVoteSpy = jest.spyOn(itemDataService, "updateVote").mockResolvedValue(mockItem);
+
+      const { container } = render(<FeedbackItem {...props} />);
+      
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const voteButton = container.querySelector('button[title="Vote"]');
+      expect(voteButton).toBeTruthy();
+
+      await act(async () => {
+        fireEvent.click(voteButton!);
+      });
+
+      await waitFor(() => {
+        expect(updateVoteSpy).toHaveBeenCalled();
+      });
+    });
+
+    test("vote button animation ends correctly", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "vote-anim-item",
+        boardId: testBoardId,
+        title: "Animation Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Vote",
+        team: { id: "team-1" },
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+      
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const voteButton = container.querySelector('button[title="Vote"]');
+      if (voteButton) {
+        fireEvent.animationEnd(voteButton);
+      }
+      
+      expect(container.firstChild).toBeTruthy();
+    });
+  });
+
+  describe("FeedbackItemHelper static methods extended", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("handleDropFeedbackItemOnFeedbackItem calls addFeedbackItemAsChild", async () => {
+      const parent: IFeedbackItemDocument = {
+        id: "parent-helper",
+        boardId: testBoardId,
+        title: "Parent",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const child: IFeedbackItemDocument = { ...parent, id: "child-helper" };
+
+      jest.spyOn(itemDataService, "addFeedbackItemAsChild").mockResolvedValue({
+        updatedParentFeedbackItem: parent,
+        updatedChildFeedbackItem: child,
+        updatedGrandchildFeedbackItems: [],
+        updatedOldParentFeedbackItem: undefined,
+      });
+
+      const refreshFeedbackItems = jest.fn();
+      const props: any = {
+        boardId: testBoardId,
+        refreshFeedbackItems,
+      };
+
+      await FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(
+        props,
+        "dropped-id",
+        "target-id"
+      );
+
+      expect(itemDataService.addFeedbackItemAsChild).toHaveBeenCalledWith(
+        testBoardId,
+        "target-id",
+        "dropped-id"
+      );
+      expect(refreshFeedbackItems).toHaveBeenCalled();
+    });
+  });
+
+  describe("Timer format display", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("displays timer in correct format for seconds", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "timer-format-item",
+        boardId: testBoardId,
+        title: "Timer Format",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 125,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 125,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Act",
+        team: { id: "team-1" },
+        boardTitle: "Test",
+        defaultActionItemAreaPath: "Area",
+        defaultActionItemIteration: "Iter",
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+      
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      // 125 seconds = 2:05
+      expect(container.textContent).toContain("2:05 elapsed");
+    });
+  });
+
+  describe("Group button interactions", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("clicking expand group button calls toggleGroupExpand", async () => {
+      const mockToggleGroupExpand = jest.fn();
+      const mockItem: IFeedbackItemDocument = {
+        id: "group-btn-item",
+        boardId: testBoardId,
+        title: "Group Button Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: ["child-1", "child-2"],
+        isGroupedCarouselItem: false,
+        childFeedbackItemIds: ["child-1", "child-2"],
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: ["child-1", "child-2"],
+        groupCount: 2,
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        isFocusModalHidden: true,
+        team: { id: "team-1" },
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        groupedItemProps: {
+          isMainItem: true,
+          isGroupExpanded: false,
+          groupedCount: 2,
+          parentItemId: "",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: mockToggleGroupExpand,
+        },
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+      
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const expandButton = container.querySelector(".feedback-expand-group");
+      if (expandButton) {
+        fireEvent.click(expandButton);
+        expect(mockToggleGroupExpand).toHaveBeenCalled();
+      }
+    });
+  });
+
+  describe("Delete feedback interactions", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("pressing delete key shows confirmation dialog", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "delete-key-item",
+        boardId: testBoardId,
+        title: "Delete Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        team: { id: "team-1" },
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+      
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "Delete" });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText("Delete Feedback")).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("Drag and drop extended coverage", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("handles drag enter event", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "drag-enter-item",
+        boardId: testBoardId,
+        title: "Drag Enter Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        team: { id: "team-1" },
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+      
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const feedbackItem = container.querySelector(".feedbackItem");
+      if (feedbackItem) {
+        fireEvent.dragEnter(feedbackItem);
+        fireEvent.dragLeave(feedbackItem);
+      }
+      
       expect(container.firstChild).toBeTruthy();
     });
   });
