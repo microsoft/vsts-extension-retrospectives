@@ -270,6 +270,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .editable-text {
     @apply inline-block max-w-full align-middle whitespace-pre-wrap wrap-break-word cursor-text text-base;
+
+    & a {
+      @apply text-(--palette-primary-darken-6) underline;
+    }
   }
 
   & .editable-text-input-container {
@@ -1427,7 +1431,7 @@ kbd {
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button):hover {
-  @apply bg-(--color-gray-light);
+  @apply bg-gray-light;
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled {
@@ -1435,11 +1439,11 @@ kbd {
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled i {
-  @apply text-[var(--text-disabled-color)];
+  @apply text-(--text-disabled-color);
 }
 
 .board-metadata-form .feedback-column-card.marked-for-deletion {
-  @apply bg-[var(--text-disabled-color)] ml-0.5;
+  @apply bg-(--text-disabled-color) ml-0.5;
 }
 
 .board-metadata-form .feedback-column-card.marked-for-deletion .feedback-column-card-icon {
@@ -1459,7 +1463,7 @@ kbd {
 }
 
 .board-metadata-form .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button:hover {
-  @apply bg-[var(--color-gray-light)] text-[var(--status-info-foreground)];
+  @apply bg-gray-light text-(--status-info-foreground);
 }
 
 .board-metadata-form .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button.is-disabled i.ms-Button-icon {
@@ -1471,11 +1475,11 @@ kbd {
 }
 
 .board-metadata-form .create-feedback-column-card-button-wrapper .create-feedback-column-card-button {
-  @apply border-none text-[var(--text-primary-color)];
+  @apply border-none text-(--text-primary-color);
 }
 
 .board-metadata-form .create-feedback-column-card-button-wrapper .ms-Button-icon {
-  @apply text-[var(--status-info-foreground)] bg-[var(--nav-vertical-background-color)] p-1 h-[22px];
+  @apply text-(--status-info-foreground) bg-(--nav-vertical-background-color) p-1 h-[22px];
 }
 
 .board-metadata-form .board-metadata-logo {
@@ -1483,7 +1487,7 @@ kbd {
 }
 
 .board-metadata-form .input-validation-message {
-  @apply text-[var(--color-error)];
+  @apply text-(--color-error);
 }
 
 .board-metadata-form .title-input-container {
@@ -1491,7 +1495,7 @@ kbd {
 }
 
 .board-metadata-form .title-input-container.column-template-dropdown {
-  @apply inline-flex bg-[var(--background-color)] font-normal ml-2.5 w-2/3;
+  @apply inline-flex bg-(--background-color) font-normal ml-2.5 w-2/3;
 }
 
 .board-metadata-form .title-input-container.max-vote-counter .ms-TextField-wrapper .ms-TextField-fieldGroup {
@@ -1527,11 +1531,11 @@ kbd {
 }
 
 .retrospectives-board-metadata-dialog {
-  @apply w-[500px] max-w-[500px] max-h-full right-0 top-0 bottom-0 bg-[var(--background-color)];
+  @apply w-[500px] max-w-[500px] max-h-full right-0 top-0 bottom-0 bg-(--background-color);
 }
 
 .retrospectives-board-metadata-dialog .ms-Dialog-title {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .ms-Checkbox:not(.is-checked):hover .ms-Checkbox-checkmark {
@@ -1539,11 +1543,11 @@ kbd {
 }
 
 .ms-Dialog-button.ms-Dialog-button--close .ms-Button-icon {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .ms-Dialog-button.ms-Dialog-button--close:hover {
-  @apply bg-[var(--border-subtle-color)];
+  @apply bg-(--border-subtle-color);
 }
 
 .feedback-board-container {
@@ -1555,7 +1559,7 @@ kbd {
 }
 
 .feedback-board-container-header-spacer {
-  @apply bg-[#1f1f1f] h-px z-[2] w-full fixed mt-10;
+  @apply bg-[#1f1f1f] h-px z-2 w-full fixed mt-10;
 }
 
 .extension-header-spacer {
@@ -1567,7 +1571,7 @@ kbd {
 }
 
 #extension-header {
-  @apply flex z-[2] w-full items-center justify-start py-2.5 px-[15px];
+  @apply flex z-2 w-full items-center justify-start py-2.5 px-[15px];
 }
 
 #extension-header .extension-title-text {
@@ -1595,11 +1599,11 @@ kbd {
 }
 
 .pivot-container {
-  @apply fixed top-[45px] z-[2] w-full items-center justify-start;
+  @apply fixed top-[45px] z-2 w-full items-center justify-start;
 }
 
 .pivot-container .ms-Pivot {
-  @apply ml-[calc(10px-8px)];
+  @apply ml-0.5;
 }
 
 .pivot-container button[role="tab"] {
@@ -1611,11 +1615,11 @@ kbd {
 }
 
 .vertical-tab-separator {
-  @apply w-0.5 flex h-6 bg-[var(--color-gray-dark)];
+  @apply w-0.5 flex h-6 bg-(--color-gray-dark);
 }
 
 .menu-button {
-  @apply ml-[5px] mr-5 bg-[var(--color-gray-light)];
+  @apply ml-[5px] mr-5 bg-(--color-gray-light);
 }
 
 .board-selector-group {
@@ -1639,23 +1643,23 @@ kbd {
 }
 
 .workflow-stage-timer {
-  @apply inline-flex items-center bg-[var(--nav-header-active-item-background)] rounded text-[var(--text-primary-color)];
+  @apply inline-flex items-center bg-(--nav-header-active-item-background) rounded text-(--text-primary-color);
 }
 
 .workflow-stage-timer > span {
-  @apply bg-[var(--background-color)] text-[var(--text-primary-color)] border border-[var(--border-subtle-color)] rounded py-1 px-2 text-xs min-w-[60px] text-center w-[75px];
+  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs min-w-[60px] text-center w-[75px];
 }
 
 .workflow-stage-timer select {
-  @apply bg-[var(--background-color)] text-[var(--text-primary-color)] border border-[var(--border-subtle-color)] rounded py-1 px-2 text-xs w-[75px] cursor-pointer;
+  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs w-[75px] cursor-pointer;
 }
 
 .workflow-stage-timer select:focus-visible {
-  @apply outline-2 outline-[var(--border-subtle-color)] outline-offset-2;
+  @apply outline-2 outline-(--border-subtle-color) outline-offset-2;
 }
 
 .workflow-stage-timer select option {
-  @apply bg-[var(--background-color)] text-[var(--text-primary-color)];
+  @apply bg-(--background-color) text-(--text-primary-color);
 }
 
 .workflow-stage-timer button {
@@ -1667,7 +1671,7 @@ kbd {
 }
 
 .workflow-stage-timer button:focus-visible {
-  @apply outline-2 outline-[var(--border-subtle-color)] outline-offset-2;
+  @apply outline-2 outline-(--border-subtle-color) outline-offset-2;
 }
 
 .workflow-stage-timer button:disabled {
@@ -1679,7 +1683,7 @@ kbd {
 }
 
 .feedback-workflow-wrapper-background {
-  @apply relative -ml-[325px] top-1.5 -z-[1];
+  @apply relative -ml-[325px] top-1.5 -z-1;
 }
 
 .info-message-bar {
@@ -1695,7 +1699,7 @@ kbd {
 }
 
 .team-effectiveness-section-information {
-  @apply rounded-[5px] bg-[var(--border-subtle-color)] font-bold my-[5px_auto_10px_auto] p-[3px] text-center w-[350px];
+  @apply rounded-[5px] bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-[3px] text-center w-[350px];
 }
 
 .team-effectiveness-measurement-table {
@@ -1741,7 +1745,7 @@ kbd {
 }
 
 .team-effectiveness-measurement-table thead .team-effectiveness-favorability-label {
-  @apply border-b-4 border-solid border-[var(--text-primary-color)] outline outline-4 outline-[var(--background-color)];
+  @apply border-b-4 border-solid border-(--text-primary-color) outline outline-4 outline-(--background-color);
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index {
@@ -1819,7 +1823,7 @@ kbd {
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row:nth-child(odd) {
-  @apply bg-[var(--border-subtle-color)];
+  @apply bg-(--border-subtle-color);
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row th {
@@ -1835,15 +1839,15 @@ kbd {
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
-  @apply border-r-2 border-solid border-[var(--color-primary)];
+  @apply border-r-2 border-solid border-(--color-primary);
 }
 
 .team-effectiveness-dialog {
-  @apply bg-[var(--background-color)] border-[3px] border-solid border-[var(--border-subtle-color)] max-w-[840px] text-[var(--text-primary-color)];
+  @apply bg-(--background-color) border-[3px] border-solid border-(--border-subtle-color) max-w-[840px] text-(--text-primary-color);
 }
 
 .team-effectiveness-dialog .ms-Dialog-title {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .team-effectiveness-dialog .ms-Dialog-content .ms-Dialog-header {
@@ -1859,22 +1863,22 @@ kbd {
 }
 
 .board-actions-menu {
-  @apply bg-[var(--background-color)];
+  @apply bg-(--background-color);
 }
 
 .board-actions-menu button.ms-ContextualMenu-link {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .board-actions-menu button.ms-ContextualMenu-link:hover {
-  @apply bg-[var(--border-subtle-color)] text-[var(--text-primary-color)];
+  @apply bg-(--border-subtle-color) text-(--text-primary-color);
 }
 
 .create-new-board-button,
 .metadata-form-save-button,
 .extension-menu-close-button,
 .team-effectiveness-submit-button {
-  @apply bg-[var(--color-primary)] text-white;
+  @apply bg-(--color-primary) text-white;
 }
 
 .feedbackItem {
@@ -1886,15 +1890,15 @@ kbd {
 }
 
 .feedbackItem:focus-visible .mainItemCard {
-  @apply outline outline-[3px] outline-[var(--color-primary)] outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
+  @apply outline-[3px] outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
 }
 
 .feedbackItem.newFeedbackItem .ms-DocumentCard {
-  @apply [animation:fadeInFromGreen_1000ms_ease-in_1];
+  @apply animate-[fadeInFromGreen_1000ms_ease-in_1];
 }
 
 .feedbackItem.removeFeedbackItem .ms-DocumentCard {
-  @apply [animation:fadeOutToRed_1000ms_ease-in_1_forwards];
+  @apply animate-[fadeOutToRed_1000ms_ease-in_1_forwards];
 }
 
 .feedbackItem.hideFeedbackItem .card-content,
@@ -1907,7 +1911,7 @@ kbd {
 }
 
 .feedbackItem .mainItemCard {
-  @apply w-full max-w-80 bg-[var(--background-color)] box-border border-t border-r border-b border-[rgb(96,94,92)] border-l-0;
+  @apply w-full max-w-80 bg-(--background-color) box-border border-t border-r border-b border-[rgb(96,94,92)] border-l-0;
 }
 
 .feedbackItem .mainItemCard .card-integral-part {
@@ -1917,7 +1921,7 @@ kbd {
 .feedbackItem .mainItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span,
 .feedback-item-group .mainItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span {
-  @apply text-[var(--text-secondary-color)];
+  @apply text-(--text-secondary-color);
 }
 
 .card-header-base {
@@ -1940,7 +1944,7 @@ kbd {
   }
 
   &:focus-visible {
-    @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
+    @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
   }
 
   &:disabled {
@@ -1948,38 +1952,38 @@ kbd {
   }
 
   & i {
-    @apply leading-5 text-[var(--text-secondary-color)] text-sm;
+    @apply leading-5 text-(--text-secondary-color) text-sm;
   }
 }
 
 .focus-outline-primary {
-  @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
+  @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus {
-  @apply h-[34px] max-w-[150px] z-[1] my-0 mr-auto mb-0 ml-0 py-0 pr-[5px] pb-0 pl-0 bg-inherit border-none flex leading-[34px] text-xs font-semibold text-[var(--text-primary-color)];
+  @apply h-[34px] max-w-[150px] z-1 my-0 mr-auto mb-0 ml-0 py-0 pr-[5px] pb-0 pl-0 bg-inherit border-none flex leading-[34px] text-xs font-semibold text-(--text-primary-color);
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus i {
-  @apply w-9 ml-0.5 [line-height:inherit] -mr-1;
+  @apply w-9 ml-0.5 leading-inherit -mr-1;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus:focus-visible {
-  @apply outline outline-2 outline-[var(--color-primary)] outline-offset-2 rounded-[3px];
+  @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote:hover:not(:disabled) i,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-add-vote:hover:not(:disabled) i,
 .feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-add-vote:hover:not(:disabled) i,
 .feedback-item-group .groupedItemCard .card-integral-part .card-header .feedback-add-vote:hover:not(:disabled) i {
-  @apply text-[var(--color-primary)];
+  @apply text-(--color-primary);
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation,
 .feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation,
 .feedback-item-group .groupedItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation {
-  @apply [animation:push_0.3s_linear_1];
+  @apply animate-[push_0.3s_linear_1];
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-add-vote.voteAnimation i,
@@ -1992,7 +1996,7 @@ kbd {
 .feedbackItemGroupItem .mainItemCard .card-integral-part .card-header .feedback-vote-count,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-vote-count,
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-vote-count {
-  @apply text-[var(--text-secondary-color)] flex items-center;
+  @apply text-(--text-secondary-color) flex items-center;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .item-actions-menu {
@@ -2008,7 +2012,7 @@ kbd {
 .feedbackItem .mainItemCard .card-integral-part .card-content .original-column-info,
 .feedback-item-group .mainItemCard .card-integral-part .card-content .original-column-info,
 .feedback-item-group .groupedItemCard .card-integral-part .card-content .original-column-info {
-  @apply text-right font-light italic text-[0.75em] text-[var(--text-secondary-color)];
+  @apply text-right font-light italic text-[0.75em] text-(--text-secondary-color);
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-content .feedback-yourvote-count,
@@ -2020,7 +2024,7 @@ kbd {
 .feedbackItem .mainItemCard .card-integral-part .card-id,
 .feedback-item-group .mainItemCard .card-integral-part .card-id,
 .feedback-item-group .groupedItemCard .card-integral-part .card-id {
-  @apply ml-4 pb-2 text-[var(--text-secondary-color)];
+  @apply ml-4 pb-2 text-(--text-secondary-color);
 }
 
 .feedbackItem .mainItemCard .card-integral-part .ms-DocumentCardActivity .msDocumentCardActivity-details {
@@ -2035,7 +2039,7 @@ kbd {
 
 .feedbackItem .mainItemCard .card-action-timer,
 .feedbackItemGroupItem .mainItemCard .card-action-timer {
-  @apply mb-2.5 text-[var(--text-primary-color)] bg-[var(--nav-header-active-item-background)] py-0.5 px-1.5;
+  @apply mb-2.5 text-(--text-primary-color) bg-(--nav-header-active-item-background) py-0.5 px-1.5;
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack {
@@ -2043,7 +2047,7 @@ kbd {
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .related-feedback-header {
-  @apply font-bold text-[var(--text-primary-color)] p-2 bg-[var(--nav-vertical-background-color)];
+  @apply font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack ul {
@@ -2055,11 +2059,11 @@ kbd {
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul .fa-li {
-  @apply border-solid h-[30px] border-t-0 border-r-[3px] border-b-0 border-l-0 border-[var(--text-secondary-color)] text-[var(--text-disabled-color)];
+  @apply border-solid h-[30px] border-t-0 border-r-[3px] border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color);
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li {
-  @apply [word-wrap:break-word] p-[5px] border-b border-b-[var(--text-disabled-color)];
+  @apply [word-wrap:break-word] p-[5px] border-b border-b-(--text-disabled-color);
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li span {
@@ -2075,26 +2079,26 @@ kbd {
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li .related-feedback-title {
-  @apply ml-2.5 text-[var(--text-primary-color)] [line-height:1.2] text-[0.95em] [-webkit-box-orient:vertical] overflow-hidden [text-overflow:ellipsis] [-webkit-line-clamp:2];
+  @apply ml-2.5 text-(--text-primary-color) leading-[1.2] text-[0.95em] [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
   display: -webkit-box;
 }
 
 .dialog-feedback-base {
-  @apply bg-[var(--background-color)];
+  @apply bg-(--background-color);
 }
 
 .dialog-feedback-base .ms-Dialog-title,
 .dialog-feedback-base .ms-Dialog-subText {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .retrospectives-move-feedback-item-dialog {
-  @apply bg-[var(--background-color)];
+  @apply bg-(--background-color);
 }
 
 .retrospectives-move-feedback-item-dialog .ms-Dialog-title,
 .retrospectives-move-feedback-item-dialog .ms-Dialog-subText {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .retrospectives-move-feedback-item-dialog .move-feedback-item-column-button i {
@@ -2102,7 +2106,7 @@ kbd {
 }
 
 .retrospectives-group-feedback-item-dialog {
-  @apply bg-[var(--background-color)];
+  @apply bg-(--background-color);
 }
 
 .retrospectives-group-feedback-item-dialog .ms-SearchBox {
@@ -2111,7 +2115,7 @@ kbd {
 
 .retrospectives-group-feedback-item-dialog .ms-Dialog-title,
 .retrospectives-group-feedback-item-dialog .ms-Dialog-subText {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .retrospectives-group-feedback-item-dialog .output-container {
@@ -2119,7 +2123,7 @@ kbd {
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .no-matching-feedback-message {
-  @apply text-[15px] italic text-[var(--text-primary-color)];
+  @apply text-[15px] italic text-(--text-primary-color);
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item {
