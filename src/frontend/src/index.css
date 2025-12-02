@@ -8,15 +8,11 @@
 
   --color-primary: #0078d4;
   --color-border-gray: #605e5c;
-  --color-error: rgb(204, 41, 61);
-  --color-success: rgb(51, 153, 51);
-  --color-task-yellow: rgb(242, 203, 29);
-  --color-bug-red: rgb(204, 41, 61);
+  --color-error: #cc293d;
+  --color-success: #339933;
+  --color-task-yellow: #f2cb1d;
   --color-gray-light: #f4f4f4;
   --color-gray-medium: #dadada;
-  --color-gray-dark: #dcdcdc;
-  --color-unfavorable: #d6201f;
-  --color-neutral: #ffd302;
   --color-favorable: #006b3d;
 }
 
@@ -90,7 +86,7 @@ body {
 }
 
 .work-item-bug-color {
-  @apply text-(--color-bug-red);
+  @apply text-(--color-error);
 }
 
 .focus-outline-standard {
@@ -259,7 +255,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) .ms-Dialog-inner a {
-  @apply text-primary-darken-6 underline;
+  @apply text-[var(--text-primary-darken-6)] underline;
 }
 
 .editable-document-card-title {
@@ -268,7 +264,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply inline-block max-w-full align-middle whitespace-pre-wrap wrap-break-word cursor-text text-base;
 
     & a {
-      @apply text-primary-darken-6 underline;
+      @apply text-[var(--text-primary-darken-6)] underline;
     }
   }
 
@@ -289,7 +285,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .input-validation-message {
-    @apply float-left text-[rgb(204,41,61)] text-[15px];
+    @apply float-left text-[var(--color-error)] text-[15px];
   }
 
   & .save-symbol {
@@ -586,7 +582,7 @@ kbd {
   }
 
   & .bug-red {
-    @apply text-(--color-bug-red);
+    @apply text-(--color-error);
   }
 
   & .ms-Image-image {
@@ -631,7 +627,7 @@ kbd {
 }
 
 .action-item-selector .bug-red {
-  @apply text-(--color-bug-red);
+  @apply text-(--color-error);
 }
 
 .add-action-item-wrapper {
@@ -889,7 +885,7 @@ kbd {
       }
 
       & tr .board-summary-container .action-items-summary-card .bug-red {
-        @apply text-(--color-bug-red);
+        @apply text-(--color-error);
       }
 
       & tr .board-summary-container .action-items-summary-card .work-item-title {
@@ -984,11 +980,11 @@ kbd {
 }
 
 .chart-legend-color-unfavorable {
-  @apply bg-unfavorable;
+  @apply bg-error;
 }
 
 .chart-legend-color-neutral {
-  @apply bg-(--color-neutral);
+  @apply bg-task-yellow;
 }
 
 .chart-legend-color-favorable {
@@ -1240,12 +1236,12 @@ kbd {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response.red-chart-response {
-  @apply bg-unfavorable;
+  @apply bg-error;
   background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response.yellow-chart-response {
-  @apply bg-neutral text-black;
+  @apply bg-task-yellow text-black;
   background-image: repeating-linear-gradient(90deg, transparent, transparent 15px, #ceab02 15px, #ceab02 16px);
 }
 
@@ -1415,7 +1411,7 @@ kbd {
 }
 
 .board-metadata-form .feedback-column-card .editable-document-card-title .editable-text {
-  @apply display:inherit ml-2.5 text-[1.1em] leading-[1.1em] text-start;
+  @apply [display:inherit] ml-2.5 text-[1.1em] leading-[1.1em] text-start;
 }
 
 .board-metadata-form .feedback-column-card .editable-document-card-title .editable-text-input-container {
@@ -1611,7 +1607,7 @@ kbd {
 }
 
 .vertical-tab-separator {
-  @apply w-0.5 flex h-6 bg-(--color-gray-dark);
+  @apply w-0.5 flex h-6 bg-(--color-gray-medium);
 }
 
 .menu-button {
