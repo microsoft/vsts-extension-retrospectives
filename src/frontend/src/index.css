@@ -13,7 +13,6 @@
   --color-task-yellow: #f2cb1d;
   --color-gray-light: #f4f4f4;
   --color-gray-medium: #dadada;
-  --color-favorable: #006b3d;
 }
 
 @layer components {
@@ -988,7 +987,7 @@ kbd {
 }
 
 .chart-legend-color-favorable {
-  @apply bg-(--color-favorable);
+  @apply bg-success;
 }
 
 .feedback-carousel-pivot > div {
@@ -1246,7 +1245,7 @@ kbd {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response.green-chart-response {
-  @apply bg-favorable;
+  @apply bg-success;
   background-image: radial-gradient(#006238 20%, transparent 20%), radial-gradient(#006238 20%, transparent 20%);
   background-size: 12px 12px;
   background-position:
@@ -1797,7 +1796,7 @@ kbd {
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-9 {
-  @apply bg-[rgb(141,223,126)];
+  @apply bg-success;
   background-image: radial-gradient(#00a45d 10%, transparent 10%), radial-gradient(#00a45d 10%, transparent 10%);
   background-size: 12px 12px;
   background-position:
@@ -1806,7 +1805,7 @@ kbd {
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-10 {
-  @apply bg-[rgb(98,204,126)];
+  @apply bg-success;
   background-image: radial-gradient(#006238 10%, transparent 10%), radial-gradient(#006238 10%, transparent 10%);
   background-size: 12px 12px;
   background-position:
@@ -1827,7 +1826,7 @@ kbd {
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row .team-assessment-score-button {
-  color: var(--color-primary);
+  @apply text-(--text-primary-color);
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
