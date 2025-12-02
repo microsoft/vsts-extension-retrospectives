@@ -104,7 +104,7 @@ describe("Editable Text Component", () => {
     expect(mockOnSave).toHaveBeenCalledWith("Original Text");
   });
 
-  it("adds newline when Ctrl+Enter is pressed in multiline mode", async () => {
+  it("stays in edit mode when Ctrl+Enter is pressed (allows multiline)", async () => {
     const propsMultiline = { ...mockedTestProps, text: "Line 1", isMultiline: true };
     render(<EditableText {...propsMultiline} />);
 
@@ -114,8 +114,26 @@ describe("Editable Text Component", () => {
     const textarea = document.querySelector("textarea") as HTMLElement;
     await userEvent.type(textarea, "{Control>}{Enter}{/Control}");
 
-    // Component should still be in edit mode with newline added
+    // Component should still be in edit mode (not saved)
     expect(document.querySelector("textarea")).toBeTruthy();
+    // onSave should not have been called
+    expect(mockOnSave).not.toHaveBeenCalled();
+  });
+
+  it("stays in edit mode when Shift+Enter is pressed (allows multiline)", async () => {
+    const propsMultiline = { ...mockedTestProps, text: "Line 1", isMultiline: true };
+    render(<EditableText {...propsMultiline} />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const textarea = document.querySelector("textarea") as HTMLElement;
+    await userEvent.type(textarea, "{Shift>}{Enter}{/Shift}");
+
+    // Component should still be in edit mode (not saved)
+    expect(document.querySelector("textarea")).toBeTruthy();
+    // onSave should not have been called
+    expect(mockOnSave).not.toHaveBeenCalled();
   });
 
   it("shows error when trying to save empty text with Enter", async () => {
@@ -252,6 +270,17 @@ describe("Editable Text Component", () => {
     const textarea = document.querySelector("textarea") as HTMLElement;
     await userEvent.clear(textarea);
     await userEvent.type(textarea, "{Control>}{Enter}{/Control}");
+
+    expect(document.body.textContent).toContain("This cannot be empty.");
+  });
+
+  it("shows error when trying to add newline with Shift+Enter on empty text", async () => {
+    const propsMultiline = { ...mockedTestProps, text: "", isMultiline: true };
+    render(<EditableText {...propsMultiline} />);
+
+    const textarea = document.querySelector("textarea") as HTMLElement;
+    await userEvent.clear(textarea);
+    await userEvent.type(textarea, "{Shift>}{Enter}{/Shift}");
 
     expect(document.body.textContent).toContain("This cannot be empty.");
   });
