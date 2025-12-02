@@ -2201,5 +2201,6 @@ kbd {
 }
 
 .retro-toast-progress {
-  @apply h-1 bg-primary animate-[retro-toast-progress-shrink] ease-linear animation-fill-mode-[forwards];
+  @apply h-1 bg-primary animate-[retro-toast-progress-shrink] ease-linear;
+  animation-fill-mode: forwards;
 }
