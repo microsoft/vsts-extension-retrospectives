@@ -2129,7 +2129,7 @@ kbd {
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item:focus .feedbackItem .mainItemCard,
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item:active .feedbackItem .mainItemCard,
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item:hover .feedbackItem .mainItemCard {
-  @apply border-2 border-solid border-[var(--color-primary)];
+  @apply border-2 border-solid border-primary;
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem {

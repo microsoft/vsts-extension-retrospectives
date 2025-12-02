@@ -2,6 +2,7 @@
 import { TextField } from "@fluentui/react/lib/TextField";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
+import { parseMarkdown, hasMarkdownFormatting } from "../utilities/markdownUtils";
 
 export interface EditableTextProps {
   isDisabled?: boolean;
@@ -194,7 +195,7 @@ class EditableText extends React.Component<EditableTextProps, EditableTextState>
     return (
       <div className="editable-text-container">
         <p className="editable-text" tabIndex={0} onKeyDown={this.props.isDisabled ? () => {} : this.handleEditKeyDown} onClick={this.props.isDisabled ? () => {} : this.handleEdit} role="textbox" title="Click to edit" aria-required={true} aria-label={`Feedback title is ${this.props.isDisabled ? "obscured during collection." : this.props.text + ". Click to edit."}`}>
-          {this.props.text}
+          {hasMarkdownFormatting(this.props.text) ? parseMarkdown(this.props.text) : this.props.text}
         </p>
       </div>
     );
