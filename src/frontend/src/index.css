@@ -990,6 +990,14 @@ kbd {
   @apply bg-success;
 }
 
+.card-footer {
+  @apply mx-4 pb-2 text-(--text-secondary-color) flex flex-row;
+
+  & .card-id {
+    @apply grow;
+  }
+}
+
 .feedback-carousel-pivot > div {
   @apply flex;
 }
@@ -1993,12 +2001,6 @@ kbd {
   @apply text-xs;
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-id,
-.feedback-item-group .mainItemCard .card-integral-part .card-id,
-.feedback-item-group .groupedItemCard .card-integral-part .card-id {
-  @apply ml-4 pb-2 text-(--text-secondary-color);
-}
-
 .feedbackItem .mainItemCard .card-integral-part .ms-DocumentCardActivity .msDocumentCardActivity-details {
   @apply pl-1.5;
 }
@@ -2124,9 +2126,9 @@ kbd {
   @apply w-full [word-wrap:break-word];
 }
 
-.retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem .mainItemCard .anonymous-created-date .card-id,
+.retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem .mainItemCard .anonymous-created-date .card-footer,
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem .mainItemCard .non-editable-text-container,
-.retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem .mainItemCard .card-id {
+.retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem .mainItemCard .card-footer {
   @apply text-(--text-primary-color);
 }
 
