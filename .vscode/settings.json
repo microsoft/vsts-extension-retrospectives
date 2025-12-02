@@ -1,6 +1,6 @@
 {
   "css.validate": true,
-  "css.lint.unknownAtRules": "warning",
+  "css.lint.unknownAtRules": "ignore",
   "tailwindCSS.includeLanguages": {
     "plaintext": "html"
   },

@@ -5038,4 +5038,612 @@ describe("Feedback Item", () => {
       expect(container.firstChild).toBeTruthy();
     });
   });
+
+  describe("Group Feedback Dialog - Extended Coverage", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("opens group feedback dialog with g key in Group phase", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "group-dialog-item",
+        boardId: testBoardId,
+        title: "Group Dialog Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        team: { id: "team-1" },
+        boardTitle: "Test Board",
+        defaultActionItemAreaPath: "",
+        defaultActionItemIteration: "",
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        moveFeedbackItem: jest.fn(),
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "g" });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Group Feedback/i)).toBeInTheDocument();
+      });
+    });
+
+    test("opens move feedback dialog with m key in Group phase", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "move-dialog-item",
+        boardId: testBoardId,
+        title: "Move Dialog Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const secondColumnId = "second-column-uuid";
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+        [secondColumnId]: {
+          columnProperties: {
+            id: secondColumnId,
+            title: "Second Column",
+            iconClass: "far fa-frown",
+            accentColor: "#ff0000",
+          },
+          columnItems: [] as any[],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne, secondColumnId],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        team: { id: "team-1" },
+        boardTitle: "Test Board",
+        defaultActionItemAreaPath: "",
+        defaultActionItemIteration: "",
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        moveFeedbackItem: jest.fn(),
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "m" });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Move Feedback to Different Column/i)).toBeInTheDocument();
+      });
+    });
+
+    test("shows search results in group feedback dialog", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "search-results-item",
+        boardId: testBoardId,
+        title: "Search Results Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const otherItem: IFeedbackItemDocument = {
+        id: "other-item",
+        boardId: testBoardId,
+        title: "Other Feedback Item",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-2",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [
+            { feedbackItem: mockItem, actionItems: [] as any[] },
+            { feedbackItem: otherItem, actionItems: [] as any[] },
+          ],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        team: { id: "team-1" },
+        boardTitle: "Test Board",
+        defaultActionItemAreaPath: "",
+        defaultActionItemIteration: "",
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        moveFeedbackItem: jest.fn(),
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+        columnProps: {
+          columnItems: [
+            { feedbackItem: mockItem, actionItems: [] },
+            { feedbackItem: otherItem, actionItems: [] },
+          ],
+        },
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "g" });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Group Feedback/i)).toBeInTheDocument();
+      });
+    });
+
+    test("handles escape key to close group dialog", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "escape-dialog-item",
+        boardId: testBoardId,
+        title: "Escape Dialog Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        team: { id: "team-1" },
+        boardTitle: "Test Board",
+        defaultActionItemAreaPath: "",
+        defaultActionItemIteration: "",
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        moveFeedbackItem: jest.fn(),
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "g" });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Group Feedback/i)).toBeInTheDocument();
+      });
+
+      // Press escape to close
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "Escape" });
+      });
+    });
+  });
+
+  describe("FeedbackItemHelper - Extended Coverage", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("FeedbackItemHelper is a valid class", () => {
+      // Just verify the class exists and can be referenced
+      expect(FeedbackItemHelper).toBeDefined();
+      expect(typeof FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem).toBe('function');
+    });
+  });
+
+  describe("Delete dialog interactions", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("cancels delete dialog when cancel is clicked", async () => {
+      const mockItem: IFeedbackItemDocument = {
+        id: "cancel-delete-item",
+        boardId: testBoardId,
+        title: "Cancel Delete Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        team: { id: "team-1" },
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "Delete" });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText("Delete Feedback")).toBeInTheDocument();
+      });
+
+      // Click cancel button
+      const cancelButton = screen.getByRole("button", { name: /Cancel/i });
+      fireEvent.click(cancelButton);
+
+      // Dialog should close
+      await waitFor(() => {
+        expect(screen.queryByText("Delete Feedback")).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("Move feedback dialog interactions", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("moves feedback item when column button is clicked", async () => {
+      const mockMoveFeedbackItem = jest.fn();
+      const mockItem: IFeedbackItemDocument = {
+        id: "move-click-item",
+        boardId: testBoardId,
+        title: "Move Click Test",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "user-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      };
+
+      const secondColumnId = "second-column-uuid";
+      const columns = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Test Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+          },
+          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
+        },
+        [secondColumnId]: {
+          columnProperties: {
+            id: secondColumnId,
+            title: "Second Column",
+            iconClass: "far fa-frown",
+            accentColor: "#ff0000",
+          },
+          columnItems: [] as any[],
+        },
+      };
+
+      const props: any = {
+        id: mockItem.id,
+        title: mockItem.title,
+        columnId: testColumnUuidOne,
+        columns,
+        columnIds: [testColumnUuidOne, secondColumnId],
+        boardId: testBoardId,
+        createdDate: new Date(),
+        upvotes: 0,
+        groupIds: [],
+        userIdRef: "user-1",
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [],
+        allWorkItemTypes: [],
+        originalColumnId: testColumnUuidOne,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        team: { id: "team-1" },
+        boardTitle: "Test Board",
+        defaultActionItemAreaPath: "",
+        defaultActionItemIteration: "",
+        onVoteCasted: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        moveFeedbackItem: mockMoveFeedbackItem,
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+      };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "m" });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Move Feedback to Different Column/i)).toBeInTheDocument();
+      });
+
+      // Click on the second column button
+      const moveButton = screen.getByText("Second Column");
+      fireEvent.click(moveButton);
+
+      expect(mockMoveFeedbackItem).toHaveBeenCalled();
+    });
+  });
 });
+

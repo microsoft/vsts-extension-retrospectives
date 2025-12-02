@@ -13,6 +13,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "bradlc.vscode-tailwindcss",
         "ms-dotnettools.csharp",
         "ms-azuretools.vscode-docker",
         "vscode-icons-team.vscode-icons",

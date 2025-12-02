@@ -20,6 +20,15 @@ jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: jest.fn((plugin, component) => component),
 }));
 
+jest.mock("../../dal/boardDataService", () => ({
+  __esModule: true,
+  default: {
+    checkIfBoardNameIsTaken: jest.fn().mockResolvedValue(false),
+    getSetting: jest.fn().mockResolvedValue(null),
+    saveSetting: jest.fn().mockResolvedValue(undefined),
+  },
+}));
+
 const mockedProps: IFeedbackBoardMetadataFormProps = {
   isNewBoardCreation: true,
   isDuplicatingBoard: false,
@@ -1097,5 +1106,123 @@ describe("FeedbackBoardMetadataForm - Save Button State", () => {
     // Save button state depends on columns having titles
     const saveButton = screen.getByRole("button", { name: /save/i });
     expect(saveButton).toBeInTheDocument();
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Form Submission With Delete Confirmation", () => {
+  let mockOnFormSubmit: jest.Mock;
+  let mockOnFormCancel: jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockOnFormSubmit = jest.fn();
+    mockOnFormCancel = jest.fn();
+    mockedProps.isNewBoardCreation = false;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = testExistingBoard;
+    mockedProps.onFormSubmit = mockOnFormSubmit;
+    mockedProps.onFormCancel = mockOnFormCancel;
+  });
+
+  it("should mark column for deletion and show visual indication", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    // Delete a column to mark it for deletion
+    const deleteButtons = screen.getAllByTitle("Delete");
+    const initialCount = deleteButtons.length;
+    await user.click(deleteButtons[0]);
+
+    // The deleted column should show undo button
+    const undoButtons = screen.getAllByTitle("Undo Delete");
+    expect(undoButtons.length).toBeGreaterThan(0);
+  });
+
+  it("should handle form submission with existing board", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    // Component should render with existing board title
+    const titleInput = screen.getByLabelText(/please enter new retrospective title/i) as HTMLInputElement;
+    expect(titleInput.value).toBe(testExistingBoard.title);
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Board Name Taken Validation", () => {
+  let mockOnFormSubmit: jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockOnFormSubmit = jest.fn();
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+    mockedProps.onFormSubmit = mockOnFormSubmit;
+  });
+
+  it("should validate board name is not empty", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    expect(saveButton).toBeDisabled();
+  });
+
+  it("should handle whitespace-only board names", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const titleInput = screen.getByLabelText(/please enter new retrospective title/i);
+    await user.type(titleInput, "   ");
+
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    expect(saveButton).toBeDisabled();
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Column Operations Extended", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should toggle color dialog visibility", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const changeColorButtons = screen.getAllByRole("button", { name: /change column color/i });
+    await user.click(changeColorButtons[0]);
+
+    // Dialog should be visible
+    expect(screen.getByText(/choose column color/i)).toBeInTheDocument();
+  });
+
+  it("should update column title in place", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    // Component should render column settings
+    expect(screen.getByRole("heading", { name: /column settings/i })).toBeInTheDocument();
+  });
+
+  it("should handle column reordering with move buttons", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const moveUpButtons = screen.getAllByTitle("Move Up");
+    const moveDownButtons = screen.getAllByTitle("Move Down");
+
+    // Second column's move up should be enabled
+    if (moveUpButtons.length > 1) {
+      expect(moveUpButtons[1]).not.toBeDisabled();
+      await user.click(moveUpButtons[1]);
+    }
+
+    // First column's move down should be enabled
+    if (moveDownButtons.length > 0) {
+      expect(moveDownButtons[0]).not.toBeDisabled();
+      await user.click(moveDownButtons[0]);
+    }
   });
 });

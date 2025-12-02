@@ -35,26 +35,6 @@
   }
 }
 
-.work-item-task-color {
-  @apply text-task-yellow;
-}
-
-.work-item-bug-color {
-  @apply text-(--color-bug-red);
-}
-
-.focus-outline-standard {
-  @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
-}
-
-.button-primary {
-  @apply bg-primary text-white;
-}
-
-.dialog-text-primary {
-  @apply text-(--text-primary-color);
-}
-
 @keyframes fadeInFromGreen {
   from {
     opacity: 0;
@@ -91,8 +71,38 @@
   }
 }
 
+@keyframes retro-toast-progress-shrink {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
 body {
   @apply overflow-hidden;
+}
+
+.work-item-task-color {
+  @apply text-task-yellow;
+}
+
+.work-item-bug-color {
+  @apply text-(--color-bug-red);
+}
+
+.focus-outline-standard {
+  @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
+}
+
+.button-primary {
+  @apply bg-primary text-white;
+}
+
+.dialog-text-primary {
+  @apply text-(--text-primary-color);
 }
 
 button:hover:not(.ms-Button),
@@ -521,10 +531,10 @@ kbd {
 }
 
 .selector-list-header {
-  @apply bg-[var(--background-color)] flex h-8 w-[450px] pl-2.5;
+  @apply bg-(--background-color) flex h-8 w-[450px] pl-2.5;
 
   & .selector-list-header-text {
-    @apply align-middle text-center leading-8 text-[#0071cd] font-semibold text-sm;
+    @apply align-middle text-center leading-8 text-primary font-semibold text-sm;
   }
 }
 
@@ -532,10 +542,10 @@ kbd {
   @apply max-h-[250px] overflow-auto;
 
   & .selector-list-item {
-    @apply bg-[var(--background-color)] h-8 w-[450px] flex cursor-pointer pl-2 text-[var(--text-primary-color)];
+    @apply bg-(--background-color) h-8 w-[450px] flex cursor-pointer pl-2 text-(--text-primary-color);
 
     &:hover {
-      @apply bg-[var(--border-subtle-color)] text-black;
+      @apply bg-(--border-subtle-color) text-black;
     }
   }
 
@@ -569,14 +579,14 @@ kbd {
 }
 
 .related-task-sub-card {
-  @apply h-[35px] m-0 max-w-full border-0 bg-[var(--background-color)] text-[var(--text-primary-color)];
+  @apply h-[35px] m-0 max-w-full border-0 bg-(--background-color) text-(--text-primary-color);
 
   & .task-yellow {
-    @apply text-[var(--color-task-yellow)];
+    @apply text-task-yellow;
   }
 
   & .bug-red {
-    @apply text-[var(--color-bug-red)];
+    @apply text-(--color-bug-red);
   }
 
   & .ms-Image-image {
@@ -584,10 +594,10 @@ kbd {
   }
 
   & .ms-Button--icon {
-    @apply bg-[var(--background-color)];
+    @apply bg-(--background-color);
 
     & .ms-Button-icon:hover {
-      @apply text-[var(--color-primary)];
+      @apply text-primary;
     }
   }
 
@@ -600,11 +610,11 @@ kbd {
   }
 
   & .ms-DocumentCardTitle {
-    @apply leading-[10px] whitespace-nowrap overflow-hidden text-[10px] text-[var(--text-primary-color)] content-center;
+    @apply leading-[10px] whitespace-nowrap overflow-hidden text-[10px] text-(--text-primary-color) content-center;
   }
 
   &.resolved-border-right {
-    @apply border-r-[3px] border-[var(--color-success)];
+    @apply border-r-[3px] border-success;
 
     &:hover {
       border-right-color: var(--color-success);
@@ -617,34 +627,34 @@ kbd {
 }
 
 .action-item-selector .task-yellow {
-  @apply text-[var(--color-task-yellow)];
+  @apply text-task-yellow;
 }
 
 .action-item-selector .bug-red {
-  @apply text-[var(--color-bug-red)];
+  @apply text-(--color-bug-red);
 }
 
 .add-action-item-wrapper {
-  @apply flex max-w-full bg-[var(--nav-vertical-background-color)];
+  @apply flex max-w-full bg-(--nav-vertical-background-color);
 
   & .feedback-spacer {
     @apply flex-1;
   }
 
   & .add-action-item-section .add-action-item-button {
-    @apply h-8 text-[var(--text-primary-color)];
+    @apply h-8 text-(--text-primary-color);
   }
 }
 
 .add-action-item-list-items .ms-List-cell:hover {
-  @apply bg-[var(--border-subtle-color)];
+  @apply bg-(--border-subtle-color);
 }
 
 .action-items {
-  @apply border-l border-[var(--color-border-gray)];
+  @apply border-l border-border-gray;
 
   & .work-item-type-icon-container {
-    @apply bg-[var(--background-color)];
+    @apply bg-(--background-color);
   }
 
   & .ms-DocumentCard .ms-DocumentCardActions {
@@ -654,7 +664,7 @@ kbd {
       @apply h-[30px] w-[25px];
 
       & .ms-Button .ms-Button-flexContainer i {
-        @apply text-[var(--color-primary)] text-xs;
+        @apply text-primary text-xs;
       }
 
       & .ms-Button:hover:not(:disabled) i {
@@ -664,7 +674,7 @@ kbd {
   }
 
   & .ms-DocumentCardPreview {
-    @apply border-r border-[var(--color-border-gray)];
+    @apply border-r border-border-gray;
   }
 }
 
@@ -676,7 +686,7 @@ kbd {
   }
 
   & .add-action-item-list-container {
-    @apply bg-[var(--background-color)];
+    @apply bg-(--background-color);
 
     & .add-action-item-list-item {
       @apply flex cursor-pointer pl-2 items-center justify-start bg-inherit w-full border-0 overflow-hidden;
@@ -685,12 +695,12 @@ kbd {
         @apply mr-2 w-4;
 
         &.fas.fa-link {
-          @apply text-[var(--border-subtle-color)];
+          @apply text-(--border-subtle-color);
         }
       }
 
       & .add-action-item-list-item-text {
-        @apply leading-8 mr-[15px] text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis text-[var(--text-primary-color)];
+        @apply leading-8 mr-[15px] text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis text-(--text-primary-color);
       }
     }
   }
@@ -716,7 +726,7 @@ kbd {
   }
 
   & .input-validation-message {
-    @apply text-[var(--color-error)];
+    @apply text-(--color-error);
   }
 
   & .work-item-id-input {
@@ -728,7 +738,7 @@ kbd {
   @apply flex w-full h-[65px] items-center px-8 py-0;
 
   & .menu-button {
-    @apply ml-1.5 mr-5 bg-[var(--color-gray-light)];
+    @apply ml-1.5 mr-5 bg-gray-light;
   }
 
   & .board-summary-table-title {
@@ -741,17 +751,17 @@ kbd {
 
   & th,
   & td {
-    @apply border border-black/[0.02] whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer;
+    @apply border border-black/2 whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer;
   }
 
   & table {
     @apply border border-black/10 border-collapse overflow-auto w-full;
 
     & thead {
-      @apply bg-[var(--color-primary)] text-white;
+      @apply bg-primary text-white;
 
       & tr th {
-        @apply bg-[#0078d4] font-normal h-[30px] leading-[30px] sticky p-1.5 top-0 z-[1];
+        @apply bg-primary font-normal h-[30px] leading-[30px] sticky p-1.5 top-0 z-1;
       }
 
       & tr th .resizer {
@@ -783,7 +793,7 @@ kbd {
       }
 
       & tr:nth-child(even) {
-        @apply bg-[var(--border-subtle-color)];
+        @apply bg-(--border-subtle-color);
       }
 
       & tr .board-summary-container {
@@ -797,7 +807,7 @@ kbd {
 
       & tr .board-summary-container .board-summary-card,
       & tr .board-summary-container .action-items-summary-card {
-        @apply my-2 mx-1.5 bg-[var(--background-color)] min-h-[285px];
+        @apply my-2 mx-1.5 bg-(--background-color) min-h-[285px];
       }
 
       & tr .board-summary-container .board-summary-card .items-stats-container,
@@ -807,7 +817,7 @@ kbd {
 
       & tr .board-summary-container .board-summary-card .items-stats-container .pending-action-item-color,
       & tr .board-summary-container .action-items-summary-card .items-stats-container .pending-action-item-color {
-        @apply text-[var(--status-warning-text)];
+        @apply text-(--status-warning-text);
       }
 
       & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text,
@@ -822,7 +832,7 @@ kbd {
 
       & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text .text,
       & tr .board-summary-container .action-items-summary-card .items-stats-container .count-and-text .text {
-        @apply text-xs text-[var(--text-primary-color)];
+        @apply text-xs text-(--text-primary-color);
       }
 
       & tr .board-summary-container .board-summary-card .items-stats-container .stats-icon,
@@ -835,23 +845,23 @@ kbd {
       }
 
       & tr .board-summary-container .action-items-summary-card div[role="row"] {
-        @apply bg-[var(--background-color)] text-[var(--text-primary-color)] pt-0 border-0;
+        @apply bg-(--background-color) text-(--text-primary-color) pt-0 border-0;
       }
 
       & tr .board-summary-container .action-items-summary-card div[role="row"]:nth-child(even) {
-        @apply bg-[var(--border-subtle-color)];
+        @apply bg-(--border-subtle-color);
       }
 
       & tr .board-summary-container .action-items-summary-card .ms-DetailsList-headerWrapper {
-        @apply border-b-[3px] border-[var(--border-subtle-color)];
+        @apply border-b-[3px] border-(--border-subtle-color);
       }
 
       & tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"] {
-        @apply bg-[var(--background-color)] text-[var(--text-primary-color)] border-b border-white;
+        @apply bg-(--background-color) text-(--text-primary-color) border-b border-white;
       }
 
       & tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"]:hover {
-        @apply text-[var(--text-primary-color)];
+        @apply text-(--text-primary-color);
       }
 
       & tr .board-summary-container .action-items-summary-card .overflow-ellipsis {
@@ -875,11 +885,11 @@ kbd {
       }
 
       & tr .board-summary-container .action-items-summary-card .task-yellow {
-        @apply text-[var(--color-task-yellow)];
+        @apply text-task-yellow;
       }
 
       & tr .board-summary-container .action-items-summary-card .bug-red {
-        @apply text-[var(--color-bug-red)];
+        @apply text-(--color-bug-red);
       }
 
       & tr .board-summary-container .action-items-summary-card .work-item-title {
@@ -891,19 +901,19 @@ kbd {
       }
 
       & tr .board-summary-container .board-summary-card {
-        @apply p-5 w-1/5 min-w-[270px] border border-[var(--text-primary-color)] rounded;
+        @apply p-5 w-1/5 min-w-[270px] border border-(--text-primary-color) rounded;
       }
 
       & tr .board-summary-container .board-summary-card .resolved-green {
-        @apply text-[var(--status-success-text)];
+        @apply text-(--status-success-text);
       }
 
       & tr .board-summary-container .board-summary-card .board-summary-card-title {
-        @apply text-lg border-b-[3px] border-[var(--color-primary)];
+        @apply text-lg border-b-[3px] border-primary;
       }
 
       & tr .board-summary-container .board-summary-card .board-summary-card-title .ms-DocumentCardTitle {
-        @apply font-semibold p-0 mb-5 h-auto text-[var(--text-primary-color)];
+        @apply font-semibold p-0 mb-5 h-auto text-(--text-primary-color);
       }
     }
   }
@@ -917,7 +927,7 @@ kbd {
   }
 
   & .pending-action-item-count {
-    @apply text-[var(--status-warning-text)] font-semibold;
+    @apply text-(--status-warning-text) font-semibold;
   }
 
   & .trash-icon-header {
@@ -974,15 +984,15 @@ kbd {
 }
 
 .chart-legend-color-unfavorable {
-  @apply bg-[var(--color-unfavorable)];
+  @apply bg-unfavorable;
 }
 
 .chart-legend-color-neutral {
-  @apply bg-[var(--color-neutral)];
+  @apply bg-(--color-neutral);
 }
 
 .chart-legend-color-favorable {
-  @apply bg-[var(--color-favorable)];
+  @apply bg-(--color-favorable);
 }
 
 .feedback-carousel-pivot > div {
@@ -990,7 +1000,7 @@ kbd {
 }
 
 .feedback-carousel-pivot > .ms-Pivot .ms-Button {
-  @apply bg-[var(--background-color)] text-[var(--text-primary-color)];
+  @apply bg-(--background-color) text-(--text-primary-color);
 }
 
 .feedback-carousel-pivot-item {
@@ -1006,11 +1016,11 @@ kbd {
 }
 
 .retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog .ms-Dialog-title {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog .ms-Dialog-subText {
-  @apply text-[var(--text-primary-color)] text-sm;
+  @apply text-(--text-primary-color) text-sm;
 }
 
 .retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog .feedback-carousel-pivot .ms-Pivot {
@@ -1115,7 +1125,7 @@ kbd {
       }
 
       &:focus-visible {
-        @apply outline-2 outline-[var(--color-primary)] outline-offset-2;
+        @apply outline-2 outline-(--color-primary) outline-offset-2;
       }
     }
   }
@@ -1152,17 +1162,17 @@ kbd {
     }
 
     &:focus-visible {
-      @apply outline-2 outline-[var(--color-primary)] outline-offset-2;
+      @apply outline-2 outline-(--color-primary) outline-offset-2;
     }
   }
 }
 
 .retrospectives-retro-summary-dialog {
-  @apply max-w-none w-[70%] flex items-center bg-[var(--background-color)] text-[var(--text-primary-color)];
+  @apply max-w-none w-[70%] flex items-center bg-(--background-color) text-(--text-primary-color);
 }
 
 .retrospectives-retro-summary-dialog .ms-Dialog-title {
-  @apply text-left text-[var(--text-primary-color)];
+  @apply text-left text-(--text-primary-color);
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section {
@@ -1174,7 +1184,7 @@ kbd {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-section-header {
-  @apply text-base text-right bg-[var(--color-primary)]/[0.51] mb-1.5 py-1.5 px-2.5 font-medium;
+  @apply text-base text-right bg-primary/50 mb-1.5 py-1.5 px-2.5 font-medium;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-section-item .retro-summary-section-item-header {
@@ -1182,7 +1192,7 @@ kbd {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-item-horizontal-group {
-  @apply flex-row flex items-center mt-2.5 border-t border-[var(--border-subtle-color)] pt-2.5 w-full;
+  @apply flex-row flex items-center mt-2.5 border-t border-(--border-subtle-color) pt-2.5 w-full;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-item-horizontal-group .horizontal-group-item {
@@ -1194,7 +1204,7 @@ kbd {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-contributors-section .retro-summary-contributor {
-  @apply rounded-[10px] p-3 w-fit bg-[var(--border-subtle-color)] mr-2.5 mb-2.5;
+  @apply rounded-[10px] p-3 w-fit bg-(--border-subtle-color) mr-2.5 mb-2.5;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-contributors-section .retro-summary-contributor:last-child {
@@ -1226,21 +1236,21 @@ kbd {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .assessment-chart-action {
-  @apply whitespace-nowrap py-0 px-1.5 bg-[var(--color-primary)];
+  @apply whitespace-nowrap py-0 px-1.5 bg-primary;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response.red-chart-response {
-  @apply bg-[var(--color-unfavorable)];
+  @apply bg-unfavorable;
   background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response.yellow-chart-response {
-  @apply bg-[var(--color-neutral)] text-black;
+  @apply bg-neutral text-black;
   background-image: repeating-linear-gradient(90deg, transparent, transparent 15px, #ceab02 15px, #ceab02 16px);
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response.green-chart-response {
-  @apply bg-[var(--color-favorable)];
+  @apply bg-favorable;
   background-image: radial-gradient(#006238 20%, transparent 20%), radial-gradient(#006238 20%, transparent 20%);
   background-size: 12px 12px;
   background-position:
@@ -1253,7 +1263,7 @@ kbd {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section {
-  @apply flex items-center justify-center flex-col rounded-[3px] border-2 border-[var(--border-subtle-color)] p-2.5 w-fit mb-2.5;
+  @apply flex items-center justify-center flex-col rounded-[3px] border-2 border-(--border-subtle-color) p-2.5 w-fit mb-2.5;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section .favorability-header {
@@ -1277,11 +1287,11 @@ kbd {
 }
 
 .retrospectives-team-assessment-history-dialog {
-  @apply max-w-[1100px] w-auto flex items-center bg-[var(--background-color)] text-[var(--text-primary-color)];
+  @apply max-w-[1100px] w-auto flex items-center bg-(--background-color) text-(--text-primary-color);
 }
 
 .retrospectives-team-assessment-history-dialog .ms-Dialog-title {
-  @apply text-left text-[var(--text-primary-color)];
+  @apply text-left text-(--text-primary-color);
 }
 
 .retrospectives-team-assessment-history-dialog svg {
@@ -1289,7 +1299,7 @@ kbd {
 }
 
 .retrospectives-team-assessment-history-dialog h3 {
-  @apply text-[var(--text-primary-color)] text-base font-semibold;
+  @apply text-(--text-primary-color) text-base font-semibold;
 }
 
 .retrospectives-team-assessment-history-dialog circle:hover {
@@ -1301,11 +1311,11 @@ kbd {
 }
 
 .board-metadata-form hr {
-  @apply border-[0.5px] border-solid border-[var(--color-primary)];
+  @apply border-[0.5px] border-solid border-primary;
 }
 
 .board-metadata-form .board-metadata-form-section-information {
-  @apply border-[3px] border-solid border-[var(--color-gray-medium)] bg-[var(--color-gray-medium)] my-[5px] mx-0 mb-2.5 p-[0.2em];
+  @apply border-[3px] border-solid border-gray-medium bg-gray-medium my-[5px] mx-0 mb-2.5 p-[0.2em];
 }
 
 .board-metadata-form .board-metadata-form-section-information.warning-information {
@@ -1329,11 +1339,11 @@ kbd {
 }
 
 .board-metadata-form .board-metadata-edit-column-settings {
-  @apply border border-solid border-[var(--color-gray-medium)] p-2.5;
+  @apply border border-solid border-gray-medium p-2.5;
 }
 
 .board-metadata-form .board-metadata-form-section-subheader {
-  @apply text-[1em] font-semibold w-full flex items-center m-[0.2em] text-[var(--text-primary-color)];
+  @apply text-[1em] font-semibold w-full flex items-center m-[0.2em] text-(--text-primary-color);
 }
 
 .board-metadata-form .board-metadata-form-section-subheader label {
@@ -1341,15 +1351,15 @@ kbd {
 }
 
 .board-metadata-form .ms-Checkbox.is-checked .ms-Checkbox-checkbox {
-  @apply bg-[var(--background-color)];
+  @apply bg-(--background-color);
 }
 
 .board-metadata-form .ms-Checkbox.is-checked .ms-Checkbox-checkbox:hover {
-  @apply bg-[var(--color-primary)] text-white;
+  @apply bg-primary text-white;
 }
 
 .board-metadata-form .ms-Checkbox.is-checked .ms-Checkbox-checkmark {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .board-metadata-form .ms-Checkbox.is-checked .ms-Checkbox-checkmark:hover {
@@ -1357,27 +1367,27 @@ kbd {
 }
 
 .board-metadata-form .ms-Checkbox.is-disabled .ms-Checkbox-checkbox:hover {
-  @apply bg-[var(--background-color)];
+  @apply bg-(--background-color);
 }
 
 .board-metadata-form .ms-Checkbox .ms-Checkbox-text {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .board-metadata-form .ms-Checkbox .ms-Checkbox-text:hover {
-  @apply text-[var(--color-primary)];
+  @apply text-primary;
 }
 
 .board-metadata-form .ms-Checkbox .ms-Checkbox-checkbox {
-  @apply bg-[var(--background-color)] border-[#aaa];
+  @apply bg-(--background-color) border-[#aaa];
 }
 
 .board-metadata-form .ms-Checkbox .ms-Checkbox-checkbox:hover {
-  @apply bg-[var(--color-primary)];
+  @apply bg-primary;
 }
 
 .board-metadata-form .ms-Checkbox .ms-Checkbox-checkmark {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .board-metadata-form .ms-Checkbox .ms-Checkbox-checkmark:hover {
@@ -1385,15 +1395,15 @@ kbd {
 }
 
 .board-metadata-form .feedback-column-card {
-  @apply bg-[var(---nav-vertical-background-color)] text-[var(--text-primary-color)] h-[60px] mt-2.5 items-center;
+  @apply bg-(---nav-vertical-background-color) text-(--text-primary-color) h-[60px] mt-2.5 items-center;
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button) {
-  @apply bg-none min-w-[30px] pl-0 pr-0 ml-[5px] mr-[5px] border-none text-[var(--text-primary-color)];
+  @apply bg-none min-w-[30px] pl-0 pr-0 ml-[5px] mr-[5px] border-none text-(--text-primary-color);
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button):hover {
-  @apply bg-[var(--color-gray-light)] text-[var(--background-color)];
+  @apply bg-(--color-gray-light) text-(--background-color);
 }
 
 .board-metadata-form .feedback-column-card .editable-document-card-title {
@@ -1413,15 +1423,15 @@ kbd {
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button) {
-  @apply bg-[var(--background-color)] border-none my-0 mx-[3px];
+  @apply bg-(--background-color) border-none my-0 mx-[3px];
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button):hover {
-  @apply bg-[var(--color-gray-light)];
+  @apply bg-(--color-gray-light);
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled {
-  @apply bg-[var(--text-disabled-color)];
+  @apply bg-(--text-disabled-color);
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled i {
@@ -2185,7 +2195,7 @@ kbd {
 .retrospectives-remove-feedback-item-from-group-dialog,
 .retrospectives-delete-board-confirmation-dialog,
 .retrospectives-delete-feedback-item-dialog {
-  @apply bg-[var(--background-color)] max-w-[450px] w-[90%];
+  @apply bg-(--background-color) max-w-[450px] w-[90%];
 }
 
 .retrospectives-archive-board-confirmation-dialog .ms-Dialog-title,
@@ -2196,14 +2206,14 @@ kbd {
 .retrospectives-delete-board-confirmation-dialog .ms-Dialog-subText,
 .retrospectives-delete-feedback-item-dialog .ms-Dialog-title,
 .retrospectives-delete-feedback-item-dialog .ms-Dialog-subText {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .retrospectives-archive-board-confirmation-dialog .ms-Button--primary,
 .retrospectives-remove-feedback-item-from-group-dialog .ms-Button--primary,
 .retrospectives-delete-board-confirmation-dialog .ms-Button--primary,
 .retrospectives-delete-feedback-item-dialog .ms-Button--primary {
-  @apply bg-[var(--color-primary)] text-white;
+  @apply bg-primary text-white;
 }
 
 .retro-toast {
@@ -2229,14 +2239,4 @@ kbd {
   animation-name: retro-toast-progress-shrink;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
-}
-
-@keyframes retro-toast-progress-shrink {
-  from {
-    width: 100%;
-  }
-
-  to {
-    width: 0%;
-  }
 }

@@ -5,11 +5,14 @@ import { mockCommon } from "../__mocks__/azure-devops-extension-api/Common/Commo
 import { mockUuid } from "../__mocks__/uuid/v4";
 import { MockSDK } from "../__mocks__/azure-devops-extension-sdk/sdk";
 
-window.crypto = {
+// Ensure global/window is available in jsdom environment
+const globalAny = global as typeof globalThis & { crypto: Crypto; matchMedia: jest.Mock };
+
+globalAny.crypto = {
   randomUUID: () => randomUUID() as `${string}-${string}-${string}-${string}-${string}`,
 } as Crypto;
 
-window.matchMedia = jest.fn().mockImplementation(query => {
+globalAny.matchMedia = jest.fn().mockImplementation(query => {
   return {
     matches: false,
     media: query,
