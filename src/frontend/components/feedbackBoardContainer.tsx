@@ -1641,7 +1641,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return (
       <div className="flex flex-col h-screen">
-        <div className="flex items-center flex-shrink-0 mt-2 ml-4">
+        <div className="flex items-center shrink-0 mt-2 ml-4">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
             onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
@@ -1685,13 +1685,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <ExtensionSettingsMenu />
           </div>
         </div>
-        <div className="flex items-center justify-start flex-shrink-0">
+        <div className="flex items-center justify-start shrink-0">
           <div className="w-full">
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "Board" ? "font-bold border-b-2 border-[#0078d4]" : ""}`} onClick={() => this.handlePivotClick("Board")}>
+              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "Board" ? "font-bold border-b-2 border-primary" : ""}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
               </div>
-              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "History" ? "font-bold border-b-2 border-[#0078d4]" : ""}`} onClick={() => this.handlePivotClick("History")}>
+              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "History" ? "font-bold border-b-2 border-primary" : ""}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </div>
               {this.state.activeTab === "Board" && (
@@ -1750,7 +1750,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   <div className="flex items-center justify-start">
                     <div className="flex flex-row items-center workflow-stage-header 3">
                       {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                        <div className="border border-solid border-[var(--nav-header-active-item-background)] rounded-lg">
+                        <div className="border border-solid border-(--nav-header-active-item-background) rounded-lg">
                           <Dialog
                             hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
                             onDismiss={() => {
@@ -1877,12 +1877,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               )}
             </div>
             {this.state.activeTab === "History" && (
-              <div className="flex-1 min-h-0 overflow-auto border-t-4 border-[var(--nav-header-active-item-background)]">
+              <div className="flex-1 min-h-0 overflow-auto border-t-4 border-(--nav-header-active-item-background)">
                 <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
               </div>
             )}
             {this.state.activeTab === "Board" && (
-              <div className="flex-1 min-h-0 flex flex-col feedback-board-container border-t-4 border-[var(--nav-header-active-item-background)]">
+              <div className="flex-1 min-h-0 flex flex-col feedback-board-container border-t-4 border-(--nav-header-active-item-background)">
                 {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (

@@ -2151,44 +2151,44 @@ kbd {
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem .mainItemCard .anonymous-created-date .card-id,
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem .mainItemCard .non-editable-text-container,
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem .mainItemCard .card-id {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .retrospectives-group-feedback-item-dialog .ms-DocumentCardActivity-avatar::after {
-  @apply border border-solid border-[var(--text-primary-color)];
+  @apply border border-solid border-(--text-primary-color);
 }
 
 .feedback-action-menu {
-  @apply border border-solid border-[var(--border-subtle-color)];
+  @apply border border-solid border-(--border-subtle-color);
 }
 
 .feedback-action-menu .ms-ContextualMenu-list {
-  @apply bg-[var(--background-color)];
+  @apply bg-(--background-color);
 }
 
 .feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-itemText {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link:hover {
-  @apply text-[var(--text-primary-color)] bg-[var(--border-subtle-color)];
+  @apply text-(--text-primary-color) bg-(--border-subtle-color);
 }
 
 .feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link.is-disabled .ms-ContextualMenu-itemText {
-  @apply text-[var(--text-disabled-color)];
+  @apply text-(--text-disabled-color);
 }
 
 .dialog-confirmation-base {
-  @apply bg-[var(--background-color)] max-w-[450px] w-[90%];
+  @apply bg-(--background-color) max-w-[450px] w-[90%];
 }
 
 .dialog-confirmation-base .ms-Dialog-title,
 .dialog-confirmation-base .ms-Dialog-subText {
-  @apply text-[var(--text-primary-color)];
+  @apply text-(--text-primary-color);
 }
 
 .dialog-confirmation-base .ms-Button--primary {
-  @apply bg-[var(--color-primary)] text-white;
+  @apply bg-primary text-white;
 }
 
 .retrospectives-archive-board-confirmation-dialog,
