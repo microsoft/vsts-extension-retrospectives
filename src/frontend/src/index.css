@@ -135,7 +135,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .ms-Pivot-link:hover {
-  @apply text-status-info-foreground bg-inherit;
+  @apply text-(--status-info-foreground) bg-inherit;
 }
 
 .ms-Checkbox.is-disabled {
