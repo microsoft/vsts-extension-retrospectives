@@ -991,7 +991,7 @@ kbd {
 }
 
 .card-footer {
-  @apply mx-4 pb-2 text-(--text-secondary-color) flex flex-row;
+  @apply mx-4 pb-2 text-(--text-secondary-color) flex flex-row text-xs;
 
   & .card-id {
     @apply grow;
