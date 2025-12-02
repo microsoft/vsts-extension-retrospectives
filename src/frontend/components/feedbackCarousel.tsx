@@ -61,6 +61,10 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId);
 
     return sortedItems.map(columnItem => {
+      // Get the accent color from the item's current column, falling back to columnProps.accentColor
+      const itemAccentColor = columnProps.columns[columnItem.feedbackItem.columnId]?.columnProperties?.accentColor ?? columnProps.accentColor;
+      const itemIconClass = columnProps.columns[columnItem.feedbackItem.columnId]?.columnProperties?.iconClass ?? columnProps.iconClass;
+
       const feedbackItemProps: IFeedbackItemProps = {
         id: columnItem.feedbackItem.id,
         title: columnItem.feedbackItem.title,
@@ -72,8 +76,8 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         timerState: columnItem.feedbackItem.timerState,
         timerId: columnItem.feedbackItem.timerId,
         workflowPhase: columnProps.workflowPhase,
-        accentColor: columnProps.accentColor,
-        iconClass: columnProps.iconClass,
+        accentColor: itemAccentColor,
+        iconClass: itemIconClass,
         createdDate: columnItem.feedbackItem.createdDate.toString(),
         team: columnProps.team,
         columnProps: columnProps,
