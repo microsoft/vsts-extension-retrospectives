@@ -232,7 +232,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-(--callout-background-color) max-h-none;
 
   & button.ms-ContextualMenu-link {
-    @apply text-primary;
+    @apply text-(--text-primary-color);
 
     &:hover {
       @apply bg-(--border-subtle-color) text-primary;
