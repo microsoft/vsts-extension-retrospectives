@@ -9,8 +9,14 @@
   --color-primary: #0078d4;
   --color-border-gray: #605e5c;
   --color-error: #cc293d;
+  --color-error-lighter: color-mix(in srgb, var(--color-error), white 10%);
+  --color-error-darker: color-mix(in srgb, var(--color-error), black 10%);
   --color-success: #339933;
+  --color-success-lighter: color-mix(in srgb, var(--color-success), white 10%);
+  --color-success-darker: color-mix(in srgb, var(--color-success), black 10%);
   --color-task-yellow: #f2cb1d;
+  --color-task-yellow-lighter: color-mix(in srgb, var(--color-task-yellow), white 10%);
+  --color-task-yellow-darker: color-mix(in srgb, var(--color-task-yellow), black 10%);
   --color-gray-light: #f4f4f4;
   --color-gray-medium: #dadada;
 }
@@ -32,10 +38,10 @@
 @keyframes fadeInFromGreen {
   from {
     opacity: 0;
-    background-color: green;
+    background-color: var(--color-success-darker);
   }
   50% {
-    background-color: lightgreen;
+    background-color: var(--color-success-lighter);
   }
   to {
     opacity: 1;
@@ -47,11 +53,11 @@
     opacity: 1;
   }
   50% {
-    background-color: lightcoral;
+    background-color: var(--color-error-lighter);
   }
   to {
     opacity: 0;
-    background-color: red;
+    background-color: var(--color-error-darker);
     visibility: hidden;
   }
 }
@@ -245,11 +251,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) div[role="heading"] {
-  @apply text-primary pb-2.5;
+  @apply text-(--text-primary-color) pb-2.5;
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) :is(.ms-Dialog-content, .ms-Dialog-content .ms-Label, p.ms-Dialog-subText, .ms-Dialog-header button.ms-Dialog-button) {
-  @apply text-primary;
+  @apply text-(--text-primary-color);
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) .ms-Dialog-inner a {
@@ -1730,14 +1736,16 @@ kbd {
 }
 
 .team-effectiveness-measurement-table thead .team-effectiveness-favorability-label {
-  @apply border-b-4 border-solid border-(--text-primary-color) outline-4 outline-(--background-color);
+  @apply border-b border-solid border-(--text-primary-color) outline-4 outline-(--background-color) font-light;
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index {
   @apply text-white;
 }
 
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable {
+.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable,
+.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-neutral,
+.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable {
   @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
 }
 
@@ -1771,10 +1779,6 @@ kbd {
   background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #df9e24 9px, #df9e24 10px);
 }
 
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-neutral {
-  @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
-}
-
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-neutral.voting-index-7 {
   @apply bg-[rgb(255,211,92)];
   background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #ecc503 7px, #ecc503 8px);
@@ -1785,21 +1789,12 @@ kbd {
   background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #f7d113 7px, #f7d113 8px);
 }
 
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable {
-  @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
-}
-
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-9 {
-  @apply bg-success bg-[radial-gradient(#00a45d_10%,transparent_10%),radial-gradient(#00a45d_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
+  @apply bg-success bg-[radial-gradient(var(--color-success-darker)_10%,transparent_10%),radial-gradient(var(--color-success-darker)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-10 {
-  @apply bg-success;
-  background-image: radial-gradient(#006238 10%, transparent 10%), radial-gradient(#006238 10%, transparent 10%);
-  background-size: 12px 12px;
-  background-position:
-    top left,
-    6px 6px;
+  @apply bg-success bg-[radial-gradient(var(--color-success-darker)_10%,transparent_10%),radial-gradient(var(--color-success-darker)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row:nth-child(odd) {
@@ -1891,11 +1886,11 @@ kbd {
 }
 
 .feedbackItem .mainItemCard {
-  @apply w-full max-w-80 bg-(--background-color) box-border border-t border-r border-b border-[rgb(96,94,92)] border-l-0;
+  @apply w-full max-w-80 bg-(--background-color) box-border border-t border-r border-b border-border-gray border-l-0;
 }
 
 .feedbackItem .mainItemCard .card-integral-part {
-  @apply border-l-[3px];
+  @apply border-l-3;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span,
