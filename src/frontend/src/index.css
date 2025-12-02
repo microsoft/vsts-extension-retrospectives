@@ -111,15 +111,15 @@ button:focus:not(.ms-Button) {
 }
 
 #vss_1 {
-  @apply max-w-[400px] min-h-[30px];
+  @apply max-w-sm min-h-7;
 }
 
 .ms-Button--primary {
-  @apply bg-white text-blue-600 border border-blue-600;
+  @apply bg-white text-primary border border-primary;
 }
 
 .ms-Button--primary:hover {
-  @apply bg-blue-600 text-white;
+  @apply bg-primary text-white;
 }
 
 .ms-Button--default {
@@ -127,15 +127,15 @@ button:focus:not(.ms-Button) {
 }
 
 div.ms-Tooltip-content p.ms-Tooltip-subtext a {
-  @apply text-blue-500 underline;
+  @apply text-primary underline;
 }
 
 .ms-Pivot .ms-Button {
-  @apply text-(--text-primary-color);
+  @apply text-primary;
 }
 
 .ms-Pivot-link:hover {
-  @apply text-(--status-info-foreground) bg-inherit;
+  @apply text-status-info-foreground bg-inherit;
 }
 
 .ms-Checkbox.is-disabled {
@@ -185,7 +185,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     &:focus-visible {
-      @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
+      @apply outline-2 outline-primary outline-offset-2 rounded;
     }
   }
 }
@@ -195,21 +195,18 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .carousel-track {
-  @apply flex overflow-x-auto w-full relative;
-  @apply [scroll-snap-type:x_mandatory] scroll-smooth [-webkit-overflow-scrolling:touch];
-  @apply [scrollbar-width:none] [-ms-overflow-style:none];
-}
+  @apply flex overflow-x-auto w-full relative snap-x snap-mandatory scroll-smooth [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none];
 
-.carousel-track::-webkit-scrollbar {
-  @apply hidden; /* Chrome/Safari */
+  &::-webkit-scrollbar {
+    @apply hidden; /* Chrome/Safari */
+  }
 }
 
 .carousel-slide {
-  @apply flex-none w-full relative flex items-center justify-center;
-  @apply snap-center snap-always min-w-full py-0 px-[60px];
+  @apply flex-none w-full relative flex items-center justify-center snap-center snap-always min-w-full py-0 px-15;
 
   & .feedback-carousel-item {
-    @apply w-full max-w-[600px];
+    @apply w-full max-w-xl;
   }
 }
 
@@ -222,7 +219,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .contextual-menu-button {
-  @apply w-[25px] min-w-[25px] h-[30px] bg-inherit px-1 py-0 border-0 text-[rgba(var(--palette-neutral-80),1)];
+  @apply w-6 min-w-6 h-7.5 bg-inherit px-1 py-0 border-0 text-[rgba(var(--palette-neutral-80),1)];
 
   & i[data-icon-name="ChevronDown"] {
     @apply hidden;
@@ -241,10 +238,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-(--callout-background-color) max-h-none;
 
   & button.ms-ContextualMenu-link {
-    @apply text-(--text-primary-color);
+    @apply text-primary;
 
     &:hover {
-      @apply bg-(--border-subtle-color) text-(--text-primary-color);
+      @apply bg-(--border-subtle-color) text-primary;
     }
   }
 }
@@ -254,25 +251,24 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) div[role="heading"] {
-  @apply text-(--text-primary-color) pb-2.5;
+  @apply text-primary pb-2.5;
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) :is(.ms-Dialog-content, .ms-Dialog-content .ms-Label, p.ms-Dialog-subText, .ms-Dialog-header button.ms-Dialog-button) {
-  @apply text-(--text-primary-color);
+  @apply text-primary;
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) .ms-Dialog-inner a {
-  @apply text-(--palette-primary-darken-6) underline;
+  @apply text-primary-darken-6 underline;
 }
 
 .editable-document-card-title {
-  @apply overflow-hidden wrap-break-word flex-1 flex-col justify-center min-h-[100px] text-(--text-primary-color);
-
+  @apply overflow-hidden wrap-break-word flex-1 flex-col justify-center min-h-[100px] text-primary;
   & .editable-text {
     @apply inline-block max-w-full align-middle whitespace-pre-wrap wrap-break-word cursor-text text-base;
 
     & a {
-      @apply text-(--palette-primary-darken-6) underline;
+      @apply text-primary-darken-6 underline;
     }
   }
 
