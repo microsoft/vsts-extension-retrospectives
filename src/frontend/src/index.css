@@ -2106,7 +2106,7 @@ kbd {
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem {
-  @apply m-0 w-full;
+  @apply m-0 w-full text-(--text-primary-color);
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item .feedbackItem .mainItemCard {
