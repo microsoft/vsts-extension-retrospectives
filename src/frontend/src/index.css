@@ -1790,11 +1790,11 @@ kbd {
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-9 {
-  @apply bg-success bg-[radial-gradient(var(--color-success-darker)_10%,transparent_10%),radial-gradient(var(--color-success-darker)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
+  @apply bg-success bg-[radial-gradient(var(--color-success-lighter)_10%,transparent_10%),radial-gradient(var(--color-success-lighter)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-10 {
-  @apply bg-success bg-[radial-gradient(var(--color-success-darker)_10%,transparent_10%),radial-gradient(var(--color-success-darker)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
+  @apply bg-success bg-[radial-gradient(var(--color-success)_10%,transparent_10%),radial-gradient(var(--color-success)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row:nth-child(odd) {
@@ -1830,7 +1830,7 @@ kbd {
 }
 
 .team-effectiveness-dialog .ms-Dialog-content .ms-Dialog-inner {
-  @apply py-0 px-[3px] pb-[5px];
+  @apply py-0 px-1 pb-1.5;
 }
 
 .team-effectiveness-dialog .ms-Dialog-content i.accent3 {
@@ -2028,7 +2028,7 @@ kbd {
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul .fa-li {
-  @apply border-solid h-[30px] border-t-0 border-r-[3px] border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color);
+  @apply border-solid h-[30px] border-t-0 border-r-3 border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color);
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li {
