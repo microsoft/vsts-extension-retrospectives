@@ -134,7 +134,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .ms-Checkbox.is-disabled {
-  background-color: transparent !important;
+  @apply !bg-transparent;
 }
 
 .is-disabled .ms-Checkbox-text {
@@ -1395,7 +1395,7 @@ kbd {
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button) {
-  @apply bg-none min-w-[30px] pl-0 pr-0 ml-[5px] mr-[5px] border-none text-(--text-primary-color);
+  @apply !bg-transparent min-w-[30px] pl-0 pr-0 ml-[5px] mr-[5px] border-none text-(--text-primary-color);
 }
 
 .board-metadata-form .feedback-column-card :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button):hover {
