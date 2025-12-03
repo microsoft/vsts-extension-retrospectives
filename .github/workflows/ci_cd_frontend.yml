@@ -78,7 +78,7 @@ jobs:
 
       - name: "Spell check"
         run: |
-          wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/master/dictionaries/base.txt
+          wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/ddb8f07599b5b15147168d3bcd8bbede0df8d2c7/dictionaries/base.txt
           echo "" >> base.txt
           echo "emailable" >> base.txt
           echo "anonymize" >> base.txt
@@ -116,7 +116,7 @@ jobs:
         run: |
           #!/bin/bash
           set -e
-          docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable --repo=https://github.com/microsoft/vsts-extension-retrospectives || true
+          docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable@sha256:54c7ea4ddec6e3941887cb7933898c352f59e7f59e17a7a730f97ed348a8dfce --repo=https://github.com/microsoft/vsts-extension-retrospectives || true
 
       - if: steps.changes.outputs.src == 'true'
         name: "Code Coverage for CodeCov"
@@ -153,21 +153,12 @@ jobs:
           cat <<< $(jq ".contributions[0].properties.name = \"Retrospectives (Dev)\"" $ext_file) > $ext_file
 
       - if: steps.changes.outputs.src == 'true'
-        name: "Prepare extension package"
+        name: "Publish extension to dev environment"
         working-directory: 'src/frontend'
         env:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: |
-          npm run build
-          npm run pack:d
-
-      - if: steps.changes.outputs.src == 'true'
-        name: "Publish extension to dev environment"
-        working-directory: 'src/frontend'
+          AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
         run: >
-          npx tfx extension publish
-          --manifests vss-extension-dev.json
-          --vsix ./dist/*.vsix
-          --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+          npm run publish:d

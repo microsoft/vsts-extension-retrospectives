@@ -1,7 +1,11 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import ExtensionSettingsMenu, { ContextualMenuButton } from "../extensionSettingsMenu";
+import ExtensionSettingsMenu from "../extensionSettingsMenu";
+import boardDataService from "../../dal/boardDataService";
+import { azureDevOpsCoreService } from "../../dal/azureDevOpsCoreService";
+import { itemDataService } from "../../dal/itemDataService";
+import { IFeedbackColumn } from "../../interfaces/feedback";
 
 // Mock dependencies
 jest.mock("../../utilities/telemetryClient", () => ({
@@ -10,12 +14,6 @@ jest.mock("../../utilities/telemetryClient", () => ({
 
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: (_plugin: any, component: any) => component,
-}));
-
-jest.mock("react-toastify", () => ({
-  toast: jest.fn(() => "toast-id"),
-  Slide: {},
-  ToastContainer: (): null => null,
 }));
 
 jest.mock("../extensionSettingsMenuDialogContent", () => ({
@@ -37,13 +35,6 @@ jest.mock("../extensionSettingsMenuDialogContent", () => ({
       ))}
     </div>
   )),
-}));
-
-jest.mock("../../dal/boardDataService", () => ({
-  default: {
-    getBoardsForTeam: jest.fn().mockResolvedValue([]),
-    createBoardForTeam: jest.fn().mockResolvedValue({}),
-  },
 }));
 
 jest.mock("../../dal/azureDevOpsCoreService", () => ({
@@ -74,6 +65,24 @@ jest.mock("../keyboardShortcutsDialog", () => ({
       </div>
     ) : null,
 }));
+
+beforeAll(() => {
+  if (!window.URL.createObjectURL) {
+    Object.defineProperty(window.URL, "createObjectURL", {
+      configurable: true,
+      writable: true,
+      value: jest.fn(),
+    });
+  }
+
+  if (!window.URL.revokeObjectURL) {
+    Object.defineProperty(window.URL, "revokeObjectURL", {
+      configurable: true,
+      writable: true,
+      value: jest.fn(),
+    });
+  }
+});
 
 describe("ExtensionSettingsMenu", () => {
   let windowOpenSpy: jest.SpyInstance;
@@ -349,29 +358,133 @@ describe("ExtensionSettingsMenu", () => {
       expect(screen.getByText("Directive")).toHaveClass("hidden", "lg:inline");
     });
   });
-});
 
-describe("ContextualMenuButton", () => {
-  it("renders with label", () => {
-    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="TestLabel" />);
-    expect(screen.getByText("TestLabel")).toBeInTheDocument();
+  it("exports boards and items using the download helper", async () => {
+    const anchorElement = document.createElement("a");
+    const clickSpy = jest.spyOn(anchorElement, "click");
+    const originalCreateElement = document.createElement.bind(document);
+    const createElementSpy = jest.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+      if (tagName === "a") {
+        return anchorElement;
+      }
+      return originalCreateElement(tagName);
+    });
+
+    const objectUrlSpy = jest.spyOn(window.URL, "createObjectURL").mockReturnValue("blob:mock");
+
+    (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([{ id: "team-1", name: "Team One" }]);
+    const getBoardsSpy = jest.spyOn(boardDataService, "getBoardsForTeam").mockResolvedValue([{ id: "board-1", title: "Board One" }] as any);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([{ id: "item-1", boardId: "board-1" }]);
+
+    const menu = new ExtensionSettingsMenu({});
+
+    await (menu as any).exportData();
+
+    expect(objectUrlSpy).toHaveBeenCalled();
+    expect(clickSpy).toHaveBeenCalled();
+
+    createElementSpy.mockRestore();
+    objectUrlSpy.mockRestore();
+    getBoardsSpy.mockRestore();
   });
 
-  it("renders label with responsive visibility classes", () => {
-    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="TestLabel" />);
-    const label = screen.getByText("TestLabel");
-    expect(label).toHaveClass("hidden", "lg:inline");
+  it("processes imported data and appends feedback items", async () => {
+    (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([{ id: "team-1", name: "Team One" }]);
+    (azureDevOpsCoreService.getDefaultTeam as jest.Mock).mockResolvedValue({ id: "default-team", name: "Default" });
+    const createBoardSpy = jest.spyOn(boardDataService, "createBoardForTeam").mockResolvedValue({ id: "new-board", title: "Board One" } as any);
+
+    const importedData = [
+      {
+        team: { id: "team-1", name: "Team One" },
+        board: {
+          id: "legacy-board",
+          title: "Board One",
+          maxVotesPerUser: 5,
+          columns: [] as IFeedbackColumn[],
+          isIncludeTeamEffectivenessMeasurement: false,
+          shouldShowFeedbackAfterCollect: true,
+          isAnonymous: false,
+          startDate: "2020-01-01",
+          endDate: "2020-01-02",
+        },
+        items: [{ id: "item-1", boardId: "legacy-board" }],
+      },
+    ];
+
+    const menu = new ExtensionSettingsMenu({});
+
+    await (menu as any).processImportedData(importedData);
+
+    expect(createBoardSpy).toHaveBeenCalledWith("team-1", "Board One", 5, [], false, true, false, "2020-01-01", "2020-01-02");
+    expect(itemDataService.appendItemToBoard).toHaveBeenCalledWith(expect.objectContaining({ id: "item-1", boardId: "new-board" }));
+    createBoardSpy.mockRestore();
   });
 
-  it("calls onClick", () => {
-    const onClick = jest.fn();
-    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="Test" onClick={onClick} />);
-    fireEvent.click(screen.getByTitle("Test"));
-    expect(onClick).toHaveBeenCalled();
-  });
+  it("wires up file input for data import", async () => {
+    const originalCreateElement = document.createElement.bind(document);
+    const fakeInput = {
+      setAttribute: jest.fn(),
+      addEventListener: jest.fn(),
+      click: jest.fn(),
+      files: [{ name: "import.json" } as File] as unknown as FileList,
+    } as unknown as HTMLInputElement;
 
-  it("applies contextual menu button class", () => {
-    render(<ContextualMenuButton ariaLabel="Test" title="Test" iconClass="fas fa-test" label="Test" />);
-    expect(screen.getByTitle("Test")).toHaveClass("contextual-menu-button");
+    let changeHandler: (() => void) | undefined;
+    (fakeInput.addEventListener as jest.Mock).mockImplementation((eventName: string, handler: () => void) => {
+      if (eventName === "change") {
+        changeHandler = handler;
+      }
+    });
+
+    const createElementSpy = jest.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+      if (tagName === "input") {
+        return fakeInput;
+      }
+      return originalCreateElement(tagName);
+    });
+
+    const appendChildSpy = jest.spyOn(document.body, "appendChild").mockImplementation(() => fakeInput);
+    const removeChildSpy = jest.spyOn(document.body, "removeChild").mockImplementation(() => fakeInput);
+
+    const importPayload = [
+      {
+        team: { id: "team-1", name: "Team One" },
+        board: { id: "board-1", title: "Board One", maxVotesPerUser: 3, columns: [] as IFeedbackColumn[] } as any,
+        items: [] as any[],
+      },
+    ];
+
+    const fileReaderInstances: Array<{ onload: ((event: ProgressEvent<FileReader>) => void) | null; readAsText: jest.Mock }> = [];
+    const fileReaderSpy = jest.spyOn(window as unknown as { FileReader: typeof FileReader }, "FileReader").mockImplementation(() => {
+      const instance = {
+        onload: null as ((event: ProgressEvent<FileReader>) => void) | null,
+        readAsText: jest.fn(function () {
+          instance.onload?.({ target: { result: JSON.stringify(importPayload) } } as ProgressEvent<FileReader>);
+        }),
+      };
+      fileReaderInstances.push(instance);
+      return instance as unknown as FileReader;
+    });
+
+    const menu = new ExtensionSettingsMenu({});
+    const processSpy = jest.spyOn(menu as any, "processImportedData").mockResolvedValue(undefined);
+
+    await (menu as any).importData();
+
+    expect(createElementSpy).toHaveBeenCalledWith("input");
+    expect(fakeInput.setAttribute).toHaveBeenCalledWith("type", "file");
+    expect(appendChildSpy).toHaveBeenCalledWith(fakeInput);
+    expect(fakeInput.click).toHaveBeenCalled();
+    expect(removeChildSpy).toHaveBeenCalledWith(fakeInput);
+
+    changeHandler?.();
+    expect(fileReaderInstances[0].readAsText).toHaveBeenCalledWith(fakeInput.files[0]);
+    expect(processSpy).toHaveBeenCalledWith(importPayload);
+
+    processSpy.mockRestore();
+    createElementSpy.mockRestore();
+    appendChildSpy.mockRestore();
+    removeChildSpy.mockRestore();
+    fileReaderSpy.mockRestore();
   });
 });

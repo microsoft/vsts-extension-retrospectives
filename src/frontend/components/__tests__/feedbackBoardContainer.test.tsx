@@ -30,6 +30,49 @@ jest.mock("../../utilities/userIdentityHelper", () => ({
   encrypt: () => "encrypted-data",
 }));
 
+// Mock Web Audio API globally
+const mockOscillator = {
+  connect: jest.fn(),
+  start: jest.fn(),
+  stop: jest.fn(),
+  type: "sine" as OscillatorType,
+  frequency: { value: 0 },
+};
+
+const mockGainNode = {
+  connect: jest.fn(),
+  gain: {
+    setValueAtTime: jest.fn(),
+    linearRampToValueAtTime: jest.fn(),
+    exponentialRampToValueAtTime: jest.fn(),
+  },
+};
+
+const createMockOscillator = jest.fn(() => mockOscillator);
+const createMockGain = jest.fn(() => mockGainNode);
+
+const mockAudioContext = {
+  createOscillator: createMockOscillator,
+  createGain: createMockGain,
+  currentTime: 0,
+  destination: {},
+};
+
+(global as any).AudioContext = jest.fn(() => ({
+  createOscillator: createMockOscillator,
+  createGain: createMockGain,
+  currentTime: 0,
+  destination: {},
+}));
+(global as any).webkitAudioContext = jest.fn(() => ({
+  createOscillator: createMockOscillator,
+  createGain: createMockGain,
+  currentTime: 0,
+  destination: {},
+}));
+(window as any).AudioContext = (global as any).AudioContext;
+(window as any).webkitAudioContext = (global as any).webkitAudioContext;
+
 jest.mock("../../utilities/telemetryClient", () => ({
   appInsights: {
     trackEvent: jest.fn(),
@@ -413,9 +456,59 @@ describe("Vote Count Display", () => {
   it("should format vote count display correctly", () => {
     const currentVoteCount = "3";
     const maxVotesPerUser = 5;
-    const displayText = `Votes Used: ${currentVoteCount} / ${maxVotesPerUser}`;
+    const teamVotesUsed = 9;
+    const teamVoteCapacity = 15;
+    const displayText = `My Votes: ${currentVoteCount}/${maxVotesPerUser} Team Votes: ${teamVotesUsed}/${teamVoteCapacity}`;
 
-    expect(displayText).toBe("Votes Used: 3 / 5");
+    expect(displayText).toBe("My Votes: 3/5 Team Votes: 9/15");
+  });
+});
+
+describe("vote metrics state", () => {
+  type TestableContainer = InstanceType<typeof FeedbackBoardContainer> & {
+    getVoteMetricsState: (board: IFeedbackBoardDocument | undefined) => Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity">;
+  };
+
+  const createContainer = (): TestableContainer => {
+    return new FeedbackBoardContainer(feedbackBoardContainerProps) as TestableContainer;
+  };
+
+  const baseBoard: Partial<IFeedbackBoardDocument> = {
+    id: "board-1",
+    title: "Test Board",
+    teamId: "team-1",
+    projectId: "proj-1",
+    createdBy: mockUserIdentity as IdentityRef,
+    createdDate: new Date("2024-01-01"),
+    columns: [],
+    activePhase: WorkflowPhase.Vote,
+    teamEffectivenessMeasurementVoteCollection: [],
+    boardVoteCollection: {},
+    maxVotesPerUser: 5,
+  };
+
+  it("returns zeroed metrics when board is undefined", () => {
+    const instance = createContainer();
+    const metrics = instance.getVoteMetricsState(undefined);
+
+    expect(metrics).toEqual({ castedVoteCount: 0, currentVoteCount: "0", teamVoteCapacity: 0 });
+  });
+
+  it("derives counts for current user and team", () => {
+    const instance = createContainer();
+    const board = {
+      ...baseBoard,
+      boardVoteCollection: {
+        "encrypted-data": 3,
+        "other-user": 2,
+      },
+    } as IFeedbackBoardDocument;
+
+    const metrics = instance.getVoteMetricsState(board);
+
+    expect(metrics.castedVoteCount).toBe(5);
+    expect(metrics.currentVoteCount).toBe("3");
+    expect(metrics.teamVoteCapacity).toBe(10);
   });
 });
 
@@ -719,6 +812,9 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
+    // Spy on playStartChime to prevent AudioContext errors
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
     (instance as any).startBoardTimer();
     expect(instance.state.isBoardTimerRunning).toBe(true);
     const initialIntervalId = (instance as any).boardTimerIntervalId;
@@ -734,17 +830,26 @@ describe("Facilitation timer", () => {
     (instance as any).pauseBoardTimer();
     expect(instance.state.isBoardTimerRunning).toBe(false);
     expect((instance as any).boardTimerIntervalId).toBeUndefined();
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
   });
 
   it("does not create duplicate intervals when already running", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
+    // Spy on playStartChime to prevent AudioContext errors
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
     (instance as any).startBoardTimer();
     const firstIntervalId = (instance as any).boardTimerIntervalId;
 
     (instance as any).startBoardTimer();
     expect((instance as any).boardTimerIntervalId).toBe(firstIntervalId);
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
   });
 
   it("clears orphaned intervals when pausing", () => {
@@ -775,6 +880,9 @@ describe("Facilitation timer", () => {
       const instance = ref.current as FeedbackBoardContainerInstance | null;
       expect(instance).not.toBeNull();
       const componentInstance = instance as FeedbackBoardContainerInstance;
+
+      // Spy on playStartChime after instance is created
+      const playStartChimeSpy = jest.spyOn(componentInstance as any, "playStartChime").mockImplementation(() => {});
 
       const board = {
         id: "board-1",
@@ -848,10 +956,714 @@ describe("Facilitation timer", () => {
 
       expect(componentInstance.state.boardTimerSeconds).toBe(0);
       expect(resetButton).toBeDisabled();
+
+      playStartChimeSpy.mockRestore();
     } finally {
       componentDidMountSpy.mockRestore();
       componentDidUpdateSpy.mockRestore();
+      jest.clearAllTimers();
     }
+  });
+
+  it("timer mode (0 minutes) counts up from zero", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStartChime to prevent AudioContext errors
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 0, // Timer mode
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    expect(instance.state.boardTimerSeconds).toBe(0);
+
+    // Advance 5 seconds
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    // Timer should count UP in timer mode
+    expect(instance.state.boardTimerSeconds).toBe(5);
+
+    // Advance 10 more seconds
+    act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(15);
+    expect(instance.state.isBoardTimerRunning).toBe(true); // Should keep running
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("countdown mode (non-zero minutes) counts down to zero", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStopChime and playStartChime methods to prevent AudioContext errors
+    const playStopChimeSpy = jest.spyOn(instance as any, "playStopChime").mockImplementation(() => {});
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 3, // 3 minute countdown
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    expect(instance.state.boardTimerSeconds).toBe(180); // 3 * 60
+
+    // Advance 30 seconds
+    act(() => {
+      jest.advanceTimersByTime(30000);
+    });
+
+    // Countdown should count DOWN
+    expect(instance.state.boardTimerSeconds).toBe(150); // 180 - 30
+
+    // Advance to near end (145 more seconds to reach 5 seconds remaining)
+    act(() => {
+      jest.advanceTimersByTime(145000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(5);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+
+    // Advance past zero
+    act(() => {
+      jest.advanceTimersByTime(6000);
+    });
+
+    // Should stop at 0 and auto-pause
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+
+    // Verify chime was played
+    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+
+    playStopChimeSpy.mockRestore();
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("switching between timer and countdown modes works correctly", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStartChime to prevent AudioContext errors
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    // Start with countdown mode (5 minutes)
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 5,
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start countdown
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(300); // 5 * 60
+
+    // Advance 10 seconds
+    act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(290); // Counting down
+
+    // Pause the timer
+    act(() => {
+      (instance as any).pauseBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+
+    // Switch to timer mode (0 minutes)
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 0,
+        boardTimerSeconds: 0,
+      });
+    });
+
+    // Start timer mode
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(0);
+
+    // Advance 15 seconds
+    act(() => {
+      jest.advanceTimersByTime(15000);
+    });
+
+    // Should count up in timer mode
+    expect(instance.state.boardTimerSeconds).toBe(15);
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("plays chime sound when countdown reaches zero", () => {
+    jest.useFakeTimers();
+
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStopChime and playStartChime methods
+    const playStopChimeSpy = jest.spyOn(instance as any, "playStopChime").mockImplementation(() => {});
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 1, // 1 minute countdown
+        boardTimerSeconds: 0, // Start at 0 (will initialize to 60)
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(60); // Should initialize to 60 seconds
+
+    // Advance to 1 second remaining
+    act(() => {
+      jest.advanceTimersByTime(59000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(1);
+    expect(playStopChimeSpy).not.toHaveBeenCalled();
+
+    // Advance one more second to trigger countdown completion and chime
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    // Should have stopped at 0 and played chime
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+
+    // Verify chime was played
+    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+
+    playStopChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("does not play chime when timer mode reaches arbitrary value", () => {
+    jest.useFakeTimers();
+
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStopChime and playStartChime methods
+    const playStopChimeSpy = jest.spyOn(instance as any, "playStopChime").mockImplementation(() => {});
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 0, // Timer mode
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    // Advance 60 seconds in timer mode
+    act(() => {
+      jest.advanceTimersByTime(60000);
+    });
+
+    // Timer should count up and NOT play chime
+    expect(instance.state.boardTimerSeconds).toBe(60);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    expect(playStopChimeSpy).not.toHaveBeenCalled();
+
+    playStopChimeSpy.mockRestore();
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("plays start chime when countdown timer is started", () => {
+    jest.useFakeTimers();
+
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStartChime method
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 5,
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    // Verify start chime was played
+    expect(playStartChimeSpy).toHaveBeenCalledTimes(1);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    expect(instance.state.boardTimerSeconds).toBe(300);
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("plays start chime when timer mode is started", () => {
+    jest.useFakeTimers();
+
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStartChime method
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 0, // Timer mode
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    // Verify start chime was played
+    expect(playStartChimeSpy).toHaveBeenCalledTimes(1);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    expect(instance.state.boardTimerSeconds).toBe(0);
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("plays start chime when resuming a paused countdown", () => {
+    jest.useFakeTimers();
+
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStartChime method
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 5,
+        boardTimerSeconds: 150, // Already counting (2.5 minutes remaining)
+        isBoardTimerRunning: false,
+      });
+    });
+
+    // Resume the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    // Verify start chime was played when resuming
+    expect(playStartChimeSpy).toHaveBeenCalledTimes(1);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    expect(instance.state.boardTimerSeconds).toBe(150); // Should not reset
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("playStopChime creates audio context and plays ascending notes", () => {
+    const instance = createStandaloneTimerInstance();
+
+    // Mock AudioContext methods
+    const mockOscillator = {
+      connect: jest.fn(),
+      start: jest.fn(),
+      stop: jest.fn(),
+      type: "sine",
+      frequency: { value: 0 },
+    };
+
+    const mockGainNode = {
+      connect: jest.fn(),
+      gain: {
+        setValueAtTime: jest.fn(),
+        linearRampToValueAtTime: jest.fn(),
+        exponentialRampToValueAtTime: jest.fn(),
+      },
+    };
+
+    const mockAudioContext = {
+      createOscillator: jest.fn(() => mockOscillator),
+      createGain: jest.fn(() => mockGainNode),
+      destination: {},
+      currentTime: 0,
+    };
+
+    global.AudioContext = jest.fn(() => mockAudioContext) as any;
+
+    // Call the actual method
+    (instance as any).playStopChime();
+
+    // Verify audio context was created and used correctly
+    expect(mockAudioContext.createOscillator).toHaveBeenCalledTimes(3);
+    expect(mockAudioContext.createGain).toHaveBeenCalledTimes(3);
+    expect(mockOscillator.connect).toHaveBeenCalledTimes(3);
+    expect(mockGainNode.connect).toHaveBeenCalledTimes(3);
+    expect(mockOscillator.start).toHaveBeenCalledTimes(3);
+    expect(mockOscillator.stop).toHaveBeenCalledTimes(3);
+  });
+
+  it("playStartChime creates audio context and plays descending notes", () => {
+    const instance = createStandaloneTimerInstance();
+
+    // Mock AudioContext methods
+    const mockOscillator = {
+      connect: jest.fn(),
+      start: jest.fn(),
+      stop: jest.fn(),
+      type: "sine",
+      frequency: { value: 0 },
+    };
+
+    const mockGainNode = {
+      connect: jest.fn(),
+      gain: {
+        setValueAtTime: jest.fn(),
+        linearRampToValueAtTime: jest.fn(),
+        exponentialRampToValueAtTime: jest.fn(),
+      },
+    };
+
+    const mockAudioContext = {
+      createOscillator: jest.fn(() => mockOscillator),
+      createGain: jest.fn(() => mockGainNode),
+      destination: {},
+      currentTime: 0,
+    };
+
+    global.AudioContext = jest.fn(() => mockAudioContext) as any;
+
+    // Call the actual method
+    (instance as any).playStartChime();
+
+    // Verify audio context was created and used correctly
+    expect(mockAudioContext.createOscillator).toHaveBeenCalledTimes(3);
+    expect(mockAudioContext.createGain).toHaveBeenCalledTimes(3);
+    expect(mockOscillator.connect).toHaveBeenCalledTimes(3);
+    expect(mockGainNode.connect).toHaveBeenCalledTimes(3);
+    expect(mockOscillator.start).toHaveBeenCalledTimes(3);
+    expect(mockOscillator.stop).toHaveBeenCalledTimes(3);
+  });
+
+  it("handleCountdownDurationChange updates state", () => {
+    const instance = createStandaloneTimerInstance();
+
+    const event = {
+      target: { value: "10" },
+    } as React.ChangeEvent<HTMLSelectElement>;
+
+    (instance as any).handleCountdownDurationChange(event);
+
+    expect(instance.state.countdownDurationMinutes).toBe(10);
+  });
+
+  it("formatBoardTimer formats time correctly", () => {
+    const instance = createStandaloneTimerInstance();
+
+    expect((instance as any).formatBoardTimer(0)).toBe("0:00");
+    expect((instance as any).formatBoardTimer(5)).toBe("0:05");
+    expect((instance as any).formatBoardTimer(59)).toBe("0:59");
+    expect((instance as any).formatBoardTimer(60)).toBe("1:00");
+    expect((instance as any).formatBoardTimer(125)).toBe("2:05");
+    expect((instance as any).formatBoardTimer(3661)).toBe("61:01");
+  });
+
+  it("handleBoardTimerToggle pauses when running", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStartChime
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+
+    // Create mock event
+    const event = {
+      preventDefault: jest.fn(),
+      stopPropagation: jest.fn(),
+    } as unknown as React.MouseEvent<HTMLButtonElement>;
+
+    // Toggle to pause
+    act(() => {
+      (instance as any).handleBoardTimerToggle(event);
+    });
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("handleBoardTimerToggle starts when paused", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStartChime
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+
+    // Create mock event
+    const event = {
+      preventDefault: jest.fn(),
+      stopPropagation: jest.fn(),
+    } as unknown as React.MouseEvent<HTMLButtonElement>;
+
+    // Toggle to start
+    act(() => {
+      (instance as any).handleBoardTimerToggle(event);
+    });
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("handleBoardTimerReset resets timer", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    // Spy on playStartChime
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    // Start and advance timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBeGreaterThan(0);
+
+    // Create mock event
+    const event = {
+      preventDefault: jest.fn(),
+      stopPropagation: jest.fn(),
+    } as unknown as React.MouseEvent<HTMLButtonElement>;
+
+    // Reset timer
+    act(() => {
+      (instance as any).handleBoardTimerReset(event);
+    });
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("renderWorkflowTimerControls returns null when no current board", () => {
+    const instance = createStandaloneTimerInstance();
+
+    act(() => {
+      instance.setState({ currentBoard: null });
+    });
+
+    const result = (instance as any).renderWorkflowTimerControls();
+    expect(result).toBeNull();
+  });
+
+  it("clearBoardTimerInterval clears interval when defined", () => {
+    const instance = createStandaloneTimerInstance();
+
+    const mockIntervalId = 123;
+    (instance as any).boardTimerIntervalId = mockIntervalId;
+
+    const clearIntervalSpy = jest.spyOn(window, "clearInterval");
+
+    (instance as any).clearBoardTimerInterval();
+
+    expect(clearIntervalSpy).toHaveBeenCalledWith(mockIntervalId);
+    expect((instance as any).boardTimerIntervalId).toBeUndefined();
+
+    clearIntervalSpy.mockRestore();
+  });
+
+  it("clearBoardTimerInterval does nothing when interval not defined", () => {
+    const instance = createStandaloneTimerInstance();
+
+    (instance as any).boardTimerIntervalId = undefined;
+
+    const clearIntervalSpy = jest.spyOn(window, "clearInterval");
+
+    (instance as any).clearBoardTimerInterval();
+
+    expect(clearIntervalSpy).not.toHaveBeenCalled();
+
+    clearIntervalSpy.mockRestore();
+  });
+
+  it("pauseBoardTimer with interval defined", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    // Start timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    const intervalId = (instance as any).boardTimerIntervalId;
+    expect(intervalId).toBeDefined();
+
+    // Pause
+    act(() => {
+      (instance as any).pauseBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+    expect((instance as any).boardTimerIntervalId).toBeUndefined();
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("resetBoardTimer skips reset when already at default state", () => {
+    const instance = createStandaloneTimerInstance();
+
+    // Ensure timer is at default state
+    act(() => {
+      instance.setState({
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+    (instance as any).boardTimerIntervalId = undefined;
+
+    const clearIntervalSpy = jest.spyOn(window, "clearInterval");
+    const setStateSpy = jest.spyOn(instance, "setState");
+
+    // Call reset - should return early
+    (instance as any).resetBoardTimer();
+
+    expect(clearIntervalSpy).not.toHaveBeenCalled();
+    expect(setStateSpy).not.toHaveBeenCalled();
+
+    clearIntervalSpy.mockRestore();
+    setStateSpy.mockRestore();
+  });
+
+  it("resetBoardTimer resets when boardTimerSeconds is non-zero", () => {
+    const instance = createStandaloneTimerInstance();
+
+    act(() => {
+      instance.setState({
+        boardTimerSeconds: 100,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    act(() => {
+      (instance as any).resetBoardTimer();
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+  });
+
+  it("resetBoardTimer resets when timer is running", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    // Start timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+
+    // Reset
+    act(() => {
+      (instance as any).resetBoardTimer();
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("resetBoardTimer resets when intervalId is defined", () => {
+    const instance = createStandaloneTimerInstance();
+
+    (instance as any).boardTimerIntervalId = 999;
+
+    act(() => {
+      instance.setState({
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+      });
+    });
+
+    act(() => {
+      (instance as any).resetBoardTimer();
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect((instance as any).boardTimerIntervalId).toBeUndefined();
   });
 });
 

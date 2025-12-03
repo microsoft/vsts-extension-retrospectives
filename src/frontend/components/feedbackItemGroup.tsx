@@ -15,7 +15,6 @@ export interface IFeedbackItemGroupProps {
 export interface RetrospectiveItemGroupState {
   isBeingDragged: boolean;
   isGroupExpanded: boolean;
-  itemCardsStackHeight: number;
 }
 
 class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, RetrospectiveItemGroupState> {
@@ -26,7 +25,6 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
     this.state = {
       isBeingDragged: false,
       isGroupExpanded: false,
-      itemCardsStackHeight: 0,
     };
   }
 
@@ -112,7 +110,6 @@ class FeedbackItemGroup extends React.Component<IFeedbackItemGroupProps, Retrosp
                 }}
               />
             ))}
-          <div className="item-cards-stack hide-mobile" style={{ height: this.state.itemCardsStackHeight - 2, marginTop: 5 - this.state.itemCardsStackHeight }} />
         </div>
       </div>
     );

@@ -23,7 +23,7 @@ import { userDataService } from "../dal/userDataService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
 import SelectorCombo, { ISelectorList } from "./selectorCombo";
 import FeedbackBoardPreviewEmail from "./feedbackBoardPreviewEmail";
-import { ToastContainer, toast, Slide } from "react-toastify";
+import { ToastContainer, toast } from "./toastNotifications";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { shareBoardHelper } from "../utilities/shareBoardHelper";
 import { itemDataService } from "../dal/itemDataService";
@@ -98,6 +98,7 @@ export interface FeedbackBoardContainerState {
   allMembers: TeamMember[];
   castedVoteCount: number;
   currentVoteCount: string;
+  teamVoteCapacity: number;
   boardColumns: IFeedbackColumn[];
   questionIdForDiscussAndActBoardUpdate: number;
   activeTab: "Board" | "History";
@@ -174,6 +175,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       allMembers: [],
       castedVoteCount: 0,
       currentVoteCount: "0",
+      teamVoteCapacity: 0,
       boardColumns: [],
       questionIdForDiscussAndActBoardUpdate: -1,
       activeTab: "Board",
@@ -230,9 +232,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      const votes = Object.values(initialCurrentBoard?.boardVoteCollection || []);
-
-      this.setState({ castedVoteCount: votes !== null && votes.length > 0 ? votes.reduce((a, b) => a + b, 0) : 0 });
+      this.setState(this.getVoteMetricsState(initialCurrentBoard));
     } catch (error) {
       appInsights.trackException(error, {
         action: "votes",
@@ -303,28 +303,43 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       return;
     }
 
-    const isActPhase = this.getCurrentBoardPhase() === WorkflowPhase.Act;
+    const isTimerMode = this.state.countdownDurationMinutes === 0;
 
-    if (!isActPhase && this.state.boardTimerSeconds === 0) {
-      this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60 });
-    }
-
-    this.boardTimerIntervalId = window.setInterval(() => {
-      this.setState(previousState => {
-        const isActPhase = this.getCurrentBoardPhase() === WorkflowPhase.Act;
-        
-        if (isActPhase) {
-          return { boardTimerSeconds: previousState.boardTimerSeconds + 1 };
-        } else {
-          const newSeconds = previousState.boardTimerSeconds - 1;
-          if (newSeconds <= 0) {
-            this.pauseBoardTimer();
-            return { boardTimerSeconds: 0 };
-          }
-          return { boardTimerSeconds: newSeconds };
-        }
+    if (this.state.boardTimerSeconds === 0 && !isTimerMode) {
+      this.playStartChime();
+      this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60 }, () => {
+        this.boardTimerIntervalId = window.setInterval(() => {
+          this.setState(previousState => {
+            const newSeconds = previousState.boardTimerSeconds - 1;
+            if (newSeconds <= 0) {
+              this.pauseBoardTimer();
+              this.playStopChime();
+              return { boardTimerSeconds: 0 };
+            }
+            return { boardTimerSeconds: newSeconds };
+          });
+        }, 1000);
       });
-    }, 1000);
+    } else {
+      this.playStartChime();
+      this.boardTimerIntervalId = window.setInterval(() => {
+        this.setState(previousState => {
+          const isTimerMode = this.state.countdownDurationMinutes === 0;
+
+          if (isTimerMode) {
+            return { boardTimerSeconds: previousState.boardTimerSeconds + 1 };
+          } else {
+            const newSeconds = previousState.boardTimerSeconds - 1;
+            if (newSeconds <= 0) {
+              this.pauseBoardTimer();
+              this.playStopChime();
+              return { boardTimerSeconds: 0 };
+            }
+            return { boardTimerSeconds: newSeconds };
+          }
+        });
+      }, 1000);
+    }
 
     if (!this.state.isBoardTimerRunning) {
       this.setState({ isBoardTimerRunning: true });
@@ -382,6 +397,87 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
+  private readonly playStopChime = () => {
+    const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const now = audioContext.currentTime;
+
+    const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5 (C major chord)
+
+    frequencies.forEach((freq, index) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.type = "sine";
+      oscillator.frequency.value = freq;
+
+      const delay = index * 0.05;
+      gainNode.gain.setValueAtTime(0, now + delay);
+      gainNode.gain.linearRampToValueAtTime(0.3, now + delay + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.3);
+
+      oscillator.start(now + delay);
+      oscillator.stop(now + delay + 0.3);
+    });
+  };
+
+  private readonly playStartChime = () => {
+    const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const now = audioContext.currentTime;
+
+    const frequencies = [783.99, 659.25, 523.25]; // G5, E5, C5 (descending)
+
+    frequencies.forEach((freq, index) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.type = "sine";
+      oscillator.frequency.value = freq;
+
+      const delay = index * 0.05;
+      gainNode.gain.setValueAtTime(0, now + delay);
+      gainNode.gain.linearRampToValueAtTime(0.3, now + delay + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.3);
+
+      oscillator.start(now + delay);
+      oscillator.stop(now + delay + 0.3);
+    });
+  };
+
+  private readonly renderWorkflowTimerControls = () => {
+    if (!this.state.currentBoard) {
+      return null;
+    }
+
+    return (
+      <div className="workflow-stage-timer" role="status" aria-live="polite">
+        <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
+          <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
+        </button>
+        {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
+          <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
+            <option value={0}>Timer</option>
+            {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
+              <option key={num} value={num}>
+                {num} min
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
+        )}
+        <button type="button" className="workflow-stage-timer-reset" title="Reset timer" aria-label="Reset timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
+          <i className="fa fa-undo" />
+        </button>
+      </div>
+    );
+  };
+
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
     const currentPhase = this.getCurrentBoardPhase();
     getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
@@ -425,20 +521,42 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       })
       .filter((v, i, a) => a.indexOf(v) === i);
 
-    const votes = Object.values(board.boardVoteCollection || []);
-
-    // Calculate current user's vote count
-    const userId = encrypt(this.state.currentUserId);
-    const currentUserVoteCount = board.boardVoteCollection?.[userId]?.toString() || "0";
+    const voteMetricsState = this.getVoteMetricsState(board);
 
     this.setState({
       actionItemIds: actionItemIds.filter(item => item !== undefined),
       feedbackItems,
       contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
-      castedVoteCount: votes !== null && votes.length > 0 ? votes.reduce((a, b) => a + b, 0) : 0,
-      currentVoteCount: currentUserVoteCount,
+      ...voteMetricsState,
     });
   }
+
+  private readonly getVoteMetricsState = (board: IFeedbackBoardDocument | undefined): Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity"> => {
+    if (!board || !this.state.currentUserId) {
+      return {
+        castedVoteCount: 0,
+        currentVoteCount: "0",
+        teamVoteCapacity: 0,
+      };
+    }
+
+    const voteCollection = board.boardVoteCollection || {};
+    const votes = Object.values(voteCollection);
+    const totalVotesUsed = votes.length > 0 ? votes.reduce((sum, vote) => sum + vote, 0) : 0;
+
+    const userIdKey = encrypt(this.state.currentUserId);
+    const currentUserVotes = voteCollection[userIdKey]?.toString() || "0";
+
+    const voterCount = Object.keys(voteCollection).length;
+    const maxVotesPerUser = board.maxVotesPerUser ?? 0;
+    const teamVoteCapacity = voterCount > 0 && maxVotesPerUser > 0 ? voterCount * maxVotesPerUser : 0;
+
+    return {
+      castedVoteCount: totalVotesUsed,
+      currentVoteCount: currentUserVotes,
+      teamVoteCapacity,
+    };
+  };
 
   private readonly numberFormatter = (value: number) => {
     const formatter = new Intl.NumberFormat("en-US", { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -1283,11 +1401,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private readonly updateCurrentVoteCount = async () => {
     const boardItem = await itemDataService.getBoardItem(this.state.currentTeam.id, this.state.currentBoard.id);
-    const voteCollection = boardItem?.boardVoteCollection || {};
-    const userId = encrypt(this.state.currentUserId);
-    const currentVoteCount = voteCollection[userId]?.toString() || "0";
+    if (!boardItem) {
+      return;
+    }
 
-    this.setState({ currentVoteCount });
+    this.setState(this.getVoteMetricsState(boardItem));
   };
 
   private readonly updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
@@ -1523,7 +1641,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return (
       <div className="flex flex-col h-screen">
-        <div className="flex items-center flex-shrink-0 mt-2 ml-4">
+        <div className="flex items-center shrink-0 mt-2 ml-4">
           <Dialog
             hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
             onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
@@ -1562,15 +1680,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           </h1>
           <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="users" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
           <div className="flex-grow-spacer"></div>
-          <ExtensionSettingsMenu />
+          <div className="header-menu-with-timer">
+            {this.renderWorkflowTimerControls()}
+            <ExtensionSettingsMenu />
+          </div>
         </div>
-        <div className="flex items-center justify-start flex-shrink-0">
+        <div className="flex items-center justify-start shrink-0">
           <div className="w-full">
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "Board" ? "font-bold border-b-2 border-[#0078d4]" : ""}`} onClick={() => this.handlePivotClick("Board")}>
+              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "Board" ? "font-bold border-b-2 border-primary" : ""}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
               </div>
-              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "History" ? "font-bold border-b-2 border-[#0078d4]" : ""}`} onClick={() => this.handlePivotClick("History")}>
+              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "History" ? "font-bold border-b-2 border-primary" : ""}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </div>
               {this.state.activeTab === "Board" && (
@@ -1629,7 +1750,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   <div className="flex items-center justify-start">
                     <div className="flex flex-row items-center workflow-stage-header 3">
                       {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                        <div className="border border-solid border-[var(--nav-header-active-item-background)] rounded-lg">
+                        <div className="border border-solid border-(--nav-header-active-item-background) rounded-lg">
                           <Dialog
                             hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
                             onDismiss={() => {
@@ -1725,28 +1846,21 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
                         <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
                       </div>
-                      <div className="workflow-stage-timer" role="status" aria-live="polite">
-                        <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.getCurrentBoardPhase() === WorkflowPhase.Act ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
-                          <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
-                        </button>
-                        {this.getCurrentBoardPhase() !== WorkflowPhase.Act && !this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
-                          <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
-                            {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
-                              <option key={num} value={num}>
-                                {num} min
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <span>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
-                        )}
-                        <button type="button" className="workflow-stage-timer-reset" title="Reset timer" aria-label="Reset timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
-                          <i className="fa fa-undo" />
-                        </button>
-                      </div>
                       {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
-                        <div className="feedback-maxvotes-per-user">
-                          Votes Used: {this.state.currentVoteCount} / {this.state.currentBoard.maxVotesPerUser?.toString()}
+                        <div className="feedback-votes-count" role="status" aria-live="polite">
+                          <span className="entry" aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
+                            <i className="fas fa-user ml-1" aria-hidden="true"></i>
+                            <span className="hidden lg:inline">My Votes:</span> {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"}
+                          </span>
+                          {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 &&
+                            <>
+                              <span className="separator" aria-hidden="true">|</span>
+                              <span className="entry" aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
+                                <i className="fas fa-users ml-1" aria-hidden="true"></i>
+                                <span className="hidden lg:inline">Team Votes:</span> {this.state.castedVoteCount}/{this.state.teamVoteCapacity}
+                              </span>
+                            </>
+                          }
                         </div>
                       )}
                       {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
@@ -1754,7 +1868,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           <span className="inline-flex items-center justify-center mr-1">
                             <i className="fas fa-bullseye"></i>
                           </span>
-                          <span>Focus Mode</span>
+                          <span className="hidden lg:inline">Focus Mode</span>
                         </button>
                       )}
                     </div>
@@ -1763,12 +1877,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               )}
             </div>
             {this.state.activeTab === "History" && (
-              <div className="flex-1 min-h-0 overflow-auto border-t-4 border-[var(--nav-header-active-item-background)]">
+              <div className="flex-1 min-h-0 overflow-auto border-t-4 border-(--nav-header-active-item-background)">
                 <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
               </div>
             )}
             {this.state.activeTab === "Board" && (
-              <div className="flex-1 min-h-0 flex flex-col feedback-board-container border-t-4 border-[var(--nav-header-active-item-background)]">
+              <div className="flex-1 min-h-0 flex flex-col feedback-board-container border-t-4 border-(--nav-header-active-item-background)">
                 {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
@@ -2033,7 +2147,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </div>
           ) : (
             <>
-              <p className="team-assessment-info-text">At v2.0.1 and later (scheduled to be published on Jan 1st 2026), there will be a Widget that you can add to your Azure DevOps dashboard to see team assessment trends over time. Please check Extensions config to make sure the Retrospective Extension is updated to the latest version.</p>
+              <p className="team-assessment-info-text">Starting with version v2.0.1 (scheduled for publication on January 1st, 2026), a widget will be available that you can add to your Azure DevOps dashboard to see team assessment trends over time.</p>
+              <p className="team-assessment-info-text">Please check your Extensions configuration to ensure the Retrospective Extension is updated to the latest version.</p>
               <p className="team-assessment-info-text">
                 Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
               </p>
@@ -2153,7 +2268,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </>
           )}
         </Dialog>
-        <ToastContainer transition={Slide} closeButton={false} className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
+        <ToastContainer className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
   }

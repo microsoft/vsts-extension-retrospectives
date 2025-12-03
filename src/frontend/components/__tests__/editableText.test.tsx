@@ -104,7 +104,7 @@ describe("Editable Text Component", () => {
     expect(mockOnSave).toHaveBeenCalledWith("Original Text");
   });
 
-  it("adds newline when Ctrl+Enter is pressed in multiline mode", async () => {
+  it("stays in edit mode when Ctrl+Enter is pressed (allows multiline)", async () => {
     const propsMultiline = { ...mockedTestProps, text: "Line 1", isMultiline: true };
     render(<EditableText {...propsMultiline} />);
 
@@ -114,8 +114,26 @@ describe("Editable Text Component", () => {
     const textarea = document.querySelector("textarea") as HTMLElement;
     await userEvent.type(textarea, "{Control>}{Enter}{/Control}");
 
-    // Component should still be in edit mode with newline added
+    // Component should still be in edit mode (not saved)
     expect(document.querySelector("textarea")).toBeTruthy();
+    // onSave should not have been called
+    expect(mockOnSave).not.toHaveBeenCalled();
+  });
+
+  it("stays in edit mode when Shift+Enter is pressed (allows multiline)", async () => {
+    const propsMultiline = { ...mockedTestProps, text: "Line 1", isMultiline: true };
+    render(<EditableText {...propsMultiline} />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const textarea = document.querySelector("textarea") as HTMLElement;
+    await userEvent.type(textarea, "{Shift>}{Enter}{/Shift}");
+
+    // Component should still be in edit mode (not saved)
+    expect(document.querySelector("textarea")).toBeTruthy();
+    // onSave should not have been called
+    expect(mockOnSave).not.toHaveBeenCalled();
   });
 
   it("shows error when trying to save empty text with Enter", async () => {
@@ -256,6 +274,17 @@ describe("Editable Text Component", () => {
     expect(document.body.textContent).toContain("This cannot be empty.");
   });
 
+  it("shows error when trying to add newline with Shift+Enter on empty text", async () => {
+    const propsMultiline = { ...mockedTestProps, text: "", isMultiline: true };
+    render(<EditableText {...propsMultiline} />);
+
+    const textarea = document.querySelector("textarea") as HTMLElement;
+    await userEvent.clear(textarea);
+    await userEvent.type(textarea, "{Shift>}{Enter}{/Shift}");
+
+    expect(document.body.textContent).toContain("This cannot be empty.");
+  });
+
   describe("Accessibility - Fix double character announcement (Issue #1261)", () => {
     it("should not have aria-live on the editable text container", () => {
       render(<EditableText {...mockedTestProps} />);
@@ -330,6 +359,130 @@ describe("Editable Text Component", () => {
       // Verify input has proper ARIA but container doesn't have aria-live
       expect(input.getAttribute("aria-label")).toBe("Please enter feedback title");
       expect(container.getAttribute("aria-live")).toBeNull();
+    });
+  });
+
+  describe("Markdown formatting support", () => {
+    it("renders bold text with asterisks in display mode", () => {
+      const propsWithBold = { ...mockedTestProps, text: "This is **bold** text" };
+      render(<EditableText {...propsWithBold} />);
+
+      const strongElement = document.querySelector("strong");
+      expect(strongElement).toBeTruthy();
+      expect(strongElement?.textContent).toBe("bold");
+    });
+
+    it("renders bold text with underscores in display mode", () => {
+      const propsWithBold = { ...mockedTestProps, text: "This is __bold__ text" };
+      render(<EditableText {...propsWithBold} />);
+
+      const strongElement = document.querySelector("strong");
+      expect(strongElement).toBeTruthy();
+      expect(strongElement?.textContent).toBe("bold");
+    });
+
+    it("renders italic text with asterisk in display mode", () => {
+      const propsWithItalic = { ...mockedTestProps, text: "This is *italic* text" };
+      render(<EditableText {...propsWithItalic} />);
+
+      const emElement = document.querySelector("em");
+      expect(emElement).toBeTruthy();
+      expect(emElement?.textContent).toBe("italic");
+    });
+
+    it("renders italic text with underscore in display mode", () => {
+      const propsWithItalic = { ...mockedTestProps, text: "This is _italic_ text" };
+      render(<EditableText {...propsWithItalic} />);
+
+      const emElement = document.querySelector("em");
+      expect(emElement).toBeTruthy();
+      expect(emElement?.textContent).toBe("italic");
+    });
+
+    it("renders links with valid URLs in display mode", () => {
+      const propsWithLink = { ...mockedTestProps, text: "Check [this link](https://example.com) out" };
+      render(<EditableText {...propsWithLink} />);
+
+      const anchorElement = document.querySelector("a");
+      expect(anchorElement).toBeTruthy();
+      expect(anchorElement?.textContent).toBe("this link");
+      expect(anchorElement?.getAttribute("href")).toBe("https://example.com");
+      expect(anchorElement?.getAttribute("target")).toBe("_blank");
+      expect(anchorElement?.getAttribute("rel")).toBe("noopener noreferrer");
+    });
+
+    it("renders images with valid URLs in display mode", () => {
+      const propsWithImage = { ...mockedTestProps, text: "See ![alt text](https://example.com/image.png)" };
+      render(<EditableText {...propsWithImage} />);
+
+      const imgElement = document.querySelector("img");
+      expect(imgElement).toBeTruthy();
+      expect(imgElement?.getAttribute("src")).toBe("https://example.com/image.png");
+      expect(imgElement?.getAttribute("alt")).toBe("alt text");
+    });
+
+    it("does not render links with javascript: URLs (XSS prevention)", () => {
+      const propsWithMaliciousLink = { ...mockedTestProps, text: "[click me](javascript:alert('xss'))" };
+      render(<EditableText {...propsWithMaliciousLink} />);
+
+      const anchorElement = document.querySelector("a");
+      expect(anchorElement).toBeNull();
+      // The text should be rendered as plain text
+      expect(document.body.textContent).toContain("[click me](javascript:alert('xss'))");
+    });
+
+    it("does not render images with javascript: URLs (XSS prevention)", () => {
+      const propsWithMaliciousImage = { ...mockedTestProps, text: "![xss](javascript:alert('xss'))" };
+      render(<EditableText {...propsWithMaliciousImage} />);
+
+      const imgElement = document.querySelector("img");
+      expect(imgElement).toBeNull();
+    });
+
+    it("renders plain text without markdown unchanged", () => {
+      const propsWithPlainText = { ...mockedTestProps, text: "Just plain text" };
+      render(<EditableText {...propsWithPlainText} />);
+
+      expect(document.body.textContent).toContain("Just plain text");
+      expect(document.querySelector("strong")).toBeNull();
+      expect(document.querySelector("em")).toBeNull();
+      expect(document.querySelector("a")).toBeNull();
+    });
+
+    it("preserves raw markdown in edit mode", async () => {
+      const propsWithMarkdown = { ...mockedTestProps, text: "**bold** text" };
+      render(<EditableText {...propsWithMarkdown} />);
+
+      const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+      await userEvent.click(clickableElement);
+
+      const input = document.querySelector("input, textarea") as HTMLInputElement | HTMLTextAreaElement;
+      expect(input?.value).toBe("**bold** text");
+    });
+
+    it("renders multiple markdown formats in same text", () => {
+      const propsWithMixed = { ...mockedTestProps, text: "**Bold** and *italic* with [link](https://example.com)" };
+      render(<EditableText {...propsWithMixed} />);
+
+      expect(document.querySelector("strong")?.textContent).toBe("Bold");
+      expect(document.querySelector("em")?.textContent).toBe("italic");
+      expect(document.querySelector("a")?.textContent).toBe("link");
+    });
+
+    it("link click does not trigger edit mode", async () => {
+      const propsWithLink = { ...mockedTestProps, text: "[link](https://example.com)" };
+      render(<EditableText {...propsWithLink} />);
+
+      const anchorElement = document.querySelector("a") as HTMLAnchorElement;
+      expect(anchorElement).toBeTruthy();
+
+      // Click the link - it should stop propagation
+      await userEvent.click(anchorElement);
+
+      // Should not be in edit mode since link click stops propagation
+      // The component should still show the link, not an input
+      const displayedLink = document.querySelector("a");
+      expect(displayedLink).toBeTruthy();
     });
   });
 });

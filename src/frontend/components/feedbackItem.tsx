@@ -61,6 +61,9 @@ export interface IFeedbackItemProps {
   isShowingGroupedChildrenTitles: boolean;
   isFocusModalHidden: boolean;
   onVoteCasted: () => void;
+  activeTimerFeedbackItemId: string | null;
+  requestTimerStart: (feedbackItemId: string) => Promise<boolean>;
+  notifyTimerStopped: (feedbackItemId: string) => void;
 
   addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
 
@@ -533,9 +536,16 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     let updatedFeedbackItem;
     const boardId: string = this.props.boardId;
 
-    // function to handle timer count update
+    if (!this.props.timerState) {
+      const canStartTimer = await this.props.requestTimerStart(feedbackItemId);
+      if (!canStartTimer) {
+        return;
+      }
+    }
+
     const incTimer = async () => {
-      if (this.props.timerState === true) {
+      const currentItem = await itemDataService.getFeedbackItem(boardId, feedbackItemId);
+      if (currentItem && currentItem.timerState === true) {
         updatedFeedbackItem = await itemDataService.updateTimer(boardId, feedbackItemId);
         if (updatedFeedbackItem) {
           this.props.refreshFeedbackItems([updatedFeedbackItem], true);
@@ -567,6 +577,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       if (updatedFeedbackItem) {
         this.props.refreshFeedbackItems([updatedFeedbackItem], true);
       }
+      this.props.notifyTimerStopped(feedbackItemId);
     }
   };
 
@@ -711,36 +722,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     );
   }
 
-  private renderVoteActionButton(isMainItem: boolean, isBoldItem: boolean, showVoteButton: boolean, totalVotes: number, isUpvote: boolean) {
-    const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
-    const buttonTitle = isUpvote ? "Vote" : "Unvote";
-    const buttonAriaLabel = isUpvote ? `Vote up. Current vote count is ${this.props.upvotes}` : `Vote down. Current vote count is ${this.props.upvotes}`;
-    const buttonIconClass = isUpvote ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down";
-
-    return (
-      <button
-        title={buttonTitle}
-        aria-live="polite"
-        aria-label={buttonAriaLabel}
-        tabIndex={0}
-        disabled={!isMainItem || !showVoteButton || this.state.showVotedAnimation}
-        className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
-        onClick={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.setState({ showVotedAnimation: true });
-          this.onVote(this.props.id, !isUpvote).then(() => this.props.onVoteCasted());
-        }}
-        onAnimationEnd={() => {
-          this.setState({ showVotedAnimation: false });
-        }}
-      >
-        <i className={buttonIconClass} />
-        {isUpvote && <span className={isMainItem && isBoldItem ? "feedback-upvote-count bold" : "feedback-upvote-count"}> {totalVotes.toString()}</span>}
-      </button>
-    );
-  }
-
   public render(): React.JSX.Element {
     const workflowState = {
       isCollectPhase: this.props.workflowPhase === WorkflowPhase.Collect,
@@ -830,7 +811,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     return (
       <div ref={this.itemElementRef} data-feedback-item-id={this.props.id} tabIndex={0} aria-live="polite" aria-label={ariaLabel} aria-hidden={hideFeedbackItems || undefined} role="article" aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"} className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", this.props.showAddedAnimation && "newFeedbackItem", this.state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")} draggable={isDraggable} onDragStart={this.dragFeedbackItemStart} onDragOver={isNotGroupedItem ? this.dragFeedbackItemOverFeedbackItem : null} onDragEnd={this.dragFeedbackItemEnd} onDrop={isNotGroupedItem ? this.dropFeedbackItemOnFeedbackItem : null} onAnimationEnd={this.onAnimationEnd}>
         <div className="document-card-wrapper">
-          <DocumentCard className={cn(isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")}>
+          <DocumentCard className={cn("feedback-card-surface", isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")}>
             <div
               className="card-integral-part"
               style={{
@@ -846,16 +827,53 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   // Controls the top-level feedback item in a group not in focus mode
                   mainGroupedItemNotInFocusMode && this.renderGroupButton(groupItemsCount, false)
                 }
-                {
-                  showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, true) // render voting button
-                }
-                {
-                  showVotes && this.renderVoteActionButton(isMainItem, isMainCollapsedItem, showVoteButton, totalVotes, false) // render unvoting button
-                }
+                {showVotes && (
+                  <>
+                    <button
+                      title="Vote"
+                      aria-live="polite"
+                      aria-label={`Vote up. Current vote count is ${this.props.upvotes}`}
+                      tabIndex={0}
+                      disabled={!showVoteButton || this.state.showVotedAnimation}
+                      className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
+                      onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.setState({ showVotedAnimation: true });
+                        this.onVote(this.props.id, false).then(() => this.props.onVoteCasted());
+                      }}
+                      onAnimationEnd={() => {
+                        this.setState({ showVotedAnimation: false });
+                      }}
+                    >
+                      <i className="fas fa-arrow-circle-up" />
+                    </button>
+                    <span className="feedback-vote-count">{totalVotes.toString()}</span>
+                    <button
+                      title="Unvote"
+                      aria-live="polite"
+                      aria-label={`Vote down. Current vote count is ${this.props.upvotes}`}
+                      tabIndex={0}
+                      disabled={!showVoteButton || this.state.showVotedAnimation}
+                      className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
+                      onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.setState({ showVotedAnimation: true });
+                        this.onVote(this.props.id, true).then(() => this.props.onVoteCasted());
+                      }}
+                      onAnimationEnd={() => {
+                        this.setState({ showVotedAnimation: false });
+                      }}
+                    >
+                      <i className="fas fa-arrow-circle-down" />
+                    </button>
+                  </>
+                )}
                 {!this.props.newlyCreated && (
                   <div className="item-actions-menu">
                     <DefaultButton
-                      className="contextual-menu-button hide-mobile"
+                      className="contextual-menu-button"
                       aria-label="Feedback Options Menu"
                       iconProps={{ iconName: "MoreVertical" }}
                       title="Feedback actions"
@@ -912,7 +930,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               </div>
               <div className="card-content">
                 {workflowState.isActPhase && (
-                  <div className="card-action-timer hide-mobile">
+                  <div className="card-action-timer">
                     <button
                       title="Timer"
                       aria-live="polite"
@@ -932,15 +950,17 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 )}
                 {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
                 {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
-                  <div className="original-column-info hide-mobile">
+                  <div className="original-column-info">
                     Original Column: <br />
                     {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
                   </div>
                 )}
-                {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
               </div>
               {this.feedbackCreationInformationContent()}
-              <div className="card-id">#{itemPosition}</div>
+              <div className="card-footer">
+                <div className="card-id">#{itemPosition}</div>
+                {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
+              </div>
             </div>
             <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
@@ -967,7 +987,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                             {childDisplayTitle}
                           </span>
                           {this.props.columnId !== originalColumn?.columnProperties?.id && (
-                            <div className="original-column-info hide-mobile">
+                            <div className="original-column-info">
                               Original Column: <br />
                               {originalColumn.columnProperties.title}
                             </div>
@@ -1092,6 +1112,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 isShowingGroupedChildrenTitles: false,
                 isFocusModalHidden: true,
                 onVoteCasted: this.props.onVoteCasted,
+                activeTimerFeedbackItemId: this.props.activeTimerFeedbackItemId,
+                requestTimerStart: this.props.requestTimerStart,
+                notifyTimerStopped: this.props.notifyTimerStopped,
                 addFeedbackItems: this.props.addFeedbackItems,
                 removeFeedbackItemFromColumn: this.props.removeFeedbackItemFromColumn,
                 refreshFeedbackItems: this.props.refreshFeedbackItems,
