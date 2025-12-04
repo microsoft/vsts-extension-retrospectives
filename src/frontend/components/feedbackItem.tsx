@@ -929,7 +929,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 )}
               </div>
               <div className="card-content">
-                {mainGroupedItemInFocusMode && (
+                {workflowState.isActPhase && isMainItem && (
                   <div className="card-action-timer">
                     <button
                       title="Timer"
