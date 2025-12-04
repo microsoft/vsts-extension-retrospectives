@@ -331,7 +331,7 @@ describe("Feedback Item", () => {
     });
 
     test("renders in Act phase with timer", () => {
-      const props = { ...baseProps, workflowPhase: "Act", team: { id: "t1" }, boardTitle: "Board", defaultActionItemAreaPath: "Area", defaultActionItemIteration: "Iter" };
+      const props = { ...baseProps, workflowPhase: "Act", team: { id: "t1" }, boardTitle: "Board", defaultActionItemAreaPath: "Area", defaultActionItemIteration: "Iter", isGroupedCarouselItem: true, isFocusModalHidden: false, groupedItemProps: { isMainItem: true, isGroupExpanded: false, groupedCount: 0, parentItemId: "", setIsGroupBeingDragged: jest.fn(), toggleGroupExpand: jest.fn() } };
       const { container } = render(<FeedbackItem {...(props as any)} />);
       expect(container.textContent).toContain("0:30 elapsed");
     });
@@ -626,7 +626,9 @@ describe("Feedback Item", () => {
         timerSecs: 125,
         timerstate: false,
         timerId: "",
-        isGroupedCarouselItem: false,
+        isGroupedCarouselItem: true,
+        isFocusModalHidden: false,
+        groupedItemProps: { isMainItem: true, isGroupExpanded: false, groupedCount: 0, parentItemId: "", setIsGroupBeingDragged: jest.fn(), toggleGroupExpand: jest.fn() },
         workflowPhase: "Act",
         team: { id: "t1" },
         boardTitle: "Board",
@@ -660,7 +662,9 @@ describe("Feedback Item", () => {
         timerSecs: 183,
         timerstate: false,
         timerId: "",
-        isGroupedCarouselItem: false,
+        isGroupedCarouselItem: true,
+        isFocusModalHidden: false,
+        groupedItemProps: { isMainItem: true, isGroupExpanded: false, groupedCount: 0, parentItemId: "", setIsGroupBeingDragged: jest.fn(), toggleGroupExpand: jest.fn() },
         workflowPhase: "Act",
         team: { id: "t1" },
         boardTitle: "Board",
@@ -688,7 +692,7 @@ describe("Feedback Item", () => {
       timerState: overrides.timerState ?? false,
       timerId: overrides.timerId ?? null,
       groupIds: overrides.groupIds ?? [],
-      isGroupedCarouselItem: overrides.isGroupedCarouselItem ?? false,
+      isGroupedCarouselItem: overrides.isGroupedCarouselItem ?? true,
       associatedActionItemIds: overrides.associatedActionItemIds ?? [],
     });
 
@@ -738,7 +742,8 @@ describe("Feedback Item", () => {
         timerId: feedbackItem.timerId,
         isGroupedCarouselItem: feedbackItem.isGroupedCarouselItem,
         workflowPhase: "Act",
-        isFocusModalHidden: true,
+        isFocusModalHidden: false,
+        groupedItemProps: { isMainItem: true, isGroupExpanded: false, groupedCount: 0, parentItemId: "", setIsGroupBeingDragged: jest.fn(), toggleGroupExpand: jest.fn() },
         team: { id: "team-1" },
         defaultActionItemAreaPath: "Area",
         defaultActionItemIteration: "Iter",
@@ -1445,7 +1450,9 @@ describe("Feedback Item", () => {
         timerSecs: 45,
         timerstate: true,
         timerId: "timer-123",
-        isGroupedCarouselItem: false,
+        isGroupedCarouselItem: true,
+        isFocusModalHidden: false,
+        groupedItemProps: { isMainItem: true, isGroupExpanded: false, groupedCount: 0, parentItemId: "", setIsGroupBeingDragged: jest.fn(), toggleGroupExpand: jest.fn() },
         workflowPhase: "Act",
         team: { id: "t1" },
         boardTitle: "Board",
@@ -3626,7 +3633,9 @@ describe("Feedback Item", () => {
         timerSecs: 3600,
         timerstate: true,
         timerId: "long-timer",
-        isGroupedCarouselItem: false,
+        isGroupedCarouselItem: true,
+        isFocusModalHidden: false,
+        groupedItemProps: { isMainItem: true, isGroupExpanded: false, groupedCount: 0, parentItemId: "", setIsGroupBeingDragged: jest.fn(), toggleGroupExpand: jest.fn() },
         workflowPhase: "Act",
         team: { id: "t1" },
         boardTitle: "Board",
@@ -4094,7 +4103,9 @@ describe("Feedback Item", () => {
         timerSecs: 120,
         timerState: true,
         timerId: 12345,
-        isGroupedCarouselItem: false,
+        isGroupedCarouselItem: true,
+        isFocusModalHidden: false,
+        groupedItemProps: { isMainItem: true, isGroupExpanded: false, groupedCount: 0, parentItemId: "", setIsGroupBeingDragged: jest.fn(), toggleGroupExpand: jest.fn() },
         workflowPhase: "Act",
         team: { id: "team-1" },
         boardTitle: "Test Board",
@@ -4128,7 +4139,9 @@ describe("Feedback Item", () => {
         timerSecs: 60,
         timerState: false,
         timerId: null,
-        isGroupedCarouselItem: false,
+        isGroupedCarouselItem: true,
+        isFocusModalHidden: false,
+        groupedItemProps: { isMainItem: true, isGroupExpanded: false, groupedCount: 0, parentItemId: "", setIsGroupBeingDragged: jest.fn(), toggleGroupExpand: jest.fn() },
         workflowPhase: "Act",
         team: { id: "team-1" },
         boardTitle: "Test Board",
@@ -4716,7 +4729,7 @@ describe("Feedback Item", () => {
         timerState: false,
         timerId: null,
         groupIds: [],
-        isGroupedCarouselItem: false,
+        isGroupedCarouselItem: true,
       };
 
       const columns = {
@@ -4753,7 +4766,9 @@ describe("Feedback Item", () => {
         timerSecs: 125,
         timerState: false,
         timerId: null,
-        isGroupedCarouselItem: false,
+        isGroupedCarouselItem: true,
+        isFocusModalHidden: false,
+        groupedItemProps: { isMainItem: true, isGroupExpanded: false, groupedCount: 0, parentItemId: "", setIsGroupBeingDragged: jest.fn(), toggleGroupExpand: jest.fn() },
         workflowPhase: "Act",
         team: { id: "team-1" },
         boardTitle: "Test",
