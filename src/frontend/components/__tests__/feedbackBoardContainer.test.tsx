@@ -2675,4 +2675,229 @@ describe("FeedbackBoardContainer - Board Management", () => {
     expect(instance.state.currentBoard).toBeNull();
     expect(instance.state.isTeamDataLoaded).toBe(true);
   });
+
+  it("should handle board deleted when viewing current board", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board1: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+    const board2: IFeedbackBoardDocument = {
+      id: "board-2",
+      title: "Board 2",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board1,
+      boards: [board1, board2],
+    });
+
+    await (instance as any).handleBoardDeleted("team-1", "board-1");
+
+    expect(instance.state.boards.length).toBe(1);
+    expect(instance.state.currentBoard?.id).toBe("board-2");
+  });
+
+  it("should handle board deleted for different team", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board,
+      boards: [board],
+    });
+
+    const initialBoardsLength = instance.state.boards.length;
+    await (instance as any).handleBoardDeleted("team-2", "board-1");
+
+    expect(instance.state.boards.length).toBe(initialBoardsLength);
+  });
+
+  it("should handle board deleted when it's the last board", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board,
+      boards: [board],
+    });
+
+    await (instance as any).handleBoardDeleted("team-1", "board-1");
+
+    expect(instance.state.boards.length).toBe(0);
+    expect(instance.state.currentBoard).toBeNull();
+  });
+
+  it("should handle board updated for current team", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board,
+      boards: [board],
+    });
+
+    const updatedBoard = { ...board, title: "Updated Board 1" };
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardForTeamById").mockResolvedValue(updatedBoard);
+
+    await (instance as any).handleBoardUpdated("team-1", "board-1");
+
+    expect(BoardDataService.getBoardForTeamById).toHaveBeenCalledWith("team-1", "board-1");
+  });
+
+  it("should handle board updated for different team", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board,
+      boards: [board],
+    });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    const spy = jest.spyOn(BoardDataService, "getBoardForTeamById");
+    spy.mockClear();
+
+    await (instance as any).handleBoardUpdated("team-2", "board-1");
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("should initialize with default state values", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    // Check that state has expected properties
+    expect(instance.state).toBeDefined();
+    expect(instance.state.isAppInitialized).toBeDefined();
+  });
+
+  it("should handle setState for timer updates", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    instance.setState({
+      timerSecs: 60,
+      timerState: true,
+    });
+    
+    expect(instance.state.timerSecs).toBe(60);
+    expect(instance.state.timerState).toBe(true);
+  });
+
+  it("should handle setState for board selection", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+    
+    instance.setState({
+      currentBoard: board,
+      boards: [board],
+    });
+    
+    expect(instance.state.currentBoard).toBeDefined();
+    expect(instance.state.currentBoard.id).toBe("board-1");
+  });
+
+  it("should handle setState for user teams", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    const teams = [
+      { id: "team-1", name: "Alpha Team" },
+      { id: "team-2", name: "Beta Team" },
+    ] as WebApiTeam[];
+    
+    instance.setState({
+      userTeams: teams,
+      filteredUserTeams: teams,
+    });
+    
+    expect(instance.state.userTeams.length).toBe(2);
+    expect(instance.state.filteredUserTeams.length).toBe(2);
+  });
 });
