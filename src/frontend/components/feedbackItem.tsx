@@ -929,7 +929,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 )}
               </div>
               <div className="card-content">
-                {workflowState.isActPhase && (
+                {mainGroupedItemInFocusMode && (
                   <div className="card-action-timer">
                     <button
                       title="Timer"
@@ -951,8 +951,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
                 {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
                   <div className="original-column-info">
-                    Original Column: <br />
-                    {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
+                    Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
                   </div>
                 )}
               </div>
@@ -988,8 +987,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                           </span>
                           {this.props.columnId !== originalColumn?.columnProperties?.id && (
                             <div className="original-column-info">
-                              Original Column: <br />
-                              {originalColumn.columnProperties.title}
+                              Original Column: {originalColumn.columnProperties.title}
                             </div>
                           )}
                         </li>
