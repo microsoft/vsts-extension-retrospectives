@@ -1981,7 +1981,7 @@ kbd {
 .feedbackItem .mainItemCard .card-integral-part .card-content,
 .feedback-item-group .mainItemCard .card-integral-part .card-content,
 .feedback-item-group .groupedItemCard .card-integral-part .card-content {
-  @apply flex flex-col mr-4 ml-4;
+  @apply flex flex-col mx-4;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-content .original-column-info,
@@ -2079,7 +2079,7 @@ kbd {
 }
 
 .retrospectives-group-feedback-item-dialog .ms-SearchBox {
-  @apply mt-4;
+  @apply my-4;
 }
 
 .retrospectives-group-feedback-item-dialog .ms-Dialog-title,
