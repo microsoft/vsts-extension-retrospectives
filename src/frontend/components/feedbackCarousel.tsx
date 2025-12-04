@@ -104,7 +104,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         onVoteCasted: columnProps.onVoteCasted,
         groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
         groupIds: columnItem.feedbackItem.childFeedbackItemIds ?? [],
-        isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
+        isGroupedCarouselItem: (columnItem.feedbackItem.childFeedbackItemIds?.length ?? 0) > 0,
         isShowingGroupedChildrenTitles: false,
         isFocusModalHidden: this.props.isFocusModalHidden,
         activeTimerFeedbackItemId: columnProps.activeTimerFeedbackItemId,
