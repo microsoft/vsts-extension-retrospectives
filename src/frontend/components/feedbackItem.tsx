@@ -957,7 +957,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
               {this.feedbackCreationInformationContent()}
               <div className="card-footer">
                 <div className="card-id">#{itemPosition}</div>
-                {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
+                {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[My Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[My Votes: {groupedVotesByUser}]</span>}</div>}
               </div>
             </div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
