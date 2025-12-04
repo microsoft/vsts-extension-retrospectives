@@ -1652,11 +1652,15 @@ kbd {
 }
 
 .workflow-stage-timer > span {
-  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs min-w-[60px] text-center w-[75px];
+  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs min-w-15 text-center w-[75px];
+}
+
+.workflow-stage-timer > span.timer-overtime {
+  @apply text-red-600 font-semibold;
 }
 
 .workflow-stage-timer select {
-  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs w-[75px] cursor-pointer;
+  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs w-25 cursor-pointer;
 }
 
 .workflow-stage-timer select:focus-visible {
@@ -1688,7 +1692,7 @@ kbd {
 }
 
 .feedback-workflow-wrapper-background {
-  @apply relative -ml-[325px] top-1.5 -z-1;
+  @apply relative -ml-80 top-1.5 -z-1;
 }
 
 .info-message-bar {
@@ -1696,15 +1700,15 @@ kbd {
 }
 
 .info-message-bar .ms-MessageBar-actions {
-  @apply mb-[5px] mr-[5px] min-w-[130px] min-h-[50px];
+  @apply mb-1 mr-1 min-w-[130px] min-h-[50px];
 }
 
 .info-message-bar .ms-MessageBar-actions .info-message-bar-action {
-  @apply mt-[5px] mr-[5px];
+  @apply mt-1 mr-1;
 }
 
 .team-effectiveness-section-information {
-  @apply rounded-[5px] bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-[3px] text-center w-[350px];
+  @apply rounded bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-1 text-center w-[350px];
 }
 
 .team-effectiveness-measurement-table {

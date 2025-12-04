@@ -105,6 +105,7 @@ export interface FeedbackBoardContainerState {
   boardTimerSeconds: number;
   isBoardTimerRunning: boolean;
   countdownDurationMinutes: number;
+  hasPlayedStopChime: boolean;
   teamAssessmentHistoryData: {
     boardTitle: string;
     boardId: string;
@@ -182,6 +183,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       boardTimerSeconds: 0,
       isBoardTimerRunning: false,
       countdownDurationMinutes: 5,
+      hasPlayedStopChime: false,
       teamAssessmentHistoryData: [],
     };
   }
@@ -307,16 +309,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     if (this.state.boardTimerSeconds === 0 && !isTimerMode) {
       this.playStartChime();
-      this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60 }, () => {
+      this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60, hasPlayedStopChime: false }, () => {
         this.boardTimerIntervalId = window.setInterval(() => {
           this.setState(previousState => {
             const newSeconds = previousState.boardTimerSeconds - 1;
-            if (newSeconds <= 0) {
-              this.pauseBoardTimer();
+            if (newSeconds === 0 && !previousState.hasPlayedStopChime) {
               this.playStopChime();
-              return { boardTimerSeconds: 0 };
+              return { boardTimerSeconds: newSeconds, hasPlayedStopChime: true as const };
             }
-            return { boardTimerSeconds: newSeconds };
+            return { boardTimerSeconds: newSeconds, hasPlayedStopChime: previousState.hasPlayedStopChime };
           });
         }, 1000);
       });
@@ -327,15 +328,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           const isTimerMode = this.state.countdownDurationMinutes === 0;
 
           if (isTimerMode) {
-            return { boardTimerSeconds: previousState.boardTimerSeconds + 1 };
+            return { boardTimerSeconds: previousState.boardTimerSeconds + 1, hasPlayedStopChime: previousState.hasPlayedStopChime };
           } else {
             const newSeconds = previousState.boardTimerSeconds - 1;
-            if (newSeconds <= 0) {
-              this.pauseBoardTimer();
+            if (newSeconds === 0 && !previousState.hasPlayedStopChime) {
               this.playStopChime();
-              return { boardTimerSeconds: 0 };
+              return { boardTimerSeconds: newSeconds, hasPlayedStopChime: true as const };
             }
-            return { boardTimerSeconds: newSeconds };
+            return { boardTimerSeconds: newSeconds, hasPlayedStopChime: previousState.hasPlayedStopChime };
           }
         });
       }, 1000);
@@ -364,7 +364,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     this.clearBoardTimerInterval();
-    this.setState({ boardTimerSeconds: 0, isBoardTimerRunning: false });
+    this.setState({ boardTimerSeconds: 0, isBoardTimerRunning: false, hasPlayedStopChime: false });
   };
 
   private readonly handleBoardTimerToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -392,9 +392,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly formatBoardTimer = (timeInSeconds: number) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    const isNegative = timeInSeconds < 0;
+    const absoluteSeconds = Math.abs(timeInSeconds);
+    const minutes = Math.floor(absoluteSeconds / 60);
+    const seconds = absoluteSeconds % 60;
+    const formattedTime = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    return isNegative ? `-${formattedTime}` : formattedTime;
   };
 
   private readonly playStopChime = () => {
@@ -456,12 +459,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
-        <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause timer" : "Start timer"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"} timer. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
+        <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"}. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
           <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
         </button>
         {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
           <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
-            <option value={0}>Timer</option>
+            <option value={0}>Stopwatch</option>
             {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
               <option key={num} value={num}>
                 {num} min
@@ -469,9 +472,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             ))}
           </select>
         ) : (
-          <span>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
+          <span className={this.state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
         )}
-        <button type="button" className="workflow-stage-timer-reset" title="Reset timer" aria-label="Reset timer" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
+        <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
           <i className="fa fa-undo" />
         </button>
       </div>

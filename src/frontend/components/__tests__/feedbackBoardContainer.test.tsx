@@ -806,6 +806,11 @@ describe("Facilitation timer", () => {
     expect((instance as any).formatBoardTimer(0)).toBe("0:00");
     expect((instance as any).formatBoardTimer(9)).toBe("0:09");
     expect((instance as any).formatBoardTimer(65)).toBe("1:05");
+    // Test negative values
+    expect((instance as any).formatBoardTimer(-1)).toBe("-0:01");
+    expect((instance as any).formatBoardTimer(-9)).toBe("-0:09");
+    expect((instance as any).formatBoardTimer(-65)).toBe("-1:05");
+    expect((instance as any).formatBoardTimer(-125)).toBe("-2:05");
   });
 
   it("starts, advances, and pauses the board timer", () => {
@@ -926,7 +931,7 @@ describe("Facilitation timer", () => {
       });
 
       const toggleButtonInitial = screen.getByRole("button", { pressed: false });
-      const resetButton = screen.getByRole("button", { name: "Reset timer" });
+      const resetButton = screen.getByRole("button", { name: "Reset" });
       expect(resetButton).toBeDisabled();
 
       act(() => {
@@ -1008,7 +1013,7 @@ describe("Facilitation timer", () => {
     jest.clearAllTimers();
   });
 
-  it("countdown mode (non-zero minutes) counts down to zero", () => {
+  it("countdown mode (non-zero minutes) counts down past zero and continues into negative", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
@@ -1021,6 +1026,7 @@ describe("Facilitation timer", () => {
         countdownDurationMinutes: 3, // 3 minute countdown
         boardTimerSeconds: 0,
         isBoardTimerRunning: false,
+        hasPlayedStopChime: false,
       });
     });
 
@@ -1048,21 +1054,84 @@ describe("Facilitation timer", () => {
     expect(instance.state.boardTimerSeconds).toBe(5);
     expect(instance.state.isBoardTimerRunning).toBe(true);
 
-    // Advance past zero
+    // Advance to exactly 0
     act(() => {
-      jest.advanceTimersByTime(6000);
+      jest.advanceTimersByTime(5000);
     });
 
-    // Should stop at 0 and auto-pause
+    // Should be at 0, chime played, but timer still running
     expect(instance.state.boardTimerSeconds).toBe(0);
-    expect(instance.state.isBoardTimerRunning).toBe(false);
+    expect(instance.state.isBoardTimerRunning).toBe(true); // Timer continues
+    expect(instance.state.hasPlayedStopChime).toBe(true);
+    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
 
-    // Verify chime was played
+    // Continue past zero - should go negative
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(-5);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+
+    // Verify chime was played only once
     expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
 
     playStopChimeSpy.mockRestore();
     playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
+  });
+
+  it("plays stop chime only once when crossing zero", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    const playStopChimeSpy = jest.spyOn(instance as any, "playStopChime").mockImplementation(() => {});
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 1, // 1 minute countdown
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+        hasPlayedStopChime: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    // Advance past zero and into negative
+    act(() => {
+      jest.advanceTimersByTime(70000); // 70 seconds (10 seconds past zero)
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(-10);
+    // Chime should only be called once
+    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+
+    playStopChimeSpy.mockRestore();
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("resets hasPlayedStopChime when timer is reset", () => {
+    const instance = createStandaloneTimerInstance();
+
+    act(() => {
+      instance.setState({
+        boardTimerSeconds: -10,
+        isBoardTimerRunning: true,
+        hasPlayedStopChime: true,
+      });
+    });
+
+    (instance as any).resetBoardTimer();
+
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+    expect(instance.state.hasPlayedStopChime).toBe(false);
   });
 
   it("switching between timer and countdown modes works correctly", () => {
@@ -1129,7 +1198,7 @@ describe("Facilitation timer", () => {
     jest.clearAllTimers();
   });
 
-  it("plays chime sound when countdown reaches zero", () => {
+  it("plays chime sound when countdown reaches zero and continues into negative", () => {
     jest.useFakeTimers();
 
     const instance = createStandaloneTimerInstance();
@@ -1143,6 +1212,7 @@ describe("Facilitation timer", () => {
         countdownDurationMinutes: 1, // 1 minute countdown
         boardTimerSeconds: 0, // Start at 0 (will initialize to 60)
         isBoardTimerRunning: false,
+        hasPlayedStopChime: false,
       });
     });
 
@@ -1166,14 +1236,26 @@ describe("Facilitation timer", () => {
       jest.advanceTimersByTime(1000);
     });
 
-    // Should have stopped at 0 and played chime
+    // Should be at 0, chime played, but timer continues running
     expect(instance.state.boardTimerSeconds).toBe(0);
-    expect(instance.state.isBoardTimerRunning).toBe(false);
+    expect(instance.state.isBoardTimerRunning).toBe(true); // Timer continues running
+    expect(instance.state.hasPlayedStopChime).toBe(true);
 
     // Verify chime was played
     expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
 
+    // Continue past 0 into negative
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(-3);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    // Chime should only have been called once
+    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+
     playStopChimeSpy.mockRestore();
+    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
