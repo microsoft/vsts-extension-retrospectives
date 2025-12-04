@@ -1074,6 +1074,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           <div className="output-container">
             {!this.state.searchedFeedbackItems.length && this.state.searchTerm && <p className="no-matching-feedback-message">No feedback with title containing your input.</p>}
             {this.state.searchedFeedbackItems.map((searchItem, index) => {
+              const searchItemColumn = this.props.columns[searchItem.columnId];
               const feedbackItemProps: IFeedbackItemProps = {
                 id: searchItem.id,
                 title: searchItem.title,
@@ -1083,8 +1084,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 lastEditedDate: searchItem.modifiedDate ? searchItem.modifiedDate.toString() : "",
                 createdDate: searchItem.createdDate.toString(),
                 upvotes: searchItem.upvotes,
-                accentColor: this.props.accentColor,
-                iconClass: this.props.iconClass,
+                accentColor: searchItemColumn?.columnProperties?.accentColor ?? this.props.accentColor,
+                iconClass: searchItemColumn?.columnProperties?.iconClass ?? this.props.iconClass,
                 workflowPhase: this.props.workflowPhase,
                 originalColumnId: searchItem.originalColumnId,
                 team: this.props.team,
