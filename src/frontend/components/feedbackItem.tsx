@@ -714,10 +714,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           }
         }}
       >
-        <i className={cn("fa", isFocusButton && this.state.isShowingGroupedChildrenTitles && "fa-angle-double-down", isFocusButton && !this.state.isShowingGroupedChildrenTitles && "fa-angle-double-right", !isFocusButton && this.props.groupedItemProps.isGroupExpanded && "fa-chevron-down", !isFocusButton && !this.props.groupedItemProps.isGroupExpanded && "fa-chevron-right")} />
+        <i className={cn("fa", isFocusButton && this.state.isShowingGroupedChildrenTitles && "fa-chevron-down", isFocusButton && !this.state.isShowingGroupedChildrenTitles && "fa-chevron-right", !isFocusButton && this.props.groupedItemProps.isGroupExpanded && "fa-chevron-down", !isFocusButton && !this.props.groupedItemProps.isGroupExpanded && "fa-chevron-right")} />
         &nbsp;
         {isFocusButton ? `${this.props.groupCount + 1} Items` : `${groupItemsCount} Items`}
-        {isFocusButton && <i className="far fa-comments" />}
       </button>
     );
   }
@@ -961,15 +960,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
               </div>
             </div>
-            <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
-              <div className="group-child-feedback-stack" id={`group-children-${this.props.id}`}>
-                <div className="related-feedback-header">
-                  {" "}
+              <div className="group-child-feedback-stack">
+                <div className="grouped-feedback-header">
                   <i className="far fa-comments" />
-                  &nbsp;Related Feedback
+                  Grouped Feedback
                 </div>
-                <ul className="fa-ul" aria-label="List of Related Feedback" role="list">
+                <ul className="fa-ul" aria-label="List of Grouped Feedback" role="list">
                   {childrenIds.map((id: string) => {
                     const childCard: IColumnItem = columnItems?.find(c => c.feedbackItem.id === id);
                     const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
@@ -997,6 +994,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 </ul>
               </div>
             )}
+            <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
           </DocumentCard>
         </div>
         <Dialog

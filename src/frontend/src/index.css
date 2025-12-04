@@ -2015,7 +2015,7 @@ kbd {
   @apply w-full;
 }
 
-.feedbackItem .mainItemCard .group-child-feedback-stack .related-feedback-header {
+.feedbackItem .mainItemCard .group-child-feedback-stack .grouped-feedback-header {
   @apply font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
 }
 
@@ -2023,24 +2023,16 @@ kbd {
   @apply list-none;
 }
 
-.feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul {
-  @apply mt-0 ml-[37px];
-}
-
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul .fa-li {
   @apply border-solid h-[30px] border-t-0 border-r-3 border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color);
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li {
-  @apply [word-wrap:break-word] p-[5px] border-b border-b-(--text-disabled-color);
+  @apply [word-wrap:break-word] p-1;
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li span {
   @apply leading-7.5;
-}
-
-.feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li:last-child {
-  @apply border-0;
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li .original-column-info {
