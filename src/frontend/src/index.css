@@ -1652,11 +1652,11 @@ kbd {
 }
 
 .workflow-stage-timer > span {
-  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs min-w-15 text-center w-[75px];
+  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs min-w-15 text-center w-25;
 }
 
 .workflow-stage-timer > span.timer-overtime {
-  @apply text-red-600 font-semibold;
+  @apply text-error-lighter font-semibold;
 }
 
 .workflow-stage-timer select {
