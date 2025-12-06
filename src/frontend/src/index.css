@@ -1652,11 +1652,15 @@ kbd {
 }
 
 .workflow-stage-timer > span {
-  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs min-w-[60px] text-center w-[75px];
+  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs min-w-15 text-center w-25;
+}
+
+.workflow-stage-timer > span.timer-overtime {
+  @apply text-error-lighter font-semibold;
 }
 
 .workflow-stage-timer select {
-  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs w-[75px] cursor-pointer;
+  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs w-25 cursor-pointer;
 }
 
 .workflow-stage-timer select:focus-visible {
@@ -1688,7 +1692,7 @@ kbd {
 }
 
 .feedback-workflow-wrapper-background {
-  @apply relative -ml-[325px] top-1.5 -z-1;
+  @apply relative -ml-80 top-1.5 -z-1;
 }
 
 .info-message-bar {
@@ -1696,15 +1700,15 @@ kbd {
 }
 
 .info-message-bar .ms-MessageBar-actions {
-  @apply mb-[5px] mr-[5px] min-w-[130px] min-h-[50px];
+  @apply mb-1 mr-1 min-w-[130px] min-h-[50px];
 }
 
 .info-message-bar .ms-MessageBar-actions .info-message-bar-action {
-  @apply mt-[5px] mr-[5px];
+  @apply mt-1 mr-1;
 }
 
 .team-effectiveness-section-information {
-  @apply rounded-[5px] bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-[3px] text-center w-[350px];
+  @apply rounded bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-1 text-center w-[350px];
 }
 
 .team-effectiveness-measurement-table {
@@ -1981,7 +1985,7 @@ kbd {
 .feedbackItem .mainItemCard .card-integral-part .card-content,
 .feedback-item-group .mainItemCard .card-integral-part .card-content,
 .feedback-item-group .groupedItemCard .card-integral-part .card-content {
-  @apply flex flex-col mr-4 ml-4;
+  @apply flex flex-col mx-4;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-content .original-column-info,
@@ -2015,7 +2019,7 @@ kbd {
   @apply w-full;
 }
 
-.feedbackItem .mainItemCard .group-child-feedback-stack .related-feedback-header {
+.feedbackItem .mainItemCard .group-child-feedback-stack .grouped-feedback-header {
   @apply font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
 }
 
@@ -2023,24 +2027,16 @@ kbd {
   @apply list-none;
 }
 
-.feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul {
-  @apply mt-0 ml-[37px];
-}
-
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul .fa-li {
   @apply border-solid h-[30px] border-t-0 border-r-3 border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color);
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li {
-  @apply [word-wrap:break-word] p-[5px] border-b border-b-(--text-disabled-color);
+  @apply [word-wrap:break-word] p-1;
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li span {
   @apply leading-7.5;
-}
-
-.feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li:last-child {
-  @apply border-0;
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li .original-column-info {
@@ -2079,7 +2075,7 @@ kbd {
 }
 
 .retrospectives-group-feedback-item-dialog .ms-SearchBox {
-  @apply mt-4;
+  @apply my-4;
 }
 
 .retrospectives-group-feedback-item-dialog .ms-Dialog-title,

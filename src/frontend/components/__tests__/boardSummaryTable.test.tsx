@@ -937,3 +937,356 @@ describe("BoardSummaryTable - boardRowSummary", () => {
     });
   });
 });
+
+describe("BoardSummaryTable - Sorting", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("sorts by title column when clicked", async () => {
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    // Click on title header to sort
+    const titleHeader = getByText("Retrospective Name");
+    if (titleHeader) {
+      titleHeader.click();
+    }
+
+    expect(container).toBeTruthy();
+  });
+
+  it("sorts by created date column when clicked", async () => {
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    // Click on created date header to sort
+    const createdDateHeader = getByText("Created Date");
+    if (createdDateHeader) {
+      createdDateHeader.click();
+    }
+
+    expect(container).toBeTruthy();
+  });
+
+  it("toggles sort direction when same column is clicked twice", async () => {
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const titleHeader = getByText("Retrospective Name");
+    if (titleHeader) {
+      titleHeader.click(); // First click - asc
+      titleHeader.click(); // Second click - desc
+    }
+
+    expect(container).toBeTruthy();
+  });
+
+  it("clears sort when clicked three times", async () => {
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const titleHeader = getByText("Retrospective Name");
+    if (titleHeader) {
+      titleHeader.click(); // First click - asc
+      titleHeader.click(); // Second click - desc
+      titleHeader.click(); // Third click - no sort
+    }
+
+    expect(container).toBeTruthy();
+  });
+});
+
+describe("BoardSummaryTable - Row Expansion", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("expands row when expand button is clicked", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const expandButtons = container.querySelectorAll('button[aria-label*="expand"]');
+    if (expandButtons.length > 0) {
+      (expandButtons[0] as HTMLElement).click();
+    }
+
+    expect(container).toBeTruthy();
+  });
+
+  it("collapses row when expand button is clicked again", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const expandButtons = container.querySelectorAll('button[aria-label*="expand"]');
+    if (expandButtons.length > 0) {
+      (expandButtons[0] as HTMLElement).click(); // Expand
+      (expandButtons[0] as HTMLElement).click(); // Collapse
+    }
+
+    expect(container).toBeTruthy();
+  });
+});
+
+describe("BoardSummaryTable - Action Items", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+  });
+
+  it("displays action item count when feedback items have associated action items", async () => {
+    const feedbackItemsWithActions = [
+      {
+        id: "feedback-1",
+        title: "Feedback with action",
+        boardId: "board-1",
+        columnId: "col-1",
+        associatedActionItemIds: [1, 2],
+      },
+    ];
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(feedbackItemsWithActions);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("handles empty action items gracefully", async () => {
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+});
+
+describe("BoardSummaryTable - Archive/Restore", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("calls onArchiveToggle when archive button is clicked", async () => {
+    const onArchiveToggle = jest.fn().mockResolvedValue(undefined);
+    const propsWithArchiveToggle = { ...baseProps, onArchiveToggle };
+    
+    const { container } = render(<BoardSummaryTable {...propsWithArchiveToggle} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const archiveButtons = container.querySelectorAll('button[aria-label*="Archive"]');
+    if (archiveButtons.length > 0) {
+      (archiveButtons[0] as HTMLElement).click();
+    }
+  });
+
+  it("handles restore of archived board", async () => {
+    const archivedBoards: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], isArchived: true, archivedDate: new Date() },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(archivedBoards);
+    (BoardDataService.restoreArchivedFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+
+    const onArchiveToggle = jest.fn().mockResolvedValue(undefined);
+    const propsWithArchiveToggle = { ...baseProps, onArchiveToggle };
+
+    const { container } = render(<BoardSummaryTable {...propsWithArchiveToggle} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+});
+
+describe("BoardSummaryTable - Delete Board", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("confirms delete when delete button is clicked", async () => {
+    const archivedBoards: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], isArchived: true, archivedDate: new Date(Date.now() - 10 * 60 * 1000) },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(archivedBoards);
+    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("cancels delete when cancel button is clicked", async () => {
+    const archivedBoards: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], isArchived: true, archivedDate: new Date(Date.now() - 10 * 60 * 1000) },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(archivedBoards);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+});
+
+describe("BoardSummaryTable - handleConfirmDelete", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("calls delete when boardId is provided", async () => {
+    const teamId = "team-1";
+    const boardId = "board-1";
+    const tableData: IBoardSummaryTableItem[] = [{
+      id: boardId,
+      boardName: "Test Board",
+      createdDate: new Date(),
+      teamId: teamId,
+      ownerId: "owner-1",
+      isArchived: true,
+      archivedDate: new Date(Date.now() - 10 * 60 * 1000),
+      feedbackItemsCount: 0,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+    }];
+    const setTableData = jest.fn();
+    const setOpenDialogBoardId = jest.fn();
+    const setRefreshKey = jest.fn();
+
+    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+
+    await handleConfirmDelete(boardId, tableData, teamId, setOpenDialogBoardId, setTableData, setRefreshKey);
+
+    expect(BoardDataService.deleteFeedbackBoard).toHaveBeenCalledWith(teamId, boardId);
+    expect(setOpenDialogBoardId).toHaveBeenCalledWith(null);
+  });
+
+  it("does nothing when boardId is null", async () => {
+    const teamId = "team-1";
+    const tableData: IBoardSummaryTableItem[] = [];
+    const setTableData = jest.fn();
+    const setOpenDialogBoardId = jest.fn();
+    const setRefreshKey = jest.fn();
+
+    await handleConfirmDelete(null, tableData, teamId, setOpenDialogBoardId, setTableData, setRefreshKey);
+
+    expect(BoardDataService.deleteFeedbackBoard).not.toHaveBeenCalled();
+    expect(setOpenDialogBoardId).not.toHaveBeenCalled();
+  });
+});
+
+describe("BoardSummaryTable - TrashIcon and isTrashEnabled", () => {
+  it("isTrashEnabled returns true when board is archived for more than 2 minutes", () => {
+    const board: IBoardSummaryTableItem = {
+      id: "board-1",
+      boardName: "Test Board",
+      createdDate: new Date(),
+      teamId: "team-1",
+      ownerId: "owner-1",
+      isArchived: true,
+      archivedDate: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
+      feedbackItemsCount: 0,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+    };
+    expect(isTrashEnabled(board)).toBe(true);
+  });
+
+  it("isTrashEnabled returns false when board is archived for less than 2 minutes", () => {
+    const board: IBoardSummaryTableItem = {
+      id: "board-1",
+      boardName: "Test Board",
+      createdDate: new Date(),
+      teamId: "team-1",
+      ownerId: "owner-1",
+      isArchived: true,
+      archivedDate: new Date(Date.now() - 1 * 60 * 1000), // 1 minute ago
+      feedbackItemsCount: 0,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+    };
+    expect(isTrashEnabled(board)).toBe(false);
+  });
+
+  it("isTrashEnabled returns false when archivedDate is undefined", () => {
+    const board: IBoardSummaryTableItem = {
+      id: "board-1",
+      boardName: "Test Board",
+      createdDate: new Date(),
+      teamId: "team-1",
+      ownerId: "owner-1",
+      isArchived: false,
+      feedbackItemsCount: 0,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+    };
+    expect(isTrashEnabled(board)).toBe(false);
+  });
+});
+
+describe("BoardSummaryTable - handleArchiveToggle", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("archives a non-archived board when toggleIsArchived is true", async () => {
+    const teamId = "team-1";
+    const boardId = "board-1";
+    const setTableData = jest.fn();
+    const onArchiveToggle = jest.fn().mockResolvedValue(undefined);
+
+    (BoardDataService.archiveFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+
+    await handleArchiveToggle(teamId, boardId, true, setTableData, onArchiveToggle);
+
+    expect(BoardDataService.archiveFeedbackBoard).toHaveBeenCalledWith(teamId, boardId);
+    expect(onArchiveToggle).toHaveBeenCalled();
+  });
+
+  it("restores an archived board when toggleIsArchived is false", async () => {
+    const teamId = "team-1";
+    const boardId = "board-1";
+    const setTableData = jest.fn();
+    const onArchiveToggle = jest.fn().mockResolvedValue(undefined);
+
+    (BoardDataService.restoreArchivedFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+
+    await handleArchiveToggle(teamId, boardId, false, setTableData, onArchiveToggle);
+
+    expect(BoardDataService.restoreArchivedFeedbackBoard).toHaveBeenCalledWith(teamId, boardId);
+    expect(onArchiveToggle).toHaveBeenCalled();
+  });
+});

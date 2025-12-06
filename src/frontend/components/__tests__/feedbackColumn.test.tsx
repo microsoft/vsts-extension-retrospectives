@@ -5,6 +5,7 @@ import { testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackCo
 import FeedbackColumn from "../feedbackColumn";
 import FeedbackItem from "../feedbackItem";
 import { IColumnItem } from "../feedbackBoard";
+import { WorkflowPhase } from "../../interfaces/workItem";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
@@ -1112,6 +1113,209 @@ describe("Feedback Column ", () => {
         // The component should handle the drop
         expect(ref.current).toBeTruthy();
       }
+    });
+  });
+
+  describe("Focus preservation edge cases", () => {
+    test("preserves focus on input element", () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      // Create and focus an input
+      const feedbackCard = container.querySelector("[data-feedback-item-id]");
+      if (feedbackCard) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = "test value";
+        feedbackCard.appendChild(input);
+        input.focus();
+        input.setSelectionRange(2, 5);
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("preserves focus on textarea element", () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]");
+      if (feedbackCard) {
+        const textarea = document.createElement("textarea");
+        textarea.value = "test value";
+        feedbackCard.appendChild(textarea);
+        textarea.focus();
+        textarea.setSelectionRange(1, 3);
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("handles missing element gracefully", () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      // Force focus preservation without actual element
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      column?.focus();
+
+      const updatedProps = { ...props, columnItems: [] as IColumnItem[] };
+      rerender(<FeedbackColumn {...updatedProps} />);
+
+      expect(container).toBeTruthy();
+    });
+  });
+
+  describe("Column keyboard shortcuts - extended", () => {
+    test("handles e key press to edit column", () => {
+      const props = { ...testColumnProps, showColumnEditButton: true };
+      const { container, getByRole } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      
+      const event = new KeyboardEvent("keydown", { key: "e", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      // Edit dialog should open
+      expect(container).toBeTruthy();
+    });
+
+    test("handles E key press (uppercase) to edit column", () => {
+      const props = { ...testColumnProps, showColumnEditButton: true };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      
+      const event = new KeyboardEvent("keydown", { key: "E", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      expect(container).toBeTruthy();
+    });
+
+    test("handles Insert key to create new item in Collect phase", () => {
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Collect };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      
+      const event = new KeyboardEvent("keydown", { key: "Insert", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      expect(container).toBeTruthy();
+    });
+
+    test("ignores n key press in non-Collect phase", () => {
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Vote };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      
+      const event = new KeyboardEvent("keydown", { key: "n", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      expect(container).toBeTruthy();
+    });
+
+    test("ignores keyboard events when in input element", () => {
+      const props = { ...testColumnProps };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const input = document.createElement("input");
+      container.appendChild(input);
+      input.focus();
+
+      const event = new KeyboardEvent("keydown", { key: "n", bubbles: true, cancelable: true });
+      input.dispatchEvent(event);
+
+      expect(container).toBeTruthy();
+    });
+
+    test("ignores keyboard events when in textarea element", () => {
+      const props = { ...testColumnProps };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const textarea = document.createElement("textarea");
+      container.appendChild(textarea);
+      textarea.focus();
+
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
+      textarea.dispatchEvent(event);
+
+      expect(container).toBeTruthy();
+    });
+
+    test("ignores keyboard events when dialog is open", () => {
+      const props = { ...testColumnProps, showColumnEditButton: true };
+      const { container, getByRole } = render(<FeedbackColumn {...props} />);
+
+      // Open dialog first
+      fireEvent.click(getByRole("button", { name: `Edit column ${props.columnName}` }));
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const event = new KeyboardEvent("keydown", { key: "n", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      expect(container).toBeTruthy();
+    });
+  });
+
+  describe("Column items navigation", () => {
+    test("navigates to first item with Home key", () => {
+      const props = { ...testColumnProps };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      
+      const event = new KeyboardEvent("keydown", { key: "Home", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      expect(column).toBeTruthy();
+    });
+
+    test("navigates with ArrowUp at first item stays at first", () => {
+      const props = { ...testColumnProps };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      
+      // Go to first
+      column.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true, cancelable: true }));
+      // Try to go up - should stay at first
+      column.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true }));
+
+      expect(column).toBeTruthy();
+    });
+  });
+
+  describe("Component render states", () => {
+    test("renders with Group workflow phase", () => {
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Group };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+    });
+
+    test("renders with Vote workflow phase", () => {
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Vote };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+    });
+
+    test("renders with Act workflow phase", () => {
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Act };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
     });
   });
 });

@@ -714,10 +714,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           }
         }}
       >
-        <i className={cn("fa", isFocusButton && this.state.isShowingGroupedChildrenTitles && "fa-angle-double-down", isFocusButton && !this.state.isShowingGroupedChildrenTitles && "fa-angle-double-right", !isFocusButton && this.props.groupedItemProps.isGroupExpanded && "fa-chevron-down", !isFocusButton && !this.props.groupedItemProps.isGroupExpanded && "fa-chevron-right")} />
+        <i className={cn("fa", isFocusButton && this.state.isShowingGroupedChildrenTitles && "fa-chevron-down", isFocusButton && !this.state.isShowingGroupedChildrenTitles && "fa-chevron-right", !isFocusButton && this.props.groupedItemProps.isGroupExpanded && "fa-chevron-down", !isFocusButton && !this.props.groupedItemProps.isGroupExpanded && "fa-chevron-right")} />
         &nbsp;
         {isFocusButton ? `${this.props.groupCount + 1} Items` : `${groupItemsCount} Items`}
-        {isFocusButton && <i className="far fa-comments" />}
       </button>
     );
   }
@@ -929,7 +928,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 )}
               </div>
               <div className="card-content">
-                {workflowState.isActPhase && (
+                {workflowState.isActPhase && isMainItem && (
                   <div className="card-action-timer">
                     <button
                       title="Timer"
@@ -951,26 +950,23 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
                 {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
                   <div className="original-column-info">
-                    Original Column: <br />
-                    {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
+                    Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
                   </div>
                 )}
               </div>
               {this.feedbackCreationInformationContent()}
               <div className="card-footer">
                 <div className="card-id">#{itemPosition}</div>
-                {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[Your Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[Your Votes: {groupedVotesByUser}]</span>}</div>}
+                {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && this.props.groupedItemProps.isGroupExpanded) ? <span className="feedback-yourvote-count">[My Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[My Votes: {groupedVotesByUser}]</span>}</div>}
               </div>
             </div>
-            <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
-              <div className="group-child-feedback-stack" id={`group-children-${this.props.id}`}>
-                <div className="related-feedback-header">
-                  {" "}
+              <div className="group-child-feedback-stack">
+                <div className="grouped-feedback-header">
                   <i className="far fa-comments" />
-                  &nbsp;Related Feedback
+                  Grouped Feedback
                 </div>
-                <ul className="fa-ul" aria-label="List of Related Feedback" role="list">
+                <ul className="fa-ul" aria-label="List of Grouped Feedback" role="list">
                   {childrenIds.map((id: string) => {
                     const childCard: IColumnItem = columnItems?.find(c => c.feedbackItem.id === id);
                     const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
@@ -988,8 +984,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                           </span>
                           {this.props.columnId !== originalColumn?.columnProperties?.id && (
                             <div className="original-column-info">
-                              Original Column: <br />
-                              {originalColumn.columnProperties.title}
+                              Original Column: {originalColumn.columnProperties.title}
                             </div>
                           )}
                         </li>
@@ -999,6 +994,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 </ul>
               </div>
             )}
+            <div className="card-action-item-part">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={this.props.id} feedbackItemTitle={displayTitle} team={this.props.team} boardId={this.props.boardId} boardTitle={this.props.boardTitle} defaultAreaPath={this.props.defaultActionItemAreaPath} defaultIteration={this.props.defaultActionItemIteration} actionItems={this.props.actionItems} onUpdateActionItem={this.onUpdateActionItem} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
           </DocumentCard>
         </div>
         <Dialog
@@ -1076,6 +1072,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           <div className="output-container">
             {!this.state.searchedFeedbackItems.length && this.state.searchTerm && <p className="no-matching-feedback-message">No feedback with title containing your input.</p>}
             {this.state.searchedFeedbackItems.map((searchItem, index) => {
+              const searchItemColumn = this.props.columns[searchItem.columnId];
               const feedbackItemProps: IFeedbackItemProps = {
                 id: searchItem.id,
                 title: searchItem.title,
@@ -1085,8 +1082,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 lastEditedDate: searchItem.modifiedDate ? searchItem.modifiedDate.toString() : "",
                 createdDate: searchItem.createdDate.toString(),
                 upvotes: searchItem.upvotes,
-                accentColor: this.props.accentColor,
-                iconClass: this.props.iconClass,
+                accentColor: searchItemColumn?.columnProperties?.accentColor ?? this.props.accentColor,
+                iconClass: searchItemColumn?.columnProperties?.iconClass ?? this.props.iconClass,
                 workflowPhase: this.props.workflowPhase,
                 originalColumnId: searchItem.originalColumnId,
                 team: this.props.team,

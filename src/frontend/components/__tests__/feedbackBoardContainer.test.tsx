@@ -806,6 +806,11 @@ describe("Facilitation timer", () => {
     expect((instance as any).formatBoardTimer(0)).toBe("0:00");
     expect((instance as any).formatBoardTimer(9)).toBe("0:09");
     expect((instance as any).formatBoardTimer(65)).toBe("1:05");
+    // Test negative values
+    expect((instance as any).formatBoardTimer(-1)).toBe("-0:01");
+    expect((instance as any).formatBoardTimer(-9)).toBe("-0:09");
+    expect((instance as any).formatBoardTimer(-65)).toBe("-1:05");
+    expect((instance as any).formatBoardTimer(-125)).toBe("-2:05");
   });
 
   it("starts, advances, and pauses the board timer", () => {
@@ -926,7 +931,7 @@ describe("Facilitation timer", () => {
       });
 
       const toggleButtonInitial = screen.getByRole("button", { pressed: false });
-      const resetButton = screen.getByRole("button", { name: "Reset timer" });
+      const resetButton = screen.getByRole("button", { name: "Reset" });
       expect(resetButton).toBeDisabled();
 
       act(() => {
@@ -1008,7 +1013,7 @@ describe("Facilitation timer", () => {
     jest.clearAllTimers();
   });
 
-  it("countdown mode (non-zero minutes) counts down to zero", () => {
+  it("countdown mode (non-zero minutes) counts down past zero and continues into negative", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
@@ -1021,6 +1026,7 @@ describe("Facilitation timer", () => {
         countdownDurationMinutes: 3, // 3 minute countdown
         boardTimerSeconds: 0,
         isBoardTimerRunning: false,
+        hasPlayedStopChime: false,
       });
     });
 
@@ -1048,21 +1054,84 @@ describe("Facilitation timer", () => {
     expect(instance.state.boardTimerSeconds).toBe(5);
     expect(instance.state.isBoardTimerRunning).toBe(true);
 
-    // Advance past zero
+    // Advance to exactly 0
     act(() => {
-      jest.advanceTimersByTime(6000);
+      jest.advanceTimersByTime(5000);
     });
 
-    // Should stop at 0 and auto-pause
+    // Should be at 0, chime played, but timer still running
     expect(instance.state.boardTimerSeconds).toBe(0);
-    expect(instance.state.isBoardTimerRunning).toBe(false);
+    expect(instance.state.isBoardTimerRunning).toBe(true); // Timer continues
+    expect(instance.state.hasPlayedStopChime).toBe(true);
+    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
 
-    // Verify chime was played
+    // Continue past zero - should go negative
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(-5);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+
+    // Verify chime was played only once
     expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
 
     playStopChimeSpy.mockRestore();
     playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
+  });
+
+  it("plays stop chime only once when crossing zero", () => {
+    jest.useFakeTimers();
+    const instance = createStandaloneTimerInstance();
+
+    const playStopChimeSpy = jest.spyOn(instance as any, "playStopChime").mockImplementation(() => {});
+    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+
+    act(() => {
+      instance.setState({
+        countdownDurationMinutes: 1, // 1 minute countdown
+        boardTimerSeconds: 0,
+        isBoardTimerRunning: false,
+        hasPlayedStopChime: false,
+      });
+    });
+
+    // Start the timer
+    act(() => {
+      (instance as any).startBoardTimer();
+    });
+
+    // Advance past zero and into negative
+    act(() => {
+      jest.advanceTimersByTime(70000); // 70 seconds (10 seconds past zero)
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(-10);
+    // Chime should only be called once
+    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+
+    playStopChimeSpy.mockRestore();
+    playStartChimeSpy.mockRestore();
+    jest.clearAllTimers();
+  });
+
+  it("resets hasPlayedStopChime when timer is reset", () => {
+    const instance = createStandaloneTimerInstance();
+
+    act(() => {
+      instance.setState({
+        boardTimerSeconds: -10,
+        isBoardTimerRunning: true,
+        hasPlayedStopChime: true,
+      });
+    });
+
+    (instance as any).resetBoardTimer();
+
+    expect(instance.state.boardTimerSeconds).toBe(0);
+    expect(instance.state.isBoardTimerRunning).toBe(false);
+    expect(instance.state.hasPlayedStopChime).toBe(false);
   });
 
   it("switching between timer and countdown modes works correctly", () => {
@@ -1129,7 +1198,7 @@ describe("Facilitation timer", () => {
     jest.clearAllTimers();
   });
 
-  it("plays chime sound when countdown reaches zero", () => {
+  it("plays chime sound when countdown reaches zero and continues into negative", () => {
     jest.useFakeTimers();
 
     const instance = createStandaloneTimerInstance();
@@ -1143,6 +1212,7 @@ describe("Facilitation timer", () => {
         countdownDurationMinutes: 1, // 1 minute countdown
         boardTimerSeconds: 0, // Start at 0 (will initialize to 60)
         isBoardTimerRunning: false,
+        hasPlayedStopChime: false,
       });
     });
 
@@ -1166,14 +1236,26 @@ describe("Facilitation timer", () => {
       jest.advanceTimersByTime(1000);
     });
 
-    // Should have stopped at 0 and played chime
+    // Should be at 0, chime played, but timer continues running
     expect(instance.state.boardTimerSeconds).toBe(0);
-    expect(instance.state.isBoardTimerRunning).toBe(false);
+    expect(instance.state.isBoardTimerRunning).toBe(true); // Timer continues running
+    expect(instance.state.hasPlayedStopChime).toBe(true);
 
     // Verify chime was played
     expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
 
+    // Continue past 0 into negative
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    expect(instance.state.boardTimerSeconds).toBe(-3);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
+    // Chime should only have been called once
+    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+
     playStopChimeSpy.mockRestore();
+    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -2674,5 +2756,230 @@ describe("FeedbackBoardContainer - Board Management", () => {
     expect(instance.state.boards).toEqual([]);
     expect(instance.state.currentBoard).toBeNull();
     expect(instance.state.isTeamDataLoaded).toBe(true);
+  });
+
+  it("should handle board deleted when viewing current board", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board1: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+    const board2: IFeedbackBoardDocument = {
+      id: "board-2",
+      title: "Board 2",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board1,
+      boards: [board1, board2],
+    });
+
+    await (instance as any).handleBoardDeleted("team-1", "board-1");
+
+    expect(instance.state.boards.length).toBe(1);
+    expect(instance.state.currentBoard?.id).toBe("board-2");
+  });
+
+  it("should handle board deleted for different team", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board,
+      boards: [board],
+    });
+
+    const initialBoardsLength = instance.state.boards.length;
+    await (instance as any).handleBoardDeleted("team-2", "board-1");
+
+    expect(instance.state.boards.length).toBe(initialBoardsLength);
+  });
+
+  it("should handle board deleted when it's the last board", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board,
+      boards: [board],
+    });
+
+    await (instance as any).handleBoardDeleted("team-1", "board-1");
+
+    expect(instance.state.boards.length).toBe(0);
+    expect(instance.state.currentBoard).toBeNull();
+  });
+
+  it("should handle board updated for current team", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board,
+      boards: [board],
+    });
+
+    const updatedBoard = { ...board, title: "Updated Board 1" };
+    const BoardDataService = require("../../dal/boardDataService").default;
+    jest.spyOn(BoardDataService, "getBoardForTeamById").mockResolvedValue(updatedBoard);
+
+    await (instance as any).handleBoardUpdated("team-1", "board-1");
+
+    expect(BoardDataService.getBoardForTeamById).toHaveBeenCalledWith("team-1", "board-1");
+  });
+
+  it("should handle board updated for different team", async () => {
+    const instance = createStandaloneTimerInstance();
+
+    const team = { id: "team-1", name: "Team 1" } as WebApiTeam;
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+
+    instance.setState({
+      currentTeam: team,
+      currentBoard: board,
+      boards: [board],
+    });
+
+    const BoardDataService = require("../../dal/boardDataService").default;
+    const spy = jest.spyOn(BoardDataService, "getBoardForTeamById");
+    spy.mockClear();
+
+    await (instance as any).handleBoardUpdated("team-2", "board-1");
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("should initialize with default state values", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    // Check that state has expected properties
+    expect(instance.state).toBeDefined();
+    expect(instance.state.isAppInitialized).toBeDefined();
+  });
+
+  it("should handle setState for timer updates", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    instance.setState({
+      timerSecs: 60,
+      timerState: true,
+    });
+    
+    expect(instance.state.timerSecs).toBe(60);
+    expect(instance.state.timerState).toBe(true);
+  });
+
+  it("should handle setState for board selection", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    const board: IFeedbackBoardDocument = {
+      id: "board-1",
+      title: "Board 1",
+      teamId: "team-1",
+      createdDate: new Date(),
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [],
+      maxVotesPerUser: 5,
+      boardVoteCollection: {},
+      activePhase: WorkflowPhase.Collect,
+      createdBy: {} as IdentityRef,
+    };
+    
+    instance.setState({
+      currentBoard: board,
+      boards: [board],
+    });
+    
+    expect(instance.state.currentBoard).toBeDefined();
+    expect(instance.state.currentBoard.id).toBe("board-1");
+  });
+
+  it("should handle setState for user teams", () => {
+    const instance = createStandaloneTimerInstance();
+    
+    const teams = [
+      { id: "team-1", name: "Alpha Team" },
+      { id: "team-2", name: "Beta Team" },
+    ] as WebApiTeam[];
+    
+    instance.setState({
+      userTeams: teams,
+      filteredUserTeams: teams,
+    });
+    
+    expect(instance.state.userTeams.length).toBe(2);
+    expect(instance.state.filteredUserTeams.length).toBe(2);
   });
 });
