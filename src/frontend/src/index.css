@@ -1861,7 +1861,7 @@ kbd {
 }
 
 .feedbackItem {
-  @apply my-0 mr-3 mb-3 ml-0 break-inside-avoid inline-block align-top w-full max-w-80 min-w-[260px] box-border;
+  @apply my-0 mr-3 mb-3 ml-0 break-inside-avoid inline-block align-top w-full min-w-64 box-border;
 }
 
 .feedbackItem:focus {
@@ -2084,7 +2084,7 @@ kbd {
 }
 
 .retrospectives-group-feedback-item-dialog .output-container {
-  @apply overflow-y-auto h-[300px];
+  @apply overflow-y-auto h-75 flex flex-col gap-3;
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .no-matching-feedback-message {
@@ -2092,7 +2092,7 @@ kbd {
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item {
-  @apply cursor-pointer text-start block w-full;
+  @apply cursor-pointer text-start block w-full pr-3;
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item:focus .feedbackItem .mainItemCard,
