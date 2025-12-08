@@ -30,7 +30,8 @@ const getTdProps = (item: IBoardSummaryTableItem, columnId: string) => {
 
   const columnKey = columnId as keyof IBoardSummaryTableItem;
   const cellValue = item[columnKey];
-  const ariaLabel = cellValue ? `${columnId} ${cellValue}` : "";
+  const hasValue = cellValue !== undefined && cellValue !== null;
+  const ariaLabel = hasValue ? `${columnId} ${cellValue}` : undefined;
 
   return {
     "className": `${workItemsClass}`,
