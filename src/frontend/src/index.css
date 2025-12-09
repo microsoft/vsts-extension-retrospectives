@@ -327,14 +327,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-board {
   @apply w-full table table-fixed;
-
-  & .feedback-columns-container {
-    @apply table-row bg-[rgba(var(--palette-neutral-2,248,248,248),1)];
-
-    &:focus {
-      @apply outline-none;
-    }
-  }
 }
 
 .keyboard-shortcuts-dialog {
