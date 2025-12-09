@@ -371,12 +371,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
-  @apply pt-5 border border-gray-medium p-2.5 mb-1.5;
-
-  .board-metadata-form-permissions .board-metadata-form-board-settings--no-padding {
-    @apply p-0;
-  }
-
   & .board-metadata-form-section-information {
     @apply m-2.5;
   }
@@ -386,7 +380,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-table-container {
-    @apply max-h-[350px] overflow-auto;
+    @apply max-h-85 overflow-auto;
   }
 
   & .board-metadata-table {
@@ -400,7 +394,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply sticky bg-(--background-color) border-b border-(--border-subtle-color) top-0 z-1;
 
       &.cell-checkbox {
-        @apply w-[30px];
+        @apply w-7.5;
       }
     }
 
@@ -427,7 +421,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply flex justify-center items-center ml-auto;
 
         & span {
-          @apply bg-(--palette-black-alpha-6) py-0.5 px-2 rounded-[120px] text-(--text-primary-color) whitespace-nowrap;
+          @apply bg-(--palette-black-alpha-6) py-0.5 px-2 rounded-full text-(--text-primary-color) whitespace-nowrap;
         }
       }
     }
@@ -435,7 +429,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-preview-email-dialog {
-  @apply max-w-none w-[800px] h-[500px] bg-(--background-color) border border-border-gray;
+  @apply max-w-none w-200 h-125 bg-(--background-color) border border-border-gray;
 
   & div[role="heading"] {
     @apply text-(--text-primary-color);
@@ -462,7 +456,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &:focus-visible .mainItemCard {
-    @apply outline-[3px] outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
+    @apply outline-3 outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
   }
 
   & .item-cards {
