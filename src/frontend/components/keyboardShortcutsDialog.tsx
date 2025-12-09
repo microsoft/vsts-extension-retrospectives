@@ -95,6 +95,12 @@ const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsDialogProps> = ({ isOpe
           <div key={category}>
             <h3 className="keyboard-shortcuts-category-title">{category}</h3>
             <table className="keyboard-shortcuts-table">
+              <thead>
+                <tr>
+                  <th scope="col">Shortcut</th>
+                  <th scope="col">Description</th>
+                </tr>
+              </thead>
               <tbody>
                 {shortcuts.map((shortcut, index) => (
                   <tr key={index}>

@@ -42,7 +42,7 @@ const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ colum
     <thead role="rowgroup">
       <tr role="row">
         {columns.map(column => (
-          <th key={column.id} role="columnheader" {...getSortProps(column)}>
+          <th key={column.id} role="columnheader" scope="col" {...getSortProps(column)}>
             {typeof column.header === "function" ? column.header() : column.header}
           </th>
         ))}

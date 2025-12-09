@@ -187,10 +187,10 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           <table className="board-metadata-table">
             <thead>
               <tr>
-                <th className="cell-checkbox">
+                  <th className="cell-checkbox" scope="col">
                   <Checkbox className="my-2" id="select-all-permission-options-visible" ariaLabel="Add permission to every team or member in the table." boxSide="start" disabled={!canEditPermissions} checked={selectAllChecked} onChange={(_, checked) => handleSelectAllClicked(checked)} />
                 </th>
-                <th className={"text-left"}>
+                  <th className={"text-left"} scope="col">
                   <span aria-label="Permission option name table header">{"Name"}</span>
                 </th>
               </tr>

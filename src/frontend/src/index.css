@@ -8,6 +8,8 @@
 
   --color-primary: #0078d4;
   --color-border-gray: #605e5c;
+  --color-border-gray-lighter: color-mix(in srgb, var(--color-border-gray), white 10%);
+  --color-border-gray-darker: color-mix(in srgb, var(--color-border-gray), black 10%);
   --color-error: #cc293d;
   --color-error-lighter: color-mix(in srgb, var(--color-error), white 10%);
   --color-error-darker: color-mix(in srgb, var(--color-error), black 10%);
@@ -345,38 +347,38 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & table tr:hover {
     @apply bg-(--border-subtle-color);
   }
-}
 
-.keyboard-shortcuts-content {
-  @apply max-h-[60vh] overflow-y-auto flex flex-col gap-5;
-}
+  & .keyboard-shortcuts-content {
+    @apply max-h-[60vh] overflow-y-auto flex flex-col gap-5 text-(--text-primary-color);
 
-.keyboard-shortcuts-category-title {
-  @apply text-sm font-semibold mb-2.5 text-(--text-primary-color) border-b border-(--border-subtle-color) pb-1.5;
-}
-
-.keyboard-shortcuts-table {
-  @apply w-full border-collapse;
-
-  & tbody tr {
-    @apply border-b border-(--border-subtle-color);
-
-    &:first-child {
-      @apply py-2 px-3 text-left align-middle w-[40%];
-    }
-
-    &:last-child {
-      @apply py-2 px-3 text-(--text-primary-color) align-middle;
+    & .keyboard-shortcuts-category-title {
+      @apply text-sm font-semibold mb-2.5 text-(--text-primary-color) border-b border-(--border-subtle-color) pb-1.5;
     }
   }
-}
 
-.keyboard-shortcuts-key-separator {
-  @apply mx-1 text-(--text-secondary-color);
-}
+  & .keyboard-shortcuts-table {
+    @apply w-full border-collapse;
 
-kbd {
-  @apply py-0.5 px-1.5 mx-0.5 border border-[#ccc] rounded-[3px] bg-[#f7f7f7] font-mono text-xs shadow-[0_1px_2px_rgba(0,0,0,0.1)];
+    & tbody tr {
+      @apply border-b border-(--border-subtle-color);
+
+      &:first-child {
+        @apply py-2 px-3 text-left align-middle w-[40%];
+      }
+
+      &:last-child {
+        @apply py-2 px-3 text-(--text-primary-color) align-middle;
+      }
+    }
+
+    & kbd {
+      @apply py-0.5 px-1.5 mx-0.5 text-(--color-border-gray-darker) border border-[#ccc] rounded-3 bg-[#f7f7f7] font-mono text-xs shadow-[0_1px_2px_rgba(0,0,0,0.1)];
+    }
+  }
+
+  & .keyboard-shortcuts-key-separator {
+    @apply mx-1 text-(--text-secondary-color);
+  }
 }
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
