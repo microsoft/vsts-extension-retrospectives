@@ -349,7 +349,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .keyboard-shortcuts-content {
-    @apply max-h-[60vh] overflow-y-auto flex flex-col gap-5 text-(--text-primary-color);
+    @apply max-h-1/2 overflow-y-auto flex flex-col gap-5 text-(--text-primary-color);
 
     & .keyboard-shortcuts-category-title {
       @apply text-sm font-semibold mb-2.5 text-(--text-primary-color) border-b border-(--border-subtle-color) pb-1.5;
@@ -363,12 +363,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply border-b border-(--border-subtle-color);
 
       & td:first-child {
-        @apply py-2 px-3 text-left align-middle w-[40%];
+        @apply py-2 px-3 text-left align-middle w-2/5;
       }
     }
 
     & kbd {
-      @apply py-0.5 px-1.5 mx-0.5 text-border-gray-darker rounded bg-(--color-border-gray-lighter) font-mono text-xs shadow-[0_1px_2px_rgba(0,0,0,0.1)];
+      @apply py-0.5 px-1.5 mx-0.5 text-(--text-primary-color) rounded bg-border-gray-darker font-mono text-xs shadow-sm;
     }
   }
 
@@ -1804,7 +1804,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row th {
-  @apply font-normal text-center;
+  @apply font-normal;
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-question-cell {
@@ -1816,7 +1816,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
-  @apply border-r-2 border-solid border-primary;
+  @apply border-r-2 border-solid border-primary text-center;
 }
 
 .team-effectiveness-dialog {
