@@ -237,6 +237,24 @@ describe("feedback interfaces and helpers", () => {
         const result = FeedbackBoardDocumentHelper.filter(board, [], "different-user");
         expect(result).toBe(false);
       });
+
+      it("should handle when createdBy is undefined", () => {
+        const board = createBoard({
+          createdBy: undefined,
+          isPublic: true,
+        });
+        const result = FeedbackBoardDocumentHelper.filter(board, [], "any-user");
+        expect(result).toBe(true);
+      });
+
+      it("should handle when createdBy is null", () => {
+        const board = createBoard({
+          createdBy: null as any,
+          isPublic: true,
+        });
+        const result = FeedbackBoardDocumentHelper.filter(board, [], "any-user");
+        expect(result).toBe(true);
+      });
     });
   });
 
