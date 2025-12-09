@@ -140,12 +140,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   public async componentDidMount() {
-    await this.isVoted(this.props.id);
-    await this.setDisabledFeedbackItemDeletion(this.props.boardId, this.props.id);
-
-    reflectBackendService.onReceiveDeletedItem(this.receiveDeletedItemHandler);
-    this.props.shouldHaveFocus && this.itemElement && this.itemElement.focus();
-
     if (this.itemElement) {
       this.itemElement.addEventListener("keydown", this.handleItemKeyDown);
     }
@@ -153,6 +147,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     if (this.props.columnProps?.registerItemRef) {
       this.props.columnProps.registerItemRef(this.props.id, this.itemElement);
     }
+
+    await this.isVoted(this.props.id);
+    await this.setDisabledFeedbackItemDeletion(this.props.boardId, this.props.id);
+
+    reflectBackendService.onReceiveDeletedItem(this.receiveDeletedItemHandler);
+    this.props.shouldHaveFocus && this.itemElement && this.itemElement.focus();
   }
 
   public componentWillUnmount() {
@@ -169,15 +169,24 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
   private handleItemKeyDown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
-      return;
-    }
-
-    if (document.querySelector('[role="dialog"]')) {
-      return;
-    }
-
     const key = e.key.toLowerCase();
+    const isTextInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
+    const isDialogOpen = !!document.querySelector('[role="dialog"]');
+
+    if (isDialogOpen && key !== "tab") {
+      return;
+    }
+
+    if (isTextInput && key !== "tab") {
+      return;
+    }
+
+    if (key === "tab") {
+      e.preventDefault();
+      this.navigateToAdjacentCard(e.shiftKey ? "prev" : "next");
+      return;
+    }
+
     const isMainItem = !this.props.groupedItemProps || this.props.groupedItemProps.isMainItem;
 
     switch (key) {
@@ -185,6 +194,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       case "arrowdown":
         e.preventDefault();
         this.navigateToAdjacentCard(key === "arrowup" ? "prev" : "next");
+        break;
+      case "arrowleft":
+        e.preventDefault();
+        this.focusCardControl("prev");
+        break;
+      case "arrowright":
+        e.preventDefault();
+        this.focusCardControl("next");
         break;
       case "delete":
       case "backspace":
@@ -287,6 +304,42 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         }
       }
     }
+  };
+
+  private focusCardControl = (direction: "prev" | "next") => {
+    if (!this.itemElement) {
+      return;
+    }
+
+    const focusableControls = Array.from(
+      this.itemElement.querySelectorAll(
+        [
+          '[data-card-control="true"]',
+          ".editable-text-container",
+          ".non-editable-text-container",
+        ].join(","),
+      ),
+    ) as HTMLElement[];
+
+    const visibleControls = focusableControls.filter(control => control.getAttribute("aria-hidden") !== "true" && !control.hasAttribute("disabled"));
+
+    if (!visibleControls.length) {
+      return;
+    }
+
+    const activeElement = document.activeElement as HTMLElement;
+    const currentIndex = visibleControls.indexOf(activeElement);
+    let nextIndex;
+
+    if (currentIndex === -1) {
+      nextIndex = direction === "next" ? 0 : visibleControls.length - 1;
+    } else if (direction === "next") {
+      nextIndex = (currentIndex + 1) % visibleControls.length;
+    } else {
+      nextIndex = (currentIndex - 1 + visibleControls.length) % visibleControls.length;
+    }
+
+    visibleControls[nextIndex].focus();
   };
 
   private readonly receiveDeletedItemHandler = (columnId: string, feedbackItemId: string) => {
@@ -704,6 +757,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         aria-expanded={isExpanded}
         aria-label={isExpanded ? `Collapse group. Group has ${groupItemsCount} items.` : `Expand group. Group has ${groupItemsCount} items.`}
         aria-controls={isFocusButton ? `group-children-${this.props.id}` : undefined}
+        data-card-control="true"
+        tabIndex={-1}
         style={!isFocusButton ? { color: this.props.accentColor } : undefined}
         onClick={e => {
           e.stopPropagation();
@@ -832,7 +887,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       title="Vote"
                       aria-live="polite"
                       aria-label={`Vote up. Current vote count is ${this.props.upvotes}`}
-                      tabIndex={0}
+                      tabIndex={-1}
+                      data-card-control="true"
                       disabled={!showVoteButton || this.state.showVotedAnimation}
                       className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
                       onClick={e => {
@@ -852,7 +908,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       title="Unvote"
                       aria-live="polite"
                       aria-label={`Vote down. Current vote count is ${this.props.upvotes}`}
-                      tabIndex={0}
+                      tabIndex={-1}
+                      data-card-control="true"
                       disabled={!showVoteButton || this.state.showVotedAnimation}
                       className={cn("feedback-action-button", "feedback-add-vote", this.state.showVotedAnimation && "voteAnimation")}
                       onClick={e => {
@@ -874,6 +931,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     <DefaultButton
                       className="contextual-menu-button"
                       aria-label="Feedback Options Menu"
+                      data-card-control="true"
+                      tabIndex={-1}
                       iconProps={{ iconName: "MoreVertical" }}
                       title="Feedback actions"
                       menuProps={{
@@ -934,7 +993,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       title="Timer"
                       aria-live="polite"
                       aria-label={"Start/stop"}
-                      tabIndex={0}
+                      tabIndex={-1}
+                      data-card-control="true"
                       className="feedback-action-button"
                       onClick={e => {
                         e.preventDefault();
