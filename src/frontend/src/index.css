@@ -1912,7 +1912,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedbackItem.hideFeedbackItem .card-content,
 .feedbackItemGroupItem.hideFeedbackItem .card-content {
-  @apply blur-[5px] pointer-events-none;
+  @apply blur-xs pointer-events-none;
 }
 
 .feedbackItem .document-card-wrapper {
@@ -1934,13 +1934,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .card-header-base {
-  @apply h-[34px] inline-flex w-full justify-end items-center mb-2.5;
+  @apply h-8 inline-flex w-full justify-end items-center mb-2.5;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header,
 .feedback-item-group .mainItemCard .card-integral-part .card-header,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header {
-  @apply h-[34px] inline-flex w-full justify-end items-center mb-2.5;
+  @apply h-8 inline-flex w-full justify-end items-center mb-2.5;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button,
@@ -1953,7 +1953,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &:focus-visible {
-    @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
+    @apply outline-2 outline-primary outline-offset-2 rounded-sm;
   }
 
   &:disabled {
