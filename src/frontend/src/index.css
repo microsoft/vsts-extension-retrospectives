@@ -25,7 +25,7 @@
 
 @layer components {
   .retro-dialog-shell {
-    @apply max-w-none! min-w-125! w-2/3! bg-(--background-color)!;
+    @apply max-w-none! min-w-125! w-1/2! bg-(--background-color)!;
 
     & .ms-Dialog-content {
       @apply flex flex-col gap-3;
