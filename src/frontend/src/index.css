@@ -362,17 +362,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     & tbody tr {
       @apply border-b border-(--border-subtle-color);
 
-      &:first-child {
+      & td:first-child {
         @apply py-2 px-3 text-left align-middle w-[40%];
-      }
-
-      &:last-child {
-        @apply py-2 px-3 text-(--text-primary-color) align-middle;
       }
     }
 
     & kbd {
-      @apply py-0.5 px-1.5 mx-0.5 text-(--color-border-gray-darker) border border-[#ccc] rounded bg-[#f7f7f7] font-mono text-xs shadow-[0_1px_2px_rgba(0,0,0,0.1)];
+      @apply py-0.5 px-1.5 mx-0.5 text-border-gray-darker rounded bg-(--color-border-gray-lighter) font-mono text-xs shadow-[0_1px_2px_rgba(0,0,0,0.1)];
     }
   }
 
