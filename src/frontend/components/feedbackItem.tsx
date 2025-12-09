@@ -329,7 +329,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
     const activeElement = document.activeElement as HTMLElement;
     const currentIndex = visibleControls.indexOf(activeElement);
-    let nextIndex = currentIndex;
+    let nextIndex;
 
     if (currentIndex === -1) {
       nextIndex = direction === "next" ? 0 : visibleControls.length - 1;
