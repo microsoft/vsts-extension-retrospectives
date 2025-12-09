@@ -8,6 +8,8 @@
 
   --color-primary: #0078d4;
   --color-border-gray: #605e5c;
+  --color-border-gray-lighter: color-mix(in srgb, var(--color-border-gray), white 10%);
+  --color-border-gray-darker: color-mix(in srgb, var(--color-border-gray), black 10%);
   --color-error: #cc293d;
   --color-error-lighter: color-mix(in srgb, var(--color-error), white 10%);
   --color-error-darker: color-mix(in srgb, var(--color-error), black 10%);
@@ -345,38 +347,34 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & table tr:hover {
     @apply bg-(--border-subtle-color);
   }
-}
 
-.keyboard-shortcuts-content {
-  @apply max-h-[60vh] overflow-y-auto flex flex-col gap-5;
-}
+  & .keyboard-shortcuts-content {
+    @apply max-h-1/2 overflow-y-auto flex flex-col gap-5 text-(--text-primary-color);
 
-.keyboard-shortcuts-category-title {
-  @apply text-sm font-semibold mb-2.5 text-(--text-primary-color) border-b border-(--border-subtle-color) pb-1.5;
-}
-
-.keyboard-shortcuts-table {
-  @apply w-full border-collapse;
-
-  & tbody tr {
-    @apply border-b border-(--border-subtle-color);
-
-    &:first-child {
-      @apply py-2 px-3 text-left align-middle w-[40%];
-    }
-
-    &:last-child {
-      @apply py-2 px-3 text-(--text-primary-color) align-middle;
+    & .keyboard-shortcuts-category-title {
+      @apply text-sm font-semibold mb-2.5 text-(--text-primary-color) border-b border-(--border-subtle-color) pb-1.5;
     }
   }
-}
 
-.keyboard-shortcuts-key-separator {
-  @apply mx-1 text-(--text-secondary-color);
-}
+  & .keyboard-shortcuts-table {
+    @apply w-full border-collapse;
 
-kbd {
-  @apply py-0.5 px-1.5 mx-0.5 border border-[#ccc] rounded-[3px] bg-[#f7f7f7] font-mono text-xs shadow-[0_1px_2px_rgba(0,0,0,0.1)];
+    & tbody tr {
+      @apply border-b border-(--border-subtle-color);
+
+      & td:first-child {
+        @apply py-2 px-3 text-left align-middle w-2/5;
+      }
+    }
+
+    & kbd {
+      @apply py-0.5 px-1.5 mx-0.5 text-(--text-primary-color) rounded bg-border-gray-darker font-mono text-xs shadow-sm;
+    }
+  }
+
+  & .keyboard-shortcuts-key-separator {
+    @apply mx-1 text-(--text-secondary-color);
+  }
 }
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
@@ -1806,7 +1804,7 @@ kbd {
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row th {
-  @apply font-normal text-center;
+  @apply font-normal;
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-question-cell {
@@ -1818,7 +1816,7 @@ kbd {
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
-  @apply border-r-2 border-solid border-primary;
+  @apply border-r-2 border-solid border-primary text-center;
 }
 
 .team-effectiveness-dialog {
@@ -2017,35 +2015,31 @@ kbd {
 
 .feedbackItem .mainItemCard .group-child-feedback-stack {
   @apply w-full;
-}
 
-.feedbackItem .mainItemCard .group-child-feedback-stack .grouped-feedback-header {
-  @apply font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
-}
+  & .grouped-feedback-header {
+    @apply font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
+  }
 
-.feedbackItem .mainItemCard .group-child-feedback-stack ul {
-  @apply list-none;
-}
+  & ul {
+    @apply list-none m-0;
 
-.feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul .fa-li {
-  @apply border-solid h-[30px] border-t-0 border-r-3 border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color);
-}
+    & li {
+      @apply [word-wrap:break-word] p-1 flex ;
 
-.feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li {
-  @apply [word-wrap:break-word] p-1;
-}
+      & .icon {
+        @apply border-solid h-7.5 border-t-0 border-r-2 border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color) content-center w-7 text-center;
+      }
 
-.feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li span {
-  @apply leading-7.5;
-}
+      & .original-column-info {
+        @apply text-right font-light italic text-xs;
+      }
 
-.feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li .original-column-info {
-  @apply text-right font-light italic text-xs;
-}
-
-.feedbackItem .mainItemCard .group-child-feedback-stack .fa-ul li .related-feedback-title {
-  @apply ml-2.5 text-(--text-primary-color) leading-[1.2] text-base [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
-  display: -webkit-box;
+      & .related-feedback-title {
+        @apply ml-2.5 text-(--text-primary-color) text-base content-center [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
+        display: -webkit-box;
+      }
+    }
+  }
 }
 
 .dialog-feedback-base {

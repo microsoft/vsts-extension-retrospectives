@@ -963,10 +963,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
               <div className="group-child-feedback-stack">
                 <div className="grouped-feedback-header">
-                  <i className="far fa-comments" />
-                  Grouped Feedback
+                  <i className="far fa-comments" /> Grouped Feedback
                 </div>
-                <ul className="fa-ul" aria-label="List of Grouped Feedback" role="list">
+                <ul aria-label="List of Grouped Feedback" role="list">
                   {childrenIds.map((id: string) => {
                     const childCard: IColumnItem = columnItems?.find(c => c.feedbackItem.id === id);
                     const originalColumn = childCard ? this.props.columns[childCard.feedbackItem.originalColumnId] : null;
@@ -976,12 +975,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     return (
                       childCard && (
                         <li key={id} role="listitem">
-                          <span className="fa-li" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}>
+                          <div className="icon" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}>
                             <i className="fa-solid fa-quote-left" aria-hidden="true" />
-                          </span>
-                          <span className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
+                          </div>
+                          <div className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
                             {childDisplayTitle}
-                          </span>
+                          </div>
                           {this.props.columnId !== originalColumn?.columnProperties?.id && (
                             <div className="original-column-info">
                               Original Column: {originalColumn.columnProperties.title}

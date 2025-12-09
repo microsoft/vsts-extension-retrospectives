@@ -54,13 +54,13 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
   public render() {
     return (
       <tr className="effectiveness-measurement-row">
-        <td className="effectiveness-measurement-question-cell">
+        <th scope="row" className="effectiveness-measurement-question-cell">
           <i className={this.props.iconClass} />
           &nbsp;&nbsp;
           <span style={{ fontWeight: "bolder" }}>{this.props.title}</span>
           <br />
           {this.props.subtitle}
-        </td>
+        </th>
         <td className="effectiveness-measurement-tooltip-cell">
           <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content={<div dangerouslySetInnerHTML={{ __html: this.props.tooltip }} />} calloutProps={{ gapSpace: 0 }}>
             <DefaultButton className="contextual-menu-button" iconProps={{ iconName: "Error" }} />
