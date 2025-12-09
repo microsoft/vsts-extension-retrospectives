@@ -249,7 +249,7 @@ describe("feedback interfaces and helpers", () => {
 
       it("should handle when createdBy is null", () => {
         const board = createBoard({
-          createdBy: null as any,
+          createdBy: null as unknown as typeof board.createdBy,
           isPublic: true,
         });
         const result = FeedbackBoardDocumentHelper.filter(board, [], "any-user");

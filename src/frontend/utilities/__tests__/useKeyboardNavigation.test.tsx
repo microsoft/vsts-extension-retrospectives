@@ -778,7 +778,7 @@ describe("useRovingTabIndex", () => {
   });
 
   it("should handle null items ref", () => {
-    const itemsRef: React.RefObject<HTMLElement[]> = { current: null as any };
+    const itemsRef: React.RefObject<HTMLElement[]> = { current: null as unknown as HTMLElement[] };
     const setCurrentIndex = jest.fn();
 
     const { result } = renderHook(() => useRovingTabIndex(itemsRef, 0, setCurrentIndex));
@@ -791,7 +791,7 @@ describe("useRovingTabIndex", () => {
   });
 
   it("should handle items with null elements", () => {
-    const items = [document.createElement("div"), null as any, document.createElement("div")];
+    const items = [document.createElement("div"), null as unknown as HTMLElement, document.createElement("div")];
     const itemsRef: React.RefObject<HTMLElement[]> = { current: items };
     const setCurrentIndex = jest.fn();
 
