@@ -963,8 +963,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
               <div className="group-child-feedback-stack">
                 <div className="grouped-feedback-header">
-                  <i className="far fa-comments" />
-                  Grouped Feedback
+                  <i className="far fa-comments" /> Grouped Feedback
                 </div>
                 <ul className="fa-ul" aria-label="List of Grouped Feedback" role="list">
                   {childrenIds.map((id: string) => {
