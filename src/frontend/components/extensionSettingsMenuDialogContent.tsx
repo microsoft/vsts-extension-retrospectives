@@ -68,8 +68,16 @@ export const renderContent = (contentArray: ContentItem[]): React.ReactNode[] =>
   };
 
   contentArray.forEach((item, index) => {
+    const isFirst = index === 0;
+    const isLast = index === contentArray.length - 1;
+
+    const style = {
+      marginTop: isFirst ? undefined : "1rem",
+      marginBottom: isLast ? undefined : "1rem",
+    } as React.CSSProperties;
+
     elements.push(
-      <div key={`p-${index}`}>
+      <div key={`p-${index}`} style={style}>
         {applyFontStyle(item.content, item.style || "normal")}
       </div>,
     );

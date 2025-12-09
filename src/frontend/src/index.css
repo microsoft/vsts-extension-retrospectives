@@ -33,7 +33,7 @@
   }
 
   .feedback-card-surface {
-    @apply bg-transparent! z-1;
+    @apply bg-transparent! z-1 border! border-border-gray!;
     border: 1px solid var(--color-border-gray) !important;
   }
 }
@@ -177,14 +177,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .extension-settings-button {
-    @apply bg-inherit border-0 min-w-0 mx-2 p-0 text-[rgba(var(--palette-neutral-80),1)];
+    @apply bg-inherit border-0 min-w-0 mx-2 p-0 text-(--text-primary-color);
 
     & i[data-icon-name="ChevronDown"] {
       @apply hidden;
     }
 
     &:hover {
-      @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-(--text-primary-color);
+      @apply bg-(--background-color) text-(--text-primary-color);
     }
 
     &:focus-visible {
@@ -222,14 +222,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .contextual-menu-button {
-  @apply w-6 min-w-6 h-7.5 bg-inherit px-1 py-0 border-0 text-[rgba(var(--palette-neutral-80),1)];
+  @apply w-6 min-w-6 h-7.5 bg-inherit px-1 py-0 border-0 text-(--text-primary-color);
 
   & i[data-icon-name="ChevronDown"] {
     @apply hidden;
   }
 
   &:hover {
-    @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-(--text-primary-color);
+    @apply bg-(--background-color) text-(--text-primary-color);
   }
 
   &:focus-visible {
