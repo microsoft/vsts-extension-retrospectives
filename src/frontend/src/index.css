@@ -2137,6 +2137,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-(--text-primary-color) bg-(--border-subtle-color);
 }
 
+.feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link:focus,
+.feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link:focus-visible,
+.feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link.is-focused {
+  @apply outline-none text-(--text-primary-color) bg-(--border-subtle-color);
+}
+
 .feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link.is-disabled .ms-ContextualMenu-itemText {
   @apply text-(--text-disabled-color);
 }
