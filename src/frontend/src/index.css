@@ -25,10 +25,11 @@
 
 @layer components {
   .retro-dialog-shell {
-    max-width: none !important;
-    min-width: 500px !important;
-    width: 60% !important;
-    background-color: var(--background-color) !important;
+    @apply max-w-none! min-w-125! w-2/3! bg-(--background-color)!;
+
+    & .ms-Dialog-content {
+      @apply flex flex-col gap-3;
+    }
   }
 
   .feedback-card-surface {

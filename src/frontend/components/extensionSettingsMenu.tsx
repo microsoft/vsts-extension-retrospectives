@@ -14,7 +14,7 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
 import { WorkflowPhase } from "../interfaces/workItem";
 
-import { RETRO_URLS, PRIME_DIRECTIVE_CONTENT, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, WHATISNEW_CONTENT, renderContent, WHATISNEW_MARKDOWN } from "./extensionSettingsMenuDialogContent";
+import { RETRO_URLS, PRIME_DIRECTIVE_CONTENT, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, WHATISNEW_CONTENT, renderContent } from "./extensionSettingsMenuDialogContent";
 
 interface IExtensionSettingsMenuState {
   isPrimeDirectiveDialogHidden: boolean;
