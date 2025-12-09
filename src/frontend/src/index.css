@@ -1626,7 +1626,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .pivot-tab--active {
-  @apply text-primary border-primary bg-[color-mix(in_srbg,var(--color-primary)_12%,var(--background-color)_88%)];
+  @apply text-primary border-b-primary bg-[color-mix(in_srbg,var(--color-primary)_12%,var(--background-color)_88%)];
 }
 
 .pivot-tab:focus-visible {
@@ -1638,7 +1638,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .menu-button {
-  @apply ml-[5px] mr-5 bg-gray-light;
+  @apply ml-1 mr-5 bg-gray-light;
 }
 
 .board-selector-group {
@@ -1654,7 +1654,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-actions-menu {
-  @apply ml-[5px];
+  @apply ml-1;
 }
 
 .workflow-stage-header {
@@ -1662,7 +1662,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .workflow-stage-tab {
-  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer rounded-md border border-transparent transition-colors duration-150 leading-none;
+  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer rounded-md border-b-2 border-transparent transition-colors duration-150 leading-none;
 }
 
 .workflow-stage-tab:hover {
@@ -1670,7 +1670,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .workflow-stage-tab--active {
-  @apply text-primary border-primary bg-[color-mix(in_srbg,var(--color-primary)_14%,var(--background-color)_86%)];
+  @apply text-primary border-b-primary bg-[color-mix(in_srbg,var(--color-primary)_14%,var(--background-color)_86%)];
 }
 
 .workflow-stage-tab:focus-visible {
