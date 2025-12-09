@@ -34,7 +34,7 @@ describe("Workflow Stage", () => {
     const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
     expect(element).toHaveAttribute("aria-label", "Sample Workflow Stage Text");
     expect(element).toHaveAttribute("aria-selected", "true");
-    expect(element).toHaveClass("font-bold", "border-b-2", "border-[#0078d4]");
+    expect(element).toHaveClass("workflow-stage-tab", "workflow-stage-tab--active");
   });
 
   it("renders as inactive when isActive is false", () => {
@@ -44,7 +44,8 @@ describe("Workflow Stage", () => {
     const element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
     expect(element).toHaveAttribute("aria-label", "Sample Workflow Stage Text");
     expect(element).toHaveAttribute("aria-selected", "false");
-    expect(element).not.toHaveClass("font-bold");
+    expect(element).toHaveClass("workflow-stage-tab");
+    expect(element).not.toHaveClass("workflow-stage-tab--active");
     expect(element).toBeInTheDocument();
   });
 
@@ -191,19 +192,19 @@ describe("Workflow Stage", () => {
 
       let element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
       expect(element).toHaveAttribute("aria-selected", "true");
-      expect(element).toHaveClass("font-bold", "border-b-2");
+      expect(element).toHaveClass("workflow-stage-tab", "workflow-stage-tab--active");
 
       // Toggle to inactive
       rerender(<WorkflowStage {...mockedProps} isActive={false} />);
       element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
       expect(element).toHaveAttribute("aria-selected", "false");
-      expect(element).not.toHaveClass("font-bold");
+      expect(element).not.toHaveClass("workflow-stage-tab--active");
 
       // Toggle back to active
       rerender(<WorkflowStage {...mockedProps} isActive={true} />);
       element = screen.getByRole("tab", { name: "Sample Workflow Stage Text" });
       expect(element).toHaveAttribute("aria-selected", "true");
-      expect(element).toHaveClass("font-bold", "border-b-2");
+      expect(element).toHaveClass("workflow-stage-tab", "workflow-stage-tab--active");
     });
   });
 });

@@ -25,7 +25,7 @@ class WorkflowStage extends React.Component<IWorkflowStageProps, IWorkflowStageS
   };
 
   public render() {
-    const classes = cn("px-2.5 py-1.5 cursor-pointer text-sm", this.props.isActive && "font-bold border-b-2 border-[#0078d4]");
+    const classes = cn("workflow-stage-tab", this.props.isActive && "workflow-stage-tab--active");
 
     return (
       <div className={classes} aria-setsize={4} aria-posinset={this.props.ariaPosInSet} aria-label={this.props.display} aria-selected={this.props.isActive} role="tab" onClick={e => this.clickWorkflowState(e, this.props.value)} onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.handleKeyPressWorkFlowState(e, this.props.value)} tabIndex={0}>
