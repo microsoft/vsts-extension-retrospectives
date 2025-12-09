@@ -372,7 +372,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & kbd {
-      @apply py-0.5 px-1.5 mx-0.5 text-(--color-border-gray-darker) border border-[#ccc] rounded-3 bg-[#f7f7f7] font-mono text-xs shadow-[0_1px_2px_rgba(0,0,0,0.1)];
+      @apply py-0.5 px-1.5 mx-0.5 text-(--color-border-gray-darker) border border-[#ccc] rounded bg-[#f7f7f7] font-mono text-xs shadow-[0_1px_2px_rgba(0,0,0,0.1)];
     }
   }
 
