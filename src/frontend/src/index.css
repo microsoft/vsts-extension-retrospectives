@@ -1617,8 +1617,24 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] bg-transparent;
 }
 
+.pivot-tab {
+  @apply px-3 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent rounded-sm leading-none;
+}
+
+.pivot-tab:hover {
+  @apply text-primary;
+}
+
+.pivot-tab--active {
+  @apply text-primary border-primary bg-[color-mix(in_srbg,var(--color-primary)_12%,var(--background-color)_88%)];
+}
+
+.pivot-tab:focus-visible {
+  @apply outline-2 outline-primary outline-offset-2;
+}
+
 .vertical-tab-separator {
-  @apply w-0.5 flex h-6 bg-gray-medium;
+  @apply w-0.5 flex h-6 bg-border-gray;
 }
 
 .menu-button {
@@ -1643,6 +1659,22 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .workflow-stage-header {
   @apply flex items-center gap-3 flex-wrap;
+}
+
+.workflow-stage-tab {
+  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer rounded-md border border-transparent transition-colors duration-150 leading-none;
+}
+
+.workflow-stage-tab:hover {
+  @apply text-primary border-[color-mix(in_srbg,var(--color-primary)_40%,var(--color-border-gray)_60%)];
+}
+
+.workflow-stage-tab--active {
+  @apply text-primary border-primary bg-[color-mix(in_srbg,var(--color-primary)_14%,var(--background-color)_86%)];
+}
+
+.workflow-stage-tab:focus-visible {
+  @apply outline-2 outline-primary outline-offset-2;
 }
 
 .workflow-stage-timer {

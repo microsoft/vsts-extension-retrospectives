@@ -1691,10 +1691,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         <div className="flex items-center justify-start shrink-0">
           <div className="w-full">
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "Board" ? "font-bold border-b-2 border-primary" : ""}`} onClick={() => this.handlePivotClick("Board")}>
+              <div className={`pivot-tab ${this.state.activeTab === "Board" ? "pivot-tab--active" : ""}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
               </div>
-              <div className={`px-2.5 py-1.5 cursor-pointer text-sm ${this.state.activeTab === "History" ? "font-bold border-b-2 border-primary" : ""}`} onClick={() => this.handlePivotClick("History")}>
+              <div className={`pivot-tab ${this.state.activeTab === "History" ? "pivot-tab--active" : ""}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </div>
               {this.state.activeTab === "Board" && (
