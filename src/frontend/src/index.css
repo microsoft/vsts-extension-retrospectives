@@ -1618,7 +1618,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .pivot-tab {
-  @apply px-3 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent rounded-sm leading-none;
+  @apply px-3 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent leading-none;
 }
 
 .pivot-tab:hover {
@@ -1626,7 +1626,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .pivot-tab--active {
-  @apply text-primary border-b-primary bg-[color-mix(in_srbg,var(--color-primary)_12%,var(--background-color)_88%)];
+  @apply text-primary border-b-primary;
 }
 
 .pivot-tab:focus-visible {
@@ -1662,15 +1662,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .workflow-stage-tab {
-  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer rounded-md border-b-2 border-transparent transition-colors duration-150 leading-none;
+  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent transition-colors duration-150 leading-none;
 }
 
 .workflow-stage-tab:hover {
-  @apply text-primary border-[color-mix(in_srbg,var(--color-primary)_40%,var(--color-border-gray)_60%)];
+  @apply text-primary;
 }
 
 .workflow-stage-tab--active {
-  @apply text-primary border-b-primary bg-[color-mix(in_srbg,var(--color-primary)_14%,var(--background-color)_86%)];
+  @apply text-primary border-b-primary;
 }
 
 .workflow-stage-tab:focus-visible {
@@ -1730,7 +1730,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .info-message-bar .ms-MessageBar-actions {
-  @apply mb-1 mr-1 min-w-[130px] min-h-[50px];
+  @apply mb-1 mr-1 min-w-32 min-h-12;
 }
 
 .info-message-bar .ms-MessageBar-actions .info-message-bar-action {
@@ -1738,7 +1738,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-section-information {
-  @apply rounded bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-1 text-center w-[350px];
+  @apply rounded bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-1 text-center w-86;
 }
 
 .team-effectiveness-measurement-table {
