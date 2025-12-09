@@ -140,12 +140,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   }
 
   public async componentDidMount() {
-    await this.isVoted(this.props.id);
-    await this.setDisabledFeedbackItemDeletion(this.props.boardId, this.props.id);
-
-    reflectBackendService.onReceiveDeletedItem(this.receiveDeletedItemHandler);
-    this.props.shouldHaveFocus && this.itemElement && this.itemElement.focus();
-
     if (this.itemElement) {
       this.itemElement.addEventListener("keydown", this.handleItemKeyDown);
     }
@@ -153,6 +147,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     if (this.props.columnProps?.registerItemRef) {
       this.props.columnProps.registerItemRef(this.props.id, this.itemElement);
     }
+
+    await this.isVoted(this.props.id);
+    await this.setDisabledFeedbackItemDeletion(this.props.boardId, this.props.id);
+
+    reflectBackendService.onReceiveDeletedItem(this.receiveDeletedItemHandler);
+    this.props.shouldHaveFocus && this.itemElement && this.itemElement.focus();
   }
 
   public componentWillUnmount() {
@@ -321,7 +321,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       ),
     ) as HTMLElement[];
 
-    const visibleControls = focusableControls.filter(control => !control.getAttribute("aria-hidden") && control.offsetParent !== null && !control.hasAttribute("disabled"));
+    const visibleControls = focusableControls.filter(control => control.getAttribute("aria-hidden") !== "true" && !control.hasAttribute("disabled"));
 
     if (!visibleControls.length) {
       return;

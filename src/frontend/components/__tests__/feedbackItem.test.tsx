@@ -1034,7 +1034,7 @@ describe("Feedback Item", () => {
         },
       };
 
-      const sharedProps = {
+      const sharedProps: any = {
         columnId,
         columns: sharedColumns,
         columnIds: [columnId],
@@ -1043,23 +1043,22 @@ describe("Feedback Item", () => {
         createdDate: firstItem.createdDate,
         lastEditedDate: "",
         upvotes: 0,
-        groupIds: [],
+        groupIds: [] as string[],
         userIdRef: firstItem.userIdRef,
         actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
         shouldHaveFocus: false,
         hideFeedbackItems: false,
-        nonHiddenWorkItems: [],
-        allWorkItemTypes: [],
+        nonHiddenWorkItemTypes: [] as any[],
+        allWorkItemTypes: [] as any[],
         originalColumnId: columnId,
         timerSecs: 0,
         timerState: false,
-        timerId: null,
+        timerId: null as any,
         isGroupedCarouselItem: false,
         workflowPhase: "Group",
         isFocusModalHidden: true,
-        groupedItemProps: undefined,
         team: { id: "team-1" },
         defaultActionItemAreaPath: "Area",
         defaultActionItemIteration: "Iter",
@@ -1072,7 +1071,10 @@ describe("Feedback Item", () => {
         moveFeedbackItem: jest.fn(),
         groupCount: 0,
         isShowingGroupedChildrenTitles: false,
-        activeTimerFeedbackItemId: null,
+        activeTimerFeedbackItemId: null as string | null,
+        columnProps: {} as any,
+        accentColor: sharedColumns[columnId].columnProperties.accentColor,
+        iconClass: sharedColumns[columnId].columnProperties.iconClass,
       };
 
       const { container } = render(
@@ -1091,7 +1093,9 @@ describe("Feedback Item", () => {
         fireEvent.keyDown(firstCard, { key: "Tab" });
       });
 
-      expect(document.activeElement).toBe(secondCard);
+      await waitFor(() => {
+        expect(document.activeElement).toBe(secondCard);
+      });
     });
 
     test("arrow keys move focus through card controls", async () => {
@@ -1106,13 +1110,17 @@ describe("Feedback Item", () => {
         fireEvent.keyDown(card, { key: "ArrowRight" });
       });
 
-      expect(document.activeElement?.getAttribute("data-card-control")).toBe("true");
+      await waitFor(() => {
+        expect(document.activeElement?.getAttribute("data-card-control")).toBe("true");
+      });
 
       await act(async () => {
         fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowLeft" });
       });
 
-      expect(document.activeElement?.getAttribute("data-card-control")).toBe("true");
+      await waitFor(() => {
+        expect(document.activeElement?.getAttribute("data-card-control")).toBe("true");
+      });
     });
   });
 
