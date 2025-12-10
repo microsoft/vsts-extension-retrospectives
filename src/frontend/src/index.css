@@ -883,7 +883,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & tr .board-summary-container .action-items-summary-card .no-action-items {
-        @apply text-4 relative top-1/2 -translate-y-1/2 text-center;
+        @apply text-sm relative top-1/2 -translate-y-1/2 text-center;
       }
 
       & tr .board-summary-container .board-summary-card {
@@ -1513,11 +1513,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-choose-column-accent-color-dialog .choose-feedback-column-accent-color-button {
-  @apply text-8 h-12 m-1;
+  @apply text-3xl h-12 m-1;
 }
 
 .retrospectives-choose-column-icon-dialog .choose-feedback-column-icon-button {
-  @apply text-8 h-12 m-1;
+  @apply text-3xl h-12 m-1;
 }
 
 .retrospectives-board-metadata-dialog {
@@ -1565,7 +1565,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 #extension-header .extension-title-text {
-  @apply text-7 leading-10 tracking-[-0.04em] font-medium;
+  @apply text-3xl leading-10 tracking-[-0.04em] font-medium;
 }
 
 #extension-header .contact-us-button {

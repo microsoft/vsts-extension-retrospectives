@@ -4,6 +4,8 @@
   "description": "Azure DevOps Retrospective Extension",
   "main": "index.tsx",
   "scripts": {
+    "test": "jest --env=jsdom --silent -ci --reporters=default --reporters=jest-junit --coverage",
+    "test:fuzz": "jest --env=jsdom --testMatch='**/*.fuzz.test.{ts,tsx}' --verbose",
     "build": "npm run clean && npm run compile && npx webpack --mode=production",
     "clean": "npx rimraf ./dist ./coverage ./reports ./node_modules/applicationinsights-js/dist/*.map",
     "compile": "npx postcss ./src/index.css -o ./src/bundle.css --config ./postcss.config.js --no-map",
@@ -15,9 +17,7 @@
     "pack:d": "npm run build && npx tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
     "pack:p": "npm run build && npx tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
     "publish:d": "npm run pack:d && npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}",
-    "publish:p": "npm run pack:p && npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}",
-    "test": "jest --env=jsdom --silent -ci --reporters=default --reporters=jest-junit --coverage",
-    "test:fuzz": "jest --env=jsdom --testMatch='**/*.fuzz.test.{ts,tsx}' --verbose"
+    "publish:p": "npm run pack:p && npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}"
   },
   "repository": {
     "type": "git",
