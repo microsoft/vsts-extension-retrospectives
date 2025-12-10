@@ -150,15 +150,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .is-disabled .ms-Checkbox-checkbox {
-  @apply text-(--text-disabled-color)!;
-}
-
-.is-disabled .ms-Checkbox-checkmark {
-  @apply text-(--text-disabled-color)!;
-}
-
 .is-disabled {
   @apply bg-(--text-disabled-color) border-(--text-disabled-color) text-(--text-disabled-color);
+
+  & :is(.ms-Checkbox-text, .ms-Checkbox-checkbox, .ms-Checkbox-checkmark) {
+    @apply text-(--text-disabled-color)!;
+  }
 }
 
 .ms-ContextualMenu-divider {
@@ -1022,69 +1019,65 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-full;
 }
 
-.retrospectives-carousel-dialog-modal .ms-Overlay {
-  @apply bg-black/40;
-}
+.retrospectives-carousel-dialog-modal {
+  & .ms-Overlay {
+    @apply bg-black/30;
+  }
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog {
-  @apply bg-[rgba(var(--palette-neutral-2,248,248,248),1)];
-}
+  & .retrospectives-carousel-dialog {
+    @apply bg-(--background-color);
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog .ms-Dialog-title {
-  @apply text-(--text-primary-color);
-}
+    & .ms-Dialog-title {
+      @apply text-(--text-primary-color);
+    }
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog .ms-Dialog-subText {
-  @apply text-(--text-primary-color) text-sm;
-}
+    & .ms-Dialog-subText {
+      @apply text-(--text-primary-color) text-sm;
+    }
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog .feedback-carousel-pivot .ms-Pivot {
-  @apply mb-5;
-}
+    & .feedback-carousel-pivot .ms-Pivot {
+      @apply mb-5;
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog .feedback-carousel-pivot .ms-Pivot .ms-Button:first-of-type {
-  @apply -ml-2;
-}
+      & .ms-Button:first-of-type {
+        @apply -ml-2;
+      }
+    }
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class^="content-"],
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class*=" content"] {
-  @apply overflow-y-hidden;
-}
+    & :is(div[class^="content-"], div[class*=" content"]) {
+      @apply overflow-y-hidden;
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class^="content-"] .slick-dots,
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class*=" content"] .slick-dots {
-  @apply static pt-5 bottom-auto;
-}
+      & .slick-dots {
+        @apply static pt-5 bottom-auto;
+      }
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class^="content-"] .slick-next,
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class*=" content"] .slick-next {
-  @apply right-0 z-1 h-full opacity-100 w-[25px];
-}
+      & .slick-next {
+        @apply right-0 z-1 h-full opacity-100 w-6;
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class^="content-"] .slick-next::before,
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class*=" content"] .slick-next::before {
-  @apply text-[#999999] text-[25px];
-}
+        &::before {
+          @apply text-[#999999] text-2xl;
+        }
+      }
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class^="content-"] .slick-prev,
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class*=" content"] .slick-prev {
-  @apply left-0 z-1 h-full opacity-100 w-[25px];
-}
+      & .slick-prev {
+        @apply left-0 z-1 h-full opacity-100 w-6;
 
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class^="content-"] .slick-prev::before,
-.retrospectives-carousel-dialog-modal .retrospectives-carousel-dialog div[class*=" content"] .slick-prev::before {
-  @apply text-[#999999] text-[25px];
+        &::before {
+          @apply text-[#999999] text-2xl;
+        }
+      }
+    }
+  }
 }
 
 .feedback-carousel-item {
   @apply mt-1.5 mb-1.5 ml-[calc((100%-320px)/2)];
 
   & .related-task-sub-card {
-    @apply w-[319px];
+    @apply w-80;
   }
 
   & .add-action-item-wrapper {
-    @apply w-[319px];
+    @apply w-80;
   }
 
   & .feedback-item .main-item-card {
@@ -1093,8 +1086,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column {
-  @apply border-r-2 border-l-2 border-[rgba(var(--palette-neutral-20,200,200,200),1)] table-cell;
-  @apply h-[calc(100vh-45px-30px)];
+  @apply border-r-2 border-l-2 border-(--nav-header-active-item-background) table-cell;
+  @apply h-[calc(100vh-75px)];
 
   &:focus {
     @apply outline-none;
@@ -1114,7 +1107,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column-header {
-  @apply p-2.5 pt-[15px] pl-[15px] border-b-[3px] border-[rgba(var(--palette-neutral-20,200,200,200),1)] flex items-center justify-between gap-2;
+  @apply p-2.5 pt-4 pl-4 border-b-3 border-(--nav-header-active-item-background) flex items-center justify-between gap-2;
 
   & .feedback-column-title {
     @apply flex items-center;
@@ -1124,7 +1117,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & .feedback-column-name {
-      @apply text-[15px] ml-1.5;
+      @apply text-sm ml-1.5;
     }
   }
 
@@ -1133,7 +1126,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
     & .feedback-column-edit-button,
     & .feedback-column-info-button {
-      @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] cursor-pointer bg-transparent border-0 py-1 px-2 rounded-[3px] transition-colors duration-200 ml-0.5;
+      @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] cursor-pointer bg-transparent border-0 py-1 px-2 rounded-sm transition-colors duration-200 ml-0.5;
 
       &:hover {
         @apply bg-[rgba(var(--palette-neutral-20,200,200,200),0.5)];
@@ -1155,7 +1148,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-items-container {
-  @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-[30px] overflow-hidden w-full box-border;
+  @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-7 overflow-hidden w-full box-border;
 
   & > div {
     @apply contents;
@@ -1195,7 +1188,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section #retro-summary-created-by {
-  @apply my-[3px] mx-0;
+  @apply my-1 mx-0;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-section-header {
@@ -1231,7 +1224,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores {
-  @apply clear-both relative min-w-[100px] min-h-[100px] p-0 flex flex-col items-center;
+  @apply clear-both relative min-w-25 min-h-25 p-0 flex flex-col items-center;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart {
@@ -1243,11 +1236,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .chart-question {
-  @apply w-[250px] text-right m-0.5;
+  @apply w-64 text-right m-0.5;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .team-effectiveness-average-number {
-  @apply p-[3px] font-bold my-auto mx-0.5 w-[30px] text-center;
+  @apply p-3 font-bold my-auto mx-0.5 w-7 text-center;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .assessment-chart-action {
