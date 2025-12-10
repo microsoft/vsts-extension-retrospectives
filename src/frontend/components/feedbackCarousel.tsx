@@ -128,10 +128,15 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       <Pivot className="feedback-carousel-pivot">
         {this.state.feedbackColums.map(columnProps => {
           const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
+          const slideIds = feedbackCarouselItems.map((_, index) => `slide-${columnProps.columnId}-${index}`);
+          const activeDotCss = slideIds
+            .map(slideId => `.carousel-container:has(#${slideId}:target) .carousel-dots a[href="#${slideId}"] { opacity: 1; transform: scale(1.05); }`)
+            .join("\n");
 
           return (
             <PivotItem key={columnProps.columnId} headerText={columnProps.columnName} className="feedback-carousel-pivot-item" {...columnProps}>
               <div className="carousel-container">
+                {activeDotCss && <style>{activeDotCss}</style>}
                 <ol className="carousel-track" id={`carousel-${columnProps.columnId}`}>
                   {feedbackCarouselItems.map((child, index) => {
                     return (
@@ -151,6 +156,13 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
                     );
                   })}
                 </ol>
+                <ul className="carousel-dots" aria-label="Focus mode pagination">
+                  {slideIds.map((slideId, index) => (
+                    <li key={slideId}>
+                      <a href={`#${slideId}`} className="carousel-dot" aria-label={`Go to card ${index + 1} of ${slideIds.length}`} />
+                    </li>
+                  ))}
+                </ul>
               </div>
             </PivotItem>
           );

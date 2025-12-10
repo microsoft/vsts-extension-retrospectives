@@ -221,6 +221,27 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply min-h-96;
 }
 
+.carousel-dots {
+  @apply flex items-center justify-center gap-2;
+
+  & li {
+    @apply list-none;
+  }
+}
+
+.carousel-dot {
+  @apply block w-2.5 h-2.5 rounded-full bg-(--text-secondary-color) opacity-30 transition duration-150 ease-in-out transform;
+
+  &:hover,
+  &:focus-visible {
+    @apply opacity-70 outline-none ring-2 ring-offset-2 ring-(--border-subtle-color);
+  }
+}
+
+.carousel-container:not(:has(.carousel-slide:target)) .carousel-dots li:first-child .carousel-dot {
+  @apply opacity-100;
+}
+
 .contextual-menu-button {
   @apply w-6 min-w-6 h-7.5 bg-inherit px-1 py-0 border-0 text-(--text-primary-color);
 
