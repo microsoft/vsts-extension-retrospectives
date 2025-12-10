@@ -378,7 +378,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & kbd {
-      @apply py-0.5 px-1.5 mx-0.5 text-(--text-primary-color) rounded bg-border-gray-darker font-mono text-xs shadow-sm;
+      @apply py-0.5 px-1.5 mx-0.5 text-(--text-primary-color) rounded bg-(--border-subtle-color) font-mono text-xs shadow-sm;
     }
   }
 
