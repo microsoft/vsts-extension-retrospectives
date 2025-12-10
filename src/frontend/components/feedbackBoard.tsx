@@ -681,9 +681,12 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             subText: "Now is the time to focus! Discuss one feedback item at a time and create actionable work items.",
           }}
           modalProps={{
+            isBlocking: true,
             containerClassName: "retrospectives-carousel-dialog",
             className: "retrospectives-carousel-dialog-modal",
-            isBlocking: true,
+            focusTrapZoneProps: {
+              firstFocusableSelector: "ms-Dialog-header",
+            },
           }}
         >
           <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
