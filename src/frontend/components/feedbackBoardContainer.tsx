@@ -1875,7 +1875,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </div>
                       {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
                         <div className="feedback-votes-count" role="status" aria-live="polite">
-                          <span className="entry" aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
+                          <span className="entry" title={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
                             <i className="fas fa-user ml-1" aria-hidden="true"></i>
                             <span className="hidden lg:inline">My Votes:</span> {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"}
                           </span>
@@ -1884,7 +1884,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               <span className="separator" aria-hidden="true">
                                 |
                               </span>
-                              <span className="entry" aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
+                              <span className="entry" title={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`} aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
                                 <i className="fas fa-users ml-1" aria-hidden="true"></i>
                                 <span className="hidden lg:inline">Team Votes:</span> {this.state.castedVoteCount}/{this.state.teamVoteCapacity}
                               </span>

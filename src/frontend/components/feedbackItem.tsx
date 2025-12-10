@@ -783,12 +783,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const childrenIds = this.props.groupIds;
 
-    const isFocusModalHidden = this.props.isFocusModalHidden;
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
-    const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
+    const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && this.props.isFocusModalHidden;
 
     const columnItems = this.props.columns[this.props.columnId]?.columnItems;
 
+    {this.props.isFocusModalHidden && !workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && <div className="original-column-info">Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
     const mainFeedbackItem = columnItems?.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
     const groupedFeedbackItems = this.props.groupIds
       .map(id => {
@@ -1000,7 +1000,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </div>
                 )}
                 {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
-                {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && <div className="original-column-info">Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
+                {this.props.isFocusModalHidden && !workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && <div className="original-column-info">Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
               </div>
               {this.feedbackCreationInformationContent()}
               <div className="card-footer">
@@ -1029,7 +1029,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                           <div className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
                             {childDisplayTitle}
                           </div>
-                          {this.props.columnId !== originalColumn?.columnProperties?.id && <div className="original-column-info">Original Column: {originalColumn.columnProperties.title}</div>}
+                          {this.props.isFocusModalHidden && this.props.columnId !== originalColumn?.columnProperties?.id && <div className="original-column-info">Original Column: {originalColumn.columnProperties.title}</div>}
                         </li>
                       )
                     );
