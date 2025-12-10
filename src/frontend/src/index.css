@@ -149,7 +149,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-(--text-disabled-color)!;
 }
 
-.is-disabled .ms-Checkbox-checkbox {
 .is-disabled {
   @apply bg-(--text-disabled-color) border-(--text-disabled-color) text-(--text-disabled-color);
 
@@ -1043,29 +1042,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
     }
 
-    & :is(div[class^="content-"], div[class*=" content"]) {
-      @apply overflow-y-hidden;
-
-      & .slick-dots {
-        @apply static pt-5 bottom-auto;
-      }
-
-      & .slick-next {
-        @apply right-0 z-1 h-full opacity-100 w-6;
-
-        &::before {
-          @apply text-[#999999] text-2xl;
-        }
-      }
-
-      & .slick-prev {
-        @apply left-0 z-1 h-full opacity-100 w-6;
-
-        &::before {
-          @apply text-[#999999] text-2xl;
-        }
-      }
-    }
   }
 }
 
@@ -1267,7 +1243,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li div {
-  @apply inline-block min-h-[0.655em] p-2 box-border;
+  @apply inline-block min-h-2 p-2 box-border;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section {
