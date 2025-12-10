@@ -87,10 +87,13 @@ const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsDialogProps> = ({ isOpe
         isBlocking: false,
         containerClassName: "keyboard-shortcuts-dialog",
         className: "retrospectives-dialog-modal",
+        focusTrapZoneProps: {
+          firstFocusableSelector: "ms-Dialog-header",
+        },
       }}
       minWidth={660}
     >
-      <div className="keyboard-shortcuts-content">
+      <div className="keyboard-shortcuts-content" tabIndex={-1}>
         {Object.entries(groupedShortcuts).map(([category, shortcuts]) => (
           <div key={category}>
             <h3 className="keyboard-shortcuts-category-title">{category}</h3>
