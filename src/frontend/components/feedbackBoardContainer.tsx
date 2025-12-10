@@ -1777,8 +1777,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               <table className="team-effectiveness-measurement-table">
                                 <thead>
                                   <tr>
-                                    <th scope="col" className="text-left">Question</th>
-                                    <th scope="col" className="text-left">Details</th>
+                                    <th scope="col" className="text-left">
+                                      Question
+                                    </th>
+                                    <th scope="col" className="text-left">
+                                      Details
+                                    </th>
                                     <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
                                       Unfavorable
                                     </th>
@@ -1792,16 +1796,36 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                   <tr>
                                     <th scope="col" className="text-left"></th>
                                     <th scope="col" className="text-left"></th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">
+                                      1
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">
+                                      2
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">
+                                      3
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">
+                                      4
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">
+                                      5
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">
+                                      6
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">
+                                      7
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">
+                                      8
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">
+                                      9
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">
+                                      10
+                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1855,15 +1879,17 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             <i className="fas fa-user ml-1" aria-hidden="true"></i>
                             <span className="hidden lg:inline">My Votes:</span> {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"}
                           </span>
-                          {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 &&
+                          {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 && (
                             <>
-                              <span className="separator" aria-hidden="true">|</span>
+                              <span className="separator" aria-hidden="true">
+                                |
+                              </span>
                               <span className="entry" aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
                                 <i className="fas fa-users ml-1" aria-hidden="true"></i>
                                 <span className="hidden lg:inline">Team Votes:</span> {this.state.castedVoteCount}/{this.state.teamVoteCapacity}
                               </span>
                             </>
-                          }
+                          )}
                         </div>
                       )}
                       {this.getCurrentBoardPhase() === WorkflowPhase.Act && (

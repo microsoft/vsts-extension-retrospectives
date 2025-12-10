@@ -162,16 +162,12 @@ describe("Feedback Carousel ", () => {
       const initialColumn = { ...testColumnProps, columnId: "col1", columnName: "Initial Column" };
       const updatedColumn = { ...testColumnProps, columnId: "col2", columnName: "Updated Column" };
 
-      const { container, rerender } = render(
-        <FeedbackCarousel feedbackColumnPropsList={[initialColumn]} isFeedbackAnonymous={true} isFocusModalHidden={false} />
-      );
+      const { container, rerender } = render(<FeedbackCarousel feedbackColumnPropsList={[initialColumn]} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
 
       expect(container.textContent).toContain("Initial Column");
 
       // Rerender with different props to trigger componentDidUpdate
-      rerender(
-        <FeedbackCarousel feedbackColumnPropsList={[updatedColumn]} isFeedbackAnonymous={true} isFocusModalHidden={false} />
-      );
+      rerender(<FeedbackCarousel feedbackColumnPropsList={[updatedColumn]} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
 
       expect(container.textContent).toContain("Updated Column");
     });
@@ -179,14 +175,10 @@ describe("Feedback Carousel ", () => {
     it("should not update state when feedbackColumnPropsList stays the same reference", () => {
       const columns = [{ ...testColumnProps, columnId: "col1", columnName: "Test Column" }];
 
-      const { container, rerender } = render(
-        <FeedbackCarousel feedbackColumnPropsList={columns} isFeedbackAnonymous={true} isFocusModalHidden={false} />
-      );
+      const { container, rerender } = render(<FeedbackCarousel feedbackColumnPropsList={columns} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
 
       // Rerender with same reference
-      rerender(
-        <FeedbackCarousel feedbackColumnPropsList={columns} isFeedbackAnonymous={false} isFocusModalHidden={true} />
-      );
+      rerender(<FeedbackCarousel feedbackColumnPropsList={columns} isFeedbackAnonymous={false} isFocusModalHidden={true} />);
 
       expect(container.textContent).toContain("Test Column");
     });

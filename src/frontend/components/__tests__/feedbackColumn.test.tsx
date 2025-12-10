@@ -647,7 +647,7 @@ describe("Feedback Column ", () => {
   describe("Static Methods", () => {
     test("createFeedbackItemProps creates proper props object", () => {
       const props = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0]);
-      
+
       expect(props).toHaveProperty("id");
       expect(props).toHaveProperty("title");
       expect(props).toHaveProperty("boardId");
@@ -681,7 +681,7 @@ describe("Feedback Column ", () => {
       };
 
       const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(propsWithDifferent, itemInDifferentColumn);
-      
+
       expect(feedbackItemProps.accentColor).toBe("#ff0000");
     });
 
@@ -695,7 +695,7 @@ describe("Feedback Column ", () => {
       };
 
       const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, itemInMissingColumn);
-      
+
       expect(feedbackItemProps.accentColor).toBe(testColumnProps.accentColor);
     });
   });
@@ -713,7 +713,7 @@ describe("Feedback Column ", () => {
         feedbackCard.appendChild(contentEditable);
 
         contentEditable.focus();
-        
+
         // Set selection
         const range = document.createRange();
         const selection = window.getSelection();
@@ -764,7 +764,7 @@ describe("Feedback Column ", () => {
         feedbackCard.appendChild(contentEditable);
 
         contentEditable.focus();
-        
+
         // Set selection beyond text length
         const range = document.createRange();
         const selection = window.getSelection();
@@ -794,7 +794,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Navigate to last
       const event = new KeyboardEvent("keydown", { key: "End", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -811,7 +811,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Navigate forward from unset state
       const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -828,7 +828,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // First go down to set focus
       column.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
       // Then try to go up - should stay at 0
@@ -838,14 +838,12 @@ describe("Feedback Column ", () => {
     });
 
     test("does not navigate when focusedItemIndex is negative and direction is prev", () => {
-      const items = [
-        { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1" } },
-      ];
+      const items = [{ ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1" } }];
       const props = { ...testColumnProps, columnItems: items };
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Try to go up without first focusing
       const event = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -866,7 +864,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Navigate - should only see parent item
       column.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
 
@@ -880,7 +878,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Press i key
       const event = new KeyboardEvent("keydown", { key: "i", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -893,7 +891,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Press i key - should have no effect
       const event = new KeyboardEvent("keydown", { key: "i", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -909,7 +907,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "Insert", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -986,14 +984,16 @@ describe("Feedback Column ", () => {
       const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
       if (feedbackCard) {
         feedbackCard.focus();
-        
+
         // Update with different items that don't include the focused item
-        const updatedProps = { 
-          ...props, 
-          columnItems: [{ 
-            ...props.columnItems[0], 
-            feedbackItem: { ...props.columnItems[0].feedbackItem, id: "different-id" } 
-          }] 
+        const updatedProps = {
+          ...props,
+          columnItems: [
+            {
+              ...props.columnItems[0],
+              feedbackItem: { ...props.columnItems[0].feedbackItem, id: "different-id" },
+            },
+          ],
         };
         rerender(<FeedbackColumn {...updatedProps} />);
       }
@@ -1021,7 +1021,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Navigate to last
       column.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true, cancelable: true }));
       // Try to go past last - should stay at last
@@ -1035,7 +1035,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "i", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1071,7 +1071,7 @@ describe("Feedback Column ", () => {
       const { getByRole, getByLabelText, queryByRole } = render(<FeedbackColumn {...props} />);
 
       fireEvent.click(getByRole("button", { name: `Edit column ${props.columnName}` }));
-      
+
       // Dialog should be open
       expect(getByRole("dialog")).toBeInTheDocument();
 
@@ -1178,7 +1178,7 @@ describe("Feedback Column ", () => {
       const { container, getByRole } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "e", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1191,7 +1191,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "E", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1203,7 +1203,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "Insert", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1215,7 +1215,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "n", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1271,7 +1271,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "Home", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1283,7 +1283,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Go to first
       column.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true, cancelable: true }));
       // Try to go up - should stay at first

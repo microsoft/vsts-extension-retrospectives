@@ -1182,9 +1182,7 @@ describe("FeedbackBoard Component", () => {
       const originalItem = { ...mockFeedbackItems[0] };
       const movedItem = { ...mockFeedbackItems[0], columnId: testColumnProps.columnIds[1] };
 
-      (itemDataService.getFeedbackItemsForBoard as jest.Mock)
-        .mockResolvedValueOnce([originalItem])
-        .mockResolvedValueOnce([movedItem]);
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([originalItem]).mockResolvedValueOnce([movedItem]);
 
       const { rerender } = render(<FeedbackBoard {...mockedProps} />);
 

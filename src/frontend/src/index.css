@@ -330,7 +330,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .keyboard-shortcuts-dialog {
-  @apply bg-(--background-color);
+  @apply max-h-1/2 bg-(--background-color);
 
   & .ms-Dialog-title,
   & .ms-Dialog-subText {
@@ -421,7 +421,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply flex justify-center items-center ml-auto;
 
         & span {
-          @apply bg-(--palette-black-alpha-6) py-0.5 px-2 rounded-full text-(--text-primary-color) whitespace-nowrap;
+          @apply bg-(--background-color) py-0.5 px-2 rounded-full text-(--text-primary-color) whitespace-nowrap;
         }
       }
     }
@@ -440,7 +440,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & textarea {
-    @apply bg-[rgba(var(--palette-neutral-2,248,248,248),1)] text-(--text-primary-color);
+    @apply bg-(--background-color) text-(--text-primary-color);
   }
 }
 
@@ -449,14 +449,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-item-group {
-  @apply mb-3 mr-3 break-inside-avoid inline-block align-top w-full max-w-80 min-w-[260px] box-border;
+  @apply mb-3 mr-3 break-inside-avoid inline-block align-top w-full max-w-80 min-w-65 box-border;
 
   &:focus {
     @apply outline-none;
   }
 
   &:focus-visible .mainItemCard {
-    @apply outline-3 outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
+    @apply outline-3 outline-primary outline-offset-2 shadow-md shadow-blue-500/30;
   }
 
   & .item-cards {
@@ -467,11 +467,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & .mainItemCard .card-integral-part {
-      @apply border-l-[3px];
+      @apply border-l-3;
     }
 
     & .mainItemCard .card-header .feedback-expand-group {
-      @apply h-[35px] max-w-[150px] z-1 m-0 mr-auto bg-inherit border-0 flex leading-[35px] text-xs font-semibold;
+      @apply h-9 max-w-40 z-1 m-0 mr-auto bg-inherit border-0 flex leading-9 text-xs font-semibold;
     }
 
     & .mainItemCard .card-header .feedback-expand-group i {
@@ -479,7 +479,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & .mainItemCard .card-header .feedback-expand-group:focus-visible {
-      @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
+      @apply outline-2 outline-primary outline-offset-2 rounded-sm;
     }
   }
 
@@ -488,23 +488,23 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &.feedback-item-group-expanded .feedbackItemGroupGroupedItem .groupedItemCard {
-    @apply w-full max-w-80 mt-0 bg-[rgba(var(--palette-neutral-10),1)] box-border;
+    @apply w-full max-w-80 mt-0 box-border bg-(--background-color);
   }
 
   &.feedback-item-group-expanded .feedbackItemGroupGroupedItem .groupedItemCard .card-integral-part {
-    @apply border-l-[3px] border-solid bg-(--background-color);
+    @apply border-l-3 border-solid bg-(--background-color);
   }
 }
 
 .no-boards-container {
-  @apply pt-[125px] w-full flex justify-center items-center flex-col text-sm text-center;
+  @apply pt-32 w-full flex justify-center items-center flex-col text-sm text-center;
 
   & .no-boards-text {
-    @apply mt-2.5 mb-[15px] max-w-full text-[28px];
+    @apply mt-2.5 mb-4 max-w-full text-2xl;
   }
 
   & .no-boards-sub-text {
-    @apply mb-[15px];
+    @apply mb-4;
   }
 
   & .create-new-board-button {
@@ -512,12 +512,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & img {
-    @apply h-40 mb-[15px];
+    @apply h-40 mb-4;
   }
 }
 
 .selector-list-header {
-  @apply bg-(--background-color) flex h-8 w-[450px] pl-2.5;
+  @apply bg-(--background-color) flex h-8 w-md pl-2.5;
 
   & .selector-list-header-text {
     @apply align-middle text-center leading-8 text-primary font-semibold text-sm;
@@ -525,10 +525,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .selector-list-container {
-  @apply max-h-[250px] overflow-auto;
+  @apply max-h-62 overflow-auto;
 
   & .selector-list-item {
-    @apply bg-(--background-color) h-8 w-[450px] flex cursor-pointer pl-2 text-(--text-primary-color);
+    @apply bg-(--background-color) h-8 w-md flex cursor-pointer pl-2 text-(--text-primary-color);
 
     &:hover {
       @apply bg-(--border-subtle-color) text-black;
@@ -536,7 +536,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .selector-list-item-text {
-    @apply align-middle leading-8 mr-[15px] text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis;
+    @apply align-middle leading-8 mr-4 text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis;
   }
 
   & i {
@@ -565,7 +565,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .related-task-sub-card {
-  @apply h-[35px] m-0 max-w-full border-0 bg-(--background-color) text-(--text-primary-color);
+  @apply h-9 m-0 max-w-full border-0 bg-(--background-color) text-(--text-primary-color);
 
   & .task-yellow {
     @apply text-task-yellow;
@@ -592,7 +592,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .ms-DocumentCardPreview-iconContainer2 {
-    @apply w-[30px];
+    @apply w-8;
   }
 
   & .ms-DocumentCardTitle {
@@ -665,10 +665,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .add-action-item-callout .ms-Callout-main {
-  @apply max-h-[90vh];
+  @apply max-h-9/10;
 
   & .work-item-list-divider {
-    @apply border border-[rgb(234,234,234)];
+    @apply border border-gray-light;
   }
 
   & .add-action-item-list-container {
@@ -686,14 +686,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & .add-action-item-list-item-text {
-        @apply leading-8 mr-[15px] text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis text-(--text-primary-color);
+        @apply leading-8 mr-4 text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis text-(--text-primary-color);
       }
     }
   }
 }
 
 .retrospectives-link-existing-work-item-dialog {
-  @apply w-[500px] h-[250px] max-w-[500px];
+  @apply w-125 h-62 max-w-md;
 
   & .error-container {
     @apply h-5;
@@ -721,19 +721,19 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 #feedback-board-summary-table-header {
-  @apply flex w-full h-[65px] items-center px-8 py-0;
+  @apply flex w-full h-16 items-center px-8 py-0;
 
   & .menu-button {
     @apply ml-1.5 mr-5 bg-gray-light;
   }
 
   & .board-summary-table-title {
-    @apply leading-10 tracking-[-0.04em] text-lg font-semibold text-left text-[rgb(51,51,51)];
+    @apply leading-10 text-lg font-semibold text-left text-(--text-primary-color);
   }
 }
 
 .board-summary-table-container {
-  @apply min-w-[1000px] overflow-auto h-[calc(100vh-92px)];
+  @apply min-w-250 overflow-auto h-[calc(100vh-92px)];
 
   & th,
   & td {
@@ -747,7 +747,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply bg-primary text-white;
 
       & tr th {
-        @apply bg-primary font-normal h-[30px] leading-[30px] sticky p-1.5 top-0 z-1;
+        @apply bg-primary font-normal h-8 leading-8 sticky p-1.5 top-0 z-1;
       }
 
       & tr th .resizer {
@@ -771,7 +771,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
     & tbody {
       & tr td {
-        @apply items-center text-sm font-normal h-[45px] py-1.5 px-1.5;
+        @apply items-center text-sm font-normal h-11 py-1.5 px-1.5;
 
         &:first-of-type {
           @apply p-0;
@@ -788,12 +788,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
       & tr .board-summary-container .rt-tr.-odd,
       & tr .board-summary-container .rt-tr.-even {
-        @apply h-[35px];
+        @apply h-8;
       }
 
       & tr .board-summary-container .board-summary-card,
       & tr .board-summary-container .action-items-summary-card {
-        @apply my-2 mx-1.5 bg-(--background-color) min-h-[285px];
+        @apply my-2 mx-1.5 bg-(--background-color) min-h-72;
       }
 
       & tr .board-summary-container .board-summary-card .items-stats-container,
@@ -813,7 +813,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
       & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text .count,
       & tr .board-summary-container .action-items-summary-card .items-stats-container .count-and-text .count {
-        @apply font-semibold text-[15px];
+        @apply font-semibold text-sm;
       }
 
       & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text .text,
@@ -827,7 +827,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & tr .board-summary-container .action-items-summary-card {
-        @apply w-4/5 max-w-[800px] overflow-y-auto;
+        @apply w-4/5 max-w-200 overflow-y-auto;
       }
 
       & tr .board-summary-container .action-items-summary-card div[role="row"] {
@@ -839,7 +839,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & tr .board-summary-container .action-items-summary-card .ms-DetailsList-headerWrapper {
-        @apply border-b-[3px] border-(--border-subtle-color);
+        @apply border-b-3 border-(--border-subtle-color);
       }
 
       & tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"] {
@@ -883,11 +883,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & tr .board-summary-container .action-items-summary-card .no-action-items {
-        @apply text-[15px] relative top-1/2 -translate-y-1/2 text-center;
+        @apply text-4 relative top-1/2 -translate-y-1/2 text-center;
       }
 
       & tr .board-summary-container .board-summary-card {
-        @apply p-5 w-1/5 min-w-[270px] border border-(--text-primary-color) rounded;
+        @apply p-5 w-1/5 min-w-68 border border-(--text-primary-color) rounded;
       }
 
       & tr .board-summary-container .board-summary-card .resolved-green {
@@ -895,7 +895,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & tr .board-summary-container .board-summary-card .board-summary-card-title {
-        @apply text-lg border-b-[3px] border-primary;
+        @apply text-lg border-b-3 border-primary;
       }
 
       & tr .board-summary-container .board-summary-card .board-summary-card-title .ms-DocumentCardTitle {
@@ -925,7 +925,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .trash-icon-disabled {
-    @apply text-[#b0b0b0] cursor-not-allowed;
+    @apply text-gray-medium cursor-not-allowed;
 
     & i {
       @apply text-inherit;
@@ -936,13 +936,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply flex justify-center items-center cursor-default;
 
     &:hover {
-      @apply text-red-600;
+      @apply text-error;
     }
   }
 }
 
 .warning-text {
-  @apply text-red-600;
+  @apply text-error;
 
   & i {
     @apply mr-1.5;
@@ -950,7 +950,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-summary-initialization-spinner {
-  @apply absolute top-1/2 left-1/2 -mt-[50px] -ml-[50px];
+  @apply absolute top-1/2 left-1/2 -mt-12 -ml-12;
 }
 
 .flex-grow-spacer {
@@ -1281,247 +1281,247 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-team-assessment-history-dialog {
-  @apply max-w-[1100px] w-auto flex items-center bg-(--background-color) text-(--text-primary-color);
-}
+  @apply max-w-250 w-auto flex items-center bg-(--background-color) text-(--text-primary-color);
 
-.retrospectives-team-assessment-history-dialog .ms-Dialog-title {
-  @apply text-left text-(--text-primary-color);
-}
+  & .ms-Dialog-title {
+    @apply text-left text-(--text-primary-color);
+  }
 
-.retrospectives-team-assessment-history-dialog svg {
-  @apply border border-[#e0e0e0] rounded bg-[#fafafa];
-}
+  & svg {
+    @apply border border-[#e0e0e0] rounded bg-[#fafafa];
+  }
 
-.retrospectives-team-assessment-history-dialog h3 {
-  @apply text-(--text-primary-color) text-base font-semibold;
-}
+  & h3 {
+    @apply text-(--text-primary-color) text-base font-semibold;
+  }
 
-.retrospectives-team-assessment-history-dialog circle:hover {
-  @apply cursor-pointer [r:7];
+  & circle:hover {
+    @apply cursor-pointer [r:7];
+  }
 }
 
 .board-metadata-form {
   @apply text-center;
-}
 
-.board-metadata-form hr {
-  @apply border border-primary;
-}
+  & hr {
+    @apply border border-primary;
+  }
 
-.board-metadata-form .board-metadata-form-section-information {
-  @apply border-3 border-gray-medium bg-gray-medium my-1.5 mx-0 mb-2.5 p-1;
-}
+  & .board-metadata-form-section-information {
+    @apply border-3 border-gray-medium bg-gray-medium my-1.5 mx-0 mb-2.5 p-1;
 
-.board-metadata-form .board-metadata-form-section-information.warning-information {
-  @apply bg-task-yellow border-none;
-}
+    &.warning-information {
+      @apply bg-task-yellow border-none;
+    }
+  }
 
-.board-metadata-form .board-metadata-form-setting-label {
-  @apply flex;
-}
+  & .board-metadata-form-setting-label {
+    @apply flex;
+  }
 
-.board-metadata-form .board-metadata-form-anonymous-feedback-section {
-  @apply my-5 mx-10;
-}
+  & .board-metadata-form-anonymous-feedback-section {
+    @apply my-5 mx-10;
+  }
 
-.board-metadata-form .board-metadata-form-section-header {
-  @apply py-[5px] px-2.5 text-[1.1em] font-medium m-0 bg-primary text-right text-(--text-primary-color);
-}
+  & .board-metadata-form-section-header {
+    @apply py-[5px] px-2.5 text-[1.1em] font-medium m-0 bg-primary text-right text-(--text-primary-color);
 
-.board-metadata-form .board-metadata-form-section-header.bottom-padding-zero {
-  @apply pb-0;
-}
+    &.bottom-padding-zero {
+      @apply pb-0;
+    }
+  }
 
-.board-metadata-form .board-metadata-edit-column-settings {
-  @apply border border-solid border-gray-medium p-2.5;
-}
+  & .board-metadata-edit-column-settings {
+    @apply border border-solid border-gray-medium p-2.5;
+  }
 
-.board-metadata-form .board-metadata-form-section-subheader {
-  @apply text-[1em] font-semibold w-full flex items-center m-[0.2em] text-(--text-primary-color);
-}
+  & .board-metadata-form-section-subheader {
+    @apply text-[1em] font-semibold w-full flex items-center m-[0.2em] text-(--text-primary-color);
 
-.board-metadata-form .board-metadata-form-section-subheader label {
-  @apply flex-1 text-start;
-}
+    & label {
+      @apply flex-1 text-start;
+    }
+  }
 
-.board-metadata-form .ms-Checkbox.is-checked .ms-Checkbox-checkbox {
-  @apply bg-(--background-color);
-}
+  & .ms-Checkbox.is-checked .ms-Checkbox-checkbox {
+    @apply bg-(--background-color);
+  }
 
-.board-metadata-form .ms-Checkbox.is-checked .ms-Checkbox-checkbox:hover {
-  @apply bg-primary text-white;
-}
+  & .ms-Checkbox.is-checked .ms-Checkbox-checkbox:hover {
+    @apply bg-primary text-white;
+  }
 
-.board-metadata-form .ms-Checkbox.is-checked .ms-Checkbox-checkmark {
-  @apply text-(--text-primary-color);
-}
+  & .ms-Checkbox.is-checked .ms-Checkbox-checkmark {
+    @apply text-(--text-primary-color);
+  }
 
-.board-metadata-form .ms-Checkbox.is-checked .ms-Checkbox-checkmark:hover {
-  @apply text-white;
-}
+  & .ms-Checkbox.is-checked .ms-Checkbox-checkmark:hover {
+    @apply text-white;
+  }
 
-.board-metadata-form .ms-Checkbox.is-disabled .ms-Checkbox-checkbox:hover {
-  @apply bg-(--background-color);
-}
+  & .ms-Checkbox.is-disabled .ms-Checkbox-checkbox:hover {
+    @apply bg-(--background-color);
+  }
 
-.board-metadata-form .ms-Checkbox .ms-Checkbox-text {
-  @apply text-(--text-primary-color);
-}
+  & .ms-Checkbox .ms-Checkbox-text {
+    @apply text-(--text-primary-color);
+  }
 
-.board-metadata-form .ms-Checkbox .ms-Checkbox-text:hover {
-  @apply text-primary;
-}
+  & .ms-Checkbox .ms-Checkbox-text:hover {
+    @apply text-primary;
+  }
 
-.board-metadata-form .ms-Checkbox .ms-Checkbox-checkbox {
-  @apply bg-(--background-color) border-[#aaa];
-}
+  & .ms-Checkbox .ms-Checkbox-checkbox {
+    @apply bg-(--background-color) border-[#aaa];
+  }
 
-.board-metadata-form .ms-Checkbox .ms-Checkbox-checkbox:hover {
-  @apply bg-primary;
-}
+  & .ms-Checkbox .ms-Checkbox-checkbox:hover {
+    @apply bg-primary;
+  }
 
-.board-metadata-form .ms-Checkbox .ms-Checkbox-checkmark {
-  @apply text-(--text-primary-color);
-}
+  & .ms-Checkbox .ms-Checkbox-checkmark {
+    @apply text-(--text-primary-color);
+  }
 
-.board-metadata-form .ms-Checkbox .ms-Checkbox-checkmark:hover {
-  @apply text-white;
-}
+  & .ms-Checkbox .ms-Checkbox-checkmark:hover {
+    @apply text-white;
+  }
 
-.board-metadata-form .feedback-column-card {
-  @apply bg-(---nav-vertical-background-color) text-(--text-primary-color) h-[60px] mt-2.5 items-center;
-}
+  & .feedback-column-card {
+    @apply bg-(---nav-vertical-background-color) text-(--text-primary-color) h-[60px] mt-2.5 items-center;
 
-.board-metadata-form .feedback-column-card :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button) {
-  @apply bg-transparent! min-w-[30px] pl-0 pr-0 ml-[5px] mr-[5px] border-none text-(--text-primary-color);
-}
+    & :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button) {
+      @apply bg-transparent! min-w-[30px] pl-0 pr-0 ml-[5px] mr-[5px] border-none text-(--text-primary-color);
+    }
 
-.board-metadata-form .feedback-column-card :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button):hover {
-  @apply bg-gray-light text-(--background-color);
-}
+    & :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button):hover {
+      @apply bg-gray-light text-(--background-color);
+    }
 
-.board-metadata-form .feedback-column-card .editable-document-card-title {
-  @apply mt-0 min-h-auto text-inherit;
-}
+    & .editable-document-card-title {
+      @apply mt-0 min-h-auto text-inherit;
+    }
 
-.board-metadata-form .feedback-column-card .editable-document-card-title .input-validation-message {
-  @apply float-none block text-xs;
-}
+    & .editable-document-card-title .input-validation-message {
+      @apply float-none block text-xs;
+    }
 
-.board-metadata-form .feedback-column-card .editable-document-card-title .editable-text {
-  @apply [display:inherit] ml-2.5 text-[1.1em] leading-[1.1em] text-start;
-}
+    & .editable-document-card-title .editable-text {
+      @apply [display:inherit] ml-2.5 text-[1.1em] leading-[1.1em] text-start;
+    }
 
-.board-metadata-form .feedback-column-card .editable-document-card-title .editable-text-input-container {
-  @apply pt-0 w-auto;
-}
+    & .editable-document-card-title .editable-text-input-container {
+      @apply pt-0 w-auto;
+    }
 
-.board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button) {
-  @apply bg-(--background-color) border-none my-0 mx-[3px];
-}
+    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button) {
+      @apply bg-(--background-color) border-none my-0 mx-[3px];
+    }
 
-.board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button):hover {
-  @apply bg-gray-light;
-}
+    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button):hover {
+      @apply bg-gray-light;
+    }
 
-.board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled {
-  @apply bg-(--text-disabled-color);
-}
+    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled {
+      @apply bg-(--text-disabled-color);
+    }
 
-.board-metadata-form .feedback-column-card :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled i {
-  @apply text-(--text-disabled-color);
-}
+    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled i {
+      @apply text-(--text-disabled-color);
+    }
+  }
 
-.board-metadata-form .feedback-column-card.marked-for-deletion {
-  @apply bg-(--text-disabled-color) ml-0.5;
-}
+  & .feedback-column-card.marked-for-deletion {
+    @apply bg-(--text-disabled-color) ml-0.5;
+  }
 
-.board-metadata-form .feedback-column-card.marked-for-deletion .feedback-column-card-icon {
-  @apply text-black/30;
-}
+  & .feedback-column-card.marked-for-deletion .feedback-column-card-icon {
+    @apply text-black/30;
+  }
 
-.board-metadata-form .feedback-column-card.marked-for-deletion .editable-text {
-  @apply text-black/30;
-}
+  & .feedback-column-card.marked-for-deletion .editable-text {
+    @apply text-black/30;
+  }
 
-.board-metadata-form .feedback-column-card.marked-for-deletion i.ms-Button-icon {
-  @apply text-black/30;
-}
+  & .feedback-column-card.marked-for-deletion i.ms-Button-icon {
+    @apply text-black/30;
+  }
 
-.board-metadata-form .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button {
-  @apply bg-white border-none;
-}
+  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button {
+    @apply bg-white border-none;
+  }
 
-.board-metadata-form .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button:hover {
-  @apply bg-gray-light text-(--status-info-foreground);
-}
+  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button:hover {
+    @apply bg-gray-light text-(--status-info-foreground);
+  }
 
-.board-metadata-form .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button.is-disabled i.ms-Button-icon {
-  @apply text-black/25;
-}
+  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button.is-disabled i.ms-Button-icon {
+    @apply text-black/25;
+  }
 
-.board-metadata-form .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button i.ms-Button-icon {
-  @apply text-black;
-}
+  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button i.ms-Button-icon {
+    @apply text-black;
+  }
 
-.board-metadata-form .create-feedback-column-card-button-wrapper .create-feedback-column-card-button {
-  @apply border-none text-(--text-primary-color);
-}
+  & .create-feedback-column-card-button-wrapper .create-feedback-column-card-button {
+    @apply border-none text-(--text-primary-color);
+  }
 
-.board-metadata-form .create-feedback-column-card-button-wrapper .ms-Button-icon {
-  @apply text-(--status-info-foreground) bg-(--nav-vertical-background-color) p-1 h-[22px];
-}
+  & .create-feedback-column-card-button-wrapper .ms-Button-icon {
+    @apply text-(--status-info-foreground) bg-(--nav-vertical-background-color) p-1 h-[22px];
+  }
 
-.board-metadata-form .board-metadata-logo {
-  @apply mb-5;
-}
+  & .board-metadata-logo {
+    @apply mb-5;
+  }
 
-.board-metadata-form .input-validation-message {
-  @apply text-error;
-}
+  & .input-validation-message {
+    @apply text-error;
+  }
 
-.board-metadata-form .title-input-container {
-  @apply text-base font-semibold flex flex-col items-center pb-0.5 flex-1;
-}
+  & .title-input-container {
+    @apply text-base font-semibold flex flex-col items-center pb-0.5 flex-1;
+  }
 
-.board-metadata-form .title-input-container.column-template-dropdown {
-  @apply inline-flex bg-(--background-color) font-normal ml-2.5 w-2/3;
-}
+  & .title-input-container.column-template-dropdown {
+    @apply inline-flex bg-(--background-color) font-normal ml-2.5 w-2/3;
+  }
 
-.board-metadata-form .title-input-container.max-vote-counter .ms-TextField-wrapper .ms-TextField-fieldGroup {
-  @apply w-full;
-}
+  & .title-input-container.max-vote-counter .ms-TextField-wrapper .ms-TextField-fieldGroup {
+    @apply w-full;
+  }
 
-.board-metadata-form .title-input-container .ms-TextField-wrapper {
-  @apply flex items-center w-full;
-}
+  & .title-input-container .ms-TextField-wrapper {
+    @apply flex items-center w-full;
+  }
 
-.board-metadata-form .title-input-container .ms-TextField-wrapper .ms-Label {
-  @apply w-[50px];
-}
+  & .title-input-container .ms-TextField-wrapper .ms-Label {
+    @apply w-12;
+  }
 
-.board-metadata-form .title-input-container .ms-TextField-wrapper .ms-TextField-fieldGroup {
-  @apply w-full max-w-full;
-}
+  & .title-input-container .ms-TextField-wrapper .ms-TextField-fieldGroup {
+    @apply w-full max-w-full;
+  }
 
-.board-metadata-form .title-input-container .ms-TextField-wrapper .ms-TextField-fieldGroup #retrospective-title-input {
-  @apply w-full;
-}
+  & .title-input-container .ms-TextField-wrapper .ms-TextField-fieldGroup #retrospective-title-input {
+    @apply w-full;
+  }
 
-.board-metadata-form .title-input-container .ms-TextField-errorMessage {
-  @apply -ml-[82px];
+  & .title-input-container .ms-TextField-errorMessage {
+    @apply -ml-20;
+  }
 }
 
 .retrospectives-choose-column-accent-color-dialog .choose-feedback-column-accent-color-button {
-  @apply text-[30px] h-[50px] m-[5px];
+  @apply text-8 h-12 m-1;
 }
 
 .retrospectives-choose-column-icon-dialog .choose-feedback-column-icon-button {
-  @apply text-[30px] h-[50px] m-[5px];
+  @apply text-8 h-12 m-1;
 }
 
 .retrospectives-board-metadata-dialog {
-  @apply w-[500px] max-w-[500px] max-h-full right-0 top-0 bottom-0 bg-(--background-color);
+  @apply w-125 max-w-125 max-h-full right-0 top-0 bottom-0 bg-(--background-color);
 }
 
 .retrospectives-board-metadata-dialog .ms-Dialog-title {
@@ -1545,15 +1545,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .initialization-spinner {
-  @apply absolute top-1/2 left-1/2 -mt-[50px] -ml-[50px];
+  @apply absolute top-1/2 left-1/2 -mt-12 -ml-12;
 }
 
 .feedback-board-container-header-spacer {
-  @apply bg-[#1f1f1f] h-px z-2 w-full fixed mt-10;
+  @apply bg-(--background-color) h-px z-2 w-full fixed mt-10;
 }
 
 .extension-header-spacer {
-  @apply pb-[45px];
+  @apply pb-12;
 }
 
 .team-filter-container .ms-TextField {
@@ -1561,15 +1561,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 #extension-header {
-  @apply flex z-2 w-full items-center justify-start py-2.5 px-[15px];
+  @apply flex z-2 w-full items-center justify-start py-2.5 px-4;
 }
 
 #extension-header .extension-title-text {
-  @apply text-[26px] leading-10 tracking-[-0.04em] font-medium;
+  @apply text-7 leading-10 tracking-[-0.04em] font-medium;
 }
 
 #extension-header .contact-us-button {
-  @apply mt-[5px] ml-auto mr-5;
+  @apply mt-1 ml-auto mr-5;
 }
 
 #extension-header .contact-us-button .ms-Button {
@@ -2043,7 +2043,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply list-none m-0;
 
     & li {
-      @apply [word-wrap:break-word] p-1 flex ;
+      @apply [word-wrap:break-word] p-1 flex;
 
       & .icon {
         @apply border-solid h-7.5 border-t-0 border-r-2 border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color) content-center w-7 text-center;
@@ -2171,7 +2171,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .dialog-confirmation-base {
-  @apply bg-(--background-color) max-w-[450px] w-[90%];
+  @apply bg-(--background-color) max-w-md w-9/10;
 }
 
 .dialog-confirmation-base .ms-Dialog-title,
@@ -2187,7 +2187,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .retrospectives-remove-feedback-item-from-group-dialog,
 .retrospectives-delete-board-confirmation-dialog,
 .retrospectives-delete-feedback-item-dialog {
-  @apply bg-(--background-color) max-w-[450px] w-[90%];
+  @apply bg-(--background-color) max-w-md w-9/10;
 }
 
 .retrospectives-archive-board-confirmation-dialog .ms-Dialog-title,

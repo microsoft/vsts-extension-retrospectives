@@ -394,9 +394,7 @@ describe("FeedbackBoardContainer additional coverage", () => {
         castedVoteCount: 2,
         teamVoteCapacity: 4,
         currentVoteCount: "1",
-        teamAssessmentHistoryData: [
-          { boardTitle: "Board 1", boardId: "board-1", createdDate: new Date(), questionAverages: [{ questionId: 1, average: 8 }] },
-        ],
+        teamAssessmentHistoryData: [{ boardTitle: "Board 1", boardId: "board-1", createdDate: new Date(), questionAverages: [{ questionId: 1, average: 8 }] }],
       });
     });
 
@@ -3152,7 +3150,7 @@ describe("FeedbackBoardContainer - Board Management", () => {
 
   it("should initialize with default state values", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     // Check that state has expected properties
     expect(instance.state).toBeDefined();
     expect(instance.state.isAppInitialized).toBeDefined();
@@ -3160,19 +3158,19 @@ describe("FeedbackBoardContainer - Board Management", () => {
 
   it("should handle setState for timer updates", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     instance.setState({
       timerSecs: 60,
       timerState: true,
     });
-    
+
     expect(instance.state.timerSecs).toBe(60);
     expect(instance.state.timerState).toBe(true);
   });
 
   it("should handle setState for board selection", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const board: IFeedbackBoardDocument = {
       id: "board-1",
       title: "Board 1",
@@ -3185,29 +3183,29 @@ describe("FeedbackBoardContainer - Board Management", () => {
       activePhase: WorkflowPhase.Collect,
       createdBy: {} as IdentityRef,
     };
-    
+
     instance.setState({
       currentBoard: board,
       boards: [board],
     });
-    
+
     expect(instance.state.currentBoard).toBeDefined();
     expect(instance.state.currentBoard.id).toBe("board-1");
   });
 
   it("should handle setState for user teams", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const teams = [
       { id: "team-1", name: "Alpha Team" },
       { id: "team-2", name: "Beta Team" },
     ] as WebApiTeam[];
-    
+
     instance.setState({
       userTeams: teams,
       filteredUserTeams: teams,
     });
-    
+
     expect(instance.state.userTeams.length).toBe(2);
     expect(instance.state.filteredUserTeams.length).toBe(2);
   });

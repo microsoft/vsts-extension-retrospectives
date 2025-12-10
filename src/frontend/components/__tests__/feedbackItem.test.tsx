@@ -3807,7 +3807,7 @@ describe("Feedback Item", () => {
     test("handles dragEnd event", () => {
       const { container } = render(<FeedbackItem {...dragDropProps} />);
       const card = container.querySelector(".feedbackItem");
-      
+
       if (card) {
         fireEvent.dragEnd(card);
       }
@@ -3817,7 +3817,7 @@ describe("Feedback Item", () => {
     test("handles dragEnter event", () => {
       const { container } = render(<FeedbackItem {...dragDropProps} />);
       const card = container.querySelector(".feedbackItem");
-      
+
       if (card) {
         fireEvent.dragEnter(card);
       }
@@ -3827,7 +3827,7 @@ describe("Feedback Item", () => {
     test("handles dragLeave event", () => {
       const { container } = render(<FeedbackItem {...dragDropProps} />);
       const card = container.querySelector(".feedbackItem");
-      
+
       if (card) {
         fireEvent.dragLeave(card);
       }
@@ -3981,9 +3981,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         groupIds: [],
         userIdRef: "",
-        actionItems: [
-          { id: 123, fields: { "System.Title": "Action Item 1", "System.State": "Active", "System.WorkItemType": "Task" } },
-        ],
+        actionItems: [{ id: 123, fields: { "System.Title": "Action Item 1", "System.State": "Active", "System.WorkItemType": "Task" } }],
         associatedActionItemIds: [123],
         newlyCreated: false,
         showAddedAnimation: false,
@@ -4264,7 +4262,7 @@ describe("Feedback Item", () => {
         },
       };
       const columnIdsWithDifferent = [...testColumnIds, differentColumnId];
-      
+
       const props: any = {
         id: "moved-item",
         title: "Moved Item",
@@ -4395,9 +4393,7 @@ describe("Feedback Item", () => {
             accentColor: "#008000",
             notes: "",
           },
-          columnItems: [
-            { feedbackItem: { ...feedbackItem }, actionItems: [] as any[] as any[] },
-          ],
+          columnItems: [{ feedbackItem: { ...feedbackItem }, actionItems: [] as any[] as any[] }],
         },
       };
 
@@ -4465,7 +4461,7 @@ describe("Feedback Item", () => {
 
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(getFeedbackItemSpy).toHaveBeenCalled());
-      
+
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       await act(async () => {
         fireEvent.keyDown(card, { key: "m" });
@@ -4479,14 +4475,14 @@ describe("Feedback Item", () => {
     test("pressing v triggers vote in Vote phase", async () => {
       const props = buildKbdTestProps({ workflowPhase: "Vote" });
       const mockItem = createKeyboardTestItem({ id: props.id, upvotes: 1 });
-      
+
       const getFeedbackItemSpy = jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
       jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
       const updateVoteSpy = jest.spyOn(itemDataService, "updateVote").mockResolvedValue(mockItem);
 
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(getFeedbackItemSpy).toHaveBeenCalled());
-      
+
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       await act(async () => {
         fireEvent.keyDown(card, { key: "v" });
@@ -4500,7 +4496,7 @@ describe("Feedback Item", () => {
     test("pressing arrow up navigates to previous card", async () => {
       const item1 = createKeyboardTestItem({ id: "item-1" });
       const item2 = createKeyboardTestItem({ id: "item-2" });
-      
+
       const columns = {
         [testColumnUuidOne]: {
           columnProperties: {
@@ -4555,10 +4551,10 @@ describe("Feedback Item", () => {
 
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(getFeedbackItemSpy).toHaveBeenCalled());
-      
+
       const card = container.querySelector(`[data-feedback-item-id="item-2"]`) as HTMLElement;
       fireEvent.keyDown(card, { key: "ArrowUp" });
-      
+
       expect(container.firstChild).toBeTruthy();
     });
 
@@ -4582,10 +4578,10 @@ describe("Feedback Item", () => {
 
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(getFeedbackItemSpy).toHaveBeenCalled());
-      
+
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       fireEvent.keyDown(card, { key: " " });
-      
+
       expect(mockToggleGroupExpand).toHaveBeenCalled();
     });
   });
@@ -4659,7 +4655,7 @@ describe("Feedback Item", () => {
       const updateVoteSpy = jest.spyOn(itemDataService, "updateVote").mockResolvedValue(mockItem);
 
       const { container } = render(<FeedbackItem {...props} />);
-      
+
       await waitFor(() => {
         expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
       });
@@ -4739,7 +4735,7 @@ describe("Feedback Item", () => {
       jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
 
       const { container } = render(<FeedbackItem {...props} />);
-      
+
       await waitFor(() => {
         expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
       });
@@ -4748,7 +4744,7 @@ describe("Feedback Item", () => {
       if (voteButton) {
         fireEvent.animationEnd(voteButton);
       }
-      
+
       expect(container.firstChild).toBeTruthy();
     });
   });
@@ -4791,17 +4787,9 @@ describe("Feedback Item", () => {
         refreshFeedbackItems,
       };
 
-      await FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(
-        props,
-        "dropped-id",
-        "target-id"
-      );
+      await FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(props, "dropped-id", "target-id");
 
-      expect(itemDataService.addFeedbackItemAsChild).toHaveBeenCalledWith(
-        testBoardId,
-        "target-id",
-        "dropped-id"
-      );
+      expect(itemDataService.addFeedbackItemAsChild).toHaveBeenCalledWith(testBoardId, "target-id", "dropped-id");
       expect(refreshFeedbackItems).toHaveBeenCalled();
     });
   });
@@ -4877,7 +4865,7 @@ describe("Feedback Item", () => {
       jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
 
       const { container } = render(<FeedbackItem {...props} />);
-      
+
       await waitFor(() => {
         expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
       });
@@ -4967,7 +4955,7 @@ describe("Feedback Item", () => {
       jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
 
       const { container } = render(<FeedbackItem {...props} />);
-      
+
       await waitFor(() => {
         expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
       });
@@ -5049,13 +5037,13 @@ describe("Feedback Item", () => {
       jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
 
       const { container } = render(<FeedbackItem {...props} />);
-      
+
       await waitFor(() => {
         expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
       });
 
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
-      
+
       await act(async () => {
         fireEvent.keyDown(card, { key: "Delete" });
       });
@@ -5134,7 +5122,7 @@ describe("Feedback Item", () => {
       jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
 
       const { container } = render(<FeedbackItem {...props} />);
-      
+
       await waitFor(() => {
         expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
       });
@@ -5144,7 +5132,7 @@ describe("Feedback Item", () => {
         fireEvent.dragEnter(feedbackItem);
         fireEvent.dragLeave(feedbackItem);
       }
-      
+
       expect(container.firstChild).toBeTruthy();
     });
   });
@@ -5548,7 +5536,7 @@ describe("Feedback Item", () => {
     test("FeedbackItemHelper is a valid class", () => {
       // Just verify the class exists and can be referenced
       expect(FeedbackItemHelper).toBeDefined();
-      expect(typeof FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem).toBe('function');
+      expect(typeof FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem).toBe("function");
     });
   });
 
@@ -8023,4 +8011,3 @@ describe("Feedback Item", () => {
     });
   });
 });
-

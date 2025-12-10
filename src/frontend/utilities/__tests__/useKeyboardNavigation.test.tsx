@@ -1,12 +1,7 @@
 import React from "react";
 import { renderHook, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import {
-  useKeyboardNavigation,
-  useGlobalKeyboardShortcuts,
-  useRovingTabIndex,
-  KeyboardNavigationOptions,
-} from "../useKeyboardNavigation";
+import { useKeyboardNavigation, useGlobalKeyboardShortcuts, useRovingTabIndex, KeyboardNavigationOptions } from "../useKeyboardNavigation";
 import { WorkflowPhase } from "../../interfaces/workItem";
 
 describe("useKeyboardNavigation", () => {
@@ -748,7 +743,7 @@ describe("useRovingTabIndex", () => {
 
   it("should focus the new item when navigating", () => {
     const items = [document.createElement("div"), document.createElement("div"), document.createElement("div")];
-    items.forEach((item) => document.body.appendChild(item));
+    items.forEach(item => document.body.appendChild(item));
     const itemsRef: React.RefObject<HTMLElement[]> = { current: items };
     const setCurrentIndex = jest.fn();
     const focusSpy = jest.spyOn(items[1], "focus");
@@ -761,7 +756,7 @@ describe("useRovingTabIndex", () => {
 
     expect(focusSpy).toHaveBeenCalled();
 
-    items.forEach((item) => document.body.removeChild(item));
+    items.forEach(item => document.body.removeChild(item));
   });
 
   it("should handle empty items array", () => {

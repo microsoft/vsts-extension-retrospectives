@@ -311,15 +311,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       return;
     }
 
-    const focusableControls = Array.from(
-      this.itemElement.querySelectorAll(
-        [
-          '[data-card-control="true"]',
-          ".editable-text-container",
-          ".non-editable-text-container",
-        ].join(","),
-      ),
-    ) as HTMLElement[];
+    const focusableControls = Array.from(this.itemElement.querySelectorAll(['[data-card-control="true"]', ".editable-text-container", ".non-editable-text-container"].join(","))) as HTMLElement[];
 
     const visibleControls = focusableControls.filter(control => control.getAttribute("aria-hidden") !== "true" && !control.hasAttribute("disabled"));
 
@@ -1008,11 +1000,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                   </div>
                 )}
                 {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
-                {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
-                  <div className="original-column-info">
-                    Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
-                  </div>
-                )}
+                {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && <div className="original-column-info">Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
               </div>
               {this.feedbackCreationInformationContent()}
               <div className="card-footer">
@@ -1041,11 +1029,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                           <div className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
                             {childDisplayTitle}
                           </div>
-                          {this.props.columnId !== originalColumn?.columnProperties?.id && (
-                            <div className="original-column-info">
-                              Original Column: {originalColumn.columnProperties.title}
-                            </div>
-                          )}
+                          {this.props.columnId !== originalColumn?.columnProperties?.id && <div className="original-column-info">Original Column: {originalColumn.columnProperties.title}</div>}
                         </li>
                       )
                     );

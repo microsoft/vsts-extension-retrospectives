@@ -474,11 +474,11 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const selectAllCheckbox = getByLabelText("Add permission to every team or member in the table.");
-      
+
       await act(async () => {
         fireEvent.click(selectAllCheckbox);
       });
-      
+
       expect(selectAllCheckbox).toBeTruthy();
     });
 
@@ -492,21 +492,19 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: testUserId,
         isNewBoardCreation: true,
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
-        ],
+        permissionOptions: [{ id: "team1", name: "Team One", uniqueName: "team-one", type: "team" }],
         onPermissionChanged,
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const checkbox = container.querySelector('#permission-option-team1');
-      
+      const checkbox = container.querySelector("#permission-option-team1");
+
       if (checkbox) {
         await act(async () => {
           fireEvent.click(checkbox);
         });
       }
-      
+
       expect(container.firstChild).toBeTruthy();
     });
 
@@ -520,21 +518,19 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: testUserId,
         isNewBoardCreation: true,
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "member1", name: "Member One", uniqueName: "member1@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "member1", name: "Member One", uniqueName: "member1@example.com", type: "member" }],
         onPermissionChanged,
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const checkbox = container.querySelector('#permission-option-member1');
-      
+      const checkbox = container.querySelector("#permission-option-member1");
+
       if (checkbox) {
         await act(async () => {
           fireEvent.click(checkbox);
         });
       }
-      
+
       expect(container.firstChild).toBeTruthy();
     });
 
@@ -557,11 +553,11 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const selectAllCheckbox = getByLabelText("Add permission to every team or member in the table.");
-      
+
       await act(async () => {
         fireEvent.click(selectAllCheckbox);
       });
-      
+
       expect(selectAllCheckbox).toBeTruthy();
     });
 
@@ -575,15 +571,13 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: "different-user-id",
         isNewBoardCreation: false,
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "team1", name: "Team Alpha", uniqueName: "team-alpha", type: "team" },
-        ],
+        permissionOptions: [{ id: "team1", name: "Team Alpha", uniqueName: "team-alpha", type: "team" }],
         onPermissionChanged,
       });
 
       const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const selectAllCheckbox = getByLabelText("Add permission to every team or member in the table.");
-      
+
       expect(selectAllCheckbox).toBeDisabled();
     });
 
@@ -597,24 +591,22 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: "non-owner-id",
         isNewBoardCreation: false,
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
-        ],
+        permissionOptions: [{ id: "team1", name: "Team One", uniqueName: "team-one", type: "team" }],
         onPermissionChanged,
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const checkbox = container.querySelector('#permission-option-team1');
-      
+      const checkbox = container.querySelector("#permission-option-team1");
+
       // The checkbox exists but clicking it should not trigger changes when user is not authorized
       expect(checkbox).toBeInTheDocument();
-      
+
       if (checkbox) {
         await act(async () => {
           fireEvent.click(checkbox);
         });
       }
-      
+
       // onPermissionChanged shouldn't be called for initial render when user can't edit
       // The handlePermissionClicked function has a guard that returns early if !canEditPermissions
       expect(container.firstChild).toBeTruthy();
@@ -640,11 +632,11 @@ describe("Board Metadata Form Permissions", () => {
 
       const { container, getByPlaceholderText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const searchInput = getByPlaceholderText("Search teams or users");
-      
+
       await act(async () => {
         fireEvent.change(searchInput, { target: { value: "Alpha" } });
       });
-      
+
       expect(container.firstChild).toBeTruthy();
     });
 
@@ -665,15 +657,15 @@ describe("Board Metadata Form Permissions", () => {
 
       const { container, getByPlaceholderText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const searchInput = getByPlaceholderText("Search teams or users");
-      
+
       await act(async () => {
         fireEvent.change(searchInput, { target: { value: "Alpha" } });
       });
-      
+
       await act(async () => {
         fireEvent.change(searchInput, { target: { value: "" } });
       });
-      
+
       expect(container.firstChild).toBeTruthy();
     });
   });
@@ -689,21 +681,19 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: testUserId,
         isNewBoardCreation: true,
         permissions: { Teams: ["team1"], Members: [] },
-        permissionOptions: [
-          { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
-        ],
+        permissionOptions: [{ id: "team1", name: "Team One", uniqueName: "team-one", type: "team" }],
         onPermissionChanged,
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const checkbox = container.querySelector('#permission-option-team1');
-      
+      const checkbox = container.querySelector("#permission-option-team1");
+
       if (checkbox) {
         await act(async () => {
           fireEvent.click(checkbox);
         });
       }
-      
+
       expect(container.firstChild).toBeTruthy();
     });
 
@@ -717,21 +707,19 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: testUserId,
         isNewBoardCreation: true,
         permissions: { Teams: [], Members: ["member1"] },
-        permissionOptions: [
-          { id: "member1", name: "Member One", uniqueName: "member1@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "member1", name: "Member One", uniqueName: "member1@example.com", type: "member" }],
         onPermissionChanged,
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const checkbox = container.querySelector('#permission-option-member1');
-      
+      const checkbox = container.querySelector("#permission-option-member1");
+
       if (checkbox) {
         await act(async () => {
           fireEvent.click(checkbox);
         });
       }
-      
+
       expect(container.firstChild).toBeTruthy();
     });
   });
@@ -756,21 +744,19 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const selectAllCheckbox = getByLabelText("Add permission to every team or member in the table.");
-      
+
       expect(selectAllCheckbox).not.toBeDisabled();
     });
 
     it("should display admin badge for team admins", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "admin1", name: "Admin User", uniqueName: "admin@example.com", type: "member", isTeamAdmin: true },
-        ],
+        permissionOptions: [{ id: "admin1", name: "Admin User", uniqueName: "admin@example.com", type: "member", isTeamAdmin: true }],
       });
 
       const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const adminBadge = getByLabelText("Team admin badge");
-      
+
       expect(adminBadge).toBeInTheDocument();
       expect(adminBadge).toHaveTextContent("Admin");
     });
@@ -786,14 +772,12 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: "owner-id",
         isNewBoardCreation: false,
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "owner-id", name: "Owner User", uniqueName: "owner@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "owner-id", name: "Owner User", uniqueName: "owner@example.com", type: "member" }],
       });
 
       const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const ownerBadge = getByLabelText("Board owner badge");
-      
+
       expect(ownerBadge).toBeInTheDocument();
       expect(ownerBadge).toHaveTextContent("Owner");
     });
@@ -803,14 +787,12 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: "new-owner-id",
         isNewBoardCreation: true,
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "new-owner-id", name: "New Owner", uniqueName: "newowner@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "new-owner-id", name: "New Owner", uniqueName: "newowner@example.com", type: "member" }],
       });
 
       const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const ownerBadge = getByLabelText("Board owner badge");
-      
+
       expect(ownerBadge).toBeInTheDocument();
     });
 
@@ -823,14 +805,12 @@ describe("Board Metadata Form Permissions", () => {
         currentUserId: "owner-id",
         isNewBoardCreation: false,
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "owner-id", name: "Owner User", uniqueName: "owner@example.com", type: "member" },
-        ],
+        permissionOptions: [{ id: "owner-id", name: "Owner User", uniqueName: "owner@example.com", type: "member" }],
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const ownerCheckbox = container.querySelector('#permission-option-owner-id');
-      
+      const ownerCheckbox = container.querySelector("#permission-option-owner-id");
+
       expect(ownerCheckbox).toBeDisabled();
     });
   });
@@ -839,28 +819,24 @@ describe("Board Metadata Form Permissions", () => {
     it("should render team icon for team type options", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
-        ],
+        permissionOptions: [{ id: "team1", name: "Team One", uniqueName: "team-one", type: "team" }],
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const teamIcon = container.querySelector('.fa-users');
-      
+      const teamIcon = container.querySelector(".fa-users");
+
       expect(teamIcon).toBeInTheDocument();
     });
 
     it("should render profile image for member type options", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [
-          { id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member", thumbnailUrl: "https://example.com/avatar.jpg" },
-        ],
+        permissionOptions: [{ id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member", thumbnailUrl: "https://example.com/avatar.jpg" }],
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       const memberImage = container.querySelector('.permission-image[src="https://example.com/avatar.jpg"]');
-      
+
       expect(memberImage).toBeInTheDocument();
     });
   });

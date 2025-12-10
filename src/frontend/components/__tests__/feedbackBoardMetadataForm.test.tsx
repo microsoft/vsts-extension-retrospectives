@@ -887,7 +887,7 @@ describe("FeedbackBoardMetadataForm - Form Submission Extended", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const deleteButtons = screen.getAllByTitle("Delete");
-    
+
     // Delete all but one column
     for (let i = 0; i < deleteButtons.length - 1; i++) {
       await user.click(deleteButtons[i]);
@@ -965,7 +965,7 @@ describe("FeedbackBoardMetadataForm - Delete Column Undo", () => {
 
     const deleteButtons = screen.getAllByTitle("Delete");
     const initialCount = deleteButtons.length;
-    
+
     await user.click(deleteButtons[0]);
 
     const undoButtons = screen.getAllByTitle("Undo Delete");
@@ -989,7 +989,7 @@ describe("FeedbackBoardMetadataForm - Column Move Operations", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const moveUpButtons = screen.getAllByTitle("Move Up");
-    
+
     // Click the second column's move up button (should be enabled)
     if (moveUpButtons.length > 1) {
       await user.click(moveUpButtons[1]);
@@ -1002,7 +1002,7 @@ describe("FeedbackBoardMetadataForm - Column Move Operations", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const moveDownButtons = screen.getAllByTitle("Move Down");
-    
+
     // Click the first column's move down button (should be enabled)
     if (moveDownButtons.length > 0) {
       await user.click(moveDownButtons[0]);
@@ -1079,7 +1079,7 @@ describe("FeedbackBoardMetadataForm - Title Reset", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const titleInput = screen.getByLabelText(/please enter new retrospective title/i) as HTMLInputElement;
-    
+
     await user.type(titleInput, "Test Title");
     expect(titleInput.value).toBe("Test Title");
 
