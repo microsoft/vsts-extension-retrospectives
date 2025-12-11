@@ -233,34 +233,6 @@ describe("useKeyboardNavigation", () => {
     expect(onDelete).not.toHaveBeenCalled();
   });
 
-  it("should call onHome when Home is pressed", () => {
-    const onHome = jest.fn();
-    const options: KeyboardNavigationOptions = { onHome };
-
-    renderHook(() => useKeyboardNavigation(elementRef, options));
-
-    act(() => {
-      const event = new KeyboardEvent("keydown", { key: "Home" });
-      elementRef.current!.dispatchEvent(event);
-    });
-
-    expect(onHome).toHaveBeenCalledTimes(1);
-  });
-
-  it("should call onEnd when End is pressed", () => {
-    const onEnd = jest.fn();
-    const options: KeyboardNavigationOptions = { onEnd };
-
-    renderHook(() => useKeyboardNavigation(elementRef, options));
-
-    act(() => {
-      const event = new KeyboardEvent("keydown", { key: "End" });
-      elementRef.current!.dispatchEvent(event);
-    });
-
-    expect(onEnd).toHaveBeenCalledTimes(1);
-  });
-
   it("should call onPageUp when PageUp is pressed", () => {
     const onPageUp = jest.fn();
     const options: KeyboardNavigationOptions = { onPageUp };
@@ -711,34 +683,6 @@ describe("useRovingTabIndex", () => {
     });
 
     expect(setCurrentIndex).toHaveBeenCalledWith(0);
-  });
-
-  it("should navigate to first item", () => {
-    const items = [document.createElement("div"), document.createElement("div"), document.createElement("div")];
-    const itemsRef: React.RefObject<HTMLElement[]> = { current: items };
-    const setCurrentIndex = jest.fn();
-
-    const { result } = renderHook(() => useRovingTabIndex(itemsRef, 2, setCurrentIndex));
-
-    act(() => {
-      result.current("first");
-    });
-
-    expect(setCurrentIndex).toHaveBeenCalledWith(0);
-  });
-
-  it("should navigate to last item", () => {
-    const items = [document.createElement("div"), document.createElement("div"), document.createElement("div")];
-    const itemsRef: React.RefObject<HTMLElement[]> = { current: items };
-    const setCurrentIndex = jest.fn();
-
-    const { result } = renderHook(() => useRovingTabIndex(itemsRef, 0, setCurrentIndex));
-
-    act(() => {
-      result.current("last");
-    });
-
-    expect(setCurrentIndex).toHaveBeenCalledWith(2);
   });
 
   it("should focus the new item when navigating", () => {

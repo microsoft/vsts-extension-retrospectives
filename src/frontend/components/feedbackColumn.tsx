@@ -204,14 +204,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         e.preventDefault();
         this.navigateItems("next", visibleItems);
         break;
-      case "Home":
-        e.preventDefault();
-        this.navigateItems("first", visibleItems);
-        break;
-      case "End":
-        e.preventDefault();
-        this.navigateItems("last", visibleItems);
-        break;
       case "Insert":
         if (this.props.workflowPhase === WorkflowPhase.Collect) {
           e.preventDefault();
@@ -232,7 +224,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     return this.props.columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId);
   };
 
-  private navigateItems = (direction: "next" | "prev" | "first" | "last", visibleItems: IColumnItem[]) => {
+  private navigateItems = (direction: "next" | "prev", visibleItems: IColumnItem[]) => {
     if (visibleItems.length === 0) {
       if (this.props.workflowPhase === WorkflowPhase.Collect && this.createFeedbackButton) {
         this.createFeedbackButton.focus();
@@ -248,12 +240,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         break;
       case "prev":
         newIndex = this.state.focusedItemIndex < 0 ? -1 : this.state.focusedItemIndex <= 0 ? 0 : this.state.focusedItemIndex - 1;
-        break;
-      case "first":
-        newIndex = 0;
-        break;
-      case "last":
-        newIndex = visibleItems.length - 1;
         break;
     }
 
