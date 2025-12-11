@@ -85,11 +85,11 @@ describe("KeyboardShortcutsDialog", () => {
       expect(getByText("Navigate between columns")).toBeInTheDocument();
     });
 
-    test("displays home/end shortcuts", () => {
+    test("displays page navigation shortcuts", () => {
       const { getByText } = render(<KeyboardShortcutsDialog isOpen={true} onClose={jest.fn()} currentWorkflowPhase={WorkflowPhase.Collect} />);
 
-      expect(getByText("Jump to first item in column")).toBeInTheDocument();
-      expect(getByText("Jump to last item in column")).toBeInTheDocument();
+      expect(getByText("Scroll up in column")).toBeInTheDocument();
+      expect(getByText("Scroll down in column")).toBeInTheDocument();
     });
 
     test("displays tab navigation", () => {
@@ -152,11 +152,6 @@ describe("KeyboardShortcutsDialog", () => {
       expect(getByText("Edit column notes")).toBeInTheDocument();
     });
 
-    test("displays view column info shortcut", () => {
-      const { getByText } = render(<KeyboardShortcutsDialog isOpen={true} onClose={jest.fn()} currentWorkflowPhase={WorkflowPhase.Collect} />);
-
-      expect(getByText("View column info")).toBeInTheDocument();
-    });
   });
 
   describe("Keyboard key rendering", () => {

@@ -1244,6 +1244,7 @@ describe("Feedback Item", () => {
         timerId: "",
         isGroupedCarouselItem: false,
         workflowPhase: "Group",
+        isFocusModalHidden: true,
       };
       const { container } = render(<FeedbackItem {...props} />);
       expect(container.querySelector(".original-column-info")).toBeTruthy();
