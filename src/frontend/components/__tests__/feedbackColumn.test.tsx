@@ -139,6 +139,60 @@ describe("Feedback Column ", () => {
         rerender(<FeedbackColumn {...updatedProps} />);
       }
     });
+
+    it("logs a warning if restoring contenteditable cursor throws", () => {
+      jest.useFakeTimers();
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+      const createRangeSpy = jest.spyOn(document, "createRange").mockImplementation(() => {
+        throw new Error("boom");
+      });
+
+      try {
+        const props = { ...testColumnProps };
+        const ref = React.createRef<FeedbackColumn>();
+        const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+        expect(ref.current).toBeTruthy();
+
+        const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+        expect(feedbackCard).toBeTruthy();
+
+        const itemId = props.columnItems[0].feedbackItem.id;
+
+        const contentEditable = document.createElement("div");
+        contentEditable.setAttribute("contenteditable", "true");
+        contentEditable.textContent = "Editable";
+        // Ensure restoreFocus sees contenteditable
+        Object.defineProperty(contentEditable, "isContentEditable", { value: true });
+
+        feedbackCard.appendChild(contentEditable);
+        contentEditable.focus();
+        expect(document.activeElement).toBe(contentEditable);
+
+        // Ignore any warnings from initial render.
+        warnSpy.mockClear();
+
+        (ref.current as any).focusPreservation = {
+          elementId: itemId,
+          selectionStart: null,
+          selectionEnd: null,
+          isContentEditable: true,
+          cursorPosition: 2,
+        };
+
+        (ref.current as any).restoreFocus();
+        jest.runOnlyPendingTimers();
+
+        expect(createRangeSpy).toHaveBeenCalled();
+        expect(
+          warnSpy.mock.calls.some(call => call[0] === "Failed to restore cursor position:" && call[1] instanceof Error),
+        ).toBe(true);
+      } finally {
+        createRangeSpy.mockRestore();
+        warnSpy.mockRestore();
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
+      }
+    });
   });
 
   describe("Accessibility - Keyboard Navigation", () => {
