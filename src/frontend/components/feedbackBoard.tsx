@@ -16,7 +16,6 @@ import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
 import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
-import { useGlobalKeyboardShortcuts } from "../utilities/useKeyboardNavigation";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -99,6 +98,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     document.addEventListener("keydown", this.handleBoardKeyDown);
   };
 
+  // TODO (enpolat): it doesn't work after go into edit mode and back. Fix it.
   private handleBoardKeyDown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
     if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || document.querySelector('[role="dialog"]')) {

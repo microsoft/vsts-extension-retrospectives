@@ -29,13 +29,11 @@ const keyboardShortcuts: KeyboardShortcut[] = [
 
   // Item navigation
   { keys: ["↑", "↓"], description: "Navigate between feedback items", category: "Navigation" },
-  { keys: ["Home"], description: "Jump to first item in column", category: "Navigation" },
-  { keys: ["End"], description: "Jump to last item in column", category: "Navigation" },
   { keys: ["Page Up"], description: "Scroll up in column", category: "Navigation" },
   { keys: ["Page Down"], description: "Scroll down in column", category: "Navigation" },
 
   // Item actions - Collect phase
-  { keys: ["N", "Insert"], description: "Create new feedback item", category: "Actions", workflowPhases: [WorkflowPhase.Collect] },
+  { keys: ["Insert"], description: "Create new feedback item", category: "Actions", workflowPhases: [WorkflowPhase.Collect] },
   { keys: ["Enter"], description: "Edit feedback title", category: "Actions", workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act] },
   { keys: ["Delete"], description: "Delete feedback item", category: "Actions", workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act] },
 
@@ -53,14 +51,11 @@ const keyboardShortcuts: KeyboardShortcut[] = [
 
   // Column actions
   { keys: ["E"], description: "Edit column notes", category: "Column" },
-  { keys: ["I"], description: "View column info", category: "Column" },
 ];
 
 const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsDialogProps> = ({ isOpen, onClose, currentWorkflowPhase }) => {
-  // Filter shortcuts based on current workflow phase
   const relevantShortcuts = keyboardShortcuts.filter(shortcut => !shortcut.workflowPhases || shortcut.workflowPhases.includes(currentWorkflowPhase));
 
-  // Group shortcuts by category
   const groupedShortcuts = relevantShortcuts.reduce(
     (acc, shortcut) => {
       if (!acc[shortcut.category]) {

@@ -347,7 +347,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .keyboard-shortcuts-dialog {
-  @apply max-h-1/2 bg-(--background-color);
+  @apply max-h-4/5 bg-(--background-color);
 
   & .ms-Dialog-title,
   & .ms-Dialog-subText {
@@ -1271,7 +1271,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-team-assessment-history-dialog {
-  @apply max-w-250 w-auto flex items-center bg-(--background-color) text-(--text-primary-color);
+  @apply max-w-280 w-auto flex items-center bg-(--background-color) text-(--text-primary-color);
 
   & .ms-Dialog-title {
     @apply text-left text-(--text-primary-color);

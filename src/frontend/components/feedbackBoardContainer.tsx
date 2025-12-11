@@ -2169,17 +2169,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             className: "retrospectives-dialog-modal",
           }}
         >
-          {this.state.teamAssessmentHistoryData.length === 0 ? (
+          {this.state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
             <div className="team-assessment-no-data">
               <p>No team assessment history available.</p>
               <p>Create retrospectives with team assessments to see historical trends.</p>
             </div>
           ) : (
             <>
-              <p className="team-assessment-info-text">Starting with version v2.0.1 (scheduled for publication on January 1st, 2026), a widget will be available that you can add to your Azure DevOps dashboard to see team assessment trends over time.</p>
-              <p className="team-assessment-info-text">Please check your Extensions configuration to ensure the Retrospective Extension is updated to the latest version.</p>
               <p className="team-assessment-info-text">
-                Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
+                Showing average scores over time across {this.state.teamAssessmentHistoryData.slice(-13).length} retrospective{this.state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
               </p>
               {(() => {
                 const questionColors = [
@@ -2199,7 +2197,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 const yScale = (value: number) => padding.top + chartHeight - (value / 10) * chartHeight;
 
-                const allDates = this.state.teamAssessmentHistoryData.map(board => new Date(board.createdDate).getTime());
+                const recentHistoryData = this.state.teamAssessmentHistoryData.slice(-13);
+
+                const allDates = recentHistoryData.map(board => new Date(board.createdDate).getTime());
                 const minDate = Math.min(...allDates);
                 const maxDate = Math.max(...allDates);
                 const dateRange = maxDate - minDate || 1;
@@ -2223,7 +2223,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                       {questions.map((question, qIndex) => {
                         const color = questionColors[qIndex % questionColors.length];
-                        const dataPoints = this.state.teamAssessmentHistoryData
+                        const dataPoints = recentHistoryData
                           .map(board => {
                             const questionData = board.questionAverages.find(qa => qa.questionId === question.id);
                             return questionData ? { date: new Date(board.createdDate), average: questionData.average, boardTitle: board.boardTitle } : null;
@@ -2249,9 +2249,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         );
                       })}
 
-                      {this.state.teamAssessmentHistoryData.map((board, index) => {
+                      {recentHistoryData.map((board, index) => {
                         const date = new Date(board.createdDate);
-                        const shouldShowLabel = index === 0 || index === this.state.teamAssessmentHistoryData.length - 1 || this.state.teamAssessmentHistoryData.length <= 5 || (this.state.teamAssessmentHistoryData.length > 5 && index % Math.ceil(this.state.teamAssessmentHistoryData.length / 5) === 0);
+                        const shouldShowLabel = index === 0 || index === recentHistoryData.length - 1 || recentHistoryData.length <= 5 || (recentHistoryData.length > 5 && index % Math.ceil(recentHistoryData.length / 5) === 0);
 
                         if (!shouldShowLabel) return null;
 
@@ -2264,9 +2264,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                       <text x={padding.left - 50} y={svgHeight / 2} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${svgHeight / 2})`}>
                         Average Score
-                      </text>
-                      <text x={(padding.left + svgWidth - padding.right) / 2} y={svgHeight - 40} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600">
-                        Retrospective Date
                       </text>
 
                       {questions.map((question, qIndex) => {
