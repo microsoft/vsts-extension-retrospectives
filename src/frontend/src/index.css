@@ -274,6 +274,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-(--text-primary-color) pb-2.5;
 }
 
+:is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) ul {
+  @apply flex flex-col gap-3 ml-6;
+}
+
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) :is(.ms-Dialog-content, .ms-Dialog-content .ms-Label, p.ms-Dialog-subText, .ms-Dialog-header button.ms-Dialog-button) {
   @apply text-(--text-primary-color);
 }
@@ -297,7 +301,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply inline-block min-w-3/4 w-full resize-none align-middle pt-5;
 
     & .editable-text-input.error-border {
-      @apply border border-red-600 -m-px;
+      @apply border border-error -m-px;
     }
 
     & .ms-TextField-wrapper .ms-TextField-fieldGroup .editable-text-input {
