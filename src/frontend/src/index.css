@@ -275,7 +275,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) ul {
-  @apply flex flex-col gap-3 ml-6;
+  @apply flex flex-col gap-3 ml-6 list-disc;
 }
 
 :is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) :is(.ms-Dialog-content, .ms-Dialog-content .ms-Label, p.ms-Dialog-subText, .ms-Dialog-header button.ms-Dialog-button) {
