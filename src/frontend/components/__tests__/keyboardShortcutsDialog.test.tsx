@@ -106,26 +106,6 @@ describe("KeyboardShortcutsDialog", () => {
       expect(getByText("Create new feedback item")).toBeInTheDocument();
     });
 
-    test("displays Group phase shortcuts", () => {
-      const { getByText } = render(<KeyboardShortcutsDialog isOpen={true} onClose={jest.fn()} currentWorkflowPhase={WorkflowPhase.Group} />);
-
-      expect(getByText("Group feedback items")).toBeInTheDocument();
-      expect(getByText("Move feedback to different column")).toBeInTheDocument();
-    });
-
-    test("displays Vote phase shortcuts", () => {
-      const { getByText } = render(<KeyboardShortcutsDialog isOpen={true} onClose={jest.fn()} currentWorkflowPhase={WorkflowPhase.Vote} />);
-
-      expect(getByText("Cast/Remove vote")).toBeInTheDocument();
-    });
-
-    test("displays Act phase shortcuts", () => {
-      const { getByText } = render(<KeyboardShortcutsDialog isOpen={true} onClose={jest.fn()} currentWorkflowPhase={WorkflowPhase.Act} />);
-
-      expect(getByText("Add action item")).toBeInTheDocument();
-      expect(getByText("Start/Stop timer")).toBeInTheDocument();
-    });
-
     test("does not display Group shortcuts in Collect phase", () => {
       const { queryByText } = render(<KeyboardShortcutsDialog isOpen={true} onClose={jest.fn()} currentWorkflowPhase={WorkflowPhase.Collect} />);
 

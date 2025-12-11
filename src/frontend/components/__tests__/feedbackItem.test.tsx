@@ -6267,7 +6267,10 @@ describe("Feedback Item", () => {
         fireEvent.keyDown(card, { key: "Enter" });
       });
 
-      // Test passes if no error is thrown
+      await waitFor(() => {
+        const input = container.querySelector(".editable-text-input") as HTMLElement | null;
+        expect(input).toBeTruthy();
+      });
     });
 
     test("pressing v in Vote phase casts vote", async () => {

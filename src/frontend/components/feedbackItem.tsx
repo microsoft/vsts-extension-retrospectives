@@ -213,11 +213,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       case "enter":
         if (target.tagName !== "BUTTON" && target.tagName !== "A") {
           e.preventDefault();
-          const titleElement = this.itemElement?.querySelector(".non-editable-text-container, .editable-text-container");
-          if (titleElement) {
-            (titleElement as HTMLElement).focus();
-            (titleElement as HTMLElement).click();
-          }
+          this.startEditingTitle();
         }
         break;
       case " ":
@@ -275,6 +271,34 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           this.hideRemoveFeedbackItemFromGroupConfirmationDialog();
         }
         break;
+    }
+  };
+
+  private startEditingTitle = () => {
+    if (!this.itemElement) {
+      return;
+    }
+
+    const activeEditor = this.itemElement.querySelector(
+      ".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input",
+    ) as HTMLElement | null;
+
+    if (activeEditor) {
+      activeEditor.focus();
+      return;
+    }
+
+    const titleText = this.itemElement.querySelector(".editable-text") as HTMLElement | null;
+    if (titleText) {
+      titleText.focus();
+      titleText.click();
+      return;
+    }
+
+    const container = this.itemElement.querySelector(".non-editable-text-container, .editable-text-container") as HTMLElement | null;
+    if (container) {
+      container.focus();
+      container.click();
     }
   };
 

@@ -34,20 +34,8 @@ const keyboardShortcuts: KeyboardShortcut[] = [
 
   // Item actions - Collect phase
   { keys: ["Insert"], description: "Create new feedback item", category: "Actions", workflowPhases: [WorkflowPhase.Collect] },
-  { keys: ["Enter"], description: "Edit feedback title", category: "Actions", workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act] },
+  { keys: ["Enter"], description: "Edit feedback item", category: "Actions", workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act] },
   { keys: ["Delete"], description: "Delete feedback item", category: "Actions", workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act] },
-
-  // Group phase actions
-  { keys: ["G"], description: "Group feedback items", category: "Actions", workflowPhases: [WorkflowPhase.Group] },
-  { keys: ["M"], description: "Move feedback to different column", category: "Actions", workflowPhases: [WorkflowPhase.Group] },
-  { keys: ["Space"], description: "Expand/Collapse group", category: "Actions", workflowPhases: [WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act] },
-
-  // Vote phase actions
-  { keys: ["V"], description: "Cast/Remove vote", category: "Actions", workflowPhases: [WorkflowPhase.Vote] },
-
-  // Act phase actions
-  { keys: ["A"], description: "Add action item", category: "Actions", workflowPhases: [WorkflowPhase.Act] },
-  { keys: ["T"], description: "Start/Stop timer", category: "Actions", workflowPhases: [WorkflowPhase.Act] },
 
   // Column actions
   { keys: ["E"], description: "Edit column notes", category: "Column" },
