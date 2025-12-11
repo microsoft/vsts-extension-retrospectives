@@ -284,6 +284,100 @@ describe("Feedback Item", () => {
     });
   });
 
+  describe("Keyboard shortcuts - obscured feedback", () => {
+    test("Enter does not open edit mode when feedback is hidden", async () => {
+      const feedbackItem: IFeedbackItemDocument = {
+        id: "hidden-item",
+        boardId: testBoardId,
+        title: "Top secret",
+        columnId: testColumnUuidOne,
+        originalColumnId: testColumnUuidOne,
+        upvotes: 0,
+        voteCollection: {},
+        createdDate: new Date(),
+        userIdRef: "someone-else", // different from mocked getUserIdentity().id
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+      } as any;
+
+      const columns: any = {
+        [testColumnUuidOne]: {
+          columnProperties: {
+            id: testColumnUuidOne,
+            title: "Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+            notes: "",
+          },
+          columnItems: [{ feedbackItem: { ...feedbackItem }, actionItems: [] }],
+        },
+      };
+
+      const props: any = {
+        id: feedbackItem.id,
+        title: feedbackItem.title,
+        description: "",
+        columnId: feedbackItem.columnId,
+        columns,
+        columnIds: [feedbackItem.columnId],
+        boardId: feedbackItem.boardId,
+        boardTitle: "Board",
+        createdDate: feedbackItem.createdDate,
+        lastEditedDate: "",
+        upvotes: feedbackItem.upvotes,
+        groupIds: [],
+        userIdRef: feedbackItem.userIdRef,
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: true,
+        nonHiddenWorkItemTypes: [] as any[],
+        allWorkItemTypes: [] as any[],
+        originalColumnId: feedbackItem.originalColumnId,
+        timerSecs: feedbackItem.timerSecs,
+        timerState: feedbackItem.timerState,
+        timerId: feedbackItem.timerId,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Collect",
+        isFocusModalHidden: true,
+        team: { id: "team-1" },
+        defaultActionItemAreaPath: "Area",
+        defaultActionItemIteration: "Iter",
+        onVoteCasted: jest.fn(),
+        requestTimerStart: jest.fn().mockResolvedValue(true),
+        notifyTimerStopped: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+        moveFeedbackItem: jest.fn(),
+        groupCount: 0,
+        isShowingGroupedChildrenTitles: false,
+        activeTimerFeedbackItemId: null,
+        columnProps: {} as any,
+        accentColor: columns[testColumnUuidOne].columnProperties.accentColor,
+        iconClass: columns[testColumnUuidOne].columnProperties.iconClass,
+      };
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      expect(card).toBeTruthy();
+
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "Enter" });
+      });
+
+      // Should remain in non-editing state (no input/textarea editor visible).
+      expect(container.querySelector(".editable-text-input-container")).toBeNull();
+      expect(container.textContent).toContain("[Hidden Feedback]");
+    });
+  });
+
   describe("Different workflow phases", () => {
     const baseProps: any = {
       id: "test-id",

@@ -212,6 +212,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         break;
       case "enter":
         if (target.tagName !== "BUTTON" && target.tagName !== "A") {
+          if (this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id) {
+            e.preventDefault();
+            return;
+          }
           e.preventDefault();
           this.startEditingTitle();
         }
@@ -1023,7 +1027,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     </button>
                   </div>
                 )}
-                {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
+                {<EditableDocumentCardTitle isDisabled={hideFeedbackItems} isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
                 {this.props.isFocusModalHidden && !workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && <div className="original-column-info">Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
               </div>
               {this.feedbackCreationInformationContent()}
