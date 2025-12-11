@@ -1717,6 +1717,177 @@ describe("FeedbackBoard Component", () => {
 
       removeEventListenerSpy.mockRestore();
     });
+
+    it("opens Keyboard Shortcuts dialog on ? key", async () => {
+      // Ensure the Focus Mode dialog isn't open; otherwise key handling is suppressed in the component.
+      render(<FeedbackBoard {...mockedProps} isCarouselDialogHidden={true} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+
+      act(() => {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }));
+      });
+
+      expect(await screen.findByText("Keyboard Shortcuts")).toBeInTheDocument();
+    });
+  });
+
+  describe("Column defaults", () => {
+    it("applies default iconClass and accentColor when missing", async () => {
+      const boardWithMissingDefaults: IFeedbackBoardDocument = {
+        ...mockedBoard,
+        columns: mockedBoard.columns.map(col => ({
+          ...col,
+          iconClass: "",
+          accentColor: "",
+          notes: undefined as unknown as string,
+        })),
+      };
+
+      render(<FeedbackBoard {...mockedProps} board={boardWithMissingDefaults} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnId = boardWithMissingDefaults.columns[0].id;
+      const columnProps = getLatestColumnProps(columnId);
+
+      expect(columnProps?.iconClass).toBe("fas fa-chalkboard");
+      expect(columnProps?.accentColor).toBe("#0078d4");
+      expect(columnProps?.columnNotes).toBe("");
+    });
+  });
+
+  describe("Timer and focus edge cases", () => {
+    it("stops missing previous timer ID without crashing", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      // Start a timer for an item that does not exist in state.
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.requestTimerStart("missing-item");
+      });
+
+      // Starting another timer should attempt to stop the previous one and early-return.
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.requestTimerStart("next-item");
+      });
+
+      expect(itemDataService.flipTimer).not.toHaveBeenCalled();
+      expect(appInsights.trackException).not.toHaveBeenCalled();
+    });
+
+    it("stops an existing active timer when starting another", async () => {
+      const clearIntervalSpy = jest.spyOn(window, "clearInterval");
+
+      const itemWithActiveTimer: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        timerState: true,
+        timerId: 123 as any,
+      };
+
+      const otherItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[1],
+        id: "other-item",
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithActiveTimer, otherItem]);
+      (itemDataService.flipTimer as jest.Mock).mockResolvedValue({
+        ...itemWithActiveTimer,
+        timerState: false,
+        timerId: null,
+      });
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(itemWithActiveTimer.columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBe(itemWithActiveTimer.id);
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(itemWithActiveTimer.columnId);
+        await columnProps.requestTimerStart(otherItem.id);
+      });
+
+      expect(clearIntervalSpy).toHaveBeenCalledWith(123);
+      expect(itemDataService.flipTimer).toHaveBeenCalledWith(mockedBoard.id, itemWithActiveTimer.id, null);
+      expect(reflectBackendService.broadcastUpdatedItem).toHaveBeenCalledWith("dummyColumn", itemWithActiveTimer.id);
+
+      clearIntervalSpy.mockRestore();
+    });
+
+    it("clears active timer when notifyTimerStopped is called for the active item", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.requestTimerStart("active-item");
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBe("active-item");
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.notifyTimerStopped("active-item");
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBeNull();
+      });
+    });
+
+    it("sets focus to create button when removing last item", async () => {
+      const singleItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: "single-item",
+        columnId: testColumnProps.columnIds[0],
+        originalColumnId: testColumnProps.columnIds[0],
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([singleItem]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = singleItem.columnId;
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.columnItems?.length).toBe(1);
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.removeFeedbackItemFromColumn(columnId, singleItem.id, true);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.shouldFocusOnCreateFeedback).toBe(true);
+      });
+    });
   });
 
   describe("Column Notes - Edge Cases", () => {
