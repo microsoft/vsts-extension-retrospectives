@@ -63,7 +63,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   private createFeedbackButton: IButton;
   private columnRef: React.RefObject<HTMLDivElement> = React.createRef();
   private itemRefs: Map<string, HTMLElement> = new Map();
-  private previousItemCount: number = 0;
   private focusPreservation: {
     elementId: string | null;
     selectionStart: number | null;
@@ -89,8 +88,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     if (this.columnRef.current) {
       this.columnRef.current.addEventListener("keydown", this.handleColumnKeyDown);
     }
-
-    this.previousItemCount = this.props.columnItems.length;
   }
 
   public componentDidUpdate(prevProps: FeedbackColumnProps) {
@@ -100,8 +97,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       this.restoreFocus();
       this.focusPreservation = null;
     }
-
-    this.previousItemCount = this.props.columnItems.length;
   }
 
   public getSnapshotBeforeUpdate(prevProps: FeedbackColumnProps): null {
