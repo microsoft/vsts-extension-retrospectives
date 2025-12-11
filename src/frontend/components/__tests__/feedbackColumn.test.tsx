@@ -183,9 +183,7 @@ describe("Feedback Column ", () => {
         jest.runOnlyPendingTimers();
 
         expect(createRangeSpy).toHaveBeenCalled();
-        expect(
-          warnSpy.mock.calls.some(call => call[0] === "Failed to restore cursor position:" && call[1] instanceof Error),
-        ).toBe(true);
+        expect(warnSpy.mock.calls.some(call => call[0] === "Failed to restore cursor position:" && call[1] instanceof Error)).toBe(true);
       } finally {
         createRangeSpy.mockRestore();
         warnSpy.mockRestore();

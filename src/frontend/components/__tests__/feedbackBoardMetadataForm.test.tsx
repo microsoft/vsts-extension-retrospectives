@@ -1613,7 +1613,7 @@ describe("FeedbackBoardMetadataForm - Save Button Disabled States", () => {
     if (deleteButtons.length > 0) {
       await user.click(deleteButtons[0]);
     }
-    
+
     if (deleteButtons.length > 1) {
       const secondDeleteButtons = screen.getAllByTitle("Delete");
       const secondButton = secondDeleteButtons.find(btn => !btn.hasAttribute("disabled"));
@@ -1674,7 +1674,7 @@ describe("FeedbackBoardMetadataForm - Column Title Update", () => {
 
     // Verify that columns section is rendered
     expect(screen.getByRole("heading", { name: /column settings/i })).toBeInTheDocument();
-    
+
     // Verify that there are change icon buttons (one per column)
     const iconButtons = screen.getAllByRole("button", { name: /change column icon/i });
     expect(iconButtons.length).toBeGreaterThan(0);
@@ -1697,7 +1697,7 @@ describe("FeedbackBoardMetadataForm - Save Button Validation Edge Cases", () => 
 
     // Mark all columns for deletion (testing line 204-205)
     const deleteButtons = screen.getAllByTitle("Delete");
-    
+
     // Click delete on all columns that can be deleted
     for (let i = 0; i < deleteButtons.length; i++) {
       const currentDeleteButtons = screen.getAllByTitle("Delete");
@@ -1711,7 +1711,7 @@ describe("FeedbackBoardMetadataForm - Save Button Validation Edge Cases", () => 
     await waitFor(() => {
       const saveButton = screen.getByRole("button", { name: /save/i });
       const undoButtons = screen.queryAllByTitle("Undo Delete");
-      
+
       // If all columns are marked for deletion
       if (undoButtons.length >= 3) {
         expect(saveButton).toBeDisabled();
@@ -1746,7 +1746,7 @@ describe("FeedbackBoardMetadataForm - EditableDocumentCardTitle Integration", ()
     // Simulate the onSave callback by checking initial state
     const iconButtons = screen.getAllByRole("button", { name: /change column icon/i });
     expect(iconButtons.length).toBeGreaterThan(0);
-    
+
     // The component properly renders editable titles
     // Testing line 445-446 through integration
     expect(screen.getByRole("heading", { name: /column settings/i })).toBeInTheDocument();
@@ -1806,23 +1806,7 @@ describe("FeedbackBoardMetadataForm - Template Selection Extended", () => {
 
     const templateDropdown = screen.getByLabelText(/apply template/i) as HTMLSelectElement;
 
-    const templates = [
-      "start-stop-continue",
-      "good-improve-ideas-thanks",
-      "mad-sad-glad",
-      "4ls",
-      "daki",
-      "kalm",
-      "wlai",
-      "1to1",
-      "speedboat",
-      "clarity",
-      "energy",
-      "psy-safety",
-      "wlb",
-      "confidence",
-      "efficiency",
-    ];
+    const templates = ["start-stop-continue", "good-improve-ideas-thanks", "mad-sad-glad", "4ls", "daki", "kalm", "wlai", "1to1", "speedboat", "clarity", "energy", "psy-safety", "wlb", "confidence", "efficiency"];
 
     for (const template of templates) {
       await user.selectOptions(templateDropdown, template);
@@ -1862,14 +1846,17 @@ describe("FeedbackBoardMetadataForm - Comprehensive Coverage Tests", () => {
     }
 
     // Check if save button becomes disabled (testing line 204-205)
-    await waitFor(() => {
-      const saveButton = screen.getByRole("button", { name: /save/i });
-      const undoButtons = screen.queryAllByTitle("Undo Delete");
-      if (undoButtons.length >= totalColumns) {
-        // All columns deleted - save should be disabled
-        expect(saveButton).toBeDisabled();
-      }
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const saveButton = screen.getByRole("button", { name: /save/i });
+        const undoButtons = screen.queryAllByTitle("Undo Delete");
+        if (undoButtons.length >= totalColumns) {
+          // All columns deleted - save should be disabled
+          expect(saveButton).toBeDisabled();
+        }
+      },
+      { timeout: 3000 },
+    );
   });
 
   it("should execute line 209 - check when column has empty title", async () => {
@@ -1880,21 +1867,24 @@ describe("FeedbackBoardMetadataForm - Comprehensive Coverage Tests", () => {
     await user.type(titleInput, "Test Board");
 
     // Find text inputs within column cards
-    const columnCards = container.querySelectorAll('.feedback-column-card');
+    const columnCards = container.querySelectorAll(".feedback-column-card");
     if (columnCards.length > 0) {
       const firstCard = columnCards[0];
       const columnInput = firstCard.querySelector('input[type="text"]') as HTMLInputElement;
-      
+
       if (columnInput) {
         // Clear the column title to make it empty
         await user.clear(columnInput);
-        
+
         // Wait for state update
-        await waitFor(() => {
-          const saveButton = screen.getByRole("button", { name: /save/i });
-          // Save button should be disabled when column has empty title (testing line 208-209)
-          expect(saveButton).toBeDisabled();
-        }, { timeout: 2000 });
+        await waitFor(
+          () => {
+            const saveButton = screen.getByRole("button", { name: /save/i });
+            // Save button should be disabled when column has empty title (testing line 208-209)
+            expect(saveButton).toBeDisabled();
+          },
+          { timeout: 2000 },
+        );
       }
     }
   });
@@ -1904,17 +1894,17 @@ describe("FeedbackBoardMetadataForm - Comprehensive Coverage Tests", () => {
     const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     // Find a column card with an input
-    const columnCards = container.querySelectorAll('.feedback-column-card');
+    const columnCards = container.querySelectorAll(".feedback-column-card");
     if (columnCards.length > 0) {
       const firstCard = columnCards[0];
       const columnInput = firstCard.querySelector('input[type="text"]') as HTMLInputElement;
-      
+
       if (columnInput) {
         const originalValue = columnInput.value;
-        
+
         // Type to trigger the onChange event which calls onSave (lines 445-446)
         await user.type(columnInput, "X");
-        
+
         // Verify the value changed (onSave was called and updated state)
         await waitFor(() => {
           expect(columnInput.value).not.toBe(originalValue);
@@ -1930,13 +1920,13 @@ describe("FeedbackBoardMetadataForm - Comprehensive Coverage Tests", () => {
 
     const changeIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
     await user.click(changeIconButtons[0]);
-    
+
     expect(screen.getByText(/choose column icon/i)).toBeInTheDocument();
-    
+
     // Click an icon to trigger the onClick which sets state including columnCardBeingEdited to null
     const iconButtons = screen.getAllByRole("button", { name: /choose the icon/i });
     await user.click(iconButtons[0]);
-    
+
     // Dialog should close (onDismiss would be called if we closed it differently,
     // but onClick also sets columnCardBeingEdited to null which is the key state change)
     await waitFor(() => {
@@ -1950,13 +1940,13 @@ describe("FeedbackBoardMetadataForm - Comprehensive Coverage Tests", () => {
 
     const changeColorButtons = screen.getAllByRole("button", { name: /change column color/i });
     await user.click(changeColorButtons[0]);
-    
+
     expect(screen.getByText(/choose column color/i)).toBeInTheDocument();
-    
+
     // Click a color to trigger the onClick which sets state including columnCardBeingEdited to undefined
     const colorButtons = screen.getAllByRole("button", { name: /choose the color/i });
     await user.click(colorButtons[0]);
-    
+
     // Dialog should close (onDismiss would be called if we closed it differently,
     // but onClick also sets columnCardBeingEdited to undefined which is the key state change)
     await waitFor(() => {

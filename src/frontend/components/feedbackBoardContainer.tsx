@@ -1901,13 +1901,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 <>
                   <div className="mx-4 vertical-tab-separator" />
                   <div className="flex items-center justify-start">
-                    <button
-                      className="flex items-center bg-transparent border-0 cursor-pointer text-sm hover:bg-transparent focus:outline-none"
-                      onClick={this.showTeamAssessmentHistoryDialog}
-                      title="Team Assessment History"
-                      aria-label="Team Assessment History"
-                      type="button"
-                    >
+                    <button className="flex items-center bg-transparent border-0 cursor-pointer text-sm hover:bg-transparent focus:outline-none" onClick={this.showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
                       <span className="inline-flex items-center justify-center lg:mr-1">
                         <i className="fas fa-chart-line"></i>
                       </span>

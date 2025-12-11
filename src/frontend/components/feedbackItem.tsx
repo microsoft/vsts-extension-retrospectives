@@ -283,9 +283,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       return;
     }
 
-    const activeEditor = this.itemElement.querySelector(
-      ".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input",
-    ) as HTMLElement | null;
+    const activeEditor = this.itemElement.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
 
     if (activeEditor) {
       activeEditor.focus();
@@ -816,7 +814,9 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
 
     const columnItems = this.props.columns[this.props.columnId]?.columnItems;
 
-    {this.props.isFocusModalHidden && !workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && <div className="original-column-info">Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
+    {
+      this.props.isFocusModalHidden && !workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && <div className="original-column-info">Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>;
+    }
     const mainFeedbackItem = columnItems?.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
     const groupedFeedbackItems = this.props.groupIds
       .map(id => {

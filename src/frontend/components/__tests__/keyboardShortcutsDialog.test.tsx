@@ -131,7 +131,6 @@ describe("KeyboardShortcutsDialog", () => {
 
       expect(getByText("Edit column notes")).toBeInTheDocument();
     });
-
   });
 
   describe("Keyboard key rendering", () => {

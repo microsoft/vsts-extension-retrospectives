@@ -1910,7 +1910,7 @@ describe("FeedbackBoard Component", () => {
     it("handles onColumnNotesChange when callback is undefined", async () => {
       const propsWithoutCallback = {
         ...mockedProps,
-        onColumnNotesChange: undefined as FeedbackBoardProps['onColumnNotesChange'] | undefined,
+        onColumnNotesChange: undefined as FeedbackBoardProps["onColumnNotesChange"] | undefined,
       };
 
       render(<FeedbackBoard {...propsWithoutCallback} />);

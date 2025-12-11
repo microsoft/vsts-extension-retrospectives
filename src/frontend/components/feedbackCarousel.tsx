@@ -129,9 +129,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         {this.state.feedbackColums.map(columnProps => {
           const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
           const slideIds = feedbackCarouselItems.map((_, index) => `slide-${columnProps.columnId}-${index}`);
-          const activeDotCss = slideIds
-            .map(slideId => `.carousel-container:has(#${slideId}:target) .carousel-dots a[href="#${slideId}"] { opacity: 1; transform: scale(1.05); }`)
-            .join("\n");
+          const activeDotCss = slideIds.map(slideId => `.carousel-container:has(#${slideId}:target) .carousel-dots a[href="#${slideId}"] { opacity: 1; transform: scale(1.05); }`).join("\n");
 
           return (
             <PivotItem key={columnProps.columnId} headerText={columnProps.columnName} className="feedback-carousel-pivot-item" {...columnProps}>
