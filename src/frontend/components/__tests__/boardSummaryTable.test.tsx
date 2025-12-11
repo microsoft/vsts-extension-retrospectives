@@ -747,6 +747,119 @@ describe("BoardSummaryTable - Sorting Functionality", () => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
     });
   });
+
+  it("sorts by archivedDate with nulls and covers both null-side branches", async () => {
+    const boardsWithArchivedDates: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], title: "Null A", isArchived: true, archivedDate: null as unknown as Date },
+      { ...mockBoards[1], title: "Date Old", isArchived: true, archivedDate: new Date("2023-01-01") },
+      { ...mockBoards[0], id: "board-null-b", title: "Null B", isArchived: true, archivedDate: undefined as unknown as Date },
+      { ...mockBoards[1], id: "board-date-new", title: "Date New", isArchived: true, archivedDate: new Date("2023-02-01") },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(boardsWithArchivedDates);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const archivedDateHeader = Array.from(container.querySelectorAll('th[role="columnheader"]')).find(th => th.textContent?.includes("Archived Date")) as HTMLElement;
+    expect(archivedDateHeader).toBeTruthy();
+
+    // First click: archivedDate becomes active sort (asc)
+    archivedDateHeader.click();
+
+    await waitFor(() => {
+      const rows = container.querySelectorAll('tbody tr[tabindex="0"]');
+      expect(rows.length).toBeGreaterThanOrEqual(4);
+      const firstRowName = rows[0]?.querySelectorAll("td")?.[1]?.textContent;
+      const secondRowName = rows[1]?.querySelectorAll("td")?.[1]?.textContent;
+      // Date rows come first in asc, null/undefined go last
+      expect([firstRowName, secondRowName]).toEqual(["Date Old", "Date New"]);
+    });
+
+    // Second click: archivedDate desc
+    archivedDateHeader.click();
+
+    await waitFor(() => {
+      const rows = container.querySelectorAll('tbody tr[tabindex="0"]');
+      const firstRowName = rows[0]?.querySelectorAll("td")?.[1]?.textContent;
+      const secondRowName = rows[1]?.querySelectorAll("td")?.[1]?.textContent;
+      expect([firstRowName, secondRowName]).toEqual(["Date New", "Date Old"]);
+    });
+  });
+
+  it("createdDate sort toggles desc → none → asc and updates aria-sort", async () => {
+    const boardsWithDates: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], title: "Old", createdDate: new Date("2023-01-01") },
+      { ...mockBoards[1], title: "New", createdDate: new Date("2023-06-01") },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(boardsWithDates);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const createdDateHeader = Array.from(container.querySelectorAll('th[role="columnheader"]')).find(th => th.textContent?.includes("Created Date")) as HTMLElement;
+    expect(createdDateHeader).toBeTruthy();
+
+    // Initial state: createdDate is current sort and descending
+    expect(createdDateHeader.getAttribute("aria-sort")).toBe("descending");
+
+    // Click 1: desc -> none
+    createdDateHeader.click();
+    await waitFor(() => {
+      expect(createdDateHeader.getAttribute("aria-sort")).toBe("none");
+    });
+
+    // Click 2: none -> asc
+    createdDateHeader.click();
+    await waitFor(() => {
+      expect(createdDateHeader.getAttribute("aria-sort")).toBe("ascending");
+      const rows = container.querySelectorAll('tbody tr[tabindex="0"]');
+      const firstRowName = rows[0]?.querySelectorAll("td")?.[1]?.textContent;
+      expect(firstRowName).toBe("Old");
+    });
+  });
+});
+
+describe("BoardSummaryTable - Row Expansion Rendering", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("renders BoardSummary content when expanding a row", async () => {
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(container.querySelectorAll(".contextual-menu-button").length).toBeGreaterThan(0);
+    });
+
+    const expandButtons = container.querySelectorAll(".contextual-menu-button");
+    (expandButtons[0] as HTMLElement).click();
+
+    await waitFor(() => {
+      expect(container.textContent).toContain("Looks like no work items were created for this board.");
+    });
+  });
+});
+
+describe("buildBoardSummaryState", () => {
+  it("returns initialized empty state for no documents", () => {
+    const state = buildBoardSummaryState([]);
+    expect(state.boardsTableItems).toEqual([]);
+    expect(state.feedbackBoards).toEqual([]);
+    expect(state.isDataLoaded).toBe(true);
+    expect(state.allDataLoaded).toBe(false);
+  });
 });
 
 describe("BoardSummaryTable - Row Expansion", () => {
