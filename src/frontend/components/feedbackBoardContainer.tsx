@@ -1522,13 +1522,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         title: "Show retrospective summary",
       },
       {
-        key: "teamAssessmentHistory",
-        iconProps: { iconName: "TimelineProgress" },
-        onClick: this.showTeamAssessmentHistoryDialog,
-        text: "Show team assessment history",
-        title: "Show team assessment history",
-      },
-      {
         key: "seperator",
         itemType: ContextualMenuItemType.Divider,
       },
@@ -1901,6 +1894,25 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </button>
                       )}
                     </div>
+                  </div>
+                </>
+              )}
+              {this.state.activeTab === "History" && (
+                <>
+                  <div className="mx-4 vertical-tab-separator" />
+                  <div className="flex items-center justify-start">
+                    <button
+                      className="flex items-center bg-transparent border-0 cursor-pointer text-sm hover:bg-transparent focus:outline-none"
+                      onClick={this.showTeamAssessmentHistoryDialog}
+                      title="Team Assessment History"
+                      aria-label="Team Assessment History"
+                      type="button"
+                    >
+                      <span className="inline-flex items-center justify-center lg:mr-1">
+                        <i className="fas fa-chart-line"></i>
+                      </span>
+                      <span className="hidden lg:inline">Team Assessment History</span>
+                    </button>
                   </div>
                 </>
               )}
