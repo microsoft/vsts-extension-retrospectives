@@ -217,8 +217,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         e.preventDefault();
         this.navigateItems("last", visibleItems);
         break;
-      case "n":
-      case "N":
       case "Insert":
         if (this.props.workflowPhase === WorkflowPhase.Collect) {
           e.preventDefault();
