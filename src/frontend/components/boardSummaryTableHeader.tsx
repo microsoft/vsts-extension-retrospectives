@@ -7,7 +7,7 @@ interface BoardSummaryTableHeaderProps {
   columns: ISimpleColumn[];
   sortColumn: string;
   sortDirection: SortDirection;
-  onSort: (columnId: string, sortDescFirst?: boolean) => void;
+  onSort: (columnId: string) => void;
 }
 
 const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ columns, sortColumn, sortDirection, onSort }) => {
@@ -33,7 +33,7 @@ const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ colum
     return {
       "className": sortClassName,
       "aria-sort": ariaSort,
-      "onClick": () => onSort(column.id, column.sortDescFirst),
+      "onClick": () => onSort(column.id),
       "style": { cursor: "pointer" },
     };
   };

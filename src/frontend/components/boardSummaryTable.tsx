@@ -122,17 +122,14 @@ export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClic
   );
 }
 
-// Simple column definition interface
 export interface ISimpleColumn {
   id: string;
   header: string | (() => React.JSX.Element) | null;
   accessor?: keyof IBoardSummaryTableItem;
   cell: (item: IBoardSummaryTableItem) => React.JSX.Element | string | number;
   sortable?: boolean;
-  sortDescFirst?: boolean;
 }
 
-// Simple sorting types
 type SortDirection = "asc" | "desc" | false;
 
 export interface ITableData {
@@ -171,7 +168,6 @@ function getColumns(onArchiveToggle: () => void, setTableData: React.Dispatch<Re
       accessor: "createdDate",
       cell: (item: IBoardSummaryTableItem) => dateFormatter.format(item.createdDate),
       sortable: true,
-      sortDescFirst: true,
     },
     {
       id: "isArchived",
@@ -189,7 +185,6 @@ function getColumns(onArchiveToggle: () => void, setTableData: React.Dispatch<Re
         </div>
       ),
       sortable: true,
-      sortDescFirst: true,
     },
     {
       id: "archivedDate",
@@ -197,7 +192,6 @@ function getColumns(onArchiveToggle: () => void, setTableData: React.Dispatch<Re
       accessor: "archivedDate",
       cell: (item: IBoardSummaryTableItem) => (item.archivedDate ? dateFormatter.format(item.archivedDate) : ""),
       sortable: true,
-      sortDescFirst: true,
     },
     {
       id: "feedbackItemsCount",
@@ -324,7 +318,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     allDataLoaded: false,
   });
 
-  // Simple sorting state
   const [sortColumn, setSortColumn] = useState<string>("createdDate");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -336,25 +329,21 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
 
   const [refreshKey, setRefreshKey] = useState(false);
 
-  // Toggle sort function
-  const toggleSort = (columnId: string, sortDescFirst?: boolean) => {
+  const toggleSort = (columnId: string) => {
     if (sortColumn === columnId) {
-      // Toggle direction
       if (sortDirection === "asc") {
         setSortDirection("desc");
       } else if (sortDirection === "desc") {
         setSortDirection(false);
       } else {
-        setSortDirection(sortDescFirst ? "desc" : "asc");
+        setSortDirection("asc");
       }
     } else {
-      // New column
       setSortColumn(columnId);
-      setSortDirection(sortDescFirst ? "desc" : "asc");
+      setSortDirection("asc");
     }
   };
 
-  // Toggle row expansion
   const toggleExpanded = (rowId: string) => {
     setExpandedRows(prev => {
       const next = new Set(prev);
@@ -367,7 +356,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     });
   };
 
-  // Get sorted data
   const getSortedData = (): IBoardSummaryTableItem[] => {
     if (!sortDirection) return tableData;
 
@@ -398,7 +386,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     return sorted;
   };
 
-  // Get columns
   const columns = getColumns(props.onArchiveToggle, setTableData, setOpenDialogBoardId, props.currentUserId, props.currentUserIsTeamAdmin, expandedRows, toggleExpanded);
 
   const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
@@ -411,7 +398,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     const updatedBoardsTableItems = [...state.boardsTableItems];
     const updatedActionItemsByBoard = { ...state.actionItemsByBoard };
 
-    // Preload all work item state info once, up front
     const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
     await Promise.all(
       props.supportedWorkItemTypes.map(async workItemType => {
@@ -425,7 +411,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
         const feedbackBoardId: string = feedbackBoard.id;
         const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
 
-        // Always set feedback item count, even if 0
         const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
         if (boardIndex !== -1) {
           updatedBoardsTableItems[boardIndex] = {
@@ -436,7 +421,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
 
         if (!feedbackItems.length) return;
 
-        // Filter feedback items that have associated action items
         const actionableFeedbackItems = feedbackItems.filter(item => item.associatedActionItemIds && item.associatedActionItemIds.length > 0);
 
         if (!actionableFeedbackItems.length) {
@@ -453,7 +437,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           }),
         );
 
-        // Update action items for this board
         updatedActionItemsByBoard[feedbackBoardId] = {
           isDataLoaded: true,
           actionItems: aggregatedWorkItems,
@@ -464,7 +447,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           return !states.length || (states[0].category !== "Completed" && states[0].category !== "Removed");
         });
 
-        // Update board table item with work item counts
         if (boardIndex !== -1) {
           updatedBoardsTableItems[boardIndex] = {
             ...updatedBoardsTableItems[boardIndex],
@@ -475,7 +457,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       }),
     );
 
-    // Final state update
     setBoardSummaryState({
       ...state,
       boardsTableItems: updatedBoardsTableItems,
@@ -493,20 +474,19 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
 
   useEffect(() => {
     if (teamId !== props.teamId || refreshKey) {
-      // Triggers when teamId changes OR refreshKey is true
       BoardDataService.getBoardsForTeam(props.teamId)
         .then((boardDocuments: IFeedbackBoardDocument[]) => {
           setTeamId(props.teamId);
           handleBoardsDocuments(boardDocuments);
         })
         .finally(() => {
-          setRefreshKey(false); // Reset refreshKey after fetching
+          setRefreshKey(false);
         })
         .catch(e => {
           appInsights.trackException(e);
         });
     }
-  }, [props.teamId, refreshKey]); // Runs when teamId or refreshKey updates
+  }, [props.teamId, refreshKey]);
 
   if (boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner" size={SpinnerSize.large} label="Loading..." ariaLive="assertive" />;
