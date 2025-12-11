@@ -110,6 +110,18 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         e.preventDefault();
         this.setState({ isKeyboardShortcutsDialogOpen: true });
         break;
+      case "ArrowUp":
+        if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.defaultPrevented) {
+          e.preventDefault();
+          this.columnRefs[this.state.focusedColumnIndex]?.current?.navigateByKeyboard("prev");
+        }
+        break;
+      case "ArrowDown":
+        if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.defaultPrevented) {
+          e.preventDefault();
+          this.columnRefs[this.state.focusedColumnIndex]?.current?.navigateByKeyboard("next");
+        }
+        break;
       case "ArrowLeft":
         if (!e.shiftKey && !e.ctrlKey && !e.altKey) {
           e.preventDefault();
@@ -651,7 +663,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         showColumnEditButton: !!canCurrentUserEditBoard,
         columnNotes: this.state.columnNotes[columnId] ?? "",
         onColumnNotesChange: (notes: string) => this.handleColumnNotesChange(columnId, notes),
-        registerItemRef: this.columnRefs[index]?.current?.registerItemRef,
+        registerItemRef: (itemId: string, element: HTMLElement | null) => this.columnRefs[index]?.current?.registerItemRef(itemId, element),
         onVoteCasted: () => {
           if (this.props.onVoteCasted) {
             this.props.onVoteCasted();

@@ -1106,7 +1106,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
     & .feedback-column-edit-button,
     & .feedback-column-info-button {
-      @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] cursor-pointer bg-transparent border-0 py-1 px-2 rounded-sm transition-colors duration-200 ml-0.5;
+      @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] cursor-pointer bg-transparent border-0 px-1 rounded-sm transition-colors duration-200 ml-0.5;
 
       &:hover {
         @apply bg-[rgba(var(--palette-neutral-20,200,200,200),0.5)];
@@ -1880,6 +1880,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedbackItem:focus-visible .mainItemCard {
+  @apply outline-[3px] outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
+}
+
+.feedbackItem:focus .mainItemCard,
+.feedbackItemGroupItem:focus .groupedItemCard {
   @apply outline-[3px] outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
 }
 

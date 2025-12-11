@@ -257,6 +257,11 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     }
   };
 
+  public navigateByKeyboard = (direction: "next" | "prev") => {
+    const visibleItems = this.getVisibleColumnItems();
+    this.navigateItems(direction, visibleItems);
+  };
+
   public focusColumn = () => {
     if (this.columnRef.current) {
       this.columnRef.current.focus();
