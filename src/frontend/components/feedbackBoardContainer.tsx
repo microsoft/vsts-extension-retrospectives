@@ -1525,8 +1525,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         key: "teamAssessmentHistory",
         iconProps: { iconName: "TimelineProgress" },
         onClick: this.showTeamAssessmentHistoryDialog,
-        text: "Team assessment history",
-        title: "Team assessment history",
+        text: "Show team assessment history",
+        title: "Show team assessment history",
       },
       {
         key: "seperator",
