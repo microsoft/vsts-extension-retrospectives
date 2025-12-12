@@ -334,11 +334,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-base ml-3 flex flex-nowrap items-center gap-2;
 
   & .entry {
-    @apply flex items-center gap-1 -ml-1 text-sm text-(--text-secondary-color);
-
-    & strong {
-      @apply text-(--text-primary-color);
-    }
+    @apply flex items-center gap-1 -ml-1 text-sm;
   }
 
   & .separator {
