@@ -771,10 +771,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply bg-primary font-normal h-8 leading-8 sticky p-1.5 top-0 z-1;
       }
 
-      & tr th .resizer {
-        @apply absolute right-0 top-0 h-full w-1.5 cursor-col-resize select-none touch-none;
-      }
-
       & tr th:first-of-type {
         width: 35px !important;
         max-width: 35px !important;
