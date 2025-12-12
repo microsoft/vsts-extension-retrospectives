@@ -237,6 +237,15 @@ const getLatestColumnPropsById = (columnId: string) => {
   return undefined;
 };
 
+// In production, key events usually target a focused Element.
+// In these tests we often dispatch on `document`, which makes `e.target` a `Document` without `.closest()`.
+// Provide a minimal shim so keyboard shortcut handling doesn't crash under jsdom.
+beforeAll(() => {
+  if (!(document as unknown as { closest?: unknown }).closest) {
+    (document as unknown as { closest: () => null }).closest = () => null;
+  }
+});
+
 describe("FeedbackBoard Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
