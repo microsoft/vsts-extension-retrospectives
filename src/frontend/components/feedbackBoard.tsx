@@ -98,12 +98,28 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     document.addEventListener("keydown", this.handleBoardKeyDown);
   };
 
-  // TODO (enpolat): it doesn't work after go into edit mode and back. Fix it.
+  private getColumnIndexFromElement = (element: Element | null): number | null => {
+    if (!element) {
+      return null;
+    }
+
+    const columnElement = element.closest("[data-column-id]");
+    const columnId = columnElement?.getAttribute("data-column-id");
+    if (!columnId) {
+      return null;
+    }
+
+    const index = this.state.columnIds.indexOf(columnId);
+    return index >= 0 ? index : null;
+  };
+
   private handleBoardKeyDown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
     if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || document.querySelector('[role="dialog"]')) {
       return;
     }
+
+    const targetColumnIndex = this.getColumnIndexFromElement(target) ?? this.getColumnIndexFromElement(document.activeElement) ?? this.state.focusedColumnIndex;
 
     switch (e.key) {
       case "?":
@@ -113,13 +129,13 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       case "ArrowUp":
         if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.defaultPrevented) {
           e.preventDefault();
-          this.columnRefs[this.state.focusedColumnIndex]?.current?.navigateByKeyboard("prev");
+          this.columnRefs[targetColumnIndex]?.current?.navigateByKeyboard("prev");
         }
         break;
       case "ArrowDown":
         if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.defaultPrevented) {
           e.preventDefault();
-          this.columnRefs[this.state.focusedColumnIndex]?.current?.navigateByKeyboard("next");
+          this.columnRefs[targetColumnIndex]?.current?.navigateByKeyboard("next");
         }
         break;
       case "ArrowLeft":
@@ -168,10 +184,15 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   };
 
   private navigateToColumnByIndex = (index: number) => {
-    if (index >= 0 && index < this.columnRefs.length && this.columnRefs[index]?.current) {
-      this.setState({ focusedColumnIndex: index });
-      this.columnRefs[index].current?.focusColumn();
+    if (index < 0 || index >= this.columnRefs.length) {
+      return;
     }
+
+    const columnRef = this.columnRefs[index];
+
+    this.setState({ focusedColumnIndex: index }, () => {
+      columnRef?.current?.focusColumn();
+    });
   };
 
   private closeKeyboardShortcutsDialog = () => {
