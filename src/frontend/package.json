@@ -74,7 +74,7 @@
     "sass-loader": "16.0.6",
     "stream-browserify": "3.0.0",
     "style-loader": "4.0.0",
-    "tailwindcss": "4.1.17",
+    "tailwindcss": "4.1.18",
     "tfx-cli": "0.22.2",
     "ts-jest": "29.4.6",
     "ts-loader": "9.5.4",
