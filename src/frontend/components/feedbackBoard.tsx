@@ -703,7 +703,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         >
           <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
         </Dialog>
-        <KeyboardShortcutsDialog isOpen={this.state.isKeyboardShortcutsDialogOpen} onClose={this.closeKeyboardShortcutsDialog} currentWorkflowPhase={this.props.workflowPhase} />
+        <KeyboardShortcutsDialog isOpen={this.state.isKeyboardShortcutsDialogOpen} onClose={this.closeKeyboardShortcutsDialog} />
       </>
     );
   }
