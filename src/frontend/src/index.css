@@ -971,7 +971,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-assessment-button {
-  @apply border border-solid border-(--nav-header-active-item-background) rounded-lg hidden sm:block;
+  @apply border border-solid border-(--nav-header-active-item-background) rounded-lg hidden md:block;
 }
 
 .team-assessment-no-data {
@@ -1594,7 +1594,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .pivot-tab {
-  @apply block px-3 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent leading-none;
+  @apply px-3 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent leading-none;
 
   &:hover {
     @apply text-primary;
@@ -1609,7 +1609,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &.history {
-    @apply hidden sm:block;
+    @apply hidden md:block;
   }
 }
 
