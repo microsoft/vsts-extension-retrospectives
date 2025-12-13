@@ -1344,7 +1344,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-form-section-header {
-    @apply py-[5px] px-2.5 text-[1.1em] font-medium m-0 bg-primary text-right text-(--text-primary-color);
+    @apply py-1 px-2.5 text-[1.1em] font-medium m-0 bg-primary text-right text-(--text-primary-color);
 
     &.bottom-padding-zero {
       @apply pb-0;
@@ -1408,10 +1408,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .feedback-column-card {
-    @apply bg-(---nav-vertical-background-color) text-(--text-primary-color) h-[60px] mt-2.5 items-center;
+    @apply bg-(---nav-vertical-background-color) text-(--text-primary-color) h-15 mt-2.5 items-center;
 
     & :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button) {
-      @apply bg-transparent! min-w-[30px] pl-0 pr-0 ml-[5px] mr-[5px] border-none text-(--text-primary-color);
+      @apply bg-transparent! min-w-7 pl-0 pr-0 ml-1 mr-1 border-none text-(--text-primary-color);
     }
 
     & :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button):hover {
@@ -1427,7 +1427,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & .editable-document-card-title .editable-text {
-      @apply [display:inherit] ml-2.5 text-[1.1em] leading-[1.1em] text-start;
+      @apply [display:inherit] ml-2.5 text-start;
     }
 
     & .editable-document-card-title .editable-text-input-container {
@@ -1435,7 +1435,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button) {
-      @apply bg-(--background-color) border-none my-0 mx-[3px];
+      @apply bg-(--background-color) border-none my-0 mx-1;
     }
 
     & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button):hover {
@@ -1488,7 +1488,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .create-feedback-column-card-button-wrapper .ms-Button-icon {
-    @apply text-(--status-info-foreground) bg-(--nav-vertical-background-color) p-1 h-[22px];
+    @apply text-(--status-info-foreground) bg-(--nav-vertical-background-color) p-1 h-5;
   }
 
   & .board-metadata-logo {
@@ -1605,11 +1605,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 #extension-header .team-selector {
-  @apply font-normal flex items-baseline my-0 mx-[25px] pt-1;
+  @apply font-normal flex items-baseline my-0 mx-6 pt-1;
 }
 
 .pivot-container {
-  @apply fixed top-[45px] z-2 w-full items-center justify-start;
+  @apply fixed top-11 z-2 w-full items-center justify-start;
 }
 
 .pivot-container .ms-Pivot {
@@ -1859,7 +1859,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-dialog {
-  @apply bg-(--background-color) border-[3px] border-solid border-(--border-subtle-color) max-w-[840px] text-(--text-primary-color);
+  @apply bg-(--background-color) border-[3px] border-solid border-(--border-subtle-color) max-w-210 text-(--text-primary-color);
 }
 
 .team-effectiveness-dialog .ms-Dialog-title {
@@ -1982,7 +1982,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus {
-  @apply h-[34px] max-w-[150px] z-1 my-0 mr-auto mb-0 ml-0 py-0 pr-[5px] pb-0 pl-0 bg-inherit border-none flex leading-[34px] text-xs font-semibold text-primary;
+  @apply h-8 max-w-36 z-1 my-0 mr-auto mb-0 ml-0 py-0 pr-1 pb-0 pl-0 bg-inherit border-none flex leading-8 text-xs font-semibold text-primary;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus i {
