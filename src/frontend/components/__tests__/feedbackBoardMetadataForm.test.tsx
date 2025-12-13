@@ -1241,7 +1241,6 @@ describe("FeedbackBoardMetadataForm - ComponentDidMount Settings Loading", () =>
   });
 
   it("should load saved settings for new board on mount", async () => {
-    const BoardDataService = require("../../dal/boardDataService").default;
     mockGetSetting.mockImplementation((key: string) => {
       if (key === "lastVotes") return Promise.resolve(8);
       if (key === "lastTeamEffectiveness") return Promise.resolve(false);
@@ -1267,7 +1266,6 @@ describe("FeedbackBoardMetadataForm - ComponentDidMount Settings Loading", () =>
   });
 
   it("should use default settings when saved settings return null", async () => {
-    const BoardDataService = require("../../dal/boardDataService").default;
     mockGetSetting.mockResolvedValue(null);
 
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
@@ -1279,7 +1277,6 @@ describe("FeedbackBoardMetadataForm - ComponentDidMount Settings Loading", () =>
   });
 
   it("should not load settings for duplicate board", async () => {
-    const BoardDataService = require("../../dal/boardDataService").default;
     mockGetSetting.mockResolvedValue(10);
     mockedProps.isDuplicatingBoard = true;
     mockedProps.currentBoard = testExistingBoard;
@@ -1293,7 +1290,6 @@ describe("FeedbackBoardMetadataForm - ComponentDidMount Settings Loading", () =>
   });
 
   it("should not load settings for existing board", async () => {
-    const BoardDataService = require("../../dal/boardDataService").default;
     mockGetSetting.mockResolvedValue(10);
     mockedProps.isNewBoardCreation = false;
     mockedProps.currentBoard = testExistingBoard;
@@ -1721,7 +1717,7 @@ describe("FeedbackBoardMetadataForm - Save Button Validation Edge Cases", () => 
 
   it("should handle columns with empty titles", async () => {
     const user = userEvent.setup();
-    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const titleInput = screen.getByLabelText(/please enter new retrospective title/i);
     await user.type(titleInput, "Valid Board Title");
@@ -1740,8 +1736,8 @@ describe("FeedbackBoardMetadataForm - EditableDocumentCardTitle Integration", ()
   });
 
   it("should call onSave when column title is updated", async () => {
-    const user = userEvent.setup();
-    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
+    userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     // Simulate the onSave callback by checking initial state
     const iconButtons = screen.getAllByRole("button", { name: /change column icon/i });
@@ -1762,7 +1758,7 @@ describe("FeedbackBoardMetadataForm - Dialog Dismiss Handlers", () => {
 
   it("should handle icon dialog dismiss via onDismiss handler", async () => {
     const user = userEvent.setup();
-    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const changeIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
     await user.click(changeIconButtons[0]);
@@ -1778,7 +1774,7 @@ describe("FeedbackBoardMetadataForm - Dialog Dismiss Handlers", () => {
 
   it("should handle color dialog dismiss via onDismiss handler", async () => {
     const user = userEvent.setup();
-    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const changeColorButtons = screen.getAllByRole("button", { name: /change column color/i });
     await user.click(changeColorButtons[0]);

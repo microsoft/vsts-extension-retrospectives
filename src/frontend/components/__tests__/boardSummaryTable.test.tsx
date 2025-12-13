@@ -598,7 +598,7 @@ describe("BoardSummaryTable, additional coverage", () => {
     it("renders sortable column headers", async () => {
       (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(mockBoards);
 
-      const { container, getByText } = render(<BoardSummaryTable teamId="team-1" currentUserId="user-1" currentUserIsTeamAdmin={true} onArchiveToggle={jest.fn()} supportedWorkItemTypes={[]} />);
+      const { container } = render(<BoardSummaryTable teamId="team-1" currentUserId="user-1" currentUserIsTeamAdmin={true} onArchiveToggle={jest.fn()} supportedWorkItemTypes={[]} />);
 
       await waitFor(() => {
         expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
