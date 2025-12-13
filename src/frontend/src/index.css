@@ -1022,28 +1022,22 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-full;
 }
 
-.retrospectives-carousel-dialog-modal {
-  & .ms-Overlay {
-    @apply bg-black/30;
+.retrospectives-carousel-dialog {
+  @apply bg-(--background-color);
+
+  & .ms-Dialog-title {
+    @apply text-(--text-primary-color);
   }
 
-  & .retrospectives-carousel-dialog {
-    @apply bg-(--background-color);
+  & .ms-Dialog-subText {
+    @apply text-(--text-primary-color) text-sm;
+  }
 
-    & .ms-Dialog-title {
-      @apply text-(--text-primary-color);
-    }
+  & .feedback-carousel-pivot .ms-Pivot {
+    @apply mb-5;
 
-    & .ms-Dialog-subText {
-      @apply text-(--text-primary-color) text-sm;
-    }
-
-    & .feedback-carousel-pivot .ms-Pivot {
-      @apply mb-5;
-
-      & .ms-Button:first-of-type {
-        @apply -ml-2;
-      }
+    & .ms-Button:first-of-type {
+      @apply -ml-2;
     }
   }
 }

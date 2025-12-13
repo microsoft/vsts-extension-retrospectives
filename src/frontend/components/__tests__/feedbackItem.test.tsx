@@ -8131,7 +8131,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
     userIdRef: overrides.userIdRef ?? "test-user-id",
     timerSecs: overrides.timerSecs ?? 0,
     timerState: overrides.timerState ?? false,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     timerId: (overrides as any).timerId ?? null,
     groupIds: overrides.groupIds ?? [],
     parentFeedbackItemId: overrides.parentFeedbackItemId ?? null,
@@ -8193,8 +8192,8 @@ describe("FeedbackItem additional coverage (merged)", () => {
       groupIds: [],
       isShowingGroupedChildrenTitles: false,
       isFocusModalHidden: true,
-      onVoteCasted: jest.fn(),
       activeTimerFeedbackItemId: null,
+      onVoteCasted: jest.fn(),
       requestTimerStart: jest.fn().mockResolvedValue(true),
       notifyTimerStopped: jest.fn(),
       addFeedbackItems: jest.fn(),
@@ -8332,7 +8331,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
   test("Enter starts editing title (focus moves to title editor)", async () => {
     const props = makeProps();
     const { container } = render(<FeedbackItem {...props} />);
-    const root = container.querySelector(`[data-feedback-item-id=\"${props.id}\"]`) as HTMLElement;
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
 
     fireEvent.keyDown(root, { key: "Enter" });
 

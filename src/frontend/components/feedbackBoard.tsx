@@ -736,7 +736,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
             this.carouselDialogRef = ref;
           }}
           className="retrospectives-carousel-dialog"
-          style={{ minWidth: "900px", border: "none", borderRadius: "4px", padding: "0", maxWidth: "90vw", maxHeight: "90vh" }}
           onClose={this.props.hideCarouselDialog}
         >
           <div className="retrospectives-carousel-dialog-content">
