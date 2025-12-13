@@ -135,7 +135,7 @@ describe("KeyboardShortcutsDialog", () => {
 
   describe("Keyboard key rendering", () => {
     test("renders kbd elements for shortcuts", () => {
-      const { container, getByRole } = render(<KeyboardShortcutsDialog isOpen={true} onClose={jest.fn()} />);
+      const { getByRole } = render(<KeyboardShortcutsDialog isOpen={true} onClose={jest.fn()} />);
 
       // Ensure dialog is open
       const dialog = getByRole("dialog");
