@@ -1012,6 +1012,116 @@ describe("Feedback Item", () => {
       updateTimerSpy.mockRestore();
       flipTimerSpy.mockRestore();
     });
+
+    test("pressing Tab moves focus to the next feedback card", async () => {
+      const firstItem = createKeyboardTestItem({ id: "keyboard-first", title: "First Card" });
+      const secondItem = createKeyboardTestItem({ id: "keyboard-second", title: "Second Card" });
+
+      const columnId = firstItem.columnId;
+      const sharedColumns = {
+        [columnId]: {
+          columnProperties: {
+            id: columnId,
+            title: "Keyboard Column",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+            notes: "",
+          },
+          columnItems: [
+            { feedbackItem: { ...firstItem }, actionItems: [] as any[] },
+            { feedbackItem: { ...secondItem }, actionItems: [] as any[] },
+          ],
+        },
+      };
+
+      const sharedProps: any = {
+        columnId,
+        columns: sharedColumns,
+        columnIds: [columnId],
+        boardId: firstItem.boardId,
+        boardTitle: "Keyboard Board",
+        createdDate: firstItem.createdDate,
+        lastEditedDate: "",
+        upvotes: 0,
+        groupIds: [] as string[],
+        userIdRef: firstItem.userIdRef,
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+        nonHiddenWorkItemTypes: [] as any[],
+        allWorkItemTypes: [] as any[],
+        originalColumnId: columnId,
+        timerSecs: 0,
+        timerState: false,
+        timerId: null as any,
+        isGroupedCarouselItem: false,
+        workflowPhase: "Group",
+        isFocusModalHidden: true,
+        team: { id: "team-1" },
+        defaultActionItemAreaPath: "Area",
+        defaultActionItemIteration: "Iter",
+        onVoteCasted: jest.fn(),
+        requestTimerStart: jest.fn().mockResolvedValue(true),
+        notifyTimerStopped: jest.fn(),
+        refreshFeedbackItems: jest.fn(),
+        addFeedbackItems: jest.fn(),
+        removeFeedbackItemFromColumn: jest.fn(),
+        moveFeedbackItem: jest.fn(),
+        groupCount: 0,
+        isShowingGroupedChildrenTitles: false,
+        activeTimerFeedbackItemId: null as string | null,
+        columnProps: {} as any,
+        accentColor: sharedColumns[columnId].columnProperties.accentColor,
+        iconClass: sharedColumns[columnId].columnProperties.iconClass,
+      };
+
+      const { container } = render(
+        <>
+          <FeedbackItem {...{ ...sharedProps, id: firstItem.id, title: firstItem.title }} />
+          <FeedbackItem {...{ ...sharedProps, id: secondItem.id, title: secondItem.title }} />
+        </>,
+      );
+
+      const firstCard = container.querySelector(`[data-feedback-item-id="${firstItem.id}"]`) as HTMLElement;
+      const secondCard = container.querySelector(`[data-feedback-item-id="${secondItem.id}"]`) as HTMLElement;
+
+      firstCard.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(firstCard, { key: "Tab" });
+      });
+
+      await waitFor(() => {
+        expect(document.activeElement).toBe(secondCard);
+      });
+    });
+
+    test("arrow keys move focus through card controls", async () => {
+      const props = buildKeyboardTestProps({ workflowPhase: "Vote", isFocusModalHidden: true, onVoteCasted: jest.fn() });
+
+      const { container } = render(<FeedbackItem {...props} />);
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "ArrowRight" });
+      });
+
+      await waitFor(() => {
+        expect(document.activeElement?.getAttribute("data-card-control")).toBe("true");
+      });
+
+      await act(async () => {
+        fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowLeft" });
+      });
+
+      await waitFor(() => {
+        expect(document.activeElement?.getAttribute("data-card-control")).toBe("true");
+      });
+    });
   });
 
   describe("FeedbackItemHelper", () => {

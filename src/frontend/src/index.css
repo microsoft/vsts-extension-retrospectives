@@ -25,14 +25,15 @@
 
 @layer components {
   .retro-dialog-shell {
-    max-width: none !important;
-    min-width: 500px !important;
-    width: 60% !important;
-    background-color: var(--background-color) !important;
+    @apply max-w-none! min-w-125! w-1/2! bg-(--background-color)!;
+
+    & .ms-Dialog-content {
+      @apply flex flex-col gap-3;
+    }
   }
 
   .feedback-card-surface {
-    @apply bg-transparent! z-1;
+    @apply bg-transparent! z-1 border! border-border-gray!;
     border: 1px solid var(--color-border-gray) !important;
   }
 }
@@ -176,14 +177,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .extension-settings-button {
-    @apply bg-inherit border-0 min-w-0 mx-2 p-0 text-[rgba(var(--palette-neutral-80),1)];
+    @apply bg-inherit border-0 min-w-0 mx-2 p-0 text-(--text-primary-color);
 
     & i[data-icon-name="ChevronDown"] {
       @apply hidden;
     }
 
     &:hover {
-      @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-(--text-primary-color);
+      @apply bg-(--background-color) text-(--text-primary-color);
     }
 
     &:focus-visible {
@@ -221,14 +222,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .contextual-menu-button {
-  @apply w-6 min-w-6 h-7.5 bg-inherit px-1 py-0 border-0 text-[rgba(var(--palette-neutral-80),1)];
+  @apply w-6 min-w-6 h-7.5 bg-inherit px-1 py-0 border-0 text-(--text-primary-color);
 
   & i[data-icon-name="ChevronDown"] {
     @apply hidden;
   }
 
   &:hover {
-    @apply bg-[rgba(var(--palette-neutral-0),0.15)] text-(--text-primary-color);
+    @apply bg-(--background-color) text-(--text-primary-color);
   }
 
   &:focus-visible {
@@ -326,14 +327,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-board {
   @apply w-full table table-fixed;
-
-  & .feedback-columns-container {
-    @apply table-row bg-[rgba(var(--palette-neutral-2,248,248,248),1)];
-
-    &:focus {
-      @apply outline-none;
-    }
-  }
 }
 
 .keyboard-shortcuts-dialog {
@@ -378,12 +371,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
-  @apply pt-5 border border-gray-medium p-2.5 mb-1.5;
-
-  .board-metadata-form-permissions .board-metadata-form-board-settings--no-padding {
-    @apply p-0;
-  }
-
   & .board-metadata-form-section-information {
     @apply m-2.5;
   }
@@ -393,7 +380,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-table-container {
-    @apply max-h-[350px] overflow-auto;
+    @apply max-h-85 overflow-auto;
   }
 
   & .board-metadata-table {
@@ -407,7 +394,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply sticky bg-(--background-color) border-b border-(--border-subtle-color) top-0 z-1;
 
       &.cell-checkbox {
-        @apply w-[30px];
+        @apply w-7.5;
       }
     }
 
@@ -434,7 +421,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply flex justify-center items-center ml-auto;
 
         & span {
-          @apply bg-(--palette-black-alpha-6) py-0.5 px-2 rounded-[120px] text-(--text-primary-color) whitespace-nowrap;
+          @apply bg-(--palette-black-alpha-6) py-0.5 px-2 rounded-full text-(--text-primary-color) whitespace-nowrap;
         }
       }
     }
@@ -442,7 +429,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-preview-email-dialog {
-  @apply max-w-none w-[800px] h-[500px] bg-(--background-color) border border-border-gray;
+  @apply max-w-none w-200 h-125 bg-(--background-color) border border-border-gray;
 
   & div[role="heading"] {
     @apply text-(--text-primary-color);
@@ -469,7 +456,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &:focus-visible .mainItemCard {
-    @apply outline-[3px] outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
+    @apply outline-3 outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
   }
 
   & .item-cards {
@@ -1618,7 +1605,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .pivot-tab {
-  @apply px-3 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent rounded-sm leading-none;
+  @apply px-3 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent leading-none;
 }
 
 .pivot-tab:hover {
@@ -1626,7 +1613,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .pivot-tab--active {
-  @apply text-primary border-primary bg-[color-mix(in_srbg,var(--color-primary)_12%,var(--background-color)_88%)];
+  @apply text-primary border-b-primary;
 }
 
 .pivot-tab:focus-visible {
@@ -1638,7 +1625,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .menu-button {
-  @apply ml-[5px] mr-5 bg-gray-light;
+  @apply ml-1 mr-5 bg-gray-light;
 }
 
 .board-selector-group {
@@ -1654,7 +1641,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-actions-menu {
-  @apply ml-[5px];
+  @apply ml-1;
 }
 
 .workflow-stage-header {
@@ -1662,15 +1649,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .workflow-stage-tab {
-  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer rounded-md border border-transparent transition-colors duration-150 leading-none;
+  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent transition-colors duration-150 leading-none;
 }
 
 .workflow-stage-tab:hover {
-  @apply text-primary border-[color-mix(in_srbg,var(--color-primary)_40%,var(--color-border-gray)_60%)];
+  @apply text-primary;
 }
 
 .workflow-stage-tab--active {
-  @apply text-primary border-primary bg-[color-mix(in_srbg,var(--color-primary)_14%,var(--background-color)_86%)];
+  @apply text-primary border-b-primary;
 }
 
 .workflow-stage-tab:focus-visible {
@@ -1730,7 +1717,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .info-message-bar .ms-MessageBar-actions {
-  @apply mb-1 mr-1 min-w-[130px] min-h-[50px];
+  @apply mb-1 mr-1 min-w-32 min-h-12;
 }
 
 .info-message-bar .ms-MessageBar-actions .info-message-bar-action {
@@ -1738,7 +1725,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-section-information {
-  @apply rounded bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-1 text-center w-[350px];
+  @apply rounded bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-1 text-center w-86;
 }
 
 .team-effectiveness-measurement-table {
@@ -1912,7 +1899,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedbackItem.hideFeedbackItem .card-content,
 .feedbackItemGroupItem.hideFeedbackItem .card-content {
-  @apply blur-[5px] pointer-events-none;
+  @apply blur-xs pointer-events-none;
 }
 
 .feedbackItem .document-card-wrapper {
@@ -1934,13 +1921,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .card-header-base {
-  @apply h-[34px] inline-flex w-full justify-end items-center mb-2.5;
+  @apply h-8 inline-flex w-full justify-end items-center mb-2.5;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header,
 .feedback-item-group .mainItemCard .card-integral-part .card-header,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header {
-  @apply h-[34px] inline-flex w-full justify-end items-center mb-2.5;
+  @apply h-8 inline-flex w-full justify-end items-center mb-2.5;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button,
@@ -1953,7 +1940,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &:focus-visible {
-    @apply outline-2 outline-primary outline-offset-2 rounded-[3px];
+    @apply outline-2 outline-primary outline-offset-2 rounded-sm;
   }
 
   &:disabled {

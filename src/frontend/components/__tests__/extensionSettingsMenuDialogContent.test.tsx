@@ -34,36 +34,15 @@ describe("extensionSettingsMenuDialogContent", () => {
       expect(italicElement).toHaveTextContent("This is italic text");
     });
 
-    it("should not add top margin to first element", () => {
-      const content = [{ content: "First paragraph" }];
-      const { container } = render(<>{renderContent(content)}</>);
-
-      const div = container.querySelector("div");
-      expect(div).toHaveStyle({ marginTop: undefined });
-    });
-
-    it("should add top margin to non-first elements", () => {
+    it("should render items without adding layout margins", () => {
       const content = [{ content: "First paragraph" }, { content: "Second paragraph" }];
       const { container } = render(<>{renderContent(content)}</>);
 
       const divs = container.querySelectorAll("div");
-      expect(divs[1]).toHaveStyle({ marginTop: "1rem" });
-    });
-
-    it("should not add bottom margin to last element", () => {
-      const content = [{ content: "Only paragraph" }];
-      const { container } = render(<>{renderContent(content)}</>);
-
-      const div = container.querySelector("div");
-      expect(div).toHaveStyle({ marginBottom: undefined });
-    });
-
-    it("should add bottom margin to non-last elements", () => {
-      const content = [{ content: "First paragraph" }, { content: "Second paragraph" }];
-      const { container } = render(<>{renderContent(content)}</>);
-
-      const divs = container.querySelectorAll("div");
-      expect(divs[0]).toHaveStyle({ marginBottom: "1rem" });
+      expect(divs[0]).toHaveTextContent("First paragraph");
+      expect(divs[1]).toHaveTextContent("Second paragraph");
+      expect(divs[0]).not.toHaveStyle({ marginTop: "1rem", marginBottom: "1rem" });
+      expect(divs[1]).not.toHaveStyle({ marginTop: "1rem", marginBottom: "1rem" });
     });
 
     it("should render multiple content items with correct styling", () => {
@@ -73,17 +52,17 @@ describe("extensionSettingsMenuDialogContent", () => {
       const divs = container.querySelectorAll("div");
       expect(divs).toHaveLength(3);
 
-      // First item - normal, no top margin, has bottom margin
+      // First item - normal
       expect(divs[0]).toHaveTextContent("Normal text");
-      expect(divs[0]).toHaveStyle({ marginTop: undefined, marginBottom: "1rem" });
+      expect(divs[0]).not.toHaveStyle({ marginTop: "1rem", marginBottom: "1rem" });
 
-      // Second item - bold, has both margins
+      // Second item - bold
       expect(divs[1].querySelector("b")).toHaveTextContent("Bold text");
-      expect(divs[1]).toHaveStyle({ marginTop: "1rem", marginBottom: "1rem" });
+      expect(divs[1]).not.toHaveStyle({ marginTop: "1rem", marginBottom: "1rem" });
 
-      // Third item - italic, has top margin, no bottom margin
+      // Third item - italic
       expect(divs[2].querySelector("i")).toHaveTextContent("Italic text");
-      expect(divs[2]).toHaveStyle({ marginTop: "1rem", marginBottom: undefined });
+      expect(divs[2]).not.toHaveStyle({ marginTop: "1rem", marginBottom: "1rem" });
     });
 
     it("should handle PRIME_DIRECTIVE_CONTENT correctly", () => {
@@ -135,10 +114,8 @@ describe("extensionSettingsMenuDialogContent", () => {
       const { container } = render(<>{renderContent(content)}</>);
 
       const div = container.querySelector("div");
-      expect(div).toHaveStyle({
-        marginTop: undefined,
-        marginBottom: undefined,
-      });
+      expect(div).toHaveTextContent("Single item");
+      expect(div).not.toHaveStyle({ marginTop: "1rem", marginBottom: "1rem" });
     });
   });
 });
