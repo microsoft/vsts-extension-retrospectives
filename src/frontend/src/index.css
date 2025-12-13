@@ -166,7 +166,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .extension-settings-menu {
-  @apply flex flex-nowrap mr-1;
+  @apply mr-1 hidden sm:flex sm:flex-nowrap;
 
   & .ms-Button-label {
     @apply text-xs;
@@ -1591,18 +1591,22 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .pivot-tab {
   @apply px-3 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent leading-none;
-}
 
-.pivot-tab:hover {
-  @apply text-primary;
-}
+  &:hover {
+    @apply text-primary;
+  }
 
-.pivot-tab--active {
-  @apply text-primary border-b-primary;
-}
+  &:focus-visible {
+    @apply outline-2 outline-primary outline-offset-2;
+  }
 
-.pivot-tab:focus-visible {
-  @apply outline-2 outline-primary outline-offset-2;
+  &.active {
+    @apply text-primary border-b-primary;
+  }
+
+  &.history {
+    @apply hidden sm:block;
+  }
 }
 
 .vertical-tab-separator {
