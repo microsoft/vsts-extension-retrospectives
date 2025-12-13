@@ -41,7 +41,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
-import { AssessmentIcon, CloseIcon } from "./icons";
+import { AssessmentIcon, CloseIcon, InfoIcon, PauseCircleIcon, PlayCircleIcon, RefreshIcon } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -489,7 +489,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
         <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"}. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
-          <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
+          {this.state.isBoardTimerRunning ? <PauseCircleIcon /> : <PlayCircleIcon />}
         </button>
         {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
           <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
@@ -504,7 +504,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <span className={this.state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
         )}
         <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
-          <i className="fa fa-undo" />
+          <RefreshIcon />
         </button>
       </div>
     );
@@ -1793,7 +1793,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           >
                             <DialogContent>
                               <div className="team-effectiveness-section-information">
-                                <i className="fa fa-info-circle" />
+                                <InfoIcon />
                                 &nbsp;All answers will be saved anonymously
                               </div>
                               <table className="team-effectiveness-measurement-table">

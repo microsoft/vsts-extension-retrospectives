@@ -19,6 +19,7 @@ import { reflectBackendService } from "../dal/reflectBackendService";
 import { IColumn, IColumnItem } from "./feedbackBoard";
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
+import { PlayCircleIcon, StopCircleIcon } from "./icons";
 
 export interface IFeedbackItemColumnContext {
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
@@ -1025,7 +1026,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                         this.timerSwitch(this.props.id);
                       }}
                     >
-                      <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
+                      {curTimerState ? <StopCircleIcon /> : <PlayCircleIcon />}
                       <span> {this.formatTimer(this.props.timerSecs)} elapsed</span>
                     </button>
                   </div>

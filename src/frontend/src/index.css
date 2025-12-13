@@ -211,7 +211,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-carousel-pivot-item .carousel-container {
-  @apply min-h-96;
+  @apply min-h-90;
 }
 
 .carousel-dots {
@@ -1040,13 +1040,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-carousel-dialog {
-  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 backdrop:backdrop-blur-xs backdrop:bg-black/50;
+  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-xl;
 
   & .header {
-    @apply flex justify-between items-center p-5 border-b border-b-border-gray-lighter text-(--text-primary-color);
+    @apply flex justify-between items-center px-5 py-3 text-(--text-primary-color);
 
     & .title {
-      @apply m-0 text-2xl font-semibold;
+      @apply m-0 text-xl font-semibold;
     }
 
     & button {
@@ -1059,11 +1059,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .subText {
-    @apply p-5 text-sm text-(--text-primary-color);
+    @apply px-5 py-3 text-sm text-(--text-primary-color);
   }
 
   & .inner {
-    @apply p-5;
+    @apply px-5 py-3;
   }
 
   & .feedback-carousel-pivot .ms-Pivot {
@@ -1726,6 +1726,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .workflow-stage-timer .workflow-stage-timer-toggle {
   @apply gap-1.5;
+
+  & svg {
+    @apply w-4 h-4;
+  }
 }
 
 .feedback-workflow-wrapper-background {
@@ -1745,7 +1749,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-section-information {
-  @apply rounded bg-(--border-subtle-color) font-bold my-[5px_auto_10px_auto] p-1 text-center w-86;
+  @apply flex items-center justify-center gap-1 rounded bg-(--border-subtle-color) my-2.5 mx-auto p-1 w-86;
+
+  & svg {
+    @apply w-5 h-5;
+  }
 }
 
 .team-effectiveness-measurement-table {
@@ -1945,36 +1953,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-(--text-secondary-color);
 }
 
-.card-header-base {
-  @apply h-8 inline-flex w-full justify-end items-center mb-2.5;
-}
-
 .feedbackItem .mainItemCard .card-integral-part .card-header,
 .feedback-item-group .mainItemCard .card-integral-part .card-header,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header {
-  @apply h-8 inline-flex w-full justify-end items-center mb-2.5;
-}
-
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-action-button,
-.feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-action-button,
-.feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-action-button {
-  @apply h-6 min-w-6 max-w-25 z-1 py-0 px-0.5 items-center my-0 mx-0.5 bg-inherit border-none flex justify-center;
-
-  &:focus {
-    @apply border-none;
-  }
-
-  &:focus-visible {
-    @apply outline-2 outline-primary outline-offset-2 rounded-sm;
-  }
-
-  &:disabled {
-    @apply opacity-50 cursor-default;
-  }
-
-  & i {
-    @apply leading-5 text-(--text-secondary-color) text-sm;
-  }
+  @apply inline-flex items-center justify-end gap-2 w-full h-8 mb-2.5 text-(--text-secondary-color);
 }
 
 .focus-outline-primary {
@@ -2017,7 +1999,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .feedbackItemGroupItem .mainItemCard .card-integral-part .card-header .feedback-vote-count,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-vote-count,
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-vote-count {
-  @apply text-(--text-secondary-color) flex items-center;
+  @apply text-(--text-secondary-color);
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .item-actions-menu {
@@ -2052,9 +2034,28 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply py-2 px-4 block text-sm font-light leading-4 overflow-hidden wrap-break-word h-11;
 }
 
-.feedbackItem .mainItemCard .card-action-timer,
-.feedbackItemGroupItem .mainItemCard .card-action-timer {
+.card-action-timer {
   @apply mb-2.5 text-(--text-primary-color) bg-(--nav-header-active-item-background) py-0.5 px-1.5;
+
+  & .feedback-action-button {
+    @apply flex items-center justify-center gap-1 h-6 cursor-pointer;
+
+    &:focus {
+      @apply border-none;
+    }
+
+    &:focus-visible {
+      @apply outline-2 outline-primary outline-offset-2 rounded-sm;
+    }
+
+    &:disabled {
+      @apply opacity-50 cursor-default;
+    }
+
+    & svg {
+      @apply w-4 h-4;
+    }
+  }
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack {
