@@ -41,7 +41,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
-import { AssessmentIcon, CloseIcon, InfoIcon, PauseCircleIcon, PlayCircleIcon, RefreshIcon } from "./icons";
+import { AssessmentIcon, CloseIcon, InfoIcon, PauseCircleIcon, PeopleIcon, PersonIcon, PlayCircleIcon, RefreshIcon } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -1896,7 +1896,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
                         <div className="feedback-votes-count" role="status" aria-live="polite">
                           <span className="entry" title={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
-                            <i className="fas fa-user ml-1" aria-hidden="true"></i>
+                            <PersonIcon />
                             <span className="hidden lg:inline">My Votes:</span> {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"}
                           </span>
                           {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 && (
@@ -1905,7 +1905,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                 |
                               </span>
                               <span className="entry" title={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`} aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
-                                <i className="fas fa-users ml-1" aria-hidden="true"></i>
+                                <PeopleIcon />
                                 <span className="hidden lg:inline">Team Votes:</span> {this.state.castedVoteCount}/{this.state.teamVoteCapacity}
                               </span>
                             </>

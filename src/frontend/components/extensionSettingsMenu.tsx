@@ -12,10 +12,9 @@ import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/fee
 import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
-import { WorkflowPhase } from "../interfaces/workItem";
 
-import { RETRO_URLS, PRIME_DIRECTIVE_CONTENT, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, WHATISNEW_CONTENT, renderContent } from "./extensionSettingsMenuDialogContent";
-import { PrivacyTipIcon } from "./icons";
+import { RETRO_URLS, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, WHATISNEW_CONTENT, renderContent } from "./extensionSettingsMenuDialogContent";
+import { CelebrationIcon, CloseIcon, CloudDownloadIcon, CloudIcon, CloudUploadIcon, ContactPhoneIcon, HelpIcon, KeyboardIcon, MenuBookIcon, PrivacyTipIcon, VolunteerActivismIcon } from "./icons";
 
 interface IExtensionSettingsMenuState {
   isPrimeDirectiveDialogHidden: boolean;
@@ -109,6 +108,9 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     };
   }
 
+  private readonly primeDirectiveDialogRef = React.createRef<HTMLDialogElement>();
+  private readonly whatsNewDialogRef = React.createRef<HTMLDialogElement>();
+
   private readonly exportData = async () => {
     const toastId = toast("Processing boards...");
     const exportedData: IExportImportDataSchema[] = [];
@@ -178,36 +180,8 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     }
   };
 
-  private readonly showPrimeDirectiveDialog = () => {
-    this.setState({ isPrimeDirectiveDialogHidden: false });
-  };
-
-  private readonly hidePrimeDirectiveDialog = () => {
-    this.setState({ isPrimeDirectiveDialogHidden: true });
-  };
-
-  private readonly showWhatsNewDialog = () => {
-    this.setState({ isWhatsNewDialogHidden: false });
-  };
-
-  private readonly hideWhatsNewDialog = () => {
-    this.setState({ isWhatsNewDialogHidden: true });
-  };
-
-  private readonly showPleaseJoinUsDialog = () => {
-    this.setState({ isPleaseJoinUsDialogHidden: false });
-  };
-
   private readonly hidePleaseJoinUsDialog = () => {
     this.setState({ isPleaseJoinUsDialogHidden: true });
-  };
-
-  private readonly onRetrospectiveWikiClicked = () => {
-    window.open(RETRO_URLS.retrospectivewiki, "_blank");
-  };
-
-  private readonly onChangeLogClicked = () => {
-    window.open(RETRO_URLS.changelog, "_blank");
   };
 
   private readonly onGetHelpClicked = () => {
@@ -218,86 +192,105 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     window.open(RETRO_URLS.contributing, "_blank");
   };
 
-  private readonly onContactUsClicked = () => {
-    window.open(RETRO_URLS.issues, "_blank");
-  };
-
-  private readonly exportImportDataMenu: IContextualMenuItem[] = [
-    {
-      key: "exportData",
-      iconProps: { iconName: "CloudDownload" },
-      onClick: () => {
-        this.exportData().catch(console.error);
-      },
-      text: "Export data",
-      title: "Export data",
-    },
-    {
-      key: "importData",
-      iconProps: { iconName: "CloudUpload" },
-      onClick: () => {
-        this.importData().catch(console.error);
-      },
-      text: "Import data",
-      title: "Import data",
-    },
-  ];
-
-  private readonly retroHelpMenu: IContextualMenuItem[] = [
-    {
-      key: "whatsNew",
-      iconProps: { iconName: "Megaphone" },
-      onClick: this.showWhatsNewDialog,
-      text: "What's new",
-      title: "What's new",
-    },
-    {
-      key: "keyboardShortcuts",
-      iconProps: { iconName: "KeyboardClassic" },
-      onClick: () => this.setState({ isKeyboardShortcutsDialogHidden: false }),
-      text: "Keyboard shortcuts",
-      title: "Keyboard shortcuts",
-    },
-    {
-      key: "userGuide",
-      iconProps: { iconName: "BookAnswers" },
-      onClick: () => this.setState({ isGetHelpDialogHidden: false }),
-      text: "User guide",
-      title: "User guide",
-    },
-    {
-      key: "volunteer",
-      iconProps: { iconName: "Teamwork" },
-      onClick: this.showPleaseJoinUsDialog,
-      text: "Volunteer",
-      title: "Volunteer",
-    },
-    {
-      key: "contactUs",
-      iconProps: { iconName: "ChatInviteFriend" },
-      onClick: this.onContactUsClicked,
-      text: "Contact us",
-      title: "Contact us",
-    },
-  ];
-
   public render() {
     return (
       <div className="extension-settings-menu">
-        <button onClick={this.showPrimeDirectiveDialog} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
+        <button onClick={() => this.primeDirectiveDialogRef.current?.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
           <PrivacyTipIcon />
           <span className="hidden lg:inline">Directive</span>
         </button>
+        <dialog className="prime-directive-dialog" aria-label="The Prime Directive" ref={this.primeDirectiveDialogRef} onClose={() => this.primeDirectiveDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">The Prime Directive</h2>
+            <button onClick={() => this.primeDirectiveDialogRef.current?.close()} aria-label="Close">
+              <CloseIcon />
+            </button>
+          </div>
+          <div className="subText">The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective. By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</div>
+          <strong className="subText">&apos;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&apos;</strong>
+          <em className="subText">--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
+          <div className="inner">
+            <button className="button" onClick={() => window.open("https://retrospectivewiki.com", "_blank")}>
+              Open Retrospective Wiki
+            </button>
+            <button className="default button" onClick={() => this.primeDirectiveDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
 
-        <ExtensionSettingsButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} />
-        <ExtensionSettingsButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} />
+        <details className="flex items-center relative">
+          <summary aria-label="Data Import/Export" title="Data Import/Export" className="extension-settings-button">
+            <CloudIcon />
+            <span className="hidden lg:inline">Data</span>
+          </summary>
 
-        <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog retro-dialog-shell">
-          {renderContent(PRIME_DIRECTIVE_CONTENT)}
-        </ExtensionDialog>
-        <ExtensionDialog hidden={this.state.isWhatsNewDialogHidden} onDismiss={this.hideWhatsNewDialog} title="What's New" onDefaultClick={this.onChangeLogClicked} defaultButtonText="Open change log" containerClassName="whatsnew-dialog retro-dialog-shell">
-          {renderContent(WHATISNEW_CONTENT)}
-        </ExtensionDialog>
+          <div className="callout-menu left">
+            <button onClick={this.importData}>
+              <CloudUploadIcon />
+              Import Data
+            </button>
+            <button onClick={this.exportData}>
+              <CloudDownloadIcon />
+              Export Data
+            </button>
+          </div>
+        </details>
+
+        <details className="flex items-center relative">
+          <summary aria-label="Retrospective Help" title="Retrospective Help" className="extension-settings-button">
+            <HelpIcon />
+            <span className="hidden lg:inline">Help</span>
+          </summary>
+
+          <div className="callout-menu right">
+            <button onClick={() => this.whatsNewDialogRef.current?.showModal()}>
+              <CelebrationIcon />
+              What&apos;s new
+            </button>
+            <button onClick={() => this.setState({ isKeyboardShortcutsDialogHidden: false })}>
+              <KeyboardIcon />
+              Keyboard shortcuts
+            </button>
+            <button onClick={() => this.setState({ isGetHelpDialogHidden: false })}>
+              <MenuBookIcon />
+              User guide
+            </button>
+            <button onClick={() => this.setState({ isPleaseJoinUsDialogHidden: false })}>
+              <VolunteerActivismIcon />
+              Volunteer
+            </button>
+            <button onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank")}>
+              <ContactPhoneIcon />
+              Contact us
+            </button>
+          </div>
+        </details>
+
+        <dialog className="whats-new-dialog" aria-label="What is New" ref={this.whatsNewDialogRef} onClose={() => this.whatsNewDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">What&apos;s New</h2>
+            <button onClick={() => this.whatsNewDialogRef.current?.close()} aria-label="Close">
+              <CloseIcon />
+            </button>
+          </div>
+          <div className="subText">The latest release includes redesign of menu options, enabling mobile view, role-based permission setting, redesign of deleting boards, and implementation of sticky defaults.</div>
+          <div className="subText li">Extension settings menu was redesigned to mirror the ADO settings menu, in addition to moving Prime Directive and adding Volunteer options.</div>
+          <div className="subText li">Switch to mobile view was enabled for improved viewing on mobile devices with support limited to core functionality.</div>
+          <div className="subText li">Ability to set permissions for accessing the retrospective board is now restricted to the board owner or a team admin.</div>
+          <div className="subText li">Functionality to delete boards was moved from the Board menu to the History table and is only enabled for archived boards.</div>
+          <div className="subText li">User settings for maximum votes, Team Assessment, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.</div>
+          <div className="subText">Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.</div>
+          <div className="inner">
+            <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>
+              Open change log
+            </button>
+            <button className="default button" onClick={() => this.whatsNewDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
+
         <ExtensionDialog
           hidden={this.state.isGetHelpDialogHidden}
           onDismiss={() => {

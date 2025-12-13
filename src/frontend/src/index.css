@@ -108,12 +108,6 @@ body {
   @apply text-primary;
 }
 
-/*
-button:hover:not(.ms-Button), button:focus:not(.ms-Button) {
-  @apply border-none;
-}
-*/
-
 .ms-Button--primary {
   @apply bg-white text-primary border border-primary;
 }
@@ -165,12 +159,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .extension-settings-menu {
   @apply mr-1 flex flex-nowrap;
 
-  & .ms-Button-label {
-    @apply text-xs;
-  }
-
   & .extension-settings-button {
-    @apply flex items-center gap-1 cursor-pointer text-sm bg-inherit border-0 min-w-0 mx-2 p-0 text-(--text-primary-color);
+    @apply flex items-center gap-1 cursor-pointer text-sm text-left bg-inherit border-0 min-w-0 mx-2 p-0 text-(--text-primary-color);
 
     & svg {
       @apply w-4;
@@ -182,6 +172,30 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
     &:focus-visible {
       @apply outline-2 outline-primary outline-offset-2 rounded;
+    }
+  }
+
+  & .callout-menu {
+    @apply absolute mt-3 bg-[rgb(var(--palette-neutral-6))] text-sm shadow-lg min-w-48 z-10;
+
+    &.left {
+      @apply left-0;
+    }
+
+    &.right {
+      @apply right-0;
+    }
+
+    & button {
+      @apply flex items-center gap-2 w-full px-4 py-2 bg-inherit border-0 text-(--text-primary-color) cursor-pointer;
+
+      &:hover {
+        @apply text-primary;
+      }
+
+      & svg {
+        @apply w-4 h-4;
+      }
     }
   }
 }
@@ -267,20 +281,54 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-(--callout-background-color);
 }
 
-:is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) div[role="heading"] {
-  @apply text-(--text-primary-color) pb-2.5;
-}
+.whats-new-dialog,
+.prime-directive-dialog,
+.retrospectives-carousel-dialog {
+  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-xl;
 
-:is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) ul {
-  @apply flex flex-col gap-3 ml-6 list-disc;
-}
+  & .header {
+    @apply flex justify-between items-center px-5 py-3 text-(--text-primary-color);
 
-:is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) :is(.ms-Dialog-content, .ms-Dialog-content .ms-Label, p.ms-Dialog-subText, .ms-Dialog-header button.ms-Dialog-button) {
-  @apply text-(--text-primary-color);
-}
+    & .title {
+      @apply m-0 text-xl font-semibold;
+    }
 
-:is(.prime-directive-dialog, .whatsnew-dialog, .retro-help-dialog, .volunteer-dialog) .ms-Dialog-inner a {
-  @apply text-primary underline;
+    & button {
+      @apply border-0 cursor-pointer p-2 text-base;
+
+      &:hover {
+        @apply bg-(--border-subtle-color) rounded;
+      }
+    }
+  }
+
+  & .subText {
+    @apply block px-5 py-3 text-sm text-(--text-primary-color);
+
+    &.li {
+      @apply list-disc;
+    }
+  }
+
+  & .inner {
+    @apply flex items-center justify-end gap-3 px-5 py-3;
+
+    & .button {
+      @apply px-4 py-2 rounded text-sm border border-(--border-subtle-color) cursor-pointer bg-(--text-primary-color) text-[rgb(var(--palette-neutral-0))];
+
+      &.default {
+        @apply bg-primary text-white border-primary;
+      }
+    }
+  }
+
+  & .feedback-carousel-pivot .ms-Pivot {
+    @apply mb-5;
+
+    & .ms-Button:first-of-type {
+      @apply -ml-2;
+    }
+  }
 }
 
 .editable-document-card-title {
@@ -332,6 +380,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .entry {
     @apply flex items-center gap-1 -ml-1 text-sm;
+
+    & svg {
+      @apply w-5 h-5;
+    }
   }
 
   & .separator {
@@ -1037,42 +1089,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-carousel-pivot-item {
   @apply w-full;
-}
-
-.retrospectives-carousel-dialog {
-  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-xl;
-
-  & .header {
-    @apply flex justify-between items-center px-5 py-3 text-(--text-primary-color);
-
-    & .title {
-      @apply m-0 text-xl font-semibold;
-    }
-
-    & button {
-      @apply border-0 cursor-pointer p-2 text-base;
-
-      &:hover {
-        @apply bg-(--border-subtle-color) rounded;
-      }
-    }
-  }
-
-  & .subText {
-    @apply px-5 py-3 text-sm text-(--text-primary-color);
-  }
-
-  & .inner {
-    @apply px-5 py-3;
-  }
-
-  & .feedback-carousel-pivot .ms-Pivot {
-    @apply mb-5;
-
-    & .ms-Button:first-of-type {
-      @apply -ml-2;
-    }
-  }
 }
 
 .feedback-carousel-item {
