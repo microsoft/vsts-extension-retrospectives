@@ -1,19 +1,16 @@
 import React from "react";
 import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
 import { DefaultButton } from "@fluentui/react/lib/Button";
-import { WorkflowPhase } from "../interfaces/workItem";
 
 interface KeyboardShortcut {
   keys: string[];
   description: string;
   category: string;
-  workflowPhases?: WorkflowPhase[];
 }
 
 interface KeyboardShortcutsDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  currentWorkflowPhase: WorkflowPhase;
 }
 
 const keyboardShortcuts: KeyboardShortcut[] = [
@@ -24,44 +21,23 @@ const keyboardShortcuts: KeyboardShortcut[] = [
   // Column navigation
   { keys: ["1-5"], description: "Jump to column by number", category: "Navigation" },
   { keys: ["←", "→"], description: "Navigate between columns", category: "Navigation" },
+  { keys: ["↑", "↓"], description: "Navigate between feedback items", category: "Navigation" },
   { keys: ["Tab"], description: "Move focus to next element", category: "Navigation" },
   { keys: ["Shift", "Tab"], description: "Move focus to previous element", category: "Navigation" },
-
-  // Item navigation
-  { keys: ["↑", "↓"], description: "Navigate between feedback items", category: "Navigation" },
-  { keys: ["Home"], description: "Jump to first item in column", category: "Navigation" },
-  { keys: ["End"], description: "Jump to last item in column", category: "Navigation" },
   { keys: ["Page Up"], description: "Scroll up in column", category: "Navigation" },
   { keys: ["Page Down"], description: "Scroll down in column", category: "Navigation" },
 
   // Item actions - Collect phase
-  { keys: ["N", "Insert"], description: "Create new feedback item", category: "Actions", workflowPhases: [WorkflowPhase.Collect] },
-  { keys: ["Enter"], description: "Edit feedback title", category: "Actions", workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act] },
-  { keys: ["Delete"], description: "Delete feedback item", category: "Actions", workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act] },
-
-  // Group phase actions
-  { keys: ["G"], description: "Group feedback items", category: "Actions", workflowPhases: [WorkflowPhase.Group] },
-  { keys: ["M"], description: "Move feedback to different column", category: "Actions", workflowPhases: [WorkflowPhase.Group] },
-  { keys: ["Space"], description: "Expand/Collapse group", category: "Actions", workflowPhases: [WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act] },
-
-  // Vote phase actions
-  { keys: ["V"], description: "Cast/Remove vote", category: "Actions", workflowPhases: [WorkflowPhase.Vote] },
-
-  // Act phase actions
-  { keys: ["A"], description: "Add action item", category: "Actions", workflowPhases: [WorkflowPhase.Act] },
-  { keys: ["T"], description: "Start/Stop timer", category: "Actions", workflowPhases: [WorkflowPhase.Act] },
+  { keys: ["Insert"], description: "Create new feedback item", category: "Actions" },
+  { keys: ["Enter"], description: "Edit feedback item", category: "Actions" },
+  { keys: ["Delete"], description: "Delete feedback item", category: "Actions" },
 
   // Column actions
   { keys: ["E"], description: "Edit column notes", category: "Column" },
-  { keys: ["I"], description: "View column info", category: "Column" },
 ];
 
-const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsDialogProps> = ({ isOpen, onClose, currentWorkflowPhase }) => {
-  // Filter shortcuts based on current workflow phase
-  const relevantShortcuts = keyboardShortcuts.filter(shortcut => !shortcut.workflowPhases || shortcut.workflowPhases.includes(currentWorkflowPhase));
-
-  // Group shortcuts by category
-  const groupedShortcuts = relevantShortcuts.reduce(
+const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsDialogProps> = ({ isOpen, onClose }) => {
+  const groupedShortcuts = keyboardShortcuts.reduce(
     (acc, shortcut) => {
       if (!acc[shortcut.category]) {
         acc[shortcut.category] = [];
@@ -87,10 +63,13 @@ const KeyboardShortcutsDialog: React.FC<KeyboardShortcutsDialogProps> = ({ isOpe
         isBlocking: false,
         containerClassName: "keyboard-shortcuts-dialog",
         className: "retrospectives-dialog-modal",
+        focusTrapZoneProps: {
+          firstFocusableSelector: "ms-Dialog-header",
+        },
       }}
       minWidth={660}
     >
-      <div className="keyboard-shortcuts-content">
+      <div className="keyboard-shortcuts-content" tabIndex={-1}>
         {Object.entries(groupedShortcuts).map(([category, shortcuts]) => (
           <div key={category}>
             <h3 className="keyboard-shortcuts-category-title">{category}</h3>

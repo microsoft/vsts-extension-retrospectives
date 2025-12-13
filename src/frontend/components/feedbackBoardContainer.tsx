@@ -13,6 +13,7 @@ import { reflectBackendService } from "../dal/reflectBackendService";
 import BoardSummaryTable from "./boardSummaryTable";
 import FeedbackBoardMetadataForm from "./feedbackBoardMetadataForm";
 import FeedbackBoard from "../components/feedbackBoard";
+import FeedbackCarousel, { type FocusModeModel } from "./feedbackCarousel";
 
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
@@ -40,6 +41,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
+import { AssessmentIcon, CloseIcon, InfoIcon, PauseCircleIcon, PeopleIcon, PersonIcon, PlayCircleIcon, RefreshIcon } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -84,6 +86,7 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogMessage: string;
   teamBoardDeletedDialogTitle: string;
   isCarouselDialogHidden: boolean;
+  focusModeModel: FocusModeModel | null;
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
   isTeamAssessmentHistoryDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
@@ -147,6 +150,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isBoardDuplicateDialogHidden: true,
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
+      focusModeModel: null,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isTeamAssessmentHistoryDialogHidden: true,
       isArchiveBoardConfirmationDialogHidden: true,
@@ -189,6 +193,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private boardTimerIntervalId?: number;
+  private carouselDialogRef: HTMLDialogElement | null = null;
 
   public async componentDidMount() {
     let initialCurrentTeam: WebApiTeam | undefined;
@@ -283,6 +288,30 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
     if (prevState.activeTab !== this.state.activeTab && this.state.activeTab !== "Board") {
       this.pauseBoardTimer();
+    }
+
+    if (prevState.isCarouselDialogHidden !== this.state.isCarouselDialogHidden && this.carouselDialogRef) {
+      if (!this.state.isCarouselDialogHidden && !this.carouselDialogRef.open) {
+        this.openDialog(this.carouselDialogRef);
+      } else if (this.state.isCarouselDialogHidden && this.carouselDialogRef.open) {
+        this.closeDialog(this.carouselDialogRef);
+      }
+    }
+  }
+
+  private openDialog(dialog: HTMLDialogElement) {
+    if (typeof dialog.showModal === "function") {
+      dialog.showModal();
+    } else {
+      dialog.setAttribute("open", "");
+    }
+  }
+
+  private closeDialog(dialog: HTMLDialogElement) {
+    if (typeof dialog.close === "function") {
+      dialog.close();
+    } else {
+      dialog.removeAttribute("open");
     }
   }
 
@@ -460,7 +489,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
         <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"}. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
-          <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
+          {this.state.isBoardTimerRunning ? <PauseCircleIcon /> : <PlayCircleIcon />}
         </button>
         {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
           <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
@@ -475,7 +504,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <span className={this.state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
         )}
         <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
-          <i className="fa fa-undo" />
+          <RefreshIcon />
         </button>
       </div>
     );
@@ -1487,8 +1516,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           await this.copyBoardUrl();
           this.showBoardUrlCopiedToast();
         },
-        text: `Copy retrospective link (for ${phaseText} phase)`,
-        title: `Copy retrospective link (for ${phaseText} phase)`,
+        text: `Copy link to ${phaseText} phase`,
+        title: `Copy link to ${phaseText} phase`,
       },
       {
         key: "seperator",
@@ -1520,13 +1549,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         onClick: this.showRetroSummaryDialog,
         text: "Show retrospective summary",
         title: "Show retrospective summary",
-      },
-      {
-        key: "teamAssessmentHistory",
-        iconProps: { iconName: "TimelineProgress" },
-        onClick: this.showTeamAssessmentHistoryDialog,
-        text: "Team assessment history",
-        title: "Team assessment history",
       },
       {
         key: "seperator",
@@ -1691,10 +1713,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         <div className="flex items-center justify-start shrink-0">
           <div className="w-full">
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className={`pivot-tab ${this.state.activeTab === "Board" ? "pivot-tab--active" : ""}`} onClick={() => this.handlePivotClick("Board")}>
+              <div className={`pivot-tab board ${this.state.activeTab === "Board" ? "active" : ""}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
               </div>
-              <div className={`pivot-tab ${this.state.activeTab === "History" ? "pivot-tab--active" : ""}`} onClick={() => this.handlePivotClick("History")}>
+              <div className={`pivot-tab history ${this.state.activeTab === "History" ? "active" : ""}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </div>
               {this.state.activeTab === "Board" && (
@@ -1753,7 +1775,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   <div className="flex items-center justify-start">
                     <div className="flex flex-row items-center workflow-stage-header 3">
                       {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                        <div className="border border-solid border-(--nav-header-active-item-background) rounded-lg">
+                        <>
                           <Dialog
                             hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
                             onDismiss={() => {
@@ -1771,14 +1793,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           >
                             <DialogContent>
                               <div className="team-effectiveness-section-information">
-                                <i className="fa fa-info-circle" />
+                                <InfoIcon />
                                 &nbsp;All answers will be saved anonymously
                               </div>
                               <table className="team-effectiveness-measurement-table">
                                 <thead>
                                   <tr>
-                                    <th scope="col" className="text-left">Question</th>
-                                    <th scope="col" className="text-left">Details</th>
+                                    <th scope="col" className="text-left">
+                                      Question
+                                    </th>
+                                    <th scope="col" className="text-left">
+                                      Details
+                                    </th>
                                     <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
                                       Unfavorable
                                     </th>
@@ -1792,16 +1818,36 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                   <tr>
                                     <th scope="col" className="text-left"></th>
                                     <th scope="col" className="text-left"></th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">
+                                      1
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">
+                                      2
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">
+                                      3
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">
+                                      4
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">
+                                      5
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">
+                                      6
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">
+                                      7
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">
+                                      8
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">
+                                      9
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">
+                                      10
+                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1828,7 +1874,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             </DialogFooter>
                           </Dialog>
                           <button
-                            className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
+                            className="team-assessment-button"
                             onClick={() => {
                               this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
                             }}
@@ -1836,12 +1882,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             aria-label="Team Assessment"
                             type="button"
                           >
-                            <span className="inline-flex items-center justify-center lg:mr-1">
-                              <i className="fas fa-chart-line"></i>
-                            </span>
+                            <AssessmentIcon />
                             <span className="hidden lg:inline">Team Assessment</span>
                           </button>
-                        </div>
+                        </>
                       )}
                       <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
                         <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
@@ -1851,30 +1895,61 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </div>
                       {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
                         <div className="feedback-votes-count" role="status" aria-live="polite">
-                          <span className="entry" aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
-                            <i className="fas fa-user ml-1" aria-hidden="true"></i>
+                          <span className="entry" title={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
+                            <PersonIcon />
                             <span className="hidden lg:inline">My Votes:</span> {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"}
                           </span>
-                          {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 &&
+                          {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 && (
                             <>
-                              <span className="separator" aria-hidden="true">|</span>
-                              <span className="entry" aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
-                                <i className="fas fa-users ml-1" aria-hidden="true"></i>
+                              <span className="separator" aria-hidden="true">
+                                |
+                              </span>
+                              <span className="entry" title={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`} aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
+                                <PeopleIcon />
                                 <span className="hidden lg:inline">Team Votes:</span> {this.state.castedVoteCount}/{this.state.teamVoteCapacity}
                               </span>
                             </>
-                          }
+                          )}
                         </div>
                       )}
                       {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                        <button className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
-                          <span className="inline-flex items-center justify-center mr-1">
+                        <>
+                          <button className="focus-mode-button" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
                             <i className="fas fa-bullseye"></i>
-                          </span>
-                          <span className="hidden lg:inline">Focus Mode</span>
-                        </button>
+                            <span className="">Focus Mode</span>
+                          </button>
+                          <dialog
+                            ref={ref => {
+                              this.carouselDialogRef = ref;
+                            }}
+                            className="retrospectives-carousel-dialog"
+                            onClose={this.hideCarouselDialog}
+                          >
+                            <div className="header">
+                              <h2 className="title">Focus Mode</h2>
+                              <button onClick={this.hideCarouselDialog} aria-label="Close">
+                                <CloseIcon />
+                              </button>
+                            </div>
+                            <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
+                            <div className="inner">{this.state.focusModeModel && <FeedbackCarousel focusModeModel={this.state.focusModeModel} isFocusModalHidden={this.state.isCarouselDialogHidden} />}</div>
+                          </dialog>
+                        </>
                       )}
                     </div>
+                  </div>
+                </>
+              )}
+              {this.state.activeTab === "History" && (
+                <>
+                  <div className="mx-4 vertical-tab-separator" />
+                  <div className="flex items-center justify-start">
+                    <button className="flex items-center bg-transparent border-0 cursor-pointer text-sm hover:bg-transparent focus:outline-none" onClick={this.showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
+                      <span className="inline-flex items-center justify-center lg:mr-1">
+                        <i className="fas fa-chart-line"></i>
+                      </span>
+                      <span className="hidden lg:inline">Team Assessment History</span>
+                    </button>
                   </div>
                 </>
               )}
@@ -1941,7 +2016,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
                       </MessageBar>
                     )}
-                    <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} onColumnNotesChange={this.persistColumnNotes} />
+                    <FeedbackBoard
+                      board={this.state.currentBoard}
+                      team={this.state.currentTeam}
+                      displayBoard={true}
+                      workflowPhase={this.state.currentBoard.activePhase}
+                      nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
+                      allWorkItemTypes={this.state.allWorkItemTypes}
+                      onFocusModeModelChange={focusModeModel => {
+                        this.setState({ focusModeModel });
+                      }}
+                      isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
+                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false}
+                      userId={this.state.currentUserId}
+                      onVoteCasted={this.updateCurrentVoteCount}
+                      onColumnNotesChange={this.persistColumnNotes}
+                    />
                     <Dialog
                       hidden={this.state.isArchiveBoardConfirmationDialogHidden}
                       onDismiss={this.hideArchiveBoardConfirmationDialog}
@@ -2143,17 +2233,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             className: "retrospectives-dialog-modal",
           }}
         >
-          {this.state.teamAssessmentHistoryData.length === 0 ? (
+          {this.state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
             <div className="team-assessment-no-data">
               <p>No team assessment history available.</p>
               <p>Create retrospectives with team assessments to see historical trends.</p>
             </div>
           ) : (
             <>
-              <p className="team-assessment-info-text">Starting with version v2.0.1 (scheduled for publication on January 1st, 2026), a widget will be available that you can add to your Azure DevOps dashboard to see team assessment trends over time.</p>
-              <p className="team-assessment-info-text">Please check your Extensions configuration to ensure the Retrospective Extension is updated to the latest version.</p>
               <p className="team-assessment-info-text">
-                Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
+                Showing average scores over time across {this.state.teamAssessmentHistoryData.slice(-13).length} retrospective{this.state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
               </p>
               {(() => {
                 const questionColors = [
@@ -2173,7 +2261,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 const yScale = (value: number) => padding.top + chartHeight - (value / 10) * chartHeight;
 
-                const allDates = this.state.teamAssessmentHistoryData.map(board => new Date(board.createdDate).getTime());
+                const recentHistoryData = this.state.teamAssessmentHistoryData.slice(-13);
+
+                const allDates = recentHistoryData.map(board => new Date(board.createdDate).getTime());
                 const minDate = Math.min(...allDates);
                 const maxDate = Math.max(...allDates);
                 const dateRange = maxDate - minDate || 1;
@@ -2197,7 +2287,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                       {questions.map((question, qIndex) => {
                         const color = questionColors[qIndex % questionColors.length];
-                        const dataPoints = this.state.teamAssessmentHistoryData
+                        const dataPoints = recentHistoryData
                           .map(board => {
                             const questionData = board.questionAverages.find(qa => qa.questionId === question.id);
                             return questionData ? { date: new Date(board.createdDate), average: questionData.average, boardTitle: board.boardTitle } : null;
@@ -2223,9 +2313,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         );
                       })}
 
-                      {this.state.teamAssessmentHistoryData.map((board, index) => {
+                      {recentHistoryData.map((board, index) => {
                         const date = new Date(board.createdDate);
-                        const shouldShowLabel = index === 0 || index === this.state.teamAssessmentHistoryData.length - 1 || this.state.teamAssessmentHistoryData.length <= 5 || (this.state.teamAssessmentHistoryData.length > 5 && index % Math.ceil(this.state.teamAssessmentHistoryData.length / 5) === 0);
+                        const shouldShowLabel = index === 0 || index === recentHistoryData.length - 1 || recentHistoryData.length <= 5 || (recentHistoryData.length > 5 && index % Math.ceil(recentHistoryData.length / 5) === 0);
 
                         if (!shouldShowLabel) return null;
 
@@ -2238,9 +2328,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                       <text x={padding.left - 50} y={svgHeight / 2} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${svgHeight / 2})`}>
                         Average Score
-                      </text>
-                      <text x={(padding.left + svgWidth - padding.right) / 2} y={svgHeight - 40} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600">
-                        Retrospective Date
                       </text>
 
                       {questions.map((question, qIndex) => {

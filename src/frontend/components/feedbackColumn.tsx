@@ -63,7 +63,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   private createFeedbackButton: IButton;
   private columnRef: React.RefObject<HTMLDivElement> = React.createRef();
   private itemRefs: Map<string, HTMLElement> = new Map();
-  private previousItemCount: number = 0;
   private focusPreservation: {
     elementId: string | null;
     selectionStart: number | null;
@@ -89,8 +88,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     if (this.columnRef.current) {
       this.columnRef.current.addEventListener("keydown", this.handleColumnKeyDown);
     }
-
-    this.previousItemCount = this.props.columnItems.length;
   }
 
   public componentDidUpdate(prevProps: FeedbackColumnProps) {
@@ -100,8 +97,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       this.restoreFocus();
       this.focusPreservation = null;
     }
-
-    this.previousItemCount = this.props.columnItems.length;
   }
 
   public getSnapshotBeforeUpdate(prevProps: FeedbackColumnProps): null {
@@ -209,16 +204,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         e.preventDefault();
         this.navigateItems("next", visibleItems);
         break;
-      case "Home":
-        e.preventDefault();
-        this.navigateItems("first", visibleItems);
-        break;
-      case "End":
-        e.preventDefault();
-        this.navigateItems("last", visibleItems);
-        break;
-      case "n":
-      case "N":
       case "Insert":
         if (this.props.workflowPhase === WorkflowPhase.Collect) {
           e.preventDefault();
@@ -239,7 +224,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     return this.props.columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId);
   };
 
-  private navigateItems = (direction: "next" | "prev" | "first" | "last", visibleItems: IColumnItem[]) => {
+  private navigateItems = (direction: "next" | "prev", visibleItems: IColumnItem[]) => {
     if (visibleItems.length === 0) {
       if (this.props.workflowPhase === WorkflowPhase.Collect && this.createFeedbackButton) {
         this.createFeedbackButton.focus();
@@ -256,12 +241,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       case "prev":
         newIndex = this.state.focusedItemIndex < 0 ? -1 : this.state.focusedItemIndex <= 0 ? 0 : this.state.focusedItemIndex - 1;
         break;
-      case "first":
-        newIndex = 0;
-        break;
-      case "last":
-        newIndex = visibleItems.length - 1;
-        break;
     }
 
     if (newIndex < 0) {
@@ -276,6 +255,11 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         itemElement.focus();
       }
     }
+  };
+
+  public navigateByKeyboard = (direction: "next" | "prev") => {
+    const visibleItems = this.getVisibleColumnItems();
+    this.navigateItems(direction, visibleItems);
   };
 
   public focusColumn = () => {

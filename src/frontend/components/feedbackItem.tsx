@@ -17,14 +17,18 @@ import { itemDataService } from "../dal/itemDataService";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { reflectBackendService } from "../dal/reflectBackendService";
 import { IColumn, IColumnItem } from "./feedbackBoard";
-import { FeedbackColumnProps } from "./feedbackColumn";
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
+import { PlayCircleIcon, StopCircleIcon } from "./icons";
+
+export interface IFeedbackItemColumnContext {
+  registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
+}
 
 export interface IFeedbackItemProps {
   id: string;
   title: string;
-  columnProps: FeedbackColumnProps;
+  columnProps?: IFeedbackItemColumnContext;
   columns: { [id: string]: IColumn };
   columnIds: string[];
   createdBy?: string;
@@ -212,12 +216,12 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         break;
       case "enter":
         if (target.tagName !== "BUTTON" && target.tagName !== "A") {
-          e.preventDefault();
-          const titleElement = this.itemElement?.querySelector(".non-editable-text-container, .editable-text-container");
-          if (titleElement) {
-            (titleElement as HTMLElement).focus();
-            (titleElement as HTMLElement).click();
+          if (this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id) {
+            e.preventDefault();
+            return;
           }
+          e.preventDefault();
+          this.startEditingTitle();
         }
         break;
       case " ":
@@ -278,6 +282,32 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     }
   };
 
+  private startEditingTitle = () => {
+    if (!this.itemElement) {
+      return;
+    }
+
+    const activeEditor = this.itemElement.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
+
+    if (activeEditor) {
+      activeEditor.focus();
+      return;
+    }
+
+    const titleText = this.itemElement.querySelector(".editable-text") as HTMLElement | null;
+    if (titleText) {
+      titleText.focus();
+      titleText.click();
+      return;
+    }
+
+    const container = this.itemElement.querySelector(".non-editable-text-container, .editable-text-container") as HTMLElement | null;
+    if (container) {
+      container.focus();
+      container.click();
+    }
+  };
+
   private navigateToAdjacentCard = (direction: "prev" | "next") => {
     const columnItems = this.props.columns[this.props.columnId]?.columnItems || [];
     const visibleItems = columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId);
@@ -311,15 +341,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
       return;
     }
 
-    const focusableControls = Array.from(
-      this.itemElement.querySelectorAll(
-        [
-          '[data-card-control="true"]',
-          ".editable-text-container",
-          ".non-editable-text-container",
-        ].join(","),
-      ),
-    ) as HTMLElement[];
+    const focusableControls = Array.from(this.itemElement.querySelectorAll(['[data-card-control="true"]', ".editable-text-container", ".non-editable-text-container"].join(","))) as HTMLElement[];
 
     const visibleControls = focusableControls.filter(control => control.getAttribute("aria-hidden") !== "true" && !control.hasAttribute("disabled"));
 
@@ -791,12 +813,14 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const isGroupedCarouselItem = this.props.isGroupedCarouselItem;
     const childrenIds = this.props.groupIds;
 
-    const isFocusModalHidden = this.props.isFocusModalHidden;
     const mainGroupedItemInFocusMode = isGroupedCarouselItem && isMainItem && workflowState.isActPhaseFocusMode;
-    const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && isFocusModalHidden;
+    const mainGroupedItemNotInFocusMode = !isNotGroupedItem && isMainItem && this.props.groupCount > 0 && this.props.isFocusModalHidden;
 
     const columnItems = this.props.columns[this.props.columnId]?.columnItems;
 
+    {
+      this.props.isFocusModalHidden && !workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && <div className="original-column-info">Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>;
+    }
     const mainFeedbackItem = columnItems?.find(c => c.feedbackItem.id === this.props.id)?.feedbackItem;
     const groupedFeedbackItems = this.props.groupIds
       .map(id => {
@@ -1002,17 +1026,13 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                         this.timerSwitch(this.props.id);
                       }}
                     >
-                      <i className={curTimerState ? "fa fa-stop-circle" : "fa fa-play-circle"} />
+                      {curTimerState ? <StopCircleIcon /> : <PlayCircleIcon />}
                       <span> {this.formatTimer(this.props.timerSecs)} elapsed</span>
                     </button>
                   </div>
                 )}
-                {<EditableDocumentCardTitle isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
-                {!workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && (
-                  <div className="original-column-info">
-                    Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}
-                  </div>
-                )}
+                {<EditableDocumentCardTitle isDisabled={hideFeedbackItems} isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={this.onDocumentCardTitleSave} />}
+                {this.props.isFocusModalHidden && !workflowState.isCollectPhase && this.props.columnId !== this.props.originalColumnId && <div className="original-column-info">Original Column: {this.props.columns[this.props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
               </div>
               {this.feedbackCreationInformationContent()}
               <div className="card-footer">
@@ -1041,11 +1061,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                           <div className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
                             {childDisplayTitle}
                           </div>
-                          {this.props.columnId !== originalColumn?.columnProperties?.id && (
-                            <div className="original-column-info">
-                              Original Column: {originalColumn.columnProperties.title}
-                            </div>
-                          )}
+                          {this.props.isFocusModalHidden && this.props.columnId !== originalColumn?.columnProperties?.id && <div className="original-column-info">Original Column: {originalColumn.columnProperties.title}</div>}
                         </li>
                       )
                     );

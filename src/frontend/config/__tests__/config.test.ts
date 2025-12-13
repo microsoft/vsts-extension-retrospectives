@@ -30,18 +30,16 @@ describe("config", () => {
     it("should warn when APP_INSIGHTS_INSTRUMENTATION_KEY is missing", () => {
       // Save original value
       const originalKey = process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY;
-      
+
       // Remove the env var
       delete process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY;
-      
+
       // Force re-import to trigger getConfiguration again
       jest.resetModules();
       require("../config");
-      
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("missing Application Insights Instrumentation key")
-      );
-      
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("missing Application Insights Instrumentation key"));
+
       // Restore
       if (originalKey) {
         process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY = originalKey;
@@ -51,18 +49,16 @@ describe("config", () => {
     it("should warn when COLLABORATION_STATE_SERVICE_URL is missing", () => {
       // Save original value
       const originalUrl = process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL;
-      
+
       // Remove the env var
       delete process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL;
-      
+
       // Force re-import to trigger getConfiguration again
       jest.resetModules();
       require("../config");
-      
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Backend Service URL was not provided")
-      );
-      
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Backend Service URL was not provided"));
+
       // Restore
       if (originalUrl) {
         process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL = originalUrl;

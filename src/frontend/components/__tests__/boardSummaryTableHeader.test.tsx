@@ -24,7 +24,6 @@ const mockColumns: ISimpleColumn[] = [
     accessor: "createdDate",
     cell: (item: any) => new Date(item.createdDate).toLocaleDateString(),
     sortable: true,
-    sortDescFirst: true,
   },
 ];
 
@@ -73,6 +72,6 @@ describe("BoardSummaryTableHeader", () => {
     );
     const boardNameHeader = getByText("Retrospective Name");
     fireEvent.click(boardNameHeader);
-    expect(onSort).toHaveBeenCalledWith("boardName", undefined);
+    expect(onSort).toHaveBeenCalledWith("boardName");
   });
 });

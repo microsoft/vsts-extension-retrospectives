@@ -10,8 +10,6 @@ export interface KeyboardNavigationOptions {
   onEscape?: () => void;
   onSpace?: () => void;
   onDelete?: () => void;
-  onHome?: () => void;
-  onEnd?: () => void;
   onPageUp?: () => void;
   onPageDown?: () => void;
   enabled?: boolean;
@@ -24,7 +22,7 @@ export interface KeyboardNavigationOptions {
  * Provides consistent keyboard event handling across components
  */
 export function useKeyboardNavigation(elementRef: React.RefObject<HTMLElement>, options: KeyboardNavigationOptions) {
-  const { onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onEnter, onEscape, onSpace, onDelete, onHome, onEnd, onPageUp, onPageDown, enabled = true, preventDefault = true } = options;
+  const { onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onEnter, onEscape, onSpace, onDelete, onPageUp, onPageDown, enabled = true, preventDefault = true } = options;
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -88,18 +86,6 @@ export function useKeyboardNavigation(elementRef: React.RefObject<HTMLElement>, 
             handled = true;
           }
           break;
-        case "Home":
-          if (onHome) {
-            onHome();
-            handled = true;
-          }
-          break;
-        case "End":
-          if (onEnd) {
-            onEnd();
-            handled = true;
-          }
-          break;
         case "PageUp":
           if (onPageUp) {
             onPageUp();
@@ -119,7 +105,7 @@ export function useKeyboardNavigation(elementRef: React.RefObject<HTMLElement>, 
         event.stopPropagation();
       }
     },
-    [enabled, onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onEnter, onEscape, onSpace, onDelete, onHome, onEnd, onPageUp, onPageDown, preventDefault],
+    [enabled, onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onEnter, onEscape, onSpace, onDelete, onPageUp, onPageDown, preventDefault],
   );
 
   useEffect(() => {
@@ -199,7 +185,7 @@ export function useRovingTabIndex(itemsRef: React.RefObject<HTMLElement[]>, curr
   }, [itemsRef, currentIndex]);
 
   const handleNavigation = useCallback(
-    (direction: "next" | "prev" | "first" | "last") => {
+    (direction: "next" | "prev") => {
       const items = itemsRef.current;
       if (!items || items.length === 0) return;
 
@@ -211,12 +197,6 @@ export function useRovingTabIndex(itemsRef: React.RefObject<HTMLElement[]>, curr
           break;
         case "prev":
           newIndex = (currentIndex - 1 + items.length) % items.length;
-          break;
-        case "first":
-          newIndex = 0;
-          break;
-        case "last":
-          newIndex = items.length - 1;
           break;
       }
 
