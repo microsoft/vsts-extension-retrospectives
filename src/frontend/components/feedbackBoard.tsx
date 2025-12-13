@@ -12,7 +12,6 @@ import { ExceptionCode } from "../interfaces/retrospectiveState";
 import { WorkflowPhase } from "../interfaces/workItem";
 
 import FeedbackCarousel from "./feedbackCarousel";
-import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
 import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
@@ -64,6 +63,7 @@ export interface FeedbackBoardState {
 
 class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardState> {
   private columnRefs: React.RefObject<FeedbackColumn>[] = [];
+  private carouselDialogRef: HTMLDialogElement | null = null;
 
   constructor(props: FeedbackBoardProps) {
     super(props);
@@ -92,6 +92,50 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     reflectBackendService.onReceiveUpdatedItem(this.receiveUpdatedItemHandler);
 
     this.setupKeyboardShortcuts();
+  }
+
+  public async componentDidUpdate(prevProps: FeedbackBoardProps) {
+    // Handle dialog state changes  
+    if (this.carouselDialogRef) {
+      if (!this.props.isCarouselDialogHidden && !this.carouselDialogRef.open) {
+        // Use showModal if available (browser), otherwise just set open attribute (for tests)
+        if (typeof this.carouselDialogRef.showModal === 'function') {
+          this.carouselDialogRef.showModal();
+        } else {
+          this.carouselDialogRef.setAttribute('open', '');
+        }
+      } else if (this.props.isCarouselDialogHidden && this.carouselDialogRef.open) {
+        // Use close if available (browser), otherwise just remove open attribute (for tests)
+        if (typeof this.carouselDialogRef.close === 'function') {
+          this.carouselDialogRef.close();
+        } else {
+          this.carouselDialogRef.removeAttribute('open');
+        }
+      }
+    }
+
+    if (prevProps.board.id !== this.props.board.id) {
+      this.setState({
+        isDataLoaded: false,
+        columns: {},
+        columnIds: [],
+        hasItems: false,
+        columnNotes: {},
+        activeTimerFeedbackItemId: null,
+      });
+      this.initColumns();
+      await this.getAllBoardFeedbackItems();
+    }
+
+    if (prevProps.board.modifiedDate !== this.props.board.modifiedDate) {
+      this.setState({ columnNotes: {}, activeTimerFeedbackItemId: null });
+      this.initColumns();
+      await this.getAllBoardFeedbackItems();
+    }
+
+    if (prevProps.team.id !== this.props.team.id) {
+      await this.setDefaultIterationAndAreaPath(this.props.team.id);
+    }
   }
 
   private setupKeyboardShortcuts = () => {
@@ -198,31 +242,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   private closeKeyboardShortcutsDialog = () => {
     this.setState({ isKeyboardShortcutsDialogOpen: false });
   };
-
-  public async componentDidUpdate(prevProps: FeedbackBoardProps) {
-    if (prevProps.board.id !== this.props.board.id) {
-      this.setState({
-        isDataLoaded: false,
-        columns: {},
-        columnIds: [],
-        hasItems: false,
-        columnNotes: {},
-        activeTimerFeedbackItemId: null,
-      });
-      this.initColumns();
-      await this.getAllBoardFeedbackItems();
-    }
-
-    if (prevProps.board.modifiedDate !== this.props.board.modifiedDate) {
-      this.setState({ columnNotes: {}, activeTimerFeedbackItemId: null });
-      this.initColumns();
-      await this.getAllBoardFeedbackItems();
-    }
-
-    if (prevProps.team.id !== this.props.team.id) {
-      await this.setDefaultIterationAndAreaPath(this.props.team.id);
-    }
-  }
 
   public async componentWillUnmount() {
     reflectBackendService.removeOnReceiveNewItem(this.receiveNewItemHandler);
@@ -704,26 +723,27 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
               return <FeedbackColumn {...columnProps} />;
             })}
         </div>
-        <Dialog
-          hidden={this.props.isCarouselDialogHidden}
-          onDismiss={this.props.hideCarouselDialog}
-          minWidth={900}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: "Focus Mode",
-            subText: "Now is the time to focus! Discuss one feedback item at a time and create actionable work items.",
-          }}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: "retrospectives-carousel-dialog",
-            className: "retrospectives-carousel-dialog-modal",
-            focusTrapZoneProps: {
-              firstFocusableSelector: "ms-Dialog-header",
-            },
-          }}
+        <dialog 
+          ref={ref => { this.carouselDialogRef = ref; }} 
+          className="retrospectives-carousel-dialog" 
+          style={{ minWidth: '900px', border: 'none', borderRadius: '4px', padding: '0', maxWidth: '90vw', maxHeight: '90vh' }} 
+          onClose={this.props.hideCarouselDialog}
         >
-          <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
-        </Dialog>
+          <div className="retrospectives-carousel-dialog-content">
+            <div className="ms-Dialog-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 24px 20px', borderBottom: '1px solid #edebe9' }}>
+              <h2 className="ms-Dialog-title" style={{ margin: '0', fontSize: '20px', fontWeight: '600' }}>Focus Mode</h2>
+              <button onClick={this.props.hideCarouselDialog} className="ms-Dialog-button ms-Dialog-button--close" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px', fontSize: '16px' }} aria-label="Close">
+                <i className="ms-Icon ms-Icon--Cancel" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div className="ms-Dialog-subText" style={{ padding: '0 24px 20px', color: '#605e5c' }}>
+              Now is the time to focus! Discuss one feedback item at a time and create actionable work items.
+            </div>
+            <div className="ms-Dialog-inner" style={{ padding: '0 24px 24px' }}>
+              <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
+            </div>
+          </div>
+        </dialog>
         <KeyboardShortcutsDialog isOpen={this.state.isKeyboardShortcutsDialogOpen} onClose={this.closeKeyboardShortcutsDialog} />
       </>
     );
