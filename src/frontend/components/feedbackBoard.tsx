@@ -94,23 +94,31 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     this.setupKeyboardShortcuts();
   }
 
+  private openDialog(dialog: HTMLDialogElement) {
+    // Use showModal if available (browser), otherwise just set open attribute (for tests)
+    if (typeof dialog.showModal === 'function') {
+      dialog.showModal();
+    } else {
+      dialog.setAttribute('open', '');
+    }
+  }
+
+  private closeDialog(dialog: HTMLDialogElement) {
+    // Use close if available (browser), otherwise just remove open attribute (for tests)
+    if (typeof dialog.close === 'function') {
+      dialog.close();
+    } else {
+      dialog.removeAttribute('open');
+    }
+  }
+
   public async componentDidUpdate(prevProps: FeedbackBoardProps) {
     // Handle dialog state changes  
     if (this.carouselDialogRef) {
       if (!this.props.isCarouselDialogHidden && !this.carouselDialogRef.open) {
-        // Use showModal if available (browser), otherwise just set open attribute (for tests)
-        if (typeof this.carouselDialogRef.showModal === 'function') {
-          this.carouselDialogRef.showModal();
-        } else {
-          this.carouselDialogRef.setAttribute('open', '');
-        }
+        this.openDialog(this.carouselDialogRef);
       } else if (this.props.isCarouselDialogHidden && this.carouselDialogRef.open) {
-        // Use close if available (browser), otherwise just remove open attribute (for tests)
-        if (typeof this.carouselDialogRef.close === 'function') {
-          this.carouselDialogRef.close();
-        } else {
-          this.carouselDialogRef.removeAttribute('open');
-        }
+        this.closeDialog(this.carouselDialogRef);
       }
     }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, act, waitFor, screen, createEvent } from "@testing-library/react";
+import { render, fireEvent, act, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import FeedbackItem, { FeedbackItemHelper } from "../feedbackItem";
 import { testColumns, testBoardId, testColumnUuidOne, testColumnIds, testFeedbackItem } from "../__mocks__/mocked_components/mockedFeedbackColumn";
