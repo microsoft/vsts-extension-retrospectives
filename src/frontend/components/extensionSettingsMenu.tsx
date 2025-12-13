@@ -13,7 +13,7 @@ import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
 
-import { RETRO_URLS, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, WHATISNEW_CONTENT, renderContent } from "./extensionSettingsMenuDialogContent";
+import { RETRO_URLS, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, renderContent } from "./extensionSettingsMenuDialogContent";
 import { CelebrationIcon, CloseIcon, CloudDownloadIcon, CloudIcon, CloudUploadIcon, ContactPhoneIcon, HelpIcon, KeyboardIcon, MenuBookIcon, PrivacyTipIcon, VolunteerActivismIcon } from "./icons";
 
 interface IExtensionSettingsMenuState {
