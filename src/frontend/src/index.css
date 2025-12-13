@@ -1023,7 +1023,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-carousel-dialog {
-  @apply bg-(--background-color);
+  @apply w-2/3 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 backdrop:bg-black/50;
 
   & .ms-Dialog-title {
     @apply text-(--text-primary-color);

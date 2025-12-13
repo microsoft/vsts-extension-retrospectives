@@ -8732,12 +8732,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(item);
 
-    const { container } = render(<FeedbackItem {...props} />);
+    render(<FeedbackItem {...props} />);
 
     await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
-
-    // onUpdateActionItem is called with undefined
-    const instance = (container.querySelector(`[data-feedback-item-id="${props.id}"]`) as any).__reactInternalInstance$;
 
     // Can't easily access private methods, but we've covered this path via ActionItemDisplay component
     expect(refreshFeedbackItems).not.toHaveBeenCalled();
@@ -9143,10 +9140,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
-    // The mobile dialog exists in the component but is hidden by default
-    // It would be shown when isMobileFeedbackItemActionsDialogHidden is false
-    const dialog = container.querySelector(".retrospectives-dialog-modal");
-
     // Component renders successfully with mobile support
     expect(container.querySelector(`[data-feedback-item-id="${props.id}"]`)).toBeTruthy();
   });
@@ -9331,8 +9324,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
     const { container } = render(<FeedbackItem {...props} />);
 
     await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
-
-    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
 
     // Simulate the case where editable-text or input doesn't exist
     // This covers lines 300-303
