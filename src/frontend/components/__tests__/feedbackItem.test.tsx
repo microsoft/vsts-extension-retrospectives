@@ -8659,10 +8659,10 @@ describe("FeedbackItem additional coverage (merged)", () => {
     // Test opening and closing Move dialog
     fireEvent.keyDown(root, { key: "m" });
     expect(await screen.findByText("Move Feedback to Different Column")).toBeInTheDocument();
-    
+
     // The Escape key handler exists in the code and will close the dialog
     // We've verified the dialog opens which covers the showMoveFeedbackItemDialog path
-    
+
     // Clean up - close dialog using the X button or by remounting
     const cancelButton = screen.queryByRole("button", { name: /cancel/i });
     if (cancelButton) {
@@ -8689,8 +8689,8 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // Simulate the onDocumentCardTitleSave being called with empty title
     // This happens internally when EditableDocumentCardTitle component saves
-    const instance: any = container.querySelector('[data-feedback-item-id]');
-    
+    const instance: any = container.querySelector("[data-feedback-item-id]");
+
     // We can't directly test the private method, but we know from the code that
     // when a newly created item's title is saved as empty, it removes the item
     // The test validates the component renders correctly with newlyCreated=true
@@ -8882,11 +8882,11 @@ describe("FeedbackItem additional coverage (merged)", () => {
     // The component should render with the grouped children displayed
     // When isShowingGroupedChildrenTitles is true and children exist
     const groupStack = container.querySelector(".group-child-feedback-stack");
-    
+
     // If children are being shown, check for the grouped feedback section
     if (groupStack) {
       expect(container.textContent).toContain("Grouped Feedback");
-      
+
       // Check for hidden feedback placeholder for child1 (different user)
       expect(container.textContent).toContain("[Hidden Feedback]");
 
@@ -9128,7 +9128,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     // Open delete dialog
     fireEvent.keyDown(root, { key: "Delete" });
     const deleteButton = await screen.findByRole("button", { name: "Delete" });
-    
+
     // Confirm deletion
     fireEvent.click(deleteButton);
 
@@ -9147,7 +9147,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     // The mobile dialog exists in the component but is hidden by default
     // It would be shown when isMobileFeedbackItemActionsDialogHidden is false
     const dialog = container.querySelector(".retrospectives-dialog-modal");
-    
+
     // Component renders successfully with mobile support
     expect(container.querySelector(`[data-feedback-item-id="${props.id}"]`)).toBeTruthy();
   });
@@ -9173,7 +9173,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
   test("Navigation to parent item when item not in visible list", async () => {
     const parent = makeDoc({ id: "parent-nav", columnId: testColumnUuidOne });
     const child = makeDoc({ id: "child-nav", columnId: testColumnUuidOne, parentFeedbackItemId: "parent-nav" });
-    
+
     const columns = {
       [testColumnUuidOne]: {
         columnProperties: testColumns[testColumnUuidOne].columnProperties,
@@ -9213,7 +9213,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // Navigate right to first control
     fireEvent.keyDown(root, { key: "ArrowRight" });
-    
+
     const firstControl = document.activeElement;
     expect(firstControl).not.toBe(root);
 
@@ -9229,7 +9229,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
   test("Drop feedback item on different item", async () => {
     const item1 = makeDoc({ id: "drop-item-1", columnId: testColumnUuidOne });
     const item2 = makeDoc({ id: "drop-item-2", columnId: testColumnUuidOne });
-    
+
     const columns = {
       [testColumnUuidOne]: {
         columnProperties: testColumns[testColumnUuidOne].columnProperties,
@@ -9294,7 +9294,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
   test("Grouped item drag sets and clears isGroupBeingDragged", async () => {
     const setIsGroupBeingDragged = jest.fn();
-    
+
     const props = makeProps({
       workflowPhase: "Group",
       groupedItemProps: {

@@ -96,24 +96,24 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
   private openDialog(dialog: HTMLDialogElement) {
     // Use showModal if available (browser), otherwise just set open attribute (for tests)
-    if (typeof dialog.showModal === 'function') {
+    if (typeof dialog.showModal === "function") {
       dialog.showModal();
     } else {
-      dialog.setAttribute('open', '');
+      dialog.setAttribute("open", "");
     }
   }
 
   private closeDialog(dialog: HTMLDialogElement) {
     // Use close if available (browser), otherwise just remove open attribute (for tests)
-    if (typeof dialog.close === 'function') {
+    if (typeof dialog.close === "function") {
       dialog.close();
     } else {
-      dialog.removeAttribute('open');
+      dialog.removeAttribute("open");
     }
   }
 
   public async componentDidUpdate(prevProps: FeedbackBoardProps) {
-    // Handle dialog state changes  
+    // Handle dialog state changes
     if (this.carouselDialogRef) {
       if (!this.props.isCarouselDialogHidden && !this.carouselDialogRef.open) {
         this.openDialog(this.carouselDialogRef);
@@ -731,23 +731,27 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
               return <FeedbackColumn {...columnProps} />;
             })}
         </div>
-        <dialog 
-          ref={ref => { this.carouselDialogRef = ref; }} 
-          className="retrospectives-carousel-dialog" 
-          style={{ minWidth: '900px', border: 'none', borderRadius: '4px', padding: '0', maxWidth: '90vw', maxHeight: '90vh' }} 
+        <dialog
+          ref={ref => {
+            this.carouselDialogRef = ref;
+          }}
+          className="retrospectives-carousel-dialog"
+          style={{ minWidth: "900px", border: "none", borderRadius: "4px", padding: "0", maxWidth: "90vw", maxHeight: "90vh" }}
           onClose={this.props.hideCarouselDialog}
         >
           <div className="retrospectives-carousel-dialog-content">
-            <div className="ms-Dialog-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 24px 20px', borderBottom: '1px solid #edebe9' }}>
-              <h2 className="ms-Dialog-title" style={{ margin: '0', fontSize: '20px', fontWeight: '600' }}>Focus Mode</h2>
-              <button onClick={this.props.hideCarouselDialog} className="ms-Dialog-button ms-Dialog-button--close" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px', fontSize: '16px' }} aria-label="Close">
+            <div className="ms-Dialog-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 24px 20px", borderBottom: "1px solid #edebe9" }}>
+              <h2 className="ms-Dialog-title" style={{ margin: "0", fontSize: "20px", fontWeight: "600" }}>
+                Focus Mode
+              </h2>
+              <button onClick={this.props.hideCarouselDialog} className="ms-Dialog-button ms-Dialog-button--close" style={{ background: "transparent", border: "none", cursor: "pointer", padding: "8px", fontSize: "16px" }} aria-label="Close">
                 <i className="ms-Icon ms-Icon--Cancel" aria-hidden="true"></i>
               </button>
             </div>
-            <div className="ms-Dialog-subText" style={{ padding: '0 24px 20px', color: '#605e5c' }}>
+            <div className="ms-Dialog-subText" style={{ padding: "0 24px 20px", color: "#605e5c" }}>
               Now is the time to focus! Discuss one feedback item at a time and create actionable work items.
             </div>
-            <div className="ms-Dialog-inner" style={{ padding: '0 24px 24px' }}>
+            <div className="ms-Dialog-inner" style={{ padding: "0 24px 24px" }}>
               <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
             </div>
           </div>
