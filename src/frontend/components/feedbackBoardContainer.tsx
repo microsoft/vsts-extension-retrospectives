@@ -13,6 +13,7 @@ import { reflectBackendService } from "../dal/reflectBackendService";
 import BoardSummaryTable from "./boardSummaryTable";
 import FeedbackBoardMetadataForm from "./feedbackBoardMetadataForm";
 import FeedbackBoard from "../components/feedbackBoard";
+import FeedbackCarousel, { type FocusModeModel } from "./feedbackCarousel";
 
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
@@ -40,6 +41,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
+import { AssessmentIcon, CloseIcon } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -84,6 +86,7 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogMessage: string;
   teamBoardDeletedDialogTitle: string;
   isCarouselDialogHidden: boolean;
+  focusModeModel: FocusModeModel | null;
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
   isTeamAssessmentHistoryDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
@@ -147,6 +150,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isBoardDuplicateDialogHidden: true,
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
+      focusModeModel: null,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isTeamAssessmentHistoryDialogHidden: true,
       isArchiveBoardConfirmationDialogHidden: true,
@@ -189,6 +193,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private boardTimerIntervalId?: number;
+  private carouselDialogRef: HTMLDialogElement | null = null;
 
   public async componentDidMount() {
     let initialCurrentTeam: WebApiTeam | undefined;
@@ -283,6 +288,30 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
     if (prevState.activeTab !== this.state.activeTab && this.state.activeTab !== "Board") {
       this.pauseBoardTimer();
+    }
+
+    if (prevState.isCarouselDialogHidden !== this.state.isCarouselDialogHidden && this.carouselDialogRef) {
+      if (!this.state.isCarouselDialogHidden && !this.carouselDialogRef.open) {
+        this.openDialog(this.carouselDialogRef);
+      } else if (this.state.isCarouselDialogHidden && this.carouselDialogRef.open) {
+        this.closeDialog(this.carouselDialogRef);
+      }
+    }
+  }
+
+  private openDialog(dialog: HTMLDialogElement) {
+    if (typeof dialog.showModal === "function") {
+      dialog.showModal();
+    } else {
+      dialog.setAttribute("open", "");
+    }
+  }
+
+  private closeDialog(dialog: HTMLDialogElement) {
+    if (typeof dialog.close === "function") {
+      dialog.close();
+    } else {
+      dialog.removeAttribute("open");
     }
   }
 
@@ -1746,7 +1775,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   <div className="flex items-center justify-start">
                     <div className="flex flex-row items-center workflow-stage-header 3">
                       {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                        <div className="team-assessment-button">
+                        <>
                           <Dialog
                             hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
                             onDismiss={() => {
@@ -1845,7 +1874,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             </DialogFooter>
                           </Dialog>
                           <button
-                            className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
+                            className="team-assessment-button"
                             onClick={() => {
                               this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
                             }}
@@ -1853,12 +1882,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             aria-label="Team Assessment"
                             type="button"
                           >
-                            <span className="inline-flex items-center justify-center lg:mr-1">
-                              <i className="fas fa-chart-line"></i>
-                            </span>
+                            <AssessmentIcon />
                             <span className="hidden lg:inline">Team Assessment</span>
                           </button>
-                        </div>
+                        </>
                       )}
                       <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
                         <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
@@ -1886,12 +1913,28 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </div>
                       )}
                       {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                        <button className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
-                          <span className="inline-flex items-center justify-center mr-1">
+                        <>
+                          <button className="focus-mode-button" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
                             <i className="fas fa-bullseye"></i>
-                          </span>
-                          <span className="hidden lg:inline">Focus Mode</span>
-                        </button>
+                            <span className="">Focus Mode</span>
+                          </button>
+                          <dialog
+                            ref={ref => {
+                              this.carouselDialogRef = ref;
+                            }}
+                            className="retrospectives-carousel-dialog"
+                            onClose={this.hideCarouselDialog}
+                          >
+                            <div className="header">
+                              <h2 className="title">Focus Mode</h2>
+                              <button onClick={this.hideCarouselDialog} aria-label="Close">
+                                <CloseIcon />
+                              </button>
+                            </div>
+                            <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
+                            <div className="inner">{this.state.focusModeModel && <FeedbackCarousel focusModeModel={this.state.focusModeModel} isFocusModalHidden={this.state.isCarouselDialogHidden} />}</div>
+                          </dialog>
+                        </>
                       )}
                     </div>
                   </div>
@@ -1973,7 +2016,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
                       </MessageBar>
                     )}
-                    <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} onColumnNotesChange={this.persistColumnNotes} />
+                    <FeedbackBoard
+                      board={this.state.currentBoard}
+                      team={this.state.currentTeam}
+                      displayBoard={true}
+                      workflowPhase={this.state.currentBoard.activePhase}
+                      nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
+                      allWorkItemTypes={this.state.allWorkItemTypes}
+                      onFocusModeModelChange={focusModeModel => {
+                        this.setState({ focusModeModel });
+                      }}
+                      isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
+                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false}
+                      userId={this.state.currentUserId}
+                      onVoteCasted={this.updateCurrentVoteCount}
+                      onColumnNotesChange={this.persistColumnNotes}
+                    />
                     <Dialog
                       hidden={this.state.isArchiveBoardConfirmationDialogHidden}
                       onDismiss={this.hideArchiveBoardConfirmationDialog}

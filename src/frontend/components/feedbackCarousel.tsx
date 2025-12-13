@@ -1,18 +1,52 @@
 import React from "react";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
-import FeedbackColumn, { FeedbackColumnProps } from "./feedbackColumn";
+import FeedbackColumn from "./feedbackColumn";
 import FeedbackItem, { IFeedbackItemProps } from "./feedbackItem";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
+import { WebApiTeam } from "azure-devops-extension-api/Core";
+import { WorkflowPhase } from "../interfaces/workItem";
+import { IFeedbackItemDocument } from "../interfaces/feedback";
+import { type IColumn, type IColumnItem } from "./feedbackBoard";
+
+export interface FocusModeModel {
+  columns: { [id: string]: IColumn };
+  columnIds: string[];
+  workflowPhase: WorkflowPhase;
+  team: WebApiTeam;
+  boardId: string;
+  boardTitle: string;
+  defaultActionItemAreaPath: string;
+  defaultActionItemIteration: string;
+  nonHiddenWorkItemTypes: WorkItemType[];
+  allWorkItemTypes: WorkItemType[];
+  hideFeedbackItems: boolean;
+  activeTimerFeedbackItemId: string | null;
+  onVoteCasted: () => void;
+  requestTimerStart: (feedbackItemId: string) => Promise<boolean>;
+  notifyTimerStopped: (feedbackItemId: string) => void;
+
+  addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
+  removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
+  refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void;
+}
+
+interface FocusModeColumn {
+  columnId: string;
+  columnName: string;
+  accentColor: string;
+  iconClass: string;
+  columnItems: IColumnItem[];
+}
 
 export interface IFeedbackCarouselProps {
-  feedbackColumnPropsList: FeedbackColumnProps[];
-  isFeedbackAnonymous: boolean;
+  focusModeModel: FocusModeModel;
   isFocusModalHidden: boolean;
 }
 
 export interface IFeedbackCarouselState {
-  feedbackColums: FeedbackColumnProps[];
+  feedbackColums: FocusModeColumn[];
 }
 
 class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedbackCarouselState> {
@@ -20,36 +54,51 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
     super(props);
 
     this.state = {
-      feedbackColums: this.buildFeedbackColumns(props.feedbackColumnPropsList),
+      feedbackColums: this.buildFeedbackColumns(props.focusModeModel),
     };
   }
 
-  private buildFeedbackColumns = (feedbackColumnPropsList: FeedbackColumnProps[]): FeedbackColumnProps[] => {
-    const columnsList = [...feedbackColumnPropsList];
+  private buildFeedbackColumns = (focusModeModel: FocusModeModel): FocusModeColumn[] => {
+    const columnsList: FocusModeColumn[] = focusModeModel.columnIds
+      .map(columnId => {
+        const column = focusModeModel.columns[columnId];
+        if (!column) {
+          return null;
+        }
+        return {
+          columnId,
+          columnName: column.columnProperties.title,
+          accentColor: column.columnProperties.accentColor,
+          iconClass: column.columnProperties.iconClass,
+          columnItems: column.columnItems,
+        };
+      })
+      .filter((col): col is FocusModeColumn => !!col);
 
     if (columnsList.length > 0) {
       const allColumnItems = columnsList.flatMap(col => col.columnItems);
       columnsList.unshift({
-        ...columnsList[0],
         columnId: "all-columns",
         columnName: "All",
+        accentColor: columnsList[0].accentColor,
+        iconClass: columnsList[0].iconClass,
         columnItems: allColumnItems,
-      } as FeedbackColumnProps);
+      });
     }
 
     return columnsList;
   };
 
   public componentDidUpdate(prevProps: IFeedbackCarouselProps) {
-    if (prevProps.feedbackColumnPropsList !== this.props.feedbackColumnPropsList) {
+    if (prevProps.focusModeModel !== this.props.focusModeModel) {
       this.setState({
-        feedbackColums: this.buildFeedbackColumns(this.props.feedbackColumnPropsList),
+        feedbackColums: this.buildFeedbackColumns(this.props.focusModeModel),
       });
     }
   }
 
-  private renderFeedbackCarouselItems = (columnProps: FeedbackColumnProps) => {
-    const sortedItems = columnProps.columnItems
+  private renderFeedbackCarouselItems = (column: FocusModeColumn) => {
+    const sortedItems = column.columnItems
       .sort((a, b) => {
         if (b.feedbackItem.upvotes !== a.feedbackItem.upvotes) {
           return b.feedbackItem.upvotes - a.feedbackItem.upvotes;
@@ -61,9 +110,10 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId);
 
     return sortedItems.map(columnItem => {
-      // Get the accent color from the item's current column, falling back to columnProps.accentColor
-      const itemAccentColor = columnProps.columns[columnItem.feedbackItem.columnId]?.columnProperties?.accentColor ?? columnProps.accentColor;
-      const itemIconClass = columnProps.columns[columnItem.feedbackItem.columnId]?.columnProperties?.iconClass ?? columnProps.iconClass;
+      const { focusModeModel } = this.props;
+
+      const itemAccentColor = focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.accentColor ?? column.accentColor;
+      const itemIconClass = focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.iconClass ?? column.iconClass;
 
       const feedbackItemProps: IFeedbackItemProps = {
         id: columnItem.feedbackItem.id,
@@ -75,41 +125,41 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         timerSecs: columnItem.feedbackItem.timerSecs,
         timerState: columnItem.feedbackItem.timerState,
         timerId: columnItem.feedbackItem.timerId,
-        workflowPhase: columnProps.workflowPhase,
+        workflowPhase: focusModeModel.workflowPhase,
         accentColor: itemAccentColor,
         iconClass: itemIconClass,
         createdDate: columnItem.feedbackItem.createdDate.toString(),
-        team: columnProps.team,
-        columnProps: columnProps,
-        columns: columnProps.columns,
-        columnIds: columnProps.columnIds,
+        team: focusModeModel.team,
+        columnProps: undefined,
+        columns: focusModeModel.columns,
+        columnIds: focusModeModel.columnIds,
         columnId: columnItem.feedbackItem.columnId,
         originalColumnId: columnItem.feedbackItem.originalColumnId,
-        boardId: columnProps.boardId,
-        boardTitle: columnProps.boardTitle,
-        defaultActionItemAreaPath: columnProps.defaultActionItemAreaPath,
-        defaultActionItemIteration: columnProps.defaultActionItemIteration,
+        boardId: focusModeModel.boardId,
+        boardTitle: focusModeModel.boardTitle,
+        defaultActionItemAreaPath: focusModeModel.defaultActionItemAreaPath,
+        defaultActionItemIteration: focusModeModel.defaultActionItemIteration,
         actionItems: columnItem.actionItems,
         newlyCreated: columnItem.newlyCreated,
         showAddedAnimation: columnItem.showAddedAnimation,
-        addFeedbackItems: columnProps.addFeedbackItems,
-        removeFeedbackItemFromColumn: columnProps.removeFeedbackItemFromColumn,
-        refreshFeedbackItems: columnProps.refreshFeedbackItems,
+        addFeedbackItems: focusModeModel.addFeedbackItems,
+        removeFeedbackItemFromColumn: focusModeModel.removeFeedbackItemFromColumn,
+        refreshFeedbackItems: focusModeModel.refreshFeedbackItems,
         moveFeedbackItem: FeedbackColumn.moveFeedbackItem,
-        nonHiddenWorkItemTypes: columnProps.nonHiddenWorkItemTypes,
-        allWorkItemTypes: columnProps.allWorkItemTypes,
+        nonHiddenWorkItemTypes: focusModeModel.nonHiddenWorkItemTypes,
+        allWorkItemTypes: focusModeModel.allWorkItemTypes,
         shouldHaveFocus: columnItem.shouldHaveFocus,
-        hideFeedbackItems: columnProps.hideFeedbackItems,
+        hideFeedbackItems: focusModeModel.hideFeedbackItems,
         userIdRef: columnItem.feedbackItem.userIdRef,
-        onVoteCasted: columnProps.onVoteCasted,
+        onVoteCasted: focusModeModel.onVoteCasted,
         groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
         groupIds: columnItem.feedbackItem.childFeedbackItemIds ?? [],
         isGroupedCarouselItem: (columnItem.feedbackItem.childFeedbackItemIds?.length ?? 0) > 0,
         isShowingGroupedChildrenTitles: false,
         isFocusModalHidden: this.props.isFocusModalHidden,
-        activeTimerFeedbackItemId: columnProps.activeTimerFeedbackItemId,
-        requestTimerStart: columnProps.requestTimerStart,
-        notifyTimerStopped: columnProps.notifyTimerStopped,
+        activeTimerFeedbackItemId: focusModeModel.activeTimerFeedbackItemId,
+        requestTimerStart: focusModeModel.requestTimerStart,
+        notifyTimerStopped: focusModeModel.notifyTimerStopped,
       };
 
       return (
@@ -126,27 +176,27 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
 
     return (
       <Pivot className="feedback-carousel-pivot">
-        {this.state.feedbackColums.map(columnProps => {
-          const feedbackCarouselItems = this.renderFeedbackCarouselItems(columnProps);
-          const slideIds = feedbackCarouselItems.map((_, index) => `slide-${columnProps.columnId}-${index}`);
+        {this.state.feedbackColums.map(column => {
+          const feedbackCarouselItems = this.renderFeedbackCarouselItems(column);
+          const slideIds = feedbackCarouselItems.map((_, index) => `slide-${column.columnId}-${index}`);
           const activeDotCss = slideIds.map(slideId => `.carousel-container:has(#${slideId}:target) .carousel-dots a[href="#${slideId}"] { opacity: 1; transform: scale(1.05); }`).join("\n");
 
           return (
-            <PivotItem key={columnProps.columnId} headerText={columnProps.columnName} className="feedback-carousel-pivot-item" {...columnProps}>
+            <PivotItem key={column.columnId} headerText={column.columnName} className="feedback-carousel-pivot-item" {...column}>
               <div className="carousel-container">
                 {activeDotCss && <style>{activeDotCss}</style>}
-                <ol className="carousel-track" id={`carousel-${columnProps.columnId}`}>
+                <ol className="carousel-track" id={`carousel-${column.columnId}`}>
                   {feedbackCarouselItems.map((child, index) => {
                     return (
-                      <li className="carousel-slide" id={`slide-${columnProps.columnId}-${index}`} key={child.key}>
+                      <li className="carousel-slide" id={`slide-${column.columnId}-${index}`} key={child.key}>
                         {index > 0 && (
-                          <a href={`#slide-${columnProps.columnId}-${index - 1}`} className={`${arrowBaseClasses} left-2.5`} aria-label="Previous slide">
+                          <a href={`#slide-${column.columnId}-${index - 1}`} className={`${arrowBaseClasses} left-2.5`} aria-label="Previous slide">
                             <i className={`fas fa-chevron-left ${arrowIconClasses}`} />
                           </a>
                         )}
                         <div className="carousel-viewport">{child}</div>
                         {index < feedbackCarouselItems.length - 1 && (
-                          <a href={`#slide-${columnProps.columnId}-${index + 1}`} className={`${arrowBaseClasses} right-2.5`} aria-label="Next slide">
+                          <a href={`#slide-${column.columnId}-${index + 1}`} className={`${arrowBaseClasses} right-2.5`} aria-label="Next slide">
                             <i className={`fas fa-chevron-right ${arrowIconClasses}`} />
                           </a>
                         )}

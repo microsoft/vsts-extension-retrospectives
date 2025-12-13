@@ -178,8 +178,6 @@ const mockedProps: FeedbackBoardProps = {
   allWorkItemTypes: testColumnProps.allWorkItemTypes,
   isAnonymous: testColumnProps.isBoardAnonymous,
   hideFeedbackItems: testColumnProps.hideFeedbackItems,
-  isCarouselDialogHidden: false,
-  hideCarouselDialog: jest.fn(() => {}),
   userId: "",
   onColumnNotesChange: jest.fn().mockResolvedValue(undefined),
 };
@@ -787,33 +785,6 @@ describe("FeedbackBoard Component", () => {
           expect(itemDataService.getFeedbackItem).toHaveBeenCalledWith(mockedBoard.id, mockFeedbackItems[0].id);
         });
       }
-    });
-  });
-
-  describe("Carousel Dialog", () => {
-    it("renders successfully when carousel is not hidden", () => {
-      const { container } = render(<FeedbackBoard {...mockedProps} isCarouselDialogHidden={false} />);
-
-      // Fluent UI Dialog renders in a portal and is difficult to test in JSDOM
-      // We verify the component renders without errors
-      const feedbackBoard = container.querySelector(".feedback-board");
-      expect(feedbackBoard).toBeTruthy();
-    });
-
-    it("renders successfully when carousel is hidden", () => {
-      const { container } = render(<FeedbackBoard {...mockedProps} isCarouselDialogHidden={true} />);
-
-      const feedbackBoard = container.querySelector(".feedback-board");
-      expect(feedbackBoard).toBeTruthy();
-    });
-
-    it("accepts hideCarouselDialog prop", () => {
-      const hideCarouselDialog = jest.fn();
-
-      render(<FeedbackBoard {...mockedProps} hideCarouselDialog={hideCarouselDialog} isCarouselDialogHidden={false} />);
-
-      // The dialog exists in DOM but we can't easily test onDismiss without more setup
-      expect(hideCarouselDialog).not.toHaveBeenCalled();
     });
   });
 
@@ -1728,8 +1699,7 @@ describe("FeedbackBoard Component", () => {
     });
 
     it("opens Keyboard Shortcuts dialog on ? key", async () => {
-      // Ensure the Focus Mode dialog isn't open; otherwise key handling is suppressed in the component.
-      render(<FeedbackBoard {...mockedProps} isCarouselDialogHidden={true} />);
+      render(<FeedbackBoard {...mockedProps} />);
 
       await waitFor(() => {
         expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();

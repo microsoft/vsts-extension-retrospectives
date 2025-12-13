@@ -17,14 +17,17 @@ import { itemDataService } from "../dal/itemDataService";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { reflectBackendService } from "../dal/reflectBackendService";
 import { IColumn, IColumnItem } from "./feedbackBoard";
-import { FeedbackColumnProps } from "./feedbackColumn";
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
+
+export interface IFeedbackItemColumnContext {
+  registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
+}
 
 export interface IFeedbackItemProps {
   id: string;
   title: string;
-  columnProps: FeedbackColumnProps;
+  columnProps?: IFeedbackItemColumnContext;
   columns: { [id: string]: IColumn };
   columnIds: string[];
   createdBy?: string;

@@ -108,14 +108,11 @@ body {
   @apply text-primary;
 }
 
-button:hover:not(.ms-Button),
-button:focus:not(.ms-Button) {
+/*
+button:hover:not(.ms-Button), button:focus:not(.ms-Button) {
   @apply border-none;
 }
-
-#vss_1 {
-  @apply max-w-sm min-h-7;
-}
+*/
 
 .ms-Button--primary {
   @apply bg-white text-primary border border-primary;
@@ -173,10 +170,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .extension-settings-button {
-    @apply bg-inherit border-0 min-w-0 mx-2 p-0 text-(--text-primary-color);
+    @apply flex items-center gap-1 cursor-pointer text-sm bg-inherit border-0 min-w-0 mx-2 p-0 text-(--text-primary-color);
 
-    & i[data-icon-name="ChevronDown"] {
-      @apply hidden;
+    & svg {
+      @apply w-4;
     }
 
     &:hover {
@@ -975,7 +972,27 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-assessment-button {
-  @apply border border-solid border-(--nav-header-active-item-background) rounded-lg;
+  @apply flex items-center gap-1 bg-transparent cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none border border-solid border-(--nav-header-active-item-background) rounded-lg;
+
+  &:hover {
+    @apply border border-solid text-primary;
+  }
+
+  & svg {
+    @apply w-5 h-5;
+  }
+}
+
+.focus-mode-button {
+  @apply flex items-center gap-1 bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none hover:text-primary;
+
+  & svg {
+    @apply w-5 h-5;
+  }
+
+  & span {
+    @apply hidden lg:inline;
+  }
 }
 
 .team-assessment-no-data {
@@ -1015,7 +1032,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-carousel-pivot > .ms-Pivot .ms-Button {
-  @apply bg-(--background-color) text-(--text-primary-color);
+  @apply bg-(--background-color) text-(--text-primary-color) border-none;
 }
 
 .feedback-carousel-pivot-item {
@@ -1023,14 +1040,30 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-carousel-dialog {
-  @apply w-2/3 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 backdrop:bg-black/50;
+  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 backdrop:backdrop-blur-xs backdrop:bg-black/50;
 
-  & .ms-Dialog-title {
-    @apply text-(--text-primary-color);
+  & .header {
+    @apply flex justify-between items-center p-5 border-b border-b-border-gray-lighter text-(--text-primary-color);
+
+    & .title {
+      @apply m-0 text-2xl font-semibold;
+    }
+
+    & button {
+      @apply border-0 cursor-pointer p-2 text-base;
+
+      &:hover {
+        @apply bg-(--border-subtle-color) rounded;
+      }
+    }
   }
 
-  & .ms-Dialog-subText {
-    @apply text-(--text-primary-color) text-sm;
+  & .subText {
+    @apply p-5 text-sm text-(--text-primary-color);
+  }
+
+  & .inner {
+    @apply p-5;
   }
 
   & .feedback-carousel-pivot .ms-Pivot {
@@ -1728,7 +1761,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-assessment-score-circle {
-  @apply inline-block h-6 w-6 border-2 rounded-full border-(--nav-header-active-item-background) transition-[background-color,border-color] duration-200 ease-in;
+  @apply inline-block h-5 w-5 border-2 rounded-full border-(--nav-header-active-item-background) transition-[background-color,border-color] duration-200 ease-in;
 }
 
 .team-assessment-score-button:hover .team-assessment-score-circle {

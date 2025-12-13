@@ -15,6 +15,7 @@ import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
 import { WorkflowPhase } from "../interfaces/workItem";
 
 import { RETRO_URLS, PRIME_DIRECTIVE_CONTENT, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, WHATISNEW_CONTENT, renderContent } from "./extensionSettingsMenuDialogContent";
+import { PrivacyTipIcon } from "./icons";
 
 interface IExtensionSettingsMenuState {
   isPrimeDirectiveDialogHidden: boolean;
@@ -283,7 +284,11 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
   public render() {
     return (
       <div className="extension-settings-menu">
-        <ExtensionSettingsButton ariaLabel="Prime Directive" title="Prime Directive" iconClass="fas fa-shield-halved" label="Directive" onClick={this.showPrimeDirectiveDialog} />
+        <button onClick={this.showPrimeDirectiveDialog} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
+          <PrivacyTipIcon />
+          <span className="hidden lg:inline">Directive</span>
+        </button>
+
         <ExtensionSettingsButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} />
         <ExtensionSettingsButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} />
 
