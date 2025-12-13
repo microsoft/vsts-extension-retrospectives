@@ -166,7 +166,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .extension-settings-menu {
-  @apply mr-1 hidden md:flex sm:flex-nowrap;
+  @apply mr-1 flex flex-nowrap;
 
   & .ms-Button-label {
     @apply text-xs;
@@ -180,7 +180,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     &:hover {
-      @apply bg-(--background-color) text-(--text-primary-color);
+      @apply text-primary;
     }
 
     &:focus-visible {
@@ -571,6 +571,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .selector-button-text {
   @apply text-sm leading-8 inline whitespace-nowrap;
+
+  &:hover {
+    @apply text-primary;
+  }
 }
 
 .selector-button-chevron {
@@ -971,7 +975,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-assessment-button {
-  @apply border border-solid border-(--nav-header-active-item-background) rounded-lg hidden md:block;
+  @apply border border-solid border-(--nav-header-active-item-background) rounded-lg;
 }
 
 .team-assessment-no-data {
@@ -1606,10 +1610,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   &.active {
     @apply text-primary border-b-primary;
-  }
-
-  &.history {
-    @apply hidden md:block;
   }
 }
 
