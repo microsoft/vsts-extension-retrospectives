@@ -1,7 +1,4 @@
 import React from "react";
-import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
-import { Dialog, DialogContent, DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
-import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import boardDataService from "../dal/boardDataService";
@@ -11,18 +8,8 @@ import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/feedback";
 import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
 
-import { RETRO_URLS, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, renderContent } from "./extensionSettingsMenuDialogContent";
 import { CelebrationIcon, CloseIcon, CloudDownloadIcon, CloudIcon, CloudUploadIcon, ContactPhoneIcon, HelpIcon, KeyboardIcon, MenuBookIcon, PrivacyTipIcon, VolunteerActivismIcon } from "./icons";
-
-interface IExtensionSettingsMenuState {
-  isPrimeDirectiveDialogHidden: boolean;
-  isWhatsNewDialogHidden: boolean;
-  isGetHelpDialogHidden: boolean;
-  isPleaseJoinUsDialogHidden: boolean;
-  isKeyboardShortcutsDialogHidden: boolean;
-}
 
 interface IExportImportDataSchema {
   team: WebApiTeam;
@@ -30,86 +17,41 @@ interface IExportImportDataSchema {
   items: IFeedbackItemDocument[];
 }
 
-interface ExtensionSettingsButtonProps {
-  ariaLabel: string;
-  title: string;
-  iconClass: string;
-  label: string;
-  onClick?: () => void;
-  menuItems?: IContextualMenuItem[];
+interface KeyboardShortcut {
+  keys: string[];
+  description: string;
+  category: string;
 }
 
-export const ExtensionSettingsButton: React.FC<ExtensionSettingsButtonProps> = ({ ariaLabel, title, iconClass, label, onClick, menuItems }) => {
-  const buttonClass = "extension-settings-button";
-  const menuProps = menuItems
-    ? {
-        items: menuItems,
-        className: "extended-options-menu",
-      }
-    : undefined;
-
-  return (
-    <DefaultButton className={buttonClass} aria-label={ariaLabel} title={title} onClick={onClick} menuProps={menuProps}>
-      <span className="ms-Button-icon">
-        <i className={iconClass}></i>
-      </span>
-      &nbsp;
-      <span className="ms-Button-label hidden lg:inline">{label}</span>
-    </DefaultButton>
-  );
-};
-
-interface ExtensionDialogProps {
-  hidden: boolean;
-  onDismiss: () => void;
-  title: string;
-  children: React.ReactNode;
-  onDefaultClick: () => void;
-  defaultButtonText: string;
-  primaryButtonText?: string;
-  containerClassName: string;
-  subText?: string;
-}
-
-const ExtensionDialog: React.FC<ExtensionDialogProps> = ({ hidden, onDismiss, title, children, onDefaultClick, defaultButtonText, primaryButtonText = "Close", containerClassName, subText }) => (
-  <Dialog
-    hidden={hidden}
-    onDismiss={onDismiss}
-    dialogContentProps={{
-      type: DialogType.close,
-      title,
-      subText,
-    }}
-    minWidth="600"
-    modalProps={{
-      isBlocking: true,
-      containerClassName,
-      className: "retrospectives-dialog-modal",
-    }}
-  >
-    <DialogContent>{children}</DialogContent>
-    <DialogFooter>
-      <DefaultButton onClick={onDefaultClick} text={defaultButtonText} />
-      <PrimaryButton onClick={onDismiss} text={primaryButtonText} className={primaryButtonText === "Close" ? "extension-menu-close-button" : undefined} />
-    </DialogFooter>
-  </Dialog>
-);
-
-export class ExtensionSettingsMenu extends React.Component<Record<string, never>, IExtensionSettingsMenuState> {
-  constructor(props: Record<string, never>) {
-    super(props);
-
-    this.state = {
-      isPrimeDirectiveDialogHidden: true,
-      isKeyboardShortcutsDialogHidden: true,
-      isWhatsNewDialogHidden: true,
-      isGetHelpDialogHidden: true,
-      isPleaseJoinUsDialogHidden: true,
-    };
-  }
-
+export class ExtensionSettingsMenu extends React.Component<Record<string, never>, {}> {
   private readonly primeDirectiveDialogRef = React.createRef<HTMLDialogElement>();
   private readonly whatsNewDialogRef = React.createRef<HTMLDialogElement>();
+  private readonly userGuideDialogRef = React.createRef<HTMLDialogElement>();
+  private readonly volunteerDialogRef = React.createRef<HTMLDialogElement>();
+  private readonly keyboardShortcutsDialogRef = React.createRef<HTMLDialogElement>();
+
+  private readonly keyboardShortcuts: KeyboardShortcut[] = [
+    // Global shortcuts
+    { keys: ["?"], description: "Show keyboard shortcuts", category: "Global" },
+    { keys: ["Esc"], description: "Close dialogs or cancel actions", category: "Global" },
+
+    // Column navigation
+    { keys: ["1-5"], description: "Jump to column by number", category: "Navigation" },
+    { keys: ["←", "→"], description: "Navigate between columns", category: "Navigation" },
+    { keys: ["↑", "↓"], description: "Navigate between feedback items", category: "Navigation" },
+    { keys: ["Tab"], description: "Move focus to next element", category: "Navigation" },
+    { keys: ["Shift", "Tab"], description: "Move focus to previous element", category: "Navigation" },
+    { keys: ["Page Up"], description: "Scroll up in column", category: "Navigation" },
+    { keys: ["Page Down"], description: "Scroll down in column", category: "Navigation" },
+
+    // Item actions - Collect phase
+    { keys: ["Insert"], description: "Create new feedback item", category: "Actions" },
+    { keys: ["Enter"], description: "Edit feedback item", category: "Actions" },
+    { keys: ["Delete"], description: "Delete feedback item", category: "Actions" },
+
+    // Column actions
+    { keys: ["E"], description: "Edit column notes", category: "Column" },
+  ];
 
   private readonly exportData = async () => {
     const toastId = toast("Processing boards...");
@@ -180,18 +122,6 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     }
   };
 
-  private readonly hidePleaseJoinUsDialog = () => {
-    this.setState({ isPleaseJoinUsDialogHidden: true });
-  };
-
-  private readonly onGetHelpClicked = () => {
-    window.open(RETRO_URLS.readme, "_blank");
-  };
-
-  private readonly onContributingClicked = () => {
-    window.open(RETRO_URLS.contributing, "_blank");
-  };
-
   public render() {
     return (
       <div className="extension-settings-menu">
@@ -248,15 +178,15 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
               <CelebrationIcon />
               What&apos;s new
             </button>
-            <button onClick={() => this.setState({ isKeyboardShortcutsDialogHidden: false })}>
+            <button onClick={() => this.keyboardShortcutsDialogRef.current?.showModal()}>
               <KeyboardIcon />
               Keyboard shortcuts
             </button>
-            <button onClick={() => this.setState({ isGetHelpDialogHidden: false })}>
+            <button onClick={() => this.userGuideDialogRef.current?.showModal()}>
               <MenuBookIcon />
               User guide
             </button>
-            <button onClick={() => this.setState({ isPleaseJoinUsDialogHidden: false })}>
+            <button onClick={() => this.volunteerDialogRef.current?.showModal()}>
               <VolunteerActivismIcon />
               Volunteer
             </button>
@@ -291,23 +221,98 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           </div>
         </dialog>
 
-        <ExtensionDialog
-          hidden={this.state.isGetHelpDialogHidden}
-          onDismiss={() => {
-            this.setState({ isGetHelpDialogHidden: true });
-          }}
-          title="Retrospectives User Guide"
-          onDefaultClick={this.onGetHelpClicked}
-          defaultButtonText="Open user guide"
-          containerClassName="retro-help-dialog retro-dialog-shell"
-        >
-          {renderContent(RETRO_HELP_CONTENT)}
-        </ExtensionDialog>
-        <ExtensionDialog hidden={this.state.isPleaseJoinUsDialogHidden} onDismiss={this.hidePleaseJoinUsDialog} title="Volunteer" onDefaultClick={this.onContributingClicked} defaultButtonText="Open contributing guidelines" containerClassName="volunteer-dialog retro-dialog-shell">
-          {renderContent(VOLUNTEER_CONTENT)}
-        </ExtensionDialog>
+        <dialog className="user-guide-dialog" aria-label="Retrospectives User Guide" ref={this.userGuideDialogRef} onClose={() => this.userGuideDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Retrospectives User Guide</h2>
+            <button onClick={() => this.userGuideDialogRef.current?.close()} aria-label="Close">
+              <CloseIcon />
+            </button>
+          </div>
+          <div className="subText">The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback. The Retrospective extension and Team Assessment feature are valuable tools supporting that process.</div>
+          <div className="subText">For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.</div>
+          <div className="inner">
+            <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md", "_blank")}>
+              Open user guide
+            </button>
+            <button className="default button" onClick={() => this.userGuideDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
 
-        <KeyboardShortcutsDialog isOpen={!this.state.isKeyboardShortcutsDialogHidden} onClose={() => this.setState({ isKeyboardShortcutsDialogHidden: true })} />
+        <dialog className="volunteer-dialog" aria-label="Volunteer" ref={this.volunteerDialogRef} onClose={() => this.volunteerDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Volunteer</h2>
+            <button onClick={() => this.volunteerDialogRef.current?.close()} aria-label="Close">
+              <CloseIcon />
+            </button>
+          </div>
+          <div className="subText">Help us make the Retrospective Extension even better!</div>
+          <div className="subText">While we will continue to maintain the extension to meet Microsoft&apos;s high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.</div>
+          <div className="subText">Want to contribute? Join us and become part of our community! 🙋</div>
+          <div className="inner">
+            <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md", "_blank")}>
+              Open contributing guidelines
+            </button>
+            <button className="default button" onClick={() => this.volunteerDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
+
+        <dialog className="keyboard-shortcuts-dialog" aria-label="Keyboard Shortcuts" ref={this.keyboardShortcutsDialogRef} onClose={() => this.keyboardShortcutsDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Keyboard Shortcuts</h2>
+            <button onClick={() => this.keyboardShortcutsDialogRef.current?.close()} aria-label="Close">
+              <CloseIcon />
+            </button>
+          </div>
+          <div className="subText">Use these keyboard shortcuts to navigate and interact with the retrospective board.</div>
+          <div className="subText">
+            {Object.entries(this.keyboardShortcuts.reduce(
+    (acc, shortcut) => {
+      if (!acc[shortcut.category]) {
+        acc[shortcut.category] = [];
+      }
+      acc[shortcut.category].push(shortcut);
+      return acc;
+    },
+    {} as { [key: string]: KeyboardShortcut[] },
+  )).map(([category, shortcuts]) => (
+              <div key={category}>
+                <h3 className="keyboard-shortcuts-category-title">{category}</h3>
+                <table className="keyboard-shortcuts-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Shortcut</th>
+                      <th scope="col">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {shortcuts.map((shortcut, index) => (
+                      <tr key={index}>
+                        <td>
+                          {shortcut.keys.map((key, idx) => (
+                            <React.Fragment key={idx}>
+                              {idx > 0 && <span className="keyboard-shortcuts-key-separator">+</span>}
+                              <kbd key={key}>{key}</kbd>
+                            </React.Fragment>
+                          ))}
+                        </td>
+                        <td>{shortcut.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+          <div className="inner">
+            <button className="default button" onClick={() => this.keyboardShortcutsDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
       </div>
     );
   }
