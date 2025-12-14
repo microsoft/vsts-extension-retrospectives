@@ -269,16 +269,18 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           </div>
           <div className="subText">Use these keyboard shortcuts to navigate and interact with the retrospective board.</div>
           <div className="subText">
-            {Object.entries(this.keyboardShortcuts.reduce(
-    (acc, shortcut) => {
-      if (!acc[shortcut.category]) {
-        acc[shortcut.category] = [];
-      }
-      acc[shortcut.category].push(shortcut);
-      return acc;
-    },
-    {} as { [key: string]: KeyboardShortcut[] },
-  )).map(([category, shortcuts]) => (
+            {Object.entries(
+              this.keyboardShortcuts.reduce(
+                (acc, shortcut) => {
+                  if (!acc[shortcut.category]) {
+                    acc[shortcut.category] = [];
+                  }
+                  acc[shortcut.category].push(shortcut);
+                  return acc;
+                },
+                {} as { [key: string]: KeyboardShortcut[] },
+              ),
+            ).map(([category, shortcuts]) => (
               <div key={category}>
                 <h3 className="keyboard-shortcuts-category-title">{category}</h3>
                 <table className="keyboard-shortcuts-table">
