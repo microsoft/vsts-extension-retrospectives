@@ -41,7 +41,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
-import { AssessmentIcon, CloseIcon, InfoIcon, PauseCircleIcon, PeopleIcon, PersonIcon, PlayCircleIcon, RefreshIcon } from "./icons";
+import { AssessmentIcon, CloseIcon, InfoIcon, MoreHorizontalIcon, PauseCircleIcon, PeopleIcon, PersonIcon, PlayCircleIcon, RefreshIcon } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -511,9 +511,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
-    const currentPhase = this.getCurrentBoardPhase();
     getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
-      service.setHash(`teamId=${teamId}&boardId=${boardId}&phase=${currentPhase}`);
+      service.setHash(`teamId=${teamId}&boardId=${boardId}&phase=${this.state.currentBoard.activePhase}`);
     });
   }
 
@@ -1337,15 +1336,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isBoardDuplicateDialogHidden: true });
   };
 
-  // Note: This is temporary, to support older boards that do not have an active phase.
-  private readonly getCurrentBoardPhase = () => {
-    if (!this.state.currentBoard?.activePhase) {
-      return WorkflowPhase.Collect;
-    }
-
-    return this.state.currentBoard.activePhase;
-  };
-
   private readonly showArchiveBoardConfirmationDialog = () => {
     this.setState({ isArchiveBoardConfirmationDialogHidden: false });
   };
@@ -1355,9 +1345,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly showBoardUrlCopiedToast = () => {
-    const currentPhase = this.getCurrentBoardPhase();
-    const phaseText = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
-    toast(`The link to retrospective ${this.state.currentBoard.title} (${phaseText} phase) has been copied to your clipboard.`);
+    toast(`The link to retrospective ${this.state.currentBoard.title} (${this.state.currentBoard.activePhase} phase) has been copied to your clipboard.`);
   };
 
   private readonly showEmailCopiedToast = () => {
@@ -1385,8 +1373,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly copyBoardUrl = async () => {
-    const currentPhase = this.getCurrentBoardPhase();
-    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, currentPhase);
+    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
     copyToClipboard(boardDeepLinkUrl);
   };
 
@@ -1480,9 +1467,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly getBoardActionContextualMenuItems = (): IContextualMenuItem[] => {
-    const currentPhase = this.getCurrentBoardPhase();
-    const phaseText = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
-
     return [
       {
         key: "createBoard",
@@ -1516,8 +1500,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           await this.copyBoardUrl();
           this.showBoardUrlCopiedToast();
         },
-        text: `Copy link to ${phaseText} phase`,
-        title: `Copy link to ${phaseText} phase`,
+        text: `Copy link to ${this.state.currentBoard.activePhase} phase`,
+        title: `Copy link to ${this.state.currentBoard.activePhase} phase`,
       },
       {
         key: "seperator",
@@ -1736,40 +1720,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           items: this.getBoardActionContextualMenuItems(),
                         }}
                       >
-                        <span className="ms-Button-icon">
-                          <i className="fa-solid fa-ellipsis-h"></i>
-                        </span>
-                        &nbsp;
+                        <MoreHorizontalIcon />
                       </DefaultButton>
-                      <Dialog
-                        hidden={this.state.isMobileBoardActionsDialogHidden}
-                        onDismiss={this.hideMobileBoardActionsDialog}
-                        modalProps={{
-                          isBlocking: false,
-                          containerClassName: "ms-dialogMainOverride",
-                          className: "retrospectives-dialog-modal",
-                        }}
-                      >
-                        <div className="mobile-contextual-menu-list">
-                          {this.getBoardActionContextualMenuItems().map((boardAction: IContextualMenuItem) => (
-                            <ActionButton
-                              key={boardAction.key}
-                              className={boardAction.className}
-                              iconProps={boardAction.iconProps}
-                              aria-label="Board Actions Menu"
-                              onClick={() => {
-                                this.hideMobileBoardActionsDialog();
-                                boardAction.onClick();
-                              }}
-                              text={boardAction.text}
-                              title={boardAction.title}
-                            />
-                          ))}
-                        </div>
-                        <DialogFooter>
-                          <DefaultButton onClick={this.hideMobileBoardActionsDialog} text="Close" />
-                        </DialogFooter>
-                      </Dialog>
                     </div>
                   </div>
                   <div className="flex items-center justify-start">
@@ -1888,12 +1840,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </>
                       )}
                       <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
-                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
-                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
-                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
-                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
                       </div>
-                      {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
+                      {this.state.currentBoard.activePhase === WorkflowPhase.Vote && (
                         <div className="feedback-votes-count" role="status" aria-live="polite">
                           <span className="entry" title={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
                             <PersonIcon />
@@ -1912,7 +1864,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           )}
                         </div>
                       )}
-                      {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
+                      {this.state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
                           <button className="focus-mode-button" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
                             <i className="fas fa-bullseye"></i>

@@ -156,11 +156,19 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           </summary>
 
           <div className="callout-menu left">
-            <button onClick={() => { this.importData(); }}>
+            <button
+              onClick={() => {
+                this.importData();
+              }}
+            >
               <CloudUploadIcon />
               Import Data
             </button>
-            <button onClick={() => { this.exportData(); }}>
+            <button
+              onClick={() => {
+                this.exportData();
+              }}
+            >
               <CloudDownloadIcon />
               Export Data
             </button>
@@ -174,23 +182,43 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           </summary>
 
           <div className="callout-menu right">
-            <button onClick={() => { this.whatsNewDialogRef.current?.showModal(); }}>
+            <button
+              onClick={() => {
+                this.whatsNewDialogRef.current?.showModal();
+              }}
+            >
               <CelebrationIcon />
               What&apos;s new
             </button>
-            <button onClick={() => { this.keyboardShortcutsDialogRef.current?.showModal(); }}>
+            <button
+              onClick={() => {
+                this.keyboardShortcutsDialogRef.current?.showModal();
+              }}
+            >
               <KeyboardIcon />
               Keyboard shortcuts
             </button>
-            <button onClick={() => { this.userGuideDialogRef.current?.showModal(); }}>
+            <button
+              onClick={() => {
+                this.userGuideDialogRef.current?.showModal();
+              }}
+            >
               <MenuBookIcon />
               User guide
             </button>
-            <button onClick={() => { this.volunteerDialogRef.current?.showModal(); }}>
+            <button
+              onClick={() => {
+                this.volunteerDialogRef.current?.showModal();
+              }}
+            >
               <VolunteerActivismIcon />
               Volunteer
             </button>
-            <button onClick={() => { window.open("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank"); }}>
+            <button
+              onClick={() => {
+                window.open("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank");
+              }}
+            >
               <ContactPhoneIcon />
               Contact us
             </button>

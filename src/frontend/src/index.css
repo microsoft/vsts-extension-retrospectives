@@ -420,7 +420,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     & tr {
       @apply border-b border-(--border-subtle-color);
 
-      & td:first-child, & th:first-child {
+      & td:first-child,
+      & th:first-child {
         @apply py-2 px-3 w-2/5;
       }
     }
@@ -1676,7 +1677,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-actions-menu {
-  @apply ml-1;
+  @apply mx-2;
 }
 
 .workflow-stage-header {
@@ -1776,7 +1777,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-assessment-score-circle {
-  @apply inline-block h-5 w-5 border-2 rounded-full border-(--nav-header-active-item-background) transition-[background-color,border-color] duration-200 ease-in;
+  @apply inline-block w-4 h-4 border-2 rounded-full border-(--nav-header-active-item-background) transition-[background-color,border-color] duration-200 ease-in;
 }
 
 .team-assessment-score-button:hover .team-assessment-score-circle {
@@ -1891,18 +1892,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .team-effectiveness-dialog .ms-Dialog-content i.accent3 {
   @apply text-[rgba(var(--palette-accent3),0.5)];
-}
-
-.board-actions-menu {
-  @apply bg-(--background-color);
-}
-
-.board-actions-menu button.ms-ContextualMenu-link {
-  @apply text-(--text-primary-color);
-}
-
-.board-actions-menu button.ms-ContextualMenu-link:hover {
-  @apply bg-(--border-subtle-color) text-(--text-primary-color);
 }
 
 .create-new-board-button,
