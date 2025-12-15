@@ -24,6 +24,7 @@ interface KeyboardShortcut {
 }
 
 export class ExtensionSettingsMenu extends React.Component<Record<string, never>, {}> {
+  private readonly menuRootRef = React.createRef<HTMLDivElement>();
   private readonly primeDirectiveDialogRef = React.createRef<HTMLDialogElement>();
   private readonly whatsNewDialogRef = React.createRef<HTMLDialogElement>();
   private readonly userGuideDialogRef = React.createRef<HTMLDialogElement>();
@@ -122,9 +123,36 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     }
   };
 
+  private readonly handleDocumentPointerDown = (event: PointerEvent) => {
+    const root = this.menuRootRef.current;
+    if (!root) {
+      return;
+    }
+
+    const target = event.target as Node | null;
+    if (!target) {
+      return;
+    }
+
+    const openDetails = Array.from(root.querySelectorAll("details[open]"));
+    for (const detailsElement of openDetails) {
+      if (!detailsElement.contains(target)) {
+        detailsElement.removeAttribute("open");
+      }
+    }
+  };
+
+  public componentDidMount(): void {
+    document.addEventListener("pointerdown", this.handleDocumentPointerDown);
+  }
+
+  public componentWillUnmount(): void {
+    document.removeEventListener("pointerdown", this.handleDocumentPointerDown);
+  }
+
   public render() {
     return (
-      <div className="extension-settings-menu">
+      <div className="extension-settings-menu" ref={this.menuRootRef}>
         <button onClick={() => this.primeDirectiveDialogRef.current?.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
           <PrivacyTipIcon />
           <span className="hidden lg:inline">Directive</span>
