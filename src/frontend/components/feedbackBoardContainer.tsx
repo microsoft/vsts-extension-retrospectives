@@ -195,6 +195,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private boardTimerIntervalId?: number;
   private carouselDialogRef: HTMLDialogElement | null = null;
   private readonly boardActionsMenuRootRef = React.createRef<HTMLDivElement>();
+  private readonly archiveBoardDialogRef = React.createRef<HTMLDialogElement>();
 
   private readonly handleBoardActionsDocumentPointerDown = (event: PointerEvent) => {
     const root = this.boardActionsMenuRootRef.current;
@@ -215,10 +216,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   };
 
-  private readonly handleBoardActionMenuItemClick = async (item: IContextualMenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
+  private readonly handleBoardActionMenuItemClick = async (handler: () => void | Promise<void>, event: React.MouseEvent<HTMLButtonElement>) => {
     const detailsElement = event.currentTarget.closest("details");
     detailsElement?.removeAttribute("open");
-    await item.onClick?.(event as unknown as React.MouseEvent<HTMLElement>, item);
+    await handler();
   };
 
   public async componentDidMount() {
@@ -1973,6 +1974,25 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       onVoteCasted={this.updateCurrentVoteCount}
                       onColumnNotesChange={this.persistColumnNotes}
                     />
+                    <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={this.archiveBoardDialogRef} onClose={() => this.archiveBoardDialogRef.current?.close()}>
+                      <div className="header">
+                        <h2 className="title">Archive Retrospective</h2>
+                        <button onClick={() => this.archiveBoardDialogRef.current?.close()} aria-label="Close">
+                          <CloseIcon />
+                        </button>
+                      </div>
+                      <div className="subText">The retrospective board 4L board with its feedback will be archived.</div>
+                      <div className="subText">Note: Archived retrospectives remain available on the History tab, where they can be restored or deleted.</div>
+                      <div className="inner">
+                        <button className="button" onClick={() => this.archiveCurrentBoard()}>
+                          Archive
+                        </button>
+                        <button className="default button" onClick={() => this.archiveBoardDialogRef.current?.close()}>
+                          Cancel
+                        </button>
+                      </div>
+                    </dialog>
+
                     <Dialog
                       hidden={this.state.isArchiveBoardConfirmationDialogHidden}
                       onDismiss={this.hideArchiveBoardConfirmationDialog}
