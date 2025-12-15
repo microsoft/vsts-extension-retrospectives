@@ -2301,11 +2301,11 @@ describe("FeedbackBoardContainer - Board operations", () => {
   it("should show and hide archive confirmation dialog", () => {
     const instance = createStandaloneTimerInstance();
 
-    (instance as any).showArchiveBoardConfirmationDialog();
-    expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(false);
+    const showModal = jest.fn();
+    (instance as any).archiveBoardDialogRef = { current: { showModal } };
 
-    (instance as any).hideArchiveBoardConfirmationDialog();
-    expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(true);
+    (instance as any).showArchiveBoardConfirmationDialog();
+    expect(showModal).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -2837,14 +2837,6 @@ describe("FeedbackBoardContainer - Utility Methods", () => {
     (instance as any).hideDropIssueInEdgeMessageBar();
     expect(instance.state.isDropIssueInEdgeMessageBarVisible).toBe(false);
   });
-
-  it("should hide mobile board actions dialog", () => {
-    const instance = createStandaloneTimerInstance();
-
-    instance.setState({ isMobileBoardActionsDialogHidden: false });
-    (instance as any).hideMobileBoardActionsDialog();
-    expect(instance.state.isMobileBoardActionsDialogHidden).toBe(true);
-  });
 });
 
 describe("FeedbackBoardContainer - Board Management", () => {
@@ -2947,6 +2939,9 @@ describe("FeedbackBoardContainer - Board Management", () => {
       isArchiveBoardConfirmationDialogHidden: false,
     });
 
+    const close = jest.fn();
+    (instance as any).archiveBoardDialogRef = { current: { close } };
+
     const BoardDataService = require("../../dal/boardDataService").default;
     jest.spyOn(BoardDataService, "archiveFeedbackBoard").mockResolvedValue(undefined);
     jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([]);
@@ -2958,7 +2953,7 @@ describe("FeedbackBoardContainer - Board Management", () => {
 
     expect(BoardDataService.archiveFeedbackBoard).toHaveBeenCalledWith("team-1", "board-1");
     expect(mockBroadcastDeletedBoard).toHaveBeenCalledWith("team-1", "board-1");
-    expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(true);
+    expect(close).toHaveBeenCalledTimes(1);
     expect(appInsights.trackEvent).toHaveBeenCalledWith({
       name: TelemetryEvents.FeedbackBoardArchived,
       properties: { boardId: "board-1" },

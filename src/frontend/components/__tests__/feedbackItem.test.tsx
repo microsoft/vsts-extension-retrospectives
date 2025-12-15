@@ -548,6 +548,7 @@ describe("Feedback Item", () => {
       const props: any = {
         id: "test-hidden",
         title: "Hidden",
+        workflowPhase: "Collect",
         columnId: testColumnUuidOne,
         columns: testColumns,
         columnIds: testColumnIds,
@@ -577,6 +578,7 @@ describe("Feedback Item", () => {
       const props: any = {
         id: "test-hidden-text",
         title: "Secret Feedback Content",
+        workflowPhase: "Collect",
         columnId: testColumnUuidOne,
         columns: testColumns,
         columnIds: testColumnIds,
@@ -611,6 +613,7 @@ describe("Feedback Item", () => {
       const props: any = {
         id: "test-owner",
         title: "My Feedback",
+        workflowPhase: "Collect",
         columnId: testColumnUuidOne,
         columns: testColumns,
         columnIds: testColumnIds,
