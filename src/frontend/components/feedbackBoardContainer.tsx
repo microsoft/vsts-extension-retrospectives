@@ -1403,6 +1403,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private readonly copyBoardUrl = async () => {
     const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
     copyToClipboard(boardDeepLinkUrl);
+    this.showBoardUrlCopiedToast();
+  };
+
+  private readonly generateCSVContent = async () => {
+    await shareBoardHelper.generateCSVContent(this.state.currentBoard);
   };
 
   private readonly renderBoardUpdateMetadataFormDialog = (isNewBoardCreation: boolean, isDuplicatingBoard: boolean, hidden: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => void, onCancel: () => void) => {
@@ -1673,11 +1678,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             key="copyLink"
                             type="button"
                             title={`Copy link to ${this.state.currentBoard.activePhase} phase`}
-                            onClick={event =>
-                              this.handleBoardActionMenuItemClick(async () => {
-                                await this.copyBoardUrl();
-                                this.showBoardUrlCopiedToast();
-                              }, event)
+                            onClick={event => this.handleBoardActionMenuItemClick(this.copyBoardUrl, event)
                             }
                           >
                             <LinkIcon />
@@ -1688,10 +1689,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             key="exportCSV"
                             type="button"
                             title="Export CSV content"
-                            onClick={event =>
-                              this.handleBoardActionMenuItemClick(() => {
-                                shareBoardHelper.generateCSVContent(this.state.currentBoard);
-                              }, event)
+                            onClick={event => this.handleBoardActionMenuItemClick(this.generateCSVContent, event)
                             }
                           >
                             <SimCardDownloadIcon />
