@@ -7,6 +7,7 @@ import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azur
 import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from "@fluentui/react/lib/DetailsList";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
+import { AssignmentTurnedInIcon, HourglassTopIcon, NoteAddIcon, SMSIcon } from "./icons";
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
@@ -262,7 +263,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
         <div className="board-summary-card" aria-label="Retrospective history card">
           <h2 title={this.props.boardName} aria-label="Retrospective name">{this.props.boardName}</h2>
           <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon fas fa-comment-dots"></i>
+            <SMSIcon />
             <div className="count-and-text" aria-label="count and text container">
               <div className="count" aria-label="feedback item count">
                 {this.props.feedbackItemsCount}
@@ -271,7 +272,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
             </div>
           </div>
           <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon fa-regular fa-square-plus"></i>
+            <NoteAddIcon />
             <div className="count-and-text" aria-label="count and text container">
               <div className="count" aria-label="total work items count">
                 {this.props.actionItems.length}
@@ -279,8 +280,8 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
               <div className="text">Work items created.</div>
             </div>
           </div>
-          <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon pending-action-item-color fa-solid fa-hourglass-half"></i>
+          <div className="items-stats-container status-warning-text" aria-label="feedback items statistics container">
+            <HourglassTopIcon />
             <div className="count-and-text" aria-label="count and text container">
               <div className={`count ${this.props.pendingWorkItemsCount > 0 ? "pending-action-item-color" : ""}`} aria-label="pending work items count">
                 {this.props.pendingWorkItemsCount}
@@ -288,8 +289,8 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
               <div className="text">Work items pending.</div>
             </div>
           </div>
-          <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon resolved-green fa-solid fa-clipboard-check"></i>
+          <div className="items-stats-container status-success-text" aria-label="feedback items statistics container">
+            <AssignmentTurnedInIcon />
             <div className="count-and-text" aria-label="count and text container">
               <div className={`count ${this.props.resolvedActionItemsCount > 0 ? "resolved-green" : ""}`} aria-label="resolved work items count">
                 {this.props.resolvedActionItemsCount}

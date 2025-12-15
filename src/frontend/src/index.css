@@ -846,13 +846,25 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & tr .board-summary-container {
-        @apply flex justify-center;
+        @apply flex justify-center my-2;
 
         & .board-summary-card {
           @apply p-5 w-1/5 min-w-68 border border-(--text-primary-color) rounded flex flex-col gap-2;
 
           & h2 {
             @apply text-lg border-b-3 border-primary;
+          }
+
+          & svg {
+            @apply w-5 h-5;
+          }
+
+          & .status-warning-text {
+            @apply text-(--status-warning-text);
+          }
+
+          & .status-success-text {
+            @apply text-(--status-success-text);
           }
         }
 
@@ -861,19 +873,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         }
       }
 
-      & tr .board-summary-container .board-summary-card,
-      & tr .board-summary-container .action-items-summary-card {
-        @apply my-2 mx-1.5 bg-(--background-color) min-h-72;
-      }
-
-      & tr .board-summary-container .board-summary-card .items-stats-container,
-      & tr .board-summary-container .action-items-summary-card .items-stats-container {
-        @apply flex gap-2;
-      }
-
-      & tr .board-summary-container .board-summary-card .items-stats-container .pending-action-item-color,
-      & tr .board-summary-container .action-items-summary-card .items-stats-container .pending-action-item-color {
-        @apply text-(--status-warning-text);
+      & tr .board-summary-container .items-stats-container {
+        @apply flex items-center gap-3;
       }
 
       & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text .count,
@@ -947,10 +948,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply text-sm relative top-1/2 -translate-y-1/2 text-center;
       }
 
-      & tr .board-summary-container .board-summary-card .resolved-green {
-        @apply text-(--status-success-text);
-      }
-
       & tr .board-summary-container .board-summary-card .board-summary-card-title .ms-DocumentCardTitle {
         @apply font-semibold p-0 mb-5 h-auto text-(--text-primary-color);
       }
@@ -963,10 +960,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .workItemsCount {
     @apply text-center;
-  }
-
-  & .pending-action-item-count {
-    @apply text-(--status-warning-text) font-semibold;
   }
 
   & .trash-icon-header {
