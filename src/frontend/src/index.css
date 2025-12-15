@@ -1705,49 +1705,41 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .workflow-stage-timer {
   @apply inline-flex items-center bg-(--nav-header-active-item-background) rounded text-(--text-primary-color);
-}
 
-.workflow-stage-timer > span {
-  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs min-w-15 text-center w-25;
-}
+  & > span {
+    @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs min-w-15 text-center w-25;
+  }
 
-.workflow-stage-timer > span.timer-overtime {
-  @apply text-error-lighter font-semibold;
-}
+  & > span.timer-overtime {
+    @apply text-error-lighter font-semibold;
+  }
 
-.workflow-stage-timer select {
-  @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs w-25 cursor-pointer;
-}
+  & select {
+    @apply bg-(--background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded py-1 px-2 text-xs w-25 cursor-pointer;
 
-.workflow-stage-timer select:focus-visible {
-  @apply outline-2 outline-(--border-subtle-color) outline-offset-2;
-}
+    &:focus-visible {
+      @apply outline-2 outline-(--border-subtle-color) outline-offset-2;
+    }
 
-.workflow-stage-timer select option {
-  @apply bg-(--background-color) text-(--text-primary-color);
-}
+    & option {
+      @apply bg-(--background-color) text-(--text-primary-color);
+    }
+  }
 
-.workflow-stage-timer button {
-  @apply border-none bg-transparent text-inherit inline-flex items-center cursor-pointer font-[inherit] py-0.5 px-1.5;
-}
+  & button {
+    @apply border-none bg-transparent text-inherit inline-flex items-center cursor-pointer font-[inherit] py-0.5 px-1.5;
 
-.workflow-stage-timer button i {
-  @apply text-sm;
-}
+    & svg {
+      @apply w-4 h-4;
+    }
 
-.workflow-stage-timer button:focus-visible {
-  @apply outline-2 outline-(--border-subtle-color) outline-offset-2;
-}
+    &:focus-visible {
+      @apply outline-2 outline-(--border-subtle-color) outline-offset-2;
+    }
 
-.workflow-stage-timer button:disabled {
-  @apply cursor-default opacity-60;
-}
-
-.workflow-stage-timer .workflow-stage-timer-toggle {
-  @apply gap-1.5;
-
-  & svg {
-    @apply w-4 h-4;
+    &:disabled {
+      @apply cursor-default opacity-60;
+    }
   }
 }
 
