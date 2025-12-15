@@ -1932,7 +1932,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               </button>
                             </div>
                             <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
-                            <div className="inner">{this.state.focusModeModel && <FeedbackCarousel focusModeModel={this.state.focusModeModel} isFocusModalHidden={this.state.isCarouselDialogHidden} />}</div>
+                            <div className="subText">{this.state.focusModeModel && <FeedbackCarousel focusModeModel={this.state.focusModeModel} isFocusModalHidden={this.state.isCarouselDialogHidden} />}</div>
                           </dialog>
                         </>
                       )}
