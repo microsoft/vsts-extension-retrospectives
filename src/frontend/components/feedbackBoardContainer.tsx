@@ -1366,11 +1366,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly showArchiveBoardConfirmationDialog = () => {
-    this.setState({ isArchiveBoardConfirmationDialogHidden: false });
+    this.archiveBoardDialogRef?.current?.show();
   };
 
   private readonly hideArchiveBoardConfirmationDialog = () => {
-    this.setState({ isArchiveBoardConfirmationDialogHidden: true });
+    this.archiveBoardDialogRef?.current?.close();
   };
 
   private readonly showBoardUrlCopiedToast = () => {
@@ -1981,8 +1981,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           <CloseIcon />
                         </button>
                       </div>
-                      <div className="subText">The retrospective board 4L board with its feedback will be archived.</div>
-                      <div className="subText">Note: Archived retrospectives remain available on the History tab, where they can be restored or deleted.</div>
+                      <div className="subText">The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.</div>
+                      <div className="subText"><em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.</div>
                       <div className="inner">
                         <button className="button" onClick={() => this.archiveCurrentBoard()}>
                           Archive
@@ -1992,63 +1992,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </button>
                       </div>
                     </dialog>
-
-                    <Dialog
-                      hidden={this.state.isArchiveBoardConfirmationDialogHidden}
-                      onDismiss={this.hideArchiveBoardConfirmationDialog}
-                      dialogContentProps={{
-                        type: DialogType.close,
-                        title: "Archive Retrospective",
-                      }}
-                      modalProps={{
-                        isBlocking: true,
-                        containerClassName: "retrospectives-archive-board-confirmation-dialog",
-                        className: "retrospectives-dialog-modal",
-                      }}
-                    >
-                      <DialogContent>
-                        <p>
-                          The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
-                        </p>
-                        <br />
-                        <p>
-                          <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-                        </p>
-                      </DialogContent>
-                      <DialogFooter>
-                        <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
-                        <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
-                      </DialogFooter>
-                    </Dialog>
                   </>
                 )}
-                <Dialog
-                  hidden={this.state.isArchiveBoardConfirmationDialogHidden}
-                  onDismiss={this.hideArchiveBoardConfirmationDialog}
-                  dialogContentProps={{
-                    type: DialogType.close,
-                    title: "Archive Retrospective",
-                  }}
-                  modalProps={{
-                    isBlocking: true,
-                    containerClassName: "retrospectives-archive-board-confirmation-dialog",
-                    className: "retrospectives-dialog-modal",
-                  }}
-                >
-                  <DialogContent>
-                    <p>
-                      The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
-                    </p>
-                    <br />
-                    <p>
-                      <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-                    </p>
-                  </DialogContent>
-                  <DialogFooter>
-                    <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
-                    <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
-                  </DialogFooter>
-                </Dialog>
               </div>
             )}
           </div>
