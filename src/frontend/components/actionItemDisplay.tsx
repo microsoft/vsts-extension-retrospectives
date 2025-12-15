@@ -18,6 +18,7 @@ import { getBoardUrl } from "../utilities/boardUrlHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import ActionItem from "./actionItem";
 import { WorkflowPhase } from "../interfaces/workItem";
+import { LinkIcon } from "./icons";
 
 export interface ActionItemDisplayProps extends IButtonProps {
   feedbackItemId: string;
@@ -234,7 +235,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
                       }
                     }}
                   >
-                    <i className="work-item-icon fas fa-link"></i>
+                    <LinkIcon />
                     <div className="add-action-item-list-item-text">Link existing work item</div>
                   </DefaultButton>
                   <div role="separator" className="work-item-list-divider" />

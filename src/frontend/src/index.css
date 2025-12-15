@@ -745,19 +745,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .add-action-item-list-container {
     @apply bg-(--background-color);
 
+    & svg {
+      @apply w-4 h-4;
+    }
+
     & .add-action-item-list-item {
-      @apply flex cursor-pointer pl-2 items-center justify-start bg-inherit w-full border-0 overflow-hidden;
-
-      & .work-item-icon {
-        @apply mr-2 w-4;
-
-        &.fas.fa-link {
-          @apply text-(--border-subtle-color);
-        }
-      }
+      @apply flex cursor-pointer pl-2 items-center justify-start bg-inherit w-full border-0 overflow-hidden text-(--text-primary-color);
 
       & .add-action-item-list-item-text {
-        @apply leading-8 mr-4 text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis text-(--text-primary-color);
+        @apply leading-8 ml-2 text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis text-(--text-primary-color);
       }
     }
   }
