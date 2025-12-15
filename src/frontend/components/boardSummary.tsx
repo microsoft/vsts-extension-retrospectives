@@ -259,10 +259,8 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
   public render() {
     return (
       <div className="board-summary-container" aria-label="Retrospective history container">
-        <DocumentCard className="board-summary-card" type={DocumentCardType.normal} aria-label="Retrospective history card">
-          <div className="ms-DocumentCard-details board-summary-card-title">
-            <DocumentCardTitle title={this.props.boardName} shouldTruncate={false} aria-label="Retrospective name" />
-          </div>
+        <div className="board-summary-card" aria-label="Retrospective history card">
+          <h2 title={this.props.boardName} aria-label="Retrospective name">{this.props.boardName}</h2>
           <div className="items-stats-container" aria-label="feedback items statistics container">
             <i className="stats-icon fas fa-comment-dots"></i>
             <div className="count-and-text" aria-label="count and text container">
@@ -299,7 +297,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
               <div className="text">Work items resolved.</div>
             </div>
           </div>
-        </DocumentCard>
+        </div>
         <div className="action-items-summary-card">
           {this.props.actionItems.length > 0 && <DetailsList items={this.state.actionItemTableItems} compact={false} columns={this.state.actionItemTableColumns} selectionMode={SelectionMode.none} setKey="set" layoutMode={DetailsListLayoutMode.justified} isHeaderVisible={true} selectionPreservedOnEmptyClick={true} onItemInvoked={this.onItemInvoked} />}
           {this.props.actionItems.length === 0 && <div className="no-action-items">Looks like no work items were created for this board.</div>}

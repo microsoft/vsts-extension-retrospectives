@@ -847,11 +847,18 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
       & tr .board-summary-container {
         @apply flex justify-center;
-      }
 
-      & tr .board-summary-container .rt-tr.-odd,
-      & tr .board-summary-container .rt-tr.-even {
-        @apply h-8;
+        & .board-summary-card {
+          @apply p-5 w-1/5 min-w-68 border border-(--text-primary-color) rounded flex flex-col gap-2;
+
+          & h2 {
+            @apply text-lg border-b-3 border-primary;
+          }
+        }
+
+        & .action-items-summary-card {
+          @apply p-5 w-4/5 max-w-200 overflow-y-auto border border-transparent;
+        }
       }
 
       & tr .board-summary-container .board-summary-card,
@@ -861,17 +868,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
       & tr .board-summary-container .board-summary-card .items-stats-container,
       & tr .board-summary-container .action-items-summary-card .items-stats-container {
-        @apply flex my-2.5 mx-0;
+        @apply flex gap-2;
       }
 
       & tr .board-summary-container .board-summary-card .items-stats-container .pending-action-item-color,
       & tr .board-summary-container .action-items-summary-card .items-stats-container .pending-action-item-color {
         @apply text-(--status-warning-text);
-      }
-
-      & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text,
-      & tr .board-summary-container .action-items-summary-card .items-stats-container .count-and-text {
-        @apply my-0 mx-8 ml-4 mr-8;
       }
 
       & tr .board-summary-container .board-summary-card .items-stats-container .count-and-text .count,
@@ -887,10 +889,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       & tr .board-summary-container .board-summary-card .items-stats-container .stats-icon,
       & tr .board-summary-container .action-items-summary-card .items-stats-container .stats-icon {
         @apply h-8 w-8 text-base p-2;
-      }
-
-      & tr .board-summary-container .action-items-summary-card {
-        @apply w-4/5 max-w-200 overflow-y-auto;
       }
 
       & tr .board-summary-container .action-items-summary-card div[role="row"] {
@@ -949,16 +947,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply text-sm relative top-1/2 -translate-y-1/2 text-center;
       }
 
-      & tr .board-summary-container .board-summary-card {
-        @apply p-5 w-1/5 min-w-68 border border-(--text-primary-color) rounded;
-      }
-
       & tr .board-summary-container .board-summary-card .resolved-green {
         @apply text-(--status-success-text);
-      }
-
-      & tr .board-summary-container .board-summary-card .board-summary-card-title {
-        @apply text-lg border-b-3 border-primary;
       }
 
       & tr .board-summary-container .board-summary-card .board-summary-card-title .ms-DocumentCardTitle {
