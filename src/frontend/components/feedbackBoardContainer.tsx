@@ -1366,11 +1366,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly showArchiveBoardConfirmationDialog = () => {
-    this.archiveBoardDialogRef?.current?.show();
-  };
-
-  private readonly hideArchiveBoardConfirmationDialog = () => {
-    this.archiveBoardDialogRef?.current?.close();
+    this.archiveBoardDialogRef?.current?.showModal();
   };
 
   private readonly showBoardUrlCopiedToast = () => {
@@ -1396,7 +1392,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private readonly archiveCurrentBoard = async () => {
     await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
-    this.hideArchiveBoardConfirmationDialog();
+    this.archiveBoardDialogRef?.current?.close();
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
     await this.reloadBoardsForCurrentTeam();
   };
@@ -1974,30 +1970,30 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       onVoteCasted={this.updateCurrentVoteCount}
                       onColumnNotesChange={this.persistColumnNotes}
                     />
-                    <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={this.archiveBoardDialogRef} onClose={() => this.archiveBoardDialogRef.current?.close()}>
-                      <div className="header">
-                        <h2 className="title">Archive Retrospective</h2>
-                        <button onClick={() => this.archiveBoardDialogRef.current?.close()} aria-label="Close">
-                          <CloseIcon />
-                        </button>
-                      </div>
-                      <div className="subText">The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.</div>
-                      <div className="subText"><em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.</div>
-                      <div className="inner">
-                        <button className="button" onClick={() => this.archiveCurrentBoard()}>
-                          Archive
-                        </button>
-                        <button className="default button" onClick={() => this.archiveBoardDialogRef.current?.close()}>
-                          Cancel
-                        </button>
-                      </div>
-                    </dialog>
                   </>
                 )}
               </div>
             )}
           </div>
         </div>
+        <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={this.archiveBoardDialogRef} onClose={() => this.archiveBoardDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Archive Retrospective</h2>
+            <button onClick={() => this.archiveBoardDialogRef.current?.close()} aria-label="Close">
+              <CloseIcon />
+            </button>
+          </div>
+          <div className="subText">The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.</div>
+          <div className="subText"><em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.</div>
+          <div className="inner">
+            <button className="button" onClick={() => this.archiveCurrentBoard()}>
+              Archive
+            </button>
+            <button className="default button" onClick={() => this.archiveBoardDialogRef.current?.close()}>
+              Cancel
+            </button>
+          </div>
+        </dialog>
         {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
         {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
         {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}

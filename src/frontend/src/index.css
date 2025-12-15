@@ -288,7 +288,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .keyboard-shortcuts-dialog,
 .archive-board-dialog,
 .retrospectives-carousel-dialog {
-  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
+  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
   & .header {
     @apply flex justify-between items-center px-5 py-3 text-(--text-primary-color);
