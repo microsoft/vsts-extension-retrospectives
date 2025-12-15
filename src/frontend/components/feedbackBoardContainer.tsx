@@ -41,7 +41,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
-import { AssessmentIcon, CloseIcon, InfoIcon, MoreHorizontalIcon, PauseCircleIcon, PeopleIcon, PersonIcon, PlayCircleIcon, RefreshIcon } from "./icons";
+import { AddIcon, AssessmentIcon, CloseIcon, ContentCopyIcon, EditIcon, ForwardToInboxIcon, InfoIcon, InventoryIcon, LinkIcon, MoreHorizontalIcon, PauseCircleIcon, PeopleIcon, PersonIcon, PlayCircleIcon, RefreshIcon, SimCardDownloadIcon, SourceIcon } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -194,6 +194,32 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private boardTimerIntervalId?: number;
   private carouselDialogRef: HTMLDialogElement | null = null;
+  private readonly boardActionsMenuRootRef = React.createRef<HTMLDivElement>();
+
+  private readonly handleBoardActionsDocumentPointerDown = (event: PointerEvent) => {
+    const root = this.boardActionsMenuRootRef.current;
+    if (!root) {
+      return;
+    }
+
+    const target = event.target as Node | null;
+    if (!target) {
+      return;
+    }
+
+    const openDetails = Array.from(root.querySelectorAll("details[open]"));
+    for (const detailsElement of openDetails) {
+      if (!detailsElement.contains(target)) {
+        detailsElement.removeAttribute("open");
+      }
+    }
+  };
+
+  private readonly handleBoardActionMenuItemClick = async (item: IContextualMenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
+    const detailsElement = event.currentTarget.closest("details");
+    detailsElement?.removeAttribute("open");
+    await item.onClick?.(event as unknown as React.MouseEvent<HTMLElement>, item);
+  };
 
   public async componentDidMount() {
     let initialCurrentTeam: WebApiTeam | undefined;
@@ -255,7 +281,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         setTimeout(this.tryReconnectToBackend, 2000);
       });
 
-      // Listen for signals for board updates.
       reflectBackendService.onReceiveNewBoard(this.handleBoardCreated);
       reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
@@ -266,9 +291,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     this.setState({ isAppInitialized: true });
+
+    document.addEventListener("pointerdown", this.handleBoardActionsDocumentPointerDown);
   }
 
-  public componentDidUpdate(prevProps: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
+  public componentDidUpdate(_: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
     if (prevState.currentTeam !== this.state.currentTeam) {
       appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: this.state.currentTeam.id } });
     }
@@ -278,7 +305,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       if (this.state.isAppInitialized) {
         userDataService.addVisit(this.state.currentTeam.id, this.state.currentBoard ? this.state.currentBoard.id : undefined);
       }
-      // Update vote counts when board changes
       if (this.state.currentTeam && this.state.currentBoard) {
         this.updateFeedbackItemsAndContributors(this.state.currentTeam, this.state.currentBoard);
       }
@@ -320,6 +346,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
     this.clearBoardTimerInterval();
+
+    document.removeEventListener("pointerdown", this.handleBoardActionsDocumentPointerDown);
   }
 
   private readonly clearBoardTimerInterval = () => {
@@ -1466,94 +1494,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   };
 
-  private readonly getBoardActionContextualMenuItems = (): IContextualMenuItem[] => {
-    return [
-      {
-        key: "createBoard",
-        iconProps: { iconName: "Add" },
-        onClick: this.showBoardCreationDialog,
-        text: "Create new retrospective",
-        title: "Create new retrospective",
-      },
-      {
-        key: "duplicateBoard",
-        iconProps: { iconName: "Copy" },
-        onClick: this.showBoardDuplicateDialog,
-        text: "Create copy of retrospective",
-        title: "Create copy of retrospective",
-      },
-      {
-        key: "editBoard",
-        iconProps: { iconName: "Edit" },
-        onClick: this.showBoardUpdateDialog,
-        text: "Edit retrospective",
-        title: "Edit retrospective",
-      },
-      {
-        key: "seperator",
-        itemType: ContextualMenuItemType.Divider,
-      },
-      {
-        key: "copyLink",
-        iconProps: { iconName: "Link" },
-        onClick: async () => {
-          await this.copyBoardUrl();
-          this.showBoardUrlCopiedToast();
-        },
-        text: `Copy link to ${this.state.currentBoard.activePhase} phase`,
-        title: `Copy link to ${this.state.currentBoard.activePhase} phase`,
-      },
-      {
-        key: "seperator",
-        itemType: ContextualMenuItemType.Divider,
-      },
-      {
-        key: "exportCSV",
-        iconProps: { iconName: "DownloadDocument" },
-        onClick: () => {
-          shareBoardHelper.generateCSVContent(this.state.currentBoard);
-        },
-        text: "Export CSV content",
-        title: "Export CSV content",
-      },
-      {
-        key: "emailPreview",
-        iconProps: { iconName: "Mail" },
-        onClick: this.showPreviewEmailDialog,
-        text: "Create email summary",
-        title: "Create email summary",
-      },
-      {
-        key: "seperator",
-        itemType: ContextualMenuItemType.Divider,
-      },
-      {
-        key: "retroSummary",
-        iconProps: { iconName: "ReportDocument" },
-        onClick: this.showRetroSummaryDialog,
-        text: "Show retrospective summary",
-        title: "Show retrospective summary",
-      },
-      {
-        key: "seperator",
-        itemType: ContextualMenuItemType.Divider,
-      },
-      {
-        key: "archiveBoard",
-        iconProps: { iconName: "Archive" },
-        onClick: this.showArchiveBoardConfirmationDialog,
-        text: "Archive retrospective",
-        title: "Archive retrospective",
-      },
-    ];
-  };
-
-  private readonly hideMobileBoardActionsDialog = () => {
-    this.setState({
-      isMobileBoardActionsDialogHidden: true,
-    });
-  };
-
   private readonly showCarouselDialog = () => {
     this.setState({ isCarouselDialogHidden: false });
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemCarouselLaunched });
@@ -1710,18 +1650,69 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <div className="board-selector">
                       <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
                     </div>
-                    <div className="board-actions-menu">
-                      <DefaultButton
-                        className="contextual-menu-button"
-                        aria-label="Board Actions Menu"
-                        title="Board Actions"
-                        menuProps={{
-                          className: "board-actions-menu",
-                          items: this.getBoardActionContextualMenuItems(),
-                        }}
-                      >
-                        <MoreHorizontalIcon />
-                      </DefaultButton>
+                    <div className="board-actions-menu" ref={this.boardActionsMenuRootRef}>
+                      <details className="flex items-center relative">
+                        <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
+                          <MoreHorizontalIcon />
+                        </summary>
+                        <div className="callout-menu left" role="menu" aria-label="Board Actions">
+                          <button key="createBoard" type="button" title="Create new retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardCreationDialog, event)}>
+                            <AddIcon />
+                            Create new retrospective
+                          </button>
+                          <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardDuplicateDialog, event)}>
+                            <ContentCopyIcon />
+                            Create copy of retrospective
+                          </button>
+                          <button key="editBoard" type="button" title="Edit retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardUpdateDialog, event)}>
+                            <EditIcon />
+                            Edit retrospective
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button
+                            key="copyLink"
+                            type="button"
+                            title={`Copy link to ${this.state.currentBoard.activePhase} phase`}
+                            onClick={event =>
+                              this.handleBoardActionMenuItemClick(async () => {
+                                await this.copyBoardUrl();
+                                this.showBoardUrlCopiedToast();
+                              }, event)
+                            }
+                          >
+                            <LinkIcon />
+                            {`Copy link to ${this.state.currentBoard.activePhase} phase`}
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button
+                            key="exportCSV"
+                            type="button"
+                            title="Export CSV content"
+                            onClick={event =>
+                              this.handleBoardActionMenuItemClick(() => {
+                                shareBoardHelper.generateCSVContent(this.state.currentBoard);
+                              }, event)
+                            }
+                          >
+                            <SimCardDownloadIcon />
+                            Export CSV content
+                          </button>
+                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => this.handleBoardActionMenuItemClick(this.showPreviewEmailDialog, event)}>
+                            <ForwardToInboxIcon />
+                            Create email summary
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => this.handleBoardActionMenuItemClick(this.showRetroSummaryDialog, event)}>
+                            <SourceIcon />
+                            Show retrospective summary
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showArchiveBoardConfirmationDialog, event)}>
+                            <InventoryIcon />
+                            Archive retrospective
+                          </button>
+                        </div>
+                      </details>
                     </div>
                   </div>
                   <div className="flex items-center justify-start">

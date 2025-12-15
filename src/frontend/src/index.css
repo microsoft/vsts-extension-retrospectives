@@ -1678,6 +1678,42 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .board-actions-menu {
   @apply mx-2;
+
+  & summary {
+    @apply contents list-none cursor-pointer;
+
+    & svg {
+      @apply w-4 h-4;
+    }
+  }
+
+  & .callout-menu {
+    @apply absolute mt-3 bg-[rgb(var(--palette-neutral-6))] text-sm shadow-lg min-w-60 z-10;
+
+    &.left {
+      @apply left-0;
+    }
+
+    &.right {
+      @apply right-0;
+    }
+
+    & button {
+      @apply flex items-center gap-2 w-full text-left px-4 py-2 bg-inherit border-0 text-(--text-primary-color) cursor-pointer;
+
+      &:hover {
+        @apply text-primary;
+      }
+
+      & svg {
+        @apply w-4 h-4;
+      }
+    }
+
+    & .divider {
+      @apply border-t border-(--border-subtle-color);
+    }
+  }
 }
 
 .workflow-stage-header {
