@@ -412,20 +412,16 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .keyboard-shortcuts-content {
     @apply max-h-1/2 overflow-y-auto flex flex-col gap-5 text-(--text-primary-color);
-
-    & .keyboard-shortcuts-category-title {
-      @apply text-sm font-semibold mb-2.5 text-(--text-primary-color) border-b border-(--border-subtle-color) pb-1.5;
-    }
   }
 
   & .keyboard-shortcuts-table {
-    @apply w-full border-collapse;
+    @apply w-full border-collapse text-left;
 
     & tbody tr {
       @apply border-b border-(--border-subtle-color);
 
       & td:first-child {
-        @apply py-2 px-3 text-left align-middle w-2/5;
+        @apply py-2 px-3 align-middle w-2/5;
       }
     }
 

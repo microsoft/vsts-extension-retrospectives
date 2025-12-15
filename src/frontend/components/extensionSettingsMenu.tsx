@@ -282,11 +282,10 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
               ),
             ).map(([category, shortcuts]) => (
               <div key={category}>
-                <h3 className="keyboard-shortcuts-category-title">{category}</h3>
                 <table className="keyboard-shortcuts-table">
                   <thead>
                     <tr>
-                      <th scope="col">Shortcut</th>
+                      <th scope="col">{category} Shortcuts</th>
                       <th scope="col">Description</th>
                     </tr>
                   </thead>
