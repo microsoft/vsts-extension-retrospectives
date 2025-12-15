@@ -849,7 +849,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const itemPosition = currentColumnItems ? currentColumnItems.findIndex(columnItem => columnItem.feedbackItem.id === this.props.id) + 1 : 0;
     const totalItemsInColumn = currentColumnItems?.length || 0;
 
-    const hideFeedbackItems = this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
+    const hideFeedbackItems = this.props.workflowPhase === "Collect" && this.props.hideFeedbackItems && this.props.userIdRef !== getUserIdentity().id;
     const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : this.props.title;
 
     let ariaLabel = `Feedback item ${itemPosition} of ${totalItemsInColumn}. `;
