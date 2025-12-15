@@ -417,11 +417,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .keyboard-shortcuts-table {
     @apply w-full border-collapse text-left;
 
-    & tbody tr {
+    & tr {
       @apply border-b border-(--border-subtle-color);
 
-      & td:first-child {
-        @apply py-2 px-3 align-middle w-2/5;
+      & td:first-child, & th:first-child {
+        @apply py-2 px-3 w-2/5;
       }
     }
 
