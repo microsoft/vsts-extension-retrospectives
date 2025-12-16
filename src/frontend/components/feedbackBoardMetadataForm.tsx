@@ -16,6 +16,7 @@ import { reactPlugin } from "../utilities/telemetryClient";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from "./feedbackBoardMetadataFormPermissions";
 import { generateUUID } from "../utilities/random";
+import { AddIcon, AdjustIcon, AngryFaceIcon, ArrowCircleDownIcon, ArrowCircleUpIcon, ConstructionIcon, DeleteIcon, ExclamationIcon, HappyFaceIcon, HelpIcon, LightBulbIcon, LockIcon, MenuBookIcon, PlayCircleIcon, RocketLaunchIcon, SadFaceIcon, StarIcon, StopCircleIcon, ThumbDownIcon, ThumbUpDownIcon, ThumbUpIcon } from "./icons";
 
 export interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -225,66 +226,90 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     });
   };
 
-  private allIconClassNames: { friendlyName: string; iconClass: string }[] = [
+  private allIconClassNames: { friendlyName: string; icon: React.ReactElement }[] = [
     {
       friendlyName: "smile",
-      iconClass: "far fa-smile",
+      icon: <HappyFaceIcon />,
     },
     {
       friendlyName: "frown",
-      iconClass: "far fa-frown",
+      icon: <SadFaceIcon />,
     },
     {
       friendlyName: "angry",
-      iconClass: "far fa-angry",
+      icon: <AngryFaceIcon />,
     },
     {
       friendlyName: "question",
-      iconClass: "fas fa-question",
+      icon: <HelpIcon />,
     },
     {
       friendlyName: "exclamation",
-      iconClass: "fas fa-exclamation",
-    },
-    {
-      friendlyName: "comments",
-      iconClass: "far fa-comments",
-    },
-    {
-      friendlyName: "compass",
-      iconClass: "far fa-compass",
-    },
-    {
-      friendlyName: "eye",
-      iconClass: "far fa-eye",
-    },
-    {
-      friendlyName: "life-ring",
-      iconClass: "fas fa-life-ring",
-    },
-    {
-      friendlyName: "anchor",
-      iconClass: "fas fa-anchor",
-    },
-    {
-      friendlyName: "balance",
-      iconClass: "fas fa-scale-unbalanced-flip",
+      icon: <ExclamationIcon />,
     },
     {
       friendlyName: "rocket",
-      iconClass: "fas fa-rocket",
+      icon: <RocketLaunchIcon />,
     },
     {
-      friendlyName: "chalkboard",
-      iconClass: "fas fa-chalkboard",
+      friendlyName: "play",
+      icon: <PlayCircleIcon />,
+    },
+    {
+      friendlyName: "stop",
+      icon: <StopCircleIcon />,
+    },
+    {
+      friendlyName: "target",
+      icon: <AdjustIcon />,
+    },
+    {
+      friendlyName: "thumb-up",
+      icon: <ThumbUpIcon />,
+    },
+    {
+      friendlyName: "thumb-down",
+      icon: <ThumbDownIcon />,
+    },
+    {
+      friendlyName: "thumb-u-down",
+      icon: <ThumbUpDownIcon />,
+    },
+    {
+      friendlyName: "star",
+      icon: <StarIcon />,
     },
     {
       friendlyName: "book",
-      iconClass: "fas fa-book",
+      icon: <MenuBookIcon />,
     },
     {
-      friendlyName: "celebrate",
-      iconClass: "fas fa-birthday-cake",
+      friendlyName: "light-bulb",
+      icon: <LightBulbIcon />,
+    },
+    {
+      friendlyName: "delete",
+      icon: <DeleteIcon />,
+    },
+    {
+      friendlyName: "add",
+      icon: <AddIcon />,
+    },
+    {
+      friendlyName: "lock",
+      icon: <LockIcon />,
+    },
+    {
+      friendlyName: "construction",
+      icon: <ConstructionIcon />,
+    },
+    {
+      friendlyName: "arrow-down",
+      icon: <ArrowCircleDownIcon />,
+    },
+    {
+      friendlyName: "arrow-up",
+      icon: <ArrowCircleUpIcon />,
     },
   ];
 
@@ -528,7 +553,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                         column: {
                           id: newColumnId,
                           title: "New Column",
-                          iconClass: this.getRandomArrayElement(this.allIconClassNames).iconClass,
+                          icon: this.getRandomArrayElement(this.allIconClassNames).icon,
                           accentColor: this.getRandomArrayElement(this.allAccentColors).colorCode,
                           notes: "",
                         },
@@ -591,7 +616,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                         className="choose-feedback-column-icon-button"
                         key={iconClassName.friendlyName}
                         onClick={() => {
-                          this.state.columnCardBeingEdited.column.iconClass = iconClassName.iconClass;
+                          this.state.columnCardBeingEdited.column.icon = iconClassName.icon;
                           this.setState({
                             isChooseColumnIconDialogHidden: true,
                             columnCardBeingEdited: null,
@@ -599,7 +624,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                           });
                         }}
                       >
-                        <i className={iconClassName.iconClass} />
+                        {iconClassName.icon}
                       </DefaultButton>
                     );
                   })}
