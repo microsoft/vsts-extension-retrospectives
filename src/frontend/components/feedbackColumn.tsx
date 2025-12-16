@@ -333,14 +333,20 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   };
 
   private readonly openEditDialog = () => {
-    this.setState({
-      columnNotesDraft: this.props.columnNotes,
-    });
-    this.editColumnNotesDialogRef.current?.showModal();
+    this.setState(
+      {
+        columnNotesDraft: this.props.columnNotes,
+      },
+      () => {
+        this.editColumnNotesDialogRef.current?.showModal();
+      },
+    );
   };
 
-  private readonly handleColumnNotesDraftChange = (_event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-    this.setState({ columnNotesDraft: newValue ?? "" });
+  private readonly handleColumnNotesDraftChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+    const target = event.target as HTMLInputElement | HTMLTextAreaElement | null;
+    const value = newValue ?? target?.value ?? "";
+    this.setState({ columnNotesDraft: value });
   };
 
   private readonly saveColumnNotes = () => {
@@ -482,7 +488,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           className="edit-column-notes-dialog"
           role="dialog"
           aria-label="Edit column notes"
-          onClose={() => this.editColumnNotesDialogRef.current?.close()}
         >
           <div className="header">
             <h2 className="title">Edit column notes</h2>
@@ -492,8 +497,10 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           </div>
           <div className="subText">
             <div className="form-group">
-            <label id="column-notes-label" htmlFor="column-notes-textarea">Column notes</label>
-            <textarea id="column-notes-textarea" aria-labelledby="column-notes-label" aria-invalid="false" onChange={this.handleColumnNotesDraftChange}>{this.state.columnNotesDraft}</textarea>
+              <label id="column-notes-label" htmlFor="column-notes-textarea">
+                Column notes
+              </label>
+              <textarea id="column-notes-textarea" aria-labelledby="column-notes-label" aria-invalid="false" value={this.state.columnNotesDraft} onChange={this.handleColumnNotesDraftChange} />
             </div>
           </div>
           <div className="inner">
