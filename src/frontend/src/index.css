@@ -968,25 +968,21 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .trash-icon-header {
     @apply text-white cursor-pointer;
-
-    & i {
-      @apply text-inherit;
-    }
   }
 
   & .trash-icon-disabled {
-    @apply text-gray-medium cursor-not-allowed;
-
-    & i {
-      @apply text-inherit;
-    }
+    @apply opacity-25 cursor-not-allowed;
   }
 
   & .trash-icon {
-    @apply flex justify-center items-center cursor-default;
+    @apply cursor-pointer;
 
     &:hover {
       @apply text-error;
+    }
+
+    & svg {
+      @apply w-6 h-6;
     }
   }
 }

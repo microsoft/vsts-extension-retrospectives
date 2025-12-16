@@ -15,6 +15,7 @@ import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetr
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import BoardSummaryTableHeader from "./boardSummaryTableHeader";
 import BoardSummaryTableBody from "./boardSummaryTableBody";
+import { DeleteIcon } from "./icons";
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -109,15 +110,15 @@ export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
 
 export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClick }: { board: IBoardSummaryTableItem; currentUserId: string; currentUserIsTeamAdmin: boolean; onClick: (event: React.MouseEvent) => void }) {
   if (!board.isArchived || !board.archivedDate || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
-    return <div className="centered-cell" />;
+    return <></>;
   }
   return isTrashEnabled(board) ? (
     <div className="centered-cell trash-icon" title="Delete board" aria-label="Delete board" onClick={onClick}>
-      <i className="fas fa-trash-alt"></i>
+      <DeleteIcon />
     </div>
   ) : (
     <div className="centered-cell trash-icon-disabled" title="Try archive before delete" aria-label="Try archive before delete">
-      <i className="fas fa-trash-alt"></i>
+      <DeleteIcon />
     </div>
   );
 }
@@ -210,8 +211,8 @@ function getColumns(onArchiveToggle: () => void, setTableData: React.Dispatch<Re
     {
       id: "trash",
       header: () => (
-        <div className="centered-cell trash-icon-header">
-          <i className="fas fa-trash-alt" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin."></i>
+        <div className="centered-cell trash-icon-header" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin.">
+          <DeleteIcon />
         </div>
       ),
       cell: (item: IBoardSummaryTableItem) => (
