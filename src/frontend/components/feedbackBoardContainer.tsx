@@ -1670,24 +1670,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             Edit retrospective
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button
-                            key="copyLink"
-                            type="button"
-                            title={`Copy link to ${this.state.currentBoard.activePhase} phase`}
-                            onClick={event => this.handleBoardActionMenuItemClick(this.copyBoardUrl, event)
-                            }
-                          >
+                          <button key="copyLink" type="button" title={`Copy link to ${this.state.currentBoard.activePhase} phase`} onClick={event => this.handleBoardActionMenuItemClick(this.copyBoardUrl, event)}>
                             <LinkIcon />
                             {`Copy link to ${this.state.currentBoard.activePhase} phase`}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button
-                            key="exportCSV"
-                            type="button"
-                            title="Export CSV content"
-                            onClick={event => this.handleBoardActionMenuItemClick(this.generateCSVContent, event)
-                            }
-                          >
+                          <button key="exportCSV" type="button" title="Export CSV content" onClick={event => this.handleBoardActionMenuItemClick(this.generateCSVContent, event)}>
                             <SimCardDownloadIcon />
                             Export CSV content
                           </button>
@@ -1982,8 +1970,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <CloseIcon />
             </button>
           </div>
-          <div className="subText">The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.</div>
-          <div className="subText"><em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.</div>
+          <div className="subText">
+            The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
+          </div>
+          <div className="subText">
+            <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
+          </div>
           <div className="inner">
             <button className="button" onClick={() => this.archiveCurrentBoard()}>
               Archive

@@ -14,6 +14,7 @@ import { TextField } from "@fluentui/react/lib/TextField";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
+import { InfoIcon, ReviewsIcon } from "./icons";
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -455,12 +456,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           <div className="feedback-column-actions">
             {this.props.showColumnEditButton && (
               <button className="feedback-column-edit-button" title="Edit column notes" aria-label={`Edit column ${this.props.columnName}`} onClick={this.openEditDialog}>
-                <i className="fas fa-comment-medical"></i>
+                <ReviewsIcon />
               </button>
             )}
             {this.props.columnNotes && (
               <button className="feedback-column-info-button" title={this.props.columnNotes} aria-label={`Column notes: ${this.props.columnNotes}`}>
-                <i className="fas fa-circle-info"></i>
+                <InfoIcon />
               </button>
             )}
           </div>

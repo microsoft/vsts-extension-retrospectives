@@ -261,7 +261,9 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
     return (
       <div className="board-summary-container" aria-label="Retrospective history container">
         <div className="board-summary-card" aria-label="Retrospective history card">
-          <h2 title={this.props.boardName} aria-label="Retrospective name">{this.props.boardName}</h2>
+          <h2 title={this.props.boardName} aria-label="Retrospective name">
+            {this.props.boardName}
+          </h2>
           <div className="items-stats-container" aria-label="feedback items statistics container">
             <SMSIcon />
             <div className="count-and-text" aria-label="count and text container">
@@ -271,7 +273,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
               <div className="text">Feedback items created.</div>
             </div>
           </div>
-          <div className="items-stats-container" aria-label="feedback items statistics container">
+          <div className="items-stats-container status-primary-text" aria-label="feedback items statistics container">
             <NoteAddIcon />
             <div className="count-and-text" aria-label="count and text container">
               <div className="count" aria-label="total work items count">

@@ -866,6 +866,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
           & .status-success-text {
             @apply text-(--status-success-text);
           }
+
+          & .status-primary-text {
+            @apply text-primary;
+          }
         }
 
         & .action-items-summary-card {
@@ -1109,7 +1113,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column-header {
-  @apply p-2.5 pt-4 pl-4 border-b-3 border-(--nav-header-active-item-background) flex items-center justify-between gap-2;
+  @apply px-4 py-2 border-b-3 border-(--nav-header-active-item-background) flex items-center justify-between gap-2;
 
   & .feedback-column-title {
     @apply flex items-center;
@@ -1128,7 +1132,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
     & .feedback-column-edit-button,
     & .feedback-column-info-button {
-      @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] cursor-pointer bg-transparent border-0 px-1 rounded-sm transition-colors duration-200 ml-0.5;
+      @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] cursor-pointer bg-transparent border-0 p-2 rounded-sm transition-colors duration-200 ml-0.5;
 
       &:hover {
         @apply bg-[rgba(var(--palette-neutral-20,200,200,200),0.5)];
@@ -1136,6 +1140,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
       &:focus-visible {
         @apply outline-2 outline-primary outline-offset-2;
+      }
+
+      & svg {
+        @apply w-5 h-5;
       }
     }
   }
