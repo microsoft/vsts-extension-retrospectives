@@ -1421,7 +1421,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply bg-(---nav-vertical-background-color) text-(--text-primary-color) h-15 mt-2.5 items-center;
 
     & :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button) {
-      @apply bg-transparent! pr-0 mx-2 border-none text-(--text-primary-color) cursor-pointer;
+      @apply bg-transparent! m-2 border-none text-(--text-primary-color) cursor-pointer;
     }
 
     & .editable-document-card-title {
