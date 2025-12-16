@@ -16,7 +16,7 @@ import { reactPlugin } from "../utilities/telemetryClient";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from "./feedbackBoardMetadataFormPermissions";
 import { generateUUID } from "../utilities/random";
-import { AddIcon, AdjustIcon, AngryFaceIcon, ArrowCircleDownIcon, ArrowCircleUpIcon, ConstructionIcon, DeleteIcon, ExclamationIcon, HappyFaceIcon, HelpIcon, LightBulbIcon, LockIcon, MenuBookIcon, PlayCircleIcon, RocketLaunchIcon, SadFaceIcon, StarIcon, StopCircleIcon, ThumbDownIcon, ThumbUpDownIcon, ThumbUpIcon } from "./icons";
+import { AddIcon, AdjustIcon, AngryFaceIcon, ArrowCircleDownIcon, ArrowCircleUpIcon, CloseIcon, ConstructionIcon, DeleteIcon, ExclamationIcon, HappyFaceIcon, HelpIcon, LightBulbIcon, LockIcon, MenuBookIcon, PlayCircleIcon, RocketLaunchIcon, SadFaceIcon, StarIcon, StopCircleIcon, ThumbDownIcon, ThumbUpDownIcon, ThumbUpIcon } from "./icons";
 
 export interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -56,11 +56,12 @@ export interface IFeedbackColumnCard {
 }
 
 class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
+  private readonly chooseColumnIconDialogRef = React.createRef<HTMLDialogElement>();
+
   constructor(props: IFeedbackBoardMetadataFormProps) {
     super(props);
 
     // Define retrospective types
-    //const isNewRetrospective = props.isNewBoardCreation && !props.isDuplicatingBoard;
     const isCopyRetrospective = props.isNewBoardCreation && props.isDuplicatingBoard;
     const isEditRetrospective = !props.isNewBoardCreation;
 
@@ -69,6 +70,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultIncludeTeamEffectivenessMeasurement = true;
     let defaultShowFeedbackAfterCollect = false;
     let defaultIsAnonymous = false;
+
     // Set defaults for a new retrospective
     let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => ({ column, markedForDeletion: false }));
     let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: [] };
@@ -107,7 +109,6 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   }
 
   async componentDidMount() {
-    // Only fetch saved votes and anonymous settings for NEW boards that are NOT duplicates
     if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
       const settingsToLoad = [BoardDataService.getSetting<number>("lastVotes"), BoardDataService.getSetting<boolean>("lastTeamEffectiveness"), BoardDataService.getSetting<boolean>("lastShowFeedback"), BoardDataService.getSetting<boolean>("lastAnonymous")];
 
@@ -125,7 +126,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
   private maxColumnCount = 5;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public handleInputChange = (event: any, newValue: string) => {
+  public handleInputChange = (_: any, newValue: string) => {
     this.setState({
       title: newValue,
       isBoardNameTaken: false,
@@ -173,15 +174,15 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     );
   }
 
-  private handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  private handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = (_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({ isIncludeTeamEffectivenessMeasurement: checked });
   };
 
-  private handleShouldShowFeedbackAfterCollectChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  private handleShouldShowFeedbackAfterCollectChange = (_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({ shouldShowFeedbackAfterCollect: checked });
   };
 
-  private handleIsAnonymousCheckboxChange = (ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  private handleIsAnonymousCheckboxChange = (_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     this.setState({ isBoardAnonymous: checked });
   };
 
@@ -195,6 +196,25 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
 
   private hideDeleteColumnConfirmationDialog = () => {
     this.setState({ isDeleteColumnConfirmationDialogHidden: true });
+  };
+
+  private openChooseColumnIconDialog = (columnCard: IFeedbackColumnCard) => {
+    this.setState(
+      {
+        columnCardBeingEdited: columnCard,
+        isChooseColumnIconDialogHidden: false,
+      },
+      () => {
+        this.chooseColumnIconDialogRef.current?.showModal();
+      },
+    );
+  };
+
+  private handleChooseColumnIconDialogClose = () => {
+    this.setState({
+      isChooseColumnIconDialogHidden: true,
+      columnCardBeingEdited: null,
+    });
   };
 
   private isSaveButtonEnabled = () => {
@@ -438,10 +458,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                             title="Change column icon"
                             disabled={columnCard.markedForDeletion}
                             onClick={() => {
-                              this.setState({
-                                columnCardBeingEdited: columnCard,
-                                isChooseColumnIconDialogHidden: false,
-                              });
+                              this.openChooseColumnIconDialog(columnCard);
                             }}
                           >
                             {columnCard.column.icon}
@@ -590,45 +607,41 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 </Dialog>
               )}
               {this.state.columnCardBeingEdited && (
-                <Dialog
-                  hidden={this.state.isChooseColumnIconDialogHidden}
-                  dialogContentProps={{
-                    type: DialogType.normal,
-                    title: "Choose Column Icon",
-                    subText: `Choose the column icon for column '${this.state.columnCardBeingEdited.column.title}'`,
-                  }}
-                  modalProps={{
-                    isBlocking: false,
-                    containerClassName: "retrospectives-choose-column-icon-dialog",
-                    className: "retrospectives-dialog-modal",
-                  }}
-                  onDismiss={() => {
-                    this.setState({
-                      isChooseColumnIconDialogHidden: true,
-                      columnCardBeingEdited: null,
-                    });
-                  }}
-                >
-                  {this.allIconClassNames.map(iconClassName => {
-                    return (
-                      <DefaultButton
-                        ariaLabel={"Choose the icon " + iconClassName.friendlyName}
-                        className="choose-feedback-column-icon-button"
-                        key={iconClassName.friendlyName}
-                        onClick={() => {
-                          this.state.columnCardBeingEdited.column.icon = iconClassName.icon;
-                          this.setState({
-                            isChooseColumnIconDialogHidden: true,
-                            columnCardBeingEdited: null,
-                            columnCards: [].concat(this.state.columnCards),
-                          });
-                        }}
-                      >
-                        {iconClassName.icon}
-                      </DefaultButton>
-                    );
-                  })}
-                </Dialog>
+                <dialog className="retrospectives-choose-column-icon-dialog" aria-label="Choose Column Icon" ref={this.chooseColumnIconDialogRef} onClose={this.handleChooseColumnIconDialogClose}>
+                  <div className="header">
+                    <h2 className="title">Choose Column Icon</h2>
+                    <button onClick={() => this.chooseColumnIconDialogRef.current?.close()} aria-label="Close">
+                      <CloseIcon />
+                    </button>
+                  </div>
+                  <div className="subText">{`Choose the column icon for column '${this.state.columnCardBeingEdited.column.title}'`}</div>
+                  <div className="subText">
+                    <div className="grid grid-cols-7 gap-2 justify-items-center items-center">
+                      {this.allIconClassNames.map(iconClassName => {
+                        return (
+                          <button
+                            aria-label={"Choose the icon " + iconClassName.friendlyName}
+                            className="choose-feedback-column-icon-button"
+                            key={iconClassName.friendlyName}
+                            onClick={() => {
+                              this.state.columnCardBeingEdited.column.icon = iconClassName.icon;
+                              this.setState({ columnCards: [].concat(this.state.columnCards) }, () => {
+                                this.chooseColumnIconDialogRef.current?.close();
+                              });
+                            }}
+                          >
+                            {iconClassName.icon}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="inner">
+                    <button className="default button" onClick={() => this.chooseColumnIconDialogRef.current?.close()}>
+                      Close
+                    </button>
+                  </div>
+                </dialog>
               )}
               {this.state.columnCardBeingEdited && (
                 <Dialog

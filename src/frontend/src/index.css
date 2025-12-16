@@ -289,6 +289,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .archive-board-dialog,
 .edit-column-notes-dialog,
 .delete-board-dialog,
+.retrospectives-choose-column-icon-dialog,
 .retrospectives-carousel-dialog {
   @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
@@ -342,6 +343,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     & .ms-Button:first-of-type {
       @apply -ml-2;
     }
+  }
+}
+
+.choose-feedback-column-icon-button {
+  @apply w-18 h-12 flex items-center justify-center rounded-lg cursor-pointer;
+
+  &:hover {
+    @apply bg-(--border-subtle-color);
   }
 }
 
