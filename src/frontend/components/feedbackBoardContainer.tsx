@@ -40,7 +40,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
-import { AddIcon, AssessmentIcon, CloseIcon, ContentCopyIcon, EditIcon, ForwardToInboxIcon, InfoIcon, InventoryIcon, LinkIcon, MoreHorizontalIcon, PauseCircleIcon, PeopleIcon, PersonIcon, PlayCircleIcon, RefreshIcon, SimCardDownloadIcon, SourceIcon } from "./icons";
+import { AddIcon, AdjustIcon, AssessmentIcon, CloseIcon, ContentCopyIcon, EditIcon, ForwardToInboxIcon, InfoIcon, InsightsIcon, InventoryIcon, LinkIcon, MoreHorizontalIcon, PauseCircleIcon, PeopleIcon, PersonIcon, PlayCircleIcon, RefreshIcon, SimCardDownloadIcon, SourceIcon } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -1840,8 +1840,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       {this.state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
                           <button className="focus-mode-button" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
-                            <i className="fas fa-bullseye"></i>
-                            <span className="">Focus Mode</span>
+                            <AdjustIcon />
+                            <span>Focus Mode</span>
                           </button>
                           <dialog
                             ref={ref => {
@@ -1868,14 +1868,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               {this.state.activeTab === "History" && (
                 <>
                   <div className="mx-4 vertical-tab-separator" />
-                  <div className="flex items-center justify-start">
-                    <button className="flex items-center bg-transparent border-0 cursor-pointer text-sm hover:bg-transparent focus:outline-none" onClick={this.showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
-                      <span className="inline-flex items-center justify-center lg:mr-1">
-                        <i className="fas fa-chart-line"></i>
-                      </span>
-                      <span className="hidden lg:inline">Team Assessment History</span>
-                    </button>
-                  </div>
+                  <button className="team-assessment-history-button" onClick={this.showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
+                    <InsightsIcon />
+                    <span className="hidden lg:inline">Team Assessment History</span>
+                  </button>
                 </>
               )}
             </div>

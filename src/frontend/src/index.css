@@ -1171,6 +1171,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
+.team-assessment-history-button {
+  @apply flex items-center gap-2 bg-transparent border-0 cursor-pointer text-sm hover:bg-transparent focus:outline-none;
+
+  & svg {
+    @apply w-5 h-5;
+  }
+}
+
 .create-button {
   @apply flex items-center p-2 gap-1 text-sm cursor-pointer;
 
