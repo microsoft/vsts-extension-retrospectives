@@ -325,9 +325,9 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
   private readonly openEditDialog = () => {
     this.setState(
-      {
-        columnNotesDraft: this.props.columnNotes,
-      },
+      (state, props) => ({
+        columnNotesDraft: props.columnNotes,
+      }),
       () => {
         this.editColumnNotesDialogRef.current?.showModal();
       },
