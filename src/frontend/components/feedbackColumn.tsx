@@ -8,13 +8,11 @@ import FeedbackItemGroup from "./feedbackItemGroup";
 import { IColumnItem, IColumn } from "./feedbackBoard";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import { ActionButton, IconButton, IButton, PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
-import { Dialog, DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
-import { TextField } from "@fluentui/react/lib/TextField";
+import { ActionButton, IconButton, IButton } from "@fluentui/react/lib/Button";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
-import { InfoIcon, ReviewsIcon } from "./icons";
+import { CloseIcon, InfoIcon, ReviewsIcon } from "./icons";
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -55,7 +53,6 @@ export interface FeedbackColumnProps {
 export interface FeedbackColumnState {
   isCollapsed: boolean;
   isCarouselHidden: boolean;
-  isEditDialogOpen: boolean;
   columnNotesDraft: string;
   focusedItemIndex: number;
 }
@@ -63,6 +60,7 @@ export interface FeedbackColumnState {
 export default class FeedbackColumn extends React.Component<FeedbackColumnProps, FeedbackColumnState> {
   private createFeedbackButton: IButton;
   private columnRef: React.RefObject<HTMLDivElement> = React.createRef();
+  private readonly editColumnNotesDialogRef = React.createRef<HTMLDialogElement>();
   private itemRefs: Map<string, HTMLElement> = new Map();
   private focusPreservation: {
     elementId: string | null;
@@ -77,7 +75,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
     this.state = {
       isCarouselHidden: true,
       isCollapsed: false,
-      isEditDialogOpen: false,
       columnNotesDraft: "",
       focusedItemIndex: -1,
     };
@@ -337,13 +334,9 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
   private readonly openEditDialog = () => {
     this.setState({
-      isEditDialogOpen: true,
       columnNotesDraft: this.props.columnNotes,
     });
-  };
-
-  private readonly closeEditDialog = () => {
-    this.setState({ isEditDialogOpen: false });
+    this.editColumnNotesDialogRef.current?.showModal();
   };
 
   private readonly handleColumnNotesDraftChange = (_event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
@@ -352,7 +345,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
   private readonly saveColumnNotes = () => {
     this.props.onColumnNotesChange(this.state.columnNotesDraft);
-    this.setState({ isEditDialogOpen: false });
+    this.editColumnNotesDialogRef.current?.close();
   };
 
   public static readonly moveFeedbackItem = async (refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void, boardId: string, feedbackItemId: string, columnId: string) => {
@@ -484,25 +477,34 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           )}
           {this.props.isDataLoaded && <div className={cn("feedback-items-container", this.props.workflowPhase === WorkflowPhase.Act && "feedback-items-actions")}>{this.renderFeedbackItems()}</div>}
         </div>
-        <Dialog
-          hidden={!this.state.isEditDialogOpen}
-          onDismiss={this.closeEditDialog}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: "Edit column notes",
-          }}
-          modalProps={{
-            isBlocking: false,
-            containerClassName: "prime-directive-dialog retro-dialog-shell",
-            className: "retrospectives-dialog-modal",
-          }}
+        <dialog
+          ref={this.editColumnNotesDialogRef}
+          className="edit-column-notes-dialog"
+          role="dialog"
+          aria-label="Edit column notes"
+          onClose={() => this.editColumnNotesDialogRef.current?.close()}
         >
-          <TextField label="Column notes" multiline autoAdjustHeight value={this.state.columnNotesDraft} onChange={this.handleColumnNotesDraftChange} />
-          <DialogFooter>
-            <PrimaryButton text="Save" onClick={this.saveColumnNotes} />
-            <DefaultButton text="Cancel" onClick={this.closeEditDialog} />
-          </DialogFooter>
-        </Dialog>
+          <div className="header">
+            <h2 className="title">Edit column notes</h2>
+            <button type="button" onClick={() => this.editColumnNotesDialogRef.current?.close()} aria-label="Close">
+              <CloseIcon />
+            </button>
+          </div>
+          <div className="subText">
+            <div className="form-group">
+            <label id="column-notes-label" htmlFor="column-notes-textarea">Column notes</label>
+            <textarea id="column-notes-textarea" aria-labelledby="column-notes-label" aria-invalid="false" onChange={this.handleColumnNotesDraftChange}>{this.state.columnNotesDraft}</textarea>
+            </div>
+          </div>
+          <div className="inner">
+            <button type="button" className="button" onClick={this.saveColumnNotes}>
+              Save
+            </button>
+            <button type="button" className="button default" onClick={() => this.editColumnNotesDialogRef.current?.close()}>
+              Cancel
+            </button>
+          </div>
+        </dialog>
       </div>
     );
   }

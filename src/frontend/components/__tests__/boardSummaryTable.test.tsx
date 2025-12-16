@@ -444,7 +444,7 @@ describe("BoardSummaryTable, additional coverage", () => {
 
       const { container } = render(<TrashIcon board={activeBoard} currentUserId="user-1" currentUserIsTeamAdmin={false} onClick={jest.fn()} />);
 
-      expect(container.querySelector(".centered-cell")).toBeTruthy();
+      expect(container).toBeEmptyDOMElement();
       expect(container.querySelector(".trash-icon")).toBeFalsy();
     });
 
@@ -464,7 +464,7 @@ describe("BoardSummaryTable, additional coverage", () => {
 
       const { container } = render(<TrashIcon board={archivedBoard} currentUserId="user-1" currentUserIsTeamAdmin={false} onClick={jest.fn()} />);
 
-      expect(container.querySelector(".centered-cell")).toBeTruthy();
+      expect(container).toBeEmptyDOMElement();
       expect(container.querySelector(".trash-icon")).toBeFalsy();
     });
 
