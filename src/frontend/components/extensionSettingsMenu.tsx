@@ -157,25 +157,6 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           <PrivacyTipIcon />
           <span className="hidden lg:inline">Directive</span>
         </button>
-        <dialog className="prime-directive-dialog" aria-label="The Prime Directive" ref={this.primeDirectiveDialogRef} onClose={() => this.primeDirectiveDialogRef.current?.close()}>
-          <div className="header">
-            <h2 className="title">The Prime Directive</h2>
-            <button onClick={() => this.primeDirectiveDialogRef.current?.close()} aria-label="Close">
-              <CloseIcon />
-            </button>
-          </div>
-          <div className="subText">The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective. By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</div>
-          <strong className="subText">&apos;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&apos;</strong>
-          <em className="subText">--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
-          <div className="inner">
-            <button className="button" onClick={() => window.open("https://retrospectivewiki.com", "_blank")}>
-              Open Retrospective Wiki
-            </button>
-            <button className="default button" onClick={() => this.primeDirectiveDialogRef.current?.close()}>
-              Close
-            </button>
-          </div>
-        </dialog>
 
         <details className="flex items-center relative">
           <summary aria-label="Data Import/Export" title="Data Import/Export" className="extension-settings-button">
@@ -252,6 +233,26 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
             </button>
           </div>
         </details>
+
+        <dialog className="prime-directive-dialog" aria-label="The Prime Directive" ref={this.primeDirectiveDialogRef} onClose={() => this.primeDirectiveDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">The Prime Directive</h2>
+            <button onClick={() => this.primeDirectiveDialogRef.current?.close()} aria-label="Close">
+              <CloseIcon />
+            </button>
+          </div>
+          <div className="subText">The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective. By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</div>
+          <strong className="subText">&apos;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&apos;</strong>
+          <em className="subText">--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
+          <div className="inner">
+            <button className="button" onClick={() => window.open("https://retrospectivewiki.com", "_blank")}>
+              Open Retrospective Wiki
+            </button>
+            <button className="default button" onClick={() => this.primeDirectiveDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
 
         <dialog className="whats-new-dialog" aria-label="What is New" ref={this.whatsNewDialogRef} onClose={() => this.whatsNewDialogRef.current?.close()}>
           <div className="header">
