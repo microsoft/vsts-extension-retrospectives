@@ -37,7 +37,7 @@ export interface IFeedbackItemProps {
   lastEditedDate: string;
   upvotes: number;
   accentColor: string;
-  iconClass: string;
+  icon: React.ReactElement;
   workflowPhase: WorkflowPhase;
   team: WebApiTeam;
   originalColumnId: string;
@@ -1119,7 +1119,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     this.props.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, this.props.id, columnId);
                   }}
                 >
-                  <i className={this.props.columns[columnId].columnProperties.iconClass} />
+                  {this.props.columns[columnId].columnProperties.icon}
                   {this.props.columns[columnId].columnProperties.title}
                 </DefaultButton>
               );
@@ -1158,7 +1158,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 createdDate: searchItem.createdDate.toString(),
                 upvotes: searchItem.upvotes,
                 accentColor: searchItemColumn?.columnProperties?.accentColor ?? this.props.accentColor,
-                iconClass: searchItemColumn?.columnProperties?.iconClass ?? this.props.iconClass,
+                icon: searchItemColumn?.columnProperties?.icon ?? this.props.icon,
                 workflowPhase: this.props.workflowPhase,
                 originalColumnId: searchItem.originalColumnId,
                 team: this.props.team,

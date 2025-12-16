@@ -73,7 +73,7 @@ export interface ITeamEffectivenessMeasurementVoteCollection {
 export interface IFeedbackColumn {
   id: string;
   title: string;
-  iconClass: string;
+  icon: React.ReactElement;
   accentColor: string;
   notes?: string;
 }

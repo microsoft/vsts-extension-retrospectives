@@ -8,7 +8,6 @@ import FeedbackItemGroup from "./feedbackItemGroup";
 import { IColumnItem, IColumn } from "./feedbackBoard";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import { ActionButton, IButton } from "@fluentui/react/lib/Button";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
@@ -21,7 +20,7 @@ export interface FeedbackColumnProps {
   columnName: string;
   columnId: string;
   accentColor: string;
-  iconClass: string;
+  icon: React.ReactElement;
   workflowPhase: WorkflowPhase;
   isDataLoaded: boolean;
   columnItems: IColumnItem[];
@@ -375,7 +374,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       timerId: columnItem.feedbackItem.timerId,
       workflowPhase: columnProps.workflowPhase,
       accentColor: accentColor,
-      iconClass: columnProps.iconClass,
+      icon: columnProps.icon,
       createdDate: columnItem.feedbackItem.createdDate.toString(),
       team: columnProps.team,
       columnProps: columnProps,
@@ -441,7 +440,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       <div ref={this.columnRef} className="feedback-column" role="region" aria-label={`${this.props.columnName} column with ${this.props.columnItems.length} feedback items`} tabIndex={0} onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
         <div className="feedback-column-header">
           <div className="feedback-column-title" aria-label={`${this.props.columnName} (${this.props.columnItems.length} feedback items)`}>
-            <i className={cn(this.props.iconClass, "feedback-column-icon")} />
+            <div className="feedback-column-icon">{this.props.icon}</div>
             <h2 className="feedback-column-name">{this.props.columnName}</h2>
           </div>
           <div className="feedback-column-actions">
