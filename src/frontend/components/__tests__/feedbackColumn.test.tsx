@@ -578,6 +578,23 @@ describe("Feedback Column ", () => {
   });
 
   describe("Keyboard Navigation - Immediate Focus (Issue fix)", () => {
+    let querySelectorSpy: jest.SpyInstance;
+    let originalQuerySelector: (selectors: string) => Element | null;
+
+    beforeEach(() => {
+      originalQuerySelector = document.querySelector.bind(document);
+      querySelectorSpy = jest.spyOn(document, "querySelector").mockImplementation(((selectors: string) => {
+        if (selectors === "[role=\"dialog\"]") {
+          return null;
+        }
+        return originalQuerySelector(selectors);
+      }) as any);
+    });
+
+    afterEach(() => {
+      querySelectorSpy.mockRestore();
+    });
+
     test("column is focusable via keyboard with tabIndex=0", () => {
       const { container } = render(<FeedbackColumn {...testColumnProps} />);
       const column = container.querySelector(".feedback-column") as HTMLElement;
@@ -953,6 +970,23 @@ describe("Feedback Column ", () => {
   });
 
   describe("Insert Key", () => {
+    let querySelectorSpy: jest.SpyInstance;
+    let originalQuerySelector: (selectors: string) => Element | null;
+
+    beforeEach(() => {
+      originalQuerySelector = document.querySelector.bind(document);
+      querySelectorSpy = jest.spyOn(document, "querySelector").mockImplementation(((selectors: string) => {
+        if (selectors === "[role=\"dialog\"]") {
+          return null;
+        }
+        return originalQuerySelector(selectors);
+      }) as any);
+    });
+
+    afterEach(() => {
+      querySelectorSpy.mockRestore();
+    });
+
     test("Insert key creates new feedback in Collect phase", () => {
       const addFeedbackItems = jest.fn();
       const props = { ...testColumnProps, workflowPhase: "Collect" as any, addFeedbackItems, columnItems: [] as IColumnItem[] };
