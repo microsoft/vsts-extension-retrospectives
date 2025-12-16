@@ -463,8 +463,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       bVal = b[sortColumn as keyof IBoardSummaryTableItem];
     }
 
-    if (aVal == null || aVal === undefined) return 1;
-    if (bVal == null || bVal === undefined) return -1;
+    if (aVal == null) return 1;
+    if (bVal == null) return -1;
     if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
     if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
     return 0;
