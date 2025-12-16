@@ -11,6 +11,7 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
+import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { AddIcon, CloseIcon, InfoIcon, ReviewsIcon } from "./icons";
 
 export interface FeedbackColumnProps {
@@ -183,7 +184,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
   private handleColumnKeyDown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || document.querySelector('[role="dialog"]')) {
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || isAnyModalDialogOpen()) {
       return;
     }
 

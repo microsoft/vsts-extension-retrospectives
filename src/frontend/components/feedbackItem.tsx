@@ -19,6 +19,7 @@ import { reflectBackendService } from "../dal/reflectBackendService";
 import { IColumn, IColumnItem } from "./feedbackBoard";
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
+import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { PlayCircleIcon, StopCircleIcon } from "./icons";
 
 export interface IFeedbackItemColumnContext {
@@ -175,7 +176,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const target = e.target as HTMLElement;
     const key = e.key.toLowerCase();
     const isTextInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
-    const isDialogOpen = !!document.querySelector('[role="dialog"]');
+    const isDialogOpen = isAnyModalDialogOpen();
 
     if (isDialogOpen && key !== "tab") {
       return;

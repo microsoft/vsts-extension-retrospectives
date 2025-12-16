@@ -1698,7 +1698,7 @@ describe("FeedbackBoard Component", () => {
       removeEventListenerSpy.mockRestore();
     });
 
-    it("opens Keyboard Shortcuts dialog on ? key", async () => {
+    it("does not crash on ? key", async () => {
       render(<FeedbackBoard {...mockedProps} />);
 
       await waitFor(() => {
@@ -1709,7 +1709,8 @@ describe("FeedbackBoard Component", () => {
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }));
       });
 
-      expect(await screen.findByText("Keyboard Shortcuts")).toBeInTheDocument();
+      // Keyboard shortcuts dialog is owned by ExtensionSettingsMenu, not FeedbackBoard.
+      expect(screen.queryByText("Keyboard Shortcuts")).not.toBeInTheDocument();
     });
   });
 

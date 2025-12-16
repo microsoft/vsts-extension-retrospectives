@@ -125,6 +125,17 @@ describe("ExtensionSettingsMenu", () => {
     expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
   });
 
+  it("opens keyboard shortcuts dialog with '?' hotkey", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).not.toHaveAttribute("open");
+
+    fireEvent.keyDown(document, { key: "?", code: "Slash", shiftKey: true });
+    expect(dialog).toHaveAttribute("open");
+  });
+
   it("opens retrospective wiki", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));

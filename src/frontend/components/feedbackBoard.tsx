@@ -15,6 +15,7 @@ import type { FocusModeModel } from "./feedbackCarousel";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
 import { PlayCircleIcon } from "./icons";
+import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -171,17 +172,13 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
   private handleBoardKeyDown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || document.querySelector('[role="dialog"]')) {
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || isAnyModalDialogOpen()) {
       return;
     }
 
     const targetColumnIndex = this.getColumnIndexFromElement(target) ?? this.getColumnIndexFromElement(document.activeElement) ?? this.state.focusedColumnIndex;
 
     switch (e.key) {
-      case "?":
-        e.preventDefault();
-        this.setState({ isKeyboardShortcutsDialogOpen: true });
-        break;
       case "ArrowUp":
         if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.defaultPrevented) {
           e.preventDefault();

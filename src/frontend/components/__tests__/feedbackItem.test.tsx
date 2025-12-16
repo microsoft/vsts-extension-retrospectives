@@ -8316,6 +8316,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     const dialog = document.createElement("div");
     dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
     document.body.appendChild(dialog);
 
     fireEvent.keyDown(root, { key: "v" });

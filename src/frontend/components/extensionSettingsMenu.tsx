@@ -31,6 +31,38 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
   private readonly volunteerDialogRef = React.createRef<HTMLDialogElement>();
   private readonly keyboardShortcutsDialogRef = React.createRef<HTMLDialogElement>();
 
+  private readonly handleDocumentKeyDown = (event: KeyboardEvent) => {
+    const target = event.target as HTMLElement | null;
+    if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+      return;
+    }
+
+    if (event.ctrlKey || event.metaKey || event.altKey) {
+      return;
+    }
+
+    const isQuestionMark = event.key === "?" || (event.key === "/" && event.shiftKey) || (event.code === "Slash" && event.shiftKey);
+    if (!isQuestionMark) {
+      return;
+    }
+
+    const keyboardDialog = this.keyboardShortcutsDialogRef.current;
+    if (!keyboardDialog) {
+      return;
+    }
+
+    // Don't open keyboard shortcuts on top of another open native dialog.
+    const openDialog = document.querySelector("dialog[open]") as HTMLDialogElement | null;
+    if (openDialog && openDialog !== keyboardDialog) {
+      return;
+    }
+
+    event.preventDefault();
+    if (!keyboardDialog.hasAttribute("open")) {
+      keyboardDialog.showModal();
+    }
+  };
+
   private readonly keyboardShortcuts: KeyboardShortcut[] = [
     // Global shortcuts
     { keys: ["?"], description: "Show keyboard shortcuts", category: "Global" },
@@ -144,10 +176,12 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
 
   public componentDidMount(): void {
     document.addEventListener("pointerdown", this.handleDocumentPointerDown);
+    document.addEventListener("keydown", this.handleDocumentKeyDown);
   }
 
   public componentWillUnmount(): void {
     document.removeEventListener("pointerdown", this.handleDocumentPointerDown);
+    document.removeEventListener("keydown", this.handleDocumentKeyDown);
   }
 
   public render() {
