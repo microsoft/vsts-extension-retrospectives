@@ -8,11 +8,11 @@ import FeedbackItemGroup from "./feedbackItemGroup";
 import { IColumnItem, IColumn } from "./feedbackBoard";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import { ActionButton, IconButton, IButton } from "@fluentui/react/lib/Button";
+import { ActionButton, IButton } from "@fluentui/react/lib/Button";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
-import { CloseIcon, InfoIcon, ReviewsIcon } from "./icons";
+import { AddIcon, CloseIcon, InfoIcon, ReviewsIcon } from "./icons";
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -58,7 +58,6 @@ export interface FeedbackColumnState {
 }
 
 export default class FeedbackColumn extends React.Component<FeedbackColumnProps, FeedbackColumnState> {
-  private createFeedbackButton: IButton;
   private columnRef: React.RefObject<HTMLDivElement> = React.createRef();
   private readonly editColumnNotesDialogRef = React.createRef<HTMLDialogElement>();
   private itemRefs: Map<string, HTMLElement> = new Map();
@@ -81,8 +80,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   }
 
   public componentDidMount() {
-    this.props.shouldFocusOnCreateFeedback && this.createFeedbackButton && this.createFeedbackButton.focus();
-
     if (this.columnRef.current) {
       this.columnRef.current.addEventListener("keydown", this.handleColumnKeyDown);
     }
@@ -224,9 +221,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
   private navigateItems = (direction: "next" | "prev", visibleItems: IColumnItem[]) => {
     if (visibleItems.length === 0) {
-      if (this.props.workflowPhase === WorkflowPhase.Collect && this.createFeedbackButton) {
-        this.createFeedbackButton.focus();
-      }
       return;
     }
 
@@ -272,8 +266,6 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         if (itemElement) {
           itemElement.focus();
         }
-      } else if (this.props.workflowPhase === WorkflowPhase.Collect && this.createFeedbackButton) {
-        this.createFeedbackButton.focus();
       }
     }
   };
@@ -467,28 +459,14 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         </div>
         <div className={cn("feedback-column-content", this.state.isCollapsed && "hide-collapse")}>
           {this.props.workflowPhase === WorkflowPhase.Collect && (
-            <div className="create-container">
-              <ActionButton
-                iconProps={{ iconName: "Add" }}
-                componentRef={(element: IButton) => {
-                  this.createFeedbackButton = element;
-                }}
-                onClick={this.createEmptyFeedbackItem}
-                aria-label="Add new feedback"
-                className="create-button"
-              >
-                Add new feedback
-              </ActionButton>
-            </div>
+            <button className="create-button" title="Add new feedback" aria-label="Add new feedback" onClick={this.createEmptyFeedbackItem}>
+              <AddIcon />
+              Add new feedback
+            </button>
           )}
           {this.props.isDataLoaded && <div className={cn("feedback-items-container", this.props.workflowPhase === WorkflowPhase.Act && "feedback-items-actions")}>{this.renderFeedbackItems()}</div>}
         </div>
-        <dialog
-          ref={this.editColumnNotesDialogRef}
-          className="edit-column-notes-dialog"
-          role="dialog"
-          aria-label="Edit column notes"
-        >
+        <dialog ref={this.editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label="Edit column notes">
           <div className="header">
             <h2 className="title">Edit column notes</h2>
             <button type="button" onClick={() => this.editColumnNotesDialogRef.current?.close()} aria-label="Close">

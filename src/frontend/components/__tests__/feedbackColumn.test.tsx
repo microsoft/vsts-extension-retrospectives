@@ -584,7 +584,7 @@ describe("Feedback Column ", () => {
     beforeEach(() => {
       originalQuerySelector = document.querySelector.bind(document);
       querySelectorSpy = jest.spyOn(document, "querySelector").mockImplementation(((selectors: string) => {
-        if (selectors === "[role=\"dialog\"]") {
+        if (selectors === '[role="dialog"]') {
           return null;
         }
         return originalQuerySelector(selectors);
@@ -976,7 +976,7 @@ describe("Feedback Column ", () => {
     beforeEach(() => {
       originalQuerySelector = document.querySelector.bind(document);
       querySelectorSpy = jest.spyOn(document, "querySelector").mockImplementation(((selectors: string) => {
-        if (selectors === "[role=\"dialog\"]") {
+        if (selectors === '[role="dialog"]') {
           return null;
         }
         return originalQuerySelector(selectors);

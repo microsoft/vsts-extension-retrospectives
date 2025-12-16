@@ -203,7 +203,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
 
   const dateFormatter = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" });
   const deleteBoardDialogRef = React.createRef<HTMLDialogElement>();
-  
+
   const toggleSort = (columnId: string) => {
     if (sortColumn === columnId) {
       if (sortDirection === "asc") {
@@ -232,91 +232,91 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
   };
 
   const columnList: ISimpleColumn[] = [
-      {
-        id: "expand",
-        header: null,
-        cell: (item: IBoardSummaryTableItem) => (
-          <DefaultButton className="contextual-menu-button" aria-label="Expand Row" title="Expand Row" onClick={() => toggleExpanded(item.id)}>
-            <span className="ms-Button-icon">
-              <i className={`fas ${expandedRows.has(item.id) ? "fa-caret-down" : "fa-caret-right"}`}></i>
-            </span>
-          </DefaultButton>
-        ),
-        sortable: false,
-      },
-      {
-        id: "boardName",
-        header: "Retrospective Name",
-        accessor: "boardName",
-        cell: (item: IBoardSummaryTableItem) => item.boardName,
-        sortable: true,
-      },
-      {
-        id: "createdDate",
-        header: "Created Date",
-        accessor: "createdDate",
-        cell: (item: IBoardSummaryTableItem) => dateFormatter.format(item.createdDate),
-        sortable: true,
-      },
-      {
-        id: "isArchived",
-        header: "Archived",
-        accessor: "isArchived",
-        cell: (item: IBoardSummaryTableItem) => (
-          <div onClick={event => event.stopPropagation()} className="centered-cell">
-            <input
-              type="checkbox"
-              checked={!!item.isArchived}
-              onChange={event => {
-                handleArchiveToggle(item.teamId, item.id, event.target.checked, setTableData, props.onArchiveToggle);
-              }}
-            />
-          </div>
-        ),
-        sortable: true,
-      },
-      {
-        id: "archivedDate",
-        header: "Archived Date",
-        accessor: "archivedDate",
-        cell: (item: IBoardSummaryTableItem) => (item.archivedDate ? dateFormatter.format(item.archivedDate) : ""),
-        sortable: true,
-      },
-      {
-        id: "feedbackItemsCount",
-        header: "Feedback Items",
-        accessor: "feedbackItemsCount",
-        cell: (item: IBoardSummaryTableItem) => item.feedbackItemsCount,
-        sortable: true,
-      },
-      {
-        id: "totalWorkItemsCount",
-        header: "Total Work Items",
-        accessor: "totalWorkItemsCount",
-        cell: (item: IBoardSummaryTableItem) => item.totalWorkItemsCount,
-        sortable: true,
-      },
-      {
-        id: "trash",
-        header: () => (
-          <div className="centered-cell trash-icon-header" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin.">
-            <DeleteIcon />
-          </div>
-        ),
-        cell: (item: IBoardSummaryTableItem) => (
-          <TrashIcon
-            board={item}
-            currentUserId={props.currentUserId}
-            currentUserIsTeamAdmin={props.currentUserIsTeamAdmin}
-            onClick={event => {
-              event.stopPropagation();
-              setOpenDialogBoardId(item.id);
-              deleteBoardDialogRef.current?.showModal();
+    {
+      id: "expand",
+      header: null,
+      cell: (item: IBoardSummaryTableItem) => (
+        <DefaultButton className="contextual-menu-button" aria-label="Expand Row" title="Expand Row" onClick={() => toggleExpanded(item.id)}>
+          <span className="ms-Button-icon">
+            <i className={`fas ${expandedRows.has(item.id) ? "fa-caret-down" : "fa-caret-right"}`}></i>
+          </span>
+        </DefaultButton>
+      ),
+      sortable: false,
+    },
+    {
+      id: "boardName",
+      header: "Retrospective Name",
+      accessor: "boardName",
+      cell: (item: IBoardSummaryTableItem) => item.boardName,
+      sortable: true,
+    },
+    {
+      id: "createdDate",
+      header: "Created Date",
+      accessor: "createdDate",
+      cell: (item: IBoardSummaryTableItem) => dateFormatter.format(item.createdDate),
+      sortable: true,
+    },
+    {
+      id: "isArchived",
+      header: "Archived",
+      accessor: "isArchived",
+      cell: (item: IBoardSummaryTableItem) => (
+        <div onClick={event => event.stopPropagation()} className="centered-cell">
+          <input
+            type="checkbox"
+            checked={!!item.isArchived}
+            onChange={event => {
+              handleArchiveToggle(item.teamId, item.id, event.target.checked, setTableData, props.onArchiveToggle);
             }}
           />
-        ),
-        sortable: false,
-      },
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      id: "archivedDate",
+      header: "Archived Date",
+      accessor: "archivedDate",
+      cell: (item: IBoardSummaryTableItem) => (item.archivedDate ? dateFormatter.format(item.archivedDate) : ""),
+      sortable: true,
+    },
+    {
+      id: "feedbackItemsCount",
+      header: "Feedback Items",
+      accessor: "feedbackItemsCount",
+      cell: (item: IBoardSummaryTableItem) => item.feedbackItemsCount,
+      sortable: true,
+    },
+    {
+      id: "totalWorkItemsCount",
+      header: "Total Work Items",
+      accessor: "totalWorkItemsCount",
+      cell: (item: IBoardSummaryTableItem) => item.totalWorkItemsCount,
+      sortable: true,
+    },
+    {
+      id: "trash",
+      header: () => (
+        <div className="centered-cell trash-icon-header" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin.">
+          <DeleteIcon />
+        </div>
+      ),
+      cell: (item: IBoardSummaryTableItem) => (
+        <TrashIcon
+          board={item}
+          currentUserId={props.currentUserId}
+          currentUserIsTeamAdmin={props.currentUserIsTeamAdmin}
+          onClick={event => {
+            event.stopPropagation();
+            setOpenDialogBoardId(item.id);
+            deleteBoardDialogRef.current?.showModal();
+          }}
+        />
+      ),
+      sortable: false,
+    },
   ];
 
   const handleActionItems = async (state: IBoardSummaryTableState) => {
@@ -497,8 +497,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
             <CloseIcon />
           </button>
         </div>
-        <div className="subText">The retrospective board {selectedBoardForDelete?.boardName} with {selectedBoardForDelete?.feedbackItemsCount} feedback items will be deleted.</div>
-        <div className="subText"><em>⚠️ Warning: This action is permanent and cannot be undone.</em></div>
+        <div className="subText">
+          The retrospective board {selectedBoardForDelete?.boardName} with {selectedBoardForDelete?.feedbackItemsCount} feedback items will be deleted.
+        </div>
+        <div className="subText">
+          <em>⚠️ Warning: This action is permanent and cannot be undone.</em>
+        </div>
         <div className="inner">
           <button className="button" onClick={handleConfirmDelete}>
             Delete

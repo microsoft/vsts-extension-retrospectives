@@ -1171,28 +1171,20 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.create-container {
-  @apply inline-flex;
+.create-button {
+  @apply flex items-center p-2 gap-1 text-sm cursor-pointer;
 
-  & .create-button {
-    @apply pl-4;
+  & svg {
+    @apply w-5 h-5 text-primary;
+  }
 
-    & i {
-      @apply -ml-1;
-    }
-
-    & .ms-Button-textContainer {
-      @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)];
-    }
-
-    &:focus-visible {
-      @apply outline-2 outline-primary outline-offset-2;
-    }
+  &:focus-visible {
+    @apply outline-2 outline-primary outline-offset-2;
   }
 }
 
 .retrospectives-retro-summary-dialog {
-  @apply max-w-none w-[70%] flex items-center bg-(--background-color) text-(--text-primary-color);
+  @apply max-w-none w-2/3 flex items-center bg-(--background-color) text-(--text-primary-color);
 }
 
 .retrospectives-retro-summary-dialog .ms-Dialog-title {
