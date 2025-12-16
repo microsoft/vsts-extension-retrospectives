@@ -14,7 +14,6 @@ import type { FocusModeModel } from "./feedbackCarousel";
 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
-import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
 import { PlayCircleIcon } from "./icons";
 
 export interface FeedbackBoardProps {
@@ -740,7 +739,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
               return <FeedbackColumn {...columnProps} />;
             })}
         </div>
-        <KeyboardShortcutsDialog isOpen={this.state.isKeyboardShortcutsDialogOpen} onClose={this.closeKeyboardShortcutsDialog} />
       </>
     );
   }
