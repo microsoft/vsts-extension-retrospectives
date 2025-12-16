@@ -1734,7 +1734,7 @@ describe("FeedbackBoard Component", () => {
       const columnId = boardWithMissingDefaults.columns[0].id;
       const columnProps = getLatestColumnProps(columnId);
 
-      expect(columnProps?.iconClass).toBe("fas fa-chalkboard");
+      expect(columnProps?.icon).toBeTruthy();
       expect(columnProps?.accentColor).toBe("#0078d4");
       expect(columnProps?.columnNotes).toBe("");
     });

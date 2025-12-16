@@ -36,7 +36,7 @@ interface FocusModeColumn {
   columnId: string;
   columnName: string;
   accentColor: string;
-  iconClass: string;
+  icon: React.ReactElement;
   columnItems: IColumnItem[];
 }
 
@@ -69,7 +69,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
           columnId,
           columnName: column.columnProperties.title,
           accentColor: column.columnProperties.accentColor,
-          iconClass: column.columnProperties.iconClass,
+          icon: column.columnProperties.icon,
           columnItems: column.columnItems,
         };
       })
@@ -81,7 +81,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         columnId: "all-columns",
         columnName: "All",
         accentColor: columnsList[0].accentColor,
-        iconClass: columnsList[0].iconClass,
+        icon: columnsList[0].icon,
         columnItems: allColumnItems,
       });
     }
@@ -113,7 +113,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       const { focusModeModel } = this.props;
 
       const itemAccentColor = focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.accentColor ?? column.accentColor;
-      const itemIconClass = focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.iconClass ?? column.iconClass;
+      const itemIcon = focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.icon ?? column.icon;
 
       const feedbackItemProps: IFeedbackItemProps = {
         id: columnItem.feedbackItem.id,
@@ -127,7 +127,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
         timerId: columnItem.feedbackItem.timerId,
         workflowPhase: focusModeModel.workflowPhase,
         accentColor: itemAccentColor,
-        iconClass: itemIconClass,
+        icon: itemIcon,
         createdDate: columnItem.feedbackItem.createdDate.toString(),
         team: focusModeModel.team,
         columnProps: undefined,

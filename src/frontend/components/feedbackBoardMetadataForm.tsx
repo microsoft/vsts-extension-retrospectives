@@ -419,7 +419,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                               });
                             }}
                           >
-                            <i className={cn("feedback-column-card-icon", columnCard.column.iconClass)} />
+                            <div className="feedback-column-card-icon">{columnCard.column.icon}</div>
                           </DefaultButton>
                           <DefaultButton
                             className="feedback-column-card-accent-color-button"
