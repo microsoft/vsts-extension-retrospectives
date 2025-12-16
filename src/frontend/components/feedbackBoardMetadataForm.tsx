@@ -407,9 +407,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     return (
                       <DocumentCard className={cn("feedback-column-card", columnCard.markedForDeletion && "marked-for-deletion")} type={DocumentCardType.compact}>
                         <div className="flex grow items-center">
-                          <DefaultButton
+                          <button
                             className="feedback-column-card-icon-button"
-                            ariaLabel="Change column icon"
+                            aria-label="Change column icon"
                             title="Change column icon"
                             disabled={columnCard.markedForDeletion}
                             onClick={() => {
@@ -419,11 +419,11 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                               });
                             }}
                           >
-                            <div className="feedback-column-card-icon">{columnCard.column.icon}</div>
-                          </DefaultButton>
-                          <DefaultButton
+                            {columnCard.column.icon}
+                          </button>
+                          <button
                             className="feedback-column-card-accent-color-button"
-                            ariaLabel="Change column color"
+                            aria-label="Change column color"
                             title="Change column color"
                             disabled={columnCard.markedForDeletion}
                             onClick={() => {
@@ -434,7 +434,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                             }}
                           >
                             <i className={cn("feedback-column-card-accent-color", "fas fa-square")} style={{ color: columnCard.column.accentColor }} />
-                          </DefaultButton>
+                          </button>
                           <EditableDocumentCardTitle
                             isDisabled={columnCard.markedForDeletion}
                             isMultiline={false}
