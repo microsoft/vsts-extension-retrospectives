@@ -2,7 +2,7 @@ import React from "react";
 import { render, waitFor } from "@testing-library/react";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 
-import BoardSummaryTable, { buildBoardSummaryState, handleConfirmDelete, IBoardSummaryTableProps, IBoardSummaryTableItem } from "../boardSummaryTable";
+import BoardSummaryTable, { buildBoardSummaryState, IBoardSummaryTableProps, IBoardSummaryTableItem } from "../boardSummaryTable";
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from "../boardSummaryTable";
 import BoardDataService from "../../dal/boardDataService";
 import { itemDataService } from "../../dal/itemDataService";
@@ -249,63 +249,6 @@ jest.spyOn(userIdentityHelper, "getUserIdentity").mockReturnValue({
 });
 
 jest.spyOn(userIdentityHelper, "encrypt").mockImplementation(id => `encrypted-${id}`);
-
-describe("handleConfirmDelete", () => {
-  const mockSetOpenDialogBoardId = jest.fn();
-  const mockSetTableData = jest.fn();
-  const mockSetRefreshKey = jest.fn();
-
-  const board: IBoardSummaryTableItem = {
-    id: "board-1",
-    boardName: "Board One",
-    feedbackItemsCount: 3,
-    teamId: "team-1",
-    ownerId: "user-1",
-    createdDate: new Date(),
-    isArchived: true,
-    archivedDate: new Date(Date.now() - 5 * 60 * 1000),
-    pendingWorkItemsCount: 0,
-    totalWorkItemsCount: 0,
-  };
-
-  const tableData: IBoardSummaryTableItem[] = [board];
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("returns early if openDialogBoardId is null", async () => {
-    await handleConfirmDelete(null, tableData, "team-1", mockSetOpenDialogBoardId, mockSetTableData, mockSetRefreshKey);
-
-    expect(BoardDataService.deleteFeedbackBoard).not.toHaveBeenCalled();
-    expect(mockSetOpenDialogBoardId).not.toHaveBeenCalled();
-  });
-
-  it("deletes board successfully and tracks event", async () => {
-    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
-
-    await handleConfirmDelete("board-1", tableData, "team-1", mockSetOpenDialogBoardId, mockSetTableData, mockSetRefreshKey);
-
-    expect(mockSetOpenDialogBoardId).toHaveBeenCalledWith(null);
-    expect(BoardDataService.deleteFeedbackBoard).toHaveBeenCalledWith("team-1", "board-1");
-    expect(reflectBackendService.broadcastDeletedBoard).toHaveBeenCalledWith("team-1", "board-1");
-    expect(mockSetTableData).toHaveBeenCalledWith(expect.any(Function));
-  });
-
-  it("handles errors and sets refresh key", async () => {
-    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockRejectedValue(new Error("fail"));
-
-    await handleConfirmDelete("board-1", tableData, "team-1", mockSetOpenDialogBoardId, mockSetTableData, mockSetRefreshKey);
-
-    expect(appInsights.trackException).toHaveBeenCalledWith(expect.any(Error), {
-      boardId: "board-1",
-      boardName: "Board One",
-      feedbackItemsCount: 3,
-      action: "delete",
-    });
-    expect(mockSetRefreshKey).toHaveBeenCalledWith(true);
-  });
-});
 
 describe("buildBoardSummaryState", () => {
   it("returns empty state when no boards exist", () => {
@@ -1243,54 +1186,6 @@ describe("BoardSummaryTable - Delete Board", () => {
     await waitFor(() => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
     });
-  });
-});
-
-describe("BoardSummaryTable - handleConfirmDelete", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("calls delete when boardId is provided", async () => {
-    const teamId = "team-1";
-    const boardId = "board-1";
-    const tableData: IBoardSummaryTableItem[] = [
-      {
-        id: boardId,
-        boardName: "Test Board",
-        createdDate: new Date(),
-        teamId: teamId,
-        ownerId: "owner-1",
-        isArchived: true,
-        archivedDate: new Date(Date.now() - 10 * 60 * 1000),
-        feedbackItemsCount: 0,
-        pendingWorkItemsCount: 0,
-        totalWorkItemsCount: 0,
-      },
-    ];
-    const setTableData = jest.fn();
-    const setOpenDialogBoardId = jest.fn();
-    const setRefreshKey = jest.fn();
-
-    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
-
-    await handleConfirmDelete(boardId, tableData, teamId, setOpenDialogBoardId, setTableData, setRefreshKey);
-
-    expect(BoardDataService.deleteFeedbackBoard).toHaveBeenCalledWith(teamId, boardId);
-    expect(setOpenDialogBoardId).toHaveBeenCalledWith(null);
-  });
-
-  it("does nothing when boardId is null", async () => {
-    const teamId = "team-1";
-    const tableData: IBoardSummaryTableItem[] = [];
-    const setTableData = jest.fn();
-    const setOpenDialogBoardId = jest.fn();
-    const setRefreshKey = jest.fn();
-
-    await handleConfirmDelete(null, tableData, teamId, setOpenDialogBoardId, setTableData, setRefreshKey);
-
-    expect(BoardDataService.deleteFeedbackBoard).not.toHaveBeenCalled();
-    expect(setOpenDialogBoardId).not.toHaveBeenCalled();
   });
 });
 

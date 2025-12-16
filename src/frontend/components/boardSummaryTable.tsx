@@ -139,49 +139,6 @@ export interface ITableData {
   expandedRows: Set<string>;
 }
 
-export async function handleConfirmDelete(
-  openDialogBoardId: string | null,
-  tableData: IBoardSummaryTableItem[],
-  teamId: string,
-  setOpenDialogBoardId: (id: string | null) => void,
-  setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>,
-  setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>,
-) {
-  if (!openDialogBoardId) return;
-
-  const deletedBoard = tableData.find(board => board.id === openDialogBoardId);
-  const deletedBoardName = deletedBoard?.boardName || "Unknown Board";
-  const deletedFeedbackCount = deletedBoard?.feedbackItemsCount || 0;
-
-  try {
-    setOpenDialogBoardId(null); // close dialog
-
-    await BoardDataService.deleteFeedbackBoard(teamId, openDialogBoardId);
-    reflectBackendService.broadcastDeletedBoard(teamId, openDialogBoardId);
-
-    setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
-
-    appInsights.trackEvent({
-      name: TelemetryEvents.FeedbackBoardDeleted,
-      properties: {
-        boardId: openDialogBoardId,
-        boardName: deletedBoardName,
-        feedbackItemsCount: deletedFeedbackCount,
-        deletedByUserId: encrypt(getUserIdentity().id),
-      },
-    });
-  } catch (error) {
-    appInsights.trackException(error, {
-      boardId: openDialogBoardId,
-      boardName: deletedBoardName,
-      feedbackItemsCount: deletedFeedbackCount,
-      action: "delete",
-    });
-
-    setRefreshKey(true);
-  }
-}
-
 export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[]): IBoardSummaryTableState {
   if (!boardDocuments.length) {
     return {
@@ -227,7 +184,6 @@ export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[])
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.Element {
   const [openDialogBoardId, setOpenDialogBoardId] = useState<string | null>(null);
   const [teamId, setTeamId] = useState<string>();
-  const [refreshKey, setRefreshKey] = useState<boolean>(false);
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
     boardsTableItems: new Array<IBoardSummaryTableItem>(),
     isDataLoaded: false,
@@ -239,8 +195,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
   const [sortColumn, setSortColumn] = useState<string>("createdDate");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-
   const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]);
+
   useEffect(() => {
     setTableData(boardSummaryState.boardsTableItems);
   }, [boardSummaryState.boardsTableItems]);
@@ -275,37 +231,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     });
   };
 
-  const getSortedData = (): IBoardSummaryTableItem[] => {
-    if (!sortDirection) return tableData;
-
-    const sorted = [...tableData].sort((a, b) => {
-      let aVal: Date | string | number | boolean | null | undefined;
-      let bVal: Date | string | number | boolean | null | undefined;
-
-      if (sortColumn === "createdDate" || sortColumn === "archivedDate") {
-        aVal = a[sortColumn as keyof IBoardSummaryTableItem];
-        bVal = b[sortColumn as keyof IBoardSummaryTableItem];
-        if (!aVal) return 1;
-        if (!bVal) return -1;
-        const aTime = new Date(aVal as Date).getTime();
-        const bTime = new Date(bVal as Date).getTime();
-        return sortDirection === "asc" ? (aTime < bTime ? -1 : 1) : aTime < bTime ? 1 : -1;
-      } else {
-        aVal = a[sortColumn as keyof IBoardSummaryTableItem];
-        bVal = b[sortColumn as keyof IBoardSummaryTableItem];
-      }
-
-      if (aVal == null || aVal === undefined) return 1;
-      if (bVal == null || bVal === undefined) return -1;
-      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    return sorted;
-  };
-
-  const columns11: ISimpleColumn[] = [
+  const columnList: ISimpleColumn[] = [
       {
         id: "expand",
         header: null,
@@ -384,6 +310,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
             currentUserIsTeamAdmin={props.currentUserIsTeamAdmin}
             onClick={event => {
               event.stopPropagation();
+              setOpenDialogBoardId(item.id);
               deleteBoardDialogRef.current?.showModal();
             }}
           />
@@ -391,12 +318,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
         sortable: false,
       },
   ];
-
-  const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
-    const state = buildBoardSummaryState(boardDocuments);
-    setBoardSummaryState(state);
-    handleActionItems(state);
-  };
 
   const handleActionItems = async (state: IBoardSummaryTableState) => {
     const updatedBoardsTableItems = [...state.boardsTableItems];
@@ -476,49 +397,119 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     return <BoardSummary actionItems={actionItems?.actionItems} pendingWorkItemsCount={currentBoard?.pendingWorkItemsCount} resolvedActionItemsCount={currentBoard?.totalWorkItemsCount - currentBoard?.pendingWorkItemsCount} boardName={currentBoard?.boardName} feedbackItemsCount={currentBoard?.feedbackItemsCount} supportedWorkItemTypes={props.supportedWorkItemTypes} />;
   };
 
+  const handleConfirmDelete = async () => {
+    try {
+      await BoardDataService.deleteFeedbackBoard(teamId, openDialogBoardId);
+      reflectBackendService.broadcastDeletedBoard(teamId, openDialogBoardId);
+
+      setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
+
+      appInsights.trackEvent({
+        name: TelemetryEvents.FeedbackBoardDeleted,
+        properties: {
+          boardId: openDialogBoardId,
+          boardName: selectedBoardForDelete?.boardName || "Unknown Board",
+          feedbackItemsCount: selectedBoardForDelete?.feedbackItemsCount || 0,
+          deletedByUserId: encrypt(getUserIdentity().id),
+        },
+      });
+    } catch (error) {
+      appInsights.trackException(error, {
+        boardId: openDialogBoardId,
+        boardName: selectedBoardForDelete?.boardName || "Unknown Board",
+        feedbackItemsCount: selectedBoardForDelete?.feedbackItemsCount || 0,
+        action: "delete",
+      });
+    }
+
+    deleteBoardDialogRef.current?.close();
+    setOpenDialogBoardId(null);
+  };
+
   useEffect(() => {
     if (teamId !== props.teamId) {
       BoardDataService.getBoardsForTeam(props.teamId)
         .then((boardDocuments: IFeedbackBoardDocument[]) => {
           setTeamId(props.teamId);
-          handleBoardsDocuments(boardDocuments);
-          if (refreshKey) {
-            setRefreshKey(false);
-          }
+          const state = buildBoardSummaryState(boardDocuments);
+          setBoardSummaryState(state);
+          handleActionItems(state);
         })
         .catch(e => {
           appInsights.trackException(e);
         });
     }
-  }, [props.teamId, refreshKey]);
+  }, [props.teamId]);
 
   if (boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner" size={SpinnerSize.large} label="Loading..." ariaLive="assertive" />;
   }
 
   const selectedBoardForDelete = tableData.find(board => board.id === openDialogBoardId);
-  const sortedData = getSortedData();
+  const sortedData = [...tableData].sort((a, b) => {
+    let aVal: Date | string | number | boolean | null | undefined;
+    let bVal: Date | string | number | boolean | null | undefined;
+
+    if (sortColumn === "createdDate" || sortColumn === "archivedDate") {
+      aVal = a[sortColumn as keyof IBoardSummaryTableItem];
+      bVal = b[sortColumn as keyof IBoardSummaryTableItem];
+      if (!aVal) return 1;
+      if (!bVal) return -1;
+      const aTime = new Date(aVal as Date).getTime();
+      const bTime = new Date(bVal as Date).getTime();
+      return sortDirection === "asc" ? (aTime < bTime ? -1 : 1) : aTime < bTime ? 1 : -1;
+    } else {
+      aVal = a[sortColumn as keyof IBoardSummaryTableItem];
+      bVal = b[sortColumn as keyof IBoardSummaryTableItem];
+    }
+
+    if (aVal == null || aVal === undefined) return 1;
+    if (bVal == null || bVal === undefined) return -1;
+    if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
 
   return (
     <div className="board-summary-table-container">
       <table>
-        <BoardSummaryTableHeader columns={columns11} sortColumn={sortColumn} sortDirection={sortDirection} onSort={toggleSort} />
-        <BoardSummaryTableBody columns={columns11} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
+        <BoardSummaryTableHeader columns={columnList} sortColumn={sortColumn} sortDirection={sortDirection} onSort={toggleSort} />
+        <BoardSummaryTableBody columns={columnList} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
       </table>
-      <dialog className="delete-board-dialog" aria-label="Delete Retrospective Board" ref={deleteBoardDialogRef} onClose={() => deleteBoardDialogRef.current?.close()}>
+      <dialog
+        className="delete-board-dialog"
+        aria-label="Delete Retrospective Board"
+        ref={deleteBoardDialogRef}
+        onClose={() => {
+          deleteBoardDialogRef.current?.close();
+          setOpenDialogBoardId(null);
+        }}
+      >
         <div className="header">
           <h2 className="title">Delete Retrospective Board</h2>
-          <button onClick={() => deleteBoardDialogRef.current?.close()} aria-label="Close">
+          <button
+            onClick={() => {
+              deleteBoardDialogRef.current?.close();
+              setOpenDialogBoardId(null);
+            }}
+            aria-label="Close"
+          >
             <CloseIcon />
           </button>
         </div>
         <div className="subText">The retrospective board {selectedBoardForDelete?.boardName} with {selectedBoardForDelete?.feedbackItemsCount} feedback items will be deleted.</div>
         <div className="subText">⚠️ Warning: This action is permanent and cannot be undone.</div>
         <div className="inner">
-          <button className="button" onClick={() => handleConfirmDelete(openDialogBoardId, tableData, props.teamId, setOpenDialogBoardId, setTableData, setRefreshKey)}>
+          <button className="button" onClick={handleConfirmDelete}>
             Delete
           </button>
-          <button className="default button" onClick={() => deleteBoardDialogRef.current?.close()}>
+          <button
+            className="default button"
+            onClick={() => {
+              deleteBoardDialogRef.current?.close();
+              setOpenDialogBoardId(null);
+            }}
+          >
             Close
           </button>
         </div>
