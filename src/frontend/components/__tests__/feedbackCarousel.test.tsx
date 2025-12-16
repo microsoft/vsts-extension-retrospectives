@@ -21,7 +21,7 @@ const buildFocusModeModel = (columnPropsList: Array<typeof testColumnProps>): Fo
       columnProperties: {
         id: col.columnId,
         title: col.columnName,
-        iconClass: col.iconClass,
+        icon: col.icon,
         accentColor: col.accentColor,
         notes: "",
       },

@@ -1,3 +1,5 @@
+import React from "react";
+
 import { getColumnsByTemplateId } from "../boardColumnsHelper";
 import { IFeedbackColumn } from "../../interfaces/feedback";
 import * as randomModule from "../random";
@@ -25,21 +27,21 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(3);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "far fa-circle-play",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "Start",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "far fa-circle-stop",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "Stop",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "far fa-circle-dot",
+          icon: expect.anything(),
           id: "uuid-3",
           title: "Continue",
           notes: "",
@@ -54,28 +56,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "far fa-smile",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "Good",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "far fa-frown",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "Improve",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "far fa-question",
+          icon: expect.anything(),
           id: "uuid-3",
           title: "Ideas",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#0078d4",
-          iconClass: "far fa-exclamation",
+          icon: expect.anything(),
           id: "uuid-4",
           title: "Thanks",
           notes: "",
@@ -90,21 +92,21 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(3);
         expect(result[0]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "far fa-angry",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "Mad",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "far fa-frown",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "Sad",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#008000",
-          iconClass: "far fa-smile",
+          icon: expect.anything(),
           id: "uuid-3",
           title: "Glad",
           notes: "",
@@ -119,28 +121,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "far fa-thumbs-up",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "Liked",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#0078d4",
-          iconClass: "far fa-lightbulb",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "Learned",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "far fa-thumbs-down",
+          icon: expect.anything(),
           id: "uuid-3",
           title: "Lacked",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "far fa-star",
+          icon: expect.anything(),
           id: "uuid-4",
           title: "Longed for",
           notes: "",
@@ -155,28 +157,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "fas fa-trash",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "Drop",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#008000",
-          iconClass: "fas fa-cart-plus",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "Add",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#0078d4",
-          iconClass: "fas fa-lock",
+          icon: expect.anything(),
           id: "uuid-3",
           title: "Keep",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "fas fa-wrench",
+          icon: expect.anything(),
           id: "uuid-4",
           title: "Improve",
           notes: "",
@@ -191,28 +193,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#0078d4",
-          iconClass: "far fa-square-check",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "Keep",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#008000",
-          iconClass: "far fa-square-plus",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "Add",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "far fa-circle-down",
+          icon: expect.anything(),
           id: "uuid-3",
           title: "Less",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#8063bf",
-          iconClass: "far fa-circle-up",
+          icon: expect.anything(),
           id: "uuid-4",
           title: "More",
           notes: "",
@@ -227,28 +229,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "fas fa-star",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "Went Well",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#8063bf",
-          iconClass: "fas fa-book",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "Learned",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#0078d4",
-          iconClass: "fas fa-rocket",
+          icon: expect.anything(),
           id: "uuid-3",
           title: "Accelerators",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "fas fa-exclamation-triangle",
+          icon: expect.anything(),
           id: "uuid-4",
           title: "Impediments",
           notes: "",
@@ -263,28 +265,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "fas fa-scale-unbalanced",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "Good",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "fas fa-scale-balanced",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "So-so",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "fas fa-scale-unbalanced-flip",
+          icon: expect.anything(),
           id: "uuid-3",
           title: "Not-so-good",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#8063bf",
-          iconClass: "fas fa-birthday-cake",
+          icon: expect.anything(),
           id: "uuid-4",
           title: "Done",
           notes: "",
@@ -299,28 +301,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "fas fa-fan",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "Propellors",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#0078d4",
-          iconClass: "fas fa-life-ring",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "Lifesavers",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "fas fa-anchor",
+          icon: expect.anything(),
           id: "uuid-3",
           title: "Anchors",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "fas fa-skull-crossbones",
+          icon: expect.anything(),
           id: "uuid-4",
           title: "Rocks",
           notes: "",
@@ -336,21 +338,21 @@ describe("boardColumnsHelper", () => {
           expect(result).toHaveLength(3);
           expect(result[0]).toEqual({
             accentColor: "#008000",
-            iconClass: "far fa-smile",
+            icon: expect.anything(),
             id: "uuid-1",
             title: "What provides clarity?",
             notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "far fa-frown",
+            icon: expect.anything(),
             id: "uuid-2",
             title: "What obstructs clarity?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            iconClass: "far fa-circle-check",
+            icon: expect.anything(),
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -365,21 +367,21 @@ describe("boardColumnsHelper", () => {
           expect(result).toHaveLength(3);
           expect(result[0]).toEqual({
             accentColor: "#008000",
-            iconClass: "far fa-smile",
+            icon: expect.anything(),
             id: "uuid-1",
             title: "What boosts energy?",
             notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "far fa-frown",
+            icon: expect.anything(),
             id: "uuid-2",
             title: "What drains energy?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            iconClass: "far fa-circle-check",
+            icon: expect.anything(),
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -394,21 +396,21 @@ describe("boardColumnsHelper", () => {
           expect(result).toHaveLength(3);
           expect(result[0]).toEqual({
             accentColor: "#008000",
-            iconClass: "far fa-smile",
+            icon: expect.anything(),
             id: "uuid-1",
             title: "What fosters psychological safety?",
             notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "far fa-frown",
+            icon: expect.anything(),
             id: "uuid-2",
             title: "What undermines pyschological safety?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            iconClass: "far fa-circle-check",
+            icon: expect.anything(),
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -423,21 +425,21 @@ describe("boardColumnsHelper", () => {
           expect(result).toHaveLength(3);
           expect(result[0]).toEqual({
             accentColor: "#008000",
-            iconClass: "far fa-smile",
+            icon: expect.anything(),
             id: "uuid-1",
             title: "What helps work-life balance?",
             notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "far fa-frown",
+            icon: expect.anything(),
             id: "uuid-2",
             title: "What hinders work-life balance?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            iconClass: "far fa-circle-check",
+            icon: expect.anything(),
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -452,21 +454,21 @@ describe("boardColumnsHelper", () => {
           expect(result).toHaveLength(3);
           expect(result[0]).toEqual({
             accentColor: "#008000",
-            iconClass: "far fa-smile",
+            icon: expect.anything(),
             id: "uuid-1",
             title: "What enhances confidence in team?",
             notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "far fa-frown",
+            icon: expect.anything(),
             id: "uuid-2",
             title: "What reduces confidence in team?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            iconClass: "far fa-circle-check",
+            icon: expect.anything(),
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -481,21 +483,21 @@ describe("boardColumnsHelper", () => {
           expect(result).toHaveLength(3);
           expect(result[0]).toEqual({
             accentColor: "#008000",
-            iconClass: "far fa-smile",
+            icon: expect.anything(),
             id: "uuid-1",
             title: "What increases efficiency?",
             notes: "",
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "far fa-frown",
+            icon: expect.anything(),
             id: "uuid-2",
             title: "What decreases efficiency?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            iconClass: "far fa-circle-check",
+            icon: expect.anything(),
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -511,14 +513,14 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(2);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "far fa-smile",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "What went well?",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "far fa-frown",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -531,14 +533,14 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(2);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "far fa-smile",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "What went well?",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "far fa-frown",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -551,14 +553,14 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(2);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "far fa-smile",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "What went well?",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "far fa-frown",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -571,14 +573,14 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(2);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "far fa-smile",
+          icon: expect.anything(),
           id: "uuid-1",
           title: "What went well?",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "far fa-frown",
+          icon: expect.anything(),
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -600,17 +602,16 @@ describe("boardColumnsHelper", () => {
           result.forEach((column: IFeedbackColumn) => {
             expect(column).toHaveProperty("id");
             expect(column).toHaveProperty("title");
-            expect(column).toHaveProperty("iconClass");
+            expect(column).toHaveProperty("icon");
             expect(column).toHaveProperty("accentColor");
 
             expect(typeof column.id).toBe("string");
             expect(typeof column.title).toBe("string");
-            expect(typeof column.iconClass).toBe("string");
+            expect(React.isValidElement(column.icon)).toBe(true);
             expect(typeof column.accentColor).toBe("string");
 
             expect(column.id).not.toBe("");
             expect(column.title).not.toBe("");
-            expect(column.iconClass).not.toBe("");
             expect(column.accentColor).not.toBe("");
           });
         });
@@ -653,14 +654,14 @@ describe("boardColumnsHelper", () => {
       });
     });
 
-    describe("icon class validation", () => {
-      it("should use valid FontAwesome icon classes", () => {
+    describe("icon validation", () => {
+      it("should provide a valid React icon element", () => {
         const allTemplates = ["start-stop-continue", "good-improve-ideas-thanks", "mad-sad-glad", "4ls", "daki", "kalm", "wlai", "1to1", "speedboat"];
 
         allTemplates.forEach(templateId => {
           const result = getColumnsByTemplateId(templateId);
           result.forEach(column => {
-            expect(column.iconClass).toMatch(/^(far|fas|fa-solid|fa-regular)\s+fa-.+/);
+            expect(React.isValidElement(column.icon)).toBe(true);
           });
         });
       });
