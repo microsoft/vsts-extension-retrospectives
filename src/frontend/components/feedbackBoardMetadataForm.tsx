@@ -557,33 +557,28 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     );
                   }}
                 />
-                <div className="create-feedback-column-card-button-wrapper">
-                  <ActionButton
-                    className="create-feedback-column-card-button"
-                    aria-label="Add new column"
-                    iconProps={{ iconName: "Add" }}
-                    disabled={this.state.columnCards.filter(columnCard => !columnCard.markedForDeletion).length >= this.maxColumnCount}
-                    onClick={() => {
-                      const newColumns: IFeedbackColumnCard[] = [].concat(this.state.columnCards);
-                      const newColumnId = generateUUID();
-                      newColumns.push({
-                        column: {
-                          id: newColumnId,
-                          title: "New Column",
-                          icon: this.getRandomArrayElement(this.allIconClassNames).icon,
-                          accentColor: this.getRandomArrayElement(this.allAccentColors).colorCode,
-                          notes: "",
-                        },
-                        markedForDeletion: false,
-                      });
-                      this.setState({
-                        columnCards: newColumns,
-                      });
-                    }}
-                  >
-                    Add new column
-                  </ActionButton>
-                </div>
+                <button
+                  className="create-feedback-column-card-button"
+                  aria-label="Add new column"
+                  disabled={this.state.columnCards.filter(columnCard => !columnCard.markedForDeletion).length >= this.maxColumnCount}
+                  onClick={() => {
+                    const newColumns: IFeedbackColumnCard[] = [].concat(this.state.columnCards);
+                    newColumns.push({
+                      column: {
+                        id: generateUUID(),
+                        title: "New Column",
+                        icon: this.getRandomArrayElement(this.allIconClassNames).icon,
+                        accentColor: this.getRandomArrayElement(this.allAccentColors).colorCode,
+                        notes: "",
+                      },
+                      markedForDeletion: false,
+                    });
+                    this.setState({ columnCards: newColumns });
+                  }}
+                >
+                  <AddIcon />
+                  Add new column
+                </button>
               </section>
               {this.props.currentBoard && (
                 <Dialog

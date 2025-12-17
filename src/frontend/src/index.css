@@ -1371,7 +1371,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-edit-column-settings {
-    @apply border border-solid border-gray-medium p-2.5;
+    @apply border border-solid border-gray-medium p-2;
   }
 
   & .board-metadata-form-section-subheader {
@@ -1498,12 +1498,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply text-black;
   }
 
-  & .create-feedback-column-card-button-wrapper .create-feedback-column-card-button {
-    @apply border-none text-(--text-primary-color);
-  }
+  & .create-feedback-column-card-button {
+    @apply flex items-center justify-self-center gap-1 text-(--text-primary-color) mt-2 p-2 cursor-pointer;
 
-  & .create-feedback-column-card-button-wrapper .ms-Button-icon {
-    @apply text-(--status-info-foreground) bg-(--nav-vertical-background-color) p-1 h-5;
+    & svg {
+      @apply w-5 h-5 text-primary;
+    }
   }
 
   & .board-metadata-logo {
