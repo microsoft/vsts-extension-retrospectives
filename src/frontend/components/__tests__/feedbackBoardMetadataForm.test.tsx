@@ -1572,17 +1572,20 @@ describe("FeedbackBoardMetadataForm - Dialog Dismissal", () => {
 
     expect(screen.getByText(/choose column color/i)).toBeInTheDocument();
 
-    // Find the close button in the dialog
-    const closeButton = container.querySelector('.ms-Dialog-button--close, button[aria-label="Close"]');
-    if (closeButton) {
-      await user.click(closeButton as HTMLElement);
-      await waitFor(() => {
-        expect(screen.queryByText(/choose column color/i)).not.toBeInTheDocument();
-      });
+    // The Fluent Dialog is rendered in a portal and doesn't include an explicit close button.
+    // Dismiss via overlay click (or Escape as a fallback).
+    const overlay =
+      document.body.querySelector(".retrospectives-dialog-modal .ms-Overlay") ??
+      document.body.querySelector(".retrospectives-choose-column-accent-color-dialog")?.closest(".ms-Modal")?.querySelector(".ms-Overlay") ??
+      document.body.querySelector(".ms-Overlay");
+    if (overlay) {
+      await user.click(overlay as HTMLElement);
     } else {
-      // Alternatively, verify dialog can be opened
-      expect(screen.getByText(/choose column color/i)).toBeInTheDocument();
+      await user.keyboard("{Escape}");
     }
+    await waitFor(() => {
+      expect(screen.queryByText(/choose column color/i)).not.toBeInTheDocument();
+    });
   });
 });
 

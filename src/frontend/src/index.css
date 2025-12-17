@@ -1783,12 +1783,65 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply flex-row items-center;
 }
 
-.info-message-bar .ms-MessageBar-actions {
+/* Native message bar (replaces Fluent UI MessageBar) */
+.retro-message-bar {
+  @apply relative flex items-start gap-3 rounded border px-4 py-3 text-sm;
+}
+
+.retro-message-bar__content {
+  @apply flex-1 text-(--text-primary-color);
+}
+
+.retro-message-bar__actions {
+  @apply flex items-center gap-2;
+}
+
+.retro-message-bar__dismiss {
+  @apply ml-2 border-0 bg-transparent cursor-pointer text-(--text-primary-color) p-1;
+
+  &:focus-visible {
+    @apply outline-2 outline-primary outline-offset-2 rounded;
+  }
+}
+
+.retro-message-bar--info {
+  border-color: color-mix(in srgb, var(--color-primary), white 40%);
+  background-color: color-mix(in srgb, var(--color-primary), white 88%);
+}
+
+.retro-message-bar--success {
+  border-color: color-mix(in srgb, var(--color-success), white 40%);
+  background-color: color-mix(in srgb, var(--color-success), white 90%);
+}
+
+.retro-message-bar--warning {
+  border-color: color-mix(in srgb, var(--color-task-yellow), white 35%);
+  background-color: color-mix(in srgb, var(--color-task-yellow), white 88%);
+}
+
+.retro-message-bar--error {
+  border-color: color-mix(in srgb, var(--color-error), white 40%);
+  background-color: color-mix(in srgb, var(--color-error), white 90%);
+}
+
+.info-message-bar .retro-message-bar__actions {
   @apply mb-1 mr-1 min-w-32 min-h-12;
 }
 
-.info-message-bar .ms-MessageBar-actions .info-message-bar-action {
+.info-message-bar .retro-message-bar__actions .info-message-bar-action {
   @apply mt-1 mr-1;
+}
+
+.info-message-bar-action-button {
+  @apply px-3 py-1 rounded border border-primary bg-white text-primary cursor-pointer;
+
+  &:hover {
+    @apply bg-primary text-white;
+  }
+
+  &:disabled {
+    @apply opacity-60 cursor-default;
+  }
 }
 
 .team-effectiveness-section-information {

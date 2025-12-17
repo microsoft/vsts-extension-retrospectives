@@ -1,7 +1,6 @@
 import React from "react";
-import { DefaultButton, IconButton, MessageBarButton, PrimaryButton } from "@fluentui/react/lib/Button";
+import { DefaultButton, IconButton, PrimaryButton } from "@fluentui/react/lib/Button";
 import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react/lib/Dialog";
-import { MessageBar, MessageBarType } from "@fluentui/react/lib/MessageBar";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
 import { WorkflowPhase } from "../interfaces/workItem";
@@ -1885,57 +1884,57 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
-                      <MessageBar
-                        className="info-message-bar"
-                        messageBarType={MessageBarType.info}
-                        isMultiline={true}
-                        onDismiss={this.hideLiveSyncInTfsIssueMessageBar}
-                        styles={{
-                          root: {
-                            background: "#cceeff",
-                          },
-                        }}
-                      >
-                        <span>
-                          <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
-                        </span>
-                      </MessageBar>
+                      <div className="retro-message-bar retro-message-bar--info info-message-bar" role="status" aria-live="polite">
+                        <div className="retro-message-bar__content">
+                          <span>
+                            <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
+                          </span>
+                        </div>
+                        <button type="button" className="retro-message-bar__dismiss" onClick={this.hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </div>
                     )}
                     {!this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected && (
-                      <MessageBar className="info-message-bar" messageBarType={MessageBarType.warning} isMultiline={true} onDismiss={this.hideDropIssueInEdgeMessageBar}>
-                        <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
-                      </MessageBar>
+                      <div className="retro-message-bar retro-message-bar--warning info-message-bar" role="alert" aria-live="assertive">
+                        <div className="retro-message-bar__content">
+                          <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
+                        </div>
+                        <button type="button" className="retro-message-bar__dismiss" onClick={this.hideDropIssueInEdgeMessageBar} aria-label="Dismiss notification">
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </div>
                     )}
                     {this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected && (
-                      <MessageBar
-                        className="info-message-bar"
-                        messageBarType={MessageBarType.warning}
-                        isMultiline={true}
-                        actions={
+                      <div className="retro-message-bar retro-message-bar--warning info-message-bar" role="alert" aria-live="assertive">
+                        <div className="retro-message-bar__content">
+                          <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
+                        </div>
+                        <div className="retro-message-bar__actions">
                           <div className="info-message-bar-action">
                             {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
                             {!this.state.isReconnectingToBackendService && (
                               <>
-                                <MessageBarButton className="info-message-bar-action-button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService} text="Reconnect" />
-                                <IconButton
+                                <button type="button" className="info-message-bar-action-button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService}>
+                                  Reconnect
+                                </button>
+                                <button
+                                  type="button"
                                   className="info-message-bar-action-button"
                                   onClick={() => {
                                     this.setState({ isBackendServiceConnected: true });
                                   }}
                                   disabled={this.state.isReconnectingToBackendService}
+                                  aria-label="Hide"
                                   title="Hide"
                                 >
-                                  <span className="ms-Button-icon">
-                                    <i className="fas fa-times"></i>
-                                  </span>
-                                </IconButton>
+                                  <span aria-hidden="true">×</span>
+                                </button>
                               </>
                             )}
                           </div>
-                        }
-                      >
-                        <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
-                      </MessageBar>
+                        </div>
+                      </div>
                     )}
                     <FeedbackBoard
                       board={this.state.currentBoard}
