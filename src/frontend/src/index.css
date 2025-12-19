@@ -366,18 +366,22 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .inner {
     @apply flex items-center justify-end gap-3 px-5 py-3;
 
-    & .button {
-      @apply px-4 py-2 rounded text-sm border border-(--border-subtle-color) cursor-pointer bg-(--text-primary-color) text-[rgb(var(--palette-neutral-0))];
+    & button {
+      @apply flex items-center gap-1 px-4 py-2 rounded text-sm border border-(--border-subtle-color) cursor-pointer bg-(--text-primary-color) text-[rgb(var(--palette-neutral-0))];
 
       &.default {
         @apply bg-primary text-white border-primary;
+      }
+
+      & svg {
+        @apply w-4 h-4;
       }
     }
   }
 }
 
 .preview-email-content {
-  @apply h-80!;
+  @apply w-full;
 }
 
 .choose-feedback-column-icon-button {

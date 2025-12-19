@@ -1405,6 +1405,84 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.previewEmailDialogRef?.current?.showModal();
   };
 
+  private readonly escapePdfText = (text: string): string => text.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+
+  private readonly createPdfFromText = (text: string, title: string): Blob => {
+    const lines = text.split(/\r?\n/).map(line => (line.trim().length === 0 ? " " : line));
+    const fontSize = 12;
+    const lineHeight = 16;
+    const startY = 780;
+    const startX = 50;
+
+    const encoder = new TextEncoder();
+    let offset = 0;
+    const offsets: number[] = [];
+    const parts: string[] = [];
+
+    const add = (part: string) => {
+      parts.push(part);
+      offset += encoder.encode(part).length;
+    };
+
+    const addObject = (part: string) => {
+      offsets.push(offset);
+      add(part);
+    };
+
+    add("%PDF-1.4\n");
+
+    addObject(`1 0 obj\n<< /Type /Catalog /Pages 2 0 R /Title (${this.escapePdfText(title)}) >>\nendobj\n`);
+    addObject("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
+
+    const contentStreamLines = lines
+      .map((line, index) => {
+        const escaped = this.escapePdfText(line);
+        const lineOp = `(${escaped}) Tj`;
+        if (index === lines.length - 1) {
+          return lineOp;
+        }
+        return `${lineOp}\nT*`;
+      })
+      .join("\n");
+
+    const contentStream = `BT\n/F1 ${fontSize} Tf\n${startX} ${startY} Td\n${lineHeight} TL\n${contentStreamLines}\nET\n`;
+    const contentLength = encoder.encode(contentStream).length;
+
+    addObject("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n");
+    addObject(`4 0 obj\n<< /Length ${contentLength} >>\nstream\n${contentStream}endstream\nendobj\n`);
+    addObject("5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n");
+
+    const xrefStart = offset;
+    add("xref\n0 6\n");
+    add("0000000000 65535 f \n");
+    for (const objOffset of offsets) {
+      add(`${objOffset.toString().padStart(10, "0")} 00000 n \n`);
+    }
+
+    add(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`);
+
+    return new Blob([parts.join("")], { type: "application/pdf" });
+  };
+
+  private readonly downloadEmailSummaryPdf = (): void => {
+    const board = this.state.currentBoard;
+    if (!board) {
+      return;
+    }
+
+    const pdfBlob = this.createPdfFromText(board.emailContent || "", board.title || "Retrospective Email Summary");
+    const fileName = `${(board.title || "Retrospective").replace(/\s+/g, "_")}_Email_Summary.pdf`;
+
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   private readonly renderBoardUpdateMetadataFormDialog = (isNewBoardCreation: boolean, isDuplicatingBoard: boolean, hidden: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => void, onCancel: () => void) => {
     const permissionOptions: FeedbackBoardPermissionOption[] = [];
 
@@ -1990,13 +2068,17 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </button>
           </div>
           <div className="subText">
-            <div className="form-group">
-              <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={this.showEmailCopiedToast}>
-                {getIconElement("content-copy")}
-                Copy to clipboard
-              </button>
-              <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={this.state.currentBoard.emailContent}></textarea>
-            </div>
+            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={this.state.currentBoard.emailContent}></textarea>
+          </div>
+          <div className="inner">
+            <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={this.showEmailCopiedToast}>
+              {getIconElement("content-copy")}
+              Copy to clipboard
+            </button>
+            <button title="Download PDF" aria-label="Download email summary as PDF" onClick={this.downloadEmailSummaryPdf} className="default button">
+              {getIconElement("sim-card-download")}
+              Download PDF
+            </button>
           </div>
         </dialog>
         <Dialog

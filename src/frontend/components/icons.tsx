@@ -805,4 +805,5 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "link-off", tags: [], name: "Link Off", icon: <LinkOffIcon /> },
   { id: "info", tags: [], name: "Info", icon: <InfoIcon /> },
   { id: "content-copy", tags: [], name: "Content Copy", icon: <ContentCopyIcon /> },
+  { id: "sim-card-download", tags: [], name: "Sim Card Download", icon: <SimCardDownloadIcon /> },
 ];
