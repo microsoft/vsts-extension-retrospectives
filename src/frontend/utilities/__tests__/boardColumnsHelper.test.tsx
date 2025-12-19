@@ -27,21 +27,21 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(3);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "play-circle",
           id: "uuid-1",
           title: "Start",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "stop-circle",
           id: "uuid-2",
           title: "Stop",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
-          icon: expect.anything(),
+          iconClass: "adjust",
           id: "uuid-3",
           title: "Continue",
           notes: "",
@@ -56,28 +56,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "happy-face",
           id: "uuid-1",
           title: "Good",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "sad-face",
           id: "uuid-2",
           title: "Improve",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
-          icon: expect.anything(),
+          iconClass: "help",
           id: "uuid-3",
           title: "Ideas",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#0078d4",
-          icon: expect.anything(),
+          iconClass: "exclamation",
           id: "uuid-4",
           title: "Thanks",
           notes: "",
@@ -92,21 +92,21 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(3);
         expect(result[0]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "angry-face",
           id: "uuid-1",
           title: "Mad",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#f6af08",
-          icon: expect.anything(),
+          iconClass: "sad-face",
           id: "uuid-2",
           title: "Sad",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "happy-face",
           id: "uuid-3",
           title: "Glad",
           notes: "",
@@ -121,28 +121,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "thumb-up",
           id: "uuid-1",
           title: "Liked",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#0078d4",
-          icon: expect.anything(),
+          iconClass: "light-bulb",
           id: "uuid-2",
           title: "Learned",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "thumb-down",
           id: "uuid-3",
           title: "Lacked",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
-          icon: expect.anything(),
+          iconClass: "star",
           id: "uuid-4",
           title: "Longed for",
           notes: "",
@@ -157,28 +157,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "delete",
           id: "uuid-1",
           title: "Drop",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "add",
           id: "uuid-2",
           title: "Add",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#0078d4",
-          icon: expect.anything(),
+          iconClass: "lock",
           id: "uuid-3",
           title: "Keep",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
-          icon: expect.anything(),
+          iconClass: "construction",
           id: "uuid-4",
           title: "Improve",
           notes: "",
@@ -193,28 +193,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#0078d4",
-          icon: expect.anything(),
+          iconClass: "check-circle",
           id: "uuid-1",
           title: "Keep",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "add-circle",
           id: "uuid-2",
           title: "Add",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
-          icon: expect.anything(),
+          iconClass: "arrow-circle-down",
           id: "uuid-3",
           title: "Less",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#8063bf",
-          icon: expect.anything(),
+          iconClass: "arrow-circle-up",
           id: "uuid-4",
           title: "More",
           notes: "",
@@ -229,28 +229,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "star",
           id: "uuid-1",
           title: "Went Well",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#8063bf",
-          icon: expect.anything(),
+          iconClass: "menu-book",
           id: "uuid-2",
           title: "Learned",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#0078d4",
-          icon: expect.anything(),
+          iconClass: "rocket-launch",
           id: "uuid-3",
           title: "Accelerators",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "exclamation",
           id: "uuid-4",
           title: "Impediments",
           notes: "",
@@ -265,28 +265,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "thumb-up",
           id: "uuid-1",
           title: "Good",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#f6af08",
-          icon: expect.anything(),
+          iconClass: "thumb-up-down",
           id: "uuid-2",
           title: "So-so",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "thumb-down",
           id: "uuid-3",
           title: "Not-so-good",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#8063bf",
-          icon: expect.anything(),
+          iconClass: "check-circle",
           id: "uuid-4",
           title: "Done",
           notes: "",
@@ -301,28 +301,28 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "rocket-launch",
           id: "uuid-1",
           title: "Propellors",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#0078d4",
-          icon: expect.anything(),
+          iconClass: "support",
           id: "uuid-2",
           title: "Lifesavers",
           notes: "",
         });
         expect(result[2]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "anchor",
           id: "uuid-3",
           title: "Anchors",
           notes: "",
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
-          icon: expect.anything(),
+          iconClass: "thumb-down",
           id: "uuid-4",
           title: "Rocks",
           notes: "",
@@ -336,23 +336,23 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("clarity");
 
           expect(result).toHaveLength(3);
-          expect(result[0]).toEqual({
-            accentColor: "#008000",
-            icon: expect.anything(),
-            id: "uuid-1",
-            title: "What provides clarity?",
-            notes: "",
-          });
+            expect(result[0]).toEqual({
+              accentColor: "#008000",
+              iconClass: "happy-face",
+              id: "uuid-1",
+              title: "What provides clarity?",
+              notes: "",
+            });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            icon: expect.anything(),
+            iconClass: "sad-face",
             id: "uuid-2",
             title: "What obstructs clarity?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            icon: expect.anything(),
+            iconClass: "check-circle",
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -365,23 +365,23 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("energy");
 
           expect(result).toHaveLength(3);
-          expect(result[0]).toEqual({
-            accentColor: "#008000",
-            icon: expect.anything(),
-            id: "uuid-1",
-            title: "What boosts energy?",
-            notes: "",
-          });
+            expect(result[0]).toEqual({
+              accentColor: "#008000",
+              iconClass: "happy-face",
+              id: "uuid-1",
+              title: "What boosts energy?",
+              notes: "",
+            });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            icon: expect.anything(),
+            iconClass: "sad-face",
             id: "uuid-2",
             title: "What drains energy?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            icon: expect.anything(),
+            iconClass: "check-circle",
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -394,23 +394,23 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("psy-safety");
 
           expect(result).toHaveLength(3);
-          expect(result[0]).toEqual({
-            accentColor: "#008000",
-            icon: expect.anything(),
-            id: "uuid-1",
-            title: "What fosters psychological safety?",
-            notes: "",
-          });
+            expect(result[0]).toEqual({
+              accentColor: "#008000",
+              iconClass: "happy-face",
+              id: "uuid-1",
+              title: "What fosters psychological safety?",
+              notes: "",
+            });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            icon: expect.anything(),
+            iconClass: "sad-face",
             id: "uuid-2",
             title: "What undermines pyschological safety?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            icon: expect.anything(),
+            iconClass: "check-circle",
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -423,23 +423,23 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("wlb");
 
           expect(result).toHaveLength(3);
-          expect(result[0]).toEqual({
-            accentColor: "#008000",
-            icon: expect.anything(),
-            id: "uuid-1",
-            title: "What helps work-life balance?",
-            notes: "",
-          });
+            expect(result[0]).toEqual({
+              accentColor: "#008000",
+              iconClass: "happy-face",
+              id: "uuid-1",
+              title: "What helps work-life balance?",
+              notes: "",
+            });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            icon: expect.anything(),
+            iconClass: "sad-face",
             id: "uuid-2",
             title: "What hinders work-life balance?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            icon: expect.anything(),
+            iconClass: "check-circle",
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -452,23 +452,23 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("confidence");
 
           expect(result).toHaveLength(3);
-          expect(result[0]).toEqual({
-            accentColor: "#008000",
-            icon: expect.anything(),
-            id: "uuid-1",
-            title: "What enhances confidence in team?",
-            notes: "",
-          });
+            expect(result[0]).toEqual({
+              accentColor: "#008000",
+              iconClass: "happy-face",
+              id: "uuid-1",
+              title: "What enhances confidence in team?",
+              notes: "",
+            });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            icon: expect.anything(),
+            iconClass: "sad-face",
             id: "uuid-2",
             title: "What reduces confidence in team?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            icon: expect.anything(),
+            iconClass: "check-circle",
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -481,23 +481,23 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("efficiency");
 
           expect(result).toHaveLength(3);
-          expect(result[0]).toEqual({
-            accentColor: "#008000",
-            icon: expect.anything(),
-            id: "uuid-1",
-            title: "What increases efficiency?",
-            notes: "",
-          });
+            expect(result[0]).toEqual({
+              accentColor: "#008000",
+              iconClass: "happy-face",
+              id: "uuid-1",
+              title: "What increases efficiency?",
+              notes: "",
+            });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            icon: expect.anything(),
+            iconClass: "sad-face",
             id: "uuid-2",
             title: "What decreases efficiency?",
             notes: "",
           });
           expect(result[2]).toEqual({
             accentColor: "#0078d4",
-            icon: expect.anything(),
+            iconClass: "check-circle",
             id: "uuid-3",
             title: "One action to try next.",
             notes: "",
@@ -513,14 +513,14 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(2);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "happy-face",
           id: "uuid-1",
           title: "What went well?",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "sad-face",
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -533,14 +533,14 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(2);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "happy-face",
           id: "uuid-1",
           title: "What went well?",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "sad-face",
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -553,14 +553,14 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(2);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "happy-face",
           id: "uuid-1",
           title: "What went well?",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "sad-face",
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -573,14 +573,14 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(2);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          icon: expect.anything(),
+          iconClass: "happy-face",
           id: "uuid-1",
           title: "What went well?",
           notes: "",
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          icon: expect.anything(),
+          iconClass: "sad-face",
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -602,7 +602,7 @@ describe("boardColumnsHelper", () => {
           result.forEach((column: IFeedbackColumn) => {
             expect(column).toHaveProperty("id");
             expect(column).toHaveProperty("title");
-            expect(column).toHaveProperty("icon");
+            expect(column).toHaveProperty("iconClass");
             expect(column).toHaveProperty("accentColor");
 
             expect(typeof column.id).toBe("string");

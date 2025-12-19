@@ -151,7 +151,7 @@ describe("UI-level integration tests for ActionItem", () => {
     expect(container.firstChild).toBeTruthy();
   });
 
-  it("applies resolved-border-right class when work item state is Completed", () => {
+  it("applies resolved class when work item state is Completed", () => {
     const modifiedProps = {
       ...defaultTestProps,
       actionItem: {
@@ -164,7 +164,7 @@ describe("UI-level integration tests for ActionItem", () => {
       allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Completed", category: "Completed", color: "blue" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
-    const resolvedElement = container.querySelector(".resolved-border-right");
+    const resolvedElement = container.querySelector(".resolved");
     expect(resolvedElement).toBeTruthy();
   });
 
@@ -212,7 +212,8 @@ describe("UI-level integration tests for ActionItem", () => {
     fireEvent.click(cancelButton);
 
     await waitFor(() => {
-      expect(queryByText("Remove Work Item Link")).toBeNull();
+      const dialog = container.querySelector(".unlink-work-item-confirmation-dialog") as HTMLDialogElement;
+      expect(dialog?.open).toBe(false);
     });
   });
 
@@ -232,7 +233,7 @@ describe("UI-level integration tests for ActionItem", () => {
     });
   });
 
-  it("renders with Resolved state category and applies resolved-border-right class", () => {
+  it("renders with Resolved state category and applies resolved class", () => {
     const modifiedProps = {
       ...defaultTestProps,
       actionItem: {
@@ -245,11 +246,11 @@ describe("UI-level integration tests for ActionItem", () => {
       allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Resolved", category: "Resolved", color: "green" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
-    const resolvedElement = container.querySelector(".resolved-border-right");
+    const resolvedElement = container.querySelector(".resolved");
     expect(resolvedElement).toBeTruthy();
   });
 
-  it("does not apply resolved-border-right class for active work items", () => {
+  it("does not apply resolved class for active work items", () => {
     const modifiedProps = {
       ...defaultTestProps,
       actionItem: {
@@ -262,7 +263,7 @@ describe("UI-level integration tests for ActionItem", () => {
       allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Active", category: "InProgress", color: "blue" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
-    const resolvedElement = container.querySelector(".resolved-border-right");
+    const resolvedElement = container.querySelector(".resolved");
     expect(resolvedElement).toBeNull();
   });
 
@@ -360,7 +361,7 @@ describe("UI-level integration tests for ActionItem", () => {
     const { getByRole } = render(<ActionItem {...defaultTestProps} />);
 
     const cardButton = getByRole("button", { name: /click to open work item/i });
-    fireEvent.keyPress(cardButton, { key: "Enter", code: "Enter", charCode: 13 });
+    fireEvent.keyDown(cardButton, { key: "Enter", code: "Enter" });
 
     await waitFor(() => expect(openWorkItem).toHaveBeenCalledWith(1));
   });

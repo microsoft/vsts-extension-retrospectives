@@ -17,6 +17,8 @@ import BoardDataService from "../../dal/boardDataService";
 import { azureDevOpsCoreService } from "../../dal/azureDevOpsCoreService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { getService } from "azure-devops-extension-sdk";
+import { getBoardUrl } from "../../utilities/boardUrlHelper";
+import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -100,6 +102,14 @@ jest.mock("../../dal/userDataService");
 jest.mock("../../dal/itemDataService");
 jest.mock("../boardSummaryTable", () => () => <div data-testid="board-summary-table" />);
 jest.mock("../effectivenessMeasurementRow", () => ({ questionId }: { questionId: number }) => <div data-testid={`effectiveness-row-${questionId}`} />);
+jest.mock("../../utilities/boardUrlHelper", () => ({
+  getBoardUrl: jest.fn(() => Promise.resolve("https://example.com/board")),
+}));
+jest.mock("../../utilities/shareBoardHelper", () => ({
+  shareBoardHelper: {
+    generateEmailText: jest.fn(() => Promise.resolve("mock email body")),
+  },
+}));
 
 jest.mock("../feedbackBoard", () => {
   const MockFeedbackBoard = () => <div data-testid="feedback-board" />;
@@ -2674,14 +2684,26 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 });
 
 describe("FeedbackBoardContainer - Retro Summary Dialog", () => {
-  it("should show and hide preview email dialog", () => {
+  it("should open preview email dialog via generator", async () => {
     const instance = createStandaloneTimerInstance();
 
-    (instance as any).showPreviewEmailDialog();
-    expect(instance.state.isPreviewEmailDialogHidden).toBe(false);
+    const showModal = jest.fn();
+    const close = jest.fn();
+    (instance as any).previewEmailDialogRef.current = { showModal, close } as any;
 
-    (instance as any).hidePreviewEmailDialog();
-    expect(instance.state.isPreviewEmailDialogHidden).toBe(true);
+    instance.setState({
+      currentTeam: { id: "team-1" } as WebApiTeam,
+      currentBoard: { id: "board-1", title: "Board", activePhase: WorkflowPhase.Collect } as IFeedbackBoardDocument,
+    });
+
+    await (instance as any).generateEmailSummaryContent();
+
+    expect(getBoardUrl).toHaveBeenCalled();
+    expect(shareBoardHelper.generateEmailText).toHaveBeenCalled();
+    expect(showModal).toHaveBeenCalled();
+
+    (instance as any).previewEmailDialogRef.current?.close();
+    expect(close).toHaveBeenCalled();
   });
 
   it("should calculate effectiveness measurements for retro summary", async () => {
