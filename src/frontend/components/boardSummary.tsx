@@ -1,7 +1,6 @@
 ﻿import React from "react";
 import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { Image } from "@fluentui/react/lib/Image";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
 import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from "@fluentui/react/lib/DetailsList";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
@@ -57,7 +56,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
         minWidth: 16,
         maxWidth: 16,
         onRender: ({ icon, type }: IActionItemsTableProps) => {
-          return <Image src={icon.url} className="work-item-type-icon" alt={`${type} icon`} />;
+          return <img src={icon.url} className="work-item-type-icon" alt={`${type} icon`} />;
         },
       },
       {

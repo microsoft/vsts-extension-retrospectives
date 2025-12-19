@@ -214,14 +214,26 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .carousel-slide {
   @apply flex-none w-full relative flex items-center justify-center snap-center snap-always min-w-full;
 
+  & .back-button {
+    @apply flex items-center justify-center absolute top-1/2 left-2.5 -translate-y-1/2 z-10 bg-(--border-subtle-color) text-(--text-primary-color) cursor-pointer transition-transform duration-200 ease-in-out border border-gray-300 rounded-full w-10 h-10 shadow-sm no-underline hover:bg-white hover:shadow-md hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
+
+    &:hover {
+      @apply bg-(--border-subtle-color);
+    }
+  }
+
+  & .next-button {
+    @apply flex items-center justify-center absolute top-1/2 right-2.5 -translate-y-1/2 z-10 bg-(--border-subtle-color) text-(--text-primary-color) cursor-pointer transition-transform duration-200 ease-in-out border border-gray-300 rounded-full w-10 h-10 shadow-sm no-underline hover:bg-white hover:shadow-md hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
+
+    &:hover {
+      @apply bg-(--border-subtle-color);
+    }
+  }
+
   & .feedback-carousel-item {
     @apply w-full max-w-xl ml-[calc((100%-320px)/2)];
 
     & .related-task-sub-card {
-      @apply w-80;
-    }
-
-    & .add-action-item-wrapper {
       @apply w-80;
     }
 
@@ -268,7 +280,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &:hover {
-    @apply bg-(--background-color);
+    @apply bg-(--background-color) text-(--text-primary-color);
   }
 
   &:focus-visible {
@@ -1822,13 +1834,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index {
-  @apply w-8.5 text-white;
-}
+  @apply w-9 text-white;
 
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable,
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-neutral,
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable {
-  @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
+  &.voting-measurement-index-unfavorable,
+  &.voting-measurement-index-neutral,
+  &.voting-measurement-index-favorable {
+    @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
+  }
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-1 {
@@ -1985,7 +1997,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus {
-  @apply h-8 max-w-36 z-1 my-0 mr-auto mb-0 ml-0 py-0 pr-1 pb-0 pl-0 bg-inherit border-none flex leading-8 text-xs font-semibold text-primary;
+  @apply flex items-center h-8 max-w-36 z-1 my-0 mr-auto mb-0 ml-0 py-0 pr-1 pb-0 pl-0 bg-inherit border-none leading-8 text-xs font-semibold text-primary;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus i {

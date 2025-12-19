@@ -803,4 +803,5 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "pause-circle", tags: [], name: "Pause Circle", icon: <PauseCircleIcon /> },
   { id: "refresh", tags: [], name: "Refresh", icon: <RefreshIcon /> },
   { id: "link-off", tags: [], name: "Link Off", icon: <LinkOffIcon /> },
+  { id: "info", tags: [], name: "Info", icon: <InfoIcon /> },
 ];
