@@ -73,15 +73,6 @@ export interface ITeamEffectivenessMeasurementVoteCollection {
 export interface IFeedbackColumn {
   id: string;
   title: string;
-  /**
-   * Newer column icon representation.
-   * Optional for compatibility with older persisted board data and tests.
-   */
-  icon?: React.ReactElement;
-  /**
-   * Legacy font-awesome class representation.
-   * Kept for backwards compatibility with components/tests that still use it.
-   */
   iconClass?: string;
   accentColor: string;
   notes?: string;

@@ -14,8 +14,8 @@ import type { FocusModeModel } from "./feedbackCarousel";
 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
-import { PlayCircleIcon } from "./icons";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
+import { getIconElement } from "./icons";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -275,7 +275,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
         boardId: this.props.board.id,
         boardTitle: this.props.board.title,
         isDataLoaded: this.state.isDataLoaded,
-        icon: this.state.columns[columnId].columnProperties.icon,
+        icon: getIconElement(this.state.columns[columnId].columnProperties.iconClass),
         workflowPhase: this.props.workflowPhase,
         addFeedbackItems: this.addFeedbackItems,
         removeFeedbackItemFromColumn: this.removeFeedbackItemFromColumn,
@@ -325,10 +325,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     this.columnRefs = columnProperties.map(() => React.createRef<FeedbackColumn>());
 
     columnProperties.forEach(col => {
-      if (!col.icon) {
-        col.icon = <PlayCircleIcon />;
-      }
-
       if (!col.accentColor) {
         col.accentColor = "#0078d4";
       }

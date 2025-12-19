@@ -9,6 +9,8 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { type IColumn, type IColumnItem } from "./feedbackBoard";
+import { getIconElement } from "./icons";
+import { get } from "node:http";
 
 export interface FocusModeModel {
   columns: { [id: string]: IColumn };
@@ -69,7 +71,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
           columnId,
           columnName: column.columnProperties.title,
           accentColor: column.columnProperties.accentColor,
-          icon: column.columnProperties.icon,
+          icon: getIconElement(column.columnProperties.iconClass),
           columnItems: column.columnItems,
         };
       })
@@ -113,7 +115,7 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
       const { focusModeModel } = this.props;
 
       const itemAccentColor = focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.accentColor ?? column.accentColor;
-      const itemIcon = focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.icon ?? column.icon;
+      const itemIcon = getIconElement(focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.iconClass) ?? column.icon;
 
       const feedbackItemProps: IFeedbackItemProps = {
         id: columnItem.feedbackItem.id,
@@ -191,13 +193,13 @@ class FeedbackCarousel extends React.Component<IFeedbackCarouselProps, IFeedback
                       <li className="carousel-slide" id={`slide-${column.columnId}-${index}`} key={child.key}>
                         {index > 0 && (
                           <a href={`#slide-${column.columnId}-${index - 1}`} className={`${arrowBaseClasses} left-2.5`} aria-label="Previous slide">
-                            <i className={`fas fa-chevron-left ${arrowIconClasses}`} />
+                            {getIconElement("chevron-left")}
                           </a>
                         )}
                         <div className="carousel-viewport">{child}</div>
                         {index < feedbackCarouselItems.length - 1 && (
                           <a href={`#slide-${column.columnId}-${index + 1}`} className={`${arrowBaseClasses} right-2.5`} aria-label="Next slide">
-                            <i className={`fas fa-chevron-right ${arrowIconClasses}`} />
+                            {getIconElement("chevron-right")}
                           </a>
                         )}
                       </li>

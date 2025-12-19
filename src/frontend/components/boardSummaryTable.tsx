@@ -14,7 +14,7 @@ import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetr
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import BoardSummaryTableHeader from "./boardSummaryTableHeader";
 import BoardSummaryTableBody from "./boardSummaryTableBody";
-import { CloseIcon, DeleteIcon } from "./icons";
+import { getIconElement } from "./icons";
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -113,11 +113,11 @@ export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClic
   }
   return isTrashEnabled(board) ? (
     <div className="centered-cell trash-icon" title="Delete board" aria-label="Delete board" onClick={onClick}>
-      <DeleteIcon />
+      {getIconElement("delete")}
     </div>
   ) : (
     <div className="centered-cell trash-icon-disabled" title="Try archive before delete" aria-label="Try archive before delete">
-      <DeleteIcon />
+      {getIconElement("delete")}
     </div>
   );
 }
@@ -236,11 +236,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       id: "expand",
       header: null,
       cell: (item: IBoardSummaryTableItem) => (
-        <DefaultButton className="contextual-menu-button" aria-label="Expand Row" title="Expand Row" onClick={() => toggleExpanded(item.id)}>
-          <span className="ms-Button-icon">
-            <i className={`fas ${expandedRows.has(item.id) ? "fa-caret-down" : "fa-caret-right"}`}></i>
-          </span>
-        </DefaultButton>
+        <button className="contextual-menu-button" aria-label="Expand Row" title="Expand Row" onClick={() => toggleExpanded(item.id)}>
+          {getIconElement(expandedRows.has(item.id) ? "chevron-down" : "chevron-right")}
+        </button>
       ),
       sortable: false,
     },
@@ -300,7 +298,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       id: "trash",
       header: () => (
         <div className="centered-cell trash-icon-header" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin.">
-          <DeleteIcon />
+          {getIconElement("delete")}
         </div>
       ),
       cell: (item: IBoardSummaryTableItem) => (
@@ -494,7 +492,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
             }}
             aria-label="Close"
           >
-            <CloseIcon />
+            {getIconElement("close")}
           </button>
         </div>
         <div className="subText">

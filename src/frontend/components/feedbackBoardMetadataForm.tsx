@@ -16,7 +16,7 @@ import { reactPlugin } from "../utilities/telemetryClient";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from "./feedbackBoardMetadataFormPermissions";
 import { generateUUID } from "../utilities/random";
-import { AddIcon, AdjustIcon, AngryFaceIcon, ArrowCircleDownIcon, ArrowCircleUpIcon, CloseIcon, ConstructionIcon, DeleteIcon, ExclamationIcon, HappyFaceIcon, HelpIcon, LightBulbIcon, LockIcon, MenuBookIcon, PlayCircleIcon, RocketLaunchIcon, SadFaceIcon, StarIcon, StopCircleIcon, ThumbDownIcon, ThumbUpDownIcon, ThumbUpIcon } from "./icons";
+import { AddIcon, availableIcons, CloseIcon, getIconElement } from "./icons";
 
 export interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -72,12 +72,24 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     let defaultIsAnonymous = false;
 
     // Set defaults for a new retrospective
-    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => ({ column, markedForDeletion: false }));
+    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => ({
+      column: {
+        ...column,
+        icon: getIconElement(column.iconClass),
+      },
+      markedForDeletion: false,
+    }));
     let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: [] };
 
     // Override shared values for Copy or Edit retrospectives
     if (isCopyRetrospective || isEditRetrospective) {
-      defaultColumns = props.currentBoard.columns.map(column => ({ column, markedForDeletion: false }));
+      defaultColumns = props.currentBoard.columns.map(column => ({
+        column: {
+          ...column,
+          icon: getIconElement(column.iconClass),
+        },
+        markedForDeletion: false,
+      }));
       defaultMaxVotes = props.currentBoard.maxVotesPerUser;
       defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
       defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
@@ -241,97 +253,18 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
     const columns = getColumnsByTemplateId(event.target.value);
     this.setState({
       columnCards: columns.map(column => {
-        return { column, markedForDeletion: false };
+        return {
+          column: {
+            ...column,
+            icon: getIconElement(column.iconClass),
+          },
+          markedForDeletion: false,
+        };
       }),
     });
   };
 
-  private allIconClassNames: { friendlyName: string; icon: React.ReactElement }[] = [
-    {
-      friendlyName: "smile",
-      icon: <HappyFaceIcon />,
-    },
-    {
-      friendlyName: "frown",
-      icon: <SadFaceIcon />,
-    },
-    {
-      friendlyName: "angry",
-      icon: <AngryFaceIcon />,
-    },
-    {
-      friendlyName: "question",
-      icon: <HelpIcon />,
-    },
-    {
-      friendlyName: "exclamation",
-      icon: <ExclamationIcon />,
-    },
-    {
-      friendlyName: "rocket",
-      icon: <RocketLaunchIcon />,
-    },
-    {
-      friendlyName: "play",
-      icon: <PlayCircleIcon />,
-    },
-    {
-      friendlyName: "stop",
-      icon: <StopCircleIcon />,
-    },
-    {
-      friendlyName: "target",
-      icon: <AdjustIcon />,
-    },
-    {
-      friendlyName: "thumb-up",
-      icon: <ThumbUpIcon />,
-    },
-    {
-      friendlyName: "thumb-down",
-      icon: <ThumbDownIcon />,
-    },
-    {
-      friendlyName: "thumb-u-down",
-      icon: <ThumbUpDownIcon />,
-    },
-    {
-      friendlyName: "star",
-      icon: <StarIcon />,
-    },
-    {
-      friendlyName: "book",
-      icon: <MenuBookIcon />,
-    },
-    {
-      friendlyName: "light-bulb",
-      icon: <LightBulbIcon />,
-    },
-    {
-      friendlyName: "delete",
-      icon: <DeleteIcon />,
-    },
-    {
-      friendlyName: "add",
-      icon: <AddIcon />,
-    },
-    {
-      friendlyName: "lock",
-      icon: <LockIcon />,
-    },
-    {
-      friendlyName: "construction",
-      icon: <ConstructionIcon />,
-    },
-    {
-      friendlyName: "arrow-down",
-      icon: <ArrowCircleDownIcon />,
-    },
-    {
-      friendlyName: "arrow-up",
-      icon: <ArrowCircleUpIcon />,
-    },
-  ];
+  private allIconClassNames = availableIcons.filter(icon => icon.tags && icon.tags.length > 0);
 
   private allAccentColors: { friendlyName: string; colorCode: string }[] = [
     {
@@ -461,7 +394,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                               this.openChooseColumnIconDialog(columnCard);
                             }}
                           >
-                            {columnCard.column.icon}
+                            {getIconElement(columnCard.column.iconClass)}
                           </button>
                           <button
                             className="feedback-column-card-accent-color-button"
@@ -567,7 +500,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                       column: {
                         id: generateUUID(),
                         title: "New Column",
-                        icon: this.getRandomArrayElement(this.allIconClassNames).icon,
+                        iconClass: this.getRandomArrayElement(this.allIconClassNames).id,
                         accentColor: this.getRandomArrayElement(this.allAccentColors).colorCode,
                         notes: "",
                       },
@@ -612,20 +545,21 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   <div className="subText">{`Choose the column icon for column '${this.state.columnCardBeingEdited.column.title}'`}</div>
                   <div className="subText">
                     <div className="grid grid-cols-7 gap-2 justify-items-center items-center">
-                      {this.allIconClassNames.map(iconClassName => {
+                      {this.allIconClassNames.map(iconOption => {
                         return (
                           <button
-                            aria-label={"Choose the icon " + iconClassName.friendlyName}
+                            title={`Choose the icon: ${iconOption.name}`}
+                            aria-label={`Choose the icon: ${iconOption.name}`}
                             className="choose-feedback-column-icon-button"
-                            key={iconClassName.friendlyName}
+                            key={iconOption.id}
                             onClick={() => {
-                              this.state.columnCardBeingEdited.column.icon = iconClassName.icon;
+                              this.state.columnCardBeingEdited.column.iconClass = iconOption.id;
                               this.setState({ columnCards: [].concat(this.state.columnCards) }, () => {
                                 this.chooseColumnIconDialogRef.current?.close();
                               });
                             }}
                           >
-                            {iconClassName.icon}
+                            {getIconElement(iconOption.id)}
                           </button>
                         );
                       })}

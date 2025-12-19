@@ -12,7 +12,7 @@ import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
-import { AddIcon, CloseIcon, InfoIcon, ReviewsIcon } from "./icons";
+import { getIconElement } from "./icons";
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -447,12 +447,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           <div className="feedback-column-actions">
             {this.props.showColumnEditButton && (
               <button className="feedback-column-edit-button" title="Edit column notes" aria-label={`Edit column ${this.props.columnName}`} onClick={this.openEditDialog}>
-                <ReviewsIcon />
+                {getIconElement("reviews")}
               </button>
             )}
             {this.props.columnNotes && (
               <button className="feedback-column-info-button" title={this.props.columnNotes} aria-label={`Column notes: ${this.props.columnNotes}`}>
-                <InfoIcon />
+                {getIconElement("info")}
               </button>
             )}
           </div>
@@ -460,7 +460,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         <div className={cn("feedback-column-content", this.state.isCollapsed && "hide-collapse")}>
           {this.props.workflowPhase === WorkflowPhase.Collect && (
             <button className="create-button" title="Add new feedback" aria-label="Add new feedback" onClick={this.createEmptyFeedbackItem}>
-              <AddIcon />
+              {getIconElement("add")}
               Add new feedback
             </button>
           )}
@@ -470,7 +470,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
           <div className="header">
             <h2 className="title">Edit column notes</h2>
             <button type="button" onClick={() => this.editColumnNotesDialogRef.current?.close()} aria-label="Close">
-              <CloseIcon />
+              {getIconElement("close")}
             </button>
           </div>
           <div className="subText">

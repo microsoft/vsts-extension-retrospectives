@@ -1,7 +1,5 @@
-import React from "react";
 import { IFeedbackColumn } from "../interfaces/feedback";
 import { generateUUID } from "./random";
-import { AddCircleIcon, AddIcon, AdjustIcon, AnchorIcon, AngryFaceIcon, ArrowCircleDownIcon, ArrowCircleUpIcon, CheckCircleIcon, ConstructionIcon, DeleteIcon, ExclamationIcon, HappyFaceIcon, HelpIcon, LightBulbIcon, LockIcon, MenuBookIcon, PlayCircleIcon, RocketLaunchIcon, SadFaceIcon, StarIcon, StopCircleIcon, SupportIcon, ThumbDownIcon, ThumbUpDownIcon, ThumbUpIcon } from "../components/icons";
 
 export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] => {
   const NEXT_ACTION = "One action to try next.";
@@ -11,21 +9,21 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000", //green
-          icon: <PlayCircleIcon />,
+          iconClass: "play-circle",
           id: generateUUID(),
           title: "Start",
           notes: "",
         },
         {
           accentColor: "#cc293d", //red
-          icon: <StopCircleIcon />,
+          iconClass: "stop-circle",
           id: generateUUID(),
           title: "Stop",
           notes: "",
         },
         {
           accentColor: "#f6af08", //yellow
-          icon: <AdjustIcon />,
+          iconClass: "adjust",
           id: generateUUID(),
           title: "Continue",
           notes: "",
@@ -35,28 +33,28 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000", //green
-          icon: <HappyFaceIcon />,
+          iconClass: "happy-face",
           id: generateUUID(),
           title: "Good",
           notes: "",
         },
         {
           accentColor: "#cc293d", //red
-          icon: <SadFaceIcon />,
+          iconClass: "sad-face",
           id: generateUUID(),
           title: "Improve",
           notes: "",
         },
         {
           accentColor: "#f6af08", //yellow
-          icon: <HelpIcon />,
+          iconClass: "help",
           id: generateUUID(),
           title: "Ideas",
           notes: "",
         },
         {
           accentColor: "#0078d4", //blue
-          icon: <ExclamationIcon />,
+          iconClass: "exclamation",
           id: generateUUID(),
           title: "Thanks",
           notes: "",
@@ -66,21 +64,21 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#cc293d", //red
-          icon: <AngryFaceIcon />,
+          iconClass: "angry-face",
           id: generateUUID(),
           title: "Mad",
           notes: "",
         },
         {
           accentColor: "#f6af08", //yellow
-          icon: <SadFaceIcon />,
+          iconClass: "sad-face",
           id: generateUUID(),
           title: "Sad",
           notes: "",
         },
         {
           accentColor: "#008000", //green
-          icon: <HappyFaceIcon />,
+          iconClass: "happy-face",
           id: generateUUID(),
           title: "Glad",
           notes: "",
@@ -90,28 +88,28 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000", //green
-          icon: <ThumbUpIcon />,
+          iconClass: "thumb-up",
           id: generateUUID(),
           title: "Liked",
           notes: "",
         },
         {
           accentColor: "#0078d4", //blue
-          icon: <LightBulbIcon />,
+          iconClass: "light-bulb",
           id: generateUUID(),
           title: "Learned",
           notes: "",
         },
         {
           accentColor: "#cc293d", //red
-          icon: <ThumbDownIcon />,
+          iconClass: "thumb-down",
           id: generateUUID(),
           title: "Lacked",
           notes: "",
         },
         {
           accentColor: "#f6af08", //yellow
-          icon: <StarIcon />,
+          iconClass: "star",
           id: generateUUID(),
           title: "Longed for",
           notes: "",
@@ -121,28 +119,28 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#cc293d", //red
-          icon: <DeleteIcon />,
+          iconClass: "delete",
           id: generateUUID(),
           title: "Drop",
           notes: "",
         },
         {
           accentColor: "#008000", //green
-          icon: <AddIcon />,
+          iconClass: "add",
           id: generateUUID(),
           title: "Add",
           notes: "",
         },
         {
           accentColor: "#0078d4", //blue
-          icon: <LockIcon />,
+          iconClass: "lock",
           id: generateUUID(),
           title: "Keep",
           notes: "",
         },
         {
           accentColor: "#f6af08", //yellow
-          icon: <ConstructionIcon />,
+          iconClass: "construction",
           id: generateUUID(),
           title: "Improve",
           notes: "",
@@ -152,28 +150,28 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#0078d4", //blue
-          icon: <CheckCircleIcon />,
+          iconClass: "check-circle",
           id: generateUUID(),
           title: "Keep",
           notes: "",
         },
         {
           accentColor: "#008000", //green
-          icon: <AddCircleIcon />,
+          iconClass: "add-circle",
           id: generateUUID(),
           title: "Add",
           notes: "",
         },
         {
           accentColor: "#f6af08", //yellow
-          icon: <ArrowCircleDownIcon />,
+          iconClass: "arrow-circle-down",
           id: generateUUID(),
           title: "Less",
           notes: "",
         },
         {
           accentColor: "#8063bf", //purple
-          icon: <ArrowCircleUpIcon />,
+          iconClass: "arrow-circle-up",
           id: generateUUID(),
           title: "More",
           notes: "",
@@ -183,28 +181,28 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000", //green
-          icon: <StarIcon />,
+          iconClass: "star",
           id: generateUUID(),
           title: "Went Well",
           notes: "",
         },
         {
           accentColor: "#8063bf", //purple
-          icon: <MenuBookIcon />,
+          iconClass: "menu-book",
           id: generateUUID(),
           title: "Learned",
           notes: "",
         },
         {
           accentColor: "#0078d4", //blue
-          icon: <RocketLaunchIcon />,
+          iconClass: "rocket-launch",
           id: generateUUID(),
           title: "Accelerators",
           notes: "",
         },
         {
           accentColor: "#cc293d", //red
-          icon: <ExclamationIcon />,
+          iconClass: "exclamation",
           id: generateUUID(),
           title: "Impediments",
           notes: "",
@@ -214,28 +212,28 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000", //green
-          icon: <ThumbUpIcon />,
+          iconClass: "thumb-up",
           id: generateUUID(),
           title: "Good",
           notes: "",
         },
         {
           accentColor: "#f6af08", //yellow
-          icon: <ThumbUpDownIcon />,
+          iconClass: "thumb-up-down",
           id: generateUUID(),
           title: "So-so",
           notes: "",
         },
         {
           accentColor: "#cc293d", //red
-          icon: <ThumbDownIcon />,
+          iconClass: "thumb-down",
           id: generateUUID(),
           title: "Not-so-good",
           notes: "",
         },
         {
           accentColor: "#8063bf", //purple
-          icon: <CheckCircleIcon />,
+          iconClass: "check-circle",
           id: generateUUID(),
           title: "Done",
           notes: "",
@@ -245,28 +243,28 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000", //green
-          icon: <RocketLaunchIcon />,
+          iconClass: "rocket-launch",
           id: generateUUID(),
           title: "Propellors",
           notes: "",
         },
         {
           accentColor: "#0078d4", //blue
-          icon: <SupportIcon />,
+          iconClass: "support",
           id: generateUUID(),
           title: "Lifesavers",
           notes: "",
         },
         {
           accentColor: "#cc293d", //red
-          icon: <AnchorIcon />,
+          iconClass: "anchor",
           id: generateUUID(),
           title: "Anchors",
           notes: "",
         },
         {
           accentColor: "#f6af08", //yellow
-          icon: <ThumbDownIcon />,
+          iconClass: "thumb-down",
           id: generateUUID(),
           title: "Rocks",
           notes: "",
@@ -277,21 +275,21 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000",
-          icon: <HappyFaceIcon />,
+          iconClass: "happy-face",
           id: generateUUID(),
           title: "What provides clarity?",
           notes: "",
         },
         {
           accentColor: "#cc293d",
-          icon: <SadFaceIcon />,
+          iconClass: "sad-face",
           id: generateUUID(),
           title: "What obstructs clarity?",
           notes: "",
         },
         {
           accentColor: "#0078d4",
-          icon: <CheckCircleIcon />,
+          iconClass: "check-circle",
           id: generateUUID(),
           title: NEXT_ACTION,
           notes: "",
@@ -301,21 +299,21 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000",
-          icon: <HappyFaceIcon />,
+          iconClass: "happy-face",
           id: generateUUID(),
           title: "What boosts energy?",
           notes: "",
         },
         {
           accentColor: "#cc293d",
-          icon: <SadFaceIcon />,
+          iconClass: "sad-face",
           id: generateUUID(),
           title: "What drains energy?",
           notes: "",
         },
         {
           accentColor: "#0078d4",
-          icon: <CheckCircleIcon />,
+          iconClass: "check-circle",
           id: generateUUID(),
           title: NEXT_ACTION,
           notes: "",
@@ -325,21 +323,21 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000",
-          icon: <HappyFaceIcon />,
+          iconClass: "happy-face",
           id: generateUUID(),
           title: "What fosters psychological safety?",
           notes: "",
         },
         {
           accentColor: "#cc293d",
-          icon: <SadFaceIcon />,
+          iconClass: "sad-face",
           id: generateUUID(),
           title: "What undermines pyschological safety?",
           notes: "",
         },
         {
           accentColor: "#0078d4",
-          icon: <CheckCircleIcon />,
+          iconClass: "check-circle",
           id: generateUUID(),
           title: NEXT_ACTION,
           notes: "",
@@ -349,21 +347,21 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000",
-          icon: <HappyFaceIcon />,
+          iconClass: "happy-face",
           id: generateUUID(),
           title: "What helps work-life balance?",
           notes: "",
         },
         {
           accentColor: "#cc293d",
-          icon: <SadFaceIcon />,
+          iconClass: "sad-face",
           id: generateUUID(),
           title: "What hinders work-life balance?",
           notes: "",
         },
         {
           accentColor: "#0078d4",
-          icon: <CheckCircleIcon />,
+          iconClass: "check-circle",
           id: generateUUID(),
           title: NEXT_ACTION,
           notes: "",
@@ -373,21 +371,21 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000",
-          icon: <HappyFaceIcon />,
+          iconClass: "happy-face",
           id: generateUUID(),
           title: "What enhances confidence in team?",
           notes: "",
         },
         {
           accentColor: "#cc293d",
-          icon: <SadFaceIcon />,
+          iconClass: "sad-face",
           id: generateUUID(),
           title: "What reduces confidence in team?",
           notes: "",
         },
         {
           accentColor: "#0078d4",
-          icon: <CheckCircleIcon />,
+          iconClass: "check-circle",
           id: generateUUID(),
           title: NEXT_ACTION,
           notes: "",
@@ -397,21 +395,21 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000",
-          icon: <HappyFaceIcon />,
+          iconClass: "happy-face",
           id: generateUUID(),
           title: "What increases efficiency?",
           notes: "",
         },
         {
           accentColor: "#cc293d",
-          icon: <SadFaceIcon />,
+          iconClass: "sad-face",
           id: generateUUID(),
           title: "What decreases efficiency?",
           notes: "",
         },
         {
           accentColor: "#0078d4",
-          icon: <CheckCircleIcon />,
+          iconClass: "check-circle",
           id: generateUUID(),
           title: NEXT_ACTION,
           notes: "",
@@ -421,14 +419,14 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
       return [
         {
           accentColor: "#008000",
-          icon: <HappyFaceIcon />,
+          iconClass: "happy-face",
           id: generateUUID(),
           title: "What went well?",
           notes: "",
         },
         {
           accentColor: "#cc293d",
-          icon: <SadFaceIcon />,
+          iconClass: "sad-face",
           id: generateUUID(),
           title: "What didn't go well?",
           notes: "",

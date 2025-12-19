@@ -20,7 +20,7 @@ import { IColumn, IColumnItem } from "./feedbackBoard";
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
-import { PlayCircleIcon, StopCircleIcon } from "./icons";
+import { getIconElement, PlayCircleIcon, StopCircleIcon } from "./icons";
 
 export interface IFeedbackItemColumnContext {
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
@@ -792,8 +792,10 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
           }
         }}
       >
-        <i className={cn("fa", isFocusButton && this.state.isShowingGroupedChildrenTitles && "fa-chevron-down", isFocusButton && !this.state.isShowingGroupedChildrenTitles && "fa-chevron-right", !isFocusButton && this.props.groupedItemProps.isGroupExpanded && "fa-chevron-down", !isFocusButton && !this.props.groupedItemProps.isGroupExpanded && "fa-chevron-right")} />
-        &nbsp;
+        {isFocusButton && this.state.isShowingGroupedChildrenTitles && getIconElement("chevron-down")}
+        {isFocusButton && !this.state.isShowingGroupedChildrenTitles && getIconElement("chevron-right")}
+        {!isFocusButton && this.props.groupedItemProps.isGroupExpanded && getIconElement("chevron-down")}
+        {!isFocusButton && !this.props.groupedItemProps.isGroupExpanded && getIconElement("chevron-right")}
         {isFocusButton ? `${this.props.groupCount + 1} Items` : `${groupItemsCount} Items`}
       </button>
     );
@@ -926,7 +928,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                         this.setState({ showVotedAnimation: false });
                       }}
                     >
-                      <i className="fas fa-arrow-circle-up" />
+                      {getIconElement("arrow-circle-up")}
                     </button>
                     <span className="feedback-vote-count">{totalVotes.toString()}</span>
                     <button
@@ -947,7 +949,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                         this.setState({ showVotedAnimation: false });
                       }}
                     >
-                      <i className="fas fa-arrow-circle-down" />
+                      {getIconElement("arrow-circle-down")}
                     </button>
                   </>
                 )}
@@ -1120,7 +1122,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                     this.props.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, this.props.id, columnId);
                   }}
                 >
-                  {this.props.columns[columnId].columnProperties.icon}
+                  {getIconElement(this.props.columns[columnId].columnProperties.iconClass)}
                   {this.props.columns[columnId].columnProperties.title}
                 </DefaultButton>
               );
@@ -1159,7 +1161,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                 createdDate: searchItem.createdDate.toString(),
                 upvotes: searchItem.upvotes,
                 accentColor: searchItemColumn?.columnProperties?.accentColor ?? this.props.accentColor,
-                icon: searchItemColumn?.columnProperties?.icon ?? this.props.icon,
+                icon: getIconElement(searchItemColumn?.columnProperties?.iconClass) ?? this.props.icon,
                 workflowPhase: this.props.workflowPhase,
                 originalColumnId: searchItem.originalColumnId,
                 team: this.props.team,

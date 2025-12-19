@@ -1,9 +1,8 @@
 import React from "react";
-import { DefaultButton } from "@fluentui/react/lib/Button";
-import { TooltipHost } from "@fluentui/react/lib/Tooltip";
 
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
+import { getIconElement } from "./icons";
 
 export interface EffectivenessMeasurementRowProps {
   title: string;
@@ -40,33 +39,31 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
     this.props.onSelectedChange(selected);
   };
 
-  private readonly renderVotingButton = (value: number) => {
-    const isSelected = this.state.selected === value;
-    return (
-      <td key={value}>
-        <button type="button" className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`} aria-label={`${value}`} aria-pressed={isSelected} onClick={() => this.updateSelected(value)}>
-          <span className="team-assessment-score-circle" />
-        </button>
-      </td>
-    );
-  };
-
   public render() {
     return (
       <tr className="effectiveness-measurement-row">
-        <th scope="row" className="effectiveness-measurement-question-cell">
-          <i className={this.props.iconClass} />
-          &nbsp;&nbsp;
-          <span style={{ fontWeight: "bolder" }}>{this.props.title}</span>
-          <br />
+        <th scope="row">
+          <p>
+            {getIconElement(this.props.iconClass)}
+            {this.props.title}
+          </p>
           {this.props.subtitle}
         </th>
         <td className="effectiveness-measurement-tooltip-cell">
-          <TooltipHost hostClassName="toggle-carousel-button-tooltip-wrapper" content={<div dangerouslySetInnerHTML={{ __html: this.props.tooltip }} />} calloutProps={{ gapSpace: 0 }}>
-            <DefaultButton className="contextual-menu-button" iconProps={{ iconName: "Error" }} />
-          </TooltipHost>
+          <button className="contextual-menu-button tooltip" aria-label={this.props.tooltip} title={this.props.tooltip}>
+            {getIconElement("exclamation")}
+          </button>
         </td>
-        {this.votingScale.map(this.renderVotingButton)}
+        {this.votingScale.map((value: number) => {
+          const isSelected = this.state.selected === value;
+          return (
+            <td key={value}>
+              <button type="button" className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`} aria-label={`${value}`} aria-pressed={isSelected} onClick={() => this.updateSelected(value)}>
+                <span className="team-assessment-score-circle" />
+              </button>
+            </td>
+          );
+        })}
       </tr>
     );
   }

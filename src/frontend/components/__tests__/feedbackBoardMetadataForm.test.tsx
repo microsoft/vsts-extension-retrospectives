@@ -1574,10 +1574,7 @@ describe("FeedbackBoardMetadataForm - Dialog Dismissal", () => {
 
     // The Fluent Dialog is rendered in a portal and doesn't include an explicit close button.
     // Dismiss via overlay click (or Escape as a fallback).
-    const overlay =
-      document.body.querySelector(".retrospectives-dialog-modal .ms-Overlay") ??
-      document.body.querySelector(".retrospectives-choose-column-accent-color-dialog")?.closest(".ms-Modal")?.querySelector(".ms-Overlay") ??
-      document.body.querySelector(".ms-Overlay");
+    const overlay = document.body.querySelector(".retrospectives-dialog-modal .ms-Overlay") ?? document.body.querySelector(".retrospectives-choose-column-accent-color-dialog")?.closest(".ms-Modal")?.querySelector(".ms-Overlay") ?? document.body.querySelector(".ms-Overlay");
     if (overlay) {
       await user.click(overlay as HTMLElement);
     } else {

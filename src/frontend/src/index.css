@@ -213,10 +213,22 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .carousel-slide {
-  @apply flex-none w-full relative flex items-center justify-center snap-center snap-always min-w-full py-0 px-15;
+  @apply flex-none w-full relative flex items-center justify-center snap-center snap-always min-w-full;
 
   & .feedback-carousel-item {
-    @apply w-full max-w-xl;
+    @apply w-full max-w-xl ml-[calc((100%-320px)/2)];
+
+    & .related-task-sub-card {
+      @apply w-80;
+    }
+
+    & .add-action-item-wrapper {
+      @apply w-80;
+    }
+
+    & .feedback-item .main-item-card {
+      @apply w-80;
+    }
   }
 }
 
@@ -250,7 +262,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .contextual-menu-button {
-  @apply w-6 min-w-6 h-7.5 bg-inherit px-1 py-0 border-0 text-(--text-primary-color);
+  @apply w-4 h-4 min-w-6 bg-inherit p-0 border-0 text-(--text-primary-color);
 
   & i[data-icon-name="ChevronDown"] {
     @apply hidden;
@@ -334,14 +346,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       &.default {
         @apply bg-primary text-white border-primary;
       }
-    }
-  }
-
-  & .feedback-carousel-pivot .ms-Pivot {
-    @apply mb-5;
-
-    & .ms-Button:first-of-type {
-      @apply -ml-2;
     }
   }
 }
@@ -557,15 +561,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & .mainItemCard .card-header .feedback-expand-group {
-      @apply h-9 max-w-40 z-1 m-0 mr-auto bg-inherit border-0 flex leading-9 text-xs font-semibold;
-    }
+      @apply flex items-center h-9 max-w-40 z-1 m-0 mr-auto bg-inherit border-0 leading-9 text-xs font-semibold;
 
-    & .mainItemCard .card-header .feedback-expand-group i {
-      @apply w-9 ml-0.5 -mr-1 leading-[inherit];
-    }
+      &:focus-visible {
+        @apply outline-2 outline-primary outline-offset-2 rounded-sm;
+      }
 
-    & .mainItemCard .card-header .feedback-expand-group:focus-visible {
-      @apply outline-2 outline-primary outline-offset-2 rounded-sm;
+      & svg {
+        @apply w-9 ml-1 leading-[inherit];
+      }
     }
   }
 
@@ -1090,22 +1094,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-full;
 }
 
-.feedback-carousel-item {
-  @apply mt-1.5 mb-1.5 ml-[calc((100%-320px)/2)];
-
-  & .related-task-sub-card {
-    @apply w-80;
-  }
-
-  & .add-action-item-wrapper {
-    @apply w-80;
-  }
-
-  & .feedback-item .main-item-card {
-    @apply w-80;
-  }
-}
-
 .feedback-column {
   @apply border-r-2 border-l-2 border-(--nav-header-active-item-background) table-cell;
   @apply h-[calc(100vh-75px)];
@@ -1128,7 +1116,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column-header {
-  @apply px-4 py-2 border-b-3 border-(--nav-header-active-item-background) flex items-center justify-between gap-2;
+  @apply px-4 py-2 border-b-3 border-(--nav-header-active-item-background) flex items-center justify-between gap-2 h-14;
 
   & .feedback-column-title {
     @apply flex items-center;
@@ -1779,68 +1767,19 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply relative -ml-80 top-1.5 -z-1;
 }
 
-.info-message-bar {
-  @apply flex-row items-center;
-}
-
-/* Native message bar (replaces Fluent UI MessageBar) */
 .retro-message-bar {
-  @apply relative flex items-start gap-3 rounded border px-4 py-3 text-sm;
-}
+  @apply flex items-center px-3 py-2 text-xs bg-yellow-100 text-black/75;
 
-.retro-message-bar__content {
-  @apply flex-1 text-(--text-primary-color);
-}
-
-.retro-message-bar__actions {
-  @apply flex items-center gap-2;
-}
-
-.retro-message-bar__dismiss {
-  @apply ml-2 border-0 bg-transparent cursor-pointer text-(--text-primary-color) p-1;
-
-  &:focus-visible {
-    @apply outline-2 outline-primary outline-offset-2 rounded;
-  }
-}
-
-.retro-message-bar--info {
-  border-color: color-mix(in srgb, var(--color-primary), white 40%);
-  background-color: color-mix(in srgb, var(--color-primary), white 88%);
-}
-
-.retro-message-bar--success {
-  border-color: color-mix(in srgb, var(--color-success), white 40%);
-  background-color: color-mix(in srgb, var(--color-success), white 90%);
-}
-
-.retro-message-bar--warning {
-  border-color: color-mix(in srgb, var(--color-task-yellow), white 35%);
-  background-color: color-mix(in srgb, var(--color-task-yellow), white 88%);
-}
-
-.retro-message-bar--error {
-  border-color: color-mix(in srgb, var(--color-error), white 40%);
-  background-color: color-mix(in srgb, var(--color-error), white 90%);
-}
-
-.info-message-bar .retro-message-bar__actions {
-  @apply mb-1 mr-1 min-w-32 min-h-12;
-}
-
-.info-message-bar .retro-message-bar__actions .info-message-bar-action {
-  @apply mt-1 mr-1;
-}
-
-.info-message-bar-action-button {
-  @apply px-3 py-1 rounded border border-primary bg-white text-primary cursor-pointer;
-
-  &:hover {
-    @apply bg-primary text-white;
+  & span {
+    @apply flex-1;
   }
 
-  &:disabled {
-    @apply opacity-60 cursor-default;
+  & .actions {
+    @apply flex items-center gap-2;
+
+    & button {
+      @apply px-2 py-1 bg-gray-medium cursor-pointer;
+    }
   }
 }
 
@@ -1885,7 +1824,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index {
-  @apply text-white;
+  @apply w-8.5 text-white;
 }
 
 .team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable,
@@ -1947,11 +1886,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row th {
-  @apply font-normal;
-}
+  @apply font-normal p-2;
 
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-question-cell {
-  @apply py-2.5 pr-0 pb-2.5 pl-2.5;
+  & p {
+    @apply flex items-center gap-1;
+  }
 }
 
 .team-effectiveness-measurement-table tbody .effectiveness-measurement-row .team-assessment-score-button {

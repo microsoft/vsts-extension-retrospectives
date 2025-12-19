@@ -9,7 +9,7 @@ import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/fee
 import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 
-import { CelebrationIcon, CloseIcon, CloudDownloadIcon, CloudIcon, CloudUploadIcon, ContactPhoneIcon, HelpIcon, KeyboardIcon, MenuBookIcon, PrivacyTipIcon, VolunteerActivismIcon } from "./icons";
+import { ContactPhoneIcon, getIconElement, KeyboardIcon, VolunteerActivismIcon } from "./icons";
 
 interface IExportImportDataSchema {
   team: WebApiTeam;
@@ -51,7 +51,6 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
       return;
     }
 
-    // Don't open keyboard shortcuts on top of another open native dialog.
     const openDialog = document.querySelector("dialog[open]") as HTMLDialogElement | null;
     if (openDialog && openDialog !== keyboardDialog) {
       return;
@@ -73,7 +72,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     { keys: ["←", "→"], description: "Navigate between columns", category: "Navigation" },
     { keys: ["↑", "↓"], description: "Navigate between feedback items", category: "Navigation" },
     { keys: ["Tab"], description: "Move focus to next element", category: "Navigation" },
-    { keys: ["Shift", "Tab"], description: "Move focus to previous element", category: "Navigation" },
+    { keys: ["Shift + Tab"], description: "Move focus to previous element", category: "Navigation" },
     { keys: ["Page Up"], description: "Scroll up in column", category: "Navigation" },
     { keys: ["Page Down"], description: "Scroll down in column", category: "Navigation" },
 
@@ -188,13 +187,13 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     return (
       <div className="extension-settings-menu" ref={this.menuRootRef}>
         <button onClick={() => this.primeDirectiveDialogRef.current?.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
-          <PrivacyTipIcon />
+          {getIconElement("privacy-tip")}
           <span className="hidden lg:inline">Directive</span>
         </button>
 
         <details className="flex items-center relative">
           <summary aria-label="Data Import/Export" title="Data Import/Export" className="extension-settings-button">
-            <CloudIcon />
+            {getIconElement("cloud")}
             <span className="hidden lg:inline">Data</span>
           </summary>
 
@@ -204,7 +203,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
                 this.importData();
               }}
             >
-              <CloudUploadIcon />
+              {getIconElement("cloud-upload")}
               Import Data
             </button>
             <button
@@ -212,7 +211,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
                 this.exportData();
               }}
             >
-              <CloudDownloadIcon />
+              {getIconElement("cloud-download")}
               Export Data
             </button>
           </div>
@@ -220,7 +219,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
 
         <details className="flex items-center relative">
           <summary aria-label="Retrospective Help" title="Retrospective Help" className="extension-settings-button">
-            <HelpIcon />
+            {getIconElement("help")}
             <span className="hidden lg:inline">Help</span>
           </summary>
 
@@ -230,7 +229,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
                 this.whatsNewDialogRef.current?.showModal();
               }}
             >
-              <CelebrationIcon />
+              {getIconElement("celebration")}
               What&apos;s new
             </button>
             <button
@@ -246,7 +245,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
                 this.userGuideDialogRef.current?.showModal();
               }}
             >
-              <MenuBookIcon />
+              {getIconElement("menu-book")}
               User guide
             </button>
             <button
@@ -272,7 +271,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           <div className="header">
             <h2 className="title">The Prime Directive</h2>
             <button onClick={() => this.primeDirectiveDialogRef.current?.close()} aria-label="Close">
-              <CloseIcon />
+              {getIconElement("close")}
             </button>
           </div>
           <div className="subText">The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective. By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</div>
@@ -292,7 +291,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           <div className="header">
             <h2 className="title">What&apos;s New</h2>
             <button onClick={() => this.whatsNewDialogRef.current?.close()} aria-label="Close">
-              <CloseIcon />
+              {getIconElement("close")}
             </button>
           </div>
           <div className="subText">The latest release includes redesign of menu options, enabling mobile view, role-based permission setting, redesign of deleting boards, and implementation of sticky defaults.</div>
@@ -316,7 +315,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           <div className="header">
             <h2 className="title">Retrospectives User Guide</h2>
             <button onClick={() => this.userGuideDialogRef.current?.close()} aria-label="Close">
-              <CloseIcon />
+              {getIconElement("close")}
             </button>
           </div>
           <div className="subText">The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback. The Retrospective extension and Team Assessment feature are valuable tools supporting that process.</div>
@@ -335,7 +334,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           <div className="header">
             <h2 className="title">Volunteer</h2>
             <button onClick={() => this.volunteerDialogRef.current?.close()} aria-label="Close">
-              <CloseIcon />
+              {getIconElement("close")}
             </button>
           </div>
           <div className="subText">Help us make the Retrospective Extension even better!</div>
@@ -355,7 +354,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           <div className="header">
             <h2 className="title">Keyboard Shortcuts</h2>
             <button onClick={() => this.keyboardShortcutsDialogRef.current?.close()} aria-label="Close">
-              <CloseIcon />
+              {getIconElement("close")}
             </button>
           </div>
           <div className="subText">Use these keyboard shortcuts to navigate and interact with the retrospective board.</div>
@@ -386,7 +385,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
                         <td>
                           {shortcut.keys.map((key, idx) => (
                             <React.Fragment key={idx}>
-                              {idx > 0 && <span className="keyboard-shortcuts-key-separator">+</span>}
+                              {idx > 0 && <span className="keyboard-shortcuts-key-separator">|</span>}
                               <kbd key={key}>{key}</kbd>
                             </React.Fragment>
                           ))}

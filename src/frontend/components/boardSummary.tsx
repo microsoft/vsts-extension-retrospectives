@@ -1,13 +1,12 @@
 ﻿import React from "react";
 import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { DocumentCard, DocumentCardTitle, DocumentCardType } from "@fluentui/react/lib/DocumentCard";
 import { Image } from "@fluentui/react/lib/Image";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
 import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from "@fluentui/react/lib/DetailsList";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
-import { AssignmentTurnedInIcon, HourglassTopIcon, NoteAddIcon, SMSIcon } from "./icons";
+import { getIconElement } from "./icons";
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
@@ -265,7 +264,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
             {this.props.boardName}
           </h2>
           <div className="items-stats-container" aria-label="feedback items statistics container">
-            <SMSIcon />
+            {getIconElement("sms")}
             <div className="count-and-text" aria-label="count and text container">
               <div className="count" aria-label="feedback item count">
                 {this.props.feedbackItemsCount}
@@ -274,7 +273,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
             </div>
           </div>
           <div className="items-stats-container status-primary-text" aria-label="feedback items statistics container">
-            <NoteAddIcon />
+            {getIconElement("note-add")}
             <div className="count-and-text" aria-label="count and text container">
               <div className="count" aria-label="total work items count">
                 {this.props.actionItems.length}
@@ -283,7 +282,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
             </div>
           </div>
           <div className="items-stats-container status-warning-text" aria-label="feedback items statistics container">
-            <HourglassTopIcon />
+            {getIconElement("hourglass-top")}
             <div className="count-and-text" aria-label="count and text container">
               <div className={`count ${this.props.pendingWorkItemsCount > 0 ? "pending-action-item-color" : ""}`} aria-label="pending work items count">
                 {this.props.pendingWorkItemsCount}
@@ -292,7 +291,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
             </div>
           </div>
           <div className="items-stats-container status-success-text" aria-label="feedback items statistics container">
-            <AssignmentTurnedInIcon />
+            {getIconElement("assignment-turned-in")}
             <div className="count-and-text" aria-label="count and text container">
               <div className={`count ${this.props.resolvedActionItemsCount > 0 ? "resolved-green" : ""}`} aria-label="resolved work items count">
                 {this.props.resolvedActionItemsCount}

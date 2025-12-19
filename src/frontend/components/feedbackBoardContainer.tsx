@@ -1,5 +1,5 @@
 import React from "react";
-import { DefaultButton, IconButton, PrimaryButton } from "@fluentui/react/lib/Button";
+import { DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
 import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react/lib/Dialog";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
@@ -39,7 +39,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
-import { AddIcon, AdjustIcon, AssessmentIcon, CloseIcon, ContentCopyIcon, EditIcon, ForwardToInboxIcon, InfoIcon, InsightsIcon, InventoryIcon, LinkIcon, MoreHorizontalIcon, PauseCircleIcon, PeopleIcon, PersonIcon, PlayCircleIcon, RefreshIcon, SimCardDownloadIcon, SourceIcon } from "./icons";
+import { AddIcon, CloseIcon, ContentCopyIcon, EditIcon, ForwardToInboxIcon, getIconElement, InfoIcon, InventoryIcon, LinkIcon, MoreHorizontalIcon, PauseCircleIcon, PlayCircleIcon, RefreshIcon, SimCardDownloadIcon, SourceIcon } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -1726,7 +1726,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                     <th scope="col" className="text-left">
                                       Question
                                     </th>
-                                    <th scope="col" className="text-left">
+                                    <th scope="col" className="text-left min-w-13">
                                       Details
                                     </th>
                                     <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
@@ -1806,7 +1806,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             aria-label="Team Assessment"
                             type="button"
                           >
-                            <AssessmentIcon />
+                            {getIconElement("assessment")}
                             <span className="hidden lg:inline">Team Assessment</span>
                           </button>
                         </>
@@ -1820,7 +1820,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       {this.state.currentBoard.activePhase === WorkflowPhase.Vote && (
                         <div className="feedback-votes-count" role="status" aria-live="polite">
                           <span className="entry" title={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
-                            <PersonIcon />
+                            {getIconElement("person")}
                             <span className="hidden lg:inline">My Votes:</span> {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"}
                           </span>
                           {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 && (
@@ -1829,7 +1829,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                 |
                               </span>
                               <span className="entry" title={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`} aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
-                                <PeopleIcon />
+                                {getIconElement("people")}
                                 <span className="hidden lg:inline">Team Votes:</span> {this.state.castedVoteCount}/{this.state.teamVoteCapacity}
                               </span>
                             </>
@@ -1839,7 +1839,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       {this.state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
                           <button className="focus-mode-button" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
-                            <AdjustIcon />
+                            {getIconElement("adjust")}
                             <span>Focus Mode</span>
                           </button>
                           <dialog
@@ -1852,7 +1852,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             <div className="header">
                               <h2 className="title">Focus Mode</h2>
                               <button onClick={this.hideCarouselDialog} aria-label="Close">
-                                <CloseIcon />
+                                {getIconElement("close")}
                               </button>
                             </div>
                             <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
@@ -1868,7 +1868,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 <>
                   <div className="mx-4 vertical-tab-separator" />
                   <button className="team-assessment-history-button" onClick={this.showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
-                    <InsightsIcon />
+                    {getIconElement("insights")}
                     <span className="hidden lg:inline">Team Assessment History</span>
                   </button>
                 </>
@@ -1884,55 +1884,52 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
-                      <div className="retro-message-bar retro-message-bar--info info-message-bar" role="status" aria-live="polite">
-                        <div className="retro-message-bar__content">
+                      <>
+                        <div className="retro-message-bar">
                           <span>
                             <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
                           </span>
                         </div>
-                        <button type="button" className="retro-message-bar__dismiss" onClick={this.hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
-                          <span aria-hidden="true">×</span>
-                        </button>
-                      </div>
+                        <div className="actions">
+                          <button type="button" className="dismiss" onClick={this.hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        </div>
+                      </>
                     )}
                     {!this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected && (
-                      <div className="retro-message-bar retro-message-bar--warning info-message-bar" role="alert" aria-live="assertive">
-                        <div className="retro-message-bar__content">
-                          <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
+                      <div className="retro-message-bar" role="alert" aria-live="assertive">
+                        <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
+                        <div className="actions">
+                          <button type="button" className="dismiss" onClick={this.hideDropIssueInEdgeMessageBar} aria-label="Dismiss notification">
+                            <span aria-hidden="true">×</span>
+                          </button>
                         </div>
-                        <button type="button" className="retro-message-bar__dismiss" onClick={this.hideDropIssueInEdgeMessageBar} aria-label="Dismiss notification">
-                          <span aria-hidden="true">×</span>
-                        </button>
                       </div>
                     )}
                     {this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected && (
-                      <div className="retro-message-bar retro-message-bar--warning info-message-bar" role="alert" aria-live="assertive">
-                        <div className="retro-message-bar__content">
-                          <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
-                        </div>
-                        <div className="retro-message-bar__actions">
-                          <div className="info-message-bar-action">
-                            {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
-                            {!this.state.isReconnectingToBackendService && (
-                              <>
-                                <button type="button" className="info-message-bar-action-button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService}>
-                                  Reconnect
-                                </button>
-                                <button
-                                  type="button"
-                                  className="info-message-bar-action-button"
-                                  onClick={() => {
-                                    this.setState({ isBackendServiceConnected: true });
-                                  }}
-                                  disabled={this.state.isReconnectingToBackendService}
-                                  aria-label="Hide"
-                                  title="Hide"
-                                >
-                                  <span aria-hidden="true">×</span>
-                                </button>
-                              </>
-                            )}
-                          </div>
+                      <div className="retro-message-bar" role="alert" aria-live="assertive">
+                        <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
+                        <div className="actions">
+                          {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
+                          {!this.state.isReconnectingToBackendService && (
+                            <>
+                              <button type="button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService}>
+                                Reconnect
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  this.setState({ isBackendServiceConnected: true });
+                                }}
+                                disabled={this.state.isReconnectingToBackendService}
+                                aria-label="Hide"
+                                title="Hide"
+                              >
+                                <span aria-hidden="true">×</span>
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     )}

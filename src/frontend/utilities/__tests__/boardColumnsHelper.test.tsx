@@ -607,7 +607,7 @@ describe("boardColumnsHelper", () => {
 
             expect(typeof column.id).toBe("string");
             expect(typeof column.title).toBe("string");
-            expect(React.isValidElement(column.icon)).toBe(true);
+            expect(typeof column.iconClass).toBe("string");
             expect(typeof column.accentColor).toBe("string");
 
             expect(column.id).not.toBe("");
@@ -661,7 +661,7 @@ describe("boardColumnsHelper", () => {
         allTemplates.forEach(templateId => {
           const result = getColumnsByTemplateId(templateId);
           result.forEach(column => {
-            expect(React.isValidElement(column.icon)).toBe(true);
+            expect(typeof column.iconClass).toBe("string");
           });
         });
       });
