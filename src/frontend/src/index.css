@@ -301,6 +301,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .edit-column-notes-dialog,
 .delete-board-dialog,
 .retrospectives-choose-column-icon-dialog,
+.link-existing-work-item-dialog,
 .unlink-work-item-confirmation-dialog,
 .retrospectives-carousel-dialog {
   @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
@@ -333,6 +334,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
       & textarea {
         @apply h-20 p-2 border bg-(--background-color) text-(--text-primary-color);
+      }
+
+      & input.search-box {
+        @apply w-full p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
       }
     }
   }

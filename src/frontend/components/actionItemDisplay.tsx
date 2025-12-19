@@ -2,12 +2,9 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { IWorkItemFormNavigationService, WorkItemTrackingServiceIds } from "azure-devops-extension-api/WorkItemTracking";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { getService, getUser } from "azure-devops-extension-sdk";
-import { BaseButton, Button, DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
 import React from "react";
 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
-import Dialog, { DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
-import { SearchBox } from "@fluentui/react/lib/SearchBox";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
@@ -35,10 +32,8 @@ export interface ActionItemDisplayProps {
 
 export interface ActionItemDisplayState {
   isLinkedWorkItemLoaded: boolean;
-  isLinkExistingItemDialogHidden: boolean;
   isWorkItemTypeListCalloutVisible: boolean;
   linkedWorkItem: WorkItem;
-  workItemSearchTextboxHasErrors: boolean;
   initialRender: boolean;
 }
 
@@ -48,10 +43,8 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
 
     this.state = {
       isWorkItemTypeListCalloutVisible: false,
-      isLinkExistingItemDialogHidden: true,
       isLinkedWorkItemLoaded: false,
       linkedWorkItem: null,
-      workItemSearchTextboxHasErrors: false,
       initialRender: true,
     };
   }
@@ -59,6 +52,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
   private readonly addWorkItemButtonRef = React.createRef<HTMLButtonElement>();
   private readonly addWorkItemMenuRef = React.createRef<HTMLDivElement>();
   private readonly addWorkItemWrapperRef = React.createRef<HTMLDivElement>();
+  private readonly linkExistingWorkItemDialogRef = React.createRef<HTMLDialogElement>();
 
   componentDidMount() {
     if (this.state.initialRender) {
@@ -145,17 +139,18 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     this.hideSelectorCallout();
   };
 
-  private readonly handleClickWorkItemType = (event: React.MouseEvent<Button | HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | HTMLSpanElement>, item: WorkItemType) => {
+  private readonly handleClickWorkItemType = (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | HTMLSpanElement>, item: WorkItemType) => {
     event && event.stopPropagation();
     this.hideSelectorCallout();
     this.addActionItem(item.name);
   };
 
-  private readonly handleInputChange = async (event?: React.ChangeEvent<HTMLInputElement>, newValue?: string) => {
+  private readonly handleInputChange = async (event?: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event?.target.value;
+
     if (!newValue?.trim()) {
       this.setState({
         isLinkedWorkItemLoaded: false,
-        workItemSearchTextboxHasErrors: false,
       });
       return;
     }
@@ -164,7 +159,6 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
 
     if (!workItemId) {
       this.setState({
-        workItemSearchTextboxHasErrors: true,
         isLinkedWorkItemLoaded: false,
       });
       return;
@@ -174,13 +168,10 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
     this.setState({
       isLinkedWorkItemLoaded: true,
       linkedWorkItem: workItem[0] ? workItem[0] : null,
-      workItemSearchTextboxHasErrors: false,
     });
   };
 
   private readonly linkExistingWorkItem = async () => {
-    this.linkExistingItemDialogDismiss();
-
     if (this.state.linkedWorkItem) {
       const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(this.props.boardId, this.props.feedbackItemId, this.state.linkedWorkItem.id);
 
@@ -188,27 +179,18 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
 
       this.props.onUpdateActionItem(updatedFeedbackItem);
     }
+
+    this.linkExistingWorkItemDialogRef.current?.close();
   };
 
-  private readonly handleLinkExistingWorkItemClick = (mouseEvent: React.MouseEvent<Button | HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton> = undefined) => {
+  private readonly handleLinkExistingWorkItemClick = (mouseEvent: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement> = undefined) => {
     if (mouseEvent) {
       mouseEvent.stopPropagation();
     }
 
     this.hideSelectorCallout();
 
-    this.setState({
-      isLinkedWorkItemLoaded: false,
-      linkedWorkItem: null,
-      isLinkExistingItemDialogHidden: false,
-      workItemSearchTextboxHasErrors: false,
-    });
-  };
-
-  private readonly linkExistingItemDialogDismiss = () => {
-    this.setState({
-      isLinkExistingItemDialogHidden: true,
-    });
+    this.linkExistingWorkItemDialogRef.current?.showModal();
   };
 
   public render(): React.JSX.Element {
@@ -249,30 +231,31 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
           </div>
         )}
         {this.renderAllWorkItemCards()}
-        <Dialog
-          hidden={this.state.isLinkExistingItemDialogHidden}
-          onDismiss={this.linkExistingItemDialogDismiss}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: "Link existing work item",
-          }}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: "retrospectives-link-existing-work-item-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          <SearchBox autoFocus={true} placeholder="Enter the exact work item id" aria-label="Enter the exact work item id" onChange={this.handleInputChange} className="work-item-id-input" />
-          <div className="error-container">{this.state.workItemSearchTextboxHasErrors && <span className="input-validation-message">Work item ids have to be positive numbers only.</span>}</div>
-          <div className="output-container">
-            {this.state.isLinkedWorkItemLoaded && this.state.linkedWorkItem && this.renderWorkItemCard(this.state.linkedWorkItem, true)}
-            {this.state.isLinkedWorkItemLoaded && !this.state.linkedWorkItem && <div className="work-item-not-found">The work item you are looking for was not found. Please verify the id.</div>}
+        <dialog ref={this.linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog" aria-label="Link existing work item" onClose={() => this.linkExistingWorkItemDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Link existing work item</h2>
+            <button onClick={() => this.linkExistingWorkItemDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
           </div>
-          <DialogFooter>
-            <PrimaryButton disabled={!this.state.linkedWorkItem} onClick={this.linkExistingWorkItem} text="Link work item" />
-            <DefaultButton onClick={this.linkExistingItemDialogDismiss} text="Cancel" />
-          </DialogFooter>
-        </Dialog>
+          <div className="subText">
+            <div className="form-group">
+              <input className="search-box" placeholder="Enter the exact work item id" role="searchbox" onChange={this.handleInputChange}></input>
+              <div className="output-container">
+                {this.state.isLinkedWorkItemLoaded && this.state.linkedWorkItem && this.renderWorkItemCard(this.state.linkedWorkItem, true)}
+                {this.state.isLinkedWorkItemLoaded && !this.state.linkedWorkItem && <div className="work-item-not-found">The work item you are looking for was not found. Please verify the id.</div>}
+              </div>
+            </div>
+          </div>
+          <div className="inner">
+            <button className="button" disabled={!this.state.linkedWorkItem} onClick={this.linkExistingWorkItem}>
+              Link work item
+            </button>
+            <button className="default button" onClick={() => this.linkExistingWorkItemDialogRef.current?.close()}>
+              Cancel
+            </button>
+          </div>
+        </dialog>
       </div>
     );
   }
