@@ -71,7 +71,6 @@ export interface FeedbackBoardContainerState {
   projectTeams: WebApiTeam[];
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
-  isPreviewEmailDialogHidden: boolean;
   isRetroSummaryDialogHidden: boolean;
   isBoardCreationDialogHidden: boolean;
   isBoardDuplicateDialogHidden: boolean;
@@ -156,7 +155,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isLiveSyncInTfsIssueMessageBarVisible: true,
       isMobileBoardActionsDialogHidden: true,
       isMobileTeamSelectorDialogHidden: true,
-      isPreviewEmailDialogHidden: true,
       isRetroSummaryDialogHidden: true,
       isReconnectingToBackendService: false,
       isSummaryDashboardVisible: false,
@@ -192,6 +190,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private boardTimerIntervalId?: number;
   private carouselDialogRef: HTMLDialogElement | null = null;
+  private readonly previewEmailDialogRef = React.createRef<HTMLDialogElement>();
   private readonly boardActionsMenuRootRef = React.createRef<HTMLDivElement>();
   private readonly archiveBoardDialogRef = React.createRef<HTMLDialogElement>();
 
@@ -1219,10 +1218,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isBoardCreationDialogHidden: true });
   };
 
-  private readonly showPreviewEmailDialog = (): void => {
-    this.setState({ isPreviewEmailDialogHidden: false });
-  };
-
   private readonly showRetroSummaryDialog = async () => {
     const measurements: { id: number; selected: number }[] = [];
 
@@ -1287,10 +1282,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       effectivenessMeasurementChartData: chartData,
       effectivenessMeasurementSummary: average,
     });
-  };
-
-  private readonly hidePreviewEmailDialog = (): void => {
-    this.setState({ isPreviewEmailDialogHidden: true });
   };
 
   private readonly hideRetroSummaryDialog = (): void => {
@@ -1372,6 +1363,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   };
 
   private readonly showEmailCopiedToast = () => {
+    copyToClipboard(this.state.currentBoard.emailContent);
     toast(`The email summary for "${this.state.currentBoard.title}" has been copied to your clipboard.`);
   };
 
@@ -1403,6 +1395,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   private readonly generateCSVContent = async () => {
     await shareBoardHelper.generateCSVContent(this.state.currentBoard);
+  };
+
+  private readonly generateEmailSummaryContent = async () => {
+    const boardUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
+    const emailContent = await shareBoardHelper.generateEmailText(this.state.currentBoard, boardUrl, false);
+    this.setState({ currentBoard: { ...this.state.currentBoard, emailContent: emailContent } });
+
+    this.previewEmailDialogRef?.current?.showModal();
   };
 
   private readonly renderBoardUpdateMetadataFormDialog = (isNewBoardCreation: boolean, isDuplicatingBoard: boolean, hidden: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => void, onCancel: () => void) => {
@@ -1678,7 +1678,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             <SimCardDownloadIcon />
                             Export CSV content
                           </button>
-                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => this.handleBoardActionMenuItemClick(this.showPreviewEmailDialog, event)}>
+                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => this.handleBoardActionMenuItemClick(this.generateEmailSummaryContent, event)}>
                             <ForwardToInboxIcon />
                             Create email summary
                           </button>
@@ -1982,20 +1982,23 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
         {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
         {this.state.currentBoard && this.renderBoardUpdateMetadataFormDialog(false, false, this.state.isBoardUpdateDialogHidden, this.hideBoardUpdateDialog, "Edit retrospective", "", this.updateBoardMetadata, this.hideBoardUpdateDialog)}
-        <Dialog
-          hidden={this.state.isPreviewEmailDialogHidden}
-          onDismiss={this.hidePreviewEmailDialog}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: "Email summary",
-          }}
-          modalProps={{
-            containerClassName: "retrospectives-preview-email-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          <FeedbackBoardPreviewEmail teamId={this.state.currentTeam.id} board={this.state.currentBoard} onCopy={this.showEmailCopiedToast} />
-        </Dialog>
+        <dialog ref={this.previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" onClose={() => this.previewEmailDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Email summary</h2>
+            <button onClick={() => this.previewEmailDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">
+            <div className="form-group">
+              <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={this.showEmailCopiedToast}>
+                {getIconElement("content-copy")}
+                Copy to clipboard
+              </button>
+              <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={this.state.currentBoard.emailContent}></textarea>
+            </div>
+          </div>
+        </dialog>
         <Dialog
           hidden={this.state.isRetroSummaryDialogHidden}
           onDismiss={this.hideRetroSummaryDialog}

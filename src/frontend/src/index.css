@@ -315,6 +315,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .retrospectives-choose-column-icon-dialog,
 .link-existing-work-item-dialog,
 .unlink-work-item-confirmation-dialog,
+.preview-email-dialog,
 .retrospectives-carousel-dialog {
   @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
@@ -344,6 +345,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     & .form-group {
       @apply flex flex-col gap-2;
 
+      & button {
+        @apply flex items-center gap-1 cursor-pointer;
+
+        & svg {
+          @apply w-4 h-4;
+        }
+      }
+
       & textarea {
         @apply h-20 p-2 border bg-(--background-color) text-(--text-primary-color);
       }
@@ -365,6 +374,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
     }
   }
+}
+
+.preview-email-content {
+  @apply h-80!;
 }
 
 .choose-feedback-column-icon-button {
@@ -533,26 +546,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
     }
   }
-}
-
-.retrospectives-preview-email-dialog {
-  @apply max-w-none w-200 h-125 bg-(--background-color) border border-border-gray;
-
-  & div[role="heading"] {
-    @apply text-(--text-primary-color);
-  }
-
-  & .copy-email-button {
-    @apply text-(--text-primary-color);
-  }
-
-  & textarea {
-    @apply bg-(--background-color) text-(--text-primary-color);
-  }
-}
-
-.preview-email-spinner {
-  @apply mt-40;
 }
 
 .feedback-item-group {

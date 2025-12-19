@@ -28,6 +28,7 @@ export interface IFeedbackBoardDocument {
   maxVotesPerUser: number;
   boardVoteCollection: { [voter: string]: number };
   teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[];
+  emailContent?: string;
   permissions?: IFeedbackBoardDocumentPermissions;
   isPublic?: boolean;
   isArchived?: boolean;
