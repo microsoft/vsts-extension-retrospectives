@@ -335,7 +335,6 @@ describe("UI-level integration tests for ActionItem", () => {
 
     act(() => {
       actionItemRef.current?.setState({
-        isUnlinkWorkItemConfirmationDialogHidden: true,
         linkedWorkItem: { id: 1 } as WorkItem,
         workItemSearchTextboxHasErrors: false,
       });

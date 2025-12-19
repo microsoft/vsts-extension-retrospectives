@@ -721,6 +721,16 @@ export const GearsIcon = () => {
   );
 };
 
+export const LinkOffIcon = () => {
+  return (
+    <svg className="icon-link-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M17 7h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.43-.98 2.63-2.31 2.98l1.46 1.46C20.88 15.61 22 13.95 22 12c0-2.76-2.24-5-5-5zm-1 4h-2.19l2 2H16zM2 4.27l3.11 3.11C3.29 8.12 2 9.91 2 12c0 2.76 2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1 0-1.59 1.21-2.9 2.76-3.07L8.73 11H8v2h2.73L13 15.27V17h1.73l4.01 4L20 19.74 3.27 3 2 4.27z" />
+      <path d="M0 24V0" fill="none" />
+    </svg>
+  );
+};
+
 export function getIconElement(iconId: string | undefined | null): React.ReactElement {
   const foundIcon = availableIcons.find(icon => icon.id === iconId || icon.tags.includes(iconId));
 
@@ -786,4 +796,11 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "chevron-left", tags: [], name: "Chevron Left", icon: <ChevronLeftIcon /> },
   { id: "chevron-down", tags: [], name: "Chevron Down", icon: <ChevronDownIcon /> },
   { id: "chevron-right", tags: [], name: "Chevron Right", icon: <ChevronRightIcon /> },
+  { id: "privacy-tip", tags: [], name: "Privacy Tip", icon: <PrivacyTipIcon /> },
+  { id: "keyboard", tags: [], name: "Keyboard", icon: <KeyboardIcon /> },
+  { id: "volunteer-activism", tags: [], name: "Volunteer Activism", icon: <VolunteerActivismIcon /> },
+  { id: "contact-phone", tags: [], name: "Contact Phone", icon: <ContactPhoneIcon /> },
+  { id: "pause-circle", tags: [], name: "Pause Circle", icon: <PauseCircleIcon /> },
+  { id: "refresh", tags: [], name: "Refresh", icon: <RefreshIcon /> },
+  { id: "link-off", tags: [], name: "Link Off", icon: <LinkOffIcon /> },
 ];

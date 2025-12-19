@@ -516,7 +516,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
         <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"}. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
-          {this.state.isBoardTimerRunning ? <PauseCircleIcon /> : <PlayCircleIcon />}
+          {this.state.isBoardTimerRunning ? getIconElement("pause-circle") : getIconElement("play-circle")}
         </button>
         {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
           <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
@@ -531,7 +531,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <span className={this.state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
         )}
         <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
-          <RefreshIcon />
+          {getIconElement("refresh")}
         </button>
       </div>
     );

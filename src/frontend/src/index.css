@@ -33,8 +33,7 @@
   }
 
   .feedback-card-surface {
-    @apply bg-transparent! z-1 border! border-border-gray!;
-    border: 1px solid var(--color-border-gray) !important;
+    @apply bg-transparent! border! border-border-gray!;
   }
 }
 
@@ -262,14 +261,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .contextual-menu-button {
-  @apply w-4 h-4 min-w-6 bg-inherit p-0 border-0 text-(--text-primary-color);
+  @apply w-4 min-w-6 bg-inherit p-0 border-0 text-(--text-primary-color);
 
   & i[data-icon-name="ChevronDown"] {
     @apply hidden;
   }
 
   &:hover {
-    @apply bg-(--background-color) text-(--text-primary-color);
+    @apply bg-(--background-color);
   }
 
   &:focus-visible {
@@ -302,6 +301,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .edit-column-notes-dialog,
 .delete-board-dialog,
 .retrospectives-choose-column-icon-dialog,
+.unlink-work-item-confirmation-dialog,
 .retrospectives-carousel-dialog {
   @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
@@ -659,7 +659,27 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .related-task-sub-card {
-  @apply h-9 m-0 max-w-full border-0 bg-(--background-color) text-(--text-primary-color);
+  @apply flex items-center max-w-full bg-(--background-color) text-(--text-primary-color);
+
+  & .work-item-type-icon {
+    @apply w-4 h-4 m-2;
+  }
+
+  & .details {
+    @apply flex-1 whitespace-nowrap overflow-hidden text-xs text-(--text-primary-color) text-ellipsis cursor-pointer;
+  }
+
+  & .action {
+    @apply m-2 cursor-pointer;
+
+    &:hover {
+      @apply text-primary;
+    }
+
+    & svg {
+      @apply w-4 h-4;
+    }
+  }
 
   & .task-yellow {
     @apply text-task-yellow;
@@ -669,36 +689,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply text-error;
   }
 
-  & .ms-Image-image {
-    @apply w-4;
-  }
-
-  & .ms-Button--icon {
-    @apply bg-(--background-color);
-
-    & .ms-Button-icon:hover {
-      @apply text-primary;
-    }
-  }
-
-  & .ms-DocumentCard-details {
-    @apply flex-1 cursor-pointer;
-  }
-
-  & .ms-DocumentCardPreview-iconContainer2 {
-    @apply w-8;
-  }
-
-  & .ms-DocumentCardTitle {
-    @apply leading-2.5 whitespace-nowrap overflow-hidden text-xs text-(--text-primary-color) content-center;
-  }
-
-  &.resolved-border-right {
+  &.resolved {
     @apply border-r-3 border-success;
-
-    &:hover {
-      border-right-color: var(--color-success);
-    }
   }
 }
 
@@ -715,14 +707,18 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .add-action-item-wrapper {
-  @apply flex max-w-full bg-(--nav-vertical-background-color);
+  @apply flex justify-end bg-(--nav-vertical-background-color);
 
-  & .feedback-spacer {
-    @apply flex-1;
-  }
+  & .add-action-item-button {
+    @apply flex items-center m-2 text-(--text-primary-color) text-sm cursor-pointer;
 
-  & .add-action-item-section .add-action-item-button {
-    @apply h-8 text-(--text-primary-color);
+    &:hover {
+      @apply text-primary;
+    }
+
+    & svg {
+      @apply w-5 h-5 text-primary;
+    }
   }
 }
 
@@ -731,7 +727,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .action-items {
-  @apply border-l border-border-gray;
+  @apply border-l-3 border-border-gray;
 
   & .work-item-type-icon-container {
     @apply bg-(--background-color);
@@ -758,27 +754,24 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.add-action-item-callout .ms-Callout-main {
-  @apply max-h-9/10;
+.popout-container {
+  @apply absolute mt-3 bg-[rgb(var(--palette-neutral-6))] text-sm shadow-lg min-w-60 z-10;
 
-  & .work-item-list-divider {
-    @apply border border-gray-light;
-  }
+  & .list-item {
+    @apply flex items-center gap-2 cursor-pointer p-2 bg-inherit w-full border-0 overflow-hidden text-(--text-primary-color);
 
-  & .add-action-item-list-container {
-    @apply bg-(--background-color);
-
-    & svg {
+    & svg,
+    & img {
       @apply w-4 h-4;
     }
 
-    & .add-action-item-list-item {
-      @apply flex cursor-pointer pl-2 items-center justify-start bg-inherit w-full border-0 overflow-hidden text-(--text-primary-color);
-
-      & .add-action-item-list-item-text {
-        @apply leading-8 ml-2 text-sm font-normal overflow-hidden whitespace-nowrap text-ellipsis text-(--text-primary-color);
-      }
+    &:hover {
+      @apply text-primary;
     }
+  }
+
+  & .separator {
+    @apply border-t border-(--border-subtle-color);
   }
 }
 
@@ -1929,7 +1922,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedbackItem {
-  @apply my-0 mr-3 mb-3 ml-0 break-inside-avoid inline-block align-top w-full min-w-64 box-border;
+  @apply m-0 mr-3 mb-3 break-inside-avoid inline-block align-top w-full min-w-64 box-border;
 }
 
 .feedbackItem:focus {

@@ -237,7 +237,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
                 this.keyboardShortcutsDialogRef.current?.showModal();
               }}
             >
-              <KeyboardIcon />
+              {getIconElement("keyboard")}
               Keyboard shortcuts
             </button>
             <button
@@ -253,7 +253,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
                 this.volunteerDialogRef.current?.showModal();
               }}
             >
-              <VolunteerActivismIcon />
+              {getIconElement("volunteer-activism")}
               Volunteer
             </button>
             <button
@@ -261,7 +261,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
                 window.open("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank");
               }}
             >
-              <ContactPhoneIcon />
+              {getIconElement("contact-phone")}
               Contact us
             </button>
           </div>
