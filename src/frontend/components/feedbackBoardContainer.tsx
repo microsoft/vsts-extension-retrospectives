@@ -1399,7 +1399,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private readonly generateEmailSummaryContent = async () => {
     const boardUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
     const emailContent = await shareBoardHelper.generateEmailText(this.state.currentBoard, boardUrl, false);
-    this.setState({ currentBoard: { ...this.state.currentBoard, emailContent: emailContent } });
+    this.setState(prevState => ({
+      currentBoard: { ...prevState.currentBoard, emailContent: emailContent }
+    }));
 
     this.previewEmailDialogRef?.current?.showModal();
   };
