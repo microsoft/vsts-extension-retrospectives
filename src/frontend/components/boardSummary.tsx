@@ -1,12 +1,11 @@
 ﻿import React from "react";
 import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { DocumentCard, DocumentCardTitle, DocumentCardType } from "@fluentui/react/lib/DocumentCard";
-import { Image } from "@fluentui/react/lib/Image";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
 import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from "@fluentui/react/lib/DetailsList";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
+import { getIconElement } from "./icons";
 
 export interface IBoardSummaryProps {
   actionItems: WorkItem[];
@@ -57,7 +56,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
         minWidth: 16,
         maxWidth: 16,
         onRender: ({ icon, type }: IActionItemsTableProps) => {
-          return <Image src={icon.url} className="work-item-type-icon" alt={`${type} icon`} />;
+          return <img src={icon.url} className="work-item-type-icon" alt={`${type} icon`} />;
         },
       },
       {
@@ -259,12 +258,12 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
   public render() {
     return (
       <div className="board-summary-container" aria-label="Retrospective history container">
-        <DocumentCard className="board-summary-card" type={DocumentCardType.normal} aria-label="Retrospective history card">
-          <div className="ms-DocumentCard-details board-summary-card-title">
-            <DocumentCardTitle title={this.props.boardName} shouldTruncate={false} aria-label="Retrospective name" />
-          </div>
+        <div className="board-summary-card" aria-label="Retrospective history card">
+          <h2 title={this.props.boardName} aria-label="Retrospective name">
+            {this.props.boardName}
+          </h2>
           <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon fas fa-comment-dots"></i>
+            {getIconElement("sms")}
             <div className="count-and-text" aria-label="count and text container">
               <div className="count" aria-label="feedback item count">
                 {this.props.feedbackItemsCount}
@@ -272,8 +271,8 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
               <div className="text">Feedback items created.</div>
             </div>
           </div>
-          <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon fa-regular fa-square-plus"></i>
+          <div className="items-stats-container status-primary-text" aria-label="feedback items statistics container">
+            {getIconElement("note-add")}
             <div className="count-and-text" aria-label="count and text container">
               <div className="count" aria-label="total work items count">
                 {this.props.actionItems.length}
@@ -281,8 +280,8 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
               <div className="text">Work items created.</div>
             </div>
           </div>
-          <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon pending-action-item-color fa-solid fa-hourglass-half"></i>
+          <div className="items-stats-container status-warning-text" aria-label="feedback items statistics container">
+            {getIconElement("hourglass-top")}
             <div className="count-and-text" aria-label="count and text container">
               <div className={`count ${this.props.pendingWorkItemsCount > 0 ? "pending-action-item-color" : ""}`} aria-label="pending work items count">
                 {this.props.pendingWorkItemsCount}
@@ -290,8 +289,8 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
               <div className="text">Work items pending.</div>
             </div>
           </div>
-          <div className="items-stats-container" aria-label="feedback items statistics container">
-            <i className="stats-icon resolved-green fa-solid fa-clipboard-check"></i>
+          <div className="items-stats-container status-success-text" aria-label="feedback items statistics container">
+            {getIconElement("assignment-turned-in")}
             <div className="count-and-text" aria-label="count and text container">
               <div className={`count ${this.props.resolvedActionItemsCount > 0 ? "resolved-green" : ""}`} aria-label="resolved work items count">
                 {this.props.resolvedActionItemsCount}
@@ -299,7 +298,7 @@ export class BoardSummary extends React.Component<IBoardSummaryProps, IBoardSumm
               <div className="text">Work items resolved.</div>
             </div>
           </div>
-        </DocumentCard>
+        </div>
         <div className="action-items-summary-card">
           {this.props.actionItems.length > 0 && <DetailsList items={this.state.actionItemTableItems} compact={false} columns={this.state.actionItemTableColumns} selectionMode={SelectionMode.none} setKey="set" layoutMode={DetailsListLayoutMode.justified} isHeaderVisible={true} selectionPreservedOnEmptyClick={true} onItemInvoked={this.onItemInvoked} />}
           {this.props.actionItems.length === 0 && <div className="no-action-items">Looks like no work items were created for this board.</div>}

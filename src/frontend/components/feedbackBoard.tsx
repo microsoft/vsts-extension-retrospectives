@@ -6,17 +6,16 @@ import { workService } from "../dal/azureDevOpsWorkService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../dal/itemDataService";
 import { reflectBackendService } from "../dal/reflectBackendService";
-import FeedbackColumn from "./feedbackColumn";
+import FeedbackColumn, { type FeedbackColumnProps } from "./feedbackColumn";
 import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from "../interfaces/feedback";
 import { ExceptionCode } from "../interfaces/retrospectiveState";
 import { WorkflowPhase } from "../interfaces/workItem";
+import type { FocusModeModel } from "./feedbackCarousel";
 
-import FeedbackCarousel from "./feedbackCarousel";
-import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
-import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
-import { useGlobalKeyboardShortcuts } from "../utilities/useKeyboardNavigation";
+import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
+import { getIconElement } from "./icons";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -28,8 +27,7 @@ export interface FeedbackBoardProps {
   allWorkItemTypes: WorkItemType[];
   isAnonymous: boolean;
   hideFeedbackItems: boolean;
-  isCarouselDialogHidden: boolean;
-  hideCarouselDialog: () => void;
+  onFocusModeModelChange?: (model: FocusModeModel) => void;
   userId: string;
   onVoteCasted?: () => void;
   onColumnNotesChange?: (columnId: string, notes: string) => Promise<void>;
@@ -93,22 +91,105 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     reflectBackendService.onReceiveUpdatedItem(this.receiveUpdatedItemHandler);
 
     this.setupKeyboardShortcuts();
+
+    this.props.onFocusModeModelChange?.(this.getFocusModeModel());
   }
+
+  public async componentDidUpdate(prevProps: FeedbackBoardProps, prevState: FeedbackBoardState) {
+    if (prevProps.board.id !== this.props.board.id) {
+      this.setState({
+        isDataLoaded: false,
+        columns: {},
+        columnIds: [],
+        hasItems: false,
+        columnNotes: {},
+        activeTimerFeedbackItemId: null,
+      });
+      this.initColumns();
+      await this.getAllBoardFeedbackItems();
+    }
+
+    if (prevProps.board.modifiedDate !== this.props.board.modifiedDate) {
+      this.setState({ columnNotes: {}, activeTimerFeedbackItemId: null });
+      this.initColumns();
+      await this.getAllBoardFeedbackItems();
+    }
+
+    if (prevProps.team.id !== this.props.team.id) {
+      await this.setDefaultIterationAndAreaPath(this.props.team.id);
+    }
+
+    const shouldUpdateFocusModeList = prevProps.board.id !== this.props.board.id || prevProps.team.id !== this.props.team.id || prevProps.workflowPhase !== this.props.workflowPhase || prevProps.hideFeedbackItems !== this.props.hideFeedbackItems || prevProps.isAnonymous !== this.props.isAnonymous || prevProps.userId !== this.props.userId || prevState.columns !== this.state.columns || prevState.columnIds !== this.state.columnIds || prevState.columnNotes !== this.state.columnNotes || prevState.isDataLoaded !== this.state.isDataLoaded || prevState.activeTimerFeedbackItemId !== this.state.activeTimerFeedbackItemId;
+
+    if (shouldUpdateFocusModeList) {
+      this.props.onFocusModeModelChange?.(this.getFocusModeModel());
+    }
+  }
+
+  private readonly getFocusModeModel = (): FocusModeModel => {
+    return {
+      columns: this.state.columns,
+      columnIds: this.state.columnIds,
+      workflowPhase: this.props.workflowPhase,
+      team: this.props.team,
+      boardId: this.props.board.id,
+      boardTitle: this.props.board.title,
+      defaultActionItemAreaPath: this.state.defaultActionItemAreaPath,
+      defaultActionItemIteration: this.state.defaultActionItemIteration,
+      nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
+      allWorkItemTypes: this.props.allWorkItemTypes,
+      hideFeedbackItems: this.props.hideFeedbackItems,
+      onVoteCasted: () => {
+        this.props.onVoteCasted?.();
+      },
+      activeTimerFeedbackItemId: this.state.activeTimerFeedbackItemId,
+      requestTimerStart: this.requestTimerStart,
+      notifyTimerStopped: this.handleTimerStopped,
+      addFeedbackItems: this.addFeedbackItems,
+      removeFeedbackItemFromColumn: this.removeFeedbackItemFromColumn,
+      refreshFeedbackItems: this.refreshFeedbackItems,
+    };
+  };
 
   private setupKeyboardShortcuts = () => {
     document.addEventListener("keydown", this.handleBoardKeyDown);
   };
 
+  private getColumnIndexFromElement = (element: Element | null): number | null => {
+    if (!element) {
+      return null;
+    }
+
+    const columnElement = element.closest("[data-column-id]");
+    const columnId = columnElement?.getAttribute("data-column-id");
+    if (!columnId) {
+      return null;
+    }
+
+    const index = this.state.columnIds.indexOf(columnId);
+    return index >= 0 ? index : null;
+  };
+
   private handleBoardKeyDown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || document.querySelector('[role="dialog"]')) {
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || isAnyModalDialogOpen()) {
       return;
     }
 
+    const targetColumnIndex = this.getColumnIndexFromElement(target) ?? this.getColumnIndexFromElement(document.activeElement) ?? this.state.focusedColumnIndex;
+
     switch (e.key) {
-      case "?":
-        e.preventDefault();
-        this.setState({ isKeyboardShortcutsDialogOpen: true });
+      case "ArrowUp":
+        if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.defaultPrevented) {
+          e.preventDefault();
+          this.columnRefs[targetColumnIndex]?.current?.navigateByKeyboard("prev");
+        }
+        break;
+      case "ArrowDown":
+        if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.defaultPrevented) {
+          e.preventDefault();
+          this.columnRefs[targetColumnIndex]?.current?.navigateByKeyboard("next");
+        }
         break;
       case "ArrowLeft":
         if (!e.shiftKey && !e.ctrlKey && !e.altKey) {
@@ -156,46 +237,73 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
   };
 
   private navigateToColumnByIndex = (index: number) => {
-    if (index >= 0 && index < this.columnRefs.length && this.columnRefs[index]?.current) {
-      this.setState({ focusedColumnIndex: index });
-      this.columnRefs[index].current?.focusColumn();
+    if (index < 0 || index >= this.columnRefs.length) {
+      return;
     }
+
+    const columnRef = this.columnRefs[index];
+
+    this.setState({ focusedColumnIndex: index }, () => {
+      columnRef?.current?.focusColumn();
+    });
   };
 
   private closeKeyboardShortcutsDialog = () => {
     this.setState({ isKeyboardShortcutsDialogOpen: false });
   };
 
-  public async componentDidUpdate(prevProps: FeedbackBoardProps) {
-    if (prevProps.board.id !== this.props.board.id) {
-      this.setState({
-        isDataLoaded: false,
-        columns: {},
-        columnIds: [],
-        hasItems: false,
-        columnNotes: {},
-        activeTimerFeedbackItemId: null,
-      });
-      this.initColumns();
-      await this.getAllBoardFeedbackItems();
-    }
-
-    if (prevProps.board.modifiedDate !== this.props.board.modifiedDate) {
-      this.setState({ columnNotes: {}, activeTimerFeedbackItemId: null });
-      this.initColumns();
-      await this.getAllBoardFeedbackItems();
-    }
-
-    if (prevProps.team.id !== this.props.team.id) {
-      await this.setDefaultIterationAndAreaPath(this.props.team.id);
-    }
-  }
-
   public async componentWillUnmount() {
     reflectBackendService.removeOnReceiveNewItem(this.receiveNewItemHandler);
     reflectBackendService.removeOnReceiveUpdatedItem(this.receiveUpdatedItemHandler);
     document.removeEventListener("keydown", this.handleBoardKeyDown);
   }
+
+  private readonly getFeedbackColumnPropsList = (): FeedbackColumnProps[] => {
+    const canCurrentUserEditBoard = this.props.board.createdBy?.id === this.props.userId;
+
+    return this.state.columnIds.map((columnId, index) => {
+      return {
+        key: columnId,
+        ref: this.columnRefs[index],
+        columns: this.state.columns,
+        columnIds: this.state.columnIds,
+        columnName: this.state.columns[columnId].columnProperties.title,
+        columnId: columnId,
+        columnItems: this.state.columns[columnId].columnItems,
+        accentColor: this.state.columns[columnId].columnProperties.accentColor,
+        team: this.props.team,
+        boardId: this.props.board.id,
+        boardTitle: this.props.board.title,
+        isDataLoaded: this.state.isDataLoaded,
+        icon: getIconElement(this.state.columns[columnId].columnProperties.iconClass),
+        workflowPhase: this.props.workflowPhase,
+        addFeedbackItems: this.addFeedbackItems,
+        removeFeedbackItemFromColumn: this.removeFeedbackItemFromColumn,
+        refreshFeedbackItems: this.refreshFeedbackItems,
+        defaultActionItemAreaPath: this.state.defaultActionItemAreaPath,
+        defaultActionItemIteration: this.state.defaultActionItemIteration,
+        nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
+        allWorkItemTypes: this.props.allWorkItemTypes,
+        isBoardAnonymous: this.props.isAnonymous,
+        shouldFocusOnCreateFeedback: !!this.state.columns[columnId].shouldFocusOnCreateFeedback,
+        hideFeedbackItems: this.props.hideFeedbackItems,
+        isFocusModalHidden: true,
+        groupIds: [] as string[],
+        showColumnEditButton: !!canCurrentUserEditBoard,
+        columnNotes: this.state.columnNotes[columnId] ?? "",
+        onColumnNotesChange: (notes: string) => this.handleColumnNotesChange(columnId, notes),
+        registerItemRef: (itemId: string, element: HTMLElement | null) => this.columnRefs[index]?.current?.registerItemRef(itemId, element),
+        onVoteCasted: () => {
+          if (this.props.onVoteCasted) {
+            this.props.onVoteCasted();
+          }
+        },
+        activeTimerFeedbackItemId: this.state.activeTimerFeedbackItemId,
+        requestTimerStart: this.requestTimerStart,
+        notifyTimerStopped: this.handleTimerStopped,
+      };
+    });
+  };
 
   private readonly receiveNewItemHandler = async (columnId: string, feedbackItemId: string) => {
     const newItem = await itemDataService.getFeedbackItem(this.props.board.id, feedbackItemId);
@@ -217,10 +325,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     this.columnRefs = columnProperties.map(() => React.createRef<FeedbackColumn>());
 
     columnProperties.forEach(col => {
-      if (!col.iconClass) {
-        col.iconClass = "fas fa-chalkboard";
-      }
-
       if (!col.accentColor) {
         col.accentColor = "#0078d4";
       }
@@ -618,50 +722,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
       return <div> An unexpected exception occurred. </div>;
     }
 
-    const canCurrentUserEditBoard = this.props.board.createdBy?.id === this.props.userId;
-
-    const feedbackColumnPropsList = this.state.columnIds.map((columnId, index) => {
-      return {
-        key: columnId,
-        ref: this.columnRefs[index],
-        columns: this.state.columns,
-        columnIds: this.state.columnIds,
-        columnName: this.state.columns[columnId].columnProperties.title,
-        columnId: columnId,
-        columnItems: this.state.columns[columnId].columnItems,
-        accentColor: this.state.columns[columnId].columnProperties.accentColor,
-        team: this.props.team,
-        boardId: this.props.board.id,
-        boardTitle: this.props.board.title,
-        isDataLoaded: this.state.isDataLoaded,
-        iconClass: this.state.columns[columnId].columnProperties.iconClass,
-        workflowPhase: this.props.workflowPhase,
-        addFeedbackItems: this.addFeedbackItems,
-        removeFeedbackItemFromColumn: this.removeFeedbackItemFromColumn,
-        refreshFeedbackItems: this.refreshFeedbackItems,
-        defaultActionItemAreaPath: this.state.defaultActionItemAreaPath,
-        defaultActionItemIteration: this.state.defaultActionItemIteration,
-        nonHiddenWorkItemTypes: this.props.nonHiddenWorkItemTypes,
-        allWorkItemTypes: this.props.allWorkItemTypes,
-        isBoardAnonymous: this.props.isAnonymous,
-        shouldFocusOnCreateFeedback: !!this.state.columns[columnId].shouldFocusOnCreateFeedback,
-        hideFeedbackItems: this.props.hideFeedbackItems,
-        isFocusModalHidden: true,
-        groupIds: [] as string[],
-        showColumnEditButton: !!canCurrentUserEditBoard,
-        columnNotes: this.state.columnNotes[columnId] ?? "",
-        onColumnNotesChange: (notes: string) => this.handleColumnNotesChange(columnId, notes),
-        registerItemRef: this.columnRefs[index]?.current?.registerItemRef,
-        onVoteCasted: () => {
-          if (this.props.onVoteCasted) {
-            this.props.onVoteCasted();
-          }
-        },
-        activeTimerFeedbackItemId: this.state.activeTimerFeedbackItemId,
-        requestTimerStart: this.requestTimerStart,
-        notifyTimerStopped: this.handleTimerStopped,
-      };
-    });
+    const feedbackColumnPropsList = this.getFeedbackColumnPropsList();
 
     return (
       <>
@@ -671,24 +732,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
               return <FeedbackColumn {...columnProps} />;
             })}
         </div>
-        <Dialog
-          hidden={this.props.isCarouselDialogHidden}
-          onDismiss={this.props.hideCarouselDialog}
-          minWidth={900}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: "Focus Mode",
-            subText: "Now is the time to focus! Discuss one feedback item at a time and create actionable work items.",
-          }}
-          modalProps={{
-            containerClassName: "retrospectives-carousel-dialog",
-            className: "retrospectives-carousel-dialog-modal",
-            isBlocking: true,
-          }}
-        >
-          <FeedbackCarousel feedbackColumnPropsList={feedbackColumnPropsList} isFeedbackAnonymous={this.props.isAnonymous} isFocusModalHidden={this.props.isCarouselDialogHidden} />
-        </Dialog>
-        <KeyboardShortcutsDialog isOpen={this.state.isKeyboardShortcutsDialogOpen} onClose={this.closeKeyboardShortcutsDialog} currentWorkflowPhase={this.props.workflowPhase} />
       </>
     );
   }

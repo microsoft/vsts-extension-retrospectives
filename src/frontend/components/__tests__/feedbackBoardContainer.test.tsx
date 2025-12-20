@@ -17,6 +17,8 @@ import BoardDataService from "../../dal/boardDataService";
 import { azureDevOpsCoreService } from "../../dal/azureDevOpsCoreService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { getService } from "azure-devops-extension-sdk";
+import { getBoardUrl } from "../../utilities/boardUrlHelper";
+import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -100,6 +102,14 @@ jest.mock("../../dal/userDataService");
 jest.mock("../../dal/itemDataService");
 jest.mock("../boardSummaryTable", () => () => <div data-testid="board-summary-table" />);
 jest.mock("../effectivenessMeasurementRow", () => ({ questionId }: { questionId: number }) => <div data-testid={`effectiveness-row-${questionId}`} />);
+jest.mock("../../utilities/boardUrlHelper", () => ({
+  getBoardUrl: jest.fn(() => Promise.resolve("https://example.com/board")),
+}));
+jest.mock("../../utilities/shareBoardHelper", () => ({
+  shareBoardHelper: {
+    generateEmailText: jest.fn(() => Promise.resolve("mock email body")),
+  },
+}));
 
 jest.mock("../feedbackBoard", () => {
   const MockFeedbackBoard = () => <div data-testid="feedback-board" />;
@@ -394,9 +404,7 @@ describe("FeedbackBoardContainer additional coverage", () => {
         castedVoteCount: 2,
         teamVoteCapacity: 4,
         currentVoteCount: "1",
-        teamAssessmentHistoryData: [
-          { boardTitle: "Board 1", boardId: "board-1", createdDate: new Date(), questionAverages: [{ questionId: 1, average: 8 }] },
-        ],
+        teamAssessmentHistoryData: [{ boardTitle: "Board 1", boardId: "board-1", createdDate: new Date(), questionAverages: [{ questionId: 1, average: 8 }] }],
       });
     });
 
@@ -2303,11 +2311,11 @@ describe("FeedbackBoardContainer - Board operations", () => {
   it("should show and hide archive confirmation dialog", () => {
     const instance = createStandaloneTimerInstance();
 
-    (instance as any).showArchiveBoardConfirmationDialog();
-    expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(false);
+    const showModal = jest.fn();
+    (instance as any).archiveBoardDialogRef = { current: { showModal } };
 
-    (instance as any).hideArchiveBoardConfirmationDialog();
-    expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(true);
+    (instance as any).showArchiveBoardConfirmationDialog();
+    expect(showModal).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -2676,14 +2684,26 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 });
 
 describe("FeedbackBoardContainer - Retro Summary Dialog", () => {
-  it("should show and hide preview email dialog", () => {
+  it("should open preview email dialog via generator", async () => {
     const instance = createStandaloneTimerInstance();
 
-    (instance as any).showPreviewEmailDialog();
-    expect(instance.state.isPreviewEmailDialogHidden).toBe(false);
+    const showModal = jest.fn();
+    const close = jest.fn();
+    (instance as any).previewEmailDialogRef.current = { showModal, close } as any;
 
-    (instance as any).hidePreviewEmailDialog();
-    expect(instance.state.isPreviewEmailDialogHidden).toBe(true);
+    instance.setState({
+      currentTeam: { id: "team-1" } as WebApiTeam,
+      currentBoard: { id: "board-1", title: "Board", activePhase: WorkflowPhase.Collect } as IFeedbackBoardDocument,
+    });
+
+    await (instance as any).generateEmailSummaryContent();
+
+    expect(getBoardUrl).toHaveBeenCalled();
+    expect(shareBoardHelper.generateEmailText).toHaveBeenCalled();
+    expect(showModal).toHaveBeenCalled();
+
+    (instance as any).previewEmailDialogRef.current?.close();
+    expect(close).toHaveBeenCalled();
   });
 
   it("should calculate effectiveness measurements for retro summary", async () => {
@@ -2839,14 +2859,6 @@ describe("FeedbackBoardContainer - Utility Methods", () => {
     (instance as any).hideDropIssueInEdgeMessageBar();
     expect(instance.state.isDropIssueInEdgeMessageBarVisible).toBe(false);
   });
-
-  it("should hide mobile board actions dialog", () => {
-    const instance = createStandaloneTimerInstance();
-
-    instance.setState({ isMobileBoardActionsDialogHidden: false });
-    (instance as any).hideMobileBoardActionsDialog();
-    expect(instance.state.isMobileBoardActionsDialogHidden).toBe(true);
-  });
 });
 
 describe("FeedbackBoardContainer - Board Management", () => {
@@ -2949,6 +2961,9 @@ describe("FeedbackBoardContainer - Board Management", () => {
       isArchiveBoardConfirmationDialogHidden: false,
     });
 
+    const close = jest.fn();
+    (instance as any).archiveBoardDialogRef = { current: { close } };
+
     const BoardDataService = require("../../dal/boardDataService").default;
     jest.spyOn(BoardDataService, "archiveFeedbackBoard").mockResolvedValue(undefined);
     jest.spyOn(BoardDataService, "getBoardsForTeam").mockResolvedValue([]);
@@ -2960,7 +2975,7 @@ describe("FeedbackBoardContainer - Board Management", () => {
 
     expect(BoardDataService.archiveFeedbackBoard).toHaveBeenCalledWith("team-1", "board-1");
     expect(mockBroadcastDeletedBoard).toHaveBeenCalledWith("team-1", "board-1");
-    expect(instance.state.isArchiveBoardConfirmationDialogHidden).toBe(true);
+    expect(close).toHaveBeenCalledTimes(1);
     expect(appInsights.trackEvent).toHaveBeenCalledWith({
       name: TelemetryEvents.FeedbackBoardArchived,
       properties: { boardId: "board-1" },
@@ -3152,7 +3167,7 @@ describe("FeedbackBoardContainer - Board Management", () => {
 
   it("should initialize with default state values", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     // Check that state has expected properties
     expect(instance.state).toBeDefined();
     expect(instance.state.isAppInitialized).toBeDefined();
@@ -3160,19 +3175,19 @@ describe("FeedbackBoardContainer - Board Management", () => {
 
   it("should handle setState for timer updates", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     instance.setState({
       timerSecs: 60,
       timerState: true,
     });
-    
+
     expect(instance.state.timerSecs).toBe(60);
     expect(instance.state.timerState).toBe(true);
   });
 
   it("should handle setState for board selection", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const board: IFeedbackBoardDocument = {
       id: "board-1",
       title: "Board 1",
@@ -3185,29 +3200,29 @@ describe("FeedbackBoardContainer - Board Management", () => {
       activePhase: WorkflowPhase.Collect,
       createdBy: {} as IdentityRef,
     };
-    
+
     instance.setState({
       currentBoard: board,
       boards: [board],
     });
-    
+
     expect(instance.state.currentBoard).toBeDefined();
     expect(instance.state.currentBoard.id).toBe("board-1");
   });
 
   it("should handle setState for user teams", () => {
     const instance = createStandaloneTimerInstance();
-    
+
     const teams = [
       { id: "team-1", name: "Alpha Team" },
       { id: "team-2", name: "Beta Team" },
     ] as WebApiTeam[];
-    
+
     instance.setState({
       userTeams: teams,
       filteredUserTeams: teams,
     });
-    
+
     expect(instance.state.userTeams.length).toBe(2);
     expect(instance.state.filteredUserTeams.length).toBe(2);
   });

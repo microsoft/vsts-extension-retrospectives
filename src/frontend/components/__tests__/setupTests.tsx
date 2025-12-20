@@ -48,3 +48,37 @@ jest.mock("azure-devops-extension-api/Common", () => {
 jest.mock("uuid", () => {
   return mockUuid;
 });
+
+// jsdom does not implement the native <dialog> API (show/showModal/close).
+// Our components use it directly, so tests need a minimal polyfill.
+// This is test-only and does not affect production behavior.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dialogProto: any = (globalThis as any).HTMLDialogElement?.prototype;
+if (dialogProto) {
+  if (typeof dialogProto.show !== "function") {
+    dialogProto.show = function () {
+      this.setAttribute("open", "");
+    };
+  }
+
+  if (typeof dialogProto.showModal !== "function") {
+    dialogProto.showModal = function () {
+      this.setAttribute("open", "");
+    };
+  }
+
+  if (typeof dialogProto.close !== "function") {
+    dialogProto.close = function (returnValue?: string) {
+      // In browsers, calling close() on an already-closed dialog is a no-op (or throws).
+      // We treat it as a no-op to avoid recursion with onClose handlers that also call close().
+      if (!this.hasAttribute("open")) {
+        return;
+      }
+      if (returnValue !== undefined) {
+        this.returnValue = returnValue;
+      }
+      this.removeAttribute("open");
+      this.dispatchEvent(new Event("close"));
+    };
+  }
+}

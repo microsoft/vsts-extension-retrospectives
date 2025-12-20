@@ -366,11 +366,11 @@ describe("FeedbackItemGroup", () => {
       expect(ariaLabel).toContain("Feedback group with 1 items");
     });
   });
-  
+
   it("should update isBeingDragged state when setIsGroupBeingDragged is called", () => {
     // Create a component instance to test the setIsGroupBeingDragged method
     let capturedSetIsGroupBeingDragged: ((isBeingDragged: boolean) => void) | null = null;
-    
+
     // Temporarily override the mock to capture the callback
     const MockFeedbackItem = ({ groupedItemProps }: any) => {
       if (groupedItemProps?.setIsGroupBeingDragged) {
@@ -386,7 +386,7 @@ describe("FeedbackItemGroup", () => {
         </div>
       );
     };
-    
+
     jest.isolateModules(() => {
       jest.doMock("../feedbackItem", () => ({
         __esModule: true,
@@ -396,15 +396,9 @@ describe("FeedbackItemGroup", () => {
         },
       }));
     });
-    
-    render(
-      <FeedbackItemGroup
-        mainFeedbackItem={mockMainItem}
-        groupedWorkItems={[mockGroupedItem]}
-        workflowState={WorkflowPhase.Collect}
-      />
-    );
-    
+
+    render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
     // Call the captured callback to test the setIsGroupBeingDragged method
     expect(capturedSetIsGroupBeingDragged).toBeDefined();
     if (capturedSetIsGroupBeingDragged) {

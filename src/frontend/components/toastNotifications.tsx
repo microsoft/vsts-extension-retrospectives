@@ -1,5 +1,4 @@
 import React from "react";
-import { MessageBar, MessageBarType } from "@fluentui/react/lib/MessageBar";
 
 export type ToastIntent = "info" | "success" | "warning" | "error";
 
@@ -142,20 +141,6 @@ function classNames(...values: Array<string | undefined>): string {
   return values.filter(Boolean).join(" ");
 }
 
-function mapIntentToMessageBarType(intent: ToastIntent): MessageBarType {
-  switch (intent) {
-    case "success":
-      return MessageBarType.success;
-    case "warning":
-      return MessageBarType.warning;
-    case "error":
-      return MessageBarType.error;
-    case "info":
-    default:
-      return MessageBarType.info;
-  }
-}
-
 export const toast: ToastApi = Object.assign(toastFunction, {
   update: (id: string, updates: ToastUpdateOptions) => toastStore.update(id, updates),
   dismiss: (id?: string) => toastStore.dismiss(id),
@@ -170,13 +155,18 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ className, toast
     return null;
   }
 
+  const roleForIntent = (intent: ToastIntent): "status" | "alert" => (intent === "warning" || intent === "error" ? "alert" : "status");
+
   return (
     <div className={classNames("retro-toast-container", className)}>
       {records.map(record => (
         <div key={record.id} className={classNames("retro-toast", toastClassName)}>
-          <MessageBar messageBarType={mapIntentToMessageBarType(record.intent)} isMultiline onDismiss={() => toast.dismiss(record.id)} dismissButtonAriaLabel="Dismiss notification">
-            {record.content}
-          </MessageBar>
+          <div className={`retro-message-bar retro-message-bar--${record.intent}`} role={roleForIntent(record.intent)} aria-live={roleForIntent(record.intent) === "alert" ? "assertive" : "polite"}>
+            <div className="retro-message-bar__content">{record.content}</div>
+            <button type="button" className="retro-message-bar__dismiss" onClick={() => toast.dismiss(record.id)} aria-label="Dismiss notification">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
           {typeof record.autoClose === "number" && record.autoClose > 0 ? <div className={classNames("retro-toast-progress", progressClassName)} style={{ animationDuration: `${record.autoClose}ms` }} /> : null}
         </div>
       ))}

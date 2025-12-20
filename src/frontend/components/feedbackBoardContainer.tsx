@@ -1,8 +1,6 @@
 import React from "react";
-import { ActionButton, DefaultButton, IconButton, MessageBarButton, PrimaryButton } from "@fluentui/react/lib/Button";
-import { ContextualMenuItemType, IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
+import { DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
 import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react/lib/Dialog";
-import { MessageBar, MessageBarType } from "@fluentui/react/lib/MessageBar";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
 import { WorkflowPhase } from "../interfaces/workItem";
@@ -13,6 +11,7 @@ import { reflectBackendService } from "../dal/reflectBackendService";
 import BoardSummaryTable from "./boardSummaryTable";
 import FeedbackBoardMetadataForm from "./feedbackBoardMetadataForm";
 import FeedbackBoard from "../components/feedbackBoard";
+import FeedbackCarousel, { type FocusModeModel } from "./feedbackCarousel";
 
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
@@ -22,7 +21,6 @@ import NoFeedbackBoardsView from "./noFeedbackBoardsView";
 import { userDataService } from "../dal/userDataService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
 import SelectorCombo, { ISelectorList } from "./selectorCombo";
-import FeedbackBoardPreviewEmail from "./feedbackBoardPreviewEmail";
 import { ToastContainer, toast } from "./toastNotifications";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { shareBoardHelper } from "../utilities/shareBoardHelper";
@@ -40,6 +38,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
+import { getIconElement } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -71,7 +70,6 @@ export interface FeedbackBoardContainerState {
   projectTeams: WebApiTeam[];
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
-  isPreviewEmailDialogHidden: boolean;
   isRetroSummaryDialogHidden: boolean;
   isBoardCreationDialogHidden: boolean;
   isBoardDuplicateDialogHidden: boolean;
@@ -84,6 +82,7 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogMessage: string;
   teamBoardDeletedDialogTitle: string;
   isCarouselDialogHidden: boolean;
+  focusModeModel: FocusModeModel | null;
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
   isTeamAssessmentHistoryDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
@@ -147,6 +146,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isBoardDuplicateDialogHidden: true,
       isBoardUpdateDialogHidden: true,
       isCarouselDialogHidden: true,
+      focusModeModel: null,
       isIncludeTeamEffectivenessMeasurementDialogHidden: true,
       isTeamAssessmentHistoryDialogHidden: true,
       isArchiveBoardConfirmationDialogHidden: true,
@@ -154,7 +154,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isLiveSyncInTfsIssueMessageBarVisible: true,
       isMobileBoardActionsDialogHidden: true,
       isMobileTeamSelectorDialogHidden: true,
-      isPreviewEmailDialogHidden: true,
       isRetroSummaryDialogHidden: true,
       isReconnectingToBackendService: false,
       isSummaryDashboardVisible: false,
@@ -189,6 +188,35 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   }
 
   private boardTimerIntervalId?: number;
+  private carouselDialogRef: HTMLDialogElement | null = null;
+  private readonly previewEmailDialogRef = React.createRef<HTMLDialogElement>();
+  private readonly boardActionsMenuRootRef = React.createRef<HTMLDivElement>();
+  private readonly archiveBoardDialogRef = React.createRef<HTMLDialogElement>();
+
+  private readonly handleBoardActionsDocumentPointerDown = (event: PointerEvent) => {
+    const root = this.boardActionsMenuRootRef.current;
+    if (!root) {
+      return;
+    }
+
+    const target = event.target as Node | null;
+    if (!target) {
+      return;
+    }
+
+    const openDetails = Array.from(root.querySelectorAll("details[open]"));
+    for (const detailsElement of openDetails) {
+      if (!detailsElement.contains(target)) {
+        detailsElement.removeAttribute("open");
+      }
+    }
+  };
+
+  private readonly handleBoardActionMenuItemClick = async (handler: () => void | Promise<void>, event: React.MouseEvent<HTMLButtonElement>) => {
+    const detailsElement = event.currentTarget.closest("details");
+    detailsElement?.removeAttribute("open");
+    await handler();
+  };
 
   public async componentDidMount() {
     let initialCurrentTeam: WebApiTeam | undefined;
@@ -250,7 +278,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         setTimeout(this.tryReconnectToBackend, 2000);
       });
 
-      // Listen for signals for board updates.
       reflectBackendService.onReceiveNewBoard(this.handleBoardCreated);
       reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
       reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
@@ -261,9 +288,11 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     this.setState({ isAppInitialized: true });
+
+    document.addEventListener("pointerdown", this.handleBoardActionsDocumentPointerDown);
   }
 
-  public componentDidUpdate(prevProps: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
+  public componentDidUpdate(_: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
     if (prevState.currentTeam !== this.state.currentTeam) {
       appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: this.state.currentTeam.id } });
     }
@@ -273,7 +302,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       if (this.state.isAppInitialized) {
         userDataService.addVisit(this.state.currentTeam.id, this.state.currentBoard ? this.state.currentBoard.id : undefined);
       }
-      // Update vote counts when board changes
       if (this.state.currentTeam && this.state.currentBoard) {
         this.updateFeedbackItemsAndContributors(this.state.currentTeam, this.state.currentBoard);
       }
@@ -284,6 +312,30 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     if (prevState.activeTab !== this.state.activeTab && this.state.activeTab !== "Board") {
       this.pauseBoardTimer();
     }
+
+    if (prevState.isCarouselDialogHidden !== this.state.isCarouselDialogHidden && this.carouselDialogRef) {
+      if (!this.state.isCarouselDialogHidden && !this.carouselDialogRef.open) {
+        this.openDialog(this.carouselDialogRef);
+      } else if (this.state.isCarouselDialogHidden && this.carouselDialogRef.open) {
+        this.closeDialog(this.carouselDialogRef);
+      }
+    }
+  }
+
+  private openDialog(dialog: HTMLDialogElement) {
+    if (typeof dialog.showModal === "function") {
+      dialog.showModal();
+    } else {
+      dialog.setAttribute("open", "");
+    }
+  }
+
+  private closeDialog(dialog: HTMLDialogElement) {
+    if (typeof dialog.close === "function") {
+      dialog.close();
+    } else {
+      dialog.removeAttribute("open");
+    }
   }
 
   public componentWillUnmount() {
@@ -291,6 +343,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
     this.clearBoardTimerInterval();
+
+    document.removeEventListener("pointerdown", this.handleBoardActionsDocumentPointerDown);
   }
 
   private readonly clearBoardTimerInterval = () => {
@@ -460,7 +514,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
         <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"}. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
-          <i className={this.state.isBoardTimerRunning ? "fa fa-pause-circle" : "fa fa-play-circle"} />
+          {this.state.isBoardTimerRunning ? getIconElement("pause-circle") : getIconElement("play-circle")}
         </button>
         {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
           <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
@@ -475,16 +529,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <span className={this.state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
         )}
         <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
-          <i className="fa fa-undo" />
+          {getIconElement("refresh")}
         </button>
       </div>
     );
   };
 
   private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
-    const currentPhase = this.getCurrentBoardPhase();
     getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
-      service.setHash(`teamId=${teamId}&boardId=${boardId}&phase=${currentPhase}`);
+      service.setHash(`teamId=${teamId}&boardId=${boardId}&phase=${this.state.currentBoard.activePhase}`);
     });
   }
 
@@ -1164,10 +1217,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isBoardCreationDialogHidden: true });
   };
 
-  private readonly showPreviewEmailDialog = (): void => {
-    this.setState({ isPreviewEmailDialogHidden: false });
-  };
-
   private readonly showRetroSummaryDialog = async () => {
     const measurements: { id: number; selected: number }[] = [];
 
@@ -1232,10 +1281,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       effectivenessMeasurementChartData: chartData,
       effectivenessMeasurementSummary: average,
     });
-  };
-
-  private readonly hidePreviewEmailDialog = (): void => {
-    this.setState({ isPreviewEmailDialogHidden: true });
   };
 
   private readonly hideRetroSummaryDialog = (): void => {
@@ -1308,30 +1353,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ isBoardDuplicateDialogHidden: true });
   };
 
-  // Note: This is temporary, to support older boards that do not have an active phase.
-  private readonly getCurrentBoardPhase = () => {
-    if (!this.state.currentBoard?.activePhase) {
-      return WorkflowPhase.Collect;
-    }
-
-    return this.state.currentBoard.activePhase;
-  };
-
   private readonly showArchiveBoardConfirmationDialog = () => {
-    this.setState({ isArchiveBoardConfirmationDialogHidden: false });
-  };
-
-  private readonly hideArchiveBoardConfirmationDialog = () => {
-    this.setState({ isArchiveBoardConfirmationDialogHidden: true });
+    this.archiveBoardDialogRef?.current?.showModal();
   };
 
   private readonly showBoardUrlCopiedToast = () => {
-    const currentPhase = this.getCurrentBoardPhase();
-    const phaseText = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
-    toast(`The link to retrospective ${this.state.currentBoard.title} (${phaseText} phase) has been copied to your clipboard.`);
+    toast(`The link to retrospective ${this.state.currentBoard.title} (${this.state.currentBoard.activePhase} phase) has been copied to your clipboard.`);
   };
 
   private readonly showEmailCopiedToast = () => {
+    copyToClipboard(this.state.currentBoard.emailContent);
     toast(`The email summary for "${this.state.currentBoard.title}" has been copied to your clipboard.`);
   };
 
@@ -1350,15 +1381,176 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
   private readonly archiveCurrentBoard = async () => {
     await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
-    this.hideArchiveBoardConfirmationDialog();
+    this.archiveBoardDialogRef?.current?.close();
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
     await this.reloadBoardsForCurrentTeam();
   };
 
   private readonly copyBoardUrl = async () => {
-    const currentPhase = this.getCurrentBoardPhase();
-    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, currentPhase);
+    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
     copyToClipboard(boardDeepLinkUrl);
+    this.showBoardUrlCopiedToast();
+  };
+
+  private readonly generateCSVContent = async () => {
+    await shareBoardHelper.generateCSVContent(this.state.currentBoard);
+  };
+
+  private readonly generateEmailSummaryContent = async () => {
+    const boardUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
+    const emailContent = await shareBoardHelper.generateEmailText(this.state.currentBoard, boardUrl, false);
+    this.setState(prevState => ({
+      currentBoard: { ...prevState.currentBoard, emailContent: emailContent }
+    }));
+
+    this.previewEmailDialogRef?.current?.showModal();
+  };
+
+  private readonly escapePdfText = (text: string): string => text.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+
+  private readonly createPdfFromText = (text: string, title: string): Blob => {
+    const pageWidth = 612;
+    const pageHeight = 792;
+    const margin = 50;
+    const fontSize = 12;
+    const lineHeight = 16;
+    const startY = pageHeight - margin;
+    const startX = margin;
+    const avgCharWidth = fontSize * 0.6; // rough width for Helvetica
+    const maxCharsPerLine = Math.max(20, Math.floor((pageWidth - margin * 2) / avgCharWidth));
+    const maxLinesPerPage = Math.floor((pageHeight - margin * 2) / lineHeight);
+
+    const wrapParagraph = (paragraph: string): string[] => {
+      if (paragraph.trim().length === 0) {
+        return [" "];
+      }
+
+      const words = paragraph.split(/\s+/);
+      const lines: string[] = [];
+      let current = "";
+
+      const pushCurrent = () => {
+        if (current.length > 0) {
+          lines.push(current);
+          current = "";
+        }
+      };
+
+      for (let word of words) {
+        if (word.length > maxCharsPerLine) {
+          pushCurrent();
+          while (word.length > 0) {
+            lines.push(word.slice(0, maxCharsPerLine));
+            word = word.slice(maxCharsPerLine);
+          }
+          continue;
+        }
+
+        if (current.length === 0) {
+          current = word;
+          continue;
+        }
+
+        if (current.length + 1 + word.length <= maxCharsPerLine) {
+          current = `${current} ${word}`;
+        } else {
+          pushCurrent();
+          current = word;
+        }
+      }
+
+      pushCurrent();
+      return lines.length ? lines : [" "];
+    };
+
+    const lines = text.split(/\r?\n/).flatMap(wrapParagraph);
+
+    const pages: string[][] = [];
+    for (let i = 0; i < lines.length; i += maxLinesPerPage) {
+      pages.push(lines.slice(i, i + maxLinesPerPage));
+    }
+
+    const encoder = new TextEncoder();
+    let offset = 0;
+    const offsets: number[] = [];
+    const parts: string[] = [];
+
+    const add = (part: string) => {
+      parts.push(part);
+      offset += encoder.encode(part).length;
+    };
+
+    const addObject = (part: string) => {
+      offsets.push(offset);
+      add(part);
+    };
+
+    const pageObjectIds = pages.map((_, index) => 3 + index * 2);
+    const contentObjectIds = pages.map((_, index) => 4 + index * 2);
+    const fontObjId = 3 + pages.length * 2;
+
+    add("%PDF-1.4\n");
+
+    addObject(`1 0 obj\n<< /Type /Catalog /Pages 2 0 R /Title (${this.escapePdfText(title)}) >>\nendobj\n`);
+
+    const kidsArray = pageObjectIds.map(id => `${id} 0 R`).join(" ");
+    addObject(`2 0 obj\n<< /Type /Pages /Kids [${kidsArray}] /Count ${pages.length} >>\nendobj\n`);
+
+    pages.forEach((pageLines, index) => {
+      const pageObjId = pageObjectIds[index];
+      const contentObjId = contentObjectIds[index];
+
+      const contentStreamLines = pageLines
+        .map((line, lineIndex) => {
+          const escaped = this.escapePdfText(line);
+          const lineOp = `(${escaped}) Tj`;
+          if (lineIndex === pageLines.length - 1) {
+            return lineOp;
+          }
+          return `${lineOp}\nT*`;
+        })
+        .join("\n");
+
+      const contentStream = `BT\n/F1 ${fontSize} Tf\n${startX} ${startY} Td\n${lineHeight} TL\n${contentStreamLines}\nET\n`;
+      const contentLength = encoder.encode(contentStream).length;
+
+      addObject(`${pageObjId} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Contents ${contentObjId} 0 R /Resources << /Font << /F1 ${fontObjId} 0 R >> >> >>\nendobj\n`);
+      addObject(`${contentObjId} 0 obj\n<< /Length ${contentLength} >>\nstream\n${contentStream}endstream\nendobj\n`);
+    });
+
+    addObject(`${fontObjId} 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n`);
+
+    const xrefStart = offset;
+    const totalObjects = fontObjId;
+    add("xref\n");
+    add(`0 ${totalObjects + 1}\n`);
+    add("0000000000 65535 f \n");
+    for (const objOffset of offsets) {
+      add(`${objOffset.toString().padStart(10, "0")} 00000 n \n`);
+    }
+
+    add(`trailer\n<< /Size ${totalObjects + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`);
+
+    return new Blob([parts.join("")], { type: "application/pdf" });
+  };
+
+  private readonly downloadEmailSummaryPdf = (): void => {
+    const board = this.state.currentBoard;
+    if (!board) {
+      return;
+    }
+
+    const pdfBlob = this.createPdfFromText(board.emailContent || "", board.title || "Retrospective Email Summary");
+    const fileName = `${(board.title || "Retrospective").replace(/\s+/g, "_")}_Email_Summary.pdf`;
+
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   private readonly renderBoardUpdateMetadataFormDialog = (isNewBoardCreation: boolean, isDuplicatingBoard: boolean, hidden: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => void, onCancel: () => void) => {
@@ -1448,104 +1640,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
       throw error;
     }
-  };
-
-  private readonly getBoardActionContextualMenuItems = (): IContextualMenuItem[] => {
-    const currentPhase = this.getCurrentBoardPhase();
-    const phaseText = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
-
-    return [
-      {
-        key: "createBoard",
-        iconProps: { iconName: "Add" },
-        onClick: this.showBoardCreationDialog,
-        text: "Create new retrospective",
-        title: "Create new retrospective",
-      },
-      {
-        key: "duplicateBoard",
-        iconProps: { iconName: "Copy" },
-        onClick: this.showBoardDuplicateDialog,
-        text: "Create copy of retrospective",
-        title: "Create copy of retrospective",
-      },
-      {
-        key: "editBoard",
-        iconProps: { iconName: "Edit" },
-        onClick: this.showBoardUpdateDialog,
-        text: "Edit retrospective",
-        title: "Edit retrospective",
-      },
-      {
-        key: "seperator",
-        itemType: ContextualMenuItemType.Divider,
-      },
-      {
-        key: "copyLink",
-        iconProps: { iconName: "Link" },
-        onClick: async () => {
-          await this.copyBoardUrl();
-          this.showBoardUrlCopiedToast();
-        },
-        text: `Copy retrospective link (for ${phaseText} phase)`,
-        title: `Copy retrospective link (for ${phaseText} phase)`,
-      },
-      {
-        key: "seperator",
-        itemType: ContextualMenuItemType.Divider,
-      },
-      {
-        key: "exportCSV",
-        iconProps: { iconName: "DownloadDocument" },
-        onClick: () => {
-          shareBoardHelper.generateCSVContent(this.state.currentBoard);
-        },
-        text: "Export CSV content",
-        title: "Export CSV content",
-      },
-      {
-        key: "emailPreview",
-        iconProps: { iconName: "Mail" },
-        onClick: this.showPreviewEmailDialog,
-        text: "Create email summary",
-        title: "Create email summary",
-      },
-      {
-        key: "seperator",
-        itemType: ContextualMenuItemType.Divider,
-      },
-      {
-        key: "retroSummary",
-        iconProps: { iconName: "ReportDocument" },
-        onClick: this.showRetroSummaryDialog,
-        text: "Show retrospective summary",
-        title: "Show retrospective summary",
-      },
-      {
-        key: "teamAssessmentHistory",
-        iconProps: { iconName: "TimelineProgress" },
-        onClick: this.showTeamAssessmentHistoryDialog,
-        text: "Team assessment history",
-        title: "Team assessment history",
-      },
-      {
-        key: "seperator",
-        itemType: ContextualMenuItemType.Divider,
-      },
-      {
-        key: "archiveBoard",
-        iconProps: { iconName: "Archive" },
-        onClick: this.showArchiveBoardConfirmationDialog,
-        text: "Archive retrospective",
-        title: "Archive retrospective",
-      },
-    ];
-  };
-
-  private readonly hideMobileBoardActionsDialog = () => {
-    this.setState({
-      isMobileBoardActionsDialogHidden: true,
-    });
   };
 
   private readonly showCarouselDialog = () => {
@@ -1691,10 +1785,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         <div className="flex items-center justify-start shrink-0">
           <div className="w-full">
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className={`pivot-tab ${this.state.activeTab === "Board" ? "pivot-tab--active" : ""}`} onClick={() => this.handlePivotClick("Board")}>
+              <div className={`pivot-tab board ${this.state.activeTab === "Board" ? "active" : ""}`} onClick={() => this.handlePivotClick("Board")}>
                 Board
               </div>
-              <div className={`pivot-tab ${this.state.activeTab === "History" ? "pivot-tab--active" : ""}`} onClick={() => this.handlePivotClick("History")}>
+              <div className={`pivot-tab history ${this.state.activeTab === "History" ? "active" : ""}`} onClick={() => this.handlePivotClick("History")}>
                 History
               </div>
               {this.state.activeTab === "Board" && (
@@ -1704,56 +1798,56 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <div className="board-selector">
                       <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
                     </div>
-                    <div className="board-actions-menu">
-                      <DefaultButton
-                        className="contextual-menu-button"
-                        aria-label="Board Actions Menu"
-                        title="Board Actions"
-                        menuProps={{
-                          className: "board-actions-menu",
-                          items: this.getBoardActionContextualMenuItems(),
-                        }}
-                      >
-                        <span className="ms-Button-icon">
-                          <i className="fa-solid fa-ellipsis-h"></i>
-                        </span>
-                        &nbsp;
-                      </DefaultButton>
-                      <Dialog
-                        hidden={this.state.isMobileBoardActionsDialogHidden}
-                        onDismiss={this.hideMobileBoardActionsDialog}
-                        modalProps={{
-                          isBlocking: false,
-                          containerClassName: "ms-dialogMainOverride",
-                          className: "retrospectives-dialog-modal",
-                        }}
-                      >
-                        <div className="mobile-contextual-menu-list">
-                          {this.getBoardActionContextualMenuItems().map((boardAction: IContextualMenuItem) => (
-                            <ActionButton
-                              key={boardAction.key}
-                              className={boardAction.className}
-                              iconProps={boardAction.iconProps}
-                              aria-label="Board Actions Menu"
-                              onClick={() => {
-                                this.hideMobileBoardActionsDialog();
-                                boardAction.onClick();
-                              }}
-                              text={boardAction.text}
-                              title={boardAction.title}
-                            />
-                          ))}
+                    <div className="board-actions-menu" ref={this.boardActionsMenuRootRef}>
+                      <details className="flex items-center relative">
+                        <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
+                          {getIconElement("more-horizontal")}
+                        </summary>
+                        <div className="callout-menu left" role="menu" aria-label="Board Actions">
+                          <button key="createBoard" type="button" title="Create new retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardCreationDialog, event)}>
+                            {getIconElement("add")}
+                            Create new retrospective
+                          </button>
+                          <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardDuplicateDialog, event)}>
+                            {getIconElement("content-copy")}
+                            Create copy of retrospective
+                          </button>
+                          <button key="editBoard" type="button" title="Edit retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardUpdateDialog, event)}>
+                            {getIconElement("edit")}
+                            Edit retrospective
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="copyLink" type="button" title={`Copy link to ${this.state.currentBoard.activePhase} phase`} onClick={event => this.handleBoardActionMenuItemClick(this.copyBoardUrl, event)}>
+                            {getIconElement("link")}
+                            {`Copy link to ${this.state.currentBoard.activePhase} phase`}
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="exportCSV" type="button" title="Export CSV content" onClick={event => this.handleBoardActionMenuItemClick(this.generateCSVContent, event)}>
+                            {getIconElement("sim-card-download")}
+                            Export CSV content
+                          </button>
+                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => this.handleBoardActionMenuItemClick(this.generateEmailSummaryContent, event)}>
+                            {getIconElement("forward-to-inbox")}
+                            Create email summary
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => this.handleBoardActionMenuItemClick(this.showRetroSummaryDialog, event)}>
+                            {getIconElement("source")}
+                            Show retrospective summary
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showArchiveBoardConfirmationDialog, event)}>
+                            {getIconElement("inventory")}
+                            Archive retrospective
+                          </button>
                         </div>
-                        <DialogFooter>
-                          <DefaultButton onClick={this.hideMobileBoardActionsDialog} text="Close" />
-                        </DialogFooter>
-                      </Dialog>
+                      </details>
                     </div>
                   </div>
                   <div className="flex items-center justify-start">
                     <div className="flex flex-row items-center workflow-stage-header 3">
                       {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                        <div className="border border-solid border-(--nav-header-active-item-background) rounded-lg">
+                        <>
                           <Dialog
                             hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
                             onDismiss={() => {
@@ -1771,14 +1865,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           >
                             <DialogContent>
                               <div className="team-effectiveness-section-information">
-                                <i className="fa fa-info-circle" />
+                                {getIconElement("info")}
                                 &nbsp;All answers will be saved anonymously
                               </div>
                               <table className="team-effectiveness-measurement-table">
                                 <thead>
                                   <tr>
-                                    <th scope="col" className="text-left">Question</th>
-                                    <th scope="col" className="text-left">Details</th>
+                                    <th scope="col" className="text-left">
+                                      Question
+                                    </th>
+                                    <th scope="col" className="text-left min-w-13">
+                                      Details
+                                    </th>
                                     <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
                                       Unfavorable
                                     </th>
@@ -1792,16 +1890,36 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                   <tr>
                                     <th scope="col" className="text-left"></th>
                                     <th scope="col" className="text-left"></th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">1</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">2</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">3</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">4</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">5</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">6</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">7</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">8</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">9</th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">10</th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">
+                                      1
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">
+                                      2
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">
+                                      3
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">
+                                      4
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">
+                                      5
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">
+                                      6
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">
+                                      7
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">
+                                      8
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">
+                                      9
+                                    </th>
+                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">
+                                      10
+                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1828,7 +1946,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             </DialogFooter>
                           </Dialog>
                           <button
-                            className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none"
+                            className="team-assessment-button"
                             onClick={() => {
                               this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
                             }}
@@ -1836,46 +1954,71 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                             aria-label="Team Assessment"
                             type="button"
                           >
-                            <span className="inline-flex items-center justify-center lg:mr-1">
-                              <i className="fas fa-chart-line"></i>
-                            </span>
+                            {getIconElement("assessment")}
                             <span className="hidden lg:inline">Team Assessment</span>
                           </button>
-                        </div>
+                        </>
                       )}
                       <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
-                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
-                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
-                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
-                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.getCurrentBoardPhase() === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
                       </div>
-                      {this.getCurrentBoardPhase() === WorkflowPhase.Vote && (
+                      {this.state.currentBoard.activePhase === WorkflowPhase.Vote && (
                         <div className="feedback-votes-count" role="status" aria-live="polite">
-                          <span className="entry" aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
-                            <i className="fas fa-user ml-1" aria-hidden="true"></i>
+                          <span className="entry" title={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
+                            {getIconElement("person")}
                             <span className="hidden lg:inline">My Votes:</span> {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"}
                           </span>
-                          {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 &&
+                          {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 && (
                             <>
-                              <span className="separator" aria-hidden="true">|</span>
-                              <span className="entry" aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
-                                <i className="fas fa-users ml-1" aria-hidden="true"></i>
+                              <span className="separator" aria-hidden="true">
+                                |
+                              </span>
+                              <span className="entry" title={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`} aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
+                                {getIconElement("people")}
                                 <span className="hidden lg:inline">Team Votes:</span> {this.state.castedVoteCount}/{this.state.teamVoteCapacity}
                               </span>
                             </>
-                          }
+                          )}
                         </div>
                       )}
-                      {this.getCurrentBoardPhase() === WorkflowPhase.Act && (
-                        <button className="flex items-center bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
-                          <span className="inline-flex items-center justify-center mr-1">
-                            <i className="fas fa-bullseye"></i>
-                          </span>
-                          <span className="hidden lg:inline">Focus Mode</span>
-                        </button>
+                      {this.state.currentBoard.activePhase === WorkflowPhase.Act && (
+                        <>
+                          <button className="focus-mode-button" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
+                            {getIconElement("adjust")}
+                            <span>Focus Mode</span>
+                          </button>
+                          <dialog
+                            ref={ref => {
+                              this.carouselDialogRef = ref;
+                            }}
+                            className="retrospectives-carousel-dialog"
+                            onClose={this.hideCarouselDialog}
+                          >
+                            <div className="header">
+                              <h2 className="title">Focus Mode</h2>
+                              <button onClick={this.hideCarouselDialog} aria-label="Close">
+                                {getIconElement("close")}
+                              </button>
+                            </div>
+                            <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
+                            <div className="subText">{this.state.focusModeModel && <FeedbackCarousel focusModeModel={this.state.focusModeModel} isFocusModalHidden={this.state.isCarouselDialogHidden} />}</div>
+                          </dialog>
+                        </>
                       )}
                     </div>
                   </div>
+                </>
+              )}
+              {this.state.activeTab === "History" && (
+                <>
+                  <div className="mx-4 vertical-tab-separator" />
+                  <button className="team-assessment-history-button" onClick={this.showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
+                    {getIconElement("insights")}
+                    <span className="hidden lg:inline">Team Assessment History</span>
+                  </button>
                 </>
               )}
             </div>
@@ -1889,138 +2032,125 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
-                      <MessageBar
-                        className="info-message-bar"
-                        messageBarType={MessageBarType.info}
-                        isMultiline={true}
-                        onDismiss={this.hideLiveSyncInTfsIssueMessageBar}
-                        styles={{
-                          root: {
-                            background: "#cceeff",
-                          },
-                        }}
-                      >
-                        <span>
-                          <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
-                        </span>
-                      </MessageBar>
+                      <>
+                        <div className="retro-message-bar">
+                          <span>
+                            <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
+                          </span>
+                        </div>
+                        <div className="actions">
+                          <button type="button" className="dismiss" onClick={this.hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        </div>
+                      </>
                     )}
                     {!this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected && (
-                      <MessageBar className="info-message-bar" messageBarType={MessageBarType.warning} isMultiline={true} onDismiss={this.hideDropIssueInEdgeMessageBar}>
+                      <div className="retro-message-bar" role="alert" aria-live="assertive">
                         <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
-                      </MessageBar>
+                        <div className="actions">
+                          <button type="button" className="dismiss" onClick={this.hideDropIssueInEdgeMessageBar} aria-label="Dismiss notification">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        </div>
+                      </div>
                     )}
                     {this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected && (
-                      <MessageBar
-                        className="info-message-bar"
-                        messageBarType={MessageBarType.warning}
-                        isMultiline={true}
-                        actions={
-                          <div className="info-message-bar-action">
-                            {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
-                            {!this.state.isReconnectingToBackendService && (
-                              <>
-                                <MessageBarButton className="info-message-bar-action-button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService} text="Reconnect" />
-                                <IconButton
-                                  className="info-message-bar-action-button"
-                                  onClick={() => {
-                                    this.setState({ isBackendServiceConnected: true });
-                                  }}
-                                  disabled={this.state.isReconnectingToBackendService}
-                                  title="Hide"
-                                >
-                                  <span className="ms-Button-icon">
-                                    <i className="fas fa-times"></i>
-                                  </span>
-                                </IconButton>
-                              </>
-                            )}
-                          </div>
-                        }
-                      >
+                      <div className="retro-message-bar" role="alert" aria-live="assertive">
                         <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
-                      </MessageBar>
+                        <div className="actions">
+                          {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
+                          {!this.state.isReconnectingToBackendService && (
+                            <>
+                              <button type="button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService}>
+                                Reconnect
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  this.setState({ isBackendServiceConnected: true });
+                                }}
+                                disabled={this.state.isReconnectingToBackendService}
+                                aria-label="Hide"
+                                title="Hide"
+                              >
+                                <span aria-hidden="true">×</span>
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     )}
-                    <FeedbackBoard board={this.state.currentBoard} team={this.state.currentTeam} displayBoard={true} workflowPhase={this.state.currentBoard.activePhase} nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes} allWorkItemTypes={this.state.allWorkItemTypes} isCarouselDialogHidden={this.state.isCarouselDialogHidden} hideCarouselDialog={this.hideCarouselDialog} isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false} hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={this.state.currentUserId} onVoteCasted={this.updateCurrentVoteCount} onColumnNotesChange={this.persistColumnNotes} />
-                    <Dialog
-                      hidden={this.state.isArchiveBoardConfirmationDialogHidden}
-                      onDismiss={this.hideArchiveBoardConfirmationDialog}
-                      dialogContentProps={{
-                        type: DialogType.close,
-                        title: "Archive Retrospective",
+                    <FeedbackBoard
+                      board={this.state.currentBoard}
+                      team={this.state.currentTeam}
+                      displayBoard={true}
+                      workflowPhase={this.state.currentBoard.activePhase}
+                      nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
+                      allWorkItemTypes={this.state.allWorkItemTypes}
+                      onFocusModeModelChange={focusModeModel => {
+                        this.setState({ focusModeModel });
                       }}
-                      modalProps={{
-                        isBlocking: true,
-                        containerClassName: "retrospectives-archive-board-confirmation-dialog",
-                        className: "retrospectives-dialog-modal",
-                      }}
-                    >
-                      <DialogContent>
-                        <p>
-                          The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
-                        </p>
-                        <br />
-                        <p>
-                          <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-                        </p>
-                      </DialogContent>
-                      <DialogFooter>
-                        <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
-                        <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
-                      </DialogFooter>
-                    </Dialog>
+                      isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
+                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false}
+                      userId={this.state.currentUserId}
+                      onVoteCasted={this.updateCurrentVoteCount}
+                      onColumnNotesChange={this.persistColumnNotes}
+                    />
                   </>
                 )}
-                <Dialog
-                  hidden={this.state.isArchiveBoardConfirmationDialogHidden}
-                  onDismiss={this.hideArchiveBoardConfirmationDialog}
-                  dialogContentProps={{
-                    type: DialogType.close,
-                    title: "Archive Retrospective",
-                  }}
-                  modalProps={{
-                    isBlocking: true,
-                    containerClassName: "retrospectives-archive-board-confirmation-dialog",
-                    className: "retrospectives-dialog-modal",
-                  }}
-                >
-                  <DialogContent>
-                    <p>
-                      The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
-                    </p>
-                    <br />
-                    <p>
-                      <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-                    </p>
-                  </DialogContent>
-                  <DialogFooter>
-                    <PrimaryButton onClick={this.archiveCurrentBoard} text="Archive" className="prime-directive-close-button" />
-                    <DefaultButton onClick={this.hideArchiveBoardConfirmationDialog} text="Cancel" />
-                  </DialogFooter>
-                </Dialog>
               </div>
             )}
           </div>
         </div>
+        <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={this.archiveBoardDialogRef} onClose={() => this.archiveBoardDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Archive Retrospective</h2>
+            <button onClick={() => this.archiveBoardDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">
+            The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
+          </div>
+          <div className="subText">
+            <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
+          </div>
+          <div className="inner">
+            <button className="button" onClick={() => this.archiveCurrentBoard()}>
+              Archive
+            </button>
+            <button className="default button" onClick={() => this.archiveBoardDialogRef.current?.close()}>
+              Cancel
+            </button>
+          </div>
+        </dialog>
         {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
         {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
         {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
         {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
         {this.state.currentBoard && this.renderBoardUpdateMetadataFormDialog(false, false, this.state.isBoardUpdateDialogHidden, this.hideBoardUpdateDialog, "Edit retrospective", "", this.updateBoardMetadata, this.hideBoardUpdateDialog)}
-        <Dialog
-          hidden={this.state.isPreviewEmailDialogHidden}
-          onDismiss={this.hidePreviewEmailDialog}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: "Email summary",
-          }}
-          modalProps={{
-            containerClassName: "retrospectives-preview-email-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          <FeedbackBoardPreviewEmail teamId={this.state.currentTeam.id} board={this.state.currentBoard} onCopy={this.showEmailCopiedToast} />
-        </Dialog>
+        <dialog ref={this.previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" onClose={() => this.previewEmailDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Email summary</h2>
+            <button onClick={() => this.previewEmailDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">
+            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={this.state.currentBoard.emailContent}></textarea>
+          </div>
+          <div className="inner">
+            <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={this.showEmailCopiedToast}>
+              {getIconElement("content-copy")}
+              Copy to clipboard
+            </button>
+            <button title="Download PDF" aria-label="Download email summary as PDF" onClick={this.downloadEmailSummaryPdf} className="default button">
+              {getIconElement("sim-card-download")}
+              Download PDF
+            </button>
+          </div>
+        </dialog>
         <Dialog
           hidden={this.state.isRetroSummaryDialogHidden}
           onDismiss={this.hideRetroSummaryDialog}
@@ -2143,17 +2273,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             className: "retrospectives-dialog-modal",
           }}
         >
-          {this.state.teamAssessmentHistoryData.length === 0 ? (
+          {this.state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
             <div className="team-assessment-no-data">
               <p>No team assessment history available.</p>
               <p>Create retrospectives with team assessments to see historical trends.</p>
             </div>
           ) : (
             <>
-              <p className="team-assessment-info-text">Starting with version v2.0.1 (scheduled for publication on January 1st, 2026), a widget will be available that you can add to your Azure DevOps dashboard to see team assessment trends over time.</p>
-              <p className="team-assessment-info-text">Please check your Extensions configuration to ensure the Retrospective Extension is updated to the latest version.</p>
               <p className="team-assessment-info-text">
-                Showing average scores over time across {this.state.teamAssessmentHistoryData.length} retrospective{this.state.teamAssessmentHistoryData.length !== 1 ? "s" : ""}.
+                Showing average scores over time across {this.state.teamAssessmentHistoryData.slice(-13).length} retrospective{this.state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
               </p>
               {(() => {
                 const questionColors = [
@@ -2173,7 +2301,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                 const yScale = (value: number) => padding.top + chartHeight - (value / 10) * chartHeight;
 
-                const allDates = this.state.teamAssessmentHistoryData.map(board => new Date(board.createdDate).getTime());
+                const recentHistoryData = this.state.teamAssessmentHistoryData.slice(-13);
+
+                const allDates = recentHistoryData.map(board => new Date(board.createdDate).getTime());
                 const minDate = Math.min(...allDates);
                 const maxDate = Math.max(...allDates);
                 const dateRange = maxDate - minDate || 1;
@@ -2197,7 +2327,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                       {questions.map((question, qIndex) => {
                         const color = questionColors[qIndex % questionColors.length];
-                        const dataPoints = this.state.teamAssessmentHistoryData
+                        const dataPoints = recentHistoryData
                           .map(board => {
                             const questionData = board.questionAverages.find(qa => qa.questionId === question.id);
                             return questionData ? { date: new Date(board.createdDate), average: questionData.average, boardTitle: board.boardTitle } : null;
@@ -2223,9 +2353,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         );
                       })}
 
-                      {this.state.teamAssessmentHistoryData.map((board, index) => {
+                      {recentHistoryData.map((board, index) => {
                         const date = new Date(board.createdDate);
-                        const shouldShowLabel = index === 0 || index === this.state.teamAssessmentHistoryData.length - 1 || this.state.teamAssessmentHistoryData.length <= 5 || (this.state.teamAssessmentHistoryData.length > 5 && index % Math.ceil(this.state.teamAssessmentHistoryData.length / 5) === 0);
+                        const shouldShowLabel = index === 0 || index === recentHistoryData.length - 1 || recentHistoryData.length <= 5 || (recentHistoryData.length > 5 && index % Math.ceil(recentHistoryData.length / 5) === 0);
 
                         if (!shouldShowLabel) return null;
 
@@ -2238,9 +2368,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
                       <text x={padding.left - 50} y={svgHeight / 2} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${svgHeight / 2})`}>
                         Average Score
-                      </text>
-                      <text x={(padding.left + svgWidth - padding.right) / 2} y={svgHeight - 40} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600">
-                        Retrospective Date
                       </text>
 
                       {questions.map((question, qIndex) => {

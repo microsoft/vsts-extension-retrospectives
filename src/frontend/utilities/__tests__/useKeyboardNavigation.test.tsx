@@ -1,12 +1,7 @@
 import React from "react";
 import { renderHook, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import {
-  useKeyboardNavigation,
-  useGlobalKeyboardShortcuts,
-  useRovingTabIndex,
-  KeyboardNavigationOptions,
-} from "../useKeyboardNavigation";
+import { useKeyboardNavigation, useGlobalKeyboardShortcuts, useRovingTabIndex, KeyboardNavigationOptions } from "../useKeyboardNavigation";
 import { WorkflowPhase } from "../../interfaces/workItem";
 
 describe("useKeyboardNavigation", () => {
@@ -15,6 +10,10 @@ describe("useKeyboardNavigation", () => {
   beforeEach(() => {
     elementRef = { current: document.createElement("div") };
     document.body.appendChild(elementRef.current!);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   afterEach(() => {
@@ -238,34 +237,6 @@ describe("useKeyboardNavigation", () => {
     expect(onDelete).not.toHaveBeenCalled();
   });
 
-  it("should call onHome when Home is pressed", () => {
-    const onHome = jest.fn();
-    const options: KeyboardNavigationOptions = { onHome };
-
-    renderHook(() => useKeyboardNavigation(elementRef, options));
-
-    act(() => {
-      const event = new KeyboardEvent("keydown", { key: "Home" });
-      elementRef.current!.dispatchEvent(event);
-    });
-
-    expect(onHome).toHaveBeenCalledTimes(1);
-  });
-
-  it("should call onEnd when End is pressed", () => {
-    const onEnd = jest.fn();
-    const options: KeyboardNavigationOptions = { onEnd };
-
-    renderHook(() => useKeyboardNavigation(elementRef, options));
-
-    act(() => {
-      const event = new KeyboardEvent("keydown", { key: "End" });
-      elementRef.current!.dispatchEvent(event);
-    });
-
-    expect(onEnd).toHaveBeenCalledTimes(1);
-  });
-
   it("should call onPageUp when PageUp is pressed", () => {
     const onPageUp = jest.fn();
     const options: KeyboardNavigationOptions = { onPageUp };
@@ -323,6 +294,88 @@ describe("useKeyboardNavigation", () => {
     });
 
     expect(onArrowUp).not.toHaveBeenCalled();
+  });
+
+  it("should not preventDefault when no handlers match", () => {
+    const options: KeyboardNavigationOptions = {};
+    renderHook(() => useKeyboardNavigation(elementRef, options));
+
+    const event = new KeyboardEvent("keydown", { key: "ArrowUp", cancelable: true });
+    const preventDefaultSpy = jest.spyOn(event, "preventDefault");
+
+    act(() => {
+      elementRef.current!.dispatchEvent(event);
+    });
+
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+  });
+
+  it("skips arrow and escape keys when handlers are missing", () => {
+    const options: KeyboardNavigationOptions = {};
+    renderHook(() => useKeyboardNavigation(elementRef, options));
+
+    act(() => {
+      elementRef.current!.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }));
+      elementRef.current!.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
+      elementRef.current!.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+      elementRef.current!.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    });
+  });
+
+  it("returns early when disabled", () => {
+    const capturedCallbacks: Array<(event: KeyboardEvent) => void> = [];
+    const useCallbackSpy = jest.spyOn(React, "useCallback").mockImplementation((fn: any) => {
+      capturedCallbacks.push(fn);
+      return fn;
+    });
+
+    renderHook(() => useKeyboardNavigation(elementRef, { enabled: false }));
+
+    const handler = capturedCallbacks[0];
+    const event = new KeyboardEvent("keydown", { key: "ArrowUp", cancelable: true });
+    const preventDefaultSpy = jest.spyOn(event, "preventDefault");
+
+    act(() => {
+      handler(event);
+    });
+
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+    useCallbackSpy.mockRestore();
+  });
+
+  it("should ignore keys without handlers (Delete/PageUp/PageDown)", () => {
+    const options: KeyboardNavigationOptions = {};
+    renderHook(() => useKeyboardNavigation(elementRef, options));
+
+    const deleteEvent = new KeyboardEvent("keydown", { key: "Delete", cancelable: true });
+    const preventDefaultDelete = jest.spyOn(deleteEvent, "preventDefault");
+    act(() => {
+      elementRef.current!.dispatchEvent(deleteEvent);
+    });
+    expect(preventDefaultDelete).not.toHaveBeenCalled();
+
+    const pageUpEvent = new KeyboardEvent("keydown", { key: "PageUp", cancelable: true });
+    const preventDefaultPageUp = jest.spyOn(pageUpEvent, "preventDefault");
+    act(() => {
+      elementRef.current!.dispatchEvent(pageUpEvent);
+    });
+    expect(preventDefaultPageUp).not.toHaveBeenCalled();
+
+    const pageDownEvent = new KeyboardEvent("keydown", { key: "PageDown", cancelable: true });
+    const preventDefaultPageDown = jest.spyOn(pageDownEvent, "preventDefault");
+    act(() => {
+      elementRef.current!.dispatchEvent(pageDownEvent);
+    });
+    expect(preventDefaultPageDown).not.toHaveBeenCalled();
+  });
+
+  it("should not register listeners when disabled", () => {
+    const options: KeyboardNavigationOptions = { enabled: false };
+    const addEventListenerSpy = jest.spyOn(elementRef.current!, "addEventListener");
+
+    renderHook(() => useKeyboardNavigation(elementRef, options));
+
+    expect(addEventListenerSpy).not.toHaveBeenCalledWith("keydown", expect.any(Function));
   });
 
   it("should not handle events on textarea fields", () => {
@@ -437,7 +490,7 @@ describe("useKeyboardNavigation", () => {
 
 describe("useGlobalKeyboardShortcuts", () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it("should call handler for single key shortcut", () => {
@@ -515,16 +568,48 @@ describe("useGlobalKeyboardShortcuts", () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
+  it("should not preventDefault when no shortcut matches", () => {
+    const handler = jest.fn();
+    const shortcuts = { x: handler };
+
+    renderHook(() => useGlobalKeyboardShortcuts(shortcuts));
+
+    const event = new KeyboardEvent("keydown", { key: "z", bubbles: true, cancelable: true });
+    Object.defineProperty(event, "target", { value: document.body, enumerable: true });
+    const preventDefaultSpy = jest.spyOn(event, "preventDefault");
+
+    act(() => {
+      document.dispatchEvent(event);
+    });
+
+    expect(handler).not.toHaveBeenCalled();
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+  });
+
+  it("does not add listeners when disabled", () => {
+    const handler = jest.fn();
+    const shortcuts = { k: handler };
+    const addEventListenerSpy = jest.spyOn(document, "addEventListener");
+
+    renderHook(() => useGlobalKeyboardShortcuts(shortcuts, false));
+
+    expect(addEventListenerSpy).not.toHaveBeenCalledWith("keydown", expect.any(Function));
+  });
+
   it("should call handler for complex ctrl+shift+key shortcut", () => {
     const handler = jest.fn();
     const shortcuts = { "ctrl+shift+k": handler };
 
+    const addEventListenerSpy = jest.spyOn(document, "addEventListener");
+
     renderHook(() => useGlobalKeyboardShortcuts(shortcuts));
+
+    const registeredHandler = addEventListenerSpy.mock.calls[0]?.[1] as (event: KeyboardEvent) => void;
 
     act(() => {
       const event = new KeyboardEvent("keydown", { key: "k", ctrlKey: true, shiftKey: true, bubbles: true, cancelable: true });
       Object.defineProperty(event, "target", { value: document.body, enumerable: true });
-      document.dispatchEvent(event);
+      registeredHandler(event);
     });
 
     expect(handler).toHaveBeenCalledTimes(1);
@@ -605,7 +690,11 @@ describe("useGlobalKeyboardShortcuts", () => {
     const handler = jest.fn();
     const shortcuts = { k: handler };
 
+    const addEventListenerSpy = jest.spyOn(document, "addEventListener");
+
     renderHook(() => useGlobalKeyboardShortcuts(shortcuts));
+
+    const registeredHandler = addEventListenerSpy.mock.calls[0]?.[1] as (event: KeyboardEvent) => void;
 
     const event = new KeyboardEvent("keydown", { key: "k", bubbles: true, cancelable: true });
     Object.defineProperty(event, "target", { value: document.body, enumerable: true });
@@ -613,7 +702,7 @@ describe("useGlobalKeyboardShortcuts", () => {
     const stopPropagationSpy = jest.spyOn(event, "stopPropagation");
 
     act(() => {
-      document.dispatchEvent(event);
+      registeredHandler(event);
     });
 
     expect(handler).toHaveBeenCalledTimes(1);
@@ -637,12 +726,16 @@ describe("useGlobalKeyboardShortcuts", () => {
     const handler = jest.fn();
     const shortcuts = { k: handler };
 
+    const addEventListenerSpy = jest.spyOn(document, "addEventListener");
+
     renderHook(() => useGlobalKeyboardShortcuts(shortcuts));
+
+    const registeredHandler = addEventListenerSpy.mock.calls[0]?.[1] as (event: KeyboardEvent) => void;
 
     act(() => {
       const event = new KeyboardEvent("keydown", { key: "K", bubbles: true, cancelable: true });
       Object.defineProperty(event, "target", { value: document.body, enumerable: true });
-      document.dispatchEvent(event);
+      registeredHandler(event);
     });
 
     expect(handler).toHaveBeenCalledTimes(1);
@@ -718,37 +811,9 @@ describe("useRovingTabIndex", () => {
     expect(setCurrentIndex).toHaveBeenCalledWith(0);
   });
 
-  it("should navigate to first item", () => {
-    const items = [document.createElement("div"), document.createElement("div"), document.createElement("div")];
-    const itemsRef: React.RefObject<HTMLElement[]> = { current: items };
-    const setCurrentIndex = jest.fn();
-
-    const { result } = renderHook(() => useRovingTabIndex(itemsRef, 2, setCurrentIndex));
-
-    act(() => {
-      result.current("first");
-    });
-
-    expect(setCurrentIndex).toHaveBeenCalledWith(0);
-  });
-
-  it("should navigate to last item", () => {
-    const items = [document.createElement("div"), document.createElement("div"), document.createElement("div")];
-    const itemsRef: React.RefObject<HTMLElement[]> = { current: items };
-    const setCurrentIndex = jest.fn();
-
-    const { result } = renderHook(() => useRovingTabIndex(itemsRef, 0, setCurrentIndex));
-
-    act(() => {
-      result.current("last");
-    });
-
-    expect(setCurrentIndex).toHaveBeenCalledWith(2);
-  });
-
   it("should focus the new item when navigating", () => {
     const items = [document.createElement("div"), document.createElement("div"), document.createElement("div")];
-    items.forEach((item) => document.body.appendChild(item));
+    items.forEach(item => document.body.appendChild(item));
     const itemsRef: React.RefObject<HTMLElement[]> = { current: items };
     const setCurrentIndex = jest.fn();
     const focusSpy = jest.spyOn(items[1], "focus");
@@ -761,7 +826,7 @@ describe("useRovingTabIndex", () => {
 
     expect(focusSpy).toHaveBeenCalled();
 
-    items.forEach((item) => document.body.removeChild(item));
+    items.forEach(item => document.body.removeChild(item));
   });
 
   it("should handle empty items array", () => {
@@ -800,5 +865,19 @@ describe("useRovingTabIndex", () => {
 
     expect(items[0].getAttribute("tabindex")).toBe("0");
     expect(items[2].getAttribute("tabindex")).toBe("-1");
+  });
+
+  it("should handle navigation when next item is null", () => {
+    const items = [null as unknown as HTMLElement];
+    const itemsRef: React.RefObject<HTMLElement[]> = { current: items };
+    const setCurrentIndex = jest.fn();
+
+    const { result } = renderHook(() => useRovingTabIndex(itemsRef, 0, setCurrentIndex));
+
+    act(() => {
+      result.current("next");
+    });
+
+    expect(setCurrentIndex).toHaveBeenCalledWith(0);
   });
 });

@@ -28,6 +28,7 @@ export interface IFeedbackBoardDocument {
   maxVotesPerUser: number;
   boardVoteCollection: { [voter: string]: number };
   teamEffectivenessMeasurementVoteCollection: ITeamEffectivenessMeasurementVoteCollection[];
+  emailContent?: string;
   permissions?: IFeedbackBoardDocumentPermissions;
   isPublic?: boolean;
   isArchived?: boolean;
@@ -73,7 +74,7 @@ export interface ITeamEffectivenessMeasurementVoteCollection {
 export interface IFeedbackColumn {
   id: string;
   title: string;
-  iconClass: string;
+  iconClass?: string;
   accentColor: string;
   notes?: string;
 }

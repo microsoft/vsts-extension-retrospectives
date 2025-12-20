@@ -1,3 +1,4 @@
+import React from "react";
 import { mocked } from "jest-mock";
 import { WorkflowPhase } from "../../../interfaces/workItem";
 
@@ -93,7 +94,7 @@ export const testColumnProps = mocked({
   columnId: testColumnUuidOne,
   originalColumnId: testColumnUuidOne,
   accentColor: testColumns[testColumnUuidOne].columnProperties.accentColor,
-  iconClass: testColumns[testColumnUuidOne].columnProperties.iconClass,
+  icon: <i className={testColumns[testColumnUuidOne].columnProperties.iconClass} />,
   workflowPhase: WorkflowPhase.Act,
   isDataLoaded: false,
   columnItems: testColumns[testColumnUuidOne].columnItems,
@@ -291,7 +292,7 @@ export const testGroupColumnProps = mocked({
   columnId: testGroupColumnUuidOne,
   originalColumnId: testGroupColumnUuidOne,
   accentColor: testGroupColumns[testGroupColumnUuidOne].columnProperties.accentColor,
-  iconClass: testGroupColumns[testGroupColumnUuidOne].columnProperties.iconClass,
+  icon: <i className={testGroupColumns[testGroupColumnUuidOne].columnProperties.iconClass} />,
   workflowPhase: WorkflowPhase.Act,
   isDataLoaded: false,
   columnItems: testGroupColumns[testGroupColumnUuidOne].columnItems,

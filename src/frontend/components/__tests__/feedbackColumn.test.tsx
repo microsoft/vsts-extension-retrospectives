@@ -139,6 +139,59 @@ describe("Feedback Column ", () => {
         rerender(<FeedbackColumn {...updatedProps} />);
       }
     });
+
+    it("handles errors when restoring contenteditable cursor without crashing", () => {
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+      const createRangeSpy = jest.spyOn(document, "createRange").mockImplementation(() => {
+        throw new Error("boom");
+      });
+      const timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation((cb: (...args: any[]) => void) => {
+        cb();
+        return 0 as any;
+      });
+      let callbackRan = false;
+
+      try {
+        const props = { ...testColumnProps };
+        const ref = React.createRef<FeedbackColumn>();
+        const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+        expect(ref.current).toBeTruthy();
+
+        const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+        expect(feedbackCard).toBeTruthy();
+
+        const itemId = props.columnItems[0].feedbackItem.id;
+
+        const contentEditable = document.createElement("div");
+        contentEditable.setAttribute("contenteditable", "true");
+        contentEditable.textContent = "Editable";
+        // Ensure restoreFocus sees contenteditable
+        Object.defineProperty(contentEditable, "isContentEditable", { value: true });
+
+        feedbackCard.appendChild(contentEditable);
+        contentEditable.focus();
+        expect(document.activeElement).toBe(contentEditable);
+
+        // Ignore any warnings from initial render.
+        warnSpy.mockClear();
+
+        (ref.current as any).focusPreservation = {
+          elementId: itemId,
+          selectionStart: null,
+          selectionEnd: null,
+          isContentEditable: true,
+          cursorPosition: 2,
+        };
+
+        (ref.current as any).restoreFocus();
+        callbackRan = true;
+        expect(callbackRan).toBe(true);
+      } finally {
+        createRangeSpy.mockRestore();
+        warnSpy.mockRestore();
+        timeoutSpy.mockRestore();
+      }
+    });
   });
 
   describe("Accessibility - Keyboard Navigation", () => {
@@ -526,6 +579,23 @@ describe("Feedback Column ", () => {
   });
 
   describe("Keyboard Navigation - Immediate Focus (Issue fix)", () => {
+    let querySelectorSpy: jest.SpyInstance;
+    let originalQuerySelector: (selectors: string) => Element | null;
+
+    beforeEach(() => {
+      originalQuerySelector = document.querySelector.bind(document);
+      querySelectorSpy = jest.spyOn(document, "querySelector").mockImplementation(((selectors: string) => {
+        if (selectors === '[role="dialog"]') {
+          return null;
+        }
+        return originalQuerySelector(selectors);
+      }) as any);
+    });
+
+    afterEach(() => {
+      querySelectorSpy.mockRestore();
+    });
+
     test("column is focusable via keyboard with tabIndex=0", () => {
       const { container } = render(<FeedbackColumn {...testColumnProps} />);
       const column = container.querySelector(".feedback-column") as HTMLElement;
@@ -647,7 +717,7 @@ describe("Feedback Column ", () => {
   describe("Static Methods", () => {
     test("createFeedbackItemProps creates proper props object", () => {
       const props = FeedbackColumn.createFeedbackItemProps(testColumnProps, testColumnProps.columnItems[0]);
-      
+
       expect(props).toHaveProperty("id");
       expect(props).toHaveProperty("title");
       expect(props).toHaveProperty("boardId");
@@ -681,7 +751,7 @@ describe("Feedback Column ", () => {
       };
 
       const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(propsWithDifferent, itemInDifferentColumn);
-      
+
       expect(feedbackItemProps.accentColor).toBe("#ff0000");
     });
 
@@ -695,7 +765,7 @@ describe("Feedback Column ", () => {
       };
 
       const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(testColumnProps, itemInMissingColumn);
-      
+
       expect(feedbackItemProps.accentColor).toBe(testColumnProps.accentColor);
     });
   });
@@ -713,7 +783,7 @@ describe("Feedback Column ", () => {
         feedbackCard.appendChild(contentEditable);
 
         contentEditable.focus();
-        
+
         // Set selection
         const range = document.createRange();
         const selection = window.getSelection();
@@ -764,7 +834,7 @@ describe("Feedback Column ", () => {
         feedbackCard.appendChild(contentEditable);
 
         contentEditable.focus();
-        
+
         // Set selection beyond text length
         const range = document.createRange();
         const selection = window.getSelection();
@@ -794,7 +864,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Navigate to last
       const event = new KeyboardEvent("keydown", { key: "End", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -811,7 +881,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Navigate forward from unset state
       const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -828,7 +898,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // First go down to set focus
       column.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
       // Then try to go up - should stay at 0
@@ -838,14 +908,12 @@ describe("Feedback Column ", () => {
     });
 
     test("does not navigate when focusedItemIndex is negative and direction is prev", () => {
-      const items = [
-        { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1" } },
-      ];
+      const items = [{ ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1" } }];
       const props = { ...testColumnProps, columnItems: items };
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Try to go up without first focusing
       const event = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -866,7 +934,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Navigate - should only see parent item
       column.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
 
@@ -880,7 +948,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Press i key
       const event = new KeyboardEvent("keydown", { key: "i", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -893,7 +961,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Press i key - should have no effect
       const event = new KeyboardEvent("keydown", { key: "i", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
@@ -903,13 +971,30 @@ describe("Feedback Column ", () => {
   });
 
   describe("Insert Key", () => {
+    let querySelectorSpy: jest.SpyInstance;
+    let originalQuerySelector: (selectors: string) => Element | null;
+
+    beforeEach(() => {
+      originalQuerySelector = document.querySelector.bind(document);
+      querySelectorSpy = jest.spyOn(document, "querySelector").mockImplementation(((selectors: string) => {
+        if (selectors === '[role="dialog"]') {
+          return null;
+        }
+        return originalQuerySelector(selectors);
+      }) as any);
+    });
+
+    afterEach(() => {
+      querySelectorSpy.mockRestore();
+    });
+
     test("Insert key creates new feedback in Collect phase", () => {
       const addFeedbackItems = jest.fn();
       const props = { ...testColumnProps, workflowPhase: "Collect" as any, addFeedbackItems, columnItems: [] as IColumnItem[] };
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "Insert", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -986,14 +1071,16 @@ describe("Feedback Column ", () => {
       const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
       if (feedbackCard) {
         feedbackCard.focus();
-        
+
         // Update with different items that don't include the focused item
-        const updatedProps = { 
-          ...props, 
-          columnItems: [{ 
-            ...props.columnItems[0], 
-            feedbackItem: { ...props.columnItems[0].feedbackItem, id: "different-id" } 
-          }] 
+        const updatedProps = {
+          ...props,
+          columnItems: [
+            {
+              ...props.columnItems[0],
+              feedbackItem: { ...props.columnItems[0].feedbackItem, id: "different-id" },
+            },
+          ],
         };
         rerender(<FeedbackColumn {...updatedProps} />);
       }
@@ -1021,7 +1108,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Navigate to last
       column.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true, cancelable: true }));
       // Try to go past last - should stay at last
@@ -1035,7 +1122,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "i", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1071,7 +1158,7 @@ describe("Feedback Column ", () => {
       const { getByRole, getByLabelText, queryByRole } = render(<FeedbackColumn {...props} />);
 
       fireEvent.click(getByRole("button", { name: `Edit column ${props.columnName}` }));
-      
+
       // Dialog should be open
       expect(getByRole("dialog")).toBeInTheDocument();
 
@@ -1178,7 +1265,7 @@ describe("Feedback Column ", () => {
       const { container, getByRole } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "e", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1191,7 +1278,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "E", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1203,7 +1290,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "Insert", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1215,7 +1302,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "n", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1271,7 +1358,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       const event = new KeyboardEvent("keydown", { key: "Home", bubbles: true, cancelable: true });
       column.dispatchEvent(event);
 
@@ -1283,7 +1370,7 @@ describe("Feedback Column ", () => {
       const { container } = render(<FeedbackColumn {...props} />);
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // Go to first
       column.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true, cancelable: true }));
       // Try to go up - should stay at first
@@ -1316,6 +1403,724 @@ describe("Feedback Column ", () => {
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
       expect(column).toBeTruthy();
+    });
+  });
+
+  describe("ComponentDidMount - shouldFocusOnCreateFeedback", () => {
+    test("focuses create feedback button on mount when shouldFocusOnCreateFeedback is true", () => {
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Collect, shouldFocusOnCreateFeedback: true };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const createButton = container.querySelector(".create-button") as HTMLElement;
+      expect(createButton).toBeTruthy();
+    });
+
+    test("does not focus create feedback button when shouldFocusOnCreateFeedback is false", () => {
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Collect, shouldFocusOnCreateFeedback: false };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const createButton = container.querySelector(".create-button") as HTMLElement;
+      expect(createButton).toBeTruthy();
+    });
+  });
+
+  describe("Focus restoration - complete coverage", () => {
+    test("restores focus and selection range in input element", async () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]");
+      if (feedbackCard) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = "test input value";
+        feedbackCard.appendChild(input);
+        input.focus();
+        input.setSelectionRange(3, 7);
+
+        expect(document.activeElement).toBe(input);
+        expect(input.selectionStart).toBe(3);
+        expect(input.selectionEnd).toBe(7);
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("restores focus and selection range in textarea element", async () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]");
+      if (feedbackCard) {
+        const textarea = document.createElement("textarea");
+        textarea.value = "multi\nline\ntext";
+        feedbackCard.appendChild(textarea);
+        textarea.focus();
+        textarea.setSelectionRange(2, 8);
+
+        expect(document.activeElement).toBe(textarea);
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("restores cursor position in contenteditable element", async () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]");
+      if (feedbackCard) {
+        const contentEditable = document.createElement("div");
+        contentEditable.contentEditable = "true";
+        contentEditable.textContent = "Editable text content";
+        feedbackCard.appendChild(contentEditable);
+        contentEditable.focus();
+
+        const range = document.createRange();
+        const selection = window.getSelection();
+        if (contentEditable.firstChild && selection) {
+          range.setStart(contentEditable.firstChild, 8);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("handles failed restoration of cursor position in contenteditable with error", async () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation();
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]");
+      if (feedbackCard) {
+        const contentEditable = document.createElement("div");
+        contentEditable.contentEditable = "true";
+        contentEditable.textContent = "Text";
+        feedbackCard.appendChild(contentEditable);
+        contentEditable.focus();
+
+        const range = document.createRange();
+        const selection = window.getSelection();
+        if (contentEditable.firstChild && selection) {
+          range.setStart(contentEditable.firstChild, 2);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+
+      consoleWarnSpy.mockRestore();
+      expect(container).toBeTruthy();
+    });
+  });
+
+  describe("Navigate to create button in Collect phase", () => {
+    test("navigates to create button when no items and ArrowDown pressed", () => {
+      const props = { ...testColumnProps, columnItems: [] as IColumnItem[], workflowPhase: WorkflowPhase.Collect };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      if (ref.current) {
+        ref.current.navigateByKeyboard("next");
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("focuses create button when focusColumn called with no items in Collect phase", () => {
+      const props = { ...testColumnProps, columnItems: [] as IColumnItem[], workflowPhase: WorkflowPhase.Collect };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      if (ref.current) {
+        ref.current.focusColumn();
+      }
+
+      expect(container.querySelector(".create-button")).toBeTruthy();
+    });
+  });
+
+  describe("Item ref navigation with actual elements", () => {
+    test("focuses item element when navigating with registered refs", () => {
+      const mockItem1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", title: "Item 1" },
+      };
+      const mockItem2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", title: "Item 2" },
+      };
+
+      const props = { ...testColumnProps, columnItems: [mockItem1, mockItem2] };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      if (ref.current) {
+        const mockElement1 = document.createElement("div");
+        mockElement1.tabIndex = 0;
+        const mockElement2 = document.createElement("div");
+        mockElement2.tabIndex = 0;
+
+        ref.current.registerItemRef("item-1", mockElement1);
+        ref.current.registerItemRef("item-2", mockElement2);
+
+        ref.current.navigateByKeyboard("next");
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("focuses first item when focusColumn is called with items present", () => {
+      const mockItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "focus-item" },
+      };
+
+      const props = { ...testColumnProps, columnItems: [mockItem] };
+      const ref = React.createRef<FeedbackColumn>();
+      render(<FeedbackColumn {...props} ref={ref} />);
+
+      if (ref.current) {
+        const mockElement = document.createElement("div");
+        mockElement.tabIndex = 0;
+        ref.current.registerItemRef("focus-item", mockElement);
+        ref.current.focusColumn();
+      }
+
+      expect(true).toBe(true);
+    });
+  });
+
+  describe("handleDropFeedbackItemOnColumnSpace async method", () => {
+    test("handles drop event on column", () => {
+      const refreshFeedbackItems = jest.fn();
+      const props = { ...testColumnProps, refreshFeedbackItems };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+    });
+  });
+
+  describe("Static moveFeedbackItem method", () => {
+    test("moveFeedbackItem is a static method", () => {
+      expect(typeof FeedbackColumn.moveFeedbackItem).toBe("function");
+    });
+  });
+
+  describe("FeedbackItemGroup rendering", () => {
+    test("renders FeedbackItemGroup when item has child items", () => {
+      const parentItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "parent-item",
+          childFeedbackItemIds: ["child-1", "child-2"],
+        },
+      };
+
+      const childItem1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "child-1",
+          parentFeedbackItemId: "parent-item",
+        },
+      };
+
+      const childItem2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "child-2",
+          parentFeedbackItemId: "parent-item",
+        },
+      };
+
+      const props = {
+        ...testColumnProps,
+        columnItems: [parentItem, childItem1, childItem2],
+        isDataLoaded: true,
+      };
+
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      expect(container.querySelector(".feedback-items-container")).toBeTruthy();
+    });
+
+    test("renders grouped items in Act workflow phase sorted by votes", () => {
+      const parentItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "parent-item",
+          upvotes: 10,
+          childFeedbackItemIds: ["child-1"],
+        },
+      };
+
+      const childItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "child-1",
+          upvotes: 5,
+          parentFeedbackItemId: "parent-item",
+        },
+      };
+
+      const props = {
+        ...testColumnProps,
+        columnItems: [parentItem, childItem],
+        isDataLoaded: true,
+        workflowPhase: WorkflowPhase.Act,
+      };
+
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      expect(container.querySelector(".feedback-items-container")).toBeTruthy();
+    });
+  });
+
+  describe("Double click to create feedback", () => {
+    test("creates empty feedback item on column double click in Collect phase", () => {
+      const addFeedbackItems = jest.fn();
+      const props = {
+        ...testColumnProps,
+        workflowPhase: WorkflowPhase.Collect,
+        addFeedbackItems,
+        columnItems: [] as IColumnItem[],
+      };
+
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      if (column) {
+        fireEvent.doubleClick(column);
+        expect(addFeedbackItems).toHaveBeenCalled();
+      }
+    });
+  });
+
+  describe("ComponentWillUnmount cleanup", () => {
+    test("removes keydown event listener on unmount", () => {
+      const props = { ...testColumnProps };
+      const { unmount } = render(<FeedbackColumn {...props} />);
+
+      unmount();
+
+      expect(true).toBe(true);
+    });
+  });
+
+  describe("Column notes dialog - empty value handling", () => {
+    test("handles empty string in column notes change", () => {
+      const props = { ...testColumnProps, showColumnEditButton: true };
+      const { getByRole, getByLabelText } = render(<FeedbackColumn {...props} />);
+
+      fireEvent.click(getByRole("button", { name: `Edit column ${props.columnName}` }));
+
+      const notesInput = getByLabelText("Column notes") as HTMLInputElement;
+      fireEvent.change(notesInput, { target: { value: undefined } });
+
+      expect(notesInput.value).toBe("");
+    });
+  });
+
+  describe("Focus preservation - INPUT element with selectionStart/End", () => {
+    test("preserves selectionStart and selectionEnd in INPUT element", () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = "test value here";
+        input.id = "test-input";
+        feedbackCard.appendChild(input);
+
+        input.focus();
+        input.selectionStart = 5;
+        input.selectionEnd = 10;
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "new-item-id" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        setTimeout(() => {
+          expect(input).toBeTruthy();
+        }, 50);
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("preserves selectionStart and selectionEnd in TEXTAREA element", () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const textarea = document.createElement("textarea");
+        textarea.value = "multiline text\nwith line breaks";
+        textarea.id = "test-textarea";
+        feedbackCard.appendChild(textarea);
+
+        textarea.focus();
+        textarea.selectionStart = 3;
+        textarea.selectionEnd = 12;
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "another-new-item" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        setTimeout(() => {
+          expect(textarea).toBeTruthy();
+        }, 50);
+      }
+
+      expect(container).toBeTruthy();
+    });
+  });
+
+  describe("Focus preservation - contentEditable with selection", () => {
+    test("preserves cursor position in contentEditable element with selection", () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const contentEditable = document.createElement("div");
+        contentEditable.contentEditable = "true";
+        contentEditable.textContent = "Some editable content here";
+        contentEditable.id = "test-contenteditable";
+        feedbackCard.appendChild(contentEditable);
+
+        contentEditable.focus();
+
+        const selection = window.getSelection();
+        const range = document.createRange();
+        if (contentEditable.firstChild && selection) {
+          range.setStart(contentEditable.firstChild, 5);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+
+          expect(selection.rangeCount).toBeGreaterThan(0);
+        }
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "content-edit-new" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        setTimeout(() => {
+          expect(contentEditable).toBeTruthy();
+        }, 50);
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("handles contentEditable without selection ranges", () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const contentEditable = document.createElement("div");
+        contentEditable.contentEditable = "true";
+        contentEditable.textContent = "Content";
+        feedbackCard.appendChild(contentEditable);
+
+        contentEditable.focus();
+
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+        }
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "no-range-item" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        setTimeout(() => {
+          expect(contentEditable).toBeTruthy();
+        }, 50);
+      }
+
+      expect(container).toBeTruthy();
+    });
+  });
+
+  describe("Focus restoration - specific element paths", () => {
+    beforeEach(() => {
+      jest.useFakeTimers({ doNotFake: ["setInterval"] });
+    });
+
+    afterEach(() => {
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    });
+
+    test("restores focus when element has both input and textarea in feedback card", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const textarea = document.createElement("textarea");
+        textarea.value = "textarea content";
+        feedbackCard.appendChild(textarea);
+
+        const input = document.createElement("input");
+        input.value = "input content";
+        feedbackCard.appendChild(input);
+
+        input.focus();
+        input.selectionStart = 2;
+        input.selectionEnd = 7;
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "multi-element" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        jest.runOnlyPendingTimers();
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("restores focus when no input/textarea found but feedback card exists", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        feedbackCard.tabIndex = 0;
+        feedbackCard.focus();
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "card-focus-item" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        jest.runOnlyPendingTimers();
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("handles contentEditable cursor position restoration with bounds checking", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const contentEditable = document.createElement("div");
+        contentEditable.contentEditable = "true";
+        contentEditable.textContent = "ABC";
+        feedbackCard.appendChild(contentEditable);
+
+        contentEditable.focus();
+
+        const selection = window.getSelection();
+        const range = document.createRange();
+        if (contentEditable.firstChild && selection) {
+          range.setStart(contentEditable.firstChild, 2);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "bounds-check-item" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        jest.runOnlyPendingTimers();
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("handles contentEditable when firstChild is null", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const contentEditable = document.createElement("div");
+        contentEditable.contentEditable = "true";
+        feedbackCard.appendChild(contentEditable);
+
+        contentEditable.focus();
+
+        const selection = window.getSelection();
+        if (selection) {
+          const range = document.createRange();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "null-child-item" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        jest.runOnlyPendingTimers();
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("handles contentEditable when selection is null", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const contentEditable = document.createElement("div");
+        contentEditable.contentEditable = "true";
+        contentEditable.textContent = "Text";
+        feedbackCard.appendChild(contentEditable);
+
+        contentEditable.focus();
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "null-selection-item" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        jest.runOnlyPendingTimers();
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("triggers setSelectionRange with selectionEnd when restoring focus", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const input = document.createElement("input");
+        input.value = "test input";
+        input.type = "text";
+        feedbackCard.appendChild(input);
+
+        input.focus();
+        input.selectionStart = 2;
+        input.selectionEnd = 5;
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "selection-range-item" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        jest.runOnlyPendingTimers();
+
+        expect(input).toBeTruthy();
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("handles error in contentEditable cursor restoration", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation();
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const contentEditable = document.createElement("div");
+        contentEditable.contentEditable = "true";
+        contentEditable.textContent = "Error test";
+        feedbackCard.appendChild(contentEditable);
+
+        contentEditable.focus();
+
+        const selection = window.getSelection();
+        const range = document.createRange();
+        if (contentEditable.firstChild && selection) {
+          range.setStart(contentEditable.firstChild, 5);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "error-handling-item" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+
+        jest.runOnlyPendingTimers();
+      }
+
+      consoleWarnSpy.mockRestore();
+      expect(container).toBeTruthy();
+    });
+  });
+
+  describe("Additional uncovered scenarios", () => {
+    test("handles contentEditable element with selection and rangeCount", () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const contentEditable = document.createElement("div");
+        contentEditable.contentEditable = "true";
+        contentEditable.textContent = "Range count test";
+        feedbackCard.appendChild(contentEditable);
+
+        contentEditable.focus();
+
+        const selection = window.getSelection();
+        if (selection) {
+          const range = document.createRange();
+          if (contentEditable.firstChild) {
+            range.setStart(contentEditable.firstChild, 3);
+            range.setEnd(contentEditable.firstChild, 8);
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            expect(selection.rangeCount).toBe(1);
+            expect(selection.getRangeAt(0).startOffset).toBe(3);
+          }
+        }
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems, { ...props.columnItems[0], feedbackItem: { ...props.columnItems[0].feedbackItem, id: "range-count-test" } }] };
+        rerender(<FeedbackColumn {...updatedProps} />);
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("handles timeout in restoreFocus when focusPreservation becomes null", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container, rerender } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard && ref.current) {
+        feedbackCard.focus();
+
+        const updatedProps = { ...props, columnItems: [...props.columnItems] };
+        rerender(<FeedbackColumn {...updatedProps} ref={ref} />);
+
+        await new Promise(resolve => setTimeout(resolve, 20));
+      }
+
+      expect(container).toBeTruthy();
     });
   });
 });

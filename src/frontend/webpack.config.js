@@ -17,7 +17,7 @@ const require = createRequire(import.meta.url);
 const BUILD_DIR = _resolve(__dirname, "dist");
 const APP_DIR = _resolve(__dirname, "");
 
-export default (env, argv) => {
+export default (_, argv) => {
   const mode = argv.mode || "production";
 
   return {
@@ -65,7 +65,7 @@ export default (env, argv) => {
       ],
     },
     optimization: {
-      /*      minimize: true,
+      minimize: true,
       minimizer: [
         new TerserPlugin({
           terserOptions: {
@@ -75,7 +75,7 @@ export default (env, argv) => {
             },
           },
         }),
-      ],*/
+      ],
       usedExports: true,
       sideEffects: false,
       splitChunks: false,

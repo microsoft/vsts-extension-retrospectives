@@ -1,8 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import FeedbackCarousel from "../../components/feedbackCarousel";
-import FeedbackItem from "../../components/feedbackItem";
-import { testGroupColumnProps, testColumnProps, testGroupFeedbackItemTwo } from "../__mocks__/mocked_components/mockedFeedbackColumn";
+import FeedbackCarousel, { type FocusModeModel } from "../../components/feedbackCarousel";
+import { testGroupColumnProps, testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { mockUuid } from "../__mocks__/uuid/v4";
 
 jest.mock("../../utilities/telemetryClient", () => ({
@@ -12,15 +11,53 @@ jest.mock("../../utilities/telemetryClient", () => ({
   },
 }));
 
+const buildFocusModeModel = (columnPropsList: Array<typeof testColumnProps>): FocusModeModel => {
+  const first = columnPropsList[0] ?? testColumnProps;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: any = {};
+
+  for (const col of columnPropsList) {
+    columns[col.columnId] = {
+      columnProperties: {
+        id: col.columnId,
+        title: col.columnName,
+        icon: col.icon,
+        accentColor: col.accentColor,
+        notes: "",
+      },
+      columnItems: col.columnItems,
+    };
+  }
+
+  return {
+    columns,
+    columnIds: columnPropsList.map(c => c.columnId),
+    workflowPhase: first.workflowPhase,
+    team: first.team,
+    boardId: first.boardId,
+    boardTitle: first.boardTitle,
+    defaultActionItemAreaPath: first.defaultActionItemAreaPath,
+    defaultActionItemIteration: first.defaultActionItemIteration,
+    nonHiddenWorkItemTypes: first.nonHiddenWorkItemTypes,
+    allWorkItemTypes: first.allWorkItemTypes,
+    hideFeedbackItems: first.hideFeedbackItems,
+    onVoteCasted: first.onVoteCasted,
+    activeTimerFeedbackItemId: first.activeTimerFeedbackItemId,
+    requestTimerStart: first.requestTimerStart,
+    notifyTimerStopped: first.notifyTimerStopped,
+    addFeedbackItems: first.addFeedbackItems,
+    removeFeedbackItemFromColumn: first.removeFeedbackItemFromColumn,
+    refreshFeedbackItems: first.refreshFeedbackItems,
+  };
+};
+
 const mockedProps = {
-  feedbackColumnPropsList: [testColumnProps],
-  isFeedbackAnonymous: true,
+  focusModeModel: buildFocusModeModel([testColumnProps]),
   isFocusModalHidden: false,
 };
 
 const mockedGroupProps = {
-  feedbackColumnPropsList: [testGroupColumnProps],
-  isFeedbackAnonymous: true,
+  focusModeModel: buildFocusModeModel([testGroupColumnProps]),
   isFocusModalHidden: false,
 };
 
@@ -57,7 +94,11 @@ describe("Feedback Carousel ", () => {
     });
 
     it("should not exist when there are no feedback columns", () => {
-      const { container } = render(<FeedbackCarousel feedbackColumnPropsList={[]} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
+      const emptyModel = buildFocusModeModel([] as unknown as Array<typeof testColumnProps>);
+      emptyModel.columnIds = [];
+      emptyModel.columns = {} as any;
+
+      const { container } = render(<FeedbackCarousel focusModeModel={emptyModel} isFocusModalHidden={false} />);
 
       expect(container.textContent).not.toContain("All");
     });
@@ -66,7 +107,7 @@ describe("Feedback Carousel ", () => {
       const column1 = { ...testColumnProps, columnId: "col1", columnName: "Column 1", columnItems: testColumnProps.columnItems.slice(0, 1) };
       const column2 = { ...testColumnProps, columnId: "col2", columnName: "Column 2", columnItems: testColumnProps.columnItems.slice(1, 2) };
 
-      const { container } = render(<FeedbackCarousel feedbackColumnPropsList={[column1, column2]} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
+      const { container } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([column1, column2])} isFocusModalHidden={false} />);
 
       // All column should contain items from both columns
       expect(container).toBeTruthy();
@@ -90,7 +131,7 @@ describe("Feedback Carousel ", () => {
 
       const propsWithSorting = {
         ...mockedProps,
-        feedbackColumnPropsList: [{ ...testColumnProps, columnItems: [item3, item1, item2] }],
+        focusModeModel: buildFocusModeModel([{ ...testColumnProps, columnItems: [item3, item1, item2] }]),
       };
 
       const { container } = render(<FeedbackCarousel {...propsWithSorting} />);
@@ -111,7 +152,7 @@ describe("Feedback Carousel ", () => {
 
       const propsWithChildren = {
         ...mockedProps,
-        feedbackColumnPropsList: [{ ...testColumnProps, columnItems: [parentItem, childItem] }],
+        focusModeModel: buildFocusModeModel([{ ...testColumnProps, columnItems: [parentItem, childItem] }]),
       };
 
       const { container } = render(<FeedbackCarousel {...propsWithChildren} />);
@@ -132,7 +173,7 @@ describe("Feedback Carousel ", () => {
 
       const propsWithEqual = {
         ...mockedProps,
-        feedbackColumnPropsList: [{ ...testColumnProps, columnItems: [item1, item2] }],
+        focusModeModel: buildFocusModeModel([{ ...testColumnProps, columnItems: [item1, item2] }]),
       };
 
       const { container } = render(<FeedbackCarousel {...propsWithEqual} />);
@@ -147,7 +188,7 @@ describe("Feedback Carousel ", () => {
       const column2 = { ...testColumnProps, columnId: "col2", columnName: "What Needs Improvement" };
       const column3 = { ...testColumnProps, columnId: "col3", columnName: "Action Items" };
 
-      const { container } = render(<FeedbackCarousel feedbackColumnPropsList={[column1, column2, column3]} isFeedbackAnonymous={true} isFocusModalHidden={false} />);
+      const { container } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([column1, column2, column3])} isFocusModalHidden={false} />);
 
       // Should have All + 3 columns
       expect(container).toBeTruthy();
@@ -162,31 +203,23 @@ describe("Feedback Carousel ", () => {
       const initialColumn = { ...testColumnProps, columnId: "col1", columnName: "Initial Column" };
       const updatedColumn = { ...testColumnProps, columnId: "col2", columnName: "Updated Column" };
 
-      const { container, rerender } = render(
-        <FeedbackCarousel feedbackColumnPropsList={[initialColumn]} isFeedbackAnonymous={true} isFocusModalHidden={false} />
-      );
+      const { container, rerender } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([initialColumn])} isFocusModalHidden={false} />);
 
       expect(container.textContent).toContain("Initial Column");
 
       // Rerender with different props to trigger componentDidUpdate
-      rerender(
-        <FeedbackCarousel feedbackColumnPropsList={[updatedColumn]} isFeedbackAnonymous={true} isFocusModalHidden={false} />
-      );
+      rerender(<FeedbackCarousel focusModeModel={buildFocusModeModel([updatedColumn])} isFocusModalHidden={false} />);
 
       expect(container.textContent).toContain("Updated Column");
     });
 
     it("should not update state when feedbackColumnPropsList stays the same reference", () => {
-      const columns = [{ ...testColumnProps, columnId: "col1", columnName: "Test Column" }];
+      const model = buildFocusModeModel([{ ...testColumnProps, columnId: "col1", columnName: "Test Column" }]);
 
-      const { container, rerender } = render(
-        <FeedbackCarousel feedbackColumnPropsList={columns} isFeedbackAnonymous={true} isFocusModalHidden={false} />
-      );
+      const { container, rerender } = render(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={false} />);
 
       // Rerender with same reference
-      rerender(
-        <FeedbackCarousel feedbackColumnPropsList={columns} isFeedbackAnonymous={false} isFocusModalHidden={true} />
-      );
+      rerender(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={true} />);
 
       expect(container.textContent).toContain("Test Column");
     });

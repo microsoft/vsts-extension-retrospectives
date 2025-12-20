@@ -1,5 +1,7 @@
 import React from "react";
-import { isValidUrl, escapeHtml, tokenizeMarkdown, parseMarkdown, hasMarkdownFormatting, stripMarkdown } from "../markdownUtils";
+import * as markdownUtils from "../markdownUtils";
+
+const { isValidUrl, escapeHtml, tokenizeMarkdown, parseMarkdown, hasMarkdownFormatting, stripMarkdown } = markdownUtils;
 
 describe("markdownUtils", () => {
   describe("isValidUrl", () => {
@@ -171,6 +173,10 @@ describe("markdownUtils", () => {
         expect(tokenizeMarkdown(undefined as unknown as string)).toEqual([]);
       });
 
+      it("should treat a single asterisk as plain text", () => {
+        expect(tokenizeMarkdown("*")).toEqual([{ type: "text", content: "*" }]);
+      });
+
       it("should handle plain text without markdown", () => {
         const tokens = tokenizeMarkdown("Just plain text");
         expect(tokens).toHaveLength(1);
@@ -195,6 +201,14 @@ describe("markdownUtils", () => {
     it("should return null for empty input", () => {
       expect(parseMarkdown("")).toBeNull();
       expect(parseMarkdown(null as unknown as string)).toBeNull();
+    });
+
+    it("should return input text when tokenizer yields no tokens", () => {
+      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([]);
+
+      expect(parseMarkdown("noop" as unknown as string)).toBe("noop");
+
+      tokenizeSpy.mockRestore();
     });
 
     it("should return string for plain text", () => {
@@ -261,6 +275,25 @@ describe("markdownUtils", () => {
           expect(props.alt).toBe("alt");
         }
       }
+    });
+
+    it("should default image alt text to empty string when missing", () => {
+      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([
+        { type: "image", content: "", url: "https://example.com/img.png" },
+      ] as unknown as ReturnType<typeof tokenizeMarkdown>);
+
+      const result = parseMarkdown("![missing-alt](https://example.com/img.png)");
+
+      expect(Array.isArray(result)).toBe(true);
+      if (Array.isArray(result) && result.length > 0) {
+        const element = result[0];
+        expect(React.isValidElement(element)).toBe(true);
+        if (React.isValidElement(element)) {
+          expect((element.props as { alt: string }).alt).toBe("");
+        }
+      }
+
+      tokenizeSpy.mockRestore();
     });
 
     it("should return array of elements for mixed formatting", () => {

@@ -111,13 +111,13 @@ describe("ShareBoardHelper", () => {
       {
         id: "col2",
         title: "What could be improved",
-        iconClass: "icon-sad",
+        iconId: "icon-sad",
         accentColor: "#ff0000",
       },
       {
         id: "col3",
         title: "Action items",
-        iconClass: "icon-action",
+        iconId: "icon-action",
         accentColor: "#0000ff",
       },
     ],

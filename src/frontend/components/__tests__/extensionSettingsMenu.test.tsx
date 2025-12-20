@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ExtensionSettingsMenu from "../extensionSettingsMenu";
 import boardDataService from "../../dal/boardDataService";
@@ -14,27 +14,6 @@ jest.mock("../../utilities/telemetryClient", () => ({
 
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: (_plugin: any, component: any) => component,
-}));
-
-jest.mock("../extensionSettingsMenuDialogContent", () => ({
-  RETRO_URLS: {
-    retrospectivewiki: "https://retrospectivewiki.org/",
-    changelog: "https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md",
-    readme: "https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md",
-    contributing: "https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md",
-    issues: "https://github.com/microsoft/vsts-extension-retrospectives/issues",
-  },
-  PRIME_DIRECTIVE_CONTENT: [{ content: "Test", style: "normal" }],
-  RETRO_HELP_CONTENT: [{ content: "Test", style: "normal" }],
-  VOLUNTEER_CONTENT: [{ content: "Test", style: "normal" }],
-  WHATISNEW_MARKDOWN: "# What's New\n\nTest",
-  renderContent: jest.fn(content => (
-    <div data-testid="rendered-content">
-      {content.map((item: any, i: number) => (
-        <span key={i}>{item.content}</span>
-      ))}
-    </div>
-  )),
 }));
 
 jest.mock("../../dal/azureDevOpsCoreService", () => ({
@@ -53,17 +32,6 @@ jest.mock("../../dal/itemDataService", () => ({
 
 jest.mock("../../utilities/servicesHelper", () => ({
   getProjectId: jest.fn().mockResolvedValue("test-project-id"),
-}));
-
-jest.mock("../keyboardShortcutsDialog", () => ({
-  __esModule: true,
-  default: ({ isOpen, onClose }: any) =>
-    isOpen ? (
-      <div data-testid="keyboard-shortcuts-dialog">
-        <h2>Keyboard Shortcuts</h2>
-        <button onClick={onClose}>Close</button>
-      </div>
-    ) : null,
 }));
 
 beforeAll(() => {
@@ -157,11 +125,22 @@ describe("ExtensionSettingsMenu", () => {
     expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
   });
 
+  it("opens keyboard shortcuts dialog with '?' hotkey", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).not.toHaveAttribute("open");
+
+    fireEvent.keyDown(document, { key: "?", code: "Slash", shiftKey: true });
+    expect(dialog).toHaveAttribute("open");
+  });
+
   it("opens retrospective wiki", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));
     fireEvent.click(screen.getByText("Open Retrospective Wiki"));
-    expect(windowOpenSpy).toHaveBeenCalledWith("https://retrospectivewiki.org/", "_blank");
+    expect(windowOpenSpy).toHaveBeenCalledWith("https://retrospectivewiki.com", "_blank");
   });
 
   it("opens What's New dialog", async () => {
@@ -190,10 +169,10 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("Volunteer"));
+      fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
     });
     await waitFor(() => {
-      expect(screen.getByText("Volunteer")).toBeInTheDocument();
+      expect(screen.getByRole("dialog", { name: "Volunteer" })).toBeInTheDocument();
     });
   });
 
@@ -204,7 +183,6 @@ describe("ExtensionSettingsMenu", () => {
       fireEvent.click(screen.getByText("Keyboard shortcuts"));
     });
     await waitFor(() => {
-      expect(screen.getByTestId("keyboard-shortcuts-dialog")).toBeInTheDocument();
       expect(screen.getByText("Keyboard Shortcuts")).toBeInTheDocument();
     });
   });
@@ -216,12 +194,13 @@ describe("ExtensionSettingsMenu", () => {
       fireEvent.click(screen.getByText("Keyboard shortcuts"));
     });
     await waitFor(() => {
-      expect(screen.getByTestId("keyboard-shortcuts-dialog")).toBeInTheDocument();
+      expect(screen.getByText("Keyboard Shortcuts")).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText("Close"));
+    const dialog = screen.getByRole("dialog", { name: "Keyboard Shortcuts" });
+    fireEvent.click(within(dialog).getByText("Close"));
     await waitFor(() => {
-      expect(screen.queryByTestId("keyboard-shortcuts-dialog")).not.toBeInTheDocument();
+      expect(screen.queryByText("Keyboard Shortcuts")).not.toBeVisible();
     });
   });
 
@@ -238,8 +217,8 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));
     expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
-    const closeButtons = screen.getAllByText("Close");
-    fireEvent.click(closeButtons[0]);
+    const dialog = screen.getByRole("dialog", { name: "The Prime Directive" });
+    fireEvent.click(within(dialog).getByText("Close"));
     await waitFor(() => {
       expect(screen.queryByText("The Prime Directive")).not.toBeVisible();
     });
@@ -254,8 +233,8 @@ describe("ExtensionSettingsMenu", () => {
     await waitFor(() => {
       expect(screen.getByText("What's New")).toBeInTheDocument();
     });
-    const closeButtons = screen.getAllByText("Close");
-    fireEvent.click(closeButtons[0]);
+    const dialog = screen.getByRole("dialog", { name: "What is New" });
+    fireEvent.click(within(dialog).getByText("Close"));
     await waitFor(() => {
       expect(screen.queryByText("What's New")).not.toBeVisible();
     });
@@ -294,8 +273,8 @@ describe("ExtensionSettingsMenu", () => {
     await waitFor(() => {
       expect(screen.getByText("Retrospectives User Guide")).toBeInTheDocument();
     });
-    const closeButtons = screen.getAllByText("Close");
-    fireEvent.click(closeButtons[0]);
+    const dialog = screen.getByRole("dialog", { name: "Retrospectives User Guide" });
+    fireEvent.click(within(dialog).getByText("Close"));
     await waitFor(() => {
       expect(screen.queryByText("Retrospectives User Guide")).not.toBeVisible();
     });
@@ -305,7 +284,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("Volunteer"));
+      fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
     });
     await waitFor(() => {
       fireEvent.click(screen.getByText("Open contributing guidelines"));
@@ -317,15 +296,15 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("Volunteer"));
+      fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
     });
     await waitFor(() => {
-      expect(screen.getByText("Volunteer")).toBeInTheDocument();
+      expect(screen.getByRole("dialog", { name: "Volunteer" })).toBeInTheDocument();
     });
-    const closeButtons = screen.getAllByText("Close");
-    fireEvent.click(closeButtons[0]);
+    const dialog = screen.getByRole("dialog", { name: "Volunteer" });
+    fireEvent.click(within(dialog).getByText("Close"));
     await waitFor(() => {
-      expect(screen.queryByText("Volunteer")).not.toBeVisible();
+      expect(dialog).not.toHaveAttribute("open");
     });
   });
 

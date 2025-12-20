@@ -4,7 +4,6 @@ import { DefaultButton } from "@fluentui/react/lib/Button";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 
-import DeleteBoardDialog from "./deleteBoardDialog";
 import BoardSummary from "./boardSummary";
 import { IFeedbackBoardDocument } from "../interfaces/feedback";
 import BoardDataService from "../dal/boardDataService";
@@ -15,6 +14,7 @@ import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetr
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import BoardSummaryTableHeader from "./boardSummaryTableHeader";
 import BoardSummaryTableBody from "./boardSummaryTableBody";
+import { getIconElement } from "./icons";
 
 export interface IBoardSummaryTableProps {
   teamId: string;
@@ -109,30 +109,27 @@ export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
 
 export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClick }: { board: IBoardSummaryTableItem; currentUserId: string; currentUserIsTeamAdmin: boolean; onClick: (event: React.MouseEvent) => void }) {
   if (!board.isArchived || !board.archivedDate || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
-    return <div className="centered-cell" />;
+    return <></>;
   }
   return isTrashEnabled(board) ? (
     <div className="centered-cell trash-icon" title="Delete board" aria-label="Delete board" onClick={onClick}>
-      <i className="fas fa-trash-alt"></i>
+      {getIconElement("delete")}
     </div>
   ) : (
     <div className="centered-cell trash-icon-disabled" title="Try archive before delete" aria-label="Try archive before delete">
-      <i className="fas fa-trash-alt"></i>
+      {getIconElement("delete")}
     </div>
   );
 }
 
-// Simple column definition interface
 export interface ISimpleColumn {
   id: string;
   header: string | (() => React.JSX.Element) | null;
   accessor?: keyof IBoardSummaryTableItem;
   cell: (item: IBoardSummaryTableItem) => React.JSX.Element | string | number;
   sortable?: boolean;
-  sortDescFirst?: boolean;
 }
 
-// Simple sorting types
 type SortDirection = "asc" | "desc" | false;
 
 export interface ITableData {
@@ -140,135 +137,6 @@ export interface ITableData {
   data: IBoardSummaryTableItem[];
   sorting: { columnId: string; direction: SortDirection };
   expandedRows: Set<string>;
-}
-
-function getColumns(onArchiveToggle: () => void, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, setOpenDialogBoardId: React.Dispatch<React.SetStateAction<string | null>>, currentUserId: string, currentUserIsTeamAdmin: boolean, expandedRows: Set<string>, toggleExpanded: (id: string) => void): ISimpleColumn[] {
-  const dateFormatter = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" });
-
-  return [
-    {
-      id: "expand",
-      header: null,
-      cell: (item: IBoardSummaryTableItem) => (
-        <DefaultButton className="contextual-menu-button" aria-label="Expand Row" title="Expand Row" onClick={() => toggleExpanded(item.id)}>
-          <span className="ms-Button-icon">
-            <i className={`fas ${expandedRows.has(item.id) ? "fa-caret-down" : "fa-caret-right"}`}></i>
-          </span>
-        </DefaultButton>
-      ),
-      sortable: false,
-    },
-    {
-      id: "boardName",
-      header: "Retrospective Name",
-      accessor: "boardName",
-      cell: (item: IBoardSummaryTableItem) => item.boardName,
-      sortable: true,
-    },
-    {
-      id: "createdDate",
-      header: "Created Date",
-      accessor: "createdDate",
-      cell: (item: IBoardSummaryTableItem) => dateFormatter.format(item.createdDate),
-      sortable: true,
-      sortDescFirst: true,
-    },
-    {
-      id: "isArchived",
-      header: "Archived",
-      accessor: "isArchived",
-      cell: (item: IBoardSummaryTableItem) => (
-        <div onClick={event => event.stopPropagation()} className="centered-cell">
-          <input
-            type="checkbox"
-            checked={!!item.isArchived}
-            onChange={event => {
-              handleArchiveToggle(item.teamId, item.id, event.target.checked, setTableData, onArchiveToggle);
-            }}
-          />
-        </div>
-      ),
-      sortable: true,
-      sortDescFirst: true,
-    },
-    {
-      id: "archivedDate",
-      header: "Archived Date",
-      accessor: "archivedDate",
-      cell: (item: IBoardSummaryTableItem) => (item.archivedDate ? dateFormatter.format(item.archivedDate) : ""),
-      sortable: true,
-      sortDescFirst: true,
-    },
-    {
-      id: "feedbackItemsCount",
-      header: "Feedback Items",
-      accessor: "feedbackItemsCount",
-      cell: (item: IBoardSummaryTableItem) => item.feedbackItemsCount,
-      sortable: true,
-    },
-    {
-      id: "totalWorkItemsCount",
-      header: "Total Work Items",
-      accessor: "totalWorkItemsCount",
-      cell: (item: IBoardSummaryTableItem) => item.totalWorkItemsCount,
-      sortable: true,
-    },
-    {
-      id: "trash",
-      header: () => (
-        <div className="centered-cell trash-icon-header">
-          <i className="fas fa-trash-alt" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin."></i>
-        </div>
-      ),
-      cell: (item: IBoardSummaryTableItem) => (
-        <TrashIcon
-          board={item}
-          currentUserId={currentUserId}
-          currentUserIsTeamAdmin={currentUserIsTeamAdmin}
-          onClick={event => {
-            event.stopPropagation();
-            setOpenDialogBoardId(item.id);
-          }}
-        />
-      ),
-      sortable: false,
-    },
-  ];
-}
-
-export async function handleConfirmDelete(openDialogBoardId: string | null, tableData: IBoardSummaryTableItem[], teamId: string, setOpenDialogBoardId: (id: string | null) => void, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, setRefreshKey: (value: boolean) => void) {
-  if (!openDialogBoardId) return;
-
-  const deletedBoard = tableData.find(board => board.id === openDialogBoardId);
-  const deletedBoardName = deletedBoard?.boardName || "Unknown Board";
-  const deletedFeedbackCount = deletedBoard?.feedbackItemsCount || 0;
-
-  try {
-    setOpenDialogBoardId(null); // close dialog
-
-    await BoardDataService.deleteFeedbackBoard(teamId, openDialogBoardId);
-    reflectBackendService.broadcastDeletedBoard(teamId, openDialogBoardId);
-
-    setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
-
-    appInsights.trackEvent({
-      name: TelemetryEvents.FeedbackBoardDeleted,
-      properties: {
-        boardId: openDialogBoardId,
-        boardName: deletedBoardName,
-        feedbackItemsCount: deletedFeedbackCount,
-        deletedByUserId: encrypt(getUserIdentity().id),
-      },
-    });
-  } catch (error) {
-    appInsights.trackException(error, {
-      boardId: openDialogBoardId,
-      boardName: deletedBoardName,
-      feedbackItemsCount: deletedFeedbackCount,
-      action: "delete",
-    });
-    setRefreshKey(true);
-  }
 }
 
 export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[]): IBoardSummaryTableState {
@@ -324,37 +192,33 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     allDataLoaded: false,
   });
 
-  // Simple sorting state
   const [sortColumn, setSortColumn] = useState<string>("createdDate");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-
   const [tableData, setTableData] = useState<IBoardSummaryTableItem[]>([]);
+
   useEffect(() => {
     setTableData(boardSummaryState.boardsTableItems);
   }, [boardSummaryState.boardsTableItems]);
 
-  const [refreshKey, setRefreshKey] = useState(false);
+  const dateFormatter = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" });
+  const deleteBoardDialogRef = React.createRef<HTMLDialogElement>();
 
-  // Toggle sort function
-  const toggleSort = (columnId: string, sortDescFirst?: boolean) => {
+  const toggleSort = (columnId: string) => {
     if (sortColumn === columnId) {
-      // Toggle direction
       if (sortDirection === "asc") {
         setSortDirection("desc");
       } else if (sortDirection === "desc") {
         setSortDirection(false);
       } else {
-        setSortDirection(sortDescFirst ? "desc" : "asc");
+        setSortDirection("asc");
       }
     } else {
-      // New column
       setSortColumn(columnId);
-      setSortDirection(sortDescFirst ? "desc" : "asc");
+      setSortDirection("asc");
     }
   };
 
-  // Toggle row expansion
   const toggleExpanded = (rowId: string) => {
     setExpandedRows(prev => {
       const next = new Set(prev);
@@ -367,51 +231,96 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     });
   };
 
-  // Get sorted data
-  const getSortedData = (): IBoardSummaryTableItem[] => {
-    if (!sortDirection) return tableData;
-
-    const sorted = [...tableData].sort((a, b) => {
-      let aVal: Date | string | number | boolean | null | undefined;
-      let bVal: Date | string | number | boolean | null | undefined;
-
-      if (sortColumn === "createdDate" || sortColumn === "archivedDate") {
-        aVal = a[sortColumn as keyof IBoardSummaryTableItem];
-        bVal = b[sortColumn as keyof IBoardSummaryTableItem];
-        if (!aVal) return 1;
-        if (!bVal) return -1;
-        const aTime = new Date(aVal as Date).getTime();
-        const bTime = new Date(bVal as Date).getTime();
-        return sortDirection === "asc" ? (aTime < bTime ? -1 : 1) : aTime < bTime ? 1 : -1;
-      } else {
-        aVal = a[sortColumn as keyof IBoardSummaryTableItem];
-        bVal = b[sortColumn as keyof IBoardSummaryTableItem];
-      }
-
-      if (aVal == null || aVal === undefined) return 1;
-      if (bVal == null || bVal === undefined) return -1;
-      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    return sorted;
-  };
-
-  // Get columns
-  const columns = getColumns(props.onArchiveToggle, setTableData, setOpenDialogBoardId, props.currentUserId, props.currentUserIsTeamAdmin, expandedRows, toggleExpanded);
-
-  const handleBoardsDocuments = (boardDocuments: IFeedbackBoardDocument[]) => {
-    const newState = buildBoardSummaryState(boardDocuments);
-    setBoardSummaryState(prev => ({ ...prev, ...newState }));
-    handleActionItems(newState).then();
-  };
+  const columnList: ISimpleColumn[] = [
+    {
+      id: "expand",
+      header: null,
+      cell: (item: IBoardSummaryTableItem) => (
+        <button className="contextual-menu-button" aria-label="Expand Row" title="Expand Row" onClick={() => toggleExpanded(item.id)}>
+          {getIconElement(expandedRows.has(item.id) ? "chevron-down" : "chevron-right")}
+        </button>
+      ),
+      sortable: false,
+    },
+    {
+      id: "boardName",
+      header: "Retrospective Name",
+      accessor: "boardName",
+      cell: (item: IBoardSummaryTableItem) => item.boardName,
+      sortable: true,
+    },
+    {
+      id: "createdDate",
+      header: "Created Date",
+      accessor: "createdDate",
+      cell: (item: IBoardSummaryTableItem) => dateFormatter.format(item.createdDate),
+      sortable: true,
+    },
+    {
+      id: "isArchived",
+      header: "Archived",
+      accessor: "isArchived",
+      cell: (item: IBoardSummaryTableItem) => (
+        <div onClick={event => event.stopPropagation()} className="centered-cell">
+          <input
+            type="checkbox"
+            checked={!!item.isArchived}
+            onChange={event => {
+              handleArchiveToggle(item.teamId, item.id, event.target.checked, setTableData, props.onArchiveToggle);
+            }}
+          />
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      id: "archivedDate",
+      header: "Archived Date",
+      accessor: "archivedDate",
+      cell: (item: IBoardSummaryTableItem) => (item.archivedDate ? dateFormatter.format(item.archivedDate) : ""),
+      sortable: true,
+    },
+    {
+      id: "feedbackItemsCount",
+      header: "Feedback Items",
+      accessor: "feedbackItemsCount",
+      cell: (item: IBoardSummaryTableItem) => item.feedbackItemsCount,
+      sortable: true,
+    },
+    {
+      id: "totalWorkItemsCount",
+      header: "Total Work Items",
+      accessor: "totalWorkItemsCount",
+      cell: (item: IBoardSummaryTableItem) => item.totalWorkItemsCount,
+      sortable: true,
+    },
+    {
+      id: "trash",
+      header: () => (
+        <div className="centered-cell trash-icon-header" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin.">
+          {getIconElement("delete")}
+        </div>
+      ),
+      cell: (item: IBoardSummaryTableItem) => (
+        <TrashIcon
+          board={item}
+          currentUserId={props.currentUserId}
+          currentUserIsTeamAdmin={props.currentUserIsTeamAdmin}
+          onClick={event => {
+            event.stopPropagation();
+            setOpenDialogBoardId(item.id);
+            deleteBoardDialogRef.current?.showModal();
+          }}
+        />
+      ),
+      sortable: false,
+    },
+  ];
 
   const handleActionItems = async (state: IBoardSummaryTableState) => {
     const updatedBoardsTableItems = [...state.boardsTableItems];
     const updatedActionItemsByBoard = { ...state.actionItemsByBoard };
 
-    // Preload all work item state info once, up front
     const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
     await Promise.all(
       props.supportedWorkItemTypes.map(async workItemType => {
@@ -425,7 +334,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
         const feedbackBoardId: string = feedbackBoard.id;
         const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
 
-        // Always set feedback item count, even if 0
         const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
         if (boardIndex !== -1) {
           updatedBoardsTableItems[boardIndex] = {
@@ -436,7 +344,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
 
         if (!feedbackItems.length) return;
 
-        // Filter feedback items that have associated action items
         const actionableFeedbackItems = feedbackItems.filter(item => item.associatedActionItemIds && item.associatedActionItemIds.length > 0);
 
         if (!actionableFeedbackItems.length) {
@@ -453,7 +360,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           }),
         );
 
-        // Update action items for this board
         updatedActionItemsByBoard[feedbackBoardId] = {
           isDataLoaded: true,
           actionItems: aggregatedWorkItems,
@@ -464,7 +370,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           return !states.length || (states[0].category !== "Completed" && states[0].category !== "Removed");
         });
 
-        // Update board table item with work item counts
         if (boardIndex !== -1) {
           updatedBoardsTableItems[boardIndex] = {
             ...updatedBoardsTableItems[boardIndex],
@@ -475,7 +380,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       }),
     );
 
-    // Final state update
     setBoardSummaryState({
       ...state,
       boardsTableItems: updatedBoardsTableItems,
@@ -491,37 +395,127 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     return <BoardSummary actionItems={actionItems?.actionItems} pendingWorkItemsCount={currentBoard?.pendingWorkItemsCount} resolvedActionItemsCount={currentBoard?.totalWorkItemsCount - currentBoard?.pendingWorkItemsCount} boardName={currentBoard?.boardName} feedbackItemsCount={currentBoard?.feedbackItemsCount} supportedWorkItemTypes={props.supportedWorkItemTypes} />;
   };
 
+  const handleConfirmDelete = async () => {
+    try {
+      await BoardDataService.deleteFeedbackBoard(teamId, openDialogBoardId);
+      reflectBackendService.broadcastDeletedBoard(teamId, openDialogBoardId);
+
+      setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
+
+      appInsights.trackEvent({
+        name: TelemetryEvents.FeedbackBoardDeleted,
+        properties: {
+          boardId: openDialogBoardId,
+          boardName: selectedBoardForDelete?.boardName || "Unknown Board",
+          feedbackItemsCount: selectedBoardForDelete?.feedbackItemsCount || 0,
+          deletedByUserId: encrypt(getUserIdentity().id),
+        },
+      });
+    } catch (error) {
+      appInsights.trackException(error, {
+        boardId: openDialogBoardId,
+        boardName: selectedBoardForDelete?.boardName || "Unknown Board",
+        feedbackItemsCount: selectedBoardForDelete?.feedbackItemsCount || 0,
+        action: "delete",
+      });
+    }
+
+    deleteBoardDialogRef.current?.close();
+    setOpenDialogBoardId(null);
+  };
+
   useEffect(() => {
-    if (teamId !== props.teamId || refreshKey) {
-      // Triggers when teamId changes OR refreshKey is true
+    if (teamId !== props.teamId) {
       BoardDataService.getBoardsForTeam(props.teamId)
         .then((boardDocuments: IFeedbackBoardDocument[]) => {
           setTeamId(props.teamId);
-          handleBoardsDocuments(boardDocuments);
-        })
-        .finally(() => {
-          setRefreshKey(false); // Reset refreshKey after fetching
+          const state = buildBoardSummaryState(boardDocuments);
+          setBoardSummaryState(state);
+          handleActionItems(state);
         })
         .catch(e => {
           appInsights.trackException(e);
         });
     }
-  }, [props.teamId, refreshKey]); // Runs when teamId or refreshKey updates
+  }, [props.teamId]);
 
   if (boardSummaryState.allDataLoaded !== true) {
     return <Spinner className="board-summary-initialization-spinner" size={SpinnerSize.large} label="Loading..." ariaLive="assertive" />;
   }
 
   const selectedBoardForDelete = tableData.find(board => board.id === openDialogBoardId);
-  const sortedData = getSortedData();
+  const sortedData = [...tableData].sort((a, b) => {
+    let aVal: Date | string | number | boolean | null | undefined;
+    let bVal: Date | string | number | boolean | null | undefined;
+
+    if (sortColumn === "createdDate" || sortColumn === "archivedDate") {
+      aVal = a[sortColumn as keyof IBoardSummaryTableItem];
+      bVal = b[sortColumn as keyof IBoardSummaryTableItem];
+      if (!aVal) return 1;
+      if (!bVal) return -1;
+      const aTime = new Date(aVal as Date).getTime();
+      const bTime = new Date(bVal as Date).getTime();
+      return sortDirection === "asc" ? (aTime < bTime ? -1 : 1) : aTime < bTime ? 1 : -1;
+    } else {
+      aVal = a[sortColumn as keyof IBoardSummaryTableItem];
+      bVal = b[sortColumn as keyof IBoardSummaryTableItem];
+    }
+
+    if (aVal == null) return 1;
+    if (bVal == null) return -1;
+    if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
 
   return (
     <div className="board-summary-table-container">
-      <DeleteBoardDialog board={selectedBoardForDelete} hidden={!openDialogBoardId} onConfirm={() => handleConfirmDelete(openDialogBoardId, tableData, props.teamId, setOpenDialogBoardId, setTableData, setRefreshKey)} onCancel={() => setOpenDialogBoardId(null)} />
       <table>
-        <BoardSummaryTableHeader columns={columns} sortColumn={sortColumn} sortDirection={sortDirection} onSort={toggleSort} />
-        <BoardSummaryTableBody columns={columns} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
+        <BoardSummaryTableHeader columns={columnList} sortColumn={sortColumn} sortDirection={sortDirection} onSort={toggleSort} />
+        <BoardSummaryTableBody columns={columnList} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
       </table>
+      <dialog
+        className="delete-board-dialog"
+        aria-label="Delete Retrospective Board"
+        ref={deleteBoardDialogRef}
+        onClose={() => {
+          deleteBoardDialogRef.current?.close();
+          setOpenDialogBoardId(null);
+        }}
+      >
+        <div className="header">
+          <h2 className="title">Delete Retrospective Board</h2>
+          <button
+            onClick={() => {
+              deleteBoardDialogRef.current?.close();
+              setOpenDialogBoardId(null);
+            }}
+            aria-label="Close"
+          >
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">
+          The retrospective board {selectedBoardForDelete?.boardName} with {selectedBoardForDelete?.feedbackItemsCount} feedback items will be deleted.
+        </div>
+        <div className="subText">
+          <em>⚠️ Warning: This action is permanent and cannot be undone.</em>
+        </div>
+        <div className="inner">
+          <button className="button" onClick={handleConfirmDelete}>
+            Delete
+          </button>
+          <button
+            className="default button"
+            onClick={() => {
+              deleteBoardDialogRef.current?.close();
+              setOpenDialogBoardId(null);
+            }}
+          >
+            Close
+          </button>
+        </div>
+      </dialog>
     </div>
   );
 }

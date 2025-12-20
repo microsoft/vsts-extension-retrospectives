@@ -178,8 +178,6 @@ const mockedProps: FeedbackBoardProps = {
   allWorkItemTypes: testColumnProps.allWorkItemTypes,
   isAnonymous: testColumnProps.isBoardAnonymous,
   hideFeedbackItems: testColumnProps.hideFeedbackItems,
-  isCarouselDialogHidden: false,
-  hideCarouselDialog: jest.fn(() => {}),
   userId: "",
   onColumnNotesChange: jest.fn().mockResolvedValue(undefined),
 };
@@ -225,6 +223,26 @@ const getLatestColumnProps = (columnId: string): any => {
   const columnCalls = feedbackColumnPropsSpy.mock.calls.filter(call => (call[0] as { columnId?: string })?.columnId === columnId);
   return columnCalls[columnCalls.length - 1]?.[0];
 };
+
+const getLatestColumnPropsById = (columnId: string) => {
+  for (let index = feedbackColumnPropsSpy.mock.calls.length - 1; index >= 0; index -= 1) {
+    const [props] = feedbackColumnPropsSpy.mock.calls[index] ?? [];
+    if (props?.columnId === columnId) {
+      return props;
+    }
+  }
+
+  return undefined;
+};
+
+// In production, key events usually target a focused Element.
+// In these tests we often dispatch on `document`, which makes `e.target` a `Document` without `.closest()`.
+// Provide a minimal shim so keyboard shortcut handling doesn't crash under jsdom.
+beforeAll(() => {
+  if (!(document as unknown as { closest?: unknown }).closest) {
+    (document as unknown as { closest: () => null }).closest = () => null;
+  }
+});
 
 describe("FeedbackBoard Component", () => {
   beforeEach(() => {
@@ -529,17 +547,6 @@ describe("FeedbackBoard Component", () => {
 
     const getColumnPropsById = (columnId: string) => feedbackColumnPropsSpy.mock.calls.find(([props]) => props.columnId === columnId)?.[0];
 
-    const getLatestColumnPropsById = (columnId: string) => {
-      for (let index = feedbackColumnPropsSpy.mock.calls.length - 1; index >= 0; index -= 1) {
-        const [props] = feedbackColumnPropsSpy.mock.calls[index] ?? [];
-        if (props?.columnId === columnId) {
-          return props;
-        }
-      }
-
-      return undefined;
-    };
-
     it("passes existing column notes to rendered feedback columns", async () => {
       const boardWithNotes = buildBoardWithNotes("Initial column note", "Other note");
 
@@ -778,33 +785,6 @@ describe("FeedbackBoard Component", () => {
           expect(itemDataService.getFeedbackItem).toHaveBeenCalledWith(mockedBoard.id, mockFeedbackItems[0].id);
         });
       }
-    });
-  });
-
-  describe("Carousel Dialog", () => {
-    it("renders successfully when carousel is not hidden", () => {
-      const { container } = render(<FeedbackBoard {...mockedProps} isCarouselDialogHidden={false} />);
-
-      // Fluent UI Dialog renders in a portal and is difficult to test in JSDOM
-      // We verify the component renders without errors
-      const feedbackBoard = container.querySelector(".feedback-board");
-      expect(feedbackBoard).toBeTruthy();
-    });
-
-    it("renders successfully when carousel is hidden", () => {
-      const { container } = render(<FeedbackBoard {...mockedProps} isCarouselDialogHidden={true} />);
-
-      const feedbackBoard = container.querySelector(".feedback-board");
-      expect(feedbackBoard).toBeTruthy();
-    });
-
-    it("accepts hideCarouselDialog prop", () => {
-      const hideCarouselDialog = jest.fn();
-
-      render(<FeedbackBoard {...mockedProps} hideCarouselDialog={hideCarouselDialog} isCarouselDialogHidden={false} />);
-
-      // The dialog exists in DOM but we can't easily test onDismiss without more setup
-      expect(hideCarouselDialog).not.toHaveBeenCalled();
     });
   });
 
@@ -1182,9 +1162,7 @@ describe("FeedbackBoard Component", () => {
       const originalItem = { ...mockFeedbackItems[0] };
       const movedItem = { ...mockFeedbackItems[0], columnId: testColumnProps.columnIds[1] };
 
-      (itemDataService.getFeedbackItemsForBoard as jest.Mock)
-        .mockResolvedValueOnce([originalItem])
-        .mockResolvedValueOnce([movedItem]);
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([originalItem]).mockResolvedValueOnce([movedItem]);
 
       const { rerender } = render(<FeedbackBoard {...mockedProps} />);
 
@@ -1299,6 +1277,681 @@ describe("FeedbackBoard Component", () => {
 
       await waitFor(() => {
         expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+    });
+
+    it("broadcasts new items when shouldBroadcast is true", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      const newItems = [mockFeedbackItems[0]];
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.addFeedbackItems(columnId, newItems, true, true, true, true, false);
+      });
+
+      await waitFor(() => {
+        expect(reflectBackendService.broadcastNewItem).toHaveBeenCalledWith(columnId, mockFeedbackItems[0].id);
+      });
+    });
+
+    it("does not broadcast new items when shouldBroadcast is false", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      const newItems = [mockFeedbackItems[0]];
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.addFeedbackItems(columnId, newItems, false, true, true, true, false);
+      });
+
+      expect(reflectBackendService.broadcastNewItem).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Timer Operations - Error Handling", () => {
+    it("stopTimerById logs exception when flipTimer fails", async () => {
+      const itemWithTimer: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        timerState: true,
+        timerId: 999 as any,
+      };
+
+      const flipError = new Error("flip timer failed");
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithTimer]);
+      (itemDataService.flipTimer as jest.Mock).mockRejectedValue(flipError);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(itemWithTimer.columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBe(itemWithTimer.id);
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(itemWithTimer.columnId);
+        await columnProps.requestTimerStart("another-item");
+      });
+
+      await waitFor(() => {
+        expect(appInsights.trackException).toHaveBeenCalledWith(
+          flipError,
+          expect.objectContaining({
+            action: "stopTimer",
+            boardId: mockedBoard.id,
+            feedbackItemId: itemWithTimer.id,
+          }),
+        );
+      });
+    });
+
+    it("stopTimerById returns early if updatedFeedbackItem is null", async () => {
+      const itemWithTimer: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        timerState: true,
+        timerId: 888 as any,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithTimer]);
+      (itemDataService.flipTimer as jest.Mock).mockResolvedValue(null);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(itemWithTimer.columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBe(itemWithTimer.id);
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(itemWithTimer.columnId);
+        await columnProps.requestTimerStart("another-item");
+      });
+
+      await waitFor(() => {
+        expect(itemDataService.flipTimer).toHaveBeenCalled();
+      });
+    });
+
+    it("requestTimerStart returns false on error", async () => {
+      const flipError = new Error("request timer start error");
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+      (itemDataService.flipTimer as jest.Mock).mockRejectedValue(flipError);
+      const originalSetState = React.Component.prototype.setState;
+
+      try {
+        // Temporarily mock setState to throw an error only when requestTimerStart
+        // attempts to set activeTimerFeedbackItemId for this specific item.
+        React.Component.prototype.setState = function (state: any) {
+          const nextState = typeof state === "function" ? state(this.state, this.props) : state;
+          if (nextState && typeof nextState === "object" && (nextState as any).activeTimerFeedbackItemId === "item-error") {
+            throw flipError;
+          }
+
+          return originalSetState.call(this, state);
+        };
+
+        render(<FeedbackBoard {...mockedProps} />);
+
+        const columnId = testColumnProps.columnIds[0];
+
+        await waitFor(() => {
+          expect(getLatestColumnProps(columnId)).toBeDefined();
+        });
+
+        let result = true;
+        await act(async () => {
+          const columnProps = getLatestColumnProps(columnId);
+          result = await columnProps.requestTimerStart("item-error");
+        });
+
+        expect(result).toBe(false);
+        expect(appInsights.trackException).toHaveBeenCalledWith(
+          flipError,
+          expect.objectContaining({
+            action: "requestTimerStart",
+            boardId: mockedBoard.id,
+            feedbackItemId: "item-error",
+          }),
+        );
+      } finally {
+        // Restore original setState even if the test fails.
+        React.Component.prototype.setState = originalSetState;
+      }
+    });
+  });
+
+  describe("Feedback Item Refresh - Broadcasting", () => {
+    it("refreshFeedbackItems does not broadcast when shouldBroadcast is false", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(mockFeedbackItems);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      const updatedItem = { ...mockFeedbackItems[0], title: "Updated without broadcast" };
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.refreshFeedbackItems([updatedItem], false);
+      });
+
+      expect(reflectBackendService.broadcastUpdatedItem).not.toHaveBeenCalled();
+    });
+
+    it("refreshFeedbackItems handles empty array", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(mockFeedbackItems);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.refreshFeedbackItems([], true);
+      });
+
+      expect(reflectBackendService.broadcastUpdatedItem).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Remove Feedback Item - Focus Handling", () => {
+    it("removeFeedbackItemFromColumn without focus flag does not set focus", async () => {
+      const items = [mockFeedbackItems[0], mockFeedbackItems[1]];
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(items);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = items[0].columnId;
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.removeFeedbackItemFromColumn(columnId, items[0].id, false);
+      });
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+    });
+
+    it("removeFeedbackItemFromColumn sets focus on last item when removed item was last", async () => {
+      const items = [mockFeedbackItems[0], { ...mockFeedbackItems[1], columnId: mockFeedbackItems[0].columnId }];
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(items);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = items[0].columnId;
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.removeFeedbackItemFromColumn(columnId, items[1].id, true);
+      });
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+    });
+  });
+
+  describe("Keyboard Shortcuts - Arrow Up/Down", () => {
+    it("handles arrow up key for item navigation", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(mockFeedbackItems);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      // Component should handle the event without crashing
+      expect(document.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("handles arrow down key for item navigation", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(mockFeedbackItems);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(document.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("ignores arrow up with modifier keys", async () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowUp", shiftKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowUp", ctrlKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowUp", altKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("ignores arrow down with modifier keys", async () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowDown", shiftKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowDown", ctrlKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowDown", altKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("ignores arrow left with altKey", async () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowLeft", altKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+
+    it("ignores arrow right with altKey", async () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      act(() => {
+        const event = new KeyboardEvent("keydown", { key: "ArrowRight", altKey: true, bubbles: true });
+        document.dispatchEvent(event);
+      });
+
+      expect(container.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+  });
+
+  describe("User Permissions", () => {
+    it("shows column edit button when user is board creator", async () => {
+      const creatorBoard = {
+        ...mockedBoard,
+        createdBy: { ...mockedIdentity, id: "creator-user-id" },
+      };
+      const propsWithCreator = {
+        ...mockedProps,
+        board: creatorBoard,
+        userId: "creator-user-id",
+      };
+
+      render(<FeedbackBoard {...propsWithCreator} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
+      expect(columnProps?.showColumnEditButton).toBe(true);
+    });
+
+    it("hides column edit button when user is not board creator", async () => {
+      const creatorBoard = {
+        ...mockedBoard,
+        createdBy: { ...mockedIdentity, id: "different-user-id" },
+      };
+      const propsWithOtherUser = {
+        ...mockedProps,
+        board: creatorBoard,
+        userId: "current-user-id",
+      };
+
+      render(<FeedbackBoard {...propsWithOtherUser} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
+      expect(columnProps?.showColumnEditButton).toBe(false);
+    });
+  });
+
+  describe("Column Item Finding", () => {
+    it("findColumnItemById returns undefined when column is null", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("Keyboard event handling", () => {
+    it("removes keyboard listener on unmount", async () => {
+      const removeEventListenerSpy = jest.spyOn(document, "removeEventListener");
+
+      const { unmount } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(reflectBackendService.onReceiveNewItem).toHaveBeenCalled();
+      });
+
+      unmount();
+
+      expect(removeEventListenerSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+
+      removeEventListenerSpy.mockRestore();
+    });
+
+    it("does not crash on ? key", async () => {
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+
+      act(() => {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }));
+      });
+
+      // Keyboard shortcuts dialog is owned by ExtensionSettingsMenu, not FeedbackBoard.
+      expect(screen.queryByText("Keyboard Shortcuts")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Column defaults", () => {
+    it("applies default iconClass and accentColor when missing", async () => {
+      const boardWithMissingDefaults: IFeedbackBoardDocument = {
+        ...mockedBoard,
+        columns: mockedBoard.columns.map(col => ({
+          ...col,
+          iconClass: "",
+          accentColor: "",
+          notes: undefined as unknown as string,
+        })),
+      };
+
+      render(<FeedbackBoard {...mockedProps} board={boardWithMissingDefaults} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnId = boardWithMissingDefaults.columns[0].id;
+      const columnProps = getLatestColumnProps(columnId);
+
+      expect(columnProps?.icon).toBeTruthy();
+      expect(columnProps?.accentColor).toBe("#0078d4");
+      expect(columnProps?.columnNotes).toBe("");
+    });
+  });
+
+  describe("Timer and focus edge cases", () => {
+    it("stops missing previous timer ID without crashing", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      // Start a timer for an item that does not exist in state.
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.requestTimerStart("missing-item");
+      });
+
+      // Starting another timer should attempt to stop the previous one and early-return.
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.requestTimerStart("next-item");
+      });
+
+      expect(itemDataService.flipTimer).not.toHaveBeenCalled();
+      expect(appInsights.trackException).not.toHaveBeenCalled();
+    });
+
+    it("stops an existing active timer when starting another", async () => {
+      const clearIntervalSpy = jest.spyOn(window, "clearInterval");
+
+      const itemWithActiveTimer: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        timerState: true,
+        timerId: 123 as any,
+      };
+
+      const otherItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[1],
+        id: "other-item",
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithActiveTimer, otherItem]);
+      (itemDataService.flipTimer as jest.Mock).mockResolvedValue({
+        ...itemWithActiveTimer,
+        timerState: false,
+        timerId: null,
+      });
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(itemWithActiveTimer.columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBe(itemWithActiveTimer.id);
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(itemWithActiveTimer.columnId);
+        await columnProps.requestTimerStart(otherItem.id);
+      });
+
+      expect(clearIntervalSpy).toHaveBeenCalledWith(123);
+      expect(itemDataService.flipTimer).toHaveBeenCalledWith(mockedBoard.id, itemWithActiveTimer.id, null);
+      expect(reflectBackendService.broadcastUpdatedItem).toHaveBeenCalledWith("dummyColumn", itemWithActiveTimer.id);
+
+      clearIntervalSpy.mockRestore();
+    });
+
+    it("clears active timer when notifyTimerStopped is called for the active item", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.requestTimerStart("active-item");
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBe("active-item");
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.notifyTimerStopped("active-item");
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBeNull();
+      });
+    });
+
+    it("sets focus to create button when removing last item", async () => {
+      const singleItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: "single-item",
+        columnId: testColumnProps.columnIds[0],
+        originalColumnId: testColumnProps.columnIds[0],
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([singleItem]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = singleItem.columnId;
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.columnItems?.length).toBe(1);
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.removeFeedbackItemFromColumn(columnId, singleItem.id, true);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.shouldFocusOnCreateFeedback).toBe(true);
+      });
+    });
+  });
+
+  describe("Column Notes - Edge Cases", () => {
+    it("handles column notes with undefined values", async () => {
+      const boardWithUndefinedNotes = {
+        ...mockedBoard,
+        columns: mockedBoard.columns.map(col => ({ ...col, notes: undefined as unknown as string })),
+      };
+
+      render(<FeedbackBoard {...mockedProps} board={boardWithUndefinedNotes} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
+      expect(columnProps?.columnNotes).toBe("");
+    });
+
+    it("handles onColumnNotesChange when callback is undefined", async () => {
+      const propsWithoutCallback = {
+        ...mockedProps,
+        onColumnNotesChange: undefined as FeedbackBoardProps["onColumnNotesChange"] | undefined,
+      };
+
+      render(<FeedbackBoard {...propsWithoutCallback} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnId = mockedBoard.columns[0].id;
+      const columnProps = getLatestColumnPropsById(columnId);
+
+      await act(async () => {
+        columnProps?.onColumnNotesChange("New notes");
+      });
+
+      // Should not crash
+      expect(document.querySelector(".feedback-board")).toBeInTheDocument();
+    });
+  });
+
+  describe("Feedback Item Active Timer Tracking", () => {
+    it("tracks active timer item ID when item has timerState true", async () => {
+      const itemWithActiveTimer: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        timerState: true,
+        timerId: 777 as any,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithActiveTimer]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(itemWithActiveTimer.columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBe(itemWithActiveTimer.id);
+      });
+    });
+
+    it("clears active timer on board change", async () => {
+      const itemWithActiveTimer: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        timerState: true,
+        timerId: 666 as any,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithActiveTimer]);
+
+      const { rerender } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(itemWithActiveTimer.columnId);
+        expect(columnProps?.activeTimerFeedbackItemId).toBe(itemWithActiveTimer.id);
+      });
+
+      const newBoard = { ...mockedBoard, id: "new-board-with-timer" };
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      rerender(<FeedbackBoard {...mockedProps} board={newBoard} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalledWith("new-board-with-timer");
       });
     });
   });

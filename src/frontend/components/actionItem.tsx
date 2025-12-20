@@ -1,6 +1,4 @@
 import React from "react";
-import { DefaultButton, IButtonProps, PrimaryButton, BaseButton, Button } from "@fluentui/react/lib/Button";
-import { DocumentCard, DocumentCardActions, DocumentCardTitle, DocumentCardType, DocumentCardPreview, IDocumentCardPreviewProps } from "@fluentui/react/lib/DocumentCard";
 import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
@@ -8,11 +6,11 @@ import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azur
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
-import Dialog, { DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
+import { getIconElement } from "./icons";
 
-export interface ActionItemProps extends IButtonProps {
+export interface ActionItemProps {
   feedbackItemId: string;
   boardId: string;
   actionItem: WorkItem;
@@ -25,7 +23,6 @@ export interface ActionItemProps extends IButtonProps {
 }
 
 export interface ActionItemState {
-  isUnlinkWorkItemConfirmationDialogHidden: boolean;
   linkedWorkItem: WorkItem;
   workItemSearchTextboxHasErrors: boolean;
 }
@@ -35,7 +32,6 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
     super(props);
 
     this.state = {
-      isUnlinkWorkItemConfirmationDialogHidden: true,
       linkedWorkItem: null as WorkItem,
       workItemSearchTextboxHasErrors: false,
     };
@@ -50,27 +46,7 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
   }
 
   public openWorkItemButton: HTMLElement;
-
-  private readonly getWorkItemTypeIconProps = (workItemType: WorkItemType): IDocumentCardPreviewProps => {
-    const typeName = workItemType?.name || "Unknown";
-    const iconUrl = workItemType?.icon?.url || "";
-
-    return {
-      previewImages: [
-        {
-          previewIconContainerClass: "work-item-type-icon-container",
-          width: 36,
-          previewIconProps: {
-            ariaLabel: `icon for work item type ${typeName}`,
-            imageProps: {
-              src: iconUrl,
-              alt: `icon for work item type ${typeName}`,
-            },
-          },
-        },
-      ],
-    };
-  };
+  private readonly unlinkWorkItemDialogRef = React.createRef<HTMLDialogElement>();
 
   private readonly onActionItemClick = async (workItemId: number) => {
     const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
@@ -93,21 +69,9 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
     this.props.onUpdateActionItem(updatedFeedbackItem);
   };
 
-  private readonly showUnlinkWorkItemConfirmationDialog = () => {
-    this.setState({
-      isUnlinkWorkItemConfirmationDialogHidden: false,
-    });
-  };
-
-  private readonly hideUnlinkWorkItemConfirmationDialog = () => {
-    this.setState({
-      isUnlinkWorkItemConfirmationDialogHidden: true,
-    });
-  };
-
   private readonly onConfirmUnlinkWorkItem = async (workItemId: number) => {
     this.onUnlinkWorkItemClick(workItemId);
-    this.hideUnlinkWorkItemConfirmationDialog();
+    this.unlinkWorkItemDialogRef.current?.close();
   };
 
   private readonly updateLinkedItem = async (workItemId: number) => {
@@ -121,18 +85,6 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
     }
   };
 
-  private readonly handleKeyPressSelectorButton = (event: React.KeyboardEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button>) => {
-    if (event.key === "Enter") {
-      this.showUnlinkWorkItem(event);
-    }
-  };
-
-  private readonly showUnlinkWorkItem = (event: React.KeyboardEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button> | React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | BaseButton | Button | HTMLSpanElement, MouseEvent>) => {
-    event.preventDefault();
-    this.showUnlinkWorkItemConfirmationDialog();
-    event.stopPropagation();
-  };
-
   private readonly showWorkItemForm = (event: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event && event.stopPropagation();
     this.onActionItemClick(this.props.actionItem.id);
@@ -140,78 +92,74 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
 
   public render() {
     const workItemType: WorkItemType = this.props.allWorkItemTypes.find(wit => wit.name === this.props.actionItem.fields["System.WorkItemType"]);
-    const iconProps: IDocumentCardPreviewProps = this.getWorkItemTypeIconProps(workItemType);
 
-    // Explicitly cast, since the returned contract contains states, but the interface defined does not
     const workItemStates: WorkItemStateColor[] = workItemType?.states ? workItemType.states : null;
     const workItemState: WorkItemStateColor = workItemStates ? workItemStates.find(wisc => wisc.name === this.props.actionItem.fields["System.State"]) : null;
-    const resolvedBorderRight: string = workItemState && (workItemState.category === "Completed" || workItemState.category === "Resolved") ? "resolved-border-right" : "";
+    const resolvedBorderRight: string = workItemState && (workItemState.category === "Completed" || workItemState.category === "Resolved") ? "resolved" : "";
 
     const systemTitle: string = this.props.actionItem.fields["System.Title"];
-    const title = systemTitle.length > 25 ? systemTitle.substring(0, 25) + "..." : systemTitle;
 
     return (
-      <DocumentCard key={`${this.props.actionItem.id}card`} className={`related-task-sub-card ${resolvedBorderRight}`} type={DocumentCardType.compact}>
-        <DocumentCardPreview key={`${this.props.actionItem.id}preview`} {...iconProps} />
+      <div key={`${this.props.actionItem.id}card`} role="group" className={`related-task-sub-card ${resolvedBorderRight}`}>
+        <img className="work-item-type-icon" alt={`icon for work item type ${workItemType?.name}`} src={workItemType?.icon?.url} />
         <div
           ref={(element: HTMLElement) => {
             this.openWorkItemButton = element;
           }}
           key={`${this.props.actionItem.id}details`}
-          className="ms-DocumentCard-details"
+          className="details"
           tabIndex={0}
           role="button"
+          title={this.props.actionItem.fields["System.Title"]}
           aria-label={`${this.props.actionItem.fields["System.WorkItemType"]} ${this.props.actionItem.fields["System.Title"]}, click to open work item`}
-          onKeyPress={(e: React.KeyboardEvent<HTMLDivElement>) => {
+          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
             if (e.key === "Enter") {
               this.showWorkItemForm(e);
             }
           }}
           onClick={this.showWorkItemForm}
         >
-          <DocumentCardTitle key={`${this.props.actionItem.id}title`} title={title} shouldTruncate={true} />
+          {systemTitle}
         </div>
         {!this.props.areActionIconsHidden && (
-          <DocumentCardActions
-            actions={[
-              {
-                iconProps: { iconName: "RemoveLink" },
-                onClick: this.showUnlinkWorkItem,
-                onKeyPress: this.handleKeyPressSelectorButton,
-                title: "Remove link to work item",
-                ariaLabel: "Remove link to work item button",
-              },
-            ]}
-          />
-        )}
-        {!this.state.isUnlinkWorkItemConfirmationDialogHidden && (
-          <Dialog
-            hidden={false}
-            onDismiss={this.hideUnlinkWorkItemConfirmationDialog}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: "Remove Work Item Link",
-              subText: `Are you sure you want to remove the link to work item '${this.props.actionItem.fields["System.Title"]}'?`,
+          <button
+            type="button"
+            title="Remove link to work item"
+            className="action"
+            aria-label="Remove link to work item button"
+            onClick={event => {
+              event.stopPropagation();
+              this.unlinkWorkItemDialogRef.current?.showModal();
             }}
-            modalProps={{
-              isBlocking: true,
-              containerClassName: "retrospectives-unlink-work-item-confirmation-dialog",
-              className: "retrospectives-dialog-modal",
-            }}
+            aria-haspopup="dialog"
           >
-            <DialogFooter>
-              <PrimaryButton
-                onClick={e => {
-                  e && e.stopPropagation();
-                  this.onConfirmUnlinkWorkItem(this.props.actionItem.id);
-                }}
-                text="Remove"
-              />
-              <DefaultButton onClick={this.hideUnlinkWorkItemConfirmationDialog} text="Cancel" />
-            </DialogFooter>
-          </Dialog>
+            {getIconElement("link-off")}
+          </button>
         )}
-      </DocumentCard>
+        <dialog className="unlink-work-item-confirmation-dialog" aria-label="Remove Work Item Link" ref={this.unlinkWorkItemDialogRef} onClose={() => this.unlinkWorkItemDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Remove Work Item Link</h2>
+            <button onClick={() => this.unlinkWorkItemDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">Are you sure you want to remove the link to work item &apos;{this.props.actionItem.fields["System.Title"]}&apos;?</div>
+          <div className="inner">
+            <button
+              className="button"
+              onClick={event => {
+                event.stopPropagation();
+                this.onConfirmUnlinkWorkItem(this.props.actionItem.id);
+              }}
+            >
+              Remove
+            </button>
+            <button className="default button" onClick={() => this.unlinkWorkItemDialogRef.current?.close()}>
+              Cancel
+            </button>
+          </div>
+        </dialog>
+      </div>
     );
   }
 }

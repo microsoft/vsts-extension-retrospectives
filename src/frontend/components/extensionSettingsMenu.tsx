@@ -1,7 +1,4 @@
 import React from "react";
-import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
-import { Dialog, DialogContent, DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
-import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import boardDataService from "../dal/boardDataService";
@@ -11,18 +8,8 @@ import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/feedback";
 import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import KeyboardShortcutsDialog from "./keyboardShortcutsDialog";
-import { WorkflowPhase } from "../interfaces/workItem";
 
-import { RETRO_URLS, PRIME_DIRECTIVE_CONTENT, RETRO_HELP_CONTENT, VOLUNTEER_CONTENT, WHATISNEW_CONTENT, renderContent } from "./extensionSettingsMenuDialogContent";
-
-interface IExtensionSettingsMenuState {
-  isPrimeDirectiveDialogHidden: boolean;
-  isWhatsNewDialogHidden: boolean;
-  isGetHelpDialogHidden: boolean;
-  isPleaseJoinUsDialogHidden: boolean;
-  isKeyboardShortcutsDialogHidden: boolean;
-}
+import { getIconElement } from "./icons";
 
 interface IExportImportDataSchema {
   team: WebApiTeam;
@@ -30,83 +17,73 @@ interface IExportImportDataSchema {
   items: IFeedbackItemDocument[];
 }
 
-interface ExtensionSettingsButtonProps {
-  ariaLabel: string;
-  title: string;
-  iconClass: string;
-  label: string;
-  onClick?: () => void;
-  menuItems?: IContextualMenuItem[];
+interface KeyboardShortcut {
+  keys: string[];
+  description: string;
+  category: string;
 }
 
-export const ExtensionSettingsButton: React.FC<ExtensionSettingsButtonProps> = ({ ariaLabel, title, iconClass, label, onClick, menuItems }) => {
-  const buttonClass = "extension-settings-button";
-  const menuProps = menuItems
-    ? {
-        items: menuItems,
-        className: "extended-options-menu",
-      }
-    : undefined;
+export class ExtensionSettingsMenu extends React.Component<Record<string, never>, {}> {
+  private readonly menuRootRef = React.createRef<HTMLDivElement>();
+  private readonly primeDirectiveDialogRef = React.createRef<HTMLDialogElement>();
+  private readonly whatsNewDialogRef = React.createRef<HTMLDialogElement>();
+  private readonly userGuideDialogRef = React.createRef<HTMLDialogElement>();
+  private readonly volunteerDialogRef = React.createRef<HTMLDialogElement>();
+  private readonly keyboardShortcutsDialogRef = React.createRef<HTMLDialogElement>();
 
-  return (
-    <DefaultButton className={buttonClass} aria-label={ariaLabel} title={title} onClick={onClick} menuProps={menuProps}>
-      <span className="ms-Button-icon">
-        <i className={iconClass}></i>
-      </span>
-      &nbsp;
-      <span className="ms-Button-label hidden lg:inline">{label}</span>
-    </DefaultButton>
-  );
-};
+  private readonly handleDocumentKeyDown = (event: KeyboardEvent) => {
+    const target = event.target as HTMLElement | null;
+    if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+      return;
+    }
 
-interface ExtensionDialogProps {
-  hidden: boolean;
-  onDismiss: () => void;
-  title: string;
-  children: React.ReactNode;
-  onDefaultClick: () => void;
-  defaultButtonText: string;
-  primaryButtonText?: string;
-  containerClassName: string;
-  subText?: string;
-}
+    if (event.ctrlKey || event.metaKey || event.altKey) {
+      return;
+    }
 
-const ExtensionDialog: React.FC<ExtensionDialogProps> = ({ hidden, onDismiss, title, children, onDefaultClick, defaultButtonText, primaryButtonText = "Close", containerClassName, subText }) => (
-  <Dialog
-    hidden={hidden}
-    onDismiss={onDismiss}
-    dialogContentProps={{
-      type: DialogType.close,
-      title,
-      subText,
-    }}
-    minWidth="600"
-    modalProps={{
-      isBlocking: true,
-      containerClassName,
-      className: "retrospectives-dialog-modal",
-    }}
-  >
-    <DialogContent>{children}</DialogContent>
-    <DialogFooter>
-      <DefaultButton onClick={onDefaultClick} text={defaultButtonText} />
-      <PrimaryButton onClick={onDismiss} text={primaryButtonText} className={primaryButtonText === "Close" ? "extension-menu-close-button" : undefined} />
-    </DialogFooter>
-  </Dialog>
-);
+    const isQuestionMark = event.key === "?" || (event.key === "/" && event.shiftKey) || (event.code === "Slash" && event.shiftKey);
+    if (!isQuestionMark) {
+      return;
+    }
 
-export class ExtensionSettingsMenu extends React.Component<Record<string, never>, IExtensionSettingsMenuState> {
-  constructor(props: Record<string, never>) {
-    super(props);
+    const keyboardDialog = this.keyboardShortcutsDialogRef.current;
+    if (!keyboardDialog) {
+      return;
+    }
 
-    this.state = {
-      isPrimeDirectiveDialogHidden: true,
-      isKeyboardShortcutsDialogHidden: true,
-      isWhatsNewDialogHidden: true,
-      isGetHelpDialogHidden: true,
-      isPleaseJoinUsDialogHidden: true,
-    };
-  }
+    const openDialog = document.querySelector("dialog[open]") as HTMLDialogElement | null;
+    if (openDialog && openDialog !== keyboardDialog) {
+      return;
+    }
+
+    event.preventDefault();
+    if (!keyboardDialog.hasAttribute("open")) {
+      keyboardDialog.showModal();
+    }
+  };
+
+  private readonly keyboardShortcuts: KeyboardShortcut[] = [
+    // Global shortcuts
+    { keys: ["?"], description: "Show keyboard shortcuts", category: "Global" },
+    { keys: ["Esc"], description: "Close dialogs or cancel actions", category: "Global" },
+
+    // Column navigation
+    { keys: ["1-5"], description: "Jump to column by number", category: "Navigation" },
+    { keys: ["←", "→"], description: "Navigate between columns", category: "Navigation" },
+    { keys: ["↑", "↓"], description: "Navigate between feedback items", category: "Navigation" },
+    { keys: ["Tab"], description: "Move focus to next element", category: "Navigation" },
+    { keys: ["Shift + Tab"], description: "Move focus to previous element", category: "Navigation" },
+    { keys: ["Page Up"], description: "Scroll up in column", category: "Navigation" },
+    { keys: ["Page Down"], description: "Scroll down in column", category: "Navigation" },
+
+    // Item actions - Collect phase
+    { keys: ["Insert"], description: "Create new feedback item", category: "Actions" },
+    { keys: ["Enter"], description: "Edit feedback item", category: "Actions" },
+    { keys: ["Delete"], description: "Delete feedback item", category: "Actions" },
+
+    // Column actions
+    { keys: ["E"], description: "Edit column notes", category: "Column" },
+  ];
 
   private readonly exportData = async () => {
     const toastId = toast("Processing boards...");
@@ -177,139 +154,256 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
     }
   };
 
-  private readonly showPrimeDirectiveDialog = () => {
-    this.setState({ isPrimeDirectiveDialogHidden: false });
+  private readonly handleDocumentPointerDown = (event: PointerEvent) => {
+    const root = this.menuRootRef.current;
+    if (!root) {
+      return;
+    }
+
+    const target = event.target as Node | null;
+    if (!target) {
+      return;
+    }
+
+    const openDetails = Array.from(root.querySelectorAll("details[open]"));
+    for (const detailsElement of openDetails) {
+      if (!detailsElement.contains(target)) {
+        detailsElement.removeAttribute("open");
+      }
+    }
   };
 
-  private readonly hidePrimeDirectiveDialog = () => {
-    this.setState({ isPrimeDirectiveDialogHidden: true });
-  };
+  public componentDidMount(): void {
+    document.addEventListener("pointerdown", this.handleDocumentPointerDown);
+    document.addEventListener("keydown", this.handleDocumentKeyDown);
+  }
 
-  private readonly showWhatsNewDialog = () => {
-    this.setState({ isWhatsNewDialogHidden: false });
-  };
-
-  private readonly hideWhatsNewDialog = () => {
-    this.setState({ isWhatsNewDialogHidden: true });
-  };
-
-  private readonly showPleaseJoinUsDialog = () => {
-    this.setState({ isPleaseJoinUsDialogHidden: false });
-  };
-
-  private readonly hidePleaseJoinUsDialog = () => {
-    this.setState({ isPleaseJoinUsDialogHidden: true });
-  };
-
-  private readonly onRetrospectiveWikiClicked = () => {
-    window.open(RETRO_URLS.retrospectivewiki, "_blank");
-  };
-
-  private readonly onChangeLogClicked = () => {
-    window.open(RETRO_URLS.changelog, "_blank");
-  };
-
-  private readonly onGetHelpClicked = () => {
-    window.open(RETRO_URLS.readme, "_blank");
-  };
-
-  private readonly onContributingClicked = () => {
-    window.open(RETRO_URLS.contributing, "_blank");
-  };
-
-  private readonly onContactUsClicked = () => {
-    window.open(RETRO_URLS.issues, "_blank");
-  };
-
-  private readonly exportImportDataMenu: IContextualMenuItem[] = [
-    {
-      key: "exportData",
-      iconProps: { iconName: "CloudDownload" },
-      onClick: () => {
-        this.exportData().catch(console.error);
-      },
-      text: "Export data",
-      title: "Export data",
-    },
-    {
-      key: "importData",
-      iconProps: { iconName: "CloudUpload" },
-      onClick: () => {
-        this.importData().catch(console.error);
-      },
-      text: "Import data",
-      title: "Import data",
-    },
-  ];
-
-  private readonly retroHelpMenu: IContextualMenuItem[] = [
-    {
-      key: "whatsNew",
-      iconProps: { iconName: "Megaphone" },
-      onClick: this.showWhatsNewDialog,
-      text: "What's new",
-      title: "What's new",
-    },
-    {
-      key: "keyboardShortcuts",
-      iconProps: { iconName: "KeyboardClassic" },
-      onClick: () => this.setState({ isKeyboardShortcutsDialogHidden: false }),
-      text: "Keyboard shortcuts",
-      title: "Keyboard shortcuts",
-    },
-    {
-      key: "userGuide",
-      iconProps: { iconName: "BookAnswers" },
-      onClick: () => this.setState({ isGetHelpDialogHidden: false }),
-      text: "User guide",
-      title: "User guide",
-    },
-    {
-      key: "volunteer",
-      iconProps: { iconName: "Teamwork" },
-      onClick: this.showPleaseJoinUsDialog,
-      text: "Volunteer",
-      title: "Volunteer",
-    },
-    {
-      key: "contactUs",
-      iconProps: { iconName: "ChatInviteFriend" },
-      onClick: this.onContactUsClicked,
-      text: "Contact us",
-      title: "Contact us",
-    },
-  ];
+  public componentWillUnmount(): void {
+    document.removeEventListener("pointerdown", this.handleDocumentPointerDown);
+    document.removeEventListener("keydown", this.handleDocumentKeyDown);
+  }
 
   public render() {
     return (
-      <div className="extension-settings-menu">
-        <ExtensionSettingsButton ariaLabel="Prime Directive" title="Prime Directive" iconClass="fas fa-shield-halved" label="Directive" onClick={this.showPrimeDirectiveDialog} />
-        <ExtensionSettingsButton ariaLabel="Data Import/Export" title="Data Import/Export" iconClass="fas fa-cloud" label="Data" menuItems={this.exportImportDataMenu} />
-        <ExtensionSettingsButton ariaLabel="Retrospective Help" title="Retrospective Help" iconClass="fas fa-question-circle" label="Help" menuItems={this.retroHelpMenu} />
+      <div className="extension-settings-menu" ref={this.menuRootRef}>
+        <button onClick={() => this.primeDirectiveDialogRef.current?.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
+          {getIconElement("privacy-tip")}
+          <span className="hidden lg:inline">Directive</span>
+        </button>
 
-        <ExtensionDialog hidden={this.state.isPrimeDirectiveDialogHidden} onDismiss={this.hidePrimeDirectiveDialog} title="The Prime Directive" onDefaultClick={this.onRetrospectiveWikiClicked} defaultButtonText="Open Retrospective Wiki" containerClassName="prime-directive-dialog retro-dialog-shell">
-          {renderContent(PRIME_DIRECTIVE_CONTENT)}
-        </ExtensionDialog>
-        <ExtensionDialog hidden={this.state.isWhatsNewDialogHidden} onDismiss={this.hideWhatsNewDialog} title="What's New" onDefaultClick={this.onChangeLogClicked} defaultButtonText="Open change log" containerClassName="whatsnew-dialog retro-dialog-shell">
-          {renderContent(WHATISNEW_CONTENT)}
-        </ExtensionDialog>
-        <ExtensionDialog
-          hidden={this.state.isGetHelpDialogHidden}
-          onDismiss={() => {
-            this.setState({ isGetHelpDialogHidden: true });
-          }}
-          title="Retrospectives User Guide"
-          onDefaultClick={this.onGetHelpClicked}
-          defaultButtonText="Open user guide"
-          containerClassName="retro-help-dialog retro-dialog-shell"
-        >
-          {renderContent(RETRO_HELP_CONTENT)}
-        </ExtensionDialog>
-        <ExtensionDialog hidden={this.state.isPleaseJoinUsDialogHidden} onDismiss={this.hidePleaseJoinUsDialog} title="Volunteer" onDefaultClick={this.onContributingClicked} defaultButtonText="Open contributing guidelines" containerClassName="volunteer-dialog retro-dialog-shell">
-          {renderContent(VOLUNTEER_CONTENT)}
-        </ExtensionDialog>
+        <details className="flex items-center relative">
+          <summary aria-label="Data Import/Export" title="Data Import/Export" className="extension-settings-button">
+            {getIconElement("cloud")}
+            <span className="hidden lg:inline">Data</span>
+          </summary>
 
-        <KeyboardShortcutsDialog isOpen={!this.state.isKeyboardShortcutsDialogHidden} onClose={() => this.setState({ isKeyboardShortcutsDialogHidden: true })} currentWorkflowPhase={WorkflowPhase.Collect} />
+          <div className="callout-menu left">
+            <button
+              onClick={() => {
+                this.importData();
+              }}
+            >
+              {getIconElement("cloud-upload")}
+              Import Data
+            </button>
+            <button
+              onClick={() => {
+                this.exportData();
+              }}
+            >
+              {getIconElement("cloud-download")}
+              Export Data
+            </button>
+          </div>
+        </details>
+
+        <details className="flex items-center relative">
+          <summary aria-label="Retrospective Help" title="Retrospective Help" className="extension-settings-button">
+            {getIconElement("help")}
+            <span className="hidden lg:inline">Help</span>
+          </summary>
+
+          <div className="callout-menu right">
+            <button
+              onClick={() => {
+                this.whatsNewDialogRef.current?.showModal();
+              }}
+            >
+              {getIconElement("celebration")}
+              What&apos;s new
+            </button>
+            <button
+              onClick={() => {
+                this.keyboardShortcutsDialogRef.current?.showModal();
+              }}
+            >
+              {getIconElement("keyboard")}
+              Keyboard shortcuts
+            </button>
+            <button
+              onClick={() => {
+                this.userGuideDialogRef.current?.showModal();
+              }}
+            >
+              {getIconElement("menu-book")}
+              User guide
+            </button>
+            <button
+              onClick={() => {
+                this.volunteerDialogRef.current?.showModal();
+              }}
+            >
+              {getIconElement("volunteer-activism")}
+              Volunteer
+            </button>
+            <button
+              onClick={() => {
+                window.open("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank");
+              }}
+            >
+              {getIconElement("contact-phone")}
+              Contact us
+            </button>
+          </div>
+        </details>
+
+        <dialog className="prime-directive-dialog" aria-label="The Prime Directive" ref={this.primeDirectiveDialogRef} onClose={() => this.primeDirectiveDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">The Prime Directive</h2>
+            <button onClick={() => this.primeDirectiveDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective. By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</div>
+          <strong className="subText">&apos;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&apos;</strong>
+          <em className="subText">--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
+          <div className="inner">
+            <button className="button" onClick={() => window.open("https://retrospectivewiki.com", "_blank")}>
+              Open Retrospective Wiki
+            </button>
+            <button className="default button" onClick={() => this.primeDirectiveDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
+
+        <dialog className="whats-new-dialog" aria-label="What is New" ref={this.whatsNewDialogRef} onClose={() => this.whatsNewDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">What&apos;s New</h2>
+            <button onClick={() => this.whatsNewDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">The latest release includes redesign of menu options, enabling mobile view, role-based permission setting, redesign of deleting boards, and implementation of sticky defaults.</div>
+          <div className="subText li">Extension settings menu was redesigned to mirror the ADO settings menu, in addition to moving Prime Directive and adding Volunteer options.</div>
+          <div className="subText li">Switch to mobile view was enabled for improved viewing on mobile devices with support limited to core functionality.</div>
+          <div className="subText li">Ability to set permissions for accessing the retrospective board is now restricted to the board owner or a team admin.</div>
+          <div className="subText li">Functionality to delete boards was moved from the Board menu to the History table and is only enabled for archived boards.</div>
+          <div className="subText li">User settings for maximum votes, Team Assessment, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.</div>
+          <div className="subText">Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.</div>
+          <div className="inner">
+            <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>
+              Open change log
+            </button>
+            <button className="default button" onClick={() => this.whatsNewDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
+
+        <dialog className="user-guide-dialog" aria-label="Retrospectives User Guide" ref={this.userGuideDialogRef} onClose={() => this.userGuideDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Retrospectives User Guide</h2>
+            <button onClick={() => this.userGuideDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback. The Retrospective extension and Team Assessment feature are valuable tools supporting that process.</div>
+          <div className="subText">For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.</div>
+          <div className="inner">
+            <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md", "_blank")}>
+              Open user guide
+            </button>
+            <button className="default button" onClick={() => this.userGuideDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
+
+        <dialog className="volunteer-dialog" aria-label="Volunteer" ref={this.volunteerDialogRef} onClose={() => this.volunteerDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Volunteer</h2>
+            <button onClick={() => this.volunteerDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">Help us make the Retrospective Extension even better!</div>
+          <div className="subText">While we will continue to maintain the extension to meet Microsoft&apos;s high standards for security and accessibility, we rely on volunteers like you to add new features and enhance the user experience.</div>
+          <div className="subText">Want to contribute? Join us and become part of our community! 🙋</div>
+          <div className="inner">
+            <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md", "_blank")}>
+              Open contributing guidelines
+            </button>
+            <button className="default button" onClick={() => this.volunteerDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
+
+        <dialog className="keyboard-shortcuts-dialog" aria-label="Keyboard Shortcuts" ref={this.keyboardShortcutsDialogRef} onClose={() => this.keyboardShortcutsDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Keyboard Shortcuts</h2>
+            <button onClick={() => this.keyboardShortcutsDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">Use these keyboard shortcuts to navigate and interact with the retrospective board.</div>
+          <div className="subText">
+            {Object.entries(
+              this.keyboardShortcuts.reduce(
+                (acc, shortcut) => {
+                  if (!acc[shortcut.category]) {
+                    acc[shortcut.category] = [];
+                  }
+                  acc[shortcut.category].push(shortcut);
+                  return acc;
+                },
+                {} as { [key: string]: KeyboardShortcut[] },
+              ),
+            ).map(([category, shortcuts]) => (
+              <div key={category}>
+                <table className="keyboard-shortcuts-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{category} Shortcuts</th>
+                      <th scope="col">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {shortcuts.map((shortcut, index) => (
+                      <tr key={index}>
+                        <td>
+                          {shortcut.keys.map((key, idx) => (
+                            <React.Fragment key={idx}>
+                              {idx > 0 && <span className="keyboard-shortcuts-key-separator">|</span>}
+                              <kbd key={key}>{key}</kbd>
+                            </React.Fragment>
+                          ))}
+                        </td>
+                        <td>{shortcut.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+          <div className="inner">
+            <button className="default button" onClick={() => this.keyboardShortcutsDialogRef.current?.close()}>
+              Close
+            </button>
+          </div>
+        </dialog>
       </div>
     );
   }
