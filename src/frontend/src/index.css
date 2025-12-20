@@ -612,11 +612,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .create-new-board-button {
-    @apply m-2.5;
-  }
-
-  & img {
-    @apply h-40 mb-4;
+    @apply m-2.5 bg-primary text-white cursor-pointer px-4 py-2 rounded;
   }
 }
 
@@ -1932,7 +1928,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-[rgba(var(--palette-accent3),0.5)];
 }
 
-.create-new-board-button,
 .metadata-form-save-button,
 .extension-menu-close-button,
 .team-effectiveness-submit-button {

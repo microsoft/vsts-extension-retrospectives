@@ -1648,8 +1648,17 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       );
     }
 
-    if (!this.state.currentTeam || !this.state.currentBoard) {
-      return <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />;
+    if (!this.state.currentTeam) {
+      return <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>;
+    }
+
+    if (!this.state.currentBoard) {
+      return (
+        <>
+          <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />
+          {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
+        </>
+      );
     }
 
     const teamSelectorList: ISelectorList<WebApiTeam> = {
@@ -2104,7 +2113,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </button>
           </div>
         </dialog>
-        {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
         {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
         {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
         {this.state.currentBoard && this.renderBoardUpdateMetadataFormDialog(false, false, this.state.isBoardUpdateDialogHidden, this.hideBoardUpdateDialog, "Edit retrospective", "", this.updateBoardMetadata, this.hideBoardUpdateDialog)}
