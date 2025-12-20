@@ -21,7 +21,6 @@ import NoFeedbackBoardsView from "./noFeedbackBoardsView";
 import { userDataService } from "../dal/userDataService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
 import SelectorCombo, { ISelectorList } from "./selectorCombo";
-import FeedbackBoardPreviewEmail from "./feedbackBoardPreviewEmail";
 import { ToastContainer, toast } from "./toastNotifications";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { shareBoardHelper } from "../utilities/shareBoardHelper";
@@ -39,7 +38,7 @@ import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
-import { AddIcon, CloseIcon, ContentCopyIcon, EditIcon, ForwardToInboxIcon, getIconElement, InfoIcon, InventoryIcon, LinkIcon, MoreHorizontalIcon, PauseCircleIcon, PlayCircleIcon, RefreshIcon, SimCardDownloadIcon, SourceIcon } from "./icons";
+import { getIconElement } from "./icons";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -1800,43 +1799,43 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                     <div className="board-actions-menu" ref={this.boardActionsMenuRootRef}>
                       <details className="flex items-center relative">
                         <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
-                          <MoreHorizontalIcon />
+                          {getIconElement("more-horizontal")}
                         </summary>
                         <div className="callout-menu left" role="menu" aria-label="Board Actions">
                           <button key="createBoard" type="button" title="Create new retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardCreationDialog, event)}>
-                            <AddIcon />
+                            {getIconElement("add")}
                             Create new retrospective
                           </button>
                           <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardDuplicateDialog, event)}>
-                            <ContentCopyIcon />
+                            {getIconElement("content-copy")}
                             Create copy of retrospective
                           </button>
                           <button key="editBoard" type="button" title="Edit retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardUpdateDialog, event)}>
-                            <EditIcon />
+                            {getIconElement("edit")}
                             Edit retrospective
                           </button>
                           <div key="seperator" className="divider" role="separator" />
                           <button key="copyLink" type="button" title={`Copy link to ${this.state.currentBoard.activePhase} phase`} onClick={event => this.handleBoardActionMenuItemClick(this.copyBoardUrl, event)}>
-                            <LinkIcon />
+                            {getIconElement("link")}
                             {`Copy link to ${this.state.currentBoard.activePhase} phase`}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
                           <button key="exportCSV" type="button" title="Export CSV content" onClick={event => this.handleBoardActionMenuItemClick(this.generateCSVContent, event)}>
-                            <SimCardDownloadIcon />
+                            {getIconElement("sim-card-download")}
                             Export CSV content
                           </button>
                           <button key="emailPreview" type="button" title="Create email summary" onClick={event => this.handleBoardActionMenuItemClick(this.generateEmailSummaryContent, event)}>
-                            <ForwardToInboxIcon />
+                            {getIconElement("forward-to-inbox")}
                             Create email summary
                           </button>
                           <div key="seperator" className="divider" role="separator" />
                           <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => this.handleBoardActionMenuItemClick(this.showRetroSummaryDialog, event)}>
-                            <SourceIcon />
+                            {getIconElement("source")}
                             Show retrospective summary
                           </button>
                           <div key="seperator" className="divider" role="separator" />
                           <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showArchiveBoardConfirmationDialog, event)}>
-                            <InventoryIcon />
+                            {getIconElement("inventory")}
                             Archive retrospective
                           </button>
                         </div>
@@ -1864,7 +1863,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           >
                             <DialogContent>
                               <div className="team-effectiveness-section-information">
-                                <InfoIcon />
+                                {getIconElement("info")}
                                 &nbsp;All answers will be saved anonymously
                               </div>
                               <table className="team-effectiveness-measurement-table">
@@ -2106,7 +2105,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <div className="header">
             <h2 className="title">Archive Retrospective</h2>
             <button onClick={() => this.archiveBoardDialogRef.current?.close()} aria-label="Close">
-              <CloseIcon />
+              {getIconElement("close")}
             </button>
           </div>
           <div className="subText">

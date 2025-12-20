@@ -1,5 +1,3 @@
-import React from "react";
-
 import { getColumnsByTemplateId } from "../boardColumnsHelper";
 import { IFeedbackColumn } from "../../interfaces/feedback";
 import * as randomModule from "../random";

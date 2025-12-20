@@ -776,6 +776,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "balance", tags: ["balance", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
   { id: "gears", tags: ["gears", "fa-solid fa-gears"], name: "Gears", icon: <GearsIcon /> },
   { id: "add", tags: [], name: "Add", icon: <AddIcon /> },
+  { id: "edit", tags: [], name: "Edit", icon: <EditIcon /> },
   { id: "link", tags: [], name: "Link", icon: <LinkIcon /> },
   { id: "sms", tags: [], name: "SMS", icon: <SMSIcon /> },
   { id: "note-add", tags: [], name: "Note Add", icon: <NoteAddIcon /> },
@@ -806,4 +807,8 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "info", tags: [], name: "Info", icon: <InfoIcon /> },
   { id: "content-copy", tags: [], name: "Content Copy", icon: <ContentCopyIcon /> },
   { id: "sim-card-download", tags: [], name: "Sim Card Download", icon: <SimCardDownloadIcon /> },
+  { id: "forward-to-inbox", tags: [], name: "Forward To Inbox", icon: <ForwardToInboxIcon /> },
+  { id: "source", tags: [], name: "Source", icon: <SourceIcon /> },
+  { id: "inventory", tags: [], name: "Inventory", icon: <InventoryIcon /> },
+  { id: "more-horizontal", tags: [], name: "More Horizontal", icon: <MoreHorizontalIcon /> },
 ];
