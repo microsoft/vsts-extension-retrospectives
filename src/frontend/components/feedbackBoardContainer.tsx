@@ -54,8 +54,6 @@ export interface FeedbackBoardContainerState {
   hasToggledArchive: boolean;
   isAppInitialized: boolean;
   isBackendServiceConnected: boolean;
-  isReconnectingToBackendService: boolean;
-  isSummaryDashboardVisible: boolean;
   isTeamDataLoaded: boolean;
   isAllTeamsLoaded: boolean;
   maxVotesPerUser: number;
@@ -154,8 +152,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isMobileBoardActionsDialogHidden: true,
       isMobileTeamSelectorDialogHidden: true,
       isRetroSummaryDialogHidden: true,
-      isReconnectingToBackendService: false,
-      isSummaryDashboardVisible: false,
       isTeamBoardDeletedInfoDialogHidden: true,
       isTeamDataLoaded: false,
       isTeamSelectorCalloutVisible: false,
@@ -270,11 +266,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     try {
       reflectBackendService.onConnectionClose(() => {
-        this.setState({
-          isBackendServiceConnected: false,
-          isReconnectingToBackendService: true,
-        });
-        setTimeout(this.tryReconnectToBackend, 2000);
+        this.setState({ isBackendServiceConnected: false });
       });
 
       reflectBackendService.onReceiveNewBoard(this.handleBoardCreated);
@@ -1365,18 +1357,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     toast(`The email summary for "${this.state.currentBoard.title}" has been copied to your clipboard.`);
   };
 
-  private readonly tryReconnectToBackend = async () => {
-    this.setState({ isReconnectingToBackendService: true });
-
-    const backendConnectionResult = await reflectBackendService.startConnection();
-    if (backendConnectionResult) {
-      reflectBackendService.switchToBoard(this.state.currentBoard.id);
-      this.setState({ isBackendServiceConnected: backendConnectionResult });
-    }
-
-    this.setState({ isReconnectingToBackendService: false });
-  };
-
   private readonly archiveCurrentBoard = async () => {
     await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
@@ -1666,6 +1646,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <span>Loading...</span>
         </div>
       );
+    }
+
+    if (!this.state.currentTeam || !this.state.currentBoard) {
+      return <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />;
     }
 
     const teamSelectorList: ISelectorList<WebApiTeam> = {
@@ -2033,7 +2017,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             )}
             {this.state.activeTab === "Board" && (
               <div className="flex-1 min-h-0 flex flex-col feedback-board-container border-t-4 border-(--nav-header-active-item-background)">
-                {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
+                {this.state.currentTeam && this.state.currentBoard && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
                       <>
@@ -2063,30 +2047,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <div className="retro-message-bar" role="alert" aria-live="assertive">
                         <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
                         <div className="actions">
-                          {this.state.isReconnectingToBackendService && (
-                            <div className="spinner" aria-live="assertive">
-                              <div></div>
-                              <span>Reconnecting...</span>
-                            </div>
-                          )}
-                          {!this.state.isReconnectingToBackendService && (
-                            <>
-                              <button type="button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService}>
-                                Reconnect
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  this.setState({ isBackendServiceConnected: true });
-                                }}
-                                disabled={this.state.isReconnectingToBackendService}
-                                aria-label="Hide"
-                                title="Hide"
-                              >
-                                <span aria-hidden="true">×</span>
-                              </button>
-                            </>
-                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              this.setState({ isBackendServiceConnected: true });
+                            }}
+                            aria-label="Hide"
+                            title="Hide"
+                          >
+                            <span aria-hidden="true">×</span>
+                          </button>
                         </div>
                       </div>
                     )}
@@ -2134,7 +2104,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </button>
           </div>
         </dialog>
-        {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
         {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
         {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
         {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
