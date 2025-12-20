@@ -334,13 +334,13 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("clarity");
 
           expect(result).toHaveLength(3);
-            expect(result[0]).toEqual({
-              accentColor: "#008000",
-              iconClass: "happy-face",
-              id: "uuid-1",
-              title: "What provides clarity?",
-              notes: "",
-            });
+          expect(result[0]).toEqual({
+            accentColor: "#008000",
+            iconClass: "happy-face",
+            id: "uuid-1",
+            title: "What provides clarity?",
+            notes: "",
+          });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "sad-face",
@@ -363,13 +363,13 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("energy");
 
           expect(result).toHaveLength(3);
-            expect(result[0]).toEqual({
-              accentColor: "#008000",
-              iconClass: "happy-face",
-              id: "uuid-1",
-              title: "What boosts energy?",
-              notes: "",
-            });
+          expect(result[0]).toEqual({
+            accentColor: "#008000",
+            iconClass: "happy-face",
+            id: "uuid-1",
+            title: "What boosts energy?",
+            notes: "",
+          });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "sad-face",
@@ -392,13 +392,13 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("psy-safety");
 
           expect(result).toHaveLength(3);
-            expect(result[0]).toEqual({
-              accentColor: "#008000",
-              iconClass: "happy-face",
-              id: "uuid-1",
-              title: "What fosters psychological safety?",
-              notes: "",
-            });
+          expect(result[0]).toEqual({
+            accentColor: "#008000",
+            iconClass: "happy-face",
+            id: "uuid-1",
+            title: "What fosters psychological safety?",
+            notes: "",
+          });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "sad-face",
@@ -421,13 +421,13 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("wlb");
 
           expect(result).toHaveLength(3);
-            expect(result[0]).toEqual({
-              accentColor: "#008000",
-              iconClass: "happy-face",
-              id: "uuid-1",
-              title: "What helps work-life balance?",
-              notes: "",
-            });
+          expect(result[0]).toEqual({
+            accentColor: "#008000",
+            iconClass: "happy-face",
+            id: "uuid-1",
+            title: "What helps work-life balance?",
+            notes: "",
+          });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "sad-face",
@@ -450,13 +450,13 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("confidence");
 
           expect(result).toHaveLength(3);
-            expect(result[0]).toEqual({
-              accentColor: "#008000",
-              iconClass: "happy-face",
-              id: "uuid-1",
-              title: "What enhances confidence in team?",
-              notes: "",
-            });
+          expect(result[0]).toEqual({
+            accentColor: "#008000",
+            iconClass: "happy-face",
+            id: "uuid-1",
+            title: "What enhances confidence in team?",
+            notes: "",
+          });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "sad-face",
@@ -479,13 +479,13 @@ describe("boardColumnsHelper", () => {
           const result = getColumnsByTemplateId("efficiency");
 
           expect(result).toHaveLength(3);
-            expect(result[0]).toEqual({
-              accentColor: "#008000",
-              iconClass: "happy-face",
-              id: "uuid-1",
-              title: "What increases efficiency?",
-              notes: "",
-            });
+          expect(result[0]).toEqual({
+            accentColor: "#008000",
+            iconClass: "happy-face",
+            id: "uuid-1",
+            title: "What increases efficiency?",
+            notes: "",
+          });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
             iconClass: "sad-face",

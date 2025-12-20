@@ -982,7 +982,6 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       }}
                     >
                       <div className="mobile-contextual-menu-list">
-                        {" "}
                         {this.feedbackItemEllipsisMenuItems
                           .filter(menuItem => !menuItem.hideMobile)
                           .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
@@ -1029,8 +1028,8 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                         this.timerSwitch(this.props.id);
                       }}
                     >
-                      {curTimerState ? <StopCircleIcon /> : <PlayCircleIcon />}
-                      <span> {this.formatTimer(this.props.timerSecs)} elapsed</span>
+                      {curTimerState ? getIconElement("stop-circle") : getIconElement("play-circle")}
+                      <span>{this.formatTimer(this.props.timerSecs)} elapsed</span>
                     </button>
                   </div>
                 )}

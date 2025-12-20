@@ -868,6 +868,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
         &:first-of-type {
           @apply p-0;
+
+          & button {
+            @apply flex items-center justify-self-center;
+          }
         }
       }
 
@@ -1025,8 +1029,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.board-summary-initialization-spinner {
-  @apply absolute top-1/2 left-1/2 -mt-12 -ml-12;
+.spinner {
+  @apply flex items-center justify-center h-screen gap-2;
+
+  & div {
+    @apply w-7 h-7 border-2 border-gray-200 border-t-primary rounded-full animate-spin;
+  }
 }
 
 .flex-grow-spacer {
@@ -1572,10 +1580,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-board-container {
   @apply flex h-[calc(100vh-88px)] overflow-y-auto overflow-x-hidden;
-}
-
-.initialization-spinner {
-  @apply absolute top-1/2 left-1/2 -mt-12 -ml-12;
 }
 
 .feedback-board-container-header-spacer {

@@ -1,7 +1,6 @@
 import React from "react";
 import { DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
 import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react/lib/Dialog";
-import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
 import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
@@ -1400,7 +1399,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const boardUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
     const emailContent = await shareBoardHelper.generateEmailText(this.state.currentBoard, boardUrl, false);
     this.setState(prevState => ({
-      currentBoard: { ...prevState.currentBoard, emailContent: emailContent }
+      currentBoard: { ...prevState.currentBoard, emailContent: emailContent },
     }));
 
     this.previewEmailDialogRef?.current?.showModal();
@@ -1661,7 +1660,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   public render() {
     if (!this.state.isAppInitialized || !this.state.isTeamDataLoaded) {
-      return <Spinner className="initialization-spinner" size={SpinnerSize.large} label="Loading..." ariaLive="assertive" />;
+      return (
+        <div className="spinner" aria-live="assertive">
+          <div></div>
+          <span>Loading...</span>
+        </div>
+      );
     }
 
     const teamSelectorList: ISelectorList<WebApiTeam> = {
@@ -2059,7 +2063,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <div className="retro-message-bar" role="alert" aria-live="assertive">
                         <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
                         <div className="actions">
-                          {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
+                          {this.state.isReconnectingToBackendService && (
+                            <div className="spinner" aria-live="assertive">
+                              <div></div>
+                              <span>Reconnecting...</span>
+                            </div>
+                          )}
                           {!this.state.isReconnectingToBackendService && (
                             <>
                               <button type="button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService}>

@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from "react";
-import { PrimaryButton, DefaultButton, IconButton, ActionButton } from "@fluentui/react/lib/Button";
+import { PrimaryButton, DefaultButton, IconButton } from "@fluentui/react/lib/Button";
 import { TextField } from "@fluentui/react/lib/TextField";
 import Dialog, { DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
 import { Checkbox } from "@fluentui/react/lib/Checkbox";
@@ -16,7 +16,7 @@ import { reactPlugin } from "../utilities/telemetryClient";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from "./feedbackBoardMetadataFormPermissions";
 import { generateUUID } from "../utilities/random";
-import { AddIcon, availableIcons, CloseIcon, getIconElement } from "./icons";
+import { availableIcons, getIconElement } from "./icons";
 
 export interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -509,7 +509,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                     this.setState({ columnCards: newColumns });
                   }}
                 >
-                  <AddIcon />
+                  {getIconElement("add")}
                   Add new column
                 </button>
               </section>
@@ -539,7 +539,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   <div className="header">
                     <h2 className="title">Choose Column Icon</h2>
                     <button onClick={() => this.chooseColumnIconDialogRef.current?.close()} aria-label="Close">
-                      <CloseIcon />
+                      {getIconElement("close")}
                     </button>
                   </div>
                   <div className="subText">{`Choose the column icon for column '${this.state.columnCardBeingEdited.column.title}'`}</div>
