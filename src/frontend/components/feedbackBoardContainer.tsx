@@ -16,7 +16,6 @@ import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
-import NoFeedbackBoardsView from "./noFeedbackBoardsView";
 import { userDataService } from "../dal/userDataService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
 import SelectorCombo, { ISelectorList } from "./selectorCombo";
@@ -1655,7 +1654,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     if (!this.state.currentBoard) {
       return (
         <>
-          <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />
+          <div className="no-boards-container">
+            <div className="no-boards-text">Get started with your first Retrospective</div>
+            <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
+            <button title="Create Board" onClick={this.showBoardCreationDialog} className="create-new-board-button">
+              Create Board
+            </button>
+          </div>
           {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
         </>
       );
