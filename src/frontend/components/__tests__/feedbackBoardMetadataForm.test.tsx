@@ -1565,7 +1565,7 @@ describe("FeedbackBoardMetadataForm - Dialog Dismissal", () => {
 
   it("should close color dialog on dismiss", async () => {
     const user = userEvent.setup();
-    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const changeColorButtons = screen.getAllByRole("button", { name: /change column color/i });
     await user.click(changeColorButtons[0]);
