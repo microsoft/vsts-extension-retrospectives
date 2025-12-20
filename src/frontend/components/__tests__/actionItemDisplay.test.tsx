@@ -417,7 +417,7 @@ describe("Action Item Display component", () => {
       allowAddNewActionItem: true,
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
-    const { container, getByPlaceholderText, queryByText } = render(<ActionItemDisplay {...propsWithAdd} />);
+    const { container, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
 
     await openLinkExistingDialog(container);
 
@@ -432,7 +432,7 @@ describe("Action Item Display component", () => {
       allowAddNewActionItem: true,
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
-    const { container, getByPlaceholderText, queryByText } = render(<ActionItemDisplay {...propsWithAdd} />);
+    const { container, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
 
     const menu = await openAddWorkItemMenu(container);
     const linkButton = within(menu).getByRole("button", { name: "Link existing work item" });

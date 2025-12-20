@@ -9,7 +9,7 @@ import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../interfaces/fee
 import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 
-import { ContactPhoneIcon, getIconElement, KeyboardIcon, VolunteerActivismIcon } from "./icons";
+import { getIconElement } from "./icons";
 
 interface IExportImportDataSchema {
   team: WebApiTeam;
