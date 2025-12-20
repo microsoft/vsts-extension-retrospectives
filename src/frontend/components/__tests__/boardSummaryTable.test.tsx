@@ -1,11 +1,13 @@
 import React from "react";
 import { render, waitFor } from "@testing-library/react";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
+import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 
 import BoardSummaryTable, { buildBoardSummaryState, IBoardSummaryTableProps, IBoardSummaryTableItem } from "../boardSummaryTable";
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from "../boardSummaryTable";
 import BoardDataService from "../../dal/boardDataService";
 import { itemDataService } from "../../dal/itemDataService";
+import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { IFeedbackBoardDocument } from "../../interfaces/feedback";
 import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
 import { reflectBackendService } from "../../dal/reflectBackendService";
@@ -54,6 +56,20 @@ jest.mock("../../dal/reflectBackendService", () => ({
 }));
 
 jest.mock("../../dal/azureDevOpsWorkItemService");
+
+beforeAll(() => {
+  if (!(window as unknown as { HTMLDialogElement?: typeof HTMLDialogElement }).HTMLDialogElement) {
+    (window as unknown as { HTMLDialogElement: typeof HTMLElement }).HTMLDialogElement = class HTMLDialogElement extends HTMLElement {} as unknown as typeof HTMLDialogElement;
+  }
+
+  HTMLDialogElement.prototype.showModal = function showModal() {
+    (this as unknown as { open: boolean }).open = true;
+  };
+
+  HTMLDialogElement.prototype.close = function close() {
+    (this as unknown as { open: boolean }).open = false;
+  };
+});
 
 const mockedIdentity: IdentityRef = {
   directoryAlias: "test.user",
@@ -1119,6 +1135,85 @@ describe("BoardSummaryTable - Action Items", () => {
   });
 });
 
+describe("BoardSummaryTable - Action Item Aggregation", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("updates pending and resolved counts from actionable work items", async () => {
+    const actionableBoard: IFeedbackBoardDocument = {
+      ...mockBoards[0],
+      id: "board-actionable",
+      title: "Actionable Board",
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([actionableBoard]);
+
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([{ id: "fb-1", associatedActionItemIds: [11, 12] }]);
+
+    (workItemService.getWorkItemStates as jest.Mock).mockResolvedValue([
+      { name: "To Do", category: "Proposed" },
+      { name: "Done", category: "Completed" },
+    ]);
+
+    (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([
+      {
+        id: 11,
+        fields: {
+          "System.WorkItemType": "Task",
+          "System.State": "To Do",
+          "System.Title": "Task One",
+          "System.ChangedDate": new Date().toISOString(),
+          "System.AssignedTo": { displayName: "Alex" },
+          "Microsoft.VSTS.Common.Priority": 1,
+        },
+      },
+      {
+        id: 12,
+        fields: {
+          "System.WorkItemType": "Task",
+          "System.State": "Done",
+          "System.Title": "Task Two",
+          "System.ChangedDate": new Date().toISOString(),
+          "System.AssignedTo": { displayName: "Blake" },
+          "Microsoft.VSTS.Common.Priority": 2,
+        },
+      },
+    ]);
+
+    const supportedWorkItemTypes: WorkItemType[] = [
+      {
+        name: "Task",
+        icon: { id: "task-icon", url: "https://example.com/task-icon.png" },
+      } as unknown as WorkItemType,
+    ];
+
+    const { container } = render(<BoardSummaryTable {...baseProps} supportedWorkItemTypes={supportedWorkItemTypes} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(container.querySelector(".contextual-menu-button")).toBeTruthy();
+    });
+
+    const expandButton = container.querySelector(".contextual-menu-button") as HTMLElement;
+    expandButton?.click();
+
+    await waitFor(() => {
+      const pendingCount = container.querySelector('[aria-label="pending work items count"]');
+      const resolvedCount = container.querySelector('[aria-label="resolved work items count"]');
+      expect(pendingCount?.textContent).toBe("1");
+      expect(resolvedCount?.textContent).toBe("1");
+    });
+
+    expect(workItemService.getWorkItemsByIds).toHaveBeenCalledWith([11, 12]);
+    expect(workItemService.getWorkItemStates).toHaveBeenCalledWith("Task");
+  });
+});
+
 describe("BoardSummaryTable - Archive/Restore", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -1185,6 +1280,84 @@ describe("BoardSummaryTable - Delete Board", () => {
 
     await waitFor(() => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+});
+
+describe("BoardSummaryTable - Delete confirmation flow", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  });
+
+  it("deletes board and broadcasts changes when confirmed", async () => {
+    const archivedBoard: IFeedbackBoardDocument = { ...mockBoards[0], id: "board-archive", title: "Archived Board", isArchived: true, archivedDate: new Date(Date.now() - 5 * 60 * 1000) };
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([archivedBoard]);
+    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(container.querySelector(".trash-icon")).toBeTruthy();
+    });
+
+    const trashIcon = container.querySelector(".trash-icon") as HTMLElement;
+    trashIcon?.click();
+
+    await waitFor(() => {
+      expect(container.querySelector(".delete-board-dialog")?.textContent).toContain("Archived Board");
+    });
+
+    getByText("Delete").click();
+
+    await waitFor(() => {
+      expect(BoardDataService.deleteFeedbackBoard).toHaveBeenCalledWith(baseProps.teamId, "board-archive");
+    });
+
+    await waitFor(() => {
+      expect(reflectBackendService.broadcastDeletedBoard).toHaveBeenCalledWith(baseProps.teamId, "board-archive");
+    });
+  });
+
+  it("tracks exception when delete fails", async () => {
+    const archivedBoard: IFeedbackBoardDocument = { ...mockBoards[0], id: "board-error", title: "Fail Board", isArchived: true, archivedDate: new Date(Date.now() - 5 * 60 * 1000) };
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([archivedBoard]);
+    const error = new Error("delete failed");
+    (BoardDataService.deleteFeedbackBoard as jest.Mock).mockRejectedValue(error);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(container.querySelector(".trash-icon")).toBeTruthy();
+    });
+
+    const trashIcon = container.querySelector(".trash-icon") as HTMLElement;
+    trashIcon?.click();
+
+    await waitFor(() => {
+      expect(container.querySelector(".delete-board-dialog")?.textContent).toContain("Fail Board");
+    });
+
+    getByText("Delete").click();
+
+    await waitFor(() => {
+      expect(appInsights.trackException).toHaveBeenCalledWith(
+        error,
+        expect.objectContaining({
+          boardId: "board-error",
+          boardName: "Fail Board",
+          feedbackItemsCount: 0,
+          action: "delete",
+        }),
+      );
     });
   });
 });

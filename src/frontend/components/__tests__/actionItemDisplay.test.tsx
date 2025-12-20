@@ -443,6 +443,43 @@ describe("Action Item Display component", () => {
     });
   });
 
+  it("closes add work item menu when clicking outside", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    await openAddWorkItemMenu(container);
+    expect(container.querySelector(".popout-container")).toBeTruthy();
+
+    fireEvent.pointerDown(document.body);
+
+    await waitFor(() => {
+      expect(container.querySelector(".popout-container")).toBeNull();
+    });
+  });
+
+  it("keeps add work item menu open when clicking inside", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    await openAddWorkItemMenu(container);
+    const menu = container.querySelector(".popout-container") as HTMLElement;
+    expect(menu).toBeTruthy();
+
+    fireEvent.pointerDown(menu);
+
+    await waitFor(() => {
+      expect(container.querySelector(".popout-container")).toBeTruthy();
+    });
+  });
+
   it("validates work item id input - shows error for non-numeric input", async () => {
     const propsWithAdd = {
       ...defaultTestProps,
@@ -494,6 +531,27 @@ describe("Action Item Display component", () => {
       expect(linkButton?.disabled).toBe(true);
       const workItemCard = container.querySelector(".work-item-card");
       expect(workItemCard).toBeNull();
+    });
+  });
+
+  it("ignores work item id of zero", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    await openLinkExistingDialog(container);
+
+    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    fireEvent.change(searchBox, { target: { value: "0" } });
+
+    await waitFor(() => {
+      expect(mockGetWorkItemsByIds).not.toHaveBeenCalled();
+      const linkButton = container.querySelector(".link-existing-work-item-dialog .button") as HTMLButtonElement;
+      expect(linkButton?.disabled).toBe(true);
+      expect(container.querySelector(".work-item-not-found")).toBeNull();
     });
   });
 
