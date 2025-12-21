@@ -136,7 +136,7 @@ describe("Board Metadata Form Permissions", () => {
       };
 
       const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      expect(getByText("This board is visible to every member in the project.")).toBeInTheDocument();
+      expect(getByText("This board is visible to every member in the project")).toBeInTheDocument();
     });
 
     it("should hide when there are team permissions", () => {
