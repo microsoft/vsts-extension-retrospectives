@@ -27,7 +27,7 @@ import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
-import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionFontAwesomeClass, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
+import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
@@ -1926,7 +1926,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                 </thead>
                                 <tbody>
                                   {questions.map(question => {
-                                    return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                                    return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
                                   })}
                                 </tbody>
                               </table>
@@ -2199,7 +2199,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           return (
                             <li className="chart-question-block" key={data.questionId}>
                               <div className="chart-question">
-                                <i className={getQuestionFontAwesomeClass(data.questionId)} /> &nbsp;
+                                <i className={getQuestionIconClassName(data.questionId)} /> &nbsp;
                                 {getQuestionShortName(data.questionId)}
                               </div>
                               {data.red > 0 && (

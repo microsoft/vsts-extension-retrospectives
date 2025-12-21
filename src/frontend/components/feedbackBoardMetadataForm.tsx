@@ -328,9 +328,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   <TextField className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={this.state.maxVotesPerUser?.toString()} onChange={this.handleMaxVotePerUserChange} />
                 </div>
                 <hr></hr>
-                <div className="board-metadata-form-section-information">
-                  <i className="fas fa-exclamation-circle"></i>&nbsp;These settings cannot be modified after board creation.
-                </div>
+                <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation</div>
                 <div className="board-metadata-form-section-subheader">
                   <div className="flex flex-col">
                     <Checkbox id="include-team-assessment-checkbox" label="Include Team Assessment" ariaLabel="Include Team Assessment. This selection cannot be modified after board creation." boxSide="start" checked={this.state.isIncludeTeamEffectivenessMeasurement} disabled={!this.props.isNewBoardCreation} onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />
@@ -347,15 +345,9 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
               <section className="board-metadata-edit-column-settings">
                 <h2 className="board-metadata-form-section-header">Column Settings</h2>
                 <div className="board-metadata-form-section-information">
-                  <i className="fas fa-exclamation-circle"></i>&nbsp;You can create a maximum of {this.maxColumnCount} columns in a retrospective.
+                  {getIconElement("exclamation")} You can create a maximum of {this.maxColumnCount} columns in a retrospective
                 </div>
-                {!this.props.isNewBoardCreation && (
-                  <div className="board-metadata-form-section-information warning-information">
-                    <i className="fas fa-exclamation-triangle"></i>&nbsp;Warning: Existing feedback items may not be
-                    <br />
-                    available after changing the board template!
-                  </div>
-                )}
+                {!this.props.isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("exclamation")} Warning: Existing feedback items may not be available after changing the board template!</div>}
                 <div className="board-metadata-form-section-subheader">
                   <label htmlFor="column-template-dropdown">Apply template:</label>
                   <select onChange={this.handleColumnsTemplateChange} id="column-template-dropdown" className="title-input-container column-template-dropdown">

@@ -20,7 +20,7 @@ import { IColumn, IColumnItem } from "./feedbackBoard";
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
-import { getIconElement, PlayCircleIcon, StopCircleIcon } from "./icons";
+import { getIconElement } from "./icons";
 
 export interface IFeedbackItemColumnContext {
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;

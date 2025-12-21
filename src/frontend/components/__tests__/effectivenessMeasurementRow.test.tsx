@@ -17,7 +17,7 @@ const defaultProps: EffectivenessMeasurementRowProps = {
   questionId: 1,
   title: "Test Question",
   subtitle: "Test subtitle for the question",
-  iconClass: "fa-solid fa-magnifying-glass",
+  iconClassName: "fa-solid fa-magnifying-glass",
   tooltip: "This is a test tooltip",
   votes: [],
   onSelectedChange: jest.fn(),

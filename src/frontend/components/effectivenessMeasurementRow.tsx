@@ -7,7 +7,7 @@ import { getIconElement } from "./icons";
 export interface EffectivenessMeasurementRowProps {
   title: string;
   subtitle: string;
-  iconClass: string;
+  iconClassName: string;
   tooltip: string;
   questionId?: number;
   votes?: ITeamEffectivenessMeasurementVoteCollection[];
@@ -44,7 +44,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
       <tr className="effectiveness-measurement-row">
         <th scope="row">
           <p>
-            {getIconElement(this.props.iconClass)}
+            {getIconElement(this.props.iconClassName)}
             {this.props.title}
           </p>
           {this.props.subtitle}
