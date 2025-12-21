@@ -1044,9 +1044,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
             </div>
             {isGroupedCarouselItem && isMainItem && this.state.isShowingGroupedChildrenTitles && (
               <div className="group-child-feedback-stack">
-                <div className="grouped-feedback-header">
-                  <i className="far fa-comments" /> Grouped Feedback
-                </div>
+                <div className="grouped-feedback-header">{getIconElement("forum")} Grouped Feedback</div>
                 <ul aria-label="List of Grouped Feedback" role="list">
                   {childrenIds.map((id: string) => {
                     const childCard: IColumnItem = columnItems?.find(c => c.feedbackItem.id === id);
@@ -1058,7 +1056,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
                       childCard && (
                         <li key={id} role="listitem">
                           <div className="icon" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}>
-                            <i className="fa-solid fa-quote-left" aria-hidden="true" />
+                            {getIconElement("sms")}
                           </div>
                           <div className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
                             {childDisplayTitle}

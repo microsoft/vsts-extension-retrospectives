@@ -2095,17 +2095,25 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-full;
 
   & .grouped-feedback-header {
-    @apply font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
+    @apply flex items-center gap-1 font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
+
+    & svg {
+      @apply w-5 h-5;
+    }
   }
 
   & ul {
     @apply list-none m-0;
 
     & li {
-      @apply [word-wrap:break-word] p-1 flex;
+      @apply grid grid-cols-[auto_1fr] [word-wrap:break-word] p-1;
 
       & .icon {
         @apply border-solid h-7.5 border-t-0 border-r-2 border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color) content-center w-7 text-center;
+
+        & svg {
+          @apply w-5 h-5;
+        }
       }
 
       & .original-column-info {
@@ -2113,7 +2121,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & .related-feedback-title {
-        @apply ml-2.5 text-(--text-primary-color) text-base content-center [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
+        @apply ml-2.5 text-(--text-primary-color) text-sm content-center [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
         display: -webkit-box;
       }
     }
