@@ -644,24 +644,24 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.selector-button-icon {
-  @apply text-lg leading-8 mr-1;
-}
+.selector-button {
+  @apply text-lg leading-8 mr-1 bg-black/5 flex h-8 items-center pl-2 pr-2 cursor-pointer hover:text-(--text-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
 
-.selector-button-text-wrapper {
-  @apply max-w-80 overflow-hidden text-ellipsis px-2;
-}
-
-.selector-button-text {
-  @apply text-sm leading-8 inline whitespace-nowrap;
-
-  &:hover {
-    @apply text-primary;
+  & svg {
+    @apply w-5 h-5;
   }
-}
 
-.selector-button-chevron {
-  @apply text-xs leading-8;
+  & div {
+    @apply max-w-80 overflow-hidden text-ellipsis px-2;
+
+    & span {
+      @apply text-sm leading-8 inline whitespace-nowrap;
+
+      &:hover {
+        @apply text-primary;
+      }
+    }
+  }
 }
 
 .list-item-shimmer {
@@ -1670,10 +1670,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-base flex items-baseline;
 }
 
-.board-selector-group .board-selector .selector-button {
-  @apply -ml-2;
-}
-
 .board-actions-menu {
   @apply mx-2;
 
@@ -1997,11 +1993,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus {
-  @apply flex items-center h-8 max-w-36 z-1 my-0 mr-auto mb-0 ml-0 py-0 pr-1 pb-0 pl-0 bg-inherit border-none leading-8 text-xs font-semibold text-primary;
-}
-
-.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus i {
-  @apply w-9 ml-0.5 leading-[inherit] -mr-1;
+  @apply flex items-center h-8 max-w-36 z-1 my-0 mr-auto mb-0 ml-3 py-0 pr-1 pb-0 pl-0 bg-inherit border-none leading-8 text-xs font-semibold text-primary;
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header .feedback-expand-group-focus:focus-visible {
@@ -2092,7 +2084,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedbackItem .mainItemCard .group-child-feedback-stack {
-  @apply w-full;
+  @apply w-full border-l-3 border-border-gray;
 
   & .grouped-feedback-header {
     @apply flex items-center gap-1 font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
@@ -2109,10 +2101,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply grid grid-cols-[auto_1fr] [word-wrap:break-word] p-1;
 
       & .icon {
-        @apply border-solid h-7.5 border-t-0 border-r-2 border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color) content-center w-7 text-center;
+        @apply w-6 h-7 border-t-0 border-r-2 border-b-0 border-l-0 border-solid border-(--text-secondary-color) text-(--text-disabled-color);
 
         & svg {
-          @apply w-5 h-5;
+          @apply w-4 h-4;
         }
       }
 
@@ -2121,7 +2113,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & .related-feedback-title {
-        @apply ml-2.5 text-(--text-primary-color) text-sm content-center [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
+        @apply ml-2.5 text-(--text-primary-color) text-xs content-center [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
         display: -webkit-box;
       }
     }

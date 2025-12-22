@@ -412,7 +412,8 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   };
 
   private readonly renderFeedbackItems = () => {
-    let columnItems: IColumnItem[] = this.props.columnItems || [];
+    const sourceColumnItems: IColumnItem[] = this.props.columnItems || [];
+    let columnItems: IColumnItem[] = sourceColumnItems;
 
     // Sort by grouped total votes if Act workflow else sort by created date
     if (this.props.workflowPhase === WorkflowPhase.Act) {
@@ -421,13 +422,15 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       columnItems = columnItems.sort((item1, item2) => new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime());
     }
 
+    columnItems = columnItems || [];
+
     return columnItems
       .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId) // Exclude child items
       .map(columnItem => {
         const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem);
 
         if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
-          const childItemsToGroup = this.props.columnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem));
+          const childItemsToGroup = sourceColumnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem));
 
           return <FeedbackItemGroup key={feedbackItemProps.id} mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={this.props.workflowPhase} />;
         } else {
@@ -437,10 +440,12 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
   };
 
   public render() {
+    const columnItems = this.props.columnItems || [];
+
     return (
-      <div ref={this.columnRef} className="feedback-column" role="region" aria-label={`${this.props.columnName} column with ${this.props.columnItems.length} feedback items`} tabIndex={0} onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
+      <div ref={this.columnRef} className="feedback-column" role="region" aria-label={`${this.props.columnName} column with ${columnItems.length} feedback items`} tabIndex={0} onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
         <div className="feedback-column-header">
-          <div className="feedback-column-title" aria-label={`${this.props.columnName} (${this.props.columnItems.length} feedback items)`}>
+          <div className="feedback-column-title" aria-label={`${this.props.columnName} (${columnItems.length} feedback items)`}>
             <div className="feedback-column-icon">{this.props.icon}</div>
             <h2 className="feedback-column-name">{this.props.columnName}</h2>
           </div>

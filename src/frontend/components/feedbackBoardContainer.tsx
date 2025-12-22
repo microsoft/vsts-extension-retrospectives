@@ -1777,7 +1777,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
             Retrospectives
           </h1>
-          <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="users" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
+          <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="people" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
           <div className="flex-grow-spacer"></div>
           <div className="header-menu-with-timer">
             {this.renderWorkflowTimerControls()}
@@ -1798,7 +1798,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   <div className="mx-4 vertical-tab-separator" />
                   <div className="flex items-center justify-start">
                     <div className="board-selector">
-                      <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-columns" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
+                      <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
                     </div>
                     <div className="board-actions-menu" ref={this.boardActionsMenuRootRef}>
                       <details className="flex items-center relative">

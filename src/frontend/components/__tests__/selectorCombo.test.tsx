@@ -130,7 +130,7 @@ describe("SelectorCombo", () => {
     test("renders icon with correct class name", () => {
       const { container } = render(<SelectorCombo {...defaultProps} />);
 
-      expect(container.querySelector(".fa-solid.fa-users")).toBeTruthy();
+      expect(container.querySelector("svg")).toBeTruthy();
     });
 
     test("renders callout with correct props when hidden", () => {

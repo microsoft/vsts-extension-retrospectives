@@ -111,7 +111,7 @@ describe("Action Item Display component", () => {
 
   it("renders correctly when there are no action items", () => {
     const { container } = render(<ActionItemDisplay {...defaultTestProps} />);
-    expect(container.querySelector(".action-items")).toBeTruthy();
+    expect(container.querySelector(".link-existing-work-item-dialog")).toBeTruthy();
   });
 
   it("renders correctly when action items exist", () => {
@@ -126,7 +126,7 @@ describe("Action Item Display component", () => {
       ],
     };
     const { container } = render(<ActionItemDisplay {...propsWithActionItems} />);
-    expect(container.querySelector(".action-items")).toBeTruthy();
+    expect(container.querySelectorAll(".related-task-sub-card")).toHaveLength(1);
   });
 
   it("renders add action item section when allowAddNewActionItem is true", () => {
@@ -176,8 +176,7 @@ describe("Action Item Display component", () => {
       ],
     };
     const { container } = render(<ActionItemDisplay {...propsWithItems} />);
-    expect(container.querySelector(".action-items")).toBeTruthy();
-    expect(container.innerHTML).toContain("action-items");
+    expect(container.querySelectorAll(".related-task-sub-card")).toHaveLength(2);
   });
 
   it("renders with disabled and checked state", () => {
@@ -201,7 +200,7 @@ describe("Action Item Display component", () => {
 
   it("renders dialog component with all elements", () => {
     const { container } = render(<ActionItemDisplay {...defaultTestProps} />);
-    expect(container.querySelector(".action-items")).toBeTruthy();
+    expect(container.querySelector(".link-existing-work-item-dialog")).toBeTruthy();
   });
 
   it("handles multiple work item types", () => {
@@ -236,7 +235,7 @@ describe("Action Item Display component", () => {
       defaultAreaPath: "/Different/Area/Path",
     };
     const { container } = render(<ActionItemDisplay {...propsWithDifferentConfig} />);
-    expect(container.querySelector(".action-items")).toBeTruthy();
+    expect(container.querySelector(".link-existing-work-item-dialog")).toBeTruthy();
   });
 
   it("calls onUpdateActionItem callback when provided", () => {
@@ -256,7 +255,7 @@ describe("Action Item Display component", () => {
       allWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any, { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any],
     };
     const { container } = render(<ActionItemDisplay {...propsWithAllTypes} />);
-    expect(container.querySelector(".action-items")).toBeTruthy();
+    expect(container.querySelector(".link-existing-work-item-dialog")).toBeTruthy();
   });
 
   it("renders with complex action item configurations", () => {
@@ -286,7 +285,7 @@ describe("Action Item Display component", () => {
       ],
     };
     const { container } = render(<ActionItemDisplay {...propsWithComplexItems} />);
-    expect(container.querySelector(".action-items")).toBeTruthy();
+    expect(container.querySelectorAll(".related-task-sub-card")).toHaveLength(2);
   });
 
   it("renders add action item button when action items can be added", () => {

@@ -466,4 +466,89 @@ describe("ExtensionSettingsMenu", () => {
     removeChildSpy.mockRestore();
     fileReaderSpy.mockRestore();
   });
+
+  it("ignores '?' shortcut when focus is on an input", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    input.focus();
+
+    fireEvent.keyDown(input, { key: "?", code: "Slash", shiftKey: true });
+
+    expect(dialog).not.toHaveAttribute("open");
+    document.body.removeChild(input);
+  });
+
+  it("does not open shortcuts dialog when a different dialog is already open", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+
+    const blockingDialog = document.createElement("dialog");
+    blockingDialog.setAttribute("open", "");
+    document.body.appendChild(blockingDialog);
+
+    fireEvent.keyDown(document, { key: "?", code: "Slash", shiftKey: true });
+
+    expect(dialog).not.toHaveAttribute("open");
+    document.body.removeChild(blockingDialog);
+  });
+
+  it("ignores keyboard shortcut when modifier keys are pressed", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+
+    fireEvent.keyDown(document, { key: "?", code: "Slash", ctrlKey: true });
+
+    expect(dialog).not.toHaveAttribute("open");
+  });
+
+  it("closes open data details when clicking outside the menu", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const details = container.querySelector("details");
+
+    details?.setAttribute("open", "");
+
+    const event = new Event("pointerdown", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "target", { value: document.body, writable: false });
+    document.dispatchEvent(event);
+
+    expect(details?.hasAttribute("open")).toBe(false);
+  });
+
+  it("falls back to the default team when imported team is missing", async () => {
+    (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([]);
+    (azureDevOpsCoreService.getDefaultTeam as jest.Mock).mockResolvedValue({ id: "default-team", name: "Default" });
+    const createBoardSpy = jest.spyOn(boardDataService, "createBoardForTeam").mockResolvedValue({ id: "new-board", title: "Legacy" } as any);
+    const appendSpy = jest.spyOn(itemDataService, "appendItemToBoard").mockResolvedValue({} as any);
+
+    const menu = new ExtensionSettingsMenu({});
+
+    const importedData = [
+      {
+        team: { id: "missing-team", name: "Missing" },
+        board: {
+          id: "legacy-board",
+          title: "Legacy",
+          maxVotesPerUser: 3,
+          columns: [] as IFeedbackColumn[],
+          isIncludeTeamEffectivenessMeasurement: false,
+          shouldShowFeedbackAfterCollect: true,
+          isAnonymous: false,
+          startDate: undefined as unknown as Date | undefined,
+          endDate: undefined as unknown as Date | undefined,
+        },
+        items: [{ id: "item-1", boardId: "legacy-board" }],
+      },
+    ];
+
+    await (menu as any).processImportedData(importedData);
+
+    expect(createBoardSpy).toHaveBeenCalledWith("default-team", "Legacy", 3, [], false, true, false, undefined, undefined);
+    expect(appendSpy).toHaveBeenCalledWith(expect.objectContaining({ id: "item-1", boardId: "new-board" }));
+
+    createBoardSpy.mockRestore();
+    appendSpy.mockRestore();
+  });
 });
