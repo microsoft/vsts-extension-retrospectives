@@ -644,24 +644,24 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.selector-button-icon {
-  @apply text-lg leading-8 mr-1;
-}
+.selector-button {
+  @apply text-lg leading-8 mr-1 bg-black/5 flex h-8 items-center pl-2 pr-2 cursor-pointer hover:text-(--text-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
 
-.selector-button-text-wrapper {
-  @apply max-w-80 overflow-hidden text-ellipsis px-2;
-}
-
-.selector-button-text {
-  @apply text-sm leading-8 inline whitespace-nowrap;
-
-  &:hover {
-    @apply text-primary;
+  & svg {
+    @apply w-5 h-5;
   }
-}
 
-.selector-button-chevron {
-  @apply text-xs leading-8;
+  & div {
+    @apply max-w-80 overflow-hidden text-ellipsis px-2;
+
+    & span {
+      @apply text-sm leading-8 inline whitespace-nowrap;
+
+      &:hover {
+        @apply text-primary;
+      }
+    }
+  }
 }
 
 .list-item-shimmer {
@@ -1668,10 +1668,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .board-selector-group .board-selector {
   @apply text-base flex items-baseline;
-}
-
-.board-selector-group .board-selector .selector-button {
-  @apply -ml-2;
 }
 
 .board-actions-menu {

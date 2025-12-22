@@ -34,7 +34,7 @@ jest.mock("../../dal/itemDataService", () => {
         updatedFeedbackItem: { id: "updated", columnId: "column-id" },
         updatedChildFeedbackItems: [],
       }),
-      sortItemsByVotesAndDate: jest.fn((items: any, originalItems?: any[]) => (items ?? originalItems ?? [])),
+      sortItemsByVotesAndDate: jest.fn((items: any, originalItems?: any[]) => items ?? originalItems ?? []),
     },
   };
 });
