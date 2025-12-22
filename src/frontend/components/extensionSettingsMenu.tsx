@@ -294,12 +294,12 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
               {getIconElement("close")}
             </button>
           </div>
-          <div className="subText">The latest release includes redesign of menu options, enabling mobile view, role-based permission setting, redesign of deleting boards, and implementation of sticky defaults.</div>
-          <div className="subText li">Extension settings menu was redesigned to mirror the ADO settings menu, in addition to moving Prime Directive and adding Volunteer options.</div>
-          <div className="subText li">Switch to mobile view was enabled for improved viewing on mobile devices with support limited to core functionality.</div>
-          <div className="subText li">Ability to set permissions for accessing the retrospective board is now restricted to the board owner or a team admin.</div>
-          <div className="subText li">Functionality to delete boards was moved from the Board menu to the History table and is only enabled for archived boards.</div>
-          <div className="subText li">User settings for maximum votes, Team Assessment, obscure feedback, and anonymous feedback are saved and used as defaults when the user creates the next retrospective board.</div>
+          <div className="subText">This release focuses on accessibility, facilitation controls, and clearer board visuals.</div>
+          <div className="subText li">Added full keyboard navigation across the board along with a dedicated keyboard shortcuts dialog and improved focus handling.</div>
+          <div className="subText li">Introduced a configurable countdown timer with a duration picker, start and stop chimes, and visibility that adapts to the board phase.</div>
+          <div className="subText li">Added a Team Assessment History dialog with trend charts so teams can review past assessment results.</div>
+          <div className="subText li">Refined feedback cards, grouped feedback visuals, and dialog layouts for better readability and consistency.</div>
+          <div className="subText li">Hid the delete icon when a board is not archived to avoid confusing destructive actions.</div>
           <div className="subText">Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.</div>
           <div className="inner">
             <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>
