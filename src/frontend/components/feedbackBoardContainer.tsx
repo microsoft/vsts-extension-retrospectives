@@ -1,7 +1,6 @@
 import React from "react";
 import { DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
 import { Dialog, DialogType, DialogFooter, DialogContent } from "@fluentui/react/lib/Dialog";
-import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 
 import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
@@ -17,7 +16,6 @@ import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
-import NoFeedbackBoardsView from "./noFeedbackBoardsView";
 import { userDataService } from "../dal/userDataService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
 import SelectorCombo, { ISelectorList } from "./selectorCombo";
@@ -29,7 +27,7 @@ import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
 import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
-import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionFontAwesomeClass, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
+import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
@@ -55,8 +53,6 @@ export interface FeedbackBoardContainerState {
   hasToggledArchive: boolean;
   isAppInitialized: boolean;
   isBackendServiceConnected: boolean;
-  isReconnectingToBackendService: boolean;
-  isSummaryDashboardVisible: boolean;
   isTeamDataLoaded: boolean;
   isAllTeamsLoaded: boolean;
   maxVotesPerUser: number;
@@ -155,8 +151,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       isMobileBoardActionsDialogHidden: true,
       isMobileTeamSelectorDialogHidden: true,
       isRetroSummaryDialogHidden: true,
-      isReconnectingToBackendService: false,
-      isSummaryDashboardVisible: false,
       isTeamBoardDeletedInfoDialogHidden: true,
       isTeamDataLoaded: false,
       isTeamSelectorCalloutVisible: false,
@@ -271,11 +265,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     try {
       reflectBackendService.onConnectionClose(() => {
-        this.setState({
-          isBackendServiceConnected: false,
-          isReconnectingToBackendService: true,
-        });
-        setTimeout(this.tryReconnectToBackend, 2000);
+        this.setState({ isBackendServiceConnected: false });
       });
 
       reflectBackendService.onReceiveNewBoard(this.handleBoardCreated);
@@ -1366,18 +1356,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     toast(`The email summary for "${this.state.currentBoard.title}" has been copied to your clipboard.`);
   };
 
-  private readonly tryReconnectToBackend = async () => {
-    this.setState({ isReconnectingToBackendService: true });
-
-    const backendConnectionResult = await reflectBackendService.startConnection();
-    if (backendConnectionResult) {
-      reflectBackendService.switchToBoard(this.state.currentBoard.id);
-      this.setState({ isBackendServiceConnected: backendConnectionResult });
-    }
-
-    this.setState({ isReconnectingToBackendService: false });
-  };
-
   private readonly archiveCurrentBoard = async () => {
     await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
     reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
@@ -1400,7 +1378,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const boardUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
     const emailContent = await shareBoardHelper.generateEmailText(this.state.currentBoard, boardUrl, false);
     this.setState(prevState => ({
-      currentBoard: { ...prevState.currentBoard, emailContent: emailContent }
+      currentBoard: { ...prevState.currentBoard, emailContent: emailContent },
     }));
 
     this.previewEmailDialogRef?.current?.showModal();
@@ -1661,7 +1639,31 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
   public render() {
     if (!this.state.isAppInitialized || !this.state.isTeamDataLoaded) {
-      return <Spinner className="initialization-spinner" size={SpinnerSize.large} label="Loading..." ariaLive="assertive" />;
+      return (
+        <div className="spinner" aria-live="assertive">
+          <div></div>
+          <span>Loading...</span>
+        </div>
+      );
+    }
+
+    if (!this.state.currentTeam) {
+      return <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>;
+    }
+
+    if (!this.state.currentBoard) {
+      return (
+        <>
+          <div className="no-boards-container">
+            <div className="no-boards-text">Get started with your first Retrospective</div>
+            <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
+            <button title="Create Board" onClick={this.showBoardCreationDialog} className="create-new-board-button">
+              Create Board
+            </button>
+          </div>
+          {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
+        </>
+      );
     }
 
     const teamSelectorList: ISelectorList<WebApiTeam> = {
@@ -1924,7 +1926,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                 </thead>
                                 <tbody>
                                   {questions.map(question => {
-                                    return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClass={getQuestionFontAwesomeClass(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                                    return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
                                   })}
                                 </tbody>
                               </table>
@@ -2029,7 +2031,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             )}
             {this.state.activeTab === "Board" && (
               <div className="flex-1 min-h-0 flex flex-col feedback-board-container border-t-4 border-(--nav-header-active-item-background)">
-                {this.state.currentTeam && this.state.currentBoard && !this.state.isSummaryDashboardVisible && (
+                {this.state.currentTeam && this.state.currentBoard && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
                       <>
@@ -2059,25 +2061,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       <div className="retro-message-bar" role="alert" aria-live="assertive">
                         <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
                         <div className="actions">
-                          {this.state.isReconnectingToBackendService && <Spinner label="Reconnecting..." labelPosition="right" className="info-message-bar-action-spinner" />}
-                          {!this.state.isReconnectingToBackendService && (
-                            <>
-                              <button type="button" onClick={this.tryReconnectToBackend} disabled={this.state.isReconnectingToBackendService}>
-                                Reconnect
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  this.setState({ isBackendServiceConnected: true });
-                                }}
-                                disabled={this.state.isReconnectingToBackendService}
-                                aria-label="Hide"
-                                title="Hide"
-                              >
-                                <span aria-hidden="true">×</span>
-                              </button>
-                            </>
-                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              this.setState({ isBackendServiceConnected: true });
+                            }}
+                            aria-label="Hide"
+                            title="Hide"
+                          >
+                            <span aria-hidden="true">×</span>
+                          </button>
                         </div>
                       </div>
                     )}
@@ -2125,8 +2118,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             </button>
           </div>
         </dialog>
-        {this.state.isTeamDataLoaded && !this.state.boards.length && !this.state.isSummaryDashboardVisible && <NoFeedbackBoardsView onCreateBoardClick={this.showBoardCreationDialog} />}
-        {this.state.isTeamDataLoaded && !this.state.currentTeam && <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>}
         {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
         {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
         {this.state.currentBoard && this.renderBoardUpdateMetadataFormDialog(false, false, this.state.isBoardUpdateDialogHidden, this.hideBoardUpdateDialog, "Edit retrospective", "", this.updateBoardMetadata, this.hideBoardUpdateDialog)}
@@ -2208,7 +2199,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           return (
                             <li className="chart-question-block" key={data.questionId}>
                               <div className="chart-question">
-                                <i className={getQuestionFontAwesomeClass(data.questionId)} /> &nbsp;
+                                <i className={getQuestionIconClassName(data.questionId)} /> &nbsp;
                                 {getQuestionShortName(data.questionId)}
                               </div>
                               {data.red > 0 && (

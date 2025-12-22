@@ -1,4 +1,4 @@
-import { questions, getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionFontAwesomeClass } from "../effectivenessMeasurementQuestionHelper";
+import { questions, getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName } from "../effectivenessMeasurementQuestionHelper";
 
 describe("effectivenessMeasurementQuestionHelper", () => {
   it("should have the correct number of questions", () => {
@@ -11,7 +11,7 @@ describe("effectivenessMeasurementQuestionHelper", () => {
       expect(question).toHaveProperty("shortTitle");
       expect(question).toHaveProperty("discussActTemplate");
       expect(question).toHaveProperty("title");
-      expect(question).toHaveProperty("fontAwesomeClass");
+      expect(question).toHaveProperty("iconClassName");
       expect(question).toHaveProperty("tooltip");
     });
   });
@@ -82,7 +82,7 @@ describe("getQuestionFontAwesomeClass", () => {
     const questionId = 1;
     const expectedClass = "fa-solid fa-magnifying-glass";
 
-    const result = getQuestionFontAwesomeClass(questionId);
+    const result = getQuestionIconClassName(questionId);
 
     expect(result).toBe(expectedClass);
   });
@@ -90,7 +90,7 @@ describe("getQuestionFontAwesomeClass", () => {
   it("should return an empty string for an invalid question id", () => {
     const questionId = 10;
 
-    const result = getQuestionFontAwesomeClass(questionId);
+    const result = getQuestionIconClassName(questionId);
 
     expect(result).toBe("");
   });

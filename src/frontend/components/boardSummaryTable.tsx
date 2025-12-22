@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { DefaultButton } from "@fluentui/react/lib/Button";
-import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 
 import BoardSummary from "./boardSummary";
@@ -440,7 +438,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
   }, [props.teamId]);
 
   if (boardSummaryState.allDataLoaded !== true) {
-    return <Spinner className="board-summary-initialization-spinner" size={SpinnerSize.large} label="Loading..." ariaLive="assertive" />;
+    return (
+      <div className="spinner" aria-live="assertive">
+        <div></div>
+        <span>Loading...</span>
+      </div>
+    );
   }
 
   const selectedBoardForDelete = tableData.find(board => board.id === openDialogBoardId);

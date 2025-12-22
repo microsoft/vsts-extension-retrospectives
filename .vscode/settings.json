@@ -1,10 +1,10 @@
 {
-  "css.validate": true,
   "css.lint.unknownAtRules": "ignore",
-  "tailwindCSS.includeLanguages": {
-    "plaintext": "html"
-  },
+  "css.validate": true,
   "files.associations": {
     "*.css": "tailwindcss"
+  },
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html"
   }
 }

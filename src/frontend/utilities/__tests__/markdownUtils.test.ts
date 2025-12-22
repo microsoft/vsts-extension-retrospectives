@@ -278,9 +278,7 @@ describe("markdownUtils", () => {
     });
 
     it("should default image alt text to empty string when missing", () => {
-      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([
-        { type: "image", content: "", url: "https://example.com/img.png" },
-      ] as unknown as ReturnType<typeof tokenizeMarkdown>);
+      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([{ type: "image", content: "", url: "https://example.com/img.png" }] as unknown as ReturnType<typeof tokenizeMarkdown>);
 
       const result = parseMarkdown("![missing-alt](https://example.com/img.png)");
 

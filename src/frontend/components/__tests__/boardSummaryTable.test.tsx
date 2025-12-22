@@ -140,7 +140,7 @@ describe("BoardSummaryTable", () => {
 
     const { container } = render(<BoardSummaryTable {...baseProps} />);
 
-    expect(container.querySelector(".board-summary-initialization-spinner")).toBeTruthy();
+    expect(container.querySelector(".spinner")).toBeTruthy();
   });
 });
 

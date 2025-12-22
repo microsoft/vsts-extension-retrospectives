@@ -4,6 +4,7 @@ import { Checkbox } from "@fluentui/react/lib/Checkbox";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../interfaces/feedback";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
+import { getIconElement } from "./icons";
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
   board: IFeedbackBoardDocument;
@@ -147,11 +148,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
   const PublicWarningBanner = () => {
     if (teamPermissions.length === 0 && memberPermissions.length === 0) {
-      return (
-        <div className="board-metadata-form-section-information">
-          <i className="fas fa-exclamation-circle" aria-label="Board is visible to every member in the project"></i>&nbsp;This board is visible to every member in the project.
-        </div>
-      );
+      return <div className="board-metadata-form-section-information">{getIconElement("exclamation")} This board is visible to every member in the project</div>;
     }
 
     return null;
@@ -159,11 +156,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
   const PermissionEditWarning = () => {
     if (!canEditPermissions) {
-      return (
-        <div className="board-metadata-form-section-information">
-          <i className="fas fa-exclamation-circle" aria-label="Permission restriction warning"></i>&nbsp;Only the Board Owner or a Team Admin can edit permissions.
-        </div>
-      );
+      return <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the Board Owner or a Team Admin can edit permissions</div>;
     }
     return null;
   };

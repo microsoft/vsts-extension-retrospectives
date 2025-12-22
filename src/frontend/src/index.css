@@ -612,11 +612,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .create-new-board-button {
-    @apply m-2.5;
-  }
-
-  & img {
-    @apply h-40 mb-4;
+    @apply m-2.5 bg-primary text-white cursor-pointer px-4 py-2 rounded;
   }
 }
 
@@ -868,6 +864,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
         &:first-of-type {
           @apply p-0;
+
+          & button {
+            @apply flex items-center justify-self-center;
+          }
         }
       }
 
@@ -1025,8 +1025,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.board-summary-initialization-spinner {
-  @apply absolute top-1/2 left-1/2 -mt-12 -ml-12;
+.spinner {
+  @apply flex items-center justify-center h-screen gap-2;
+
+  & div {
+    @apply w-7 h-7 border-2 border-gray-200 border-t-primary rounded-full animate-spin;
+  }
 }
 
 .flex-grow-spacer {
@@ -1342,10 +1346,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-form-section-information {
-    @apply border-3 border-gray-medium bg-gray-medium my-1.5 mx-0 mb-2.5 p-1;
+    @apply flex items-center gap-1 border-3 border-gray-medium bg-gray-medium my-1.5 mx-0 mb-2.5 p-1;
 
     &.warning-information {
       @apply bg-task-yellow border-none;
+    }
+
+    & svg {
+      @apply w-5 h-5;
     }
   }
 
@@ -1572,10 +1580,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-board-container {
   @apply flex h-[calc(100vh-88px)] overflow-y-auto overflow-x-hidden;
-}
-
-.initialization-spinner {
-  @apply absolute top-1/2 left-1/2 -mt-12 -ml-12;
 }
 
 .feedback-board-container-header-spacer {
@@ -1928,7 +1932,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-[rgba(var(--palette-accent3),0.5)];
 }
 
-.create-new-board-button,
 .metadata-form-save-button,
 .extension-menu-close-button,
 .team-effectiveness-submit-button {
@@ -2092,17 +2095,25 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-full;
 
   & .grouped-feedback-header {
-    @apply font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
+    @apply flex items-center gap-1 font-bold text-(--text-primary-color) p-2 bg-(--nav-vertical-background-color);
+
+    & svg {
+      @apply w-5 h-5;
+    }
   }
 
   & ul {
     @apply list-none m-0;
 
     & li {
-      @apply [word-wrap:break-word] p-1 flex;
+      @apply grid grid-cols-[auto_1fr] [word-wrap:break-word] p-1;
 
       & .icon {
         @apply border-solid h-7.5 border-t-0 border-r-2 border-b-0 border-l-0 border-(--text-secondary-color) text-(--text-disabled-color) content-center w-7 text-center;
+
+        & svg {
+          @apply w-5 h-5;
+        }
       }
 
       & .original-column-info {
@@ -2110,7 +2121,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & .related-feedback-title {
-        @apply ml-2.5 text-(--text-primary-color) text-base content-center [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
+        @apply ml-2.5 text-(--text-primary-color) text-sm content-center [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
         display: -webkit-box;
       }
     }

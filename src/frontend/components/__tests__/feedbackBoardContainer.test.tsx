@@ -116,7 +116,6 @@ jest.mock("../feedbackBoard", () => {
   MockFeedbackBoard.displayName = "MockFeedbackBoard";
   return MockFeedbackBoard;
 });
-jest.mock("../feedbackBoardPreviewEmail", () => () => <div data-testid="preview-email" />);
 
 jest.mock("../../utilities/servicesHelper", () => ({
   getLocationService: jest.fn(() => ({
