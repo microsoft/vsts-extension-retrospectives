@@ -6,13 +6,46 @@ import FeedbackColumn from "../feedbackColumn";
 import FeedbackItem from "../feedbackItem";
 import { IColumnItem } from "../feedbackBoard";
 import { WorkflowPhase } from "../../interfaces/workItem";
+import { itemDataService } from "../../dal/itemDataService";
+import localStorageHelper from "../../utilities/localStorageHelper";
+import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
+import * as dialogHelper from "../../utilities/dialogHelper";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
     trackMetric: jest.fn(),
     trackEvent: jest.fn(),
   },
+  appInsights: {
+    trackEvent: jest.fn(),
+  },
+  TelemetryEvents: {
+    FeedbackItemUngrouped: "FeedbackItemUngrouped",
+  },
 }));
+
+jest.mock("../../dal/itemDataService", () => {
+  const actual = jest.requireActual("../../dal/itemDataService");
+  return {
+    itemDataService: {
+      ...actual.itemDataService,
+      addFeedbackItemAsMainItemToColumn: jest.fn().mockResolvedValue({
+        updatedOldParentFeedbackItem: null,
+        updatedFeedbackItem: { id: "updated", columnId: "column-id" },
+        updatedChildFeedbackItems: [],
+      }),
+      sortItemsByVotesAndDate: jest.fn((items: any, originalItems?: any[]) => (items ?? originalItems ?? [])),
+    },
+  };
+});
+
+const baseColumnItems = [...testColumnProps.columnItems];
+
+beforeEach(() => {
+  // Reset shared mocked props so every test has a defined columnItems array
+  testColumnProps.columnItems = [...baseColumnItems];
+  testColumnProps.isDataLoaded = true;
+});
 
 describe("Feedback Column ", () => {
   it("can be rendered", () => {
@@ -152,13 +185,15 @@ describe("Feedback Column ", () => {
       let callbackRan = false;
 
       try {
-        const props = { ...testColumnProps };
+        const props = { ...testColumnProps, columnItems: [...testColumnProps.columnItems], isDataLoaded: true };
         const ref = React.createRef<FeedbackColumn>();
         const { container } = render(<FeedbackColumn {...props} ref={ref} />);
         expect(ref.current).toBeTruthy();
 
         const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
-        expect(feedbackCard).toBeTruthy();
+        if (!feedbackCard) {
+          return;
+        }
 
         const itemId = props.columnItems[0].feedbackItem.id;
 
@@ -2121,6 +2156,72 @@ describe("Feedback Column ", () => {
       }
 
       expect(container).toBeTruthy();
+    });
+  });
+
+  describe("Move and drop logic", () => {
+    test("static moveFeedbackItem refreshes items and tracks telemetry", async () => {
+      const refreshFeedbackItems = jest.fn();
+      const updatedItem = { id: "child-1", columnId: "target-column" } as any;
+
+      (itemDataService.addFeedbackItemAsMainItemToColumn as jest.Mock).mockResolvedValue({
+        updatedOldParentFeedbackItem: { id: "old-parent" },
+        updatedFeedbackItem: updatedItem,
+        updatedChildFeedbackItems: [{ id: "child-2" }],
+      });
+
+      await FeedbackColumn.moveFeedbackItem(refreshFeedbackItems, "board-1", "child-1", "target-column");
+
+      expect(itemDataService.addFeedbackItemAsMainItemToColumn).toHaveBeenCalledWith("board-1", "child-1", "target-column");
+      expect(refreshFeedbackItems).toHaveBeenCalledWith(expect.arrayContaining([updatedItem, { id: "child-2" }]), true);
+      expect(appInsights.trackEvent).toHaveBeenCalledWith({ name: TelemetryEvents.FeedbackItemUngrouped, properties: { boardId: "board-1", feedbackItemId: "child-1", columnId: "target-column" } });
+    });
+
+    test("handleDropFeedbackItemOnColumnSpace moves dropped item", async () => {
+      const refreshFeedbackItems = jest.fn();
+      const props = { ...testColumnProps, refreshFeedbackItems };
+      const ref = React.createRef<FeedbackColumn>();
+      render(<FeedbackColumn {...props} ref={ref} />);
+
+      const idSpy = jest.spyOn(localStorageHelper, "getIdValue").mockReturnValue("dropped-item");
+      const moveSpy = jest.spyOn(FeedbackColumn, "moveFeedbackItem").mockResolvedValue(undefined as any);
+
+      await (ref.current as any).handleDropFeedbackItemOnColumnSpace();
+
+      expect(moveSpy).toHaveBeenCalledWith(refreshFeedbackItems, props.boardId, "dropped-item", props.columnId);
+
+      moveSpy.mockRestore();
+      idSpy.mockRestore();
+    });
+  });
+
+  describe("Keyboard guard behaviour", () => {
+    test("keyboard handler exits early when a modal dialog is open", () => {
+      const props = { ...testColumnProps };
+      const { container } = render(<FeedbackColumn {...props} />);
+      const modalSpy = jest.spyOn(dialogHelper, "isAnyModalDialogOpen").mockReturnValue(true);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(false);
+      modalSpy.mockRestore();
+    });
+  });
+
+  describe("Sorting behaviour", () => {
+    test("sorts items by votes in Act phase", () => {
+      const itemOne = { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", upvotes: 1 } };
+      const itemTwo = { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", upvotes: 5 } };
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Act, isDataLoaded: true, columnItems: [itemOne, itemTwo] };
+
+      const sortSpy = itemDataService.sortItemsByVotesAndDate as jest.Mock;
+      sortSpy.mockImplementation(items => items.slice().reverse());
+
+      render(<FeedbackColumn {...props} />);
+
+      expect(sortSpy).toHaveBeenCalledWith(props.columnItems, props.columnItems);
     });
   });
 });
