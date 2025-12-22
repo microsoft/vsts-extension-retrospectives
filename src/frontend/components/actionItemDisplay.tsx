@@ -195,7 +195,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
 
   public render(): React.JSX.Element {
     return (
-      <div className="action-items">
+      <>
         {this.props.allowAddNewActionItem && (
           <div className="add-action-item-wrapper" ref={this.addWorkItemWrapperRef}>
             <button ref={this.addWorkItemButtonRef} className="add-action-item-button" aria-label="Add work item" data-automation-id="actionItemDataAutomation" onClick={this.toggleSelectorCallout}>
@@ -256,7 +256,7 @@ class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionIt
             </button>
           </div>
         </dialog>
-      </div>
+      </>
     );
   }
 }

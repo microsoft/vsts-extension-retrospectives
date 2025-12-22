@@ -1422,7 +1422,7 @@ describe("Feedback Item", () => {
         defaultActionItemIteration: "Test Iteration",
       };
       const { container } = render(<FeedbackItem {...props} />);
-      expect(container.querySelector(".card-action-item-part")).toBeTruthy();
+      expect(container.querySelector(".action-items")).toBeTruthy();
     });
   });
 
