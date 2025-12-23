@@ -428,14 +428,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.ms-FocusZone .ms-Pivot-link {
-  @apply rounded-t-sm border-t border-l border-r border-(--border-subtle-color);
-}
-
-.ms-FocusZone .ms-Pivot-link.is-selected {
-  @apply bg-(--border-subtle-color) rounded-t-sm;
-}
-
 .feedback-votes-count {
   @apply text-base ml-3 flex flex-nowrap items-center gap-2;
 
