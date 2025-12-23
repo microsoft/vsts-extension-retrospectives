@@ -294,9 +294,9 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
               {getIconElement("close")}
             </button>
           </div>
-          <div className="subText">This release focuses on accessibility, facilitation controls, and clearer board visuals.</div>
+          <div className="subText">This release focuses on accessibility, simplified stylings, and clearer visuals.</div>
           <div className="subText li">Added full keyboard navigation across the board along with a dedicated keyboard shortcuts dialog and improved focus handling.</div>
-          <div className="subText li">Introduced a configurable countdown timer with a duration picker, start and stop chimes, and visibility that adapts to the board phase.</div>
+          <div className="subText li">Introduced a configurable countdown timer with a duration picker, start and stop chimes.</div>
           <div className="subText li">Added a Team Assessment History dialog with trend charts so teams can review past assessment results.</div>
           <div className="subText li">Refined feedback cards, grouped feedback visuals, and dialog layouts for better readability and consistency.</div>
           <div className="subText li">Hid the delete icon when a board is not archived to avoid confusing destructive actions.</div>
