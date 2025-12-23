@@ -336,7 +336,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .subText {
-    @apply block px-5 py-3 text-sm text-(--text-primary-color);
+    @apply block px-5 py-2 text-sm text-(--text-primary-color);
 
     &.li {
       @apply list-item list-inside list-disc ml-4;
