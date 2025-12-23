@@ -21,7 +21,7 @@
       "path": "./assets/PACKAGE-DESCRIPTION.md"
     },
     "license": {
-      "path": "./assets/LICENSE.md"
+      "path": "./LICENSE.md"
     }
   },
   "targets": [
