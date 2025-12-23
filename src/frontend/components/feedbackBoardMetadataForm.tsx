@@ -336,7 +336,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                   </div>
                 </div>
                 <div className="board-metadata-form-section-subheader">
-                  <Checkbox id="obscure-feedback-checkbox" label="Obscure the feedback of others until after Collect phase" ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation." boxSide="start" checked={this.state.shouldShowFeedbackAfterCollect} disabled={!this.props.isNewBoardCreation} onChange={this.handleShouldShowFeedbackAfterCollectChange} />
+                  <Checkbox id="obscure-feedback-checkbox" label="Hide the feedback of others until after Collect phase" ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation." boxSide="start" checked={this.state.shouldShowFeedbackAfterCollect} disabled={!this.props.isNewBoardCreation} onChange={this.handleShouldShowFeedbackAfterCollectChange} />
                 </div>
                 <div className="board-metadata-form-section-subheader">
                   <Checkbox id="feedback-display-names-checkbox" label="Do not display names in feedback" ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation." boxSide="start" checked={this.state.isBoardAnonymous} disabled={!this.props.isNewBoardCreation} onChange={this.handleIsAnonymousCheckboxChange} />
