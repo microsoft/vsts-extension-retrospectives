@@ -152,7 +152,7 @@ jobs:
 
           cat <<< $(jq ".contributions[0].properties.name = \"Retrospectives (Dev)\"" $ext_file) > $ext_file
 
-          cp LICENSE src/frontend/assets/LICENSE.md
+          cp ../../LICENSE ./assets/LICENSE.md
 
       - if: steps.changes.outputs.src == 'true'
         name: "Publish extension to dev environment"
