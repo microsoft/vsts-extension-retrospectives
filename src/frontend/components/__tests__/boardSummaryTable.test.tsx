@@ -2,7 +2,6 @@ import React from "react";
 import { render, waitFor } from "@testing-library/react";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { WebApiTeam } from "azure-devops-extension-api/Core";
 
 import BoardSummaryTable, { buildBoardSummaryState, IBoardSummaryTableProps, IBoardSummaryTableItem } from "../boardSummaryTable";
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from "../boardSummaryTable";
