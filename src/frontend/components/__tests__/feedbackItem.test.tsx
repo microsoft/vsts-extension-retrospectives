@@ -9493,7 +9493,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     jest.spyOn(itemDataService, "updateTitle").mockResolvedValue(makeDoc({ title: "Updated" }));
 
     const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
-    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+    render(<FeedbackItem {...props} ref={ref} />);
 
     await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
