@@ -217,6 +217,30 @@ describe("UI-level integration tests for ActionItem", () => {
     });
   });
 
+  it("opens unlink confirmation dialog and closes it with X button", async () => {
+    const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
+
+    // Click the unlink button
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    fireEvent.click(unlinkButton!);
+
+    // Wait for dialog to appear
+    await waitFor(() => {
+      expect(getByText("Remove Work Item Link")).toBeTruthy();
+    });
+
+    // Click the close (X) button in the dialog header
+    const dialog = container.querySelector(".unlink-work-item-confirmation-dialog");
+    const closeButton = dialog?.querySelector('[aria-label="Close"]') as HTMLButtonElement;
+    expect(closeButton).toBeTruthy();
+    fireEvent.click(closeButton);
+
+    await waitFor(() => {
+      const dialogEl = container.querySelector(".unlink-work-item-confirmation-dialog") as HTMLDialogElement;
+      expect(dialogEl?.open).toBe(false);
+    });
+  });
+
   it("handles keyboard press on unlink button (Enter key)", async () => {
     const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
 

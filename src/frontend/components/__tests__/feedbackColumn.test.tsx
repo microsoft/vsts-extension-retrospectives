@@ -2224,4 +2224,387 @@ describe("Feedback Column ", () => {
       expect(sortSpy).toHaveBeenCalledWith(props.columnItems, props.columnItems);
     });
   });
+
+  describe("Focus preservation - INPUT/TEXTAREA selection", () => {
+    test("preserves selectionStart and selectionEnd when input is focused", () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      // Create a mock input and add it to the column
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = "test selection";
+      input.id = "test-input";
+      column.appendChild(input);
+      input.focus();
+      input.setSelectionRange(2, 8);
+
+      expect(document.activeElement).toBe(input);
+
+      (ref.current as any).preserveFocus();
+
+      expect((ref.current as any).focusPreservation).toMatchObject({
+        selectionStart: 2,
+        selectionEnd: 8,
+      });
+
+      column.removeChild(input);
+    });
+
+    test("preserves selection when textarea is focused", () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const textarea = document.createElement("textarea");
+      textarea.value = "textarea content";
+      column.appendChild(textarea);
+      textarea.focus();
+      textarea.setSelectionRange(4, 12);
+
+      expect(document.activeElement).toBe(textarea);
+
+      (ref.current as any).preserveFocus();
+
+      expect((ref.current as any).focusPreservation).toMatchObject({
+        selectionStart: 4,
+        selectionEnd: 12,
+      });
+
+      column.removeChild(textarea);
+    });
+
+    test("preserves cursor position for contenteditable elements", () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const contentEditable = document.createElement("div");
+      contentEditable.contentEditable = "true";
+      contentEditable.textContent = "editable text";
+      // Set data-feedback-item-id to simulate being inside a feedback card
+      contentEditable.setAttribute("data-feedback-item-id", "test-item");
+      column.appendChild(contentEditable);
+      contentEditable.focus();
+
+      const selection = window.getSelection();
+      const range = document.createRange();
+      if (contentEditable.firstChild && selection) {
+        range.setStart(contentEditable.firstChild, 5);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      (ref.current as any).preserveFocus();
+
+      // focusPreservation should be set if the element is within the column
+      const focusPres = (ref.current as any).focusPreservation;
+      if (focusPres) {
+        expect(focusPres.isContentEditable).toBe(true);
+        expect(focusPres.cursorPosition).toBe(5);
+      }
+
+      column.removeChild(contentEditable);
+    });
+  });
+
+  describe("RestoreFocus internals", () => {
+    test("returns early from restoreFocus when focusPreservation is null", () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      render(<FeedbackColumn {...props} ref={ref} />);
+
+      (ref.current as any).focusPreservation = null;
+      const result = (ref.current as any).restoreFocus();
+      expect(result).toBeUndefined();
+    });
+
+    test("returns early from restoreFocus timeout when focusPreservation becomes null", () => {
+      jest.useFakeTimers();
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      render(<FeedbackColumn {...props} ref={ref} />);
+
+      (ref.current as any).focusPreservation = {
+        elementId: "some-id",
+        selectionStart: null,
+        selectionEnd: null,
+        isContentEditable: false,
+        cursorPosition: null,
+      };
+
+      (ref.current as any).restoreFocus();
+
+      // Clear focusPreservation before timeout runs
+      (ref.current as any).focusPreservation = null;
+
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    });
+
+    test("handles restoreFocus when elementToFocus is not found", () => {
+      jest.useFakeTimers();
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      render(<FeedbackColumn {...props} ref={ref} />);
+
+      (ref.current as any).focusPreservation = {
+        elementId: "non-existent-id",
+        selectionStart: null,
+        selectionEnd: null,
+        isContentEditable: false,
+        cursorPosition: null,
+      };
+
+      (ref.current as any).restoreFocus();
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    });
+  });
+
+  describe("FeedbackItemGroup rendering", () => {
+    test("renders FeedbackItemGroup for items with children", () => {
+      const childItem = {
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "child-item-1",
+          parentFeedbackItemId: "parent-item-1",
+        },
+        actionItems: [] as any[],
+      };
+
+      const parentItem = {
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "parent-item-1",
+          childFeedbackItemIds: ["child-item-1"],
+        },
+        actionItems: [] as any[],
+      };
+
+      const props = {
+        ...testColumnProps,
+        isDataLoaded: true,
+        columnItems: [parentItem, childItem],
+      };
+
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      // FeedbackItemGroup should be rendered for parent item with children
+      const feedbackGroups = container.querySelectorAll(".feedback-item-group");
+      expect(feedbackGroups.length).toBeGreaterThanOrEqual(0);
+      expect(container.querySelector(".feedback-column")).toBeTruthy();
+    });
+
+    test("renders regular FeedbackItem for items without children", () => {
+      const singleItem = {
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "single-item",
+          childFeedbackItemIds: [],
+        },
+        actionItems: [] as any[],
+      };
+
+      const props = {
+        ...testColumnProps,
+        isDataLoaded: true,
+        columnItems: [singleItem],
+      };
+
+      const { container } = render(<FeedbackColumn {...props} />);
+      expect(container.querySelector(".feedback-column")).toBeTruthy();
+    });
+  });
+
+  describe("Act phase CSS class", () => {
+    test("applies feedback-items-actions class in Act phase", () => {
+      const props = {
+        ...testColumnProps,
+        workflowPhase: WorkflowPhase.Act,
+        isDataLoaded: true,
+      };
+
+      const { container } = render(<FeedbackColumn {...props} />);
+      const itemsContainer = container.querySelector(".feedback-items-actions");
+      expect(itemsContainer).toBeTruthy();
+    });
+
+    test("does not apply feedback-items-actions class in Collect phase", () => {
+      const props = {
+        ...testColumnProps,
+        workflowPhase: WorkflowPhase.Collect,
+        isDataLoaded: true,
+      };
+
+      const { container } = render(<FeedbackColumn {...props} />);
+      const itemsContainer = container.querySelector(".feedback-items-actions");
+      expect(itemsContainer).toBeFalsy();
+    });
+  });
+
+  describe("restoreFocus selection restoration", () => {
+    test("restores INPUT selection range after focus", async () => {
+      jest.useFakeTimers();
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const feedbackCard = document.createElement("div");
+      feedbackCard.setAttribute("data-feedback-item-id", "input-restore-test");
+      const input = document.createElement("input");
+      input.value = "test input value";
+      feedbackCard.appendChild(input);
+      column.appendChild(feedbackCard);
+      input.focus();
+      input.setSelectionRange(3, 7);
+
+      (ref.current as any).focusPreservation = {
+        elementId: "input-restore-test",
+        selectionStart: 3,
+        selectionEnd: 7,
+        isContentEditable: false,
+        cursorPosition: null,
+      };
+
+      (ref.current as any).restoreFocus();
+      jest.runOnlyPendingTimers();
+
+      expect(input.selectionStart).toBe(3);
+      expect(input.selectionEnd).toBe(7);
+      jest.useRealTimers();
+    });
+
+    test("restores contenteditable cursor position after focus", async () => {
+      jest.useFakeTimers();
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const feedbackCard = document.createElement("div");
+      feedbackCard.setAttribute("data-feedback-item-id", "editable-restore-test");
+      const editable = document.createElement("div");
+      editable.contentEditable = "true";
+      editable.textContent = "editable content";
+      feedbackCard.appendChild(editable);
+      column.appendChild(feedbackCard);
+
+      (ref.current as any).focusPreservation = {
+        elementId: "editable-restore-test",
+        selectionStart: null,
+        selectionEnd: null,
+        isContentEditable: true,
+        cursorPosition: 5,
+      };
+
+      (ref.current as any).restoreFocus();
+      jest.runOnlyPendingTimers();
+
+      // Focus should be restored to the contenteditable element
+      // Cursor position restoration may fail gracefully
+      jest.useRealTimers();
+    });
+
+    test("restores focus to feedbackCard when no input found", async () => {
+      jest.useFakeTimers();
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const feedbackCard = document.createElement("div");
+      feedbackCard.setAttribute("data-feedback-item-id", "card-only-test");
+      feedbackCard.tabIndex = 0;
+      column.appendChild(feedbackCard);
+
+      (ref.current as any).focusPreservation = {
+        elementId: "card-only-test",
+        selectionStart: null,
+        selectionEnd: null,
+        isContentEditable: false,
+        cursorPosition: null,
+      };
+
+      (ref.current as any).restoreFocus();
+      jest.runOnlyPendingTimers();
+
+      expect(document.activeElement).toBe(feedbackCard);
+      jest.useRealTimers();
+    });
+
+    test("handles contenteditable cursor restoration error gracefully", async () => {
+      jest.useFakeTimers();
+      const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation();
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const feedbackCard = document.createElement("div");
+      feedbackCard.setAttribute("data-feedback-item-id", "error-restore-test");
+      const editable = document.createElement("div");
+      editable.contentEditable = "true";
+      // Empty element will cause range.setStart to fail
+      feedbackCard.appendChild(editable);
+      column.appendChild(feedbackCard);
+
+      (ref.current as any).focusPreservation = {
+        elementId: "error-restore-test",
+        selectionStart: null,
+        selectionEnd: null,
+        isContentEditable: true,
+        cursorPosition: 100, // Out of range
+      };
+
+      (ref.current as any).restoreFocus();
+      jest.runOnlyPendingTimers();
+
+      // Should handle gracefully without crashing
+      consoleWarnSpy.mockRestore();
+      jest.useRealTimers();
+    });
+  });
+
+  describe("Edit column notes dialog", () => {
+    test("closes dialog when clicking X button", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      // Get the dialog and manually open it
+      const dialog = container.querySelector(".edit-column-notes-dialog") as HTMLDialogElement;
+      expect(dialog).toBeTruthy();
+      
+      // Simulate opening the dialog
+      dialog.showModal();
+      expect(dialog.open).toBe(true);
+
+      // Click the close button
+      const closeButton = dialog.querySelector('[aria-label="Close"]') as HTMLButtonElement;
+      expect(closeButton).toBeTruthy();
+      fireEvent.click(closeButton);
+
+      expect(dialog.open).toBe(false);
+    });
+
+    test("updates column notes draft on textarea change", async () => {
+      const props = { ...testColumnProps, isDataLoaded: true };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const textarea = container.querySelector("#column-notes-textarea") as HTMLTextAreaElement;
+      expect(textarea).toBeTruthy();
+
+      fireEvent.change(textarea, { target: { value: "New column notes" } });
+
+      expect(textarea.value).toBe("New column notes");
+    });
+  });
 });

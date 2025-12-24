@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, waitFor, within } from "@testing-library/react";
+import { render, fireEvent, waitFor, within, act } from "@testing-library/react";
 
 const mockOpenNewWorkItem = jest.fn();
 const mockGetUser = jest.fn(() => ({ name: "Test User", displayName: "Test User", id: "test-user-id" }));
@@ -736,5 +736,55 @@ describe("Action Item Display component", () => {
       const linkWorkItemButton = getByText("Link work item").closest("button");
       expect(linkWorkItemButton).toHaveProperty("disabled", true);
     });
+  });
+
+  it("handles handleDocumentPointerDown when callout is visible", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
+    render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+
+    // Set callout visible
+    act(() => {
+      (ref.current as any).setState({ isWorkItemTypeListCalloutVisible: true });
+    });
+
+    // Simulate pointer down outside
+    const mockEvent = {
+      target: document.body,
+    } as unknown as PointerEvent;
+
+    (ref.current as any).handleDocumentPointerDown(mockEvent);
+
+    // Should hide the callout
+    await waitFor(() => {
+      expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
+    });
+  });
+
+  it("handleDocumentPointerDown does nothing when callout is not visible", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
+    render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+
+    // Callout is not visible by default
+    expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
+
+    // Simulate pointer down - should do nothing
+    const mockEvent = {
+      target: document.body,
+    } as unknown as PointerEvent;
+
+    (ref.current as any).handleDocumentPointerDown(mockEvent);
+
+    // Still false
+    expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
   });
 });

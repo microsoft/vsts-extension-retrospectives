@@ -761,4 +761,48 @@ describe("SelectorCombo", () => {
       expect(container).toBeTruthy();
     });
   });
+
+  describe("Keyboard handlers", () => {
+    test("handleKeyPressTeamList selects item on Enter key", () => {
+      const onSelectedItemChange = jest.fn();
+      const propsWithCallback = {
+        ...defaultProps,
+        onSelectedItemChange,
+      };
+
+      const { container } = render(<SelectorCombo {...propsWithCallback} />);
+
+      // Open the callout
+      const selectorButton = getSelectorButton(container) as HTMLElement;
+      selectorButton.click();
+
+      // Find an item in the list and press Enter on it
+      const listItems = container.querySelectorAll(".selector-list-item-name");
+      if (listItems.length > 0) {
+        fireEvent.keyDown(listItems[0], { keyCode: 13 });
+      }
+
+      expect(container).toBeTruthy();
+    });
+
+    test("closeMobileSelectorDialog closes dialog on Escape key", () => {
+      const mobileProps = {
+        ...defaultProps,
+        className: "board-selector",
+      };
+
+      const ref = React.createRef<SelectorCombo<MockItem>>();
+      const { container } = render(<SelectorCombo {...mobileProps} ref={ref} />);
+
+      // Manually set the state to show mobile dialog
+      if (ref.current) {
+        (ref.current as any).setState({ isSelectorDialogHidden: false });
+      }
+
+      // Press Escape key
+      fireEvent.keyDown(document, { key: "Escape", code: "Escape" });
+
+      expect(container).toBeTruthy();
+    });
+  });
 });

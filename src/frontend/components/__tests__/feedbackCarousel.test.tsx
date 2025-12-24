@@ -224,4 +224,35 @@ describe("Feedback Carousel ", () => {
       expect(container.textContent).toContain("Test Column");
     });
   });
+
+  describe("buildFeedbackColumns with missing columns", () => {
+    it("should filter out columnIds that do not exist in columns object", () => {
+      // Create a model with an empty columns object but some columnIds
+      const emptyModel: FocusModeModel = {
+        columns: {},
+        columnIds: ["non-existent-column-id"],
+        workflowPhase: testColumnProps.workflowPhase,
+        team: testColumnProps.team,
+        boardId: testColumnProps.boardId,
+        boardTitle: testColumnProps.boardTitle,
+        defaultActionItemAreaPath: testColumnProps.defaultActionItemAreaPath,
+        defaultActionItemIteration: testColumnProps.defaultActionItemIteration,
+        nonHiddenWorkItemTypes: testColumnProps.nonHiddenWorkItemTypes,
+        allWorkItemTypes: testColumnProps.allWorkItemTypes,
+        hideFeedbackItems: testColumnProps.hideFeedbackItems,
+        onVoteCasted: testColumnProps.onVoteCasted,
+        activeTimerFeedbackItemId: testColumnProps.activeTimerFeedbackItemId,
+        requestTimerStart: testColumnProps.requestTimerStart,
+        notifyTimerStopped: testColumnProps.notifyTimerStopped,
+        addFeedbackItems: testColumnProps.addFeedbackItems,
+        removeFeedbackItemFromColumn: testColumnProps.removeFeedbackItemFromColumn,
+        refreshFeedbackItems: testColumnProps.refreshFeedbackItems,
+      };
+
+      const { container } = render(<FeedbackCarousel focusModeModel={emptyModel} isFocusModalHidden={false} />);
+
+      // Should render the carousel without crashing (columns are filtered out)
+      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
+  });
 });

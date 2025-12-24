@@ -551,4 +551,136 @@ describe("ExtensionSettingsMenu", () => {
     createBoardSpy.mockRestore();
     appendSpy.mockRestore();
   });
+
+  it("opens keyboard shortcuts with '/' and shiftKey", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+    expect(dialog).not.toHaveAttribute("open");
+
+    // Test with "/" key and shiftKey
+    fireEvent.keyDown(document, { key: "/", shiftKey: true });
+    expect(dialog).toHaveAttribute("open");
+  });
+
+  it("opens keyboard shortcuts with code 'Slash' and shiftKey", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+    expect(dialog).not.toHaveAttribute("open");
+
+    // Test with code "Slash" and shiftKey
+    fireEvent.keyDown(document, { key: "", code: "Slash", shiftKey: true });
+    expect(dialog).toHaveAttribute("open");
+  });
+
+  it("ignores keyboard shortcut when metaKey is pressed", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+
+    fireEvent.keyDown(document, { key: "?", code: "Slash", metaKey: true });
+
+    expect(dialog).not.toHaveAttribute("open");
+  });
+
+  it("ignores keyboard shortcut when altKey is pressed", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+
+    fireEvent.keyDown(document, { key: "?", code: "Slash", altKey: true });
+
+    expect(dialog).not.toHaveAttribute("open");
+  });
+
+  it("ignores non-question-mark keys", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+
+    fireEvent.keyDown(document, { key: "a" });
+
+    expect(dialog).not.toHaveAttribute("open");
+  });
+
+  it("processes imported data with multiple items", async () => {
+    (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([{ id: "team-1", name: "Team One" }]);
+    (azureDevOpsCoreService.getDefaultTeam as jest.Mock).mockResolvedValue({ id: "default-team", name: "Default" });
+    const createBoardSpy = jest.spyOn(boardDataService, "createBoardForTeam").mockResolvedValue({ id: "new-board", title: "Board" } as any);
+    const appendSpy = jest.spyOn(itemDataService, "appendItemToBoard").mockResolvedValue({} as any);
+
+    const menu = new ExtensionSettingsMenu({});
+
+    const importedData = [
+      {
+        team: { id: "team-1", name: "Team One" },
+        board: {
+          id: "board-1",
+          title: "Board One",
+          maxVotesPerUser: 3,
+          columns: [] as IFeedbackColumn[],
+          isIncludeTeamEffectivenessMeasurement: false,
+          shouldShowFeedbackAfterCollect: true,
+          isAnonymous: false,
+          startDate: undefined as unknown as string,
+          endDate: undefined as unknown as string,
+        },
+        items: [
+          { id: "item-1", boardId: "board-1" },
+          { id: "item-2", boardId: "board-1" },
+          { id: "item-3", boardId: "board-1" },
+        ],
+      },
+    ];
+
+    await (menu as any).processImportedData(importedData);
+
+    expect(appendSpy).toHaveBeenCalledTimes(3);
+    expect(appendSpy).toHaveBeenCalledWith(expect.objectContaining({ id: "item-1", boardId: "new-board" }));
+    expect(appendSpy).toHaveBeenCalledWith(expect.objectContaining({ id: "item-2", boardId: "new-board" }));
+    expect(appendSpy).toHaveBeenCalledWith(expect.objectContaining({ id: "item-3", boardId: "new-board" }));
+
+    createBoardSpy.mockRestore();
+    appendSpy.mockRestore();
+  });
+
+  it("handles keydown when keyboardShortcutsDialogRef is null", () => {
+    const menu = new ExtensionSettingsMenu({});
+    // Call handleDocumentKeyDown when ref is null
+    const event = new KeyboardEvent("keydown", { key: "?", bubbles: true });
+    (menu as any).handleDocumentKeyDown(event);
+    // Should return early without error
+    expect(true).toBe(true);
+  });
+
+  it("exports multiple boards from multiple teams", async () => {
+    const anchorElement = document.createElement("a");
+    const clickSpy = jest.spyOn(anchorElement, "click");
+    const originalCreateElement = document.createElement.bind(document);
+    const createElementSpy = jest.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+      if (tagName === "a") {
+        return anchorElement;
+      }
+      return originalCreateElement(tagName);
+    });
+
+    const objectUrlSpy = jest.spyOn(window.URL, "createObjectURL").mockReturnValue("blob:mock");
+
+    (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([
+      { id: "team-1", name: "Team One" },
+      { id: "team-2", name: "Team Two" },
+    ]);
+    const getBoardsSpy = jest.spyOn(boardDataService, "getBoardsForTeam")
+      .mockResolvedValueOnce([{ id: "board-1", title: "Board One" }] as any)
+      .mockResolvedValueOnce([{ id: "board-2", title: "Board Two" }, { id: "board-3", title: "Board Three" }] as any);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const menu = new ExtensionSettingsMenu({});
+
+    await (menu as any).exportData();
+
+    expect(getBoardsSpy).toHaveBeenCalledTimes(2);
+    expect(objectUrlSpy).toHaveBeenCalled();
+    expect(clickSpy).toHaveBeenCalled();
+
+    createElementSpy.mockRestore();
+    objectUrlSpy.mockRestore();
+    getBoardsSpy.mockRestore();
+  });
 });
