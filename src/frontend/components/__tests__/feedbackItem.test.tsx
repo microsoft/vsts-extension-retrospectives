@@ -9497,8 +9497,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
-    const itemElement = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
-
     await act(async () => {
       await (ref.current as any).onDocumentCardTitleSave("Updated Title");
     });
