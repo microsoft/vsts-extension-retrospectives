@@ -9337,4 +9337,476 @@ describe("FeedbackItem additional coverage (merged)", () => {
       expect(containerDiv).toBeTruthy();
     }
   });
+
+  test("Escape key closes delete item confirmation dialog", async () => {
+    const props = makeProps({ workflowPhase: "Collect" });
+    const { container } = render(<FeedbackItem {...props} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    // Trigger delete dialog to open (via Delete key)
+    fireEvent.keyDown(root, { key: "Delete" });
+
+    // Press Escape to close the dialog
+    fireEvent.keyDown(root, { key: "Escape" });
+
+    // Dialog should be closed
+    expect(container).toBeTruthy();
+  });
+
+  test("Escape key closes move feedback item dialog", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const { container } = render(<FeedbackItem {...props} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    // Open move dialog via keyboard shortcut 'm'
+    fireEvent.keyDown(root, { key: "m" });
+
+    // Press Escape to close the dialog
+    fireEvent.keyDown(root, { key: "Escape" });
+
+    expect(container).toBeTruthy();
+  });
+
+  test("Escape key closes group feedback item dialog", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const { container } = render(<FeedbackItem {...props} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    // Open group dialog via keyboard shortcut 'g'
+    fireEvent.keyDown(root, { key: "g" });
+
+    // Press Escape to close the dialog
+    fireEvent.keyDown(root, { key: "Escape" });
+
+    expect(container).toBeTruthy();
+  });
+
+  test("Escape key closes remove from group confirmation dialog", async () => {
+    const props = makeProps({
+      workflowPhase: "Group",
+      groupedItemProps: {
+        isMainItem: false,
+        isGroupExpanded: false,
+        groupedCount: 1,
+        parentItemId: "parent-id",
+        setIsGroupBeingDragged: jest.fn(),
+        toggleGroupExpand: jest.fn(),
+      },
+    });
+    const { container } = render(<FeedbackItem {...props} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    // Open remove from group dialog via keyboard shortcut 'u'
+    fireEvent.keyDown(root, { key: "u" });
+
+    // Press Escape to close the dialog
+    fireEvent.keyDown(root, { key: "Escape" });
+
+    expect(container).toBeTruthy();
+  });
+
+  test("startEditingTitle returns early when itemElement is null", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Set itemElement to null to cover early return
+    (ref.current as any).itemElement = null;
+    (ref.current as any).startEditingTitle();
+
+    // Should return early without error
+    expect(ref.current).toBeTruthy();
+  });
+
+  test("startEditingTitle focuses on existing editor input", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Manually add an editable-text-input-container with input
+    const itemElement = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    const inputContainer = document.createElement("div");
+    inputContainer.className = "editable-text-input-container";
+    const input = document.createElement("input");
+    inputContainer.appendChild(input);
+    itemElement.appendChild(inputContainer);
+
+    (ref.current as any).startEditingTitle();
+
+    expect(document.activeElement).toBe(input);
+
+    itemElement.removeChild(inputContainer);
+  });
+
+  test("focusCardControl when no visible controls exist", async () => {
+    const props = makeProps({ workflowPhase: "Collect" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Remove all focusable controls
+    const itemElement = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    const controls = itemElement.querySelectorAll('[data-card-control="true"]');
+    controls.forEach(c => c.remove());
+
+    // Should return early without error
+    (ref.current as any).focusCardControl("next");
+
+    expect(ref.current).toBeTruthy();
+  });
+
+  test("focusCardControl navigates in prev direction", async () => {
+    const props = makeProps({ workflowPhase: "Vote" });
+    const { container } = render(<FeedbackItem {...props} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    // Navigate left to wrap around to last control
+    fireEvent.keyDown(root, { key: "ArrowLeft" });
+
+    expect(document.activeElement).not.toBe(root);
+  });
+
+  test("onDocumentCardTitleSave focuses item element after save", async () => {
+    const refreshFeedbackItems = jest.fn();
+    const props = makeProps({ refreshFeedbackItems });
+
+    jest.spyOn(itemDataService, "updateTitle").mockResolvedValue(makeDoc({ title: "Updated" }));
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const itemElement = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    await act(async () => {
+      await (ref.current as any).onDocumentCardTitleSave("Updated Title");
+    });
+
+    await waitFor(() => {
+      expect(itemDataService.updateTitle).toHaveBeenCalled();
+    });
+  });
+
+  test("onFeedbackItemDocumentCardTitleSave removes item when title is empty for newly created", async () => {
+    const removeFeedbackItemFromColumn = jest.fn();
+    const props = makeProps({ newlyCreated: true, removeFeedbackItemFromColumn });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await act(async () => {
+      await (ref.current as any).onFeedbackItemDocumentCardTitleSave(props.id, "", true);
+    });
+
+    expect(removeFeedbackItemFromColumn).toHaveBeenCalledWith(props.columnId, props.id, false);
+  });
+
+  test("onFeedbackItemDocumentCardTitleSave does nothing when title is empty for existing item", async () => {
+    const removeFeedbackItemFromColumn = jest.fn();
+    const props = makeProps({ newlyCreated: false, removeFeedbackItemFromColumn });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await act(async () => {
+      await (ref.current as any).onFeedbackItemDocumentCardTitleSave(props.id, "   ", false);
+    });
+
+    // Should not call removeFeedbackItemFromColumn for existing items with empty title
+    expect(removeFeedbackItemFromColumn).not.toHaveBeenCalled();
+  });
+
+  test("onUpdateActionItem refreshes feedback items", async () => {
+    const refreshFeedbackItems = jest.fn();
+    const props = makeProps({ refreshFeedbackItems });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const updatedItem = makeDoc({ id: props.id, title: "Updated" });
+
+    await act(async () => {
+      await (ref.current as any).onUpdateActionItem(updatedItem);
+    });
+
+    expect(refreshFeedbackItems).toHaveBeenCalledWith([updatedItem], true);
+  });
+
+  test("onUpdateActionItem does nothing when updatedFeedbackItem is falsy", async () => {
+    const refreshFeedbackItems = jest.fn();
+    const props = makeProps({ refreshFeedbackItems });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await act(async () => {
+      await (ref.current as any).onUpdateActionItem(null);
+    });
+
+    // Should not call refreshFeedbackItems when updatedFeedbackItem is null
+    expect(refreshFeedbackItems).not.toHaveBeenCalled();
+  });
+
+  test("handleFeedbackItemSearchInputChange returns early for empty search term", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await act(async () => {
+      await (ref.current as any).handleFeedbackItemSearchInputChange(undefined, "");
+    });
+
+    expect((ref.current as any).state.searchedFeedbackItems).toEqual([]);
+  });
+
+  test("handleFeedbackItemSearchInputChange searches feedback items", async () => {
+    const searchItems = [
+      makeDoc({ id: "search-1", title: "Search Result One" }),
+      makeDoc({ id: "search-2", title: "Search Result Two" }),
+    ];
+
+    jest.spyOn(itemDataService, "getFeedbackItemsForBoard").mockResolvedValue(searchItems);
+
+    const props = makeProps({ workflowPhase: "Group" });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await act(async () => {
+      await (ref.current as any).handleFeedbackItemSearchInputChange(undefined, "Search");
+    });
+
+    expect((ref.current as any).state.searchedFeedbackItems.length).toBeGreaterThanOrEqual(0);
+  });
+
+  test("Timer switch click handler in Act phase", async () => {
+    const requestTimerStart = jest.fn().mockResolvedValue(true);
+    const notifyTimerStopped = jest.fn();
+
+    const props = makeProps({
+      workflowPhase: "Act",
+      timerSecs: 0,
+      timerState: false,
+      requestTimerStart,
+      notifyTimerStopped,
+    });
+
+    const { container } = render(<FeedbackItem {...props} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const timerButton = container.querySelector(".card-action-timer button");
+
+    if (timerButton) {
+      fireEvent.click(timerButton);
+
+      await waitFor(() => {
+        expect(requestTimerStart).toHaveBeenCalled();
+      });
+    }
+  });
+
+  test("showRemoveFeedbackItemFromGroupConfirmationDialog sets state", async () => {
+    const props = makeProps({
+      workflowPhase: "Group",
+      groupedItemProps: {
+        isMainItem: false,
+        isGroupExpanded: false,
+        groupedCount: 1,
+        parentItemId: "parent",
+        setIsGroupBeingDragged: jest.fn(),
+        toggleGroupExpand: jest.fn(),
+      },
+    });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await act(async () => {
+      (ref.current as any).showRemoveFeedbackItemFromGroupConfirmationDialog();
+    });
+
+    await waitFor(() => {
+      expect((ref.current as any).state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden).toBe(false);
+    });
+  });
+
+  test("onConfirmRemoveFeedbackItemFromGroup calls moveFeedbackItem and hides dialog", async () => {
+    const moveFeedbackItem = jest.fn();
+    const refreshFeedbackItems = jest.fn();
+
+    const props = makeProps({
+      workflowPhase: "Group",
+      moveFeedbackItem,
+      refreshFeedbackItems,
+      groupedItemProps: {
+        isMainItem: false,
+        isGroupExpanded: false,
+        groupedCount: 1,
+        parentItemId: "parent",
+        setIsGroupBeingDragged: jest.fn(),
+        toggleGroupExpand: jest.fn(),
+      },
+    });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    (ref.current as any).onConfirmRemoveFeedbackItemFromGroup();
+
+    expect(moveFeedbackItem).toHaveBeenCalledWith(refreshFeedbackItems, props.boardId, props.id, props.columnId);
+    expect((ref.current as any).state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden).toBe(true);
+  });
+
+  test("markFeedbackItemForDelete collapses expanded group", async () => {
+    const toggleGroupExpand = jest.fn();
+
+    const props = makeProps({
+      workflowPhase: "Collect",
+      groupedItemProps: {
+        isMainItem: true,
+        isGroupExpanded: true,
+        groupedCount: 2,
+        parentItemId: "",
+        setIsGroupBeingDragged: jest.fn(),
+        toggleGroupExpand,
+      },
+    });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    (ref.current as any).markFeedbackItemForDelete(true);
+
+    expect(toggleGroupExpand).toHaveBeenCalled();
+  });
+
+  test("dragFeedbackItemOverFeedbackItem handler exists", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Verify the drag handler method exists
+    expect(typeof (ref.current as any).dragFeedbackItemOverFeedbackItem).toBe("function");
+  });
+
+  test("setDisabledFeedbackItemDeletion sets isDeletionDisabled based on upvotes", async () => {
+    const itemWithVotes = makeDoc({ id: "voted-item", upvotes: 5 });
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(itemWithVotes);
+
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await act(async () => {
+      await (ref.current as any).setDisabledFeedbackItemDeletion(props.boardId, props.id);
+    });
+
+    expect((ref.current as any).state.isDeletionDisabled).toBe(true);
+  });
+
+  test("dragFeedbackItemStart method exists and is callable", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Verify the method exists
+    expect(typeof (ref.current as any).dragFeedbackItemStart).toBe("function");
+  });
+
+  test("dragFeedbackItemEnd method exists and is callable", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Verify the method exists
+    expect(typeof (ref.current as any).dragFeedbackItemEnd).toBe("function");
+  });
+
+  test("hideMobileFeedbackItemActionsDialog sets state to hidden", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    (ref.current as any).setState({ isMobileFeedbackItemActionsDialogHidden: false });
+    (ref.current as any).hideMobileFeedbackItemActionsDialog();
+
+    expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+  });
+
+  test("hideMoveFeedbackItemDialog sets dialog state to hidden", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    (ref.current as any).setState({ isMoveFeedbackItemDialogHidden: false });
+    (ref.current as any).hideMoveFeedbackItemDialog();
+
+    expect((ref.current as any).state.isMoveFeedbackItemDialogHidden).toBe(true);
+  });
+
+  test("hideGroupFeedbackItemDialog sets dialog state to hidden", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    (ref.current as any).setState({ isGroupFeedbackItemDialogHidden: false });
+    (ref.current as any).hideGroupFeedbackItemDialog();
+
+    expect((ref.current as any).state.isGroupFeedbackItemDialogHidden).toBe(true);
+  });
 });

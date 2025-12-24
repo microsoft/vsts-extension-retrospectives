@@ -1,7 +1,8 @@
 import React from "react";
-import { render, waitFor } from "@testing-library/react";
+import { render, waitFor, fireEvent } from "@testing-library/react";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
+import { WebApiTeam } from "azure-devops-extension-api/Core";
 
 import BoardSummaryTable, { buildBoardSummaryState, IBoardSummaryTableProps, IBoardSummaryTableItem } from "../boardSummaryTable";
 import { TrashIcon, isTrashEnabled, handleArchiveToggle } from "../boardSummaryTable";
@@ -1442,5 +1443,181 @@ describe("BoardSummaryTable - handleArchiveToggle", () => {
 
     expect(BoardDataService.restoreArchivedFeedbackBoard).toHaveBeenCalledWith(teamId, boardId);
     expect(onArchiveToggle).toHaveBeenCalled();
+  });
+
+  it("tracks exception when archive operation fails", async () => {
+    const teamId = "team-1";
+    const boardId = "board-error";
+    const setTableData = jest.fn();
+    const onArchiveToggle = jest.fn().mockResolvedValue(undefined);
+    const error = new Error("Archive failed");
+
+    (BoardDataService.archiveFeedbackBoard as jest.Mock).mockRejectedValue(error);
+
+    await handleArchiveToggle(teamId, boardId, true, setTableData, onArchiveToggle);
+
+    expect(appInsights.trackException).toHaveBeenCalledWith(
+      error,
+      expect.objectContaining({
+        boardId: "board-error",
+        teamId: "team-1",
+        action: "archive",
+      }),
+    );
+  });
+
+  it("tracks exception when restore operation fails", async () => {
+    const teamId = "team-1";
+    const boardId = "board-error";
+    const setTableData = jest.fn();
+    const onArchiveToggle = jest.fn().mockResolvedValue(undefined);
+    const error = new Error("Restore failed");
+
+    (BoardDataService.restoreArchivedFeedbackBoard as jest.Mock).mockRejectedValue(error);
+
+    await handleArchiveToggle(teamId, boardId, false, setTableData, onArchiveToggle);
+
+    expect(appInsights.trackException).toHaveBeenCalledWith(
+      error,
+      expect.objectContaining({
+        boardId: "board-error",
+        teamId: "team-1",
+        action: "restore",
+      }),
+    );
+  });
+});
+
+describe("BoardSummaryTable - TrashIcon rendering", () => {
+  it("renders disabled trash icon when board is archived but not past delay", () => {
+    const board: IBoardSummaryTableItem = {
+      id: "board-1",
+      boardName: "Test Board",
+      createdDate: new Date(),
+      teamId: "team-1",
+      ownerId: "owner-1",
+      isArchived: true,
+      archivedDate: new Date(Date.now() - 1 * 60 * 1000), // 1 minute ago, not past 2 min delay
+      feedbackItemsCount: 0,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+    };
+
+    const { container } = render(
+      <TrashIcon
+        board={board}
+        currentUserId="owner-1"
+        currentUserIsTeamAdmin={false}
+        onClick={jest.fn()}
+      />
+    );
+
+    expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
+    expect(container.querySelector(".trash-icon-disabled")?.getAttribute("title")).toBe("Try archive before delete");
+  });
+
+  it("renders enabled trash icon when board is archived and past delay", () => {
+    const board: IBoardSummaryTableItem = {
+      id: "board-1",
+      boardName: "Test Board",
+      createdDate: new Date(),
+      teamId: "team-1",
+      ownerId: "owner-1",
+      isArchived: true,
+      archivedDate: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago, past 2 min delay
+      feedbackItemsCount: 0,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+    };
+
+    const onClick = jest.fn();
+    const { container } = render(
+      <TrashIcon
+        board={board}
+        currentUserId="owner-1"
+        currentUserIsTeamAdmin={false}
+        onClick={onClick}
+      />
+    );
+
+    expect(container.querySelector(".trash-icon")).toBeTruthy();
+  });
+
+  it("renders nothing when user is not owner or admin", () => {
+    const board: IBoardSummaryTableItem = {
+      id: "board-1",
+      boardName: "Test Board",
+      createdDate: new Date(),
+      teamId: "team-1",
+      ownerId: "owner-1",
+      isArchived: true,
+      archivedDate: new Date(Date.now() - 5 * 60 * 1000),
+      feedbackItemsCount: 0,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+    };
+
+    const { container } = render(
+      <TrashIcon
+        board={board}
+        currentUserId="different-user"
+        currentUserIsTeamAdmin={false}
+        onClick={jest.fn()}
+      />
+    );
+
+    expect(container.querySelector(".trash-icon")).toBeFalsy();
+    expect(container.querySelector(".trash-icon-disabled")).toBeFalsy();
+  });
+
+  it("renders trash icon when user is team admin but not owner", () => {
+    const board: IBoardSummaryTableItem = {
+      id: "board-1",
+      boardName: "Test Board",
+      createdDate: new Date(),
+      teamId: "team-1",
+      ownerId: "owner-1",
+      isArchived: true,
+      archivedDate: new Date(Date.now() - 5 * 60 * 1000),
+      feedbackItemsCount: 0,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+    };
+
+    const { container } = render(
+      <TrashIcon
+        board={board}
+        currentUserId="different-user"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
+
+    expect(container.querySelector(".trash-icon")).toBeTruthy();
+  });
+
+  it("renders nothing when board is not archived", () => {
+    const board: IBoardSummaryTableItem = {
+      id: "board-1",
+      boardName: "Test Board",
+      createdDate: new Date(),
+      teamId: "team-1",
+      ownerId: "owner-1",
+      isArchived: false,
+      feedbackItemsCount: 0,
+      pendingWorkItemsCount: 0,
+      totalWorkItemsCount: 0,
+    };
+
+    const { container } = render(
+      <TrashIcon
+        board={board}
+        currentUserId="owner-1"
+        currentUserIsTeamAdmin={true}
+        onClick={jest.fn()}
+      />
+    );
+
+    expect(container.querySelector(".trash-icon")).toBeFalsy();
   });
 });
