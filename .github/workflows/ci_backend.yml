@@ -38,13 +38,14 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         run: |
-          dotnet restore --use-lock-file
+          dotnet restore --locked-mode
           dotnet build
         name: Build
         working-directory: 'src/backend'
 
       - if: steps.changes.outputs.src == 'true'
         run: |
+          dotnet restore --locked-mode
           dotnet test --logger "trx;LogFileName=test-results.trx"
         name: Test
         working-directory: 'src/backend.tests'
