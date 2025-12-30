@@ -630,4 +630,63 @@ describe("Board Summary", () => {
       expect(instance.state.actionItemTableColumns).toBeDefined();
     });
   });
+
+  describe("sortActionItemsByColumn edge cases", () => {
+    const createBoardSummaryInstance = () => new BoardSummaryComponent(mockedPropsWithActionItems);
+
+    it("should handle equal values in ascending sort by returning 0", () => {
+      const instance = createBoardSummaryInstance();
+      const sortFn = (instance as any).sortActionItemsByColumn.bind(instance);
+      
+      // Two items with same title should maintain order (return 0)
+      const items = [
+        { id: 1, title: "Same", state: "Active" },
+        { id: 2, title: "Same", state: "Active" }
+      ];
+      
+      const result = sortFn(items, "title", false);
+      expect(result.length).toBe(2);
+    });
+
+    it("should handle equal values in descending sort by returning 0", () => {
+      const instance = createBoardSummaryInstance();
+      const sortFn = (instance as any).sortActionItemsByColumn.bind(instance);
+      
+      const items = [
+        { id: 1, title: "Same", state: "Active" },
+        { id: 2, title: "Same", state: "Active" }
+      ];
+      
+      const result = sortFn(items, "title", true);
+      expect(result.length).toBe(2);
+    });
+
+    it("should return 1 for greater value in ascending sort", () => {
+      const instance = createBoardSummaryInstance();
+      const sortFn = (instance as any).sortActionItemsByColumn.bind(instance);
+      
+      const items = [
+        { id: 1, title: "B", state: "Active" },
+        { id: 2, title: "A", state: "Active" }
+      ];
+      
+      const result = sortFn(items, "title", false);
+      expect(result[0].title).toBe("A");
+      expect(result[1].title).toBe("B");
+    });
+
+    it("should return -1 for greater value in descending sort", () => {
+      const instance = createBoardSummaryInstance();
+      const sortFn = (instance as any).sortActionItemsByColumn.bind(instance);
+      
+      const items = [
+        { id: 1, title: "A", state: "Active" },
+        { id: 2, title: "B", state: "Active" }
+      ];
+      
+      const result = sortFn(items, "title", true);
+      expect(result[0].title).toBe("B");
+      expect(result[1].title).toBe("A");
+    });
+  });
 });

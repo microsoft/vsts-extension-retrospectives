@@ -132,7 +132,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - if: steps.changes.outputs.src == 'true'
-        name: "Prepare vss-extension-dev.json"
+        name: "Prepare package"
         working-directory: 'src/frontend'
         run: |
           cp vss-extension-dev.json.template vss-extension-dev.json
@@ -151,6 +151,8 @@ jobs:
           fi
 
           cat <<< $(jq ".contributions[0].properties.name = \"Retrospectives (Dev)\"" $ext_file) > $ext_file
+
+          cp ../../LICENSE ./assets/LICENSE.md
 
       - if: steps.changes.outputs.src == 'true'
         name: "Publish extension to dev environment"

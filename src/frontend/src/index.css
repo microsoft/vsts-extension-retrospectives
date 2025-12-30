@@ -336,7 +336,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .subText {
-    @apply block px-5 py-3 text-sm text-(--text-primary-color);
+    @apply block px-5 py-2 text-sm text-(--text-primary-color);
 
     &.li {
       @apply list-item list-inside list-disc ml-4;
@@ -426,14 +426,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .save-symbol {
     @apply text-gray-500 inline-block align-middle pl-2.5;
   }
-}
-
-.ms-FocusZone .ms-Pivot-link {
-  @apply rounded-t-sm border-t border-l border-r border-(--border-subtle-color);
-}
-
-.ms-FocusZone .ms-Pivot-link.is-selected {
-  @apply bg-(--border-subtle-color) rounded-t-sm;
 }
 
 .feedback-votes-count {
