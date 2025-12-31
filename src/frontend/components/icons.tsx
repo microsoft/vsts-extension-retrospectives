@@ -740,6 +740,14 @@ export const TableChartIcon = () => {
   );
 };
 
+export const SpeedIcon = () => {
+  return (
+    <svg className="icon-speed" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0z" fill="none" /><path d="M20.38 8.57l-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 15.58 6.85l1.85-1.23A10 10 0 0 0 3.35 19a2 2 0 0 0 1.72 1h13.85a2 2 0 0 0 1.74-1 10 10 0 0 0-.27-10.44zm-9.79 6.84a2 2 0 0 0 2.83 0l5.66-8.49-8.49 5.66a2 2 0 0 0 0 2.83z" />
+    </svg>
+  );
+};
+
 export function getIconElement(iconId: string | undefined | null): React.ReactElement {
   const foundIcon = availableIcons.find(icon => icon.id === iconId || icon.tags.includes(iconId));
 
@@ -762,7 +770,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "adjust", tags: ["fa-bullseye"], name: "Target", icon: <AdjustIcon /> },
   { id: "thumb-up", tags: ["far fa-thumbs-up"], name: "Thumb Up", icon: <ThumbUpIcon /> },
   { id: "thumb-down", tags: ["far fa-thumbs-down"], name: "Thumb Down", icon: <ThumbDownIcon /> },
-  { id: "thumb-up-down", tags: ["far fa-thumbs-up-down", "fa-solid fa-square-poll-vertical"], name: "Thumb Up/Down", icon: <ThumbUpDownIcon /> },
+  { id: "thumb-up-down", tags: ["far fa-thumbs-up-down"], name: "Thumb Up/Down", icon: <ThumbUpDownIcon /> },
   { id: "plumbing", tags: ["far fa-plumbing", "far fa-wrench"], name: "Plumbing", icon: <PlumbingIcon /> },
   { id: "forum", tags: ["far fa-comments"], name: "Forum", icon: <ForumIcon /> },
   { id: "explore", tags: ["far fa-compass"], name: "Explore", icon: <ExploreIcon /> },
@@ -821,4 +829,5 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "source", tags: [], name: "Source", icon: <SourceIcon /> },
   { id: "inventory", tags: [], name: "Inventory", icon: <InventoryIcon /> },
   { id: "more-horizontal", tags: [], name: "More Horizontal", icon: <MoreHorizontalIcon /> },
+  { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
 ];
