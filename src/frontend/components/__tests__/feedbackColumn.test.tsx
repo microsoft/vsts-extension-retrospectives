@@ -2581,7 +2581,7 @@ describe("Feedback Column ", () => {
       // Get the dialog and manually open it
       const dialog = container.querySelector(".edit-column-notes-dialog") as HTMLDialogElement;
       expect(dialog).toBeTruthy();
-      
+
       // Simulate opening the dialog
       dialog.showModal();
       expect(dialog.open).toBe(true);
