@@ -14,6 +14,7 @@
       "extensions": [
         "bradlc.vscode-tailwindcss",
         "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
         "ms-azuretools.vscode-docker",
         "vscode-icons-team.vscode-icons",
         "editorconfig.editorconfig",
