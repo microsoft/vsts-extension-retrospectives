@@ -757,7 +757,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .popout-container {
-  @apply absolute mt-3 bg-[rgb(var(--palette-neutral-6))] text-sm shadow-lg min-w-60 z-10;
+  @apply absolute -mt-50 bg-[rgb(var(--palette-neutral-6))] text-sm shadow-lg min-w-60 z-10;
 
   & .list-item {
     @apply flex items-center gap-2 cursor-pointer p-2 bg-inherit w-full border-0 overflow-hidden text-(--text-primary-color);
@@ -1156,7 +1156,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column-content {
-  @apply p-2.5 overflow-hidden w-full box-border;
+  @apply p-2.5 overflow-hidden w-full h-full box-border;
 }
 
 .feedback-column-info-dialog-text {
@@ -1164,7 +1164,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-items-container {
-  @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-7 overflow-hidden w-full box-border;
+  @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-7 overflow-hidden w-full h-full box-border;
 
   & > div {
     @apply contents;
