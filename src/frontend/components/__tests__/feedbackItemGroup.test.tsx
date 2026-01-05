@@ -407,4 +407,44 @@ describe("FeedbackItemGroup", () => {
       capturedSetIsGroupBeingDragged(false);
     }
   });
+
+  describe("toggleGroupExpand state toggle", () => {
+    it("should toggle isGroupExpanded from true to false", () => {
+      const { container, getByTestId } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+      const groupDiv = container.querySelector(".feedback-item-group");
+
+      // Initial state - collapsed
+      expect(groupDiv).not.toHaveClass("feedback-item-group-expanded");
+
+      // First toggle - expand
+      const toggleButton = getByTestId("toggle-expand");
+      fireEvent.click(toggleButton);
+      expect(groupDiv).toHaveClass("feedback-item-group-expanded");
+
+      // Second toggle - collapse
+      fireEvent.click(toggleButton);
+      expect(groupDiv).not.toHaveClass("feedback-item-group-expanded");
+    });
+
+    it("should toggle group multiple times correctly", () => {
+      const { container, getByTestId } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Vote} />);
+
+      const groupDiv = container.querySelector(".feedback-item-group");
+      const toggleButton = getByTestId("toggle-expand");
+
+      // Toggle multiple times
+      fireEvent.click(toggleButton);
+      expect(groupDiv).toHaveClass("feedback-item-group-expanded");
+
+      fireEvent.click(toggleButton);
+      expect(groupDiv).not.toHaveClass("feedback-item-group-expanded");
+
+      fireEvent.click(toggleButton);
+      expect(groupDiv).toHaveClass("feedback-item-group-expanded");
+
+      fireEvent.click(toggleButton);
+      expect(groupDiv).not.toHaveClass("feedback-item-group-expanded");
+    });
+  });
 });

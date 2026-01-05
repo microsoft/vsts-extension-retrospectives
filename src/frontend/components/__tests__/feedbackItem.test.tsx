@@ -9590,10 +9590,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
   });
 
   test("handleFeedbackItemSearchInputChange searches feedback items", async () => {
-    const searchItems = [
-      makeDoc({ id: "search-1", title: "Search Result One" }),
-      makeDoc({ id: "search-2", title: "Search Result Two" }),
-    ];
+    const searchItems = [makeDoc({ id: "search-1", title: "Search Result One" }), makeDoc({ id: "search-2", title: "Search Result Two" })];
 
     jest.spyOn(itemDataService, "getFeedbackItemsForBoard").mockResolvedValue(searchItems);
 

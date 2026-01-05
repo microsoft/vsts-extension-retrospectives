@@ -1502,14 +1502,7 @@ describe("BoardSummaryTable - TrashIcon rendering", () => {
       totalWorkItemsCount: 0,
     };
 
-    const { container } = render(
-      <TrashIcon
-        board={board}
-        currentUserId="owner-1"
-        currentUserIsTeamAdmin={false}
-        onClick={jest.fn()}
-      />
-    );
+    const { container } = render(<TrashIcon board={board} currentUserId="owner-1" currentUserIsTeamAdmin={false} onClick={jest.fn()} />);
 
     expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
     expect(container.querySelector(".trash-icon-disabled")?.getAttribute("title")).toBe("Try archive before delete");
@@ -1530,14 +1523,7 @@ describe("BoardSummaryTable - TrashIcon rendering", () => {
     };
 
     const onClick = jest.fn();
-    const { container } = render(
-      <TrashIcon
-        board={board}
-        currentUserId="owner-1"
-        currentUserIsTeamAdmin={false}
-        onClick={onClick}
-      />
-    );
+    const { container } = render(<TrashIcon board={board} currentUserId="owner-1" currentUserIsTeamAdmin={false} onClick={onClick} />);
 
     expect(container.querySelector(".trash-icon")).toBeTruthy();
   });
@@ -1556,14 +1542,7 @@ describe("BoardSummaryTable - TrashIcon rendering", () => {
       totalWorkItemsCount: 0,
     };
 
-    const { container } = render(
-      <TrashIcon
-        board={board}
-        currentUserId="different-user"
-        currentUserIsTeamAdmin={false}
-        onClick={jest.fn()}
-      />
-    );
+    const { container } = render(<TrashIcon board={board} currentUserId="different-user" currentUserIsTeamAdmin={false} onClick={jest.fn()} />);
 
     expect(container.querySelector(".trash-icon")).toBeFalsy();
     expect(container.querySelector(".trash-icon-disabled")).toBeFalsy();
@@ -1583,14 +1562,7 @@ describe("BoardSummaryTable - TrashIcon rendering", () => {
       totalWorkItemsCount: 0,
     };
 
-    const { container } = render(
-      <TrashIcon
-        board={board}
-        currentUserId="different-user"
-        currentUserIsTeamAdmin={true}
-        onClick={jest.fn()}
-      />
-    );
+    const { container } = render(<TrashIcon board={board} currentUserId="different-user" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
 
     expect(container.querySelector(".trash-icon")).toBeTruthy();
   });
@@ -1608,14 +1580,7 @@ describe("BoardSummaryTable - TrashIcon rendering", () => {
       totalWorkItemsCount: 0,
     };
 
-    const { container } = render(
-      <TrashIcon
-        board={board}
-        currentUserId="owner-1"
-        currentUserIsTeamAdmin={true}
-        onClick={jest.fn()}
-      />
-    );
+    const { container } = render(<TrashIcon board={board} currentUserId="owner-1" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
 
     expect(container.querySelector(".trash-icon")).toBeFalsy();
   });

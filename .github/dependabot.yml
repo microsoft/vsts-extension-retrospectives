@@ -4,6 +4,22 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/src/frontend"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/src/backend"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/src/backend.tests"
+    schedule:
+      interval: "daily"
   - package-ecosystem: "npm"
     directory: "/src/frontend"
     schedule:

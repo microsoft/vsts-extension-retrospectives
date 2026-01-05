@@ -666,9 +666,13 @@ describe("ExtensionSettingsMenu", () => {
       { id: "team-1", name: "Team One" },
       { id: "team-2", name: "Team Two" },
     ]);
-    const getBoardsSpy = jest.spyOn(boardDataService, "getBoardsForTeam")
+    const getBoardsSpy = jest
+      .spyOn(boardDataService, "getBoardsForTeam")
       .mockResolvedValueOnce([{ id: "board-1", title: "Board One" }] as any)
-      .mockResolvedValueOnce([{ id: "board-2", title: "Board Two" }, { id: "board-3", title: "Board Three" }] as any);
+      .mockResolvedValueOnce([
+        { id: "board-2", title: "Board Two" },
+        { id: "board-3", title: "Board Three" },
+      ] as any);
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
 
     const menu = new ExtensionSettingsMenu({});
@@ -682,5 +686,103 @@ describe("ExtensionSettingsMenu", () => {
     createElementSpy.mockRestore();
     objectUrlSpy.mockRestore();
     getBoardsSpy.mockRestore();
+  });
+
+  it("calls importData when Import Data button is clicked", async () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+
+    // Mock importData to avoid full file dialog flow
+    const menuComponent = container.querySelector(".extension-settings-menu");
+    expect(menuComponent).toBeInTheDocument();
+
+    // Open the Data Import/Export menu
+    const dataButton = screen.getByTitle("Data Import/Export");
+    fireEvent.click(dataButton);
+
+    // Find and click Import Data button
+    const importButton = screen.getByText("Import Data");
+    expect(importButton).toBeInTheDocument();
+
+    // Mock file input handling
+    const originalCreateElement = document.createElement.bind(document);
+    const fakeInput = {
+      setAttribute: jest.fn(),
+      click: jest.fn(),
+      addEventListener: jest.fn(),
+    };
+    const createElementSpy = jest.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+      if (tagName === "input") {
+        return fakeInput as unknown as HTMLInputElement;
+      }
+      return originalCreateElement(tagName);
+    });
+    const appendChildSpy = jest.spyOn(document.body, "appendChild").mockImplementation(() => null as any);
+    const removeChildSpy = jest.spyOn(document.body, "removeChild").mockImplementation(() => null as any);
+
+    fireEvent.click(importButton);
+
+    expect(fakeInput.setAttribute).toHaveBeenCalledWith("type", "file");
+    expect(fakeInput.click).toHaveBeenCalled();
+
+    createElementSpy.mockRestore();
+    appendChildSpy.mockRestore();
+    removeChildSpy.mockRestore();
+  });
+
+  describe("handleDocumentPointerDown", () => {
+    it("returns early when menuRootRef.current is null", () => {
+      const menu = new ExtensionSettingsMenu({});
+      // The ref is not set, so menuRootRef.current is null
+      const event = { target: document.body } as unknown as PointerEvent;
+
+      // Should not throw
+      expect(() => {
+        (menu as any).handleDocumentPointerDown(event);
+      }).not.toThrow();
+    });
+
+    it("returns early when event.target is null", () => {
+      render(<ExtensionSettingsMenu />);
+
+      // Should not throw when simulating pointerdown
+      expect(() => {
+        fireEvent.pointerDown(document.body);
+      }).not.toThrow();
+    });
+
+    it("closes open details elements when clicking outside", () => {
+      const { container } = render(<ExtensionSettingsMenu />);
+
+      // Open a details menu
+      const dataButton = screen.getByTitle("Data Import/Export");
+      fireEvent.click(dataButton);
+
+      const detailsElement = container.querySelector("details[open]");
+      expect(detailsElement).toBeInTheDocument();
+
+      // Click outside the menu
+      fireEvent.pointerDown(document.body);
+
+      // The details should be closed
+      const closedDetails = container.querySelector("details[open]");
+      expect(closedDetails).toBeNull();
+    });
+
+    it("does not close details when clicking inside", () => {
+      const { container } = render(<ExtensionSettingsMenu />);
+
+      // Open a details menu
+      const dataButton = screen.getByTitle("Data Import/Export");
+      fireEvent.click(dataButton);
+
+      const detailsElement = container.querySelector("details[open]");
+      expect(detailsElement).toBeInTheDocument();
+
+      // Click inside the details
+      fireEvent.pointerDown(detailsElement!);
+
+      // The details should still be open
+      expect(container.querySelector("details[open]")).toBeInTheDocument();
+    });
   });
 });

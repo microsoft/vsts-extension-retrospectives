@@ -787,4 +787,177 @@ describe("Action Item Display component", () => {
     // Still false
     expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
   });
+
+  it("handleDocumentPointerDown returns early when wrapper is null", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
+    render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+
+    // Set callout visible
+    act(() => {
+      (ref.current as any).setState({ isWorkItemTypeListCalloutVisible: true });
+    });
+
+    // Simulate pointer down with null target
+    const mockEvent = {
+      target: null,
+    } as unknown as PointerEvent;
+
+    // Should not throw and callout should remain visible
+    (ref.current as any).handleDocumentPointerDown(mockEvent);
+    expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(true);
+  });
+
+  it("handleDocumentPointerDown does not close callout when clicking inside the menu", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    // Open the menu
+    const addButton = container.querySelector(".add-action-item-button");
+    fireEvent.click(addButton!);
+
+    await waitFor(() => {
+      expect(container.querySelector(".popout-container")).toBeTruthy();
+    });
+
+    const menu = container.querySelector(".popout-container") as HTMLElement;
+    
+    // Click inside the menu - should not close it
+    fireEvent.pointerDown(menu);
+
+    await waitFor(() => {
+      expect(container.querySelector(".popout-container")).toBeTruthy();
+    });
+  });
+
+  it("handleDocumentPointerDown closes callout when clicking outside the menu and wrapper", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+
+    // Open the menu
+    const addButton = container.querySelector(".add-action-item-button");
+    fireEvent.click(addButton!);
+
+    await waitFor(() => {
+      expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(true);
+    });
+
+    // Create an element outside both wrapper and menu
+    const outsideElement = document.createElement("div");
+    outsideElement.id = "outside-element";
+    document.body.appendChild(outsideElement);
+
+    // Trigger pointerdown on the outside element
+    fireEvent.pointerDown(outsideElement);
+
+    await waitFor(() => {
+      // Callout should now be hidden
+      expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
+    });
+
+    // Cleanup
+    document.body.removeChild(outsideElement);
+  });
+
+  it("displays work item not found message when work item search returns undefined", async () => {
+    // Return undefined for the work item (different from empty array)
+    mockGetWorkItemsByIds.mockResolvedValue([undefined]);
+
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    await openLinkExistingDialog(container);
+
+    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    fireEvent.change(searchBox, { target: { value: "12345" } });
+
+    await waitFor(() => {
+      expect(mockGetWorkItemsByIds).toHaveBeenCalledWith([12345]);
+      // Check for "work item not found" message
+      const notFoundMessage = container.querySelector(".work-item-not-found");
+      expect(notFoundMessage).toBeTruthy();
+    });
+  });
+
+  it("does not call addAssociatedActionItem when workItem is null from openNewWorkItem", async () => {
+    mockOpenNewWorkItem.mockResolvedValue(null);
+
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      onUpdateActionItem: jest.fn(),
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+
+    const { container, getByText } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    const addButton = container.querySelector(".add-action-item-button");
+    fireEvent.click(addButton!);
+
+    await waitFor(() => {
+      expect(getByText("Bug")).toBeTruthy();
+    });
+
+    const bugButton = getByText("Bug").closest("button");
+    fireEvent.click(bugButton!);
+
+    await waitFor(() => {
+      expect(mockOpenNewWorkItem).toHaveBeenCalled();
+      expect(mockAddAssociatedActionItem).not.toHaveBeenCalled();
+    });
+  });
+
+  it("does not link work item when linkedWorkItem is null", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      onUpdateActionItem: jest.fn(),
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+
+    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
+    render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+
+    // Manually call linkExistingWorkItem with no linked work item
+    await (ref.current as any).linkExistingWorkItem();
+
+    // Should not call addAssociatedActionItem
+    expect(mockAddAssociatedActionItem).not.toHaveBeenCalled();
+  });
+
+  it("handles whitespace-only input in search box", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    await openLinkExistingDialog(container);
+
+    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    fireEvent.change(searchBox, { target: { value: "   " } });
+
+    await waitFor(() => {
+      const linkButton = container.querySelector(".link-existing-work-item-dialog .button") as HTMLButtonElement;
+      expect(linkButton?.disabled).toBe(true);
+    });
+  });
 });

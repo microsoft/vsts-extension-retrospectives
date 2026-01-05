@@ -347,7 +347,7 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
                 <div className="board-metadata-form-section-information">
                   {getIconElement("exclamation")} You can create a maximum of {this.maxColumnCount} columns in a retrospective
                 </div>
-                {!this.props.isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("exclamation")} Warning: Existing feedback items may not be available after changing the board template!</div>}
+                {!this.props.isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Warning: Existing feedback items may not be available after changing the board template!</div>}
                 <div className="board-metadata-form-section-subheader">
                   <label htmlFor="column-template-dropdown">Apply template:</label>
                   <select onChange={this.handleColumnsTemplateChange} id="column-template-dropdown" className="title-input-container column-template-dropdown">
