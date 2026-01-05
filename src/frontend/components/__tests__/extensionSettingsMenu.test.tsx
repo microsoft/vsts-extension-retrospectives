@@ -666,9 +666,13 @@ describe("ExtensionSettingsMenu", () => {
       { id: "team-1", name: "Team One" },
       { id: "team-2", name: "Team Two" },
     ]);
-    const getBoardsSpy = jest.spyOn(boardDataService, "getBoardsForTeam")
+    const getBoardsSpy = jest
+      .spyOn(boardDataService, "getBoardsForTeam")
       .mockResolvedValueOnce([{ id: "board-1", title: "Board One" }] as any)
-      .mockResolvedValueOnce([{ id: "board-2", title: "Board Two" }, { id: "board-3", title: "Board Three" }] as any);
+      .mockResolvedValueOnce([
+        { id: "board-2", title: "Board Two" },
+        { id: "board-3", title: "Board Three" },
+      ] as any);
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
 
     const menu = new ExtensionSettingsMenu({});

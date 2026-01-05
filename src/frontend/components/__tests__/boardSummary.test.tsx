@@ -641,7 +641,7 @@ describe("Board Summary", () => {
       // Two items with same title should maintain order (return 0)
       const items = [
         { id: 1, title: "Same", state: "Active" },
-        { id: 2, title: "Same", state: "Active" }
+        { id: 2, title: "Same", state: "Active" },
       ];
 
       const result = sortFn(items, "title", false);
@@ -654,7 +654,7 @@ describe("Board Summary", () => {
 
       const items = [
         { id: 1, title: "Same", state: "Active" },
-        { id: 2, title: "Same", state: "Active" }
+        { id: 2, title: "Same", state: "Active" },
       ];
 
       const result = sortFn(items, "title", true);
@@ -667,7 +667,7 @@ describe("Board Summary", () => {
 
       const items = [
         { id: 1, title: "B", state: "Active" },
-        { id: 2, title: "A", state: "Active" }
+        { id: 2, title: "A", state: "Active" },
       ];
 
       const result = sortFn(items, "title", false);
@@ -681,7 +681,7 @@ describe("Board Summary", () => {
 
       const items = [
         { id: 1, title: "A", state: "Active" },
-        { id: 2, title: "B", state: "Active" }
+        { id: 2, title: "B", state: "Active" },
       ];
 
       const result = sortFn(items, "title", true);
