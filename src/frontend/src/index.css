@@ -1338,7 +1338,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-form-section-information {
-    @apply flex items-center gap-1 border-3 border-gray-medium bg-gray-medium my-1.5 mx-0 mb-2.5 p-1;
+    @apply grid grid-cols-[auto_1fr] items-center gap-1 border-3 border-gray-medium bg-gray-medium my-1.5 mx-0 mb-2.5 p-1;
 
     &.warning-information {
       @apply bg-task-yellow border-none;
