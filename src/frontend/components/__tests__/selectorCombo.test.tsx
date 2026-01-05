@@ -805,4 +805,56 @@ describe("SelectorCombo", () => {
       expect(container).toBeTruthy();
     });
   });
+
+  describe("chooseItem with mobile dialog open", () => {
+    test("closeMobileSelectorDialog is called when choosing item while dialog is open", () => {
+      const clickSpy = jest.fn();
+      const ref = React.createRef<SelectorCombo<MockItem>>();
+      render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} ref={ref} />);
+
+      // Manually set state to have dialog open
+      if (ref.current) {
+        (ref.current as any).setState({ isSelectorDialogHidden: false });
+      }
+
+      // Call chooseItem directly
+      if (ref.current) {
+        (ref.current as any).chooseItem(mockItems[0]);
+      }
+
+      // Verify closeMobileSelectorDialog was invoked (state should now be hidden)
+      expect(ref.current?.state.isSelectorDialogHidden).toBe(true);
+      expect(clickSpy).toHaveBeenCalledWith(mockItems[0]);
+    });
+
+    test("handleKeyPressTeamList does not call chooseItem for non-Enter keys", () => {
+      const clickSpy = jest.fn();
+      const ref = React.createRef<SelectorCombo<MockItem>>();
+      render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} ref={ref} />);
+
+      // Call handleKeyPressTeamList with non-Enter key
+      if (ref.current) {
+        const mockEvent = { keyCode: 27 } as React.KeyboardEvent<HTMLDivElement>; // Escape key
+        (ref.current as any).handleKeyPressTeamList(mockEvent, mockItems[0]);
+      }
+
+      // chooseItem should not have been called
+      expect(clickSpy).not.toHaveBeenCalled();
+    });
+
+    test("handleKeyPressTeamList calls chooseItem for Enter key", () => {
+      const clickSpy = jest.fn();
+      const ref = React.createRef<SelectorCombo<MockItem>>();
+      render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} ref={ref} />);
+
+      // Call handleKeyPressTeamList with Enter key (keyCode 13)
+      if (ref.current) {
+        const mockEvent = { keyCode: 13 } as React.KeyboardEvent<HTMLDivElement>;
+        (ref.current as any).handleKeyPressTeamList(mockEvent, mockItems[0]);
+      }
+
+      // chooseItem should have been called
+      expect(clickSpy).toHaveBeenCalledWith(mockItems[0]);
+    });
+  });
 });
