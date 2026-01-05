@@ -285,6 +285,14 @@ export const LinkIcon = () => {
   );
 };
 
+export const ReportProblemIcon = () => {
+  return (
+    <svg className="icon-report-problem" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"/>
+    </svg>
+  );
+};
+
 export const SimCardDownloadIcon = () => {
   return (
     <svg className="icon-sim-card-download" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -843,5 +851,6 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "source", tags: [], name: "Source", icon: <SourceIcon /> },
   { id: "inventory", tags: [], name: "Inventory", icon: <InventoryIcon /> },
   { id: "more-horizontal", tags: [], name: "More Horizontal", icon: <MoreHorizontalIcon /> },
+  { id: "report-problem", tags: [], name: "Report Problem", icon: <ReportProblemIcon /> },
   { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
 ];
