@@ -857,22 +857,43 @@ describe("Action Item Display component", () => {
 
     // Create an element outside both wrapper and menu
     const outsideElement = document.createElement("div");
+    outsideElement.id = "outside-element";
     document.body.appendChild(outsideElement);
 
-    // Simulate pointer down on the outside element
-    const mockEvent = {
-      target: outsideElement,
-    } as unknown as PointerEvent;
+    // Trigger pointerdown on the outside element
+    fireEvent.pointerDown(outsideElement);
 
-    act(() => {
-      (ref.current as any).handleDocumentPointerDown(mockEvent);
+    await waitFor(() => {
+      // Callout should now be hidden
+      expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
     });
-
-    // Callout should now be hidden
-    expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
 
     // Cleanup
     document.body.removeChild(outsideElement);
+  });
+
+  it("displays work item not found message when work item search returns undefined", async () => {
+    // Return undefined for the work item (different from empty array)
+    mockGetWorkItemsByIds.mockResolvedValue([undefined]);
+
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container, getByPlaceholderText } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    await openLinkExistingDialog(container);
+
+    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    fireEvent.change(searchBox, { target: { value: "12345" } });
+
+    await waitFor(() => {
+      expect(mockGetWorkItemsByIds).toHaveBeenCalledWith([12345]);
+      // Check for "work item not found" message
+      const notFoundMessage = container.querySelector(".work-item-not-found");
+      expect(notFoundMessage).toBeTruthy();
+    });
   });
 
   it("does not call addAssociatedActionItem when workItem is null from openNewWorkItem", async () => {
