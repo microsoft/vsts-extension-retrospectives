@@ -831,31 +831,48 @@ describe("BoardSummaryTable - Row Expansion", () => {
   it("toggleExpanded adds row to expanded set", async () => {
     const { container } = render(<BoardSummaryTable {...baseProps} />);
 
+    // Wait for boards to be loaded and rendered
     await waitFor(() => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+      expect(container.querySelectorAll(".contextual-menu-button").length).toBeGreaterThan(0);
     });
 
     // Find and click the expand button
     const expandButtons = container.querySelectorAll(".contextual-menu-button");
-    if (expandButtons.length > 0) {
-      (expandButtons[0] as HTMLElement).click();
-    }
+    (expandButtons[0] as HTMLElement).click();
+
+    // Verify expanded content appears
+    await waitFor(() => {
+      expect(container.textContent).toContain("Looks like no work items were created for this board.");
+    });
   });
 
   it("toggleExpanded removes row from expanded set when clicked again", async () => {
     const { container } = render(<BoardSummaryTable {...baseProps} />);
 
+    // Wait for boards to be loaded and rendered
     await waitFor(() => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+      expect(container.querySelectorAll(".contextual-menu-button").length).toBeGreaterThan(0);
     });
 
     const expandButtons = container.querySelectorAll(".contextual-menu-button");
-    if (expandButtons.length > 0) {
-      // Click to expand
-      (expandButtons[0] as HTMLElement).click();
-      // Click again to collapse
-      (expandButtons[0] as HTMLElement).click();
-    }
+
+    // Click to expand
+    (expandButtons[0] as HTMLElement).click();
+
+    // Verify expanded content appears
+    await waitFor(() => {
+      expect(container.textContent).toContain("Looks like no work items were created for this board.");
+    });
+
+    // Click again to collapse
+    (expandButtons[0] as HTMLElement).click();
+
+    // Verify collapsed - expanded row content should not be visible
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-expanded-row")).toBeFalsy();
+    });
   });
 });
 
