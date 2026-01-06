@@ -161,11 +161,11 @@ describe("UI-level integration tests for ActionItem", () => {
           "System.State": "Completed",
         },
       },
-      allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Completed", category: "Completed", color: "blue" }] }],
+      allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Completed", category: "Completed", color: "012345" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
     const cardElement = container.querySelector(".related-task-sub-card") as HTMLElement;
-    expect(cardElement?.style.borderRightColor).toBe("blue");
+    expect(cardElement?.style.borderRightColor).toBe("#012345");
   });
 
   it("calls onUpdateActionItem when confirming unlink", async () => {
@@ -284,11 +284,11 @@ describe("UI-level integration tests for ActionItem", () => {
           "System.State": "Active",
         },
       },
-      allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Active", category: "InProgress", color: "blue" }] }],
+      allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Active", category: "InProgress", color: "012345" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
     const cardElement = container.querySelector(".related-task-sub-card") as HTMLElement;
-    expect(cardElement?.style.borderRightColor).toBe("blue");
+    expect(cardElement?.style.borderRightColor).toBe("#012345");
   });
 
   it("handles work item type with no states", () => {
