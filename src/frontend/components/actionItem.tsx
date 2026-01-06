@@ -111,6 +111,7 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
           role="button"
           title={this.props.actionItem.fields["System.Title"]}
           aria-label={`${this.props.actionItem.fields["System.WorkItemType"]} ${this.props.actionItem.fields["System.Title"]}, click to open work item`}
+          data-right-border-color={workItemState?.color ?? ""}
           onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
             if (e.key === "Enter") {
               this.showWorkItemForm(e);
@@ -118,7 +119,6 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
           }}
           onClick={this.showWorkItemForm}
         >
-          {workItemState?.color?.toLowerCase()}
           {systemTitle}
         </div>
         {!this.props.areActionIconsHidden && (
