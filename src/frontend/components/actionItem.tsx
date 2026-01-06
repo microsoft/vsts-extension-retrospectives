@@ -99,7 +99,7 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
     const systemTitle: string = this.props.actionItem.fields["System.Title"];
 
     return (
-      <div key={`${this.props.actionItem.id}card`} role="group" className="related-task-sub-card" style={{ borderRightColor: workItemState?.color ?? null }}>
+      <div key={`${this.props.actionItem.id}card`} role="group" className="related-task-sub-card" style={{ borderRightColor: `#${workItemState?.color ?? ""}` }}>
         <img className="work-item-type-icon" alt={`icon for work item type ${workItemType?.name}`} src={workItemType?.icon?.url} />
         <div
           ref={(element: HTMLElement) => {
