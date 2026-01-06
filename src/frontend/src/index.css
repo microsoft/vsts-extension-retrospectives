@@ -682,30 +682,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply w-4 h-4;
     }
   }
-
-  & .task-yellow {
-    @apply text-task-yellow;
-  }
-
-  & .bug-red {
-    @apply text-error;
-  }
-
-  &.resolved {
-    @apply border-success;
-  }
 }
 
 .work-item-icon {
   @apply w-4;
-}
-
-.action-item-selector .task-yellow {
-  @apply text-task-yellow;
-}
-
-.action-item-selector .bug-red {
-  @apply text-error;
 }
 
 .add-action-item-wrapper {
@@ -956,14 +936,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
       & tr .board-summary-container .action-items-summary-card .ms-List-cell {
         @apply text-sm;
-      }
-
-      & tr .board-summary-container .action-items-summary-card .task-yellow {
-        @apply text-task-yellow;
-      }
-
-      & tr .board-summary-container .action-items-summary-card .bug-red {
-        @apply text-error;
       }
 
       & tr .board-summary-container .action-items-summary-card .work-item-title {
