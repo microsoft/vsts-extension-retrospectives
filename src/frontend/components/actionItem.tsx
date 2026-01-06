@@ -95,12 +95,11 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
 
     const workItemStates: WorkItemStateColor[] = workItemType?.states ? workItemType.states : null;
     const workItemState: WorkItemStateColor = workItemStates ? workItemStates.find(wisc => wisc.name === this.props.actionItem.fields["System.State"]) : null;
-    const resolvedBorderRight: string = workItemState && (workItemState.category === "Completed" || workItemState.category === "Resolved") ? "resolved" : "";
 
     const systemTitle: string = this.props.actionItem.fields["System.Title"];
 
     return (
-      <div key={`${this.props.actionItem.id}card`} role="group" className={`related-task-sub-card ${resolvedBorderRight}`}>
+      <div key={`${this.props.actionItem.id}card`} role="group" className={`related-task-sub-card ${workItemState?.category?.toLowerCase() ?? ""}`.trim()}>
         <img className="work-item-type-icon" alt={`icon for work item type ${workItemType?.name}`} src={workItemType?.icon?.url} />
         <div
           ref={(element: HTMLElement) => {

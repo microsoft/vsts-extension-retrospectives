@@ -661,7 +661,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .related-task-sub-card {
-  @apply flex items-center max-w-full bg-(--background-color) text-(--text-primary-color);
+  @apply flex items-center max-w-full bg-(--background-color) text-(--text-primary-color) border-r-3;
 
   & .work-item-type-icon {
     @apply w-4 h-4 m-2;
@@ -692,7 +692,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &.resolved {
-    @apply border-r-3 border-success;
+    @apply border-success;
   }
 }
 
