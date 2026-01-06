@@ -258,7 +258,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     const canCurrentUserEditBoard = this.props.board.createdBy?.id === this.props.userId;
 
     return this.state.columnIds.map((columnId, index) => {
-      console.error(this.state.columns[columnId].columnProperties.iconClass);
       return {
         key: columnId,
         ref: this.columnRefs[index],
