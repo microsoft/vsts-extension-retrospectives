@@ -92,8 +92,6 @@ jest.mock("../../utilities/localStorageHelper", () => ({
   },
 }));
 
-import localStorageHelper from "../../utilities/localStorageHelper";
-
 (global as any).VSS = {
   getConfiguration: () => ({}),
   notifyLoadSucceeded: jest.fn(),
