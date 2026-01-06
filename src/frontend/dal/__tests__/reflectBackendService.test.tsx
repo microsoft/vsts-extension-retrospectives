@@ -401,6 +401,37 @@ describe("ReflectBackendService - Connection unavailable scenarios", () => {
 
       expect(mockSend).not.toHaveBeenCalled();
     });
+
+    it("startConnection returns false when signalR connection is missing", async () => {
+      const originalConnection = (reflectBackendService as unknown as { _signalRConnection: unknown })._signalRConnection;
+      (reflectBackendService as unknown as { _signalRConnection: unknown })._signalRConnection = undefined;
+
+      const result = await reflectBackendService.startConnection();
+
+      expect(result).toBe(false);
+
+      // Restore original connection for other tests
+      (reflectBackendService as unknown as { _signalRConnection: unknown })._signalRConnection = originalConnection;
+    });
+
+    it("retrieveValidToken logs and throws when token is malformed", async () => {
+      (reflectBackendService as unknown as { _tokenExpiry?: Date; _appToken?: string })._tokenExpiry = undefined;
+      (reflectBackendService as unknown as { _tokenExpiry?: Date; _appToken?: string })._appToken = undefined;
+      mockDecodeJwt.mockReturnValue(null);
+      mockGetAppToken.mockResolvedValueOnce("bad-token");
+
+      await expect(capturedAccessTokenFactory!()).rejects.toThrow("VSTS returned a malformed appToken value!");
+      expect(mockTrackException).toHaveBeenCalledWith(expect.objectContaining({ id: "MalformedAppToken" }));
+    });
+
+    it("joinBoardGroup returns early when connection is unavailable", () => {
+      (reflectBackendService as unknown as { _connectionAvailable: boolean })._connectionAvailable = false;
+
+      mockSend.mockClear();
+      (reflectBackendService as unknown as { joinBoardGroup: (id: string) => void }).joinBoardGroup("board-xyz");
+
+      expect(mockSend).not.toHaveBeenCalled();
+    });
   });
 });
 

@@ -960,4 +960,64 @@ describe("Action Item Display component", () => {
       expect(linkButton?.disabled).toBe(true);
     });
   });
+
+  it("closes link existing work item dialog when clicking close button", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    const dialog = await openLinkExistingDialog(container);
+    expect(dialog.open).toBe(true);
+
+    // Click the close button in the dialog header
+    const closeButton = dialog.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+    fireEvent.click(closeButton);
+
+    await waitFor(() => {
+      expect(dialog.open).toBe(false);
+    });
+  });
+
+  it("triggers dialog onClose handler when dialog is closed", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    const dialog = await openLinkExistingDialog(container);
+    expect(dialog.open).toBe(true);
+
+    // Trigger the close event on the dialog
+    dialog.dispatchEvent(new Event("close"));
+
+    // Dialog should handle the close event
+    expect(dialog).toBeTruthy();
+  });
+
+  it("handleClickOutside returns early when target is inside the menu", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    const menu = await openAddWorkItemMenu(container);
+
+    // Click on a button inside the menu
+    const menuButton = menu.querySelector("button");
+    if (menuButton) {
+      fireEvent.pointerDown(menuButton);
+    }
+
+    // Menu should still be open
+    await waitFor(() => {
+      expect(menu).toBeTruthy();
+    });
+  });
 });

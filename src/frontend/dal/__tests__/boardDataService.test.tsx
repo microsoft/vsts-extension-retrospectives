@@ -2,6 +2,18 @@ import BoardDataService from "../boardDataService";
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, setValue, getValue } from "../dataService";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../../interfaces/feedback";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
+import { appInsights } from "../../utilities/telemetryClient";
+
+jest.mock("../../utilities/telemetryClient", () => ({
+  appInsights: {
+    trackException: jest.fn(),
+    trackTrace: jest.fn(),
+    trackEvent: jest.fn(),
+  },
+  TelemetryExceptions: {
+    BoardsNotFoundForTeam: "BoardsNotFoundForTeam",
+  },
+}));
 
 jest.mock("../dataService", () => ({
   createDocument: jest.fn(),
@@ -98,6 +110,24 @@ describe("BoardDataService - getBoardsForTeam", () => {
     const result = await BoardDataService.getBoardsForTeam("team-123");
     expect(result).toEqual([]);
   });
+
+  it("should track trace when DocumentCollectionDoesNotExistException occurs", async () => {
+    const documentCollectionError = {
+      serverError: { typeKey: "DocumentCollectionDoesNotExistException" },
+    };
+    (readDocuments as jest.Mock).mockRejectedValue(documentCollectionError);
+
+    const result = await BoardDataService.getBoardsForTeam("team-123");
+
+    expect(result).toEqual([]);
+    expect(appInsights.trackException).toHaveBeenCalledWith(documentCollectionError);
+    expect(appInsights.trackTrace).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.any(String),
+        properties: expect.objectContaining({ teamId: "team-123" }),
+      }),
+    );
+  });
 });
 
 describe("BoardDataService - deleteFeedbackBoard", () => {
@@ -191,6 +221,18 @@ describe("BoardDataService - restoreArchivedFeedbackBoard", () => {
     expect(result.isArchived).toBe(false);
     expect(result.archivedDate).toBeUndefined();
     expect(updateDocument).toHaveBeenCalled();
+  });
+
+  it("should return undefined when board does not exist", async () => {
+    (readDocument as jest.Mock).mockResolvedValue(null);
+
+    const consoleSpy = jest.spyOn(console, "log").mockImplementation();
+    const result = await BoardDataService.restoreArchivedFeedbackBoard("team-123", "non-existent-board");
+
+    expect(result).toBeUndefined();
+    expect(consoleSpy).toHaveBeenCalledWith("Cannot restore for a non-existent feedback board. Board: non-existent-board");
+    expect(updateDocument).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 });
 
