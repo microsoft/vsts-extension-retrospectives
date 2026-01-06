@@ -118,6 +118,7 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
           }}
           onClick={this.showWorkItemForm}
         >
+          {workItemState?.color?.toLowerCase()}
           {systemTitle}
         </div>
         {!this.props.areActionIconsHidden && (

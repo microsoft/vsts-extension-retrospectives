@@ -151,7 +151,7 @@ describe("UI-level integration tests for ActionItem", () => {
     expect(container.firstChild).toBeTruthy();
   });
 
-  it("applies resolved class when work item state is Completed", () => {
+  it("applies completed class when work item state is Completed", () => {
     const modifiedProps = {
       ...defaultTestProps,
       actionItem: {
@@ -164,8 +164,8 @@ describe("UI-level integration tests for ActionItem", () => {
       allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Completed", category: "Completed", color: "blue" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
-    const resolvedElement = container.querySelector(".resolved");
-    expect(resolvedElement).toBeTruthy();
+    const completedElement = container.querySelector(".completed");
+    expect(completedElement).toBeTruthy();
   });
 
   it("calls onUpdateActionItem when confirming unlink", async () => {
