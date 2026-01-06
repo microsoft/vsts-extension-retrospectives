@@ -151,7 +151,7 @@ describe("UI-level integration tests for ActionItem", () => {
     expect(container.firstChild).toBeTruthy();
   });
 
-  it("applies completed class when work item state is Completed", () => {
+  it("applies border color when work item state is Completed", () => {
     const modifiedProps = {
       ...defaultTestProps,
       actionItem: {
@@ -164,8 +164,8 @@ describe("UI-level integration tests for ActionItem", () => {
       allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Completed", category: "Completed", color: "blue" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
-    const completedElement = container.querySelector(".completed");
-    expect(completedElement).toBeTruthy();
+    const cardElement = container.querySelector(".related-task-sub-card") as HTMLElement;
+    expect(cardElement?.style.borderRightColor).toBe("blue");
   });
 
   it("calls onUpdateActionItem when confirming unlink", async () => {
@@ -257,7 +257,7 @@ describe("UI-level integration tests for ActionItem", () => {
     });
   });
 
-  it("renders with Resolved state category and applies resolved class", () => {
+  it("renders with Resolved state and applies border color", () => {
     const modifiedProps = {
       ...defaultTestProps,
       actionItem: {
@@ -270,11 +270,11 @@ describe("UI-level integration tests for ActionItem", () => {
       allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Resolved", category: "Resolved", color: "green" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
-    const resolvedElement = container.querySelector(".resolved");
-    expect(resolvedElement).toBeTruthy();
+    const cardElement = container.querySelector(".related-task-sub-card") as HTMLElement;
+    expect(cardElement?.style.borderRightColor).toBe("green");
   });
 
-  it("does not apply resolved class for active work items", () => {
+  it("applies border color for active work items", () => {
     const modifiedProps = {
       ...defaultTestProps,
       actionItem: {
@@ -287,8 +287,8 @@ describe("UI-level integration tests for ActionItem", () => {
       allWorkItemTypes: [{ ...defaultTestProps.allWorkItemTypes[0], states: [{ name: "Active", category: "InProgress", color: "blue" }] }],
     };
     const { container } = render(<ActionItem {...modifiedProps} />);
-    const resolvedElement = container.querySelector(".resolved");
-    expect(resolvedElement).toBeNull();
+    const cardElement = container.querySelector(".related-task-sub-card") as HTMLElement;
+    expect(cardElement?.style.borderRightColor).toBe("blue");
   });
 
   it("handles work item type with no states", () => {

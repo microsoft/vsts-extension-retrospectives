@@ -99,7 +99,7 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
     const systemTitle: string = this.props.actionItem.fields["System.Title"];
 
     return (
-      <div key={`${this.props.actionItem.id}card`} role="group" className={`related-task-sub-card ${workItemState?.category?.toLowerCase() ?? ""}`.trim()}>
+      <div key={`${this.props.actionItem.id}card`} role="group" className="related-task-sub-card" style={{ borderRightColor: workItemState?.color ?? null }}>
         <img className="work-item-type-icon" alt={`icon for work item type ${workItemType?.name}`} src={workItemType?.icon?.url} />
         <div
           ref={(element: HTMLElement) => {
@@ -111,7 +111,6 @@ export class ActionItem extends React.Component<ActionItemProps, ActionItemState
           role="button"
           title={this.props.actionItem.fields["System.Title"]}
           aria-label={`${this.props.actionItem.fields["System.WorkItemType"]} ${this.props.actionItem.fields["System.Title"]}, click to open work item`}
-          data-right-border-color={workItemState?.color ?? ""}
           onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
             if (e.key === "Enter") {
               this.showWorkItemForm(e);
