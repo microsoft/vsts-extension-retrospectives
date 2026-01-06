@@ -84,6 +84,16 @@ jest.mock("../../dal/dataService", () => ({
   deleteDocument: jest.fn().mockResolvedValue({}),
 }));
 
+jest.mock("../../utilities/localStorageHelper", () => ({
+  __esModule: true,
+  default: {
+    setIdValue: jest.fn(),
+    getIdValue: jest.fn().mockReturnValue("test-item-id"),
+  },
+}));
+
+import localStorageHelper from "../../utilities/localStorageHelper";
+
 (global as any).VSS = {
   getConfiguration: () => ({}),
   notifyLoadSucceeded: jest.fn(),
@@ -9814,7 +9824,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // Open the dialog
     (ref.current as any).setState({ isDeleteItemConfirmationDialogHidden: false });
-    
+
     const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
     card.focus();
 
@@ -9833,7 +9843,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // Open the move dialog
     (ref.current as any).setState({ isMoveFeedbackItemDialogHidden: false });
-    
+
     const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
     card.focus();
 
@@ -9852,7 +9862,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // Open the group dialog
     (ref.current as any).setState({ isGroupFeedbackItemDialogHidden: false });
-    
+
     const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
     card.focus();
 
@@ -9871,7 +9881,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // Open the remove from group dialog
     (ref.current as any).setState({ isRemoveFeedbackItemFromGroupConfirmationDialogHidden: false });
-    
+
     const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
     card.focus();
 
@@ -9889,14 +9899,14 @@ describe("FeedbackItem additional coverage (merged)", () => {
     await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
     const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
-    
+
     // Create a mock input element and add it to the card
     const input = document.createElement("input");
     input.className = "editable-text-input";
     card.appendChild(input);
 
     const focusSpy = jest.spyOn(input, "focus");
-    
+
     (ref.current as any).startEditingTitle();
 
     expect(focusSpy).toHaveBeenCalled();
@@ -9914,7 +9924,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // This should not throw
     (ref.current as any).startEditingTitle();
-    
+
     expect(true).toBe(true);
   });
 
@@ -9930,7 +9940,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // This should not throw
     (ref.current as any).focusCardControl("next");
-    
+
     expect(true).toBe(true);
   });
 
@@ -9948,7 +9958,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // This should not throw
     (ref.current as any).focusCardControl("next");
-    
+
     expect(true).toBe(true);
   });
 
@@ -9963,7 +9973,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     card.focus(); // Focus on card, not on a control
 
     (ref.current as any).focusCardControl("next");
-    
+
     // Should have focused on first card control
     expect(document.activeElement).toBeTruthy();
   });
@@ -9979,7 +9989,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     card.focus();
 
     (ref.current as any).focusCardControl("prev");
-    
+
     expect(document.activeElement).toBeTruthy();
   });
 
@@ -9992,7 +10002,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // This should not throw
     (ref.current as any).navigateToAdjacentCard("next");
-    
+
     expect(true).toBe(true);
   });
 
@@ -10005,7 +10015,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // Call with empty title and newlyCreated = false
     await (ref.current as any).onFeedbackItemDocumentCardTitleSave("item-id", "   ", false);
-    
+
     // Should return early without calling any service
     expect(true).toBe(true);
   });
@@ -10020,7 +10030,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     const mockUpdatedItem = { id: "updated-item" } as any;
     await (ref.current as any).onUpdateActionItem(mockUpdatedItem);
-    
+
     expect(refreshFeedbackItems).toHaveBeenCalledWith([mockUpdatedItem], true);
   });
 
@@ -10033,7 +10043,87 @@ describe("FeedbackItem additional coverage (merged)", () => {
     await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
     await (ref.current as any).onUpdateActionItem(null);
-    
+
     expect(refreshFeedbackItems).not.toHaveBeenCalled();
+  });
+
+  test("hideMobileFeedbackItemActionsDialog sets dialog to hidden", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Open the dialog first
+    (ref.current as any).setState({ isMobileFeedbackItemActionsDialogHidden: false });
+
+    // Then hide it
+    (ref.current as any).hideMobileFeedbackItemActionsDialog();
+
+    expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+  });
+
+  test("pressSearchedFeedbackItem handles Escape key", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Open the group dialog
+    (ref.current as any).setState({ isGroupFeedbackItemDialogHidden: false });
+
+    const mockEvent = {
+      key: "Escape",
+      stopPropagation: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLButtonElement>;
+
+    const mockFeedbackItemProps = {
+      id: "target-item",
+      boardId: props.boardId,
+      columnId: props.columnId,
+    };
+
+    (ref.current as any).pressSearchedFeedbackItem(mockEvent, mockFeedbackItemProps);
+
+    expect(mockEvent.stopPropagation).toHaveBeenCalled();
+    expect((ref.current as any).state.isGroupFeedbackItemDialogHidden).toBe(true);
+  });
+
+  test("dragFeedbackItemOverFeedbackItem prevents default when not being dragged", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`);
+    expect(card).toBeTruthy();
+
+    const mockEvent = {
+      preventDefault: jest.fn(),
+      stopPropagation: jest.fn(),
+      dataTransfer: { dropEffect: "" },
+    } as unknown as React.DragEvent<HTMLDivElement>;
+
+    (ref.current as any).dragFeedbackItemOverFeedbackItem(mockEvent);
+
+    expect(mockEvent.preventDefault).toHaveBeenCalled();
+    expect(mockEvent.stopPropagation).toHaveBeenCalled();
+  });
+
+  test("dragFeedbackItemEnd resets isBeingDragged state", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Set it to true first
+    (ref.current as any).setState({ isBeingDragged: true });
+
+    (ref.current as any).dragFeedbackItemEnd();
+
+    expect((ref.current as any).state.isBeingDragged).toBe(false);
   });
 });

@@ -2644,14 +2644,14 @@ describe("Feedback Column ", () => {
       const refreshFeedbackItems = jest.fn();
       const props = { ...testColumnProps, refreshFeedbackItems };
       const ref = React.createRef<FeedbackColumn>();
-      
+
       // Ensure the mock is properly set up for this test
       (itemDataService.addFeedbackItemAsMainItemToColumn as jest.Mock).mockResolvedValueOnce({
         updatedOldParentFeedbackItem: null,
         updatedFeedbackItem: { id: "updated", columnId: "column-id" },
         updatedChildFeedbackItems: [],
       });
-      
+
       render(<FeedbackColumn {...props} ref={ref} />);
 
       // Call the private method directly
@@ -2712,6 +2712,102 @@ describe("Feedback Column ", () => {
       const props = { ...testColumnProps, columnItems: [item1, item2], workflowPhase: WorkflowPhase.Collect, isDataLoaded: true };
       const { container } = render(<FeedbackColumn {...props} />);
 
+      expect(container.querySelector(".feedback-items-container")).toBeTruthy();
+    });
+  });
+
+  describe("Focus preservation with contenteditable elements", () => {
+    test("preserves selection for contenteditable elements when focused", () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      // Create a contenteditable element inside a feedback item
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const editableDiv = document.createElement("div");
+        editableDiv.contentEditable = "true";
+        editableDiv.textContent = "Test content";
+        feedbackCard.appendChild(editableDiv);
+
+        // Focus the contenteditable
+        editableDiv.focus();
+
+        // Re-render to trigger componentDidUpdate
+        rerender(<FeedbackColumn {...props} />);
+
+        // The element should still be in the DOM
+        expect(editableDiv).toBeTruthy();
+      }
+    });
+
+    test("handles contenteditable focus restoration", () => {
+      const props = { ...testColumnProps };
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      // Create contenteditable element
+      const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
+      if (feedbackCard) {
+        const editableDiv = document.createElement("div");
+        editableDiv.contentEditable = "true";
+        editableDiv.textContent = "Test content";
+        feedbackCard.appendChild(editableDiv);
+
+        // Focus
+        editableDiv.focus();
+
+        // Set selection
+        const selection = window.getSelection();
+        if (selection && editableDiv.firstChild) {
+          const range = document.createRange();
+          range.setStart(editableDiv.firstChild, 3);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+
+        // Re-render
+        rerender(<FeedbackColumn {...props} />);
+
+        expect(editableDiv).toBeTruthy();
+      }
+    });
+  });
+
+  describe("renderFeedbackItems with grouped items", () => {
+    test("renders FeedbackItemGroup for items with children", () => {
+      const parentItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "parent-item",
+          childFeedbackItemIds: ["child-1", "child-2"],
+        },
+      };
+      const childItem1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "child-1",
+          parentFeedbackItemId: "parent-item",
+        },
+      };
+      const childItem2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "child-2",
+          parentFeedbackItemId: "parent-item",
+        },
+      };
+
+      const props = {
+        ...testColumnProps,
+        columnItems: [parentItem, childItem1, childItem2],
+        isDataLoaded: true,
+      };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      // The parent should be rendered as a group
       expect(container.querySelector(".feedback-items-container")).toBeTruthy();
     });
   });

@@ -2389,7 +2389,7 @@ describe("FeedbackBoard Component", () => {
       });
 
       const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
-      
+
       if (columnProps?.onVoteCasted) {
         columnProps.onVoteCasted();
         expect(onVoteCasted).toHaveBeenCalled();
@@ -2408,7 +2408,7 @@ describe("FeedbackBoard Component", () => {
       });
 
       const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
-      
+
       // Call onVoteCasted - should not throw even when prop is undefined
       if (columnProps?.onVoteCasted) {
         expect(() => columnProps.onVoteCasted()).not.toThrow();
