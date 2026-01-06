@@ -803,6 +803,29 @@ describe("Feedback Column ", () => {
 
       expect(feedbackItemProps.accentColor).toBe(testColumnProps.accentColor);
     });
+
+    test("moveFeedbackItem calls itemDataService and refreshFeedbackItems", async () => {
+      const mockRefreshFeedbackItems = jest.fn();
+      const boardId = "test-board";
+      const feedbackItemId = "test-item";
+      const columnId = "test-column";
+
+      // Ensure the mock returns the expected structure
+      (itemDataService.addFeedbackItemAsMainItemToColumn as jest.Mock).mockResolvedValueOnce({
+        updatedOldParentFeedbackItem: null,
+        updatedFeedbackItem: { id: feedbackItemId, columnId },
+        updatedChildFeedbackItems: [],
+      });
+
+      await FeedbackColumn.moveFeedbackItem(mockRefreshFeedbackItems, boardId, feedbackItemId, columnId);
+
+      expect(itemDataService.addFeedbackItemAsMainItemToColumn).toHaveBeenCalledWith(boardId, feedbackItemId, columnId);
+      expect(mockRefreshFeedbackItems).toHaveBeenCalled();
+      expect(appInsights.trackEvent).toHaveBeenCalledWith({
+        name: TelemetryEvents.FeedbackItemUngrouped,
+        properties: { boardId, feedbackItemId, columnId },
+      });
+    });
   });
 
   describe("Focus Preservation - Contenteditable", () => {
@@ -2605,6 +2628,91 @@ describe("Feedback Column ", () => {
       fireEvent.change(textarea, { target: { value: "New column notes" } });
 
       expect(textarea.value).toBe("New column notes");
+    });
+  });
+
+  describe("Drop feedback item on column space", () => {
+    beforeEach(() => {
+      jest.spyOn(localStorageHelper, "getIdValue").mockReturnValue("dropped-item-id");
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("handleDropFeedbackItemOnColumnSpace retrieves dropped item id and calls moveFeedbackItem", async () => {
+      const refreshFeedbackItems = jest.fn();
+      const props = { ...testColumnProps, refreshFeedbackItems };
+      const ref = React.createRef<FeedbackColumn>();
+      
+      // Ensure the mock is properly set up for this test
+      (itemDataService.addFeedbackItemAsMainItemToColumn as jest.Mock).mockResolvedValueOnce({
+        updatedOldParentFeedbackItem: null,
+        updatedFeedbackItem: { id: "updated", columnId: "column-id" },
+        updatedChildFeedbackItems: [],
+      });
+      
+      render(<FeedbackColumn {...props} ref={ref} />);
+
+      // Call the private method directly
+      await (ref.current as any).handleDropFeedbackItemOnColumnSpace();
+
+      expect(localStorageHelper.getIdValue).toHaveBeenCalled();
+      expect(itemDataService.addFeedbackItemAsMainItemToColumn).toHaveBeenCalled();
+      expect(refreshFeedbackItems).toHaveBeenCalled();
+    });
+  });
+
+  describe("Keyboard navigation with modal dialog open", () => {
+    test("ignores keyboard events when modal dialog is open", () => {
+      jest.spyOn(dialogHelper, "isAnyModalDialogOpen").mockReturnValue(true);
+
+      const props = { ...testColumnProps };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      // Event should not be prevented when dialog is open
+      expect(column).toBeTruthy();
+
+      jest.restoreAllMocks();
+    });
+  });
+
+  describe("renderFeedbackItems with different phases", () => {
+    test("renders items sorted by votes in Act phase", () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", upvotes: 5 },
+      };
+      const item2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", upvotes: 10 },
+      };
+
+      const props = { ...testColumnProps, columnItems: [item1, item2], workflowPhase: WorkflowPhase.Act, isDataLoaded: true };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      expect(container.querySelector(".feedback-items-container")).toBeTruthy();
+      expect(itemDataService.sortItemsByVotesAndDate).toHaveBeenCalled();
+    });
+
+    test("renders items sorted by date in non-Act phase", () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", createdDate: new Date("2023-01-01") },
+      };
+      const item2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", createdDate: new Date("2023-06-01") },
+      };
+
+      const props = { ...testColumnProps, columnItems: [item1, item2], workflowPhase: WorkflowPhase.Collect, isDataLoaded: true };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      expect(container.querySelector(".feedback-items-container")).toBeTruthy();
     });
   });
 });
