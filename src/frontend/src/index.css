@@ -1164,7 +1164,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-items-container {
-  @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-7 overflow-hidden w-full h-full box-border;
+  @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-7 overflow-hidden w-full box-border;
 
   & > div {
     @apply contents;
