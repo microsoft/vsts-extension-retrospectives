@@ -248,10 +248,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     });
   };
 
-  private closeKeyboardShortcutsDialog = () => {
-    this.setState({ isKeyboardShortcutsDialogOpen: false });
-  };
-
   public async componentWillUnmount() {
     reflectBackendService.removeOnReceiveNewItem(this.receiveNewItemHandler);
     reflectBackendService.removeOnReceiveUpdatedItem(this.receiveUpdatedItemHandler);
@@ -262,6 +258,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     const canCurrentUserEditBoard = this.props.board.createdBy?.id === this.props.userId;
 
     return this.state.columnIds.map((columnId, index) => {
+      console.error(this.state.columns[columnId].columnProperties.iconClass);
       return {
         key: columnId,
         ref: this.columnRefs[index],
