@@ -248,10 +248,6 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
     });
   };
 
-  private closeKeyboardShortcutsDialog = () => {
-    this.setState({ isKeyboardShortcutsDialogOpen: false });
-  };
-
   public async componentWillUnmount() {
     reflectBackendService.removeOnReceiveNewItem(this.receiveNewItemHandler);
     reflectBackendService.removeOnReceiveUpdatedItem(this.receiveUpdatedItemHandler);
