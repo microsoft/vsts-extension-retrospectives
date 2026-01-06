@@ -829,7 +829,7 @@ describe("Action Item Display component", () => {
     });
 
     const menu = container.querySelector(".popout-container") as HTMLElement;
-    
+
     // Click inside the menu - should not close it
     fireEvent.pointerDown(menu);
 

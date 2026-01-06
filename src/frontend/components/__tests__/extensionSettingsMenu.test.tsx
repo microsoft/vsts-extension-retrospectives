@@ -785,4 +785,142 @@ describe("ExtensionSettingsMenu", () => {
       expect(container.querySelector("details[open]")).toBeInTheDocument();
     });
   });
+
+  describe("Dialog button handlers", () => {
+    it("opens Prime Directive dialog when clicking Prime Directive button", () => {
+      render(<ExtensionSettingsMenu />);
+      const primeDirectiveButton = screen.getByTitle("Prime Directive");
+
+      fireEvent.click(primeDirectiveButton);
+
+      expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
+    });
+
+    it("closes Prime Directive dialog when clicking close button", () => {
+      const { container } = render(<ExtensionSettingsMenu />);
+      const primeDirectiveButton = screen.getByTitle("Prime Directive");
+
+      fireEvent.click(primeDirectiveButton);
+
+      const dialog = container.querySelector(".prime-directive-dialog") as HTMLDialogElement;
+      expect(dialog.open).toBe(true);
+
+      const closeButton = dialog.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+      fireEvent.click(closeButton);
+
+      expect(dialog.open).toBe(false);
+    });
+
+    it("opens What's New dialog from help menu", () => {
+      const { container } = render(<ExtensionSettingsMenu />);
+
+      // Open the Help menu
+      const helpButton = screen.getByTitle("Retrospective Help");
+      fireEvent.click(helpButton);
+
+      // Click What's new button in the callout menu
+      const calloutMenu = container.querySelector("details[open] .callout-menu");
+      const whatsNewButton = calloutMenu?.querySelector("button");
+      expect(whatsNewButton).toBeTruthy();
+      fireEvent.click(whatsNewButton!);
+
+      const dialog = container.querySelector(".whats-new-dialog") as HTMLDialogElement;
+      expect(dialog.open).toBe(true);
+    });
+
+    it("opens Keyboard shortcuts dialog from help menu", () => {
+      const { container } = render(<ExtensionSettingsMenu />);
+
+      // Open the Help menu
+      const helpButton = screen.getByTitle("Retrospective Help");
+      fireEvent.click(helpButton);
+
+      // Click Keyboard shortcuts button - second button in help menu
+      const calloutMenu = container.querySelector("details[open] .callout-menu");
+      const buttons = calloutMenu?.querySelectorAll("button");
+      const keyboardButton = buttons?.[1]; // Second button
+      expect(keyboardButton).toBeTruthy();
+      fireEvent.click(keyboardButton!);
+
+      const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+      expect(dialog.open).toBe(true);
+    });
+
+    it("opens User guide dialog from help menu", () => {
+      const { container } = render(<ExtensionSettingsMenu />);
+
+      // Open the Help menu
+      const helpButton = screen.getByTitle("Retrospective Help");
+      fireEvent.click(helpButton);
+
+      // Click User guide button - third button in help menu
+      const calloutMenu = container.querySelector("details[open] .callout-menu");
+      const buttons = calloutMenu?.querySelectorAll("button");
+      const userGuideButton = buttons?.[2]; // Third button
+      expect(userGuideButton).toBeTruthy();
+      fireEvent.click(userGuideButton!);
+
+      const dialog = container.querySelector(".user-guide-dialog") as HTMLDialogElement;
+      expect(dialog.open).toBe(true);
+    });
+
+    it("opens Volunteer dialog from help menu", () => {
+      const { container } = render(<ExtensionSettingsMenu />);
+
+      // Open the Help menu
+      const helpButton = screen.getByTitle("Retrospective Help");
+      fireEvent.click(helpButton);
+
+      // Click Volunteer button - fourth button in help menu
+      const calloutMenu = container.querySelector("details[open] .callout-menu");
+      const buttons = calloutMenu?.querySelectorAll("button");
+      const volunteerButton = buttons?.[3]; // Fourth button
+      expect(volunteerButton).toBeTruthy();
+      fireEvent.click(volunteerButton!);
+
+      const dialog = container.querySelector(".volunteer-dialog") as HTMLDialogElement;
+      expect(dialog.open).toBe(true);
+    });
+
+    it("opens Contact us link in new window", () => {
+      const windowOpenSpy = jest.spyOn(window, "open").mockImplementation(() => null);
+
+      const { container } = render(<ExtensionSettingsMenu />);
+
+      // Open the Help menu
+      const helpButton = screen.getByTitle("Retrospective Help");
+      fireEvent.click(helpButton);
+
+      // Click Contact us button - fifth button in help menu
+      const calloutMenu = container.querySelector("details[open] .callout-menu");
+      const buttons = calloutMenu?.querySelectorAll("button");
+      const contactButton = buttons?.[4]; // Fifth button
+      expect(contactButton).toBeTruthy();
+      fireEvent.click(contactButton!);
+
+      expect(windowOpenSpy).toHaveBeenCalledWith("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank");
+
+      windowOpenSpy.mockRestore();
+    });
+
+    it("closes dialogs using the Close button", () => {
+      const { container } = render(<ExtensionSettingsMenu />);
+
+      // Open Prime Directive dialog
+      const primeDirectiveButton = screen.getByTitle("Prime Directive");
+      fireEvent.click(primeDirectiveButton);
+
+      const dialog = container.querySelector(".prime-directive-dialog") as HTMLDialogElement;
+      expect(dialog.open).toBe(true);
+
+      // Find and click the default Close button
+      const closeButtons = dialog.querySelectorAll("button.default.button");
+      const closeButton = Array.from(closeButtons).find(btn => btn.textContent === "Close");
+      expect(closeButton).toBeTruthy();
+
+      fireEvent.click(closeButton!);
+
+      expect(dialog.open).toBe(false);
+    });
+  });
 });

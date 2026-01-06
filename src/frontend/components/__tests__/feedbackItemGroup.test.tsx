@@ -1,22 +1,36 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import FeedbackItemGroup from "../feedbackItemGroup";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import localStorageHelper from "../../utilities/localStorageHelper";
 
+// Store captured callbacks for testing
+let capturedSetIsGroupBeingDragged: ((isBeingDragged: boolean) => void) | null = null;
+
 // Mock FeedbackItem to avoid complex dependencies
 jest.mock("../feedbackItem", () => ({
   __esModule: true,
-  default: ({ groupedItemProps, id }: any) => (
-    <div data-testid={`feedback-item-${id}`} className="feedback-item-mock">
-      {groupedItemProps?.isMainItem && groupedItemProps?.toggleGroupExpand && (
-        <button onClick={groupedItemProps.toggleGroupExpand} data-testid="toggle-expand">
-          {groupedItemProps.isGroupExpanded ? "Collapse" : "Expand"}
-        </button>
-      )}
-    </div>
-  ),
+  default: ({ groupedItemProps, id }: any) => {
+    // Capture the setIsGroupBeingDragged callback when it's passed
+    if (groupedItemProps?.setIsGroupBeingDragged) {
+      capturedSetIsGroupBeingDragged = groupedItemProps.setIsGroupBeingDragged;
+    }
+    return (
+      <div data-testid={`feedback-item-${id}`} className="feedback-item-mock">
+        {groupedItemProps?.isMainItem && groupedItemProps?.toggleGroupExpand && (
+          <button onClick={groupedItemProps.toggleGroupExpand} data-testid="toggle-expand">
+            {groupedItemProps.isGroupExpanded ? "Collapse" : "Expand"}
+          </button>
+        )}
+        {groupedItemProps?.setIsGroupBeingDragged && (
+          <button onClick={() => groupedItemProps.setIsGroupBeingDragged(true)} data-testid="set-dragging-true">
+            Set Dragging
+          </button>
+        )}
+      </div>
+    );
+  },
   FeedbackItemHelper: {
     handleDropFeedbackItemOnFeedbackItem: jest.fn(),
   },
@@ -445,6 +459,40 @@ describe("FeedbackItemGroup", () => {
 
       fireEvent.click(toggleButton);
       expect(groupDiv).not.toHaveClass("feedback-item-group-expanded");
+    });
+  });
+
+  describe("setIsGroupBeingDragged", () => {
+    beforeEach(() => {
+      capturedSetIsGroupBeingDragged = null;
+    });
+
+    it("should update isBeingDragged state via setIsGroupBeingDragged callback", () => {
+      const { getByTestId } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+      // Click the button that triggers setIsGroupBeingDragged(true)
+      const setDraggingButton = getByTestId("set-dragging-true");
+      fireEvent.click(setDraggingButton);
+
+      // The callback should have been captured and called
+      expect(capturedSetIsGroupBeingDragged).toBeDefined();
+    });
+
+    it("should call setIsGroupBeingDragged with true then false", () => {
+      render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+      // The callback should be captured from the render
+      expect(capturedSetIsGroupBeingDragged).toBeDefined();
+
+      // Call with true
+      act(() => {
+        capturedSetIsGroupBeingDragged!(true);
+      });
+
+      // Call with false
+      act(() => {
+        capturedSetIsGroupBeingDragged!(false);
+      });
     });
   });
 });

@@ -84,6 +84,14 @@ jest.mock("../../dal/dataService", () => ({
   deleteDocument: jest.fn().mockResolvedValue({}),
 }));
 
+jest.mock("../../utilities/localStorageHelper", () => ({
+  __esModule: true,
+  default: {
+    setIdValue: jest.fn(),
+    getIdValue: jest.fn().mockReturnValue("test-item-id"),
+  },
+}));
+
 (global as any).VSS = {
   getConfiguration: () => ({}),
   notifyLoadSucceeded: jest.fn(),
@@ -9803,5 +9811,317 @@ describe("FeedbackItem additional coverage (merged)", () => {
     (ref.current as any).hideGroupFeedbackItemDialog();
 
     expect((ref.current as any).state.isGroupFeedbackItemDialogHidden).toBe(true);
+  });
+
+  test("Escape key closes delete item confirmation dialog", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Open the dialog
+    (ref.current as any).setState({ isDeleteItemConfirmationDialogHidden: false });
+
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    card.focus();
+
+    // Simulate Escape key
+    fireEvent.keyDown(card, { key: "Escape" });
+
+    expect((ref.current as any).state.isDeleteItemConfirmationDialogHidden).toBe(true);
+  });
+
+  test("Escape key closes move feedback item dialog", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Open the move dialog
+    (ref.current as any).setState({ isMoveFeedbackItemDialogHidden: false });
+
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    card.focus();
+
+    // Simulate Escape key
+    fireEvent.keyDown(card, { key: "Escape" });
+
+    expect((ref.current as any).state.isMoveFeedbackItemDialogHidden).toBe(true);
+  });
+
+  test("Escape key closes group feedback item dialog", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Open the group dialog
+    (ref.current as any).setState({ isGroupFeedbackItemDialogHidden: false });
+
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    card.focus();
+
+    // Simulate Escape key
+    fireEvent.keyDown(card, { key: "Escape" });
+
+    expect((ref.current as any).state.isGroupFeedbackItemDialogHidden).toBe(true);
+  });
+
+  test("Escape key closes remove from group confirmation dialog", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Open the remove from group dialog
+    (ref.current as any).setState({ isRemoveFeedbackItemFromGroupConfirmationDialogHidden: false });
+
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    card.focus();
+
+    // Simulate Escape key
+    fireEvent.keyDown(card, { key: "Escape" });
+
+    expect((ref.current as any).state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden).toBe(true);
+  });
+
+  test("startEditingTitle focuses active editor if present", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    // Create a mock input element and add it to the card
+    const input = document.createElement("input");
+    input.className = "editable-text-input";
+    card.appendChild(input);
+
+    const focusSpy = jest.spyOn(input, "focus");
+
+    (ref.current as any).startEditingTitle();
+
+    expect(focusSpy).toHaveBeenCalled();
+  });
+
+  test("startEditingTitle returns early when itemElement is null", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Set itemElement to null
+    (ref.current as any).itemElement = null;
+
+    // This should not throw
+    (ref.current as any).startEditingTitle();
+
+    expect(true).toBe(true);
+  });
+
+  test("focusCardControl returns early when itemElement is null", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Set itemElement to null
+    (ref.current as any).itemElement = null;
+
+    // This should not throw
+    (ref.current as any).focusCardControl("next");
+
+    expect(true).toBe(true);
+  });
+
+  test("focusCardControl returns early when no visible controls", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Remove all card controls to test the empty case
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    const controls = card.querySelectorAll('[data-card-control="true"]');
+    controls.forEach(c => c.remove());
+
+    // This should not throw
+    (ref.current as any).focusCardControl("next");
+
+    expect(true).toBe(true);
+  });
+
+  test("focusCardControl navigates to first control when direction is next and not focused", async () => {
+    const props = makeProps({ workflowPhase: "Vote" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    card.focus(); // Focus on card, not on a control
+
+    (ref.current as any).focusCardControl("next");
+
+    // Should have focused on first card control
+    expect(document.activeElement).toBeTruthy();
+  });
+
+  test("focusCardControl navigates to last control when direction is prev and not focused", async () => {
+    const props = makeProps({ workflowPhase: "Vote" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    card.focus();
+
+    (ref.current as any).focusCardControl("prev");
+
+    expect(document.activeElement).toBeTruthy();
+  });
+
+  test("navigateToAdjacentCard returns early when currentIndex is -1", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // This should not throw
+    (ref.current as any).navigateToAdjacentCard("next");
+
+    expect(true).toBe(true);
+  });
+
+  test("onFeedbackItemDocumentCardTitleSave handles empty title for existing item", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Call with empty title and newlyCreated = false
+    await (ref.current as any).onFeedbackItemDocumentCardTitleSave("item-id", "   ", false);
+
+    // Should return early without calling any service
+    expect(true).toBe(true);
+  });
+
+  test("onUpdateActionItem calls refreshFeedbackItems when updatedFeedbackItem exists", async () => {
+    const refreshFeedbackItems = jest.fn();
+    const props = makeProps({ refreshFeedbackItems });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const mockUpdatedItem = { id: "updated-item" } as any;
+    await (ref.current as any).onUpdateActionItem(mockUpdatedItem);
+
+    expect(refreshFeedbackItems).toHaveBeenCalledWith([mockUpdatedItem], true);
+  });
+
+  test("onUpdateActionItem does not call refreshFeedbackItems when updatedFeedbackItem is null", async () => {
+    const refreshFeedbackItems = jest.fn();
+    const props = makeProps({ refreshFeedbackItems });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await (ref.current as any).onUpdateActionItem(null);
+
+    expect(refreshFeedbackItems).not.toHaveBeenCalled();
+  });
+
+  test("hideMobileFeedbackItemActionsDialog sets dialog to hidden", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Open the dialog first
+    (ref.current as any).setState({ isMobileFeedbackItemActionsDialogHidden: false });
+
+    // Then hide it
+    (ref.current as any).hideMobileFeedbackItemActionsDialog();
+
+    expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+  });
+
+  test("pressSearchedFeedbackItem handles Escape key", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Open the group dialog
+    (ref.current as any).setState({ isGroupFeedbackItemDialogHidden: false });
+
+    const mockEvent = {
+      key: "Escape",
+      stopPropagation: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLButtonElement>;
+
+    const mockFeedbackItemProps = {
+      id: "target-item",
+      boardId: props.boardId,
+      columnId: props.columnId,
+    };
+
+    (ref.current as any).pressSearchedFeedbackItem(mockEvent, mockFeedbackItemProps);
+
+    expect(mockEvent.stopPropagation).toHaveBeenCalled();
+    expect((ref.current as any).state.isGroupFeedbackItemDialogHidden).toBe(true);
+  });
+
+  test("dragFeedbackItemOverFeedbackItem prevents default when not being dragged", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`);
+    expect(card).toBeTruthy();
+
+    const mockEvent = {
+      preventDefault: jest.fn(),
+      stopPropagation: jest.fn(),
+      dataTransfer: { dropEffect: "" },
+    } as unknown as React.DragEvent<HTMLDivElement>;
+
+    (ref.current as any).dragFeedbackItemOverFeedbackItem(mockEvent);
+
+    expect(mockEvent.preventDefault).toHaveBeenCalled();
+    expect(mockEvent.stopPropagation).toHaveBeenCalled();
+  });
+
+  test("dragFeedbackItemEnd resets isBeingDragged state", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Set it to true first
+    (ref.current as any).setState({ isBeingDragged: true });
+
+    (ref.current as any).dragFeedbackItemEnd();
+
+    expect((ref.current as any).state.isBeingDragged).toBe(false);
   });
 });

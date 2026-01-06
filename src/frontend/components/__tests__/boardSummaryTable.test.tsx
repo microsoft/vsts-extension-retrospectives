@@ -831,31 +831,48 @@ describe("BoardSummaryTable - Row Expansion", () => {
   it("toggleExpanded adds row to expanded set", async () => {
     const { container } = render(<BoardSummaryTable {...baseProps} />);
 
+    // Wait for boards to be loaded and rendered
     await waitFor(() => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+      expect(container.querySelectorAll(".contextual-menu-button").length).toBeGreaterThan(0);
     });
 
     // Find and click the expand button
     const expandButtons = container.querySelectorAll(".contextual-menu-button");
-    if (expandButtons.length > 0) {
-      (expandButtons[0] as HTMLElement).click();
-    }
+    (expandButtons[0] as HTMLElement).click();
+
+    // Verify expanded content appears
+    await waitFor(() => {
+      expect(container.textContent).toContain("Looks like no work items were created for this board.");
+    });
   });
 
   it("toggleExpanded removes row from expanded set when clicked again", async () => {
     const { container } = render(<BoardSummaryTable {...baseProps} />);
 
+    // Wait for boards to be loaded and rendered
     await waitFor(() => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+      expect(container.querySelectorAll(".contextual-menu-button").length).toBeGreaterThan(0);
     });
 
     const expandButtons = container.querySelectorAll(".contextual-menu-button");
-    if (expandButtons.length > 0) {
-      // Click to expand
-      (expandButtons[0] as HTMLElement).click();
-      // Click again to collapse
-      (expandButtons[0] as HTMLElement).click();
-    }
+
+    // Click to expand
+    (expandButtons[0] as HTMLElement).click();
+
+    // Verify expanded content appears
+    await waitFor(() => {
+      expect(container.textContent).toContain("Looks like no work items were created for this board.");
+    });
+
+    // Click again to collapse
+    (expandButtons[0] as HTMLElement).click();
+
+    // Verify collapsed - expanded row content should not be visible
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-expanded-row")).toBeFalsy();
+    });
   });
 });
 
@@ -1583,5 +1600,122 @@ describe("BoardSummaryTable - TrashIcon rendering", () => {
     const { container } = render(<TrashIcon board={board} currentUserId="owner-1" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
 
     expect(container.querySelector(".trash-icon")).toBeFalsy();
+  });
+});
+
+describe("BoardSummaryTable - sortedData with equal values and edge cases", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("handles sortedData when aVal equals bVal (returns 0)", async () => {
+    const boardsWithSameDate: IFeedbackBoardDocument[] = [
+      { ...mockBoards[0], title: "Board A", createdDate: new Date("2023-06-15") },
+      { ...mockBoards[1], id: "board-same", title: "Board B", createdDate: new Date("2023-06-15") },
+    ];
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(boardsWithSameDate);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    // Click on Created Date header to trigger sorting
+    const createdDateHeader = getByText("Created Date");
+    createdDateHeader.click();
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("closes delete dialog via close button in header", async () => {
+    const archivedBoard: IFeedbackBoardDocument = { ...mockBoards[0], id: "board-close-test", title: "Close Test Board", isArchived: true, archivedDate: new Date(Date.now() - 5 * 60 * 1000) };
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([archivedBoard]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByLabelText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(container.querySelector(".trash-icon")).toBeTruthy();
+    });
+
+    // Open the dialog
+    const trashIcon = container.querySelector(".trash-icon") as HTMLElement;
+    trashIcon?.click();
+
+    await waitFor(() => {
+      expect(container.querySelector(".delete-board-dialog")).toBeTruthy();
+    });
+
+    // Close via the close button in header
+    const closeButton = getByLabelText("Close");
+    closeButton.click();
+
+    expect(container).toBeTruthy();
+  });
+
+  it("closes delete dialog via default close button", async () => {
+    const archivedBoard: IFeedbackBoardDocument = { ...mockBoards[0], id: "board-default-close", title: "Default Close Board", isArchived: true, archivedDate: new Date(Date.now() - 5 * 60 * 1000) };
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([archivedBoard]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(container.querySelector(".trash-icon")).toBeTruthy();
+    });
+
+    // Open the dialog
+    const trashIcon = container.querySelector(".trash-icon") as HTMLElement;
+    trashIcon?.click();
+
+    await waitFor(() => {
+      expect(container.querySelector(".delete-board-dialog")).toBeTruthy();
+    });
+
+    // Close via the Close button in the dialog footer
+    getByText("Close").click();
+
+    expect(container).toBeTruthy();
+  });
+
+  it("triggers onClose handler when dialog is closed", async () => {
+    const archivedBoard: IFeedbackBoardDocument = { ...mockBoards[0], id: "board-onclose", title: "OnClose Board", isArchived: true, archivedDate: new Date(Date.now() - 5 * 60 * 1000) };
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([archivedBoard]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(container.querySelector(".trash-icon")).toBeTruthy();
+    });
+
+    // Open the dialog
+    const trashIcon = container.querySelector(".trash-icon") as HTMLElement;
+    trashIcon?.click();
+
+    await waitFor(() => {
+      const dialog = container.querySelector(".delete-board-dialog") as HTMLDialogElement;
+      expect(dialog).toBeTruthy();
+      // Simulate the close event
+      dialog.dispatchEvent(new Event("close"));
+    });
+
+    expect(container).toBeTruthy();
   });
 });

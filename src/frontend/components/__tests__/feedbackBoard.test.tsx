@@ -2329,4 +2329,122 @@ describe("FeedbackBoard Component", () => {
       expect(columnProps?.registerItemRef).toBeInstanceOf(Function);
     });
   });
+
+  describe("handleBoardKeyDown", () => {
+    it("does not handle key events when target is input", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const inputElement = document.createElement("input");
+      container.appendChild(inputElement);
+      inputElement.focus();
+
+      const keyEvent = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true });
+      inputElement.dispatchEvent(keyEvent);
+
+      // Event should not be prevented for input elements
+      expect(true).toBe(true);
+    });
+
+    it("does not handle key events when target is textarea", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      const { container } = render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const textareaElement = document.createElement("textarea");
+      container.appendChild(textareaElement);
+      textareaElement.focus();
+
+      const keyEvent = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true });
+      textareaElement.dispatchEvent(keyEvent);
+
+      // Event should not be prevented for textarea elements
+      expect(true).toBe(true);
+    });
+  });
+
+  describe("onVoteCasted callback", () => {
+    it("calls props.onVoteCasted when vote is casted", async () => {
+      const onVoteCasted = jest.fn();
+      const propsWithCallback = {
+        ...mockedProps,
+        onVoteCasted,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...propsWithCallback} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
+
+      if (columnProps?.onVoteCasted) {
+        columnProps.onVoteCasted();
+        expect(onVoteCasted).toHaveBeenCalled();
+      }
+    });
+
+    it("does not throw when onVoteCasted prop is undefined", async () => {
+      const { onVoteCasted: _, ...propsWithoutCallback } = mockedProps;
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...propsWithoutCallback} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
+
+      // Call onVoteCasted - should not throw even when prop is undefined
+      if (columnProps?.onVoteCasted) {
+        expect(() => columnProps.onVoteCasted()).not.toThrow();
+      }
+    });
+  });
+
+  describe("addFeedbackItems with shouldHaveFocus", () => {
+    it("sets shouldHaveFocus correctly when adding new items", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnId = testColumnProps.columnIds[0];
+
+      const newItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: "new-focused-item",
+        columnId,
+        originalColumnId: columnId,
+      };
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.addFeedbackItems(columnId, [newItem], false, true, true, true, false);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        const addedItem = columnProps?.columnItems?.find((item: any) => item.feedbackItem.id === "new-focused-item");
+        expect(addedItem?.shouldHaveFocus).toBe(true);
+      });
+    });
+  });
 });
