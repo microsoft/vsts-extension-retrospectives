@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, within, act } from "@testing-library/react";
+import { render, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import SelectorCombo, { ISelectorComboProps, ISelectorList, ISelectorListItem, ISelectorListItemHeader } from "../selectorCombo";
 
