@@ -802,7 +802,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "stop-circle", tags: ["fa-stop-circle"], name: "Stop", icon: <StopCircleIcon /> },
   { id: "adjust", tags: ["fa-bullseye"], name: "Target", icon: <AdjustIcon /> },
   { id: "thumb-up", tags: ["far fa-thumbs-up"], name: "Thumb Up", icon: <ThumbUpIcon /> },
-  { id: "thumb-down", tags: ["far fa-thumbs-down"], name: "Thumb Down", icon: <ThumbDownIcon /> },
+  { id: "thumb-down", tags: ["fas fa-skull-crossbones", "far fa-thumbs-down"], name: "Thumb Down", icon: <ThumbDownIcon /> },
   { id: "thumb-up-down", tags: ["far fa-thumbs-up-down"], name: "Thumb Up/Down", icon: <ThumbUpDownIcon /> },
   { id: "plumbing", tags: ["far fa-plumbing", "far fa-wrench"], name: "Plumbing", icon: <PlumbingIcon /> },
   { id: "forum", tags: ["far fa-comments"], name: "Forum", icon: <ForumIcon /> },
