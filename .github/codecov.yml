@@ -28,3 +28,16 @@ component_management:
       name: frontend/utilities
       paths:
         - src/frontend/utilities/**
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+      frontend:
+        target: auto
+        paths:
+          - src/frontend/**
+    patch:
+      default:
+        target: auto
