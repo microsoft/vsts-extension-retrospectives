@@ -1062,7 +1062,7 @@ describe("FeedbackBoard Component", () => {
     });
 
     it("registerItemRef safely handles missing column ref", async () => {
-      const { ref } = renderWithRef();
+      renderWithRef();
 
       const columnId = mockedProps.board.columns[0].id;
 
