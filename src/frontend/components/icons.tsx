@@ -12,7 +12,8 @@ export const CloseIcon = () => {
 export const CoffeeIcon = () => {
   return (
     <svg className="icon-coffee" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 5v8c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V5h10m4-2H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm-2 5V5h2v3h-2zm2 11H2v2h18v-2z"/>
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M16 5v8c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V5h10m4-2H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm-2 5V5h2v3h-2zm2 11H2v2h18v-2z" />
     </svg>
   );
 };
@@ -793,15 +794,15 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "happy-face", tags: ["fas fa-cart-plus", "far fa-smile"], name: "Smile", icon: <HappyFaceIcon /> },
   { id: "sad-face", tags: ["far fa-frown"], name: "Frown", icon: <SadFaceIcon /> },
   { id: "angry-face", tags: ["far fa-angry"], name: "Angry", icon: <AngryFaceIcon /> },
-  { id: "help", tags: ["fas fa-question"], name: "Question", icon: <HelpIcon /> },
-  { id: "exclamation", tags: ["fas fa-exclamation"], name: "Exclamation", icon: <ExclamationIcon /> },
+  { id: "help", tags: ["fas fa-question", "far fa-question"], name: "Question", icon: <HelpIcon /> },
+  { id: "exclamation", tags: ["fas fa-exclamation", "far fa-exclamation"], name: "Exclamation", icon: <ExclamationIcon /> },
   { id: "coffee", tags: ["fas fa-coffee"], name: "Coffee", icon: <CoffeeIcon /> },
-  { id: "rocket-launch", tags: ["fas fa-rocket"], name: "Rocket", icon: <RocketLaunchIcon /> },
-  { id: "play-circle", tags: ["fa-play-circle"], name: "Play", icon: <PlayCircleIcon /> },
-  { id: "stop-circle", tags: ["fa-stop-circle"], name: "Stop", icon: <StopCircleIcon /> },
-  { id: "adjust", tags: ["fa-bullseye"], name: "Target", icon: <AdjustIcon /> },
+  { id: "rocket-launch", tags: ["fas fa-rocket", "fas fa-fan"], name: "Rocket", icon: <RocketLaunchIcon /> },
+  { id: "play-circle", tags: ["far fa-circle-play"], name: "Play", icon: <PlayCircleIcon /> },
+  { id: "stop-circle", tags: ["far fa-circle-stop"], name: "Stop", icon: <StopCircleIcon /> },
+  { id: "adjust", tags: ["far fa-circle-dot", "fa-bullseye"], name: "Target", icon: <AdjustIcon /> },
   { id: "thumb-up", tags: ["far fa-thumbs-up"], name: "Thumb Up", icon: <ThumbUpIcon /> },
-  { id: "thumb-down", tags: ["far fa-thumbs-down"], name: "Thumb Down", icon: <ThumbDownIcon /> },
+  { id: "thumb-down", tags: ["fas fa-skull-crossbones", "far fa-thumbs-down"], name: "Thumb Down", icon: <ThumbDownIcon /> },
   { id: "thumb-up-down", tags: ["far fa-thumbs-up-down"], name: "Thumb Up/Down", icon: <ThumbUpDownIcon /> },
   { id: "plumbing", tags: ["far fa-plumbing", "far fa-wrench"], name: "Plumbing", icon: <PlumbingIcon /> },
   { id: "forum", tags: ["far fa-comments"], name: "Forum", icon: <ForumIcon /> },

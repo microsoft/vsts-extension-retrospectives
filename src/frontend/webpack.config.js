@@ -95,7 +95,7 @@ export default (_, argv) => {
       }),
       new CompressionPlugin(),
       codecovWebpackPlugin({
-        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        enableBundleAnalysis: Boolean(process.env.CODECOV_TOKEN),
         bundleName: "retrospective-extension-webpack-bundle",
         uploadToken: process.env.CODECOV_TOKEN,
       }),

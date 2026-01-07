@@ -262,6 +262,19 @@ describe("dataService", () => {
       await expect(setValue("key1", mockData)).rejects.toThrow("Set error");
     });
 
+    it("should catch synchronous setValue errors, track, and return undefined", async () => {
+      const mockData = { value: "test" };
+      const error = new Error("Sync set error");
+      mockDataManager.setValue.mockImplementation(() => {
+        throw error;
+      });
+
+      const result = await setValue("key1", mockData);
+
+      expect(result).toBeUndefined();
+      expect(appInsights.trackException).toHaveBeenCalledWith(error);
+    });
+
     it("should return undefined and track exception on error in setValue catch block", async () => {
       const mockData = { value: "test" };
       const error = new Error("Set value error");

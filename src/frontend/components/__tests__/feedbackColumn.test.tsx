@@ -4,6 +4,7 @@ import "@testing-library/jest-dom";
 import { testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import FeedbackColumn from "../feedbackColumn";
 import FeedbackItem from "../feedbackItem";
+import FeedbackItemGroup from "../feedbackItemGroup";
 import { IColumnItem } from "../feedbackBoard";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { itemDataService } from "../../dal/itemDataService";
@@ -128,6 +129,68 @@ describe("Feedback Column ", () => {
 
       expect(feedbackItemProps.accentColor).toEqual(expectedAccentColor);
     });
+
+    it("renders grouped items with FeedbackItemGroup", () => {
+      const baseFeedbackItem = {
+        id: "parent-item",
+        title: "Parent item",
+        description: "",
+        boardId: testColumnProps.boardId,
+        columnId: testColumnProps.columnId,
+        originalColumnId: testColumnProps.columnId,
+        createdDate: new Date(),
+        modifiedDate: new Date(),
+        upvotes: 0,
+        voteCollection: {},
+        createdBy: { displayName: "User", _links: { avatar: { href: "avatar" } } },
+        userIdRef: "user-ref",
+        timerSecs: 0,
+        timerState: "",
+        timerId: "",
+        childFeedbackItemIds: ["child-item"] as string[],
+        parentFeedbackItemId: undefined as string | undefined,
+        isGroupedCarouselItem: false,
+      } as any;
+
+      const parent: IColumnItem = {
+        feedbackItem: baseFeedbackItem,
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+      };
+
+      const child = {
+        feedbackItem: {
+          ...baseFeedbackItem,
+          id: "child-item",
+          parentFeedbackItemId: "parent-item",
+          childFeedbackItemIds: [],
+        },
+        actionItems: [] as any[],
+        newlyCreated: false,
+        showAddedAnimation: false,
+        shouldHaveFocus: false,
+        hideFeedbackItems: false,
+      } as IColumnItem;
+
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Collect, columnItems: [parent, child], isDataLoaded: true } as any;
+      const ref = React.createRef<FeedbackColumn>();
+
+      const { getByRole } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      expect(props.columnItems.length).toBe(2);
+      expect((ref.current as any).props.columnItems.length).toBe(2);
+
+      const renderedItems = (ref.current as any).renderFeedbackItems();
+      expect(Array.isArray(renderedItems)).toBe(true);
+      expect(renderedItems.length).toBe(1);
+
+      const firstItem = renderedItems[0] as any;
+      expect(firstItem.type).toBe(FeedbackItemGroup);
+      expect(getByRole("group", { name: /Feedback group with 2 items/ })).toBeInTheDocument();
+    });
   });
 
   describe("Accessibility - Focus Preservation", () => {
@@ -150,6 +213,34 @@ describe("Feedback Column ", () => {
         setTimeout(() => {
           expect(document.activeElement).toBeTruthy();
         }, 100);
+      }
+    });
+
+    it("captures cursor position for contenteditable selection", () => {
+      const props = { ...testColumnProps };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+      const editable = document.createElement("div");
+      editable.setAttribute("contenteditable", "true");
+      editable.setAttribute("data-feedback-item-id", "ce-1");
+      editable.textContent = "hello";
+      Object.defineProperty(editable, "isContentEditable", { value: true });
+      column?.appendChild(editable);
+      editable.focus();
+
+      const originalGetSelection = window.getSelection;
+      const mockRange = { startOffset: 2 } as any;
+      (window as any).getSelection = jest.fn(() => ({ rangeCount: 1, getRangeAt: () => mockRange })) as any;
+
+      (ref.current as any).preserveFocus();
+
+      expect((ref.current as any).focusPreservation?.cursorPosition).toBe(2);
+
+      if (originalGetSelection) {
+        (window as any).getSelection = originalGetSelection;
       }
     });
 
@@ -183,29 +274,30 @@ describe("Feedback Column ", () => {
         return 0 as any;
       });
       let callbackRan = false;
+      let columnElement: HTMLDivElement | null = null;
 
       try {
         const props = { ...testColumnProps, columnItems: [...testColumnProps.columnItems], isDataLoaded: true };
         const ref = React.createRef<FeedbackColumn>();
-        const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+        render(<FeedbackColumn {...props} ref={ref} />);
         expect(ref.current).toBeTruthy();
 
-        const feedbackCard = container.querySelector("[data-feedback-item-id]") as HTMLElement;
-        if (!feedbackCard) {
-          return;
-        }
-
         const itemId = props.columnItems[0].feedbackItem.id;
+        columnElement = document.createElement("div");
+        const feedbackCard = document.createElement("div");
+        feedbackCard.setAttribute("data-feedback-item-id", itemId);
+        columnElement.appendChild(feedbackCard);
+        document.body.appendChild(columnElement);
 
         const contentEditable = document.createElement("div");
         contentEditable.setAttribute("contenteditable", "true");
         contentEditable.textContent = "Editable";
-        // Ensure restoreFocus sees contenteditable
         Object.defineProperty(contentEditable, "isContentEditable", { value: true });
 
         feedbackCard.appendChild(contentEditable);
         contentEditable.focus();
         expect(document.activeElement).toBe(contentEditable);
+        (ref.current as any).columnRef.current = columnElement as any;
 
         // Ignore any warnings from initial render.
         warnSpy.mockClear();
@@ -221,11 +313,70 @@ describe("Feedback Column ", () => {
         (ref.current as any).restoreFocus();
         callbackRan = true;
         expect(callbackRan).toBe(true);
+        expect(warnSpy).toHaveBeenCalledWith("Failed to restore cursor position:", expect.any(Error));
       } finally {
+        if (columnElement && document.body.contains(columnElement)) {
+          document.body.removeChild(columnElement);
+        }
         createRangeSpy.mockRestore();
         warnSpy.mockRestore();
         timeoutSpy.mockRestore();
       }
+    });
+
+    it("restores cursor position for contenteditable focus", () => {
+      const props = { ...testColumnProps };
+      const ref = React.createRef<FeedbackColumn>();
+      const { container } = render(<FeedbackColumn {...props} ref={ref} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      expect(column).toBeTruthy();
+      const editable = document.createElement("div");
+      editable.setAttribute("contenteditable", "true");
+      editable.setAttribute("data-feedback-item-id", "ce-restore");
+      editable.appendChild(document.createTextNode("content"));
+      editable.focus = jest.fn();
+      Object.defineProperty(editable, "isContentEditable", { value: true });
+      column?.appendChild(editable);
+
+      (ref.current as any).focusPreservation = {
+        elementId: "ce-restore",
+        selectionStart: null,
+        selectionEnd: null,
+        isContentEditable: true,
+        cursorPosition: 3,
+      };
+
+      const mockRange = { setStart: jest.fn(), collapse: jest.fn() } as any;
+      const removeAllRanges = jest.fn();
+      const addRange = jest.fn();
+      const originalCreateRange = document.createRange;
+      const originalGetSelection = window.getSelection;
+      const originalSetTimeout = global.setTimeout;
+
+      jest.spyOn(document, "createRange").mockReturnValue(mockRange as any);
+      (window as any).getSelection = jest.fn(() => ({ removeAllRanges, addRange })) as any;
+      jest.spyOn(global, "setTimeout").mockImplementation((cb: (...args: any[]) => void) => {
+        cb();
+        return 0 as any;
+      });
+
+      (ref.current as any).restoreFocus();
+
+      expect(editable.focus).toHaveBeenCalled();
+      expect(mockRange.setStart).toHaveBeenCalled();
+      expect(addRange).toHaveBeenCalled();
+
+      (document.createRange as any).mockRestore();
+      if (originalGetSelection) {
+        (window as any).getSelection = originalGetSelection;
+      }
+      if ((global.setTimeout as any).mockRestore) {
+        (global.setTimeout as any).mockRestore();
+      } else {
+        global.setTimeout = originalSetTimeout;
+      }
+      document.createRange = originalCreateRange;
     });
   });
 

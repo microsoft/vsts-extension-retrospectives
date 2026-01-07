@@ -194,6 +194,21 @@ describe("markdownUtils", () => {
         expect(tokens).toHaveLength(1);
         expect(tokens[0]).toEqual({ type: "text", content: "abc" });
       });
+
+      it("should handle text ending without special characters after special char in middle", () => {
+        // This tests the branch when nextSpecialIndex === -1 (no more special chars after the current position)
+        const tokens = tokenizeMarkdown("text with a trailing asterisk* at end");
+        expect(tokens).toHaveLength(1);
+        expect(tokens[0]).toEqual({ type: "text", content: "text with a trailing asterisk* at end" });
+      });
+
+      it("should handle unmatched opening marker with plain text after", () => {
+        // This tests the branch when nextSpecialIndex === -1 with remaining plain text
+        const tokens = tokenizeMarkdown("start *incomplete");
+        expect(tokens).toHaveLength(1);
+        expect(tokens[0].type).toBe("text");
+        expect(tokens[0].content).toBe("start *incomplete");
+      });
     });
   });
 

@@ -143,6 +143,29 @@ describe("FocusManager", () => {
       expect(focusManager.popFocusHistory()).toBe(false);
     });
 
+    test("does not add to history when focusing the same element", () => {
+      const button = document.createElement("button");
+      container.appendChild(button);
+
+      button.focus();
+      focusManager.setFocus(button, true);
+
+      // Should not have added the same element to history
+      expect(focusManager.popFocusHistory()).toBe(false);
+    });
+
+    test("adds body to history when no other element is focused", () => {
+      const button = document.createElement("button");
+      container.appendChild(button);
+
+      // In JSDOM, activeElement is body when nothing is focused
+      // The code will add body to history since body !== button
+      focusManager.setFocus(button, true);
+
+      // Body was added to history
+      expect(focusManager.popFocusHistory()).toBe(true);
+    });
+
     test("returns false for null element", () => {
       expect(focusManager.setFocus(null)).toBe(false);
     });
@@ -203,6 +226,53 @@ describe("FocusManager", () => {
       container.appendChild(button2);
 
       const prev = focusManager.findNextFocusableElement(container, button1, "prev");
+      expect(prev).toBe(button2);
+    });
+
+    test("returns first focusable element when currentElement is not in the container", () => {
+      const button1 = document.createElement("button");
+      const button2 = document.createElement("button");
+      const outsideButton = document.createElement("button");
+      // Mock offsetParent to make elements "visible"
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(button2, "offsetParent", { get: () => container });
+      container.appendChild(button1);
+      container.appendChild(button2);
+
+      // outsideButton is not in the container
+      const next = focusManager.findNextFocusableElement(container, outsideButton, "next");
+      expect(next).toBe(button1);
+    });
+
+    test("returns next element for 'next' direction", () => {
+      const button1 = document.createElement("button");
+      const button2 = document.createElement("button");
+      const button3 = document.createElement("button");
+      // Mock offsetParent to make elements "visible"
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(button2, "offsetParent", { get: () => container });
+      Object.defineProperty(button3, "offsetParent", { get: () => container });
+      container.appendChild(button1);
+      container.appendChild(button2);
+      container.appendChild(button3);
+
+      const next = focusManager.findNextFocusableElement(container, button1, "next");
+      expect(next).toBe(button2);
+    });
+
+    test("returns previous element for 'prev' direction", () => {
+      const button1 = document.createElement("button");
+      const button2 = document.createElement("button");
+      const button3 = document.createElement("button");
+      // Mock offsetParent to make elements "visible"
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(button2, "offsetParent", { get: () => container });
+      Object.defineProperty(button3, "offsetParent", { get: () => container });
+      container.appendChild(button1);
+      container.appendChild(button2);
+      container.appendChild(button3);
+
+      const prev = focusManager.findNextFocusableElement(container, button3, "prev");
       expect(prev).toBe(button2);
     });
   });

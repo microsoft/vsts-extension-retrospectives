@@ -1,4 +1,43 @@
 comment:
-  layout: "diff, files"
+  layout: "diff, files, components"
   behavior: default
   require_changes: false
+
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
+  individual_components:
+    - component_id: frontend_components
+      name: frontend/components
+      paths:
+        - src/frontend/components/**
+
+    - component_id: frontend_dal
+      name: frontend/dal
+      paths:
+        - src/frontend/dal/**
+
+    - component_id: frontend_interfaces
+      name: frontend/interfaces
+      paths:
+        - src/frontend/interfaces/**
+
+    - component_id: frontend_utilities
+      name: frontend/utilities
+      paths:
+        - src/frontend/utilities/**
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+      frontend:
+        target: auto
+        paths:
+          - src/frontend/**
+    patch:
+      default:
+        target: auto
