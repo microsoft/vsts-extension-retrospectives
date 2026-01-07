@@ -2003,4 +2003,68 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
       expect(rows.length).toBeGreaterThanOrEqual(4);
     });
   });
+
+  it("covers non-date sort branch when aVal is null/undefined", async () => {
+    const boardWithMissingTitle: IFeedbackBoardDocument = {
+      ...(mockBoards[0] as any),
+      id: "board-missing-title-a",
+      title: undefined,
+      createdDate: new Date("2024-02-02"),
+    };
+
+    const boardWithTitle: IFeedbackBoardDocument = {
+      ...mockBoards[1],
+      id: "board-has-title-a",
+      title: "Alpha",
+      createdDate: new Date("2024-02-01"),
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([boardWithMissingTitle, boardWithTitle]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const titleHeaderCell = getByText("Retrospective Name").closest("th") as HTMLTableCellElement;
+    fireEvent.click(titleHeaderCell);
+
+    await waitFor(() => {
+      expect(titleHeaderCell.getAttribute("aria-sort")).toBe("ascending");
+    });
+  });
+
+  it("covers non-date sort branch when bVal is null/undefined", async () => {
+    const boardWithTitle: IFeedbackBoardDocument = {
+      ...mockBoards[0],
+      id: "board-has-title-b",
+      title: "Alpha",
+      createdDate: new Date("2024-02-02"),
+    };
+
+    const boardWithMissingTitle: IFeedbackBoardDocument = {
+      ...(mockBoards[1] as any),
+      id: "board-missing-title-b",
+      title: undefined,
+      createdDate: new Date("2024-02-01"),
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([boardWithTitle, boardWithMissingTitle]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const titleHeaderCell = getByText("Retrospective Name").closest("th") as HTMLTableCellElement;
+    fireEvent.click(titleHeaderCell);
+
+    await waitFor(() => {
+      expect(titleHeaderCell.getAttribute("aria-sort")).toBe("ascending");
+    });
+  });
 });

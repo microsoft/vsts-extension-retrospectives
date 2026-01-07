@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 
@@ -200,7 +200,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
   }, [boardSummaryState.boardsTableItems]);
 
   const dateFormatter = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" });
-  const deleteBoardDialogRef = React.createRef<HTMLDialogElement>();
+  const deleteBoardDialogRef = useRef<HTMLDialogElement>(null);
 
   const toggleSort = (columnId: string) => {
     if (sortColumn === columnId) {
@@ -307,7 +307,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           onClick={event => {
             event.stopPropagation();
             setOpenDialogBoardId(item.id);
-            deleteBoardDialogRef.current?.showModal();
+            deleteBoardDialogRef.current!.showModal();
           }}
         />
       ),
@@ -418,7 +418,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       });
     }
 
-    deleteBoardDialogRef.current?.close();
+    deleteBoardDialogRef.current!.close();
     setOpenDialogBoardId(null);
   };
 
@@ -482,7 +482,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
         aria-label="Delete Retrospective Board"
         ref={deleteBoardDialogRef}
         onClose={() => {
-          deleteBoardDialogRef.current?.close();
+          deleteBoardDialogRef.current!.close();
           setOpenDialogBoardId(null);
         }}
       >
@@ -490,7 +490,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           <h2 className="title">Delete Retrospective Board</h2>
           <button
             onClick={() => {
-              deleteBoardDialogRef.current?.close();
+              deleteBoardDialogRef.current!.close();
               setOpenDialogBoardId(null);
             }}
             aria-label="Close"
@@ -511,7 +511,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           <button
             className="default button"
             onClick={() => {
-              deleteBoardDialogRef.current?.close();
+              deleteBoardDialogRef.current!.close();
               setOpenDialogBoardId(null);
             }}
           >
