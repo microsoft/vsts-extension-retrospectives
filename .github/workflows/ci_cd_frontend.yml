@@ -127,7 +127,7 @@ jobs:
           set -e
           docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable@sha256:54c7ea4ddec6e3941887cb7933898c352f59e7f59e17a7a730f97ed348a8dfce --repo=https://github.com/microsoft/vsts-extension-retrospectives || true
 
-      - if: steps.changes.outputs.src == 'true' && secrets.CODECOV_TOKEN != ''
+      - if: steps.changes.outputs.src == 'true'
         name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
