@@ -26,6 +26,10 @@ jest.mock("../../utilities/telemetryClient", () => ({
   TelemetryEvents: {},
 }));
 
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: jest.fn((_plugin, Component) => Component),
+}));
+
 jest.mock("../feedbackBoardMetadataForm", () => mocked({}));
 
 jest.mock("../../dal/itemDataService", () => ({
@@ -233,6 +237,12 @@ const getLatestColumnPropsById = (columnId: string) => {
   }
 
   return undefined;
+};
+
+const renderWithRef = (props: FeedbackBoardProps = mockedProps) => {
+  const ref = React.createRef<any>();
+  const renderResult = render(<FeedbackBoard {...props} ref={ref} />);
+  return { ref, ...renderResult };
 };
 
 // In production, key events usually target a focused Element.
@@ -1021,6 +1031,126 @@ describe("FeedbackBoard Component", () => {
     });
   });
 
+  describe("Internal helper coverage", () => {
+    it("getColumnIndexFromElement returns null for missing targets", () => {
+      const { ref } = renderWithRef();
+      const getIndex = (ref.current as any).getColumnIndexFromElement.bind(ref.current);
+
+      expect(getIndex(null)).toBeNull();
+
+      const orphan = document.createElement("div");
+      expect(getIndex(orphan)).toBeNull();
+
+      orphan.setAttribute("data-column-id", "missing-column");
+      expect(getIndex(orphan)).toBeNull();
+    });
+
+    it("navigateToColumnByIndex ignores out of range values", async () => {
+      const { ref } = renderWithRef();
+
+      await waitFor(() => {
+        expect(ref.current.state.columnIds.length).toBeGreaterThan(0);
+      });
+
+      await act(async () => {
+        ref.current.setState({ focusedColumnIndex: 1 });
+      });
+
+      (ref.current as any).navigateToColumnByIndex(-1);
+
+      expect(ref.current.state.focusedColumnIndex).toBe(1);
+    });
+
+    it("registerItemRef safely handles missing column ref", async () => {
+      const { ref } = renderWithRef();
+
+      const columnId = mockedProps.board.columns[0].id;
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      const columnProps = getLatestColumnProps(columnId);
+
+      expect(() => columnProps.registerItemRef("item-x", null)).not.toThrow();
+    });
+
+    it("getColumnsWithReleasedFocus resets flags", () => {
+      const { ref } = renderWithRef();
+
+      const columnsState: any = {
+        col1: {
+          columnItems: [{ feedbackItem: mockFeedbackItems[0], actionItems: [], shouldHaveFocus: true }],
+          shouldFocusOnCreateFeedback: true,
+        },
+      };
+
+      const result = (ref.current as any).getColumnsWithReleasedFocus({ columns: columnsState });
+
+      expect(result.col1.shouldFocusOnCreateFeedback).toBe(false);
+      expect(result.col1.columnItems.every((item: any) => item.shouldHaveFocus === false)).toBe(true);
+    });
+
+    it("findColumnItemById skips undefined columns", () => {
+      const { ref } = renderWithRef();
+
+      (ref.current as any).state = {
+        ...ref.current.state,
+        columnIds: ["ghost"],
+        columns: { ghost: undefined as any },
+      };
+
+      const found = (ref.current as any).findColumnItemById("missing");
+      expect(found).toBeUndefined();
+    });
+
+    it("stopTimerById returns early when active timer differs", async () => {
+      const { ref } = renderWithRef();
+
+      const originalSetState = ref.current.setState.bind(ref.current);
+      const setStateMock = jest.fn(originalSetState);
+
+      (ref.current as any).state = {
+        ...ref.current.state,
+        columnIds: [],
+        columns: {},
+        activeTimerFeedbackItemId: "other",
+      };
+      (ref.current as any).findColumnItemById = (): any => undefined;
+      (ref.current as any).setState = setStateMock as any;
+
+      await act(async () => {
+        await (ref.current as any).stopTimerById("target");
+      });
+
+      expect(setStateMock).toHaveBeenCalled();
+      const updater = setStateMock.mock.calls[0][0];
+      expect(typeof updater).toBe("function");
+      expect(updater({ activeTimerFeedbackItemId: "other" })).toBeNull();
+
+      (ref.current as any).setState = originalSetState;
+    });
+
+    it("findActiveTimerFeedbackItemId skips missing columns", () => {
+      const { ref } = renderWithRef();
+
+      const columnsState: any = {
+        ghost: undefined,
+        real: {
+          columnItems: [
+            {
+              feedbackItem: { ...mockFeedbackItems[0], id: "timer-1", timerState: true },
+              actionItems: [],
+            },
+          ],
+        },
+      };
+
+      const result = (ref.current as any).findActiveTimerFeedbackItemId(columnsState);
+      expect(result).toBe("timer-1");
+    });
+  });
+
   describe("Timer Operations - Extended Coverage", () => {
     it("stopTimerById clears state when item has no timerState", async () => {
       const itemWithoutTimer: IFeedbackItemDocument = {
@@ -1323,6 +1453,37 @@ describe("FeedbackBoard Component", () => {
 
       expect(reflectBackendService.broadcastNewItem).not.toHaveBeenCalled();
     });
+
+    it("adds multiple items and keeps subsequent items unfocused while broadcasting", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      const newItems = [
+        { ...mockFeedbackItems[0], id: "new-1", columnId },
+        { ...mockFeedbackItems[0], id: "new-2", columnId },
+      ];
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.addFeedbackItems(columnId, newItems, true, false, false, true, false);
+      });
+
+      await waitFor(() => {
+        const latestProps = getLatestColumnProps(columnId);
+        expect(latestProps.columnItems[1].feedbackItem.id).toBe("new-2");
+        expect(latestProps.columnItems[1].shouldHaveFocus).toBeFalsy();
+      });
+
+      expect(reflectBackendService.broadcastNewItem).toHaveBeenCalledWith(columnId, "new-1");
+      expect(reflectBackendService.broadcastNewItem).toHaveBeenCalledWith(columnId, "new-2");
+    });
   });
 
   describe("Timer Operations - Error Handling", () => {
@@ -1475,6 +1636,28 @@ describe("FeedbackBoard Component", () => {
       });
 
       expect(reflectBackendService.broadcastUpdatedItem).not.toHaveBeenCalled();
+    });
+
+    it("refreshFeedbackItems broadcasts when shouldBroadcast is true", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(mockFeedbackItems);
+      (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      const updatedItem = { ...mockFeedbackItems[0], title: "Updated with broadcast" };
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        await columnProps.refreshFeedbackItems([updatedItem], true);
+      });
+
+      expect(reflectBackendService.broadcastUpdatedItem).toHaveBeenCalledWith("dummyColumn", updatedItem.id);
     });
   });
 
