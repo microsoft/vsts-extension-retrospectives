@@ -722,7 +722,7 @@ class FeedbackBoard extends React.Component<FeedbackBoardProps, FeedbackBoardSta
 
     return (
       <>
-        <div className="feedback-board feedback-columns-container" role="main" aria-label="Feedback board with columns">
+        <div className="feedback-board" role="main" aria-label="Feedback board with columns">
           {this.state.isDataLoaded &&
             feedbackColumnPropsList.map(columnProps => {
               return <FeedbackColumn {...columnProps} />;

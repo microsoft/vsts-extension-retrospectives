@@ -23,20 +23,6 @@
   --color-gray-medium: #dadada;
 }
 
-@layer components {
-  .retro-dialog-shell {
-    @apply max-w-none! min-w-125! w-1/2! bg-(--background-color)!;
-
-    & .ms-Dialog-content {
-      @apply flex flex-col gap-3;
-    }
-  }
-
-  .feedback-card-surface {
-    @apply bg-transparent! border! border-border-gray!;
-  }
-}
-
 @keyframes fadeInFromGreen {
   from {
     opacity: 0;
@@ -1543,7 +1529,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board-container {
-  @apply flex h-[calc(100vh-88px)] overflow-y-auto overflow-x-hidden;
+  @apply flex flex-col flex-1 h-[calc(100vh-88px)] min-h-0 border-t-4 border-(--nav-header-active-item-background) overflow-y-auto overflow-x-hidden;
 }
 
 .feedback-board-container-header-spacer {
