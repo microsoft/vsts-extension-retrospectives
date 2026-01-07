@@ -1888,11 +1888,17 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
       expect(container.querySelector(".delete-board-dialog")).toBeTruthy();
     });
 
-    // Close via the close button in header
-    const closeButton = getByLabelText("Close");
-    closeButton.click();
+    const dialog = container.querySelector(".delete-board-dialog") as HTMLDialogElement;
+    const headerCloseButton = container.querySelector('.delete-board-dialog .header button[aria-label="Close"]') as HTMLButtonElement;
 
-    expect(container).toBeTruthy();
+    expect(dialog).toBeTruthy();
+    expect(headerCloseButton).toBeTruthy();
+
+    fireEvent.click(headerCloseButton);
+
+    await waitFor(() => {
+      expect((dialog as any).open).toBe(false);
+    });
   });
 
   it("closes delete dialog via default close button", async () => {
@@ -1918,10 +1924,17 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
       expect(container.querySelector(".delete-board-dialog")).toBeTruthy();
     });
 
-    // Close via the Close button in the dialog footer
-    getByText("Close").click();
+    const dialog = container.querySelector(".delete-board-dialog") as HTMLDialogElement;
+    const footerCloseButton = container.querySelector(".delete-board-dialog .inner button.default.button") as HTMLButtonElement;
 
-    expect(container).toBeTruthy();
+    expect(dialog).toBeTruthy();
+    expect(footerCloseButton).toBeTruthy();
+
+    fireEvent.click(footerCloseButton);
+
+    await waitFor(() => {
+      expect((dialog as any).open).toBe(false);
+    });
   });
 
   it("triggers onClose handler when dialog is closed", async () => {
@@ -1943,14 +1956,18 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
     const trashIcon = container.querySelector(".trash-icon") as HTMLElement;
     trashIcon?.click();
 
+    const dialog = container.querySelector(".delete-board-dialog") as HTMLDialogElement;
+
     await waitFor(() => {
-      const dialog = container.querySelector(".delete-board-dialog") as HTMLDialogElement;
       expect(dialog).toBeTruthy();
-      // Simulate the close event
-      dialog.dispatchEvent(new Event("close"));
+      expect((dialog as any).open).toBe(true);
     });
 
-    expect(container).toBeTruthy();
+    dialog.dispatchEvent(new Event("close"));
+
+    await waitFor(() => {
+      expect((dialog as any).open).toBe(false);
+    });
   });
 
   it("covers non-date sort branches: aVal > bVal and equality return 0", async () => {
@@ -1972,9 +1989,14 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
     });
 
-    // Trigger non-date sorting by clicking the name header.
-    const titleHeader = getByText("Retrospective Name");
-    titleHeader.click();
+    // Trigger non-date sorting by clicking the <th> (onClick handler is on the header cell).
+    const titleHeaderCell = getByText("Retrospective Name").closest("th") as HTMLTableCellElement;
+    expect(titleHeaderCell).toBeTruthy();
+    fireEvent.click(titleHeaderCell);
+
+    await waitFor(() => {
+      expect(titleHeaderCell.getAttribute("aria-sort")).toBe("ascending");
+    });
 
     await waitFor(() => {
       const rows = container.querySelectorAll('tbody tr[tabindex="0"]');
