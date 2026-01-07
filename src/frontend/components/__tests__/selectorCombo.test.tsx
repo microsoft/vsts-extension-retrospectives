@@ -269,6 +269,31 @@ describe("SelectorCombo", () => {
 
       expect(container.firstChild).toBeTruthy();
     });
+
+    test("handles selectorListItem entries with missing items while computing search result count", () => {
+      const ref = React.createRef<SelectorCombo<MockItem>>();
+      render(<SelectorCombo {...defaultProps} ref={ref} />);
+
+      if (!ref.current) throw new Error("SelectorCombo ref not set");
+
+      // Force the code path that computes search result count.
+      (ref.current as any).state = {
+        ...(ref.current as any).state,
+        currentFilterText: "Item",
+      };
+
+      const selectorListWithMissingItems = {
+        selectorListItems: [
+          {
+            finishedLoading: true,
+            header: mockHeader,
+            items: undefined,
+          },
+        ],
+      } as any;
+
+      expect(() => (ref.current as any).renderSelectorCombo(selectorListWithMissingItems, true)).not.toThrow();
+    });
   });
 
   describe("List Rendering", () => {
@@ -812,19 +837,20 @@ describe("SelectorCombo", () => {
       const ref = React.createRef<SelectorCombo<MockItem>>();
       render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} ref={ref} />);
 
-      // Manually set state to have dialog open
-      if (ref.current) {
-        (ref.current as any).setState({ isSelectorDialogHidden: false });
-      }
+      if (!ref.current) throw new Error("SelectorCombo ref not set");
 
-      // Call chooseItem directly
-      if (ref.current) {
-        (ref.current as any).chooseItem(mockItems[0]);
-      }
+      // Force the branch where the mobile dialog is considered open.
+      // We only need this to be true at the moment chooseItem runs.
+      (ref.current as any).state = {
+        ...(ref.current as any).state,
+        isSelectorDialogHidden: false,
+      };
 
-      // Verify closeMobileSelectorDialog was invoked (state should now be hidden)
-      expect(ref.current?.state.isSelectorDialogHidden).toBe(true);
+      const setStateSpy = jest.spyOn(ref.current as any, "setState");
+      (ref.current as any).chooseItem(mockItems[0]);
+
       expect(clickSpy).toHaveBeenCalledWith(mockItems[0]);
+      expect(setStateSpy).toHaveBeenCalledWith({ isSelectorDialogHidden: true });
     });
 
     test("handleKeyPressTeamList does not call chooseItem for non-Enter keys", () => {
@@ -833,10 +859,9 @@ describe("SelectorCombo", () => {
       render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} ref={ref} />);
 
       // Call handleKeyPressTeamList with non-Enter key
-      if (ref.current) {
-        const mockEvent = { keyCode: 27 } as React.KeyboardEvent<HTMLDivElement>; // Escape key
-        (ref.current as any).handleKeyPressTeamList(mockEvent, mockItems[0]);
-      }
+      if (!ref.current) throw new Error("SelectorCombo ref not set");
+      const mockEvent = { keyCode: 27 } as React.KeyboardEvent<HTMLDivElement>; // Escape key
+      (ref.current as any).handleKeyPressTeamList(mockEvent, mockItems[0]);
 
       // chooseItem should not have been called
       expect(clickSpy).not.toHaveBeenCalled();
@@ -848,10 +873,9 @@ describe("SelectorCombo", () => {
       render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} ref={ref} />);
 
       // Call handleKeyPressTeamList with Enter key (keyCode 13)
-      if (ref.current) {
-        const mockEvent = { keyCode: 13 } as React.KeyboardEvent<HTMLDivElement>;
-        (ref.current as any).handleKeyPressTeamList(mockEvent, mockItems[0]);
-      }
+      if (!ref.current) throw new Error("SelectorCombo ref not set");
+      const mockEvent = { keyCode: 13 } as React.KeyboardEvent<HTMLDivElement>;
+      (ref.current as any).handleKeyPressTeamList(mockEvent, mockItems[0]);
 
       // chooseItem should have been called
       expect(clickSpy).toHaveBeenCalledWith(mockItems[0]);

@@ -2030,7 +2030,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               </div>
             )}
             {this.state.activeTab === "Board" && (
-              <div className="flex-1 min-h-0 flex flex-col feedback-board-container border-t-4 border-(--nav-header-active-item-background)">
+              <div className="feedback-board-container">
                 {this.state.currentTeam && this.state.currentBoard && (
                   <>
                     {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (

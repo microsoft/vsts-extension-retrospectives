@@ -275,6 +275,60 @@ describe("FocusManager", () => {
       const prev = focusManager.findNextFocusableElement(container, button3, "prev");
       expect(prev).toBe(button2);
     });
+
+    test("skips elements with aria-hidden", () => {
+      const button1 = document.createElement("button");
+      const hiddenButton = document.createElement("button");
+      const button3 = document.createElement("button");
+
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(hiddenButton, "offsetParent", { get: () => container });
+      Object.defineProperty(button3, "offsetParent", { get: () => container });
+
+      hiddenButton.setAttribute("aria-hidden", "true");
+
+      container.appendChild(button1);
+      container.appendChild(hiddenButton);
+      container.appendChild(button3);
+
+      const next = focusManager.findNextFocusableElement(container, button1, "next");
+      expect(next).toBe(button3);
+    });
+
+    test("treats aria-hidden currentElement as not focusable", () => {
+      const button1 = document.createElement("button");
+      const hiddenButton = document.createElement("button");
+      const button3 = document.createElement("button");
+
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(hiddenButton, "offsetParent", { get: () => container });
+      Object.defineProperty(button3, "offsetParent", { get: () => container });
+
+      hiddenButton.setAttribute("aria-hidden", "true");
+
+      container.appendChild(button1);
+      container.appendChild(hiddenButton);
+      container.appendChild(button3);
+
+      const next = focusManager.findNextFocusableElement(container, hiddenButton, "next");
+      expect(next).toBe(button1);
+    });
+
+    test("supports a custom selector", () => {
+      const link1 = document.createElement("a");
+      link1.href = "https://example.com/1";
+      const link2 = document.createElement("a");
+      link2.href = "https://example.com/2";
+
+      Object.defineProperty(link1, "offsetParent", { get: () => container });
+      Object.defineProperty(link2, "offsetParent", { get: () => container });
+
+      container.appendChild(link1);
+      container.appendChild(link2);
+
+      const next = focusManager.findNextFocusableElement(container, link1, "next", "a[href]");
+      expect(next).toBe(link2);
+    });
   });
 
   describe("getFocusableElements", () => {
@@ -293,6 +347,35 @@ describe("FocusManager", () => {
       // This tests that the method doesn't crash
       const elements = focusManager.getFocusableElements(container);
       expect(Array.isArray(elements)).toBe(true);
+    });
+
+    test("filters out elements with aria-hidden", () => {
+      const visibleButton = document.createElement("button");
+      const hiddenButton = document.createElement("button");
+
+      Object.defineProperty(visibleButton, "offsetParent", { get: () => container });
+      Object.defineProperty(hiddenButton, "offsetParent", { get: () => container });
+      hiddenButton.setAttribute("aria-hidden", "true");
+
+      container.appendChild(visibleButton);
+      container.appendChild(hiddenButton);
+
+      const elements = focusManager.getFocusableElements(container);
+      expect(elements).toEqual([visibleButton]);
+    });
+
+    test("supports a custom selector", () => {
+      const button = document.createElement("button");
+      const input = document.createElement("input");
+
+      Object.defineProperty(button, "offsetParent", { get: () => container });
+      Object.defineProperty(input, "offsetParent", { get: () => container });
+
+      container.appendChild(button);
+      container.appendChild(input);
+
+      const elements = focusManager.getFocusableElements(container, "button");
+      expect(elements).toEqual([button]);
     });
   });
 
@@ -397,6 +480,54 @@ describe("FocusManager", () => {
       container.dispatchEvent(event);
 
       expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    test("does not wrap on Shift+Tab when not on first element", () => {
+      const button1 = document.createElement("button");
+      const button2 = document.createElement("button");
+      const button3 = document.createElement("button");
+
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(button2, "offsetParent", { get: () => container });
+      Object.defineProperty(button3, "offsetParent", { get: () => container });
+
+      container.appendChild(button1);
+      container.appendChild(button2);
+      container.appendChild(button3);
+
+      focusManager.createFocusTrap(container);
+
+      button2.focus();
+      const event = new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true });
+      const preventDefaultSpy = jest.spyOn(event, "preventDefault");
+      container.dispatchEvent(event);
+
+      expect(preventDefaultSpy).not.toHaveBeenCalled();
+      expect(document.activeElement).toBe(button2);
+    });
+
+    test("does not wrap on Tab when not on last element", () => {
+      const button1 = document.createElement("button");
+      const button2 = document.createElement("button");
+      const button3 = document.createElement("button");
+
+      Object.defineProperty(button1, "offsetParent", { get: () => container });
+      Object.defineProperty(button2, "offsetParent", { get: () => container });
+      Object.defineProperty(button3, "offsetParent", { get: () => container });
+
+      container.appendChild(button1);
+      container.appendChild(button2);
+      container.appendChild(button3);
+
+      focusManager.createFocusTrap(container);
+
+      button2.focus();
+      const event = new KeyboardEvent("keydown", { key: "Tab", bubbles: true });
+      const preventDefaultSpy = jest.spyOn(event, "preventDefault");
+      container.dispatchEvent(event);
+
+      expect(preventDefaultSpy).not.toHaveBeenCalled();
+      expect(document.activeElement).toBe(button2);
     });
   });
 });

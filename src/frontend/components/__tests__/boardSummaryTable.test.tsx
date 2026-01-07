@@ -1,5 +1,5 @@
 import React from "react";
-import { render, waitFor } from "@testing-library/react";
+import { render, waitFor, fireEvent } from "@testing-library/react";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 
@@ -243,6 +243,48 @@ describe("handleArchiveToggle", () => {
     expect(mockOnArchiveToggle).toHaveBeenCalled();
   });
 
+  it("updates table data via setTableData updater when archiving", async () => {
+    const mockSetTableData = jest.fn();
+    const mockOnArchiveToggle = jest.fn();
+
+    await handleArchiveToggle("team123", "board456", true, mockSetTableData, mockOnArchiveToggle);
+
+    const updater = mockSetTableData.mock.calls[0][0] as (prev: IBoardSummaryTableItem[]) => IBoardSummaryTableItem[];
+
+    const prevData: IBoardSummaryTableItem[] = [
+      {
+        id: "board456",
+        boardName: "Board A",
+        createdDate: new Date("2023-01-01"),
+        teamId: "team123",
+        ownerId: "user-1",
+        isArchived: false,
+        archivedDate: undefined,
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+      },
+      {
+        id: "other",
+        boardName: "Other",
+        createdDate: new Date("2023-01-02"),
+        teamId: "team123",
+        ownerId: "user-1",
+        isArchived: false,
+        archivedDate: undefined,
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+      },
+    ];
+
+    const nextData = updater(prevData);
+    const updated = nextData.find(b => b.id === "board456")!;
+    expect(updated.isArchived).toBe(true);
+    expect(updated.archivedDate).toBeInstanceOf(Date);
+    expect(nextData.find(b => b.id === "other")?.isArchived).toBe(false);
+  });
+
   it("should call restoreArchivedFeedbackBoard when restoring a board", async () => {
     const mockSetTableData = jest.fn();
     const mockOnArchiveToggle = jest.fn();
@@ -256,6 +298,34 @@ describe("handleArchiveToggle", () => {
     });
     expect(mockSetTableData).toHaveBeenCalled();
     expect(mockOnArchiveToggle).toHaveBeenCalled();
+  });
+
+  it("updates table data via setTableData updater when restoring", async () => {
+    const mockSetTableData = jest.fn();
+    const mockOnArchiveToggle = jest.fn();
+
+    await handleArchiveToggle("team123", "board456", false, mockSetTableData, mockOnArchiveToggle);
+
+    const updater = mockSetTableData.mock.calls[0][0] as (prev: IBoardSummaryTableItem[]) => IBoardSummaryTableItem[];
+
+    const prevData: IBoardSummaryTableItem[] = [
+      {
+        id: "board456",
+        boardName: "Board A",
+        createdDate: new Date("2023-01-01"),
+        teamId: "team123",
+        ownerId: "user-1",
+        isArchived: true,
+        archivedDate: new Date("2023-02-01"),
+        pendingWorkItemsCount: 0,
+        totalWorkItemsCount: 0,
+        feedbackItemsCount: 0,
+      },
+    ];
+
+    const nextData = updater(prevData);
+    expect(nextData[0].isArchived).toBe(false);
+    expect(nextData[0].archivedDate).toBeNull();
   });
 });
 
@@ -971,6 +1041,40 @@ describe("BoardSummaryTable - Archive Checkbox", () => {
     if (archiveCheckboxes.length > 0) {
       (archiveCheckboxes[0] as HTMLInputElement).click();
     }
+  });
+
+  it("archive checkbox wrapper stops propagation and onChange calls archive", async () => {
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(mockBoards);
+    (BoardDataService.archiveFeedbackBoard as jest.Mock).mockResolvedValueOnce(undefined);
+    (BoardDataService.restoreArchivedFeedbackBoard as jest.Mock).mockResolvedValueOnce(undefined);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(document.body.querySelector('input[type="checkbox"]')).toBeTruthy();
+    });
+
+    const checkboxes = Array.from(document.body.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
+    const checkbox = checkboxes.find(c => !c.checked) as HTMLInputElement;
+    expect(checkbox).toBeTruthy();
+
+    const wrapper = checkbox.closest("div.centered-cell") as HTMLElement;
+    expect(wrapper).toBeTruthy();
+
+    // Covers the stopPropagation handler on the wrapper div.
+    fireEvent.click(wrapper);
+    expect(BoardDataService.archiveFeedbackBoard).not.toHaveBeenCalled();
+
+    // Covers the onChange handler which calls handleArchiveToggle.
+    fireEvent.click(checkbox);
+
+    await waitFor(() => {
+      expect(BoardDataService.archiveFeedbackBoard).toHaveBeenCalled();
+    });
   });
 });
 
@@ -1717,5 +1821,34 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
     });
 
     expect(container).toBeTruthy();
+  });
+
+  it("covers non-date sort branches: aVal > bVal and equality return 0", async () => {
+    const boardsForNameSort: IFeedbackBoardDocument[] = [
+      // Ensure initial order (createdDate desc) is Zebra then Alpha so comparator sees aVal > bVal.
+      { ...mockBoards[0], id: "board-z", title: "Zebra", createdDate: new Date("2023-06-01") },
+      { ...mockBoards[1], id: "board-a", title: "Alpha", createdDate: new Date("2023-01-01") },
+      // Two equal names to hit the comparator's equality branch (return 0).
+      { ...mockBoards[0], id: "board-s1", title: "Same", createdDate: new Date("2023-05-01") },
+      { ...mockBoards[1], id: "board-s2", title: "Same", createdDate: new Date("2023-04-01") },
+    ];
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(boardsForNameSort);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    // Trigger non-date sorting by clicking the name header.
+    const titleHeader = getByText("Retrospective Name");
+    titleHeader.click();
+
+    await waitFor(() => {
+      const rows = container.querySelectorAll('tbody tr[tabindex="0"]');
+      expect(rows.length).toBeGreaterThanOrEqual(4);
+    });
   });
 });

@@ -64,5 +64,32 @@ describe("config", () => {
         process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL = originalUrl;
       }
     });
+
+    it("does not warn when required env vars are set", () => {
+      const originalKey = process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY;
+      const originalUrl = process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL;
+
+      process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY = "ai-key";
+      process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL = "https://api.example.com";
+
+      jest.resetModules();
+      const freshConfig = require("../config");
+
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
+      expect(freshConfig.config.AppInsightsInstrumentKey).toBe("ai-key");
+      expect(freshConfig.config.CollaborationStateServiceUrl).toBe("https://api.example.com");
+
+      if (originalKey) {
+        process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY = originalKey;
+      } else {
+        delete process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY;
+      }
+
+      if (originalUrl) {
+        process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL = originalUrl;
+      } else {
+        delete process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL;
+      }
+    });
   });
 });
