@@ -548,6 +548,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply animate-[fadeOutToRed_1000ms_ease-in_1_forwards];
     }
 
+    & .mainItemCard {
+      @apply bg-(--background-color) border border-border-gray;
+    }
+
     & .mainItemCard .card-integral-part {
       @apply border-l-3;
     }
@@ -570,7 +574,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &.feedback-item-group-expanded .feedbackItemGroupGroupedItem .groupedItemCard {
-    @apply w-full max-w-80 mt-0 box-border bg-(--background-color);
+    @apply w-full max-w-80 mt-0 box-border bg-(--background-color) border border-border-gray;
   }
 
   &.feedback-item-group-expanded .feedbackItemGroupGroupedItem .groupedItemCard .card-integral-part {
