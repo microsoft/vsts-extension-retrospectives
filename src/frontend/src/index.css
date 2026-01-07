@@ -675,7 +675,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .add-action-item-wrapper {
-  @apply flex justify-end bg-(--nav-vertical-background-color);
+  @apply flex justify-end bg-(--nav-vertical-background-color) relative;
 
   & .add-action-item-button {
     @apply flex items-center m-2 text-(--text-primary-color) text-sm cursor-pointer;
@@ -723,7 +723,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .popout-container {
-  @apply absolute -mt-50 bg-[rgb(var(--palette-neutral-6))] text-sm shadow-lg min-w-60 z-10;
+  @apply absolute right-0 bottom-full bg-[rgb(var(--palette-neutral-6))] text-sm shadow-[rgb(var(--palette-neutral-0))] shadow-lg min-w-60 max-h-[60vh] z-10 overflow-y-auto;
 
   & .list-item {
     @apply flex items-center gap-2 cursor-pointer p-2 bg-inherit w-full border-0 overflow-hidden text-(--text-primary-color);
@@ -802,9 +802,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & tr th:first-of-type {
-        width: 35px !important;
-        max-width: 35px !important;
-        min-width: 35px !important;
+        @apply w-9 max-w-9 min-w-9;
       }
 
       & tr th.asc {
@@ -1057,7 +1055,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-column {
   @apply border-r-2 border-l-2 border-(--nav-header-active-item-background) table-cell;
-  @apply h-[calc(100vh-75px)];
 
   &:focus {
     @apply outline-none;
@@ -1114,7 +1111,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column-content {
-  @apply p-2.5 overflow-hidden w-full h-full box-border;
+  @apply p-2.5 w-full box-border overflow-visible;
 }
 
 .feedback-column-info-dialog-text {
@@ -1122,7 +1119,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-items-container {
-  @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-7 overflow-hidden w-full box-border;
+  @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-7 w-full box-border overflow-visible;
 
   & > div {
     @apply contents;
