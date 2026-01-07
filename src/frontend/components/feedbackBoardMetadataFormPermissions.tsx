@@ -62,7 +62,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
     if (!canEditPermissions) return; // Block unauthorized changes
 
-    let permissionList: string[] = option.type === "team" ? (teamPermissions ?? []) : (memberPermissions ?? []);
+    let permissionList: string[] = option.type === "team" ? teamPermissions : memberPermissions;
 
     if (hasPermission) {
       permissionList.push(option.id);
