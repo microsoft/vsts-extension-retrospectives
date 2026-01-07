@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mockUuid } from "../__mocks__/uuid/v4";
@@ -1107,6 +1107,106 @@ describe("FeedbackBoardMetadataForm - Save Button State", () => {
     // Save button state depends on columns having titles
     const saveButton = screen.getByRole("button", { name: /save/i });
     expect(saveButton).toBeInTheDocument();
+  });
+});
+
+describe("FeedbackBoardMetadataForm - Targeted Coverage (uncovered lines)", () => {
+  beforeEach(() => {
+    mockedProps.isNewBoardCreation = true;
+    mockedProps.isDuplicatingBoard = false;
+    mockedProps.currentBoard = null;
+  });
+
+  it("should disable Save when no active columns exist", async () => {
+    const ref = React.createRef<any>();
+    render(React.createElement(FeedbackBoardMetadataForm as any, { ...mockedProps, ref }));
+
+    await waitFor(() => expect(ref.current).toBeTruthy());
+
+    await act(async () => {
+      ref.current.setState({
+        title: "Valid Board Title",
+        columnCards: [],
+      });
+    });
+
+    expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
+  });
+
+  it("should disable Save when a column has an empty title", async () => {
+    const ref = React.createRef<any>();
+    render(React.createElement(FeedbackBoardMetadataForm as any, { ...mockedProps, ref }));
+
+    await waitFor(() => expect(ref.current).toBeTruthy());
+
+    await act(async () => {
+      ref.current.setState({
+        title: "Valid Board Title",
+        columnCards: [
+          {
+            column: {
+              id: "col-1",
+              title: "",
+              iconClass: "add",
+              accentColor: "#000000",
+              notes: "",
+            },
+            markedForDeletion: false,
+          },
+        ],
+      });
+    });
+
+    expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
+  });
+
+  it("should update a column title via EditableDocumentCardTitle onSave", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const boardTitleInput = screen.getByLabelText(/please enter new retrospective title/i);
+    await user.type(boardTitleInput, "Valid Board Title");
+
+    const firstColumnTitle = container.querySelector(".feedback-column-card .editable-text") as HTMLElement | null;
+    expect(firstColumnTitle).toBeTruthy();
+
+    if (!firstColumnTitle) return;
+
+    await user.click(firstColumnTitle);
+
+    const editInput = screen.getByLabelText("Please enter feedback title") as HTMLInputElement;
+    const originalValue = editInput.value;
+
+    await user.type(editInput, "X");
+    await user.keyboard("{Enter}");
+
+    await waitFor(() => {
+      const updatedTitle = container.querySelector(".feedback-column-card .editable-text") as HTMLElement | null;
+      expect(updatedTitle).toBeTruthy();
+      expect(updatedTitle?.textContent ?? "").toContain(`${originalValue}X`);
+    });
+  });
+
+  it("should close the icon dialog via the inner Close button", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const changeIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
+    await user.click(changeIconButtons[0]);
+
+    const dialog = container.querySelector("dialog.retrospectives-choose-column-icon-dialog") as HTMLDialogElement | null;
+    expect(dialog).toBeInTheDocument();
+
+    const innerCloseButton = dialog?.querySelector(".inner button") as HTMLButtonElement | null;
+    expect(innerCloseButton).toBeInTheDocument();
+
+    if (innerCloseButton) {
+      await user.click(innerCloseButton);
+    }
+
+    await waitFor(() => {
+      expect(container.querySelector("dialog.retrospectives-choose-column-icon-dialog")).not.toBeInTheDocument();
+    });
   });
 });
 
