@@ -952,6 +952,66 @@ describe("BoardSummaryTable - Action Items Loading", () => {
     (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
   });
 
+  it("updates total work item counts when action items are loaded", async () => {
+    const boards: IFeedbackBoardDocument[] = [
+      {
+        ...mockBoards[0],
+        id: "board-with-actions",
+        title: "Board With Actions",
+        createdDate: new Date("2024-01-02"),
+      },
+      {
+        ...mockBoards[1],
+        id: "board-no-actions",
+        title: "Board No Actions",
+        createdDate: new Date("2024-01-01"),
+      },
+    ];
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(boards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockImplementation(async (boardId: string) => {
+      if (boardId === "board-with-actions") {
+        return [{ id: "item-1", associatedActionItemIds: [1, 2] }] as any;
+      }
+      return [] as any;
+    });
+
+    (workItemService.getWorkItemStates as jest.Mock).mockResolvedValue([
+      { name: "Active", category: "InProgress" },
+      { name: "Done", category: "Completed" },
+    ] as any);
+
+    (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([
+      {
+        fields: {
+          "System.WorkItemType": "Task",
+          "System.State": "Active",
+        },
+      },
+      {
+        fields: {
+          "System.WorkItemType": "Task",
+          "System.State": "Done",
+        },
+      },
+    ] as any);
+
+    const props: IBoardSummaryTableProps = {
+      ...baseProps,
+      supportedWorkItemTypes: [{ name: "Task" } as any],
+    };
+
+    const { container, getByLabelText } = render(<BoardSummaryTable {...props} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(getByLabelText("totalWorkItemsCount 2")).toBeTruthy();
+    });
+  });
+
   it("handleActionItems processes boards with action items", async () => {
     const feedbackItemsWithActions = [
       { id: "item-1", associatedActionItemIds: [1, 2] },
@@ -1729,6 +1789,76 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
     // Click on Created Date header to trigger sorting
     const createdDateHeader = getByText("Created Date");
     createdDateHeader.click();
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("covers archivedDate sort branch when first row has no archivedDate", async () => {
+    const legacyArchived: IFeedbackBoardDocument = {
+      ...mockBoards[0],
+      id: "board-legacy-archived",
+      title: "Legacy Archived",
+      isArchived: true,
+      archivedDate: undefined,
+      createdDate: new Date("2024-01-02"),
+    };
+
+    const archivedWithDate: IFeedbackBoardDocument = {
+      ...mockBoards[1],
+      id: "board-archived-date",
+      title: "Archived With Date",
+      isArchived: true,
+      archivedDate: new Date("2024-01-01"),
+      createdDate: new Date("2024-01-01"),
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([legacyArchived, archivedWithDate]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    getByText("Archived Date").click();
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("covers archivedDate sort branch when second row has no archivedDate", async () => {
+    const archivedWithDate: IFeedbackBoardDocument = {
+      ...mockBoards[0],
+      id: "board-archived-date-first",
+      title: "Archived With Date First",
+      isArchived: true,
+      archivedDate: new Date("2024-01-01"),
+      createdDate: new Date("2024-01-02"),
+    };
+
+    const legacyArchived: IFeedbackBoardDocument = {
+      ...mockBoards[1],
+      id: "board-legacy-second",
+      title: "Legacy Second",
+      isArchived: true,
+      archivedDate: undefined,
+      createdDate: new Date("2024-01-01"),
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([archivedWithDate, legacyArchived]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    getByText("Archived Date").click();
 
     await waitFor(() => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
