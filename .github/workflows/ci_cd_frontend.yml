@@ -64,16 +64,16 @@ jobs:
         working-directory: "src/frontend"
 
       - if: steps.changes.outputs.src == 'true'
-        name: "Run tests"
-        run: npm test
-        working-directory: "src/frontend"
-
-      - if: steps.changes.outputs.src == 'true'
         name: "Build (bundle analysis)"
         run: npm run build
         working-directory: "src/frontend"
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - if: steps.changes.outputs.src == 'true'
+        name: "Run tests"
+        run: npm test
+        working-directory: "src/frontend"
 
       - if: success() || failure()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
