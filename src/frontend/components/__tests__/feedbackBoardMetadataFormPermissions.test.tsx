@@ -1043,6 +1043,24 @@ describe("Board Metadata Form Permissions", () => {
       expect(rows.length).toBeGreaterThan(0);
     });
 
+    it("should handle missing board (optional chaining) in existing board flow", () => {
+      const props = makeProps({
+        // Intentionally violate the type to exercise optional chaining branches.
+        board: undefined as unknown as any,
+        currentUserId: "some-user-id",
+        isNewBoardCreation: false,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [
+          { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
+          { id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" },
+        ],
+      });
+
+      const { queryByLabelText, getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      expect(getByLabelText("Add permission to every team or member in the table.")).toBeDisabled();
+      expect(queryByLabelText("Board owner badge")).not.toBeInTheDocument();
+    });
+
     it("should render isTeamAdmin boolean text when provided", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
