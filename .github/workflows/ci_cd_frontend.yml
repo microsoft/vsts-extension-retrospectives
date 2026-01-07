@@ -126,8 +126,9 @@ jobs:
         with:
           name: frontend
           flags: frontend
-          config_file: .github/codecov.yml
+          codecov_yml_path: .github/codecov.yml
           files: src/frontend/coverage/coverage-final.json,src/frontend/coverage/cobertura-coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
       - if: steps.changes.outputs.src == 'true'
