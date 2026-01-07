@@ -71,13 +71,15 @@ export class FocusManager {
   public findNextFocusableElement(container: HTMLElement, currentElement: HTMLElement, direction: "next" | "prev", selector = '[tabindex="0"], [tabindex="-1"], button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])'): HTMLElement | null {
     const focusableElements = Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(el => el.offsetParent !== null && !el.hasAttribute("aria-hidden"));
 
+    if (focusableElements.length === 0) return null;
+
     const currentIndex = focusableElements.indexOf(currentElement);
-    if (currentIndex === -1) return focusableElements[0] || null;
+    if (currentIndex === -1) return focusableElements[0];
 
     if (direction === "next") {
-      return focusableElements[currentIndex + 1] || focusableElements[0] || null;
+      return focusableElements[currentIndex + 1] ?? focusableElements[0];
     } else {
-      return focusableElements[currentIndex - 1] || focusableElements[focusableElements.length - 1] || null;
+      return focusableElements[currentIndex - 1] ?? focusableElements[focusableElements.length - 1];
     }
   }
 
