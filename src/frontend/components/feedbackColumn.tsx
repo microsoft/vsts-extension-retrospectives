@@ -469,7 +469,7 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
               Add new feedback
             </button>
           )}
-          {this.props.isDataLoaded && <div className={cn("feedback-items-container", this.props.workflowPhase === WorkflowPhase.Act && "feedback-items-actions")}>{this.renderFeedbackItems()}</div>}
+          {this.props.isDataLoaded && <div className="feedback-items-container">{this.renderFeedbackItems()}</div>}
         </div>
         <dialog ref={this.editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label="Edit column notes">
           <div className="header">

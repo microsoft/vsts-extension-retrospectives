@@ -2596,32 +2596,6 @@ describe("Feedback Column ", () => {
     });
   });
 
-  describe("Act phase CSS class", () => {
-    test("applies feedback-items-actions class in Act phase", () => {
-      const props = {
-        ...testColumnProps,
-        workflowPhase: WorkflowPhase.Act,
-        isDataLoaded: true,
-      };
-
-      const { container } = render(<FeedbackColumn {...props} />);
-      const itemsContainer = container.querySelector(".feedback-items-actions");
-      expect(itemsContainer).toBeTruthy();
-    });
-
-    test("does not apply feedback-items-actions class in Collect phase", () => {
-      const props = {
-        ...testColumnProps,
-        workflowPhase: WorkflowPhase.Collect,
-        isDataLoaded: true,
-      };
-
-      const { container } = render(<FeedbackColumn {...props} />);
-      const itemsContainer = container.querySelector(".feedback-items-actions");
-      expect(itemsContainer).toBeFalsy();
-    });
-  });
-
   describe("restoreFocus selection restoration", () => {
     test("restores INPUT selection range after focus", async () => {
       jest.useFakeTimers();
