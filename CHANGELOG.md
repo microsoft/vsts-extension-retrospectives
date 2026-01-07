@@ -7,7 +7,6 @@ You can find the changelog of the Retrospective Extension below.
 * Added Team Assessment History dialog with trend charts to review past assessment results. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
 * Enhanced timer with a configurable countdown, duration picker, start/stop chimes, and visibility that adapts by board phase. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392) and [GitHub PR #1405](https://github.com/microsoft/vsts-extension-retrospectives/pull/1405)
 * Implemented keyboard navigation, focus handling, and a dedicated keyboard shortcuts dialog for improved accessibility. From [GitHub PR #1386](https://github.com/microsoft/vsts-extension-retrospectives/pull/1386)
-* Sticky Settings: Board creation settings now remember your last selection
 * Restricts delete board functionality to the board owner or a team admin. From [GitHub PR #1308](https://github.com/microsoft/vsts-extension-retrospectives/pull/1308)
 * Updated hyperlinks in CONTRIBUTING markdown file. From [GitHub PR #1305](https://github.com/microsoft/vsts-extension-retrospectives/pull/1305)
 * Added "Ways to Contribute" to the CONTRIBUTING markdown file. From [GitHub PR #1304](https://github.com/microsoft/vsts-extension-retrospectives/pull/1304)
