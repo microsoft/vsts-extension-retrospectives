@@ -37,6 +37,9 @@ import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermis
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
 import { getIconElement } from "./icons";
+import { playStartChime, playStopChime } from "../utilities/audioHelper";
+import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../utilities/pdfHelper";
+import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -352,13 +355,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const isTimerMode = this.state.countdownDurationMinutes === 0;
 
     if (this.state.boardTimerSeconds === 0 && !isTimerMode) {
-      this.playStartChime();
+      playStartChime();
       this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60, hasPlayedStopChime: false }, () => {
         this.boardTimerIntervalId = window.setInterval(() => {
           this.setState(previousState => {
             const newSeconds = previousState.boardTimerSeconds - 1;
             if (newSeconds === 0 && !previousState.hasPlayedStopChime) {
-              this.playStopChime();
+              playStopChime();
               return { boardTimerSeconds: newSeconds, hasPlayedStopChime: true as const };
             }
             return { boardTimerSeconds: newSeconds, hasPlayedStopChime: previousState.hasPlayedStopChime };
@@ -366,7 +369,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         }, 1000);
       });
     } else {
-      this.playStartChime();
+      playStartChime();
       this.boardTimerIntervalId = window.setInterval(() => {
         this.setState(previousState => {
           const isTimerMode = this.state.countdownDurationMinutes === 0;
@@ -376,7 +379,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           } else {
             const newSeconds = previousState.boardTimerSeconds - 1;
             if (newSeconds === 0 && !previousState.hasPlayedStopChime) {
-              this.playStopChime();
+              playStopChime();
               return { boardTimerSeconds: newSeconds, hasPlayedStopChime: true as const };
             }
             return { boardTimerSeconds: newSeconds, hasPlayedStopChime: previousState.hasPlayedStopChime };
@@ -442,58 +445,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const seconds = absoluteSeconds % 60;
     const formattedTime = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     return isNegative ? `-${formattedTime}` : formattedTime;
-  };
-
-  private readonly playStopChime = () => {
-    const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-    const now = audioContext.currentTime;
-
-    const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5 (C major chord)
-
-    frequencies.forEach((freq, index) => {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.type = "sine";
-      oscillator.frequency.value = freq;
-
-      const delay = index * 0.05;
-      gainNode.gain.setValueAtTime(0, now + delay);
-      gainNode.gain.linearRampToValueAtTime(0.3, now + delay + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.3);
-
-      oscillator.start(now + delay);
-      oscillator.stop(now + delay + 0.3);
-    });
-  };
-
-  private readonly playStartChime = () => {
-    const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-    const now = audioContext.currentTime;
-
-    const frequencies = [783.99, 659.25, 523.25]; // G5, E5, C5 (descending)
-
-    frequencies.forEach((freq, index) => {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.type = "sine";
-      oscillator.frequency.value = freq;
-
-      const delay = index * 0.05;
-      gainNode.gain.setValueAtTime(0, now + delay);
-      gainNode.gain.linearRampToValueAtTime(0.3, now + delay + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.3);
-
-      oscillator.start(now + delay);
-      oscillator.stop(now + delay + 0.3);
-    });
   };
 
   private readonly renderWorkflowTimerControls = () => {
@@ -1384,151 +1335,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.previewEmailDialogRef?.current?.showModal();
   };
 
-  private readonly escapePdfText = (text: string): string => text.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
-
-  private readonly createPdfFromText = (text: string, title: string): Blob => {
-    const pageWidth = 612;
-    const pageHeight = 792;
-    const margin = 50;
-    const fontSize = 12;
-    const lineHeight = 16;
-    const startY = pageHeight - margin;
-    const startX = margin;
-    const avgCharWidth = fontSize * 0.6; // rough width for Helvetica
-    const maxCharsPerLine = Math.max(20, Math.floor((pageWidth - margin * 2) / avgCharWidth));
-    const maxLinesPerPage = Math.floor((pageHeight - margin * 2) / lineHeight);
-
-    const wrapParagraph = (paragraph: string): string[] => {
-      if (paragraph.trim().length === 0) {
-        return [" "];
-      }
-
-      const words = paragraph.split(/\s+/);
-      const lines: string[] = [];
-      let current = "";
-
-      const pushCurrent = () => {
-        if (current.length > 0) {
-          lines.push(current);
-          current = "";
-        }
-      };
-
-      for (let word of words) {
-        if (word.length > maxCharsPerLine) {
-          pushCurrent();
-          while (word.length > 0) {
-            lines.push(word.slice(0, maxCharsPerLine));
-            word = word.slice(maxCharsPerLine);
-          }
-          continue;
-        }
-
-        if (current.length === 0) {
-          current = word;
-          continue;
-        }
-
-        if (current.length + 1 + word.length <= maxCharsPerLine) {
-          current = `${current} ${word}`;
-        } else {
-          pushCurrent();
-          current = word;
-        }
-      }
-
-      pushCurrent();
-      return lines.length ? lines : [" "];
-    };
-
-    const lines = text.split(/\r?\n/).flatMap(wrapParagraph);
-
-    const pages: string[][] = [];
-    for (let i = 0; i < lines.length; i += maxLinesPerPage) {
-      pages.push(lines.slice(i, i + maxLinesPerPage));
-    }
-
-    const encoder = new TextEncoder();
-    let offset = 0;
-    const offsets: number[] = [];
-    const parts: string[] = [];
-
-    const add = (part: string) => {
-      parts.push(part);
-      offset += encoder.encode(part).length;
-    };
-
-    const addObject = (part: string) => {
-      offsets.push(offset);
-      add(part);
-    };
-
-    const pageObjectIds = pages.map((_, index) => 3 + index * 2);
-    const contentObjectIds = pages.map((_, index) => 4 + index * 2);
-    const fontObjId = 3 + pages.length * 2;
-
-    add("%PDF-1.4\n");
-
-    addObject(`1 0 obj\n<< /Type /Catalog /Pages 2 0 R /Title (${this.escapePdfText(title)}) >>\nendobj\n`);
-
-    const kidsArray = pageObjectIds.map(id => `${id} 0 R`).join(" ");
-    addObject(`2 0 obj\n<< /Type /Pages /Kids [${kidsArray}] /Count ${pages.length} >>\nendobj\n`);
-
-    pages.forEach((pageLines, index) => {
-      const pageObjId = pageObjectIds[index];
-      const contentObjId = contentObjectIds[index];
-
-      const contentStreamLines = pageLines
-        .map((line, lineIndex) => {
-          const escaped = this.escapePdfText(line);
-          const lineOp = `(${escaped}) Tj`;
-          if (lineIndex === pageLines.length - 1) {
-            return lineOp;
-          }
-          return `${lineOp}\nT*`;
-        })
-        .join("\n");
-
-      const contentStream = `BT\n/F1 ${fontSize} Tf\n${startX} ${startY} Td\n${lineHeight} TL\n${contentStreamLines}\nET\n`;
-      const contentLength = encoder.encode(contentStream).length;
-
-      addObject(`${pageObjId} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Contents ${contentObjId} 0 R /Resources << /Font << /F1 ${fontObjId} 0 R >> >> >>\nendobj\n`);
-      addObject(`${contentObjId} 0 obj\n<< /Length ${contentLength} >>\nstream\n${contentStream}endstream\nendobj\n`);
-    });
-
-    addObject(`${fontObjId} 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n`);
-
-    const xrefStart = offset;
-    const totalObjects = fontObjId;
-    add("xref\n");
-    add(`0 ${totalObjects + 1}\n`);
-    add("0000000000 65535 f \n");
-    for (const objOffset of offsets) {
-      add(`${objOffset.toString().padStart(10, "0")} 00000 n \n`);
-    }
-
-    add(`trailer\n<< /Size ${totalObjects + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`);
-
-    return new Blob([parts.join("")], { type: "application/pdf" });
-  };
-
   private readonly downloadEmailSummaryPdf = (): void => {
     const board = this.state.currentBoard;
     if (!board) {
       return;
     }
 
-    const pdfBlob = this.createPdfFromText(board.emailContent || "", board.title || "Retrospective Email Summary");
-    const fileName = `${(board.title || "Retrospective").replace(/\s+/g, "_")}_Email_Summary.pdf`;
-
-    const url = URL.createObjectURL(pdfBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const pdfBlob = createPdfFromText(board.emailContent || "", board.title || "Retrospective Email Summary");
+    const fileName = generatePdfFileName(board.title || "Retrospective", "Email_Summary");
+    downloadPdfBlob(pdfBlob, fileName);
   };
 
   private readonly renderBoardUpdateMetadataFormDialog = (isNewBoardCreation: boolean, isDuplicatingBoard: boolean, hidden: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => void, onCancel: () => void) => {
@@ -2274,118 +2089,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <p className="team-assessment-info-text">
                 Showing average scores over time across {this.state.teamAssessmentHistoryData.slice(-13).length} retrospective{this.state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
               </p>
-              {(() => {
-                const questionColors = [
-                  "#0078d4", // Blue
-                  "#107c10", // Green
-                  "#d83b01", // Orange-Red
-                  "#8764b8", // Purple
-                  "#00b7c3", // Cyan
-                  "#e81123", // Red
-                ];
-
-                const svgWidth = 1100;
-                const svgHeight = 500;
-                const padding = { top: 40, right: 230, bottom: 80, left: 80 };
-                const chartWidth = svgWidth - padding.left - padding.right;
-                const chartHeight = svgHeight - padding.top - padding.bottom;
-
-                const yScale = (value: number) => padding.top + chartHeight - (value / 10) * chartHeight;
-
-                const recentHistoryData = this.state.teamAssessmentHistoryData.slice(-13);
-
-                const allDates = recentHistoryData.map(board => new Date(board.createdDate).getTime());
-                const minDate = Math.min(...allDates);
-                const maxDate = Math.max(...allDates);
-                const dateRange = maxDate - minDate || 1;
-                const xScale = (date: Date) => padding.left + ((date.getTime() - minDate) / dateRange) * chartWidth;
-
-                return (
-                  <div>
-                    <svg width={svgWidth} height={svgHeight} className="team-assessment-history-svg">
-                      {[0, 2, 4, 6, 8, 10].map(value => (
-                        <g key={value}>
-                          <line x1={padding.left} y1={yScale(value)} x2={svgWidth - padding.right} y2={yScale(value)} stroke="#e0e0e0" strokeWidth="1" />
-                          <text x={padding.left - 10} y={yScale(value)} textAnchor="end" fontSize="14" fill="#666" dominantBaseline="middle">
-                            {value}
-                          </text>
-                        </g>
-                      ))}
-
-                      <line x1={padding.left} y1={svgHeight - padding.bottom} x2={svgWidth - padding.right} y2={svgHeight - padding.bottom} stroke="#666" strokeWidth="2" />
-
-                      <line x1={padding.left} y1={padding.top} x2={padding.left} y2={svgHeight - padding.bottom} stroke="#666" strokeWidth="2" />
-
-                      {questions.map((question, qIndex) => {
-                        const color = questionColors[qIndex % questionColors.length];
-                        const dataPoints = recentHistoryData
-                          .map(board => {
-                            const questionData = board.questionAverages.find(qa => qa.questionId === question.id);
-                            return questionData ? { date: new Date(board.createdDate), average: questionData.average, boardTitle: board.boardTitle } : null;
-                          })
-                          .filter(Boolean);
-
-                        if (dataPoints.length === 0) {
-                          return null;
-                        }
-
-                        const linePath = dataPoints.map((point, index) => `${index === 0 ? "M" : "L"} ${xScale(point.date)} ${yScale(point.average)}`).join(" ");
-
-                        return (
-                          <g key={question.id}>
-                            <path d={linePath} fill="none" stroke={color} strokeWidth="2.5" opacity="0.8" />
-
-                            {dataPoints.map((point, index) => (
-                              <circle key={index} cx={xScale(point.date)} cy={yScale(point.average)} r="4" fill={color} stroke="#fff" strokeWidth="2">
-                                <title>{`${question.shortTitle}\n${point.boardTitle}\nDate: ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(point.date)}\nAverage: ${this.numberFormatter(point.average)}`}</title>
-                              </circle>
-                            ))}
-                          </g>
-                        );
-                      })}
-
-                      {recentHistoryData.map((board, index) => {
-                        const date = new Date(board.createdDate);
-                        const shouldShowLabel = index === 0 || index === recentHistoryData.length - 1 || recentHistoryData.length <= 5 || (recentHistoryData.length > 5 && index % Math.ceil(recentHistoryData.length / 5) === 0);
-
-                        if (!shouldShowLabel) return null;
-
-                        return (
-                          <text key={index} x={xScale(date)} y={svgHeight - padding.bottom + 20} textAnchor="end" fontSize="12" fill="#666" transform={`rotate(-45 ${xScale(date)} ${svgHeight - padding.bottom + 20})`}>
-                            {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "2-digit" }).format(date)}
-                          </text>
-                        );
-                      })}
-
-                      <text x={padding.left - 50} y={svgHeight / 2} textAnchor="middle" fontSize="16" fill="#333" fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${svgHeight / 2})`}>
-                        Average Score
-                      </text>
-
-                      {questions.map((question, qIndex) => {
-                        const color = questionColors[qIndex % questionColors.length];
-                        const legendX = svgWidth - padding.right + 15;
-                        const legendY = padding.top + qIndex * 70;
-
-                        return (
-                          <g key={question.id}>
-                            <line x1={legendX} y1={legendY} x2={legendX + 30} y2={legendY} stroke={color} strokeWidth="2.5" />
-                            <circle cx={legendX + 15} cy={legendY} r="4" fill={color} stroke="#fff" strokeWidth="2" />
-                            <text x={legendX + 40} y={legendY - 5} fontSize="13" fill="#333" fontWeight="600">
-                              <tspan>{question.shortTitle}</tspan>
-                            </text>
-                            <text x={legendX + 40} y={legendY + 10} fontSize="10" fill="#666">
-                              <tspan>
-                                {question.title.substring(0, 25)}
-                                {question.title.length > 25 ? "..." : ""}
-                              </tspan>
-                            </text>
-                          </g>
-                        );
-                      })}
-                    </svg>
-                  </div>
-                );
-              })()}
+              <TeamAssessmentHistoryChart
+                historyData={this.state.teamAssessmentHistoryData.slice(-13)}
+                numberFormatter={this.numberFormatter}
+              />
             </>
           )}
         </Dialog>
