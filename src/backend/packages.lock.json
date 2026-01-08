@@ -63,9 +63,9 @@
       },
       "Microsoft.AspNetCore.SignalR.Core": {
         "type": "Direct",
-        "requested": "[1.2.8, )",
-        "resolved": "1.2.8",
-        "contentHash": "AcfyTrGHYAc0E+Q9E7rECJkof6W4UmvAZ0de4KJTJAiCvhitaU3QSZ0l/ARSlXqq+BlK5zoy79dJFJNGiEDiUg==",
+        "requested": "[1.2.9, )",
+        "resolved": "1.2.9",
+        "contentHash": "abZMiK7Cmiitz76S9enL86j7sQ6GUC3lKAggFbiT3njvDoGClvPZCloVZgYbLW9AzhdVRTf7JYUeiJgYAYQS8Q==",
         "dependencies": {
           "Microsoft.AspNetCore.Authorization": "2.3.0",
           "Microsoft.AspNetCore.SignalR.Common": "1.2.0",
