@@ -197,7 +197,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
             <span className="hidden lg:inline">Data</span>
           </summary>
 
-          <div className="callout-menu left">
+          <div className="callout-menu right">
             <button
               onClick={() => {
                 this.importData();
