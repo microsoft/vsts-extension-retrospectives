@@ -578,7 +578,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       return;
     }
 
-    // @ts-ignore TS2345
     this.setState(prevState => {
       const boardsForTeam = [...prevState.boards, boardToAdd]
         .filter((board: IFeedbackBoardDocument) =>
@@ -590,19 +589,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         )
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
-      const baseResult = {
+      const newCurrentBoard = boardsForTeam.length === 1 ? boardsForTeam[0] : prevState.currentBoard;
+
+      return {
         boards: boardsForTeam,
+        currentBoard: newCurrentBoard,
         isTeamBoardDeletedInfoDialogHidden: true,
       };
-
-      if (boardsForTeam.length === 1) {
-        return {
-          ...baseResult,
-          currentBoard: boardsForTeam[0],
-        };
-      }
-
-      return baseResult;
     });
   };
 
@@ -999,7 +992,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
       }
 
-      // @ts-ignore TS2345
       this.setState(prevState => {
         // Ensure that we are actually changing teams to prevent needless rerenders.
         if (!prevState.currentTeam || prevState.currentTeam.id !== matchedTeam.id) {
@@ -1011,7 +1003,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           };
         }
 
-        return {};
+        return null;
       });
     }
   };
@@ -1083,7 +1075,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     if (matchedBoard) {
-      // @ts-ignore TS2345
       this.setState(prevState => {
         // Ensure that we are actually changing boards to prevent needless rerenders.
         if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {
@@ -1092,7 +1083,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           };
         }
 
-        return {};
+        return null;
       });
     }
   };
@@ -2089,10 +2080,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               <p className="team-assessment-info-text">
                 Showing average scores over time across {this.state.teamAssessmentHistoryData.slice(-13).length} retrospective{this.state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
               </p>
-              <TeamAssessmentHistoryChart
-                historyData={this.state.teamAssessmentHistoryData.slice(-13)}
-                numberFormatter={this.numberFormatter}
-              />
+              <TeamAssessmentHistoryChart historyData={this.state.teamAssessmentHistoryData.slice(-13)} numberFormatter={this.numberFormatter} />
             </>
           )}
         </Dialog>
