@@ -295,7 +295,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
             </button>
           </div>
           <div className="subText">This release focuses on accessibility, simplified stylings, and clearer visuals.</div>
-          <div className="subText li">Standardized icons throughout the extension to ensure a consistent look and feel. Icons are included in the package, enabling support for Azure DevOps Enterprise environments.</div>
+          <div className="subText li">Standardized icons to ensure a consistent look and feel. Icons are included in the package, enabling support for Azure DevOps Enterprise environments.</div>
           <div className="subText li">Redesigned the voting phase to include the total votes used by the team.</div>
           <div className="subText li">Added support for Retrospective Board columns to include notes to clarify what is expected from the user.</div>
           <div className="subText li">Added full keyboard navigation across the board along with a dedicated keyboard shortcuts dialog and improved focus handling.</div>
