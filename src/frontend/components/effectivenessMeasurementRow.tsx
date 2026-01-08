@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback, useMemo } from "react";
 
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
@@ -16,55 +16,52 @@ export interface EffectivenessMeasurementRowProps {
   onSelectedChange: (selected: number) => void;
 }
 
-export interface EffectivenessMeasurementRowState {
-  selected: number;
-}
+const VOTING_SCALE = Array.from({ length: 10 }, (_, index) => index + 1);
 
-export default class EffectivenessMeasurementRow extends React.Component<EffectivenessMeasurementRowProps, EffectivenessMeasurementRowState> {
-  private readonly votingScale = Array.from({ length: 10 }, (_, index) => index + 1);
-
-  constructor(props: EffectivenessMeasurementRowProps) {
-    super(props);
+const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = ({ title, subtitle, iconClassName, tooltip, questionId, votes = [], onSelectedChange }) => {
+  const initialSelection = useMemo(() => {
     const currentUserId = obfuscateUserId(getUserIdentity().id);
-    const votes = this.props.votes || [];
     const vote = votes.find(e => e.userId === currentUserId)?.responses || [];
-    const currentVote = vote.filter(vote => vote.questionId === this.props.questionId || "");
-    this.state = {
-      selected: currentVote.length > 0 ? currentVote[0].selection : 0,
-    };
-  }
+    const currentVote = vote.filter(v => v.questionId === questionId || "");
+    return currentVote.length > 0 ? currentVote[0].selection : 0;
+  }, [votes, questionId]);
 
-  updateSelected = (selected: number) => {
-    this.setState({ selected });
-    this.props.onSelectedChange(selected);
-  };
+  const [selected, setSelected] = useState(initialSelection);
 
-  public render() {
-    return (
-      <tr className="effectiveness-measurement-row">
-        <th scope="row">
-          <p>
-            {getIconElement(this.props.iconClassName)}
-            {this.props.title}
-          </p>
-          {this.props.subtitle}
-        </th>
-        <td className="effectiveness-measurement-tooltip-cell">
-          <button className="contextual-menu-button tooltip" aria-label={this.props.tooltip} title={this.props.tooltip}>
-            {getIconElement("exclamation")}
-          </button>
-        </td>
-        {this.votingScale.map((value: number) => {
-          const isSelected = this.state.selected === value;
-          return (
-            <td key={value}>
-              <button type="button" className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`} aria-label={`${value}`} aria-pressed={isSelected} onClick={() => this.updateSelected(value)}>
-                <span className="team-assessment-score-circle" />
-              </button>
-            </td>
-          );
-        })}
-      </tr>
-    );
-  }
-}
+  const handleSelect = useCallback(
+    (value: number) => {
+      setSelected(value);
+      onSelectedChange(value);
+    },
+    [onSelectedChange],
+  );
+
+  return (
+    <tr className="effectiveness-measurement-row">
+      <th scope="row">
+        <p>
+          {getIconElement(iconClassName)}
+          {title}
+        </p>
+        {subtitle}
+      </th>
+      <td className="effectiveness-measurement-tooltip-cell">
+        <button className="contextual-menu-button tooltip" aria-label={tooltip} title={tooltip}>
+          {getIconElement("exclamation")}
+        </button>
+      </td>
+      {VOTING_SCALE.map((value: number) => {
+        const isSelected = selected === value;
+        return (
+          <td key={value}>
+            <button type="button" className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`} aria-label={`${value}`} aria-pressed={isSelected} onClick={() => handleSelect(value)}>
+              <span className="team-assessment-score-circle" />
+            </button>
+          </td>
+        );
+      })}
+    </tr>
+  );
+};
+
+export default EffectivenessMeasurementRow;

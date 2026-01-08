@@ -12,14 +12,12 @@ export interface EditableDocumentCardTitleProps {
   onSave: (newText: string) => void;
 }
 
-class EditableDocumentCardTitle extends React.Component<EditableDocumentCardTitleProps> {
-  public render(): React.JSX.Element {
-    return (
-      <div className="editable-document-card-title">
-        <EditableText isDisabled={this.props.isDisabled} isMultiline={this.props.isMultiline} maxLength={this.props.maxLength} text={this.props.title} isChangeEventRequired={this.props.isChangeEventRequired} onSave={this.props.onSave} />
-      </div>
-    );
-  }
-}
+const EditableDocumentCardTitle: React.FC<EditableDocumentCardTitleProps> = ({ isDisabled, isMultiline, maxLength, title, isChangeEventRequired, onSave }) => {
+  return (
+    <div className="editable-document-card-title">
+      <EditableText isDisabled={isDisabled} isMultiline={isMultiline} maxLength={maxLength} text={title} isChangeEventRequired={isChangeEventRequired} onSave={onSave} />
+    </div>
+  );
+};
 
 export default withAITracking(reactPlugin, EditableDocumentCardTitle);
