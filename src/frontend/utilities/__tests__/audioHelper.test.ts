@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import { getAudioContextConstructor, createAudioContext, playNote, playChime, playStartChime, playStopChime, isAudioSupported } from "../audioHelper";
 
 describe("audioHelper", () => {
@@ -81,6 +84,9 @@ describe("audioHelper", () => {
   });
 
   describe("getAudioContextConstructor", () => {
+    // Note: The SSR scenario (typeof window === "undefined") is tested in audioHelper.node.test.ts
+    // which runs with @jest-environment node
+
     it("should return AudioContext when available", () => {
       const MockAudioContext = jest.fn();
       Object.defineProperty(window, "AudioContext", {

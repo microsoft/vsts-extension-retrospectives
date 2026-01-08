@@ -195,6 +195,21 @@ describe("markdownUtils", () => {
         expect(tokens[0]).toEqual({ type: "text", content: "abc" });
       });
 
+      it("should not merge text tokens when non-text token is between them", () => {
+        // This tests the branch when mergedTokens has tokens but the last one is not a text token
+        const tokens = tokenizeMarkdown("**bold**text after");
+        expect(tokens).toHaveLength(2);
+        expect(tokens[0]).toEqual({ type: "bold", content: "bold" });
+        expect(tokens[1]).toEqual({ type: "text", content: "text after" });
+      });
+
+      it("should push first text token when mergedTokens is empty", () => {
+        // This tests the branch when mergedTokens.length === 0 and we push the first token
+        const tokens = tokenizeMarkdown("just text");
+        expect(tokens).toHaveLength(1);
+        expect(tokens[0]).toEqual({ type: "text", content: "just text" });
+      });
+
       it("should handle text ending without special characters after special char in middle", () => {
         // This tests the branch when nextSpecialIndex === -1 (no more special chars after the current position)
         const tokens = tokenizeMarkdown("text with a trailing asterisk* at end");
@@ -273,6 +288,23 @@ describe("markdownUtils", () => {
           expect(props.target).toBe("_blank");
           expect(props.rel).toBe("noopener noreferrer");
           expect(props.children).toBe("link");
+        }
+      }
+    });
+
+    it("should have onClick handler that stops propagation on link elements", () => {
+      const result = parseMarkdown("[link](https://example.com)");
+      expect(Array.isArray(result)).toBe(true);
+      if (Array.isArray(result) && result.length > 0) {
+        const element = result[0];
+        expect(React.isValidElement(element)).toBe(true);
+        if (React.isValidElement(element)) {
+          const props = element.props as { onClick: (e: React.MouseEvent) => void };
+          expect(typeof props.onClick).toBe("function");
+          // Call the onClick handler with a mock event to cover line 159
+          const mockEvent = { stopPropagation: jest.fn() } as unknown as React.MouseEvent;
+          props.onClick(mockEvent);
+          expect(mockEvent.stopPropagation).toHaveBeenCalled();
         }
       }
     });
