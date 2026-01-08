@@ -3,9 +3,6 @@ import { IUserContext, getUser } from "azure-devops-extension-sdk";
 
 let userIdentity: IdentityRef;
 
-/**
- * Get the identity of current user
- */
 export const getUserIdentity = (): IdentityRef => {
   if (!userIdentity) {
     const currentUser: IUserContext = getUser();
@@ -26,7 +23,7 @@ export const getUserIdentity = (): IdentityRef => {
   return userIdentity;
 };
 
-export const encrypt = (id: string): string => {
+export const obfuscateUserId = (id: string): string => {
   return id
     .split("")
     .reverse()
@@ -36,7 +33,7 @@ export const encrypt = (id: string): string => {
     .join("");
 };
 
-export const decrypt = (id: string): string => {
+export const deobfuscateUserId = (id: string): string => {
   return id
     .split("")
     .reverse()

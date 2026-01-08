@@ -34,6 +34,8 @@ const mockUserIdentity = {
 
 jest.mock("../../utilities/userIdentityHelper", () => ({
   getUserIdentity: () => mockUserIdentity,
+  obfuscateUserId: () => "encrypted-data",
+  deobfuscateUserId: (id: string) => id,
   encrypt: () => "encrypted-data",
 }));
 

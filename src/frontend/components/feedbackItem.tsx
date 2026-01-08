@@ -17,7 +17,7 @@ import { itemDataService } from "../dal/itemDataService";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { reflectBackendService } from "../dal/reflectBackendService";
 import { IColumn, IColumnItem } from "./feedbackBoard";
-import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
+import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement } from "./icons";
@@ -658,7 +658,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
   };
 
   private readonly isVoted = async (feedbackItemId: string) => {
-    const userId = encrypt(getUserIdentity().id);
+    const userId = obfuscateUserId(getUserIdentity().id);
     itemDataService.isVoted(this.props.boardId, userId, feedbackItemId).then(result => {
       this.setState({ userVotes: result });
     });
@@ -831,7 +831,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
         return item;
       })
       .filter(item => item !== undefined) as IFeedbackItemDocument[];
-    const userId = encrypt(getUserIdentity().id);
+    const userId = obfuscateUserId(getUserIdentity().id);
 
     const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
     const votesByUser = this.state.userVotes;

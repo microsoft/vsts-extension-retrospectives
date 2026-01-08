@@ -9,7 +9,7 @@ import { itemDataService } from "../dal/itemDataService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { reflectBackendService } from "../dal/reflectBackendService";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
-import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
+import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import BoardSummaryTableHeader from "./boardSummaryTableHeader";
 import BoardSummaryTableBody from "./boardSummaryTableBody";
 import { getIconElement } from "./icons";
@@ -406,7 +406,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           boardId: openDialogBoardId,
           boardName: selectedBoardForDelete?.boardName || "Unknown Board",
           feedbackItemsCount: selectedBoardForDelete?.feedbackItemsCount || 0,
-          deletedByUserId: encrypt(getUserIdentity().id),
+          deletedByUserId: obfuscateUserId(getUserIdentity().id),
         },
       });
     } catch (error) {

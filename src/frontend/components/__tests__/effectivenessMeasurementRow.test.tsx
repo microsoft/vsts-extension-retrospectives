@@ -3,15 +3,15 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import EffectivenessMeasurementRow, { EffectivenessMeasurementRowProps } from "../effectivenessMeasurementRow";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../../interfaces/feedback";
-import { encrypt, getUserIdentity } from "../../utilities/userIdentityHelper";
+import { obfuscateUserId, getUserIdentity } from "../../utilities/userIdentityHelper";
 
 jest.mock("../../utilities/userIdentityHelper", () => ({
   getUserIdentity: jest.fn(),
-  encrypt: jest.fn(),
+  obfuscateUserId: jest.fn(),
 }));
 
 const mockGetUserIdentity = getUserIdentity as jest.MockedFunction<typeof getUserIdentity>;
-const mockEncrypt = encrypt as jest.MockedFunction<typeof encrypt>;
+const mockObfuscateUserId = obfuscateUserId as jest.MockedFunction<typeof obfuscateUserId>;
 
 const defaultProps: EffectivenessMeasurementRowProps = {
   questionId: 1,
@@ -37,7 +37,7 @@ describe("EffectivenessMeasurementRow", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetUserIdentity.mockReturnValue({ id: "test-user-id" } as any);
-    mockEncrypt.mockReturnValue("encrypted-test-user-id");
+    mockObfuscateUserId.mockReturnValue("encrypted-test-user-id");
   });
 
   describe("Component Rendering", () => {

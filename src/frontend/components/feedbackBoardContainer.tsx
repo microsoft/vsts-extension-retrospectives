@@ -26,7 +26,7 @@ import { itemDataService } from "../dal/itemDataService";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
-import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
+import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
@@ -541,7 +541,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const votes = Object.values(voteCollection);
     const totalVotesUsed = votes.length > 0 ? votes.reduce((sum, vote) => sum + vote, 0) : 0;
 
-    const userIdKey = encrypt(this.state.currentUserId);
+    const userIdKey = obfuscateUserId(this.state.currentUserId);
     const currentUserVotes = voteCollection[userIdKey]?.toString() || "0";
 
     const voterCount = Object.keys(voteCollection).length;
@@ -1497,7 +1497,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const saveTeamEffectivenessMeasurement = () => {
       const teamEffectivenessMeasurementVoteCollection = this.state.currentBoard.teamEffectivenessMeasurementVoteCollection;
-      const currentUserId = encrypt(this.state.currentUserId);
+      const currentUserId = obfuscateUserId(this.state.currentUserId);
       const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
       const responseCount = currentUserVote?.responses?.length || 0;
 
@@ -1518,7 +1518,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         currentBoard.teamEffectivenessMeasurementVoteCollection = [];
       }
 
-      const currentUserId = encrypt(this.state.currentUserId);
+      const currentUserId = obfuscateUserId(this.state.currentUserId);
       if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.push({
           userId: currentUserId,

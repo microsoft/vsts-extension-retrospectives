@@ -334,7 +334,7 @@ jest.spyOn(userIdentityHelper, "getUserIdentity").mockReturnValue({
   id: "user-1", // make sure the id matches your test
 });
 
-jest.spyOn(userIdentityHelper, "encrypt").mockImplementation(id => `encrypted-${id}`);
+jest.spyOn(userIdentityHelper, "obfuscateUserId").mockImplementation(id => `encrypted-${id}`);
 
 describe("buildBoardSummaryState", () => {
   it("returns empty state when no boards exist", () => {

@@ -1,7 +1,7 @@
 import { WorkItem } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
 import { appInsights } from "../utilities/telemetryClient";
-import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
+import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { workItemService } from "./azureDevOpsWorkItemService";
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from "./dataService";
 import { generateUUID } from "../utilities/random";
@@ -258,7 +258,7 @@ class ItemDataService {
    * Increment or decrement the vote of the feedback item.
    */
   public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
-    const encryptedUserId = encrypt(userId);
+    const encryptedUserId = obfuscateUserId(userId);
 
     // Step 1: Fetch Feedback and Board Items
     const feedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);

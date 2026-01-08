@@ -1,6 +1,6 @@
 import React from "react";
 
-import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
+import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
 import { getIconElement } from "./icons";
 
@@ -25,7 +25,7 @@ export default class EffectivenessMeasurementRow extends React.Component<Effecti
 
   constructor(props: EffectivenessMeasurementRowProps) {
     super(props);
-    const currentUserId = encrypt(getUserIdentity().id);
+    const currentUserId = obfuscateUserId(getUserIdentity().id);
     const votes = this.props.votes || [];
     const vote = votes.find(e => e.userId === currentUserId)?.responses || [];
     const currentVote = vote.filter(vote => vote.questionId === this.props.questionId || "");

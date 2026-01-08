@@ -60,6 +60,8 @@ jest.mock("../../utilities/userIdentityHelper", () => ({
     uniqueName: "testuser@example.com",
     imageUrl: "https://example.com/avatar.jpg",
   }),
+  obfuscateUserId: (id: string) => id,
+  deobfuscateUserId: (id: string) => id,
   encrypt: (id: string) => id,
   decrypt: (id: string) => id,
 }));
