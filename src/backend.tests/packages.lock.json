@@ -282,8 +282,8 @@
       },
       "Microsoft.AspNetCore.SignalR.Core": {
         "type": "Transitive",
-        "resolved": "1.2.8",
-        "contentHash": "AcfyTrGHYAc0E+Q9E7rECJkof6W4UmvAZ0de4KJTJAiCvhitaU3QSZ0l/ARSlXqq+BlK5zoy79dJFJNGiEDiUg==",
+        "resolved": "1.2.9",
+        "contentHash": "abZMiK7Cmiitz76S9enL86j7sQ6GUC3lKAggFbiT3njvDoGClvPZCloVZgYbLW9AzhdVRTf7JYUeiJgYAYQS8Q==",
         "dependencies": {
           "Microsoft.AspNetCore.Authorization": "2.3.0",
           "Microsoft.AspNetCore.SignalR.Common": "1.2.0",
@@ -1128,7 +1128,7 @@
           "Azure.Security.KeyVault.Secrets": "[4.8.0, )",
           "Microsoft.ApplicationInsights.AspNetCore": "[2.23.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[9.0.11, )",
-          "Microsoft.AspNetCore.SignalR.Core": "[1.2.8, )",
+          "Microsoft.AspNetCore.SignalR.Core": "[1.2.9, )",
           "Microsoft.Azure.SignalR": "[1.32.0, )",
           "Microsoft.Extensions.Hosting": "[10.0.1, )",
           "System.IdentityModel.Tokens.Jwt": "[8.15.0, )"
