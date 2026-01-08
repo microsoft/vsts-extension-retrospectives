@@ -161,7 +161,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .callout-menu {
-    @apply absolute mt-3 bg-[rgb(var(--palette-neutral-6))] text-sm shadow-lg min-w-48 z-10;
+    @apply absolute mt-3 bg-[rgb(var(--palette-neutral-2))] text-sm shadow-lg drop-shadow-lg min-w-48 z-10;
 
     &.left {
       @apply left-0;
@@ -431,7 +431,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board {
-  @apply w-full table table-fixed;
+  @apply w-full table table-fixed h-[calc(100vh-132px)];
 }
 
 .keyboard-shortcuts-dialog {
@@ -1633,7 +1633,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .callout-menu {
-    @apply absolute mt-3 bg-[rgb(var(--palette-neutral-6))] text-sm shadow-lg min-w-60 z-10;
+    @apply absolute mt-3 bg-[rgb(var(--palette-neutral-2))] text-sm shadow-lg drop-shadow-lg min-w-60 z-10;
 
     &.left {
       @apply left-0;

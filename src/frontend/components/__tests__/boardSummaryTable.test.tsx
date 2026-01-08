@@ -952,6 +952,66 @@ describe("BoardSummaryTable - Action Items Loading", () => {
     (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue(mockBoards);
   });
 
+  it("updates total work item counts when action items are loaded", async () => {
+    const boards: IFeedbackBoardDocument[] = [
+      {
+        ...mockBoards[0],
+        id: "board-with-actions",
+        title: "Board With Actions",
+        createdDate: new Date("2024-01-02"),
+      },
+      {
+        ...mockBoards[1],
+        id: "board-no-actions",
+        title: "Board No Actions",
+        createdDate: new Date("2024-01-01"),
+      },
+    ];
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(boards);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockImplementation(async (boardId: string) => {
+      if (boardId === "board-with-actions") {
+        return [{ id: "item-1", associatedActionItemIds: [1, 2] }] as any;
+      }
+      return [] as any;
+    });
+
+    (workItemService.getWorkItemStates as jest.Mock).mockResolvedValue([
+      { name: "Active", category: "InProgress" },
+      { name: "Done", category: "Completed" },
+    ] as any);
+
+    (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([
+      {
+        fields: {
+          "System.WorkItemType": "Task",
+          "System.State": "Active",
+        },
+      },
+      {
+        fields: {
+          "System.WorkItemType": "Task",
+          "System.State": "Done",
+        },
+      },
+    ] as any);
+
+    const props: IBoardSummaryTableProps = {
+      ...baseProps,
+      supportedWorkItemTypes: [{ name: "Task" } as any],
+    };
+
+    const { container, getByLabelText } = render(<BoardSummaryTable {...props} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    await waitFor(() => {
+      expect(getByLabelText("totalWorkItemsCount 2")).toBeTruthy();
+    });
+  });
+
   it("handleActionItems processes boards with action items", async () => {
     const feedbackItemsWithActions = [
       { id: "item-1", associatedActionItemIds: [1, 2] },
@@ -1735,6 +1795,76 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
     });
   });
 
+  it("covers archivedDate sort branch when first row has no archivedDate", async () => {
+    const legacyArchived: IFeedbackBoardDocument = {
+      ...mockBoards[0],
+      id: "board-legacy-archived",
+      title: "Legacy Archived",
+      isArchived: true,
+      archivedDate: undefined,
+      createdDate: new Date("2024-01-02"),
+    };
+
+    const archivedWithDate: IFeedbackBoardDocument = {
+      ...mockBoards[1],
+      id: "board-archived-date",
+      title: "Archived With Date",
+      isArchived: true,
+      archivedDate: new Date("2024-01-01"),
+      createdDate: new Date("2024-01-01"),
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([legacyArchived, archivedWithDate]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    getByText("Archived Date").click();
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
+  it("covers archivedDate sort branch when second row has no archivedDate", async () => {
+    const archivedWithDate: IFeedbackBoardDocument = {
+      ...mockBoards[0],
+      id: "board-archived-date-first",
+      title: "Archived With Date First",
+      isArchived: true,
+      archivedDate: new Date("2024-01-01"),
+      createdDate: new Date("2024-01-02"),
+    };
+
+    const legacyArchived: IFeedbackBoardDocument = {
+      ...mockBoards[1],
+      id: "board-legacy-second",
+      title: "Legacy Second",
+      isArchived: true,
+      archivedDate: undefined,
+      createdDate: new Date("2024-01-01"),
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([archivedWithDate, legacyArchived]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    getByText("Archived Date").click();
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+  });
+
   it("closes delete dialog via close button in header", async () => {
     const archivedBoard: IFeedbackBoardDocument = { ...mockBoards[0], id: "board-close-test", title: "Close Test Board", isArchived: true, archivedDate: new Date(Date.now() - 5 * 60 * 1000) };
     (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([archivedBoard]);
@@ -1758,11 +1888,17 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
       expect(container.querySelector(".delete-board-dialog")).toBeTruthy();
     });
 
-    // Close via the close button in header
-    const closeButton = getByLabelText("Close");
-    closeButton.click();
+    const dialog = container.querySelector(".delete-board-dialog") as HTMLDialogElement;
+    const headerCloseButton = container.querySelector('.delete-board-dialog .header button[aria-label="Close"]') as HTMLButtonElement;
 
-    expect(container).toBeTruthy();
+    expect(dialog).toBeTruthy();
+    expect(headerCloseButton).toBeTruthy();
+
+    fireEvent.click(headerCloseButton);
+
+    await waitFor(() => {
+      expect((dialog as any).open).toBe(false);
+    });
   });
 
   it("closes delete dialog via default close button", async () => {
@@ -1788,10 +1924,17 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
       expect(container.querySelector(".delete-board-dialog")).toBeTruthy();
     });
 
-    // Close via the Close button in the dialog footer
-    getByText("Close").click();
+    const dialog = container.querySelector(".delete-board-dialog") as HTMLDialogElement;
+    const footerCloseButton = container.querySelector(".delete-board-dialog .inner button.default.button") as HTMLButtonElement;
 
-    expect(container).toBeTruthy();
+    expect(dialog).toBeTruthy();
+    expect(footerCloseButton).toBeTruthy();
+
+    fireEvent.click(footerCloseButton);
+
+    await waitFor(() => {
+      expect((dialog as any).open).toBe(false);
+    });
   });
 
   it("triggers onClose handler when dialog is closed", async () => {
@@ -1813,14 +1956,18 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
     const trashIcon = container.querySelector(".trash-icon") as HTMLElement;
     trashIcon?.click();
 
+    const dialog = container.querySelector(".delete-board-dialog") as HTMLDialogElement;
+
     await waitFor(() => {
-      const dialog = container.querySelector(".delete-board-dialog") as HTMLDialogElement;
       expect(dialog).toBeTruthy();
-      // Simulate the close event
-      dialog.dispatchEvent(new Event("close"));
+      expect((dialog as any).open).toBe(true);
     });
 
-    expect(container).toBeTruthy();
+    dialog.dispatchEvent(new Event("close"));
+
+    await waitFor(() => {
+      expect((dialog as any).open).toBe(false);
+    });
   });
 
   it("covers non-date sort branches: aVal > bVal and equality return 0", async () => {
@@ -1842,13 +1989,82 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
     });
 
-    // Trigger non-date sorting by clicking the name header.
-    const titleHeader = getByText("Retrospective Name");
-    titleHeader.click();
+    // Trigger non-date sorting by clicking the <th> (onClick handler is on the header cell).
+    const titleHeaderCell = getByText("Retrospective Name").closest("th") as HTMLTableCellElement;
+    expect(titleHeaderCell).toBeTruthy();
+    fireEvent.click(titleHeaderCell);
+
+    await waitFor(() => {
+      expect(titleHeaderCell.getAttribute("aria-sort")).toBe("ascending");
+    });
 
     await waitFor(() => {
       const rows = container.querySelectorAll('tbody tr[tabindex="0"]');
       expect(rows.length).toBeGreaterThanOrEqual(4);
+    });
+  });
+
+  it("covers non-date sort branch when aVal is null/undefined", async () => {
+    const boardWithMissingTitle: IFeedbackBoardDocument = {
+      ...(mockBoards[0] as any),
+      id: "board-missing-title-a",
+      title: undefined,
+      createdDate: new Date("2024-02-02"),
+    };
+
+    const boardWithTitle: IFeedbackBoardDocument = {
+      ...mockBoards[1],
+      id: "board-has-title-a",
+      title: "Alpha",
+      createdDate: new Date("2024-02-01"),
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([boardWithMissingTitle, boardWithTitle]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const titleHeaderCell = getByText("Retrospective Name").closest("th") as HTMLTableCellElement;
+    fireEvent.click(titleHeaderCell);
+
+    await waitFor(() => {
+      expect(titleHeaderCell.getAttribute("aria-sort")).toBe("ascending");
+    });
+  });
+
+  it("covers non-date sort branch when bVal is null/undefined", async () => {
+    const boardWithTitle: IFeedbackBoardDocument = {
+      ...mockBoards[0],
+      id: "board-has-title-b",
+      title: "Alpha",
+      createdDate: new Date("2024-02-02"),
+    };
+
+    const boardWithMissingTitle: IFeedbackBoardDocument = {
+      ...(mockBoards[1] as any),
+      id: "board-missing-title-b",
+      title: undefined,
+      createdDate: new Date("2024-02-01"),
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([boardWithTitle, boardWithMissingTitle]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const titleHeaderCell = getByText("Retrospective Name").closest("th") as HTMLTableCellElement;
+    fireEvent.click(titleHeaderCell);
+
+    await waitFor(() => {
+      expect(titleHeaderCell.getAttribute("aria-sort")).toBe("ascending");
     });
   });
 });

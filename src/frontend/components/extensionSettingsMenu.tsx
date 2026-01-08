@@ -197,7 +197,7 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
             <span className="hidden lg:inline">Data</span>
           </summary>
 
-          <div className="callout-menu left">
+          <div className="callout-menu right">
             <button
               onClick={() => {
                 this.importData();
@@ -298,8 +298,11 @@ export class ExtensionSettingsMenu extends React.Component<Record<string, never>
           <div className="subText li">Added full keyboard navigation across the board along with a dedicated keyboard shortcuts dialog and improved focus handling.</div>
           <div className="subText li">Introduced a configurable countdown timer with a duration picker, start and stop chimes.</div>
           <div className="subText li">Added a Team Assessment History dialog with trend charts so teams can review past assessment results.</div>
+          <div className="subText li">Added support for Retrospective Board columns to include notes to clarify what is expected from the user.</div>
+          <div className="subText li">Standardized icons to ensure a consistent look and feel. Icons are included in the package, enabling support for Azure DevOps Enterprise environments.</div>
+          <div className="subText li">Redesigned the voting phase to include the total votes used by the team.</div>
           <div className="subText li">Refined feedback cards, grouped feedback visuals, and dialog layouts for better readability and consistency.</div>
-          <div className="subText li">Hid the delete icon when a board is not archived to avoid confusing destructive actions.</div>
+          <div className="subText li">Restricted board deletion permissions to the Board Owner and Team Admin.</div>
           <div className="subText">Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.</div>
           <div className="inner">
             <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>

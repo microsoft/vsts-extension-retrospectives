@@ -29,6 +29,14 @@ export const PrivacyTipIcon = () => {
   );
 };
 
+export const EyeIcon = () => {
+  return (
+    <svg className="icon-eye" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+<path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 6.5c3.79 0 7.17 2.13 8.82 5.5-1.65 3.37-5.02 5.5-8.82 5.5S4.83 15.37 3.18 12C4.83 8.63 8.21 6.5 12 6.5m0-2C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 5c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5-2.5-1.12-2.5-2.5 1.12-2.5 2.5-2.5m0-2c-2.48 0-4.5 2.02-4.5 4.5s2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5-2.02-4.5-4.5-4.5z"/>
+    </svg>
+  );
+};
+
 export const AssessmentIcon = () => {
   return (
     <svg className="icon-assessment" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -795,7 +803,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "sad-face", tags: ["far fa-frown"], name: "Frown", icon: <SadFaceIcon /> },
   { id: "angry-face", tags: ["far fa-angry"], name: "Angry", icon: <AngryFaceIcon /> },
   { id: "help", tags: ["fas fa-question", "far fa-question"], name: "Question", icon: <HelpIcon /> },
-  { id: "exclamation", tags: ["fas fa-exclamation", "far fa-exclamation"], name: "Exclamation", icon: <ExclamationIcon /> },
+  { id: "exclamation", tags: ["fas fa-exclamation", "fas fa-exclamation-triangle", "far fa-exclamation"], name: "Exclamation", icon: <ExclamationIcon /> },
   { id: "coffee", tags: ["fas fa-coffee"], name: "Coffee", icon: <CoffeeIcon /> },
   { id: "rocket-launch", tags: ["fas fa-rocket", "fas fa-fan"], name: "Rocket", icon: <RocketLaunchIcon /> },
   { id: "play-circle", tags: ["far fa-circle-play"], name: "Play", icon: <PlayCircleIcon /> },
@@ -804,17 +812,17 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "thumb-up", tags: ["far fa-thumbs-up"], name: "Thumb Up", icon: <ThumbUpIcon /> },
   { id: "thumb-down", tags: ["fas fa-skull-crossbones", "far fa-thumbs-down"], name: "Thumb Down", icon: <ThumbDownIcon /> },
   { id: "thumb-up-down", tags: ["far fa-thumbs-up-down"], name: "Thumb Up/Down", icon: <ThumbUpDownIcon /> },
-  { id: "plumbing", tags: ["far fa-plumbing", "far fa-wrench"], name: "Plumbing", icon: <PlumbingIcon /> },
+  { id: "plumbing", tags: [], name: "Plumbing", icon: <PlumbingIcon /> },
   { id: "forum", tags: ["far fa-comments"], name: "Forum", icon: <ForumIcon /> },
   { id: "explore", tags: ["far fa-compass"], name: "Explore", icon: <ExploreIcon /> },
-  { id: "star", tags: ["far fa-star"], name: "Star", icon: <StarIcon /> },
+  { id: "star", tags: ["far fa-star", "fas fa-star"], name: "Star", icon: <StarIcon /> },
   { id: "menu-book", tags: ["fas fa-book"], name: "Book", icon: <MenuBookIcon /> },
   { id: "light-bulb", tags: ["far fa-lightbulb"], name: "Light Bulb", icon: <LightBulbIcon /> },
   { id: "delete", tags: ["fas fa-trash"], name: "Delete", icon: <DeleteIcon /> },
   { id: "add-circle", tags: ["fa-plus", "fa-plus-circle", "far fa-square-plus"], name: "Add Circle", icon: <AddCircleIcon /> },
   { id: "lock", tags: ["fas fa-lock"], name: "Lock", icon: <LockIcon /> },
   { id: "birthday-cake", tags: ["fas fa-birthday-cake"], name: "Birthday Cake", icon: <BirthdayCakeIcon /> },
-  { id: "construction", tags: ["fas fa-chalkboard", "fas fa-construction"], name: "Construction", icon: <ConstructionIcon /> },
+  { id: "construction", tags: ["fas fa-chalkboard", "fas fa-construction", "far fa-plumbing", "far fa-wrench", "fas fa-wrench"], name: "Construction", icon: <ConstructionIcon /> },
   { id: "arrow-circle-down", tags: ["fa-arrow-circle-down", "far fa-circle-down"], name: "Arrow Down", icon: <ArrowCircleDownIcon /> },
   { id: "arrow-circle-up", tags: ["fa-arrow-circle-up", "far fa-circle-up"], name: "Arrow Up", icon: <ArrowCircleUpIcon /> },
   { id: "check-circle", tags: ["fa-check-circle", "far fa-square-check"], name: "Check", icon: <CheckCircleIcon /> },
@@ -823,8 +831,9 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "search", tags: ["search", "fa-solid fa-magnifying-glass"], name: "Search", icon: <SearchIcon /> },
   { id: "electric-bolt", tags: ["electric-bolt", "fa-solid fa-bolt"], name: "Electric Bolt", icon: <ElectricBoltIcon /> },
   { id: "psychological-safety", tags: ["psychological-safety", "fa-regular fa-handshake"], name: "Psychological Safety", icon: <PsychologicalSafetyIcon /> },
-  { id: "balance", tags: ["balance", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
+  { id: "balance", tags: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip"], name: "Balance", icon: <BalanceIcon /> },
   { id: "gears", tags: ["gears", "fa-solid fa-gears"], name: "Gears", icon: <GearsIcon /> },
+  { id: "eye", tags: ["eye", "far fa-eye"], name: "Eye", icon: <EyeIcon /> },
   { id: "add", tags: [], name: "Add", icon: <AddIcon /> },
   { id: "edit", tags: [], name: "Edit", icon: <EditIcon /> },
   { id: "link", tags: [], name: "Link", icon: <LinkIcon /> },

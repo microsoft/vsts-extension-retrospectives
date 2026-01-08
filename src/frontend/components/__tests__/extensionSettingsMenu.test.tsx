@@ -1,11 +1,31 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import ExtensionSettingsMenu from "../extensionSettingsMenu";
+import ExtensionSettingsMenu, { ExtensionSettingsMenu as ExtensionSettingsMenuClass } from "../extensionSettingsMenu";
 import boardDataService from "../../dal/boardDataService";
 import { azureDevOpsCoreService } from "../../dal/azureDevOpsCoreService";
 import { itemDataService } from "../../dal/itemDataService";
 import { IFeedbackColumn } from "../../interfaces/feedback";
+
+jest.mock("../../dal/boardDataService", () => {
+  const mockBoardDataService = {
+    getBoardsForTeam: jest.fn().mockResolvedValue([]),
+    createBoardForTeam: jest.fn().mockResolvedValue({ id: "new-board-id", title: "New Board" }),
+  };
+
+  return {
+    __esModule: true,
+    default: mockBoardDataService,
+  };
+});
+
+jest.mock("../toastNotifications", () => {
+  const toastFn: any = jest.fn(() => "toast-id");
+  toastFn.update = jest.fn();
+  return {
+    toast: toastFn,
+  };
+});
 
 // Mock dependencies
 jest.mock("../../utilities/telemetryClient", () => ({
@@ -54,6 +74,12 @@ beforeAll(() => {
 
 describe("ExtensionSettingsMenu", () => {
   let windowOpenSpy: jest.SpyInstance;
+
+  const getIconCloseButton = (dialog: HTMLElement): HTMLElement => {
+    const closeButtons = within(dialog).getAllByRole("button", { name: "Close" });
+    const iconButton = closeButtons.find(btn => (btn.textContent ?? "").trim() === "");
+    return iconButton ?? closeButtons[0];
+  };
 
   beforeEach(() => {
     windowOpenSpy = jest.spyOn(window, "open").mockImplementation(() => null);
@@ -211,6 +237,113 @@ describe("ExtensionSettingsMenu", () => {
       fireEvent.click(screen.getByText("Contact us"));
     });
     expect(windowOpenSpy).toHaveBeenCalledWith("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank");
+  });
+
+  it("closes open menu details on outside pointerdown", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+
+    const details = Array.from(container.querySelectorAll("details"));
+    expect(details.length).toBeGreaterThanOrEqual(2);
+    details[0].setAttribute("open", "");
+    details[1].setAttribute("open", "");
+
+    fireEvent.pointerDown(document.body);
+
+    expect(details[0]).not.toHaveAttribute("open");
+    expect(details[1]).not.toHaveAttribute("open");
+  });
+
+  it("ignores pointerdown events with no target", () => {
+    const ref = React.createRef<ExtensionSettingsMenuClass>();
+    render(React.createElement(ExtensionSettingsMenuClass as any, { ref }));
+
+    // Call the handler directly to simulate an event without a target,
+    // which is hard to trigger through the DOM event system.
+    expect(ref.current).toBeTruthy();
+    expect(() => (ref.current as any).handleDocumentPointerDown({ target: null } as any)).not.toThrow();
+  });
+
+  it("exports data via the Data menu", async () => {
+    // Ensure the export logic runs and triggers a download click.
+    (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValueOnce([{ id: "team-1", name: "Team 1" }]);
+    (boardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([{ id: "board-1", title: "Board 1" }]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([]);
+
+    const anchorClickSpy = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+    render(<ExtensionSettingsMenu />);
+    fireEvent.click(screen.getByText("Export Data"));
+
+    await waitFor(() => {
+      expect(window.URL.createObjectURL).toHaveBeenCalled();
+      expect(anchorClickSpy).toHaveBeenCalled();
+    });
+
+    anchorClickSpy.mockRestore();
+  });
+
+  it("closes the What's New dialog with the header close button", async () => {
+    render(<ExtensionSettingsMenu />);
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    await waitFor(() => {
+      fireEvent.click(screen.getByText("What's new"));
+    });
+
+    const dialog = screen.getByRole("dialog", { name: "What is New" });
+    expect(dialog).toHaveAttribute("open");
+
+    fireEvent.click(getIconCloseButton(dialog));
+    await waitFor(() => {
+      expect(dialog).not.toHaveAttribute("open");
+    });
+  });
+
+  it("closes the User Guide dialog with the header close button", async () => {
+    render(<ExtensionSettingsMenu />);
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    await waitFor(() => {
+      fireEvent.click(screen.getByText("User guide"));
+    });
+
+    const dialog = screen.getByRole("dialog", { name: "Retrospectives User Guide" });
+    expect(dialog).toHaveAttribute("open");
+
+    fireEvent.click(getIconCloseButton(dialog));
+    await waitFor(() => {
+      expect(dialog).not.toHaveAttribute("open");
+    });
+  });
+
+  it("closes the Volunteer dialog with the header close button", async () => {
+    render(<ExtensionSettingsMenu />);
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    await waitFor(() => {
+      fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
+    });
+
+    const dialog = screen.getByRole("dialog", { name: "Volunteer" });
+    expect(dialog).toHaveAttribute("open");
+
+    fireEvent.click(getIconCloseButton(dialog));
+    await waitFor(() => {
+      expect(dialog).not.toHaveAttribute("open");
+    });
+  });
+
+  it("closes the Keyboard Shortcuts dialog with the header close button", async () => {
+    render(<ExtensionSettingsMenu />);
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    await waitFor(() => {
+      fireEvent.click(screen.getByText("Keyboard shortcuts"));
+    });
+
+    const dialog = screen.getByRole("dialog", { name: "Keyboard Shortcuts" });
+    expect(dialog).toHaveAttribute("open");
+
+    fireEvent.click(getIconCloseButton(dialog));
+    await waitFor(() => {
+      expect(dialog).not.toHaveAttribute("open");
+    });
   });
 
   it("handles keyboard shortcuts", async () => {

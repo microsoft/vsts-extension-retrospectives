@@ -840,4 +840,243 @@ describe("Board Metadata Form Permissions", () => {
       expect(memberImage).toBeInTheDocument();
     });
   });
+
+  describe("Coverage gaps", () => {
+    it("should default to empty permissions when props.permissions is missing", () => {
+      const props = makeProps({
+        // Intentionally violate the type to exercise nullish-coalescing branches.
+        permissions: undefined as unknown as any,
+        permissionOptions: [],
+      });
+
+      const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      expect(getByText("This board is visible to every member in the project")).toBeInTheDocument();
+    });
+
+    it("should early-return when non-owner/non-admin tries to toggle select-all", async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef("owner-id", "Board Owner"),
+        },
+        currentUserId: "non-owner-id",
+        isNewBoardCreation: false,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [{ id: "team1", name: "Team Alpha", uniqueName: "team-alpha", type: "team" }],
+        onPermissionChanged,
+      });
+
+      const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const selectAllCheckbox = getByLabelText("Add permission to every team or member in the table.") as HTMLInputElement;
+
+      // The UI disables this checkbox, so we explicitly re-enable it in the DOM to exercise
+      // the handler's authorization guard.
+      selectAllCheckbox.disabled = false;
+
+      await act(async () => {
+        fireEvent.click(selectAllCheckbox);
+      });
+
+      expect(onPermissionChanged).not.toHaveBeenCalled();
+    });
+
+    it("should update team permissions when an authorized user checks a team option", async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef(testUserId, "Owner User"),
+        },
+        currentUserId: testUserId,
+        isNewBoardCreation: false,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [
+          { id: testUserId, name: "Owner User", uniqueName: "owner@example.com", type: "member" },
+          { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
+        ],
+        onPermissionChanged,
+      });
+
+      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      const teamCheckbox = container.querySelector("input#permission-option-team1") as HTMLInputElement | null;
+      expect(teamCheckbox).toBeInTheDocument();
+
+      if (teamCheckbox) {
+        await act(async () => {
+          fireEvent.click(teamCheckbox);
+        });
+      }
+
+      expect(onPermissionChanged).toHaveBeenCalledWith(
+        expect.objectContaining({
+          permissions: expect.objectContaining({
+            Teams: ["team1"],
+          }),
+        }),
+      );
+    });
+
+    it("should update member permissions when an authorized user checks a member option", async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef(testUserId, "Owner User"),
+        },
+        currentUserId: testUserId,
+        isNewBoardCreation: false,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [
+          { id: testUserId, name: "Owner User", uniqueName: "owner@example.com", type: "member" },
+          { id: "member1", name: "Member One", uniqueName: "member1@example.com", type: "member" },
+        ],
+        onPermissionChanged,
+      });
+
+      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      const memberCheckbox = container.querySelector("input#permission-option-member1") as HTMLInputElement | null;
+      expect(memberCheckbox).toBeInTheDocument();
+
+      if (memberCheckbox) {
+        await act(async () => {
+          fireEvent.click(memberCheckbox);
+        });
+      }
+
+      expect(onPermissionChanged).toHaveBeenCalledWith(
+        expect.objectContaining({
+          permissions: expect.objectContaining({
+            Members: ["member1"],
+          }),
+        }),
+      );
+    });
+
+    it("should render the board owner row first (owner-first ordering)", () => {
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef("owner-id", "Owner User"),
+        },
+        currentUserId: "owner-id",
+        isNewBoardCreation: false,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [
+          { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
+          { id: "owner-id", name: "Owner User", uniqueName: "owner@example.com", type: "member" },
+          { id: "user2", name: "Other User", uniqueName: "other@example.com", type: "member" },
+        ],
+      });
+
+      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const rows = Array.from(container.querySelectorAll("tbody tr"));
+
+      expect(rows.length).toBeGreaterThan(0);
+      expect(rows[0]).toHaveTextContent("Owner User");
+    });
+
+    it("should use currentUserId as the owner on new board creation (owner-first ordering)", () => {
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          // Ensure owner logic is coming from isNewBoardCreation/currentUserId, not createdBy.
+          createdBy: makeIdentityRef("different-owner-id", "Different Owner"),
+        },
+        currentUserId: "new-owner-id",
+        isNewBoardCreation: true,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [
+          // This team would normally sort before members; owner-first should override.
+          { id: "team1", name: "AAA Team", uniqueName: "team-one", type: "team" },
+          { id: "new-owner-id", name: "New Owner", uniqueName: "newowner@example.com", type: "member" },
+          { id: "user2", name: "Other User", uniqueName: "other@example.com", type: "member" },
+        ],
+      });
+
+      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const rows = Array.from(container.querySelectorAll("tbody tr"));
+
+      expect(rows.length).toBeGreaterThan(0);
+      expect(rows[0]).toHaveTextContent("New Owner");
+    });
+
+    it("should treat the current user as the owner during new board creation", () => {
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef("someone-else", "Someone Else"),
+        },
+        currentUserId: "current-user-id",
+        isNewBoardCreation: true,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [{ id: "team1", name: "Team One", uniqueName: "team-one", type: "team" }],
+      });
+
+      const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      expect(getByLabelText("Add permission to every team or member in the table.")).not.toBeDisabled();
+    });
+
+    it("should treat all rows as non-owner when board.createdBy is missing", () => {
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: undefined as unknown as any,
+        },
+        currentUserId: "some-user-id",
+        isNewBoardCreation: false,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [
+          { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
+          { id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" },
+        ],
+      });
+
+      const { container, queryByLabelText, getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      expect(getByLabelText("Add permission to every team or member in the table.")).toBeDisabled();
+      expect(queryByLabelText("Board owner badge")).not.toBeInTheDocument();
+
+      const rows = Array.from(container.querySelectorAll("tbody tr"));
+      expect(rows.length).toBeGreaterThan(0);
+    });
+
+    it("should handle missing board (optional chaining) in existing board flow", () => {
+      const props = makeProps({
+        // Intentionally violate the type to exercise optional chaining branches.
+        board: undefined as unknown as any,
+        currentUserId: "some-user-id",
+        isNewBoardCreation: false,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [
+          { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
+          { id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" },
+        ],
+      });
+
+      const { queryByLabelText, getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      expect(getByLabelText("Add permission to every team or member in the table.")).toBeDisabled();
+      expect(queryByLabelText("Board owner badge")).not.toBeInTheDocument();
+    });
+
+    it("should render isTeamAdmin boolean text when provided", () => {
+      const props = makeProps({
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [{ id: "admin1", name: "Admin User", uniqueName: "admin@example.com", type: "member", isTeamAdmin: true }],
+      });
+
+      const { container, getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      expect(getByLabelText("Team admin badge")).toBeInTheDocument();
+
+      // React ignores boolean children, so we verify the extra span exists structurally.
+      const row = container.querySelector("tbody tr") as HTMLTableRowElement | null;
+      expect(row).toBeInTheDocument();
+
+      const contentTextSpans = row ? Array.from(row.querySelectorAll(".content-text span")) : [];
+      expect(contentTextSpans.length).toBeGreaterThanOrEqual(3);
+    });
+  });
 });
