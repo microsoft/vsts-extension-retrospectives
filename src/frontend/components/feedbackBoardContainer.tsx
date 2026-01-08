@@ -39,6 +39,7 @@ import { getService } from "azure-devops-extension-sdk";
 import { getIconElement } from "./icons";
 import { playStartChime, playStopChime } from "../utilities/audioHelper";
 import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../utilities/pdfHelper";
+import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 
 export interface FeedbackBoardContainerProps {
@@ -438,15 +439,6 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     this.setState({ countdownDurationMinutes: duration });
   };
 
-  private readonly formatBoardTimer = (timeInSeconds: number) => {
-    const isNegative = timeInSeconds < 0;
-    const absoluteSeconds = Math.abs(timeInSeconds);
-    const minutes = Math.floor(absoluteSeconds / 60);
-    const seconds = absoluteSeconds % 60;
-    const formattedTime = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-    return isNegative ? `-${formattedTime}` : formattedTime;
-  };
-
   private readonly renderWorkflowTimerControls = () => {
     if (!this.state.currentBoard) {
       return null;
@@ -454,7 +446,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
-        <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"}. ${this.formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
+        <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"}. ${formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
           {this.state.isBoardTimerRunning ? getIconElement("pause-circle") : getIconElement("play-circle")}
         </button>
         {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
@@ -467,7 +459,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             ))}
           </select>
         ) : (
-          <span className={this.state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{this.formatBoardTimer(this.state.boardTimerSeconds)}</span>
+          <span className={this.state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{formatBoardTimer(this.state.boardTimerSeconds)}</span>
         )}
         <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
           {getIconElement("refresh")}

@@ -19,6 +19,7 @@ import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { getService } from "azure-devops-extension-sdk";
 import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
+import { formatBoardTimer } from "../../utilities/useBoardTimer";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -1049,15 +1050,15 @@ describe("Facilitation timer", () => {
   });
 
   it("formats board timer output", () => {
-    const instance = createStandaloneTimerInstance();
-    expect((instance as any).formatBoardTimer(0)).toBe("0:00");
-    expect((instance as any).formatBoardTimer(9)).toBe("0:09");
-    expect((instance as any).formatBoardTimer(65)).toBe("1:05");
+    // formatBoardTimer is now an exported utility function from useBoardTimer
+    expect(formatBoardTimer(0)).toBe("0:00");
+    expect(formatBoardTimer(9)).toBe("0:09");
+    expect(formatBoardTimer(65)).toBe("1:05");
     // Test negative values
-    expect((instance as any).formatBoardTimer(-1)).toBe("-0:01");
-    expect((instance as any).formatBoardTimer(-9)).toBe("-0:09");
-    expect((instance as any).formatBoardTimer(-65)).toBe("-1:05");
-    expect((instance as any).formatBoardTimer(-125)).toBe("-2:05");
+    expect(formatBoardTimer(-1)).toBe("-0:01");
+    expect(formatBoardTimer(-9)).toBe("-0:09");
+    expect(formatBoardTimer(-65)).toBe("-1:05");
+    expect(formatBoardTimer(-125)).toBe("-2:05");
   });
 
   it("starts, advances, and pauses the board timer", () => {
@@ -1633,14 +1634,13 @@ describe("Facilitation timer", () => {
   });
 
   it("formatBoardTimer formats time correctly", () => {
-    const instance = createStandaloneTimerInstance();
-
-    expect((instance as any).formatBoardTimer(0)).toBe("0:00");
-    expect((instance as any).formatBoardTimer(5)).toBe("0:05");
-    expect((instance as any).formatBoardTimer(59)).toBe("0:59");
-    expect((instance as any).formatBoardTimer(60)).toBe("1:00");
-    expect((instance as any).formatBoardTimer(125)).toBe("2:05");
-    expect((instance as any).formatBoardTimer(3661)).toBe("61:01");
+    // formatBoardTimer is now an exported utility function from useBoardTimer
+    expect(formatBoardTimer(0)).toBe("0:00");
+    expect(formatBoardTimer(5)).toBe("0:05");
+    expect(formatBoardTimer(59)).toBe("0:59");
+    expect(formatBoardTimer(60)).toBe("1:00");
+    expect(formatBoardTimer(125)).toBe("2:05");
+    expect(formatBoardTimer(3661)).toBe("61:01");
   });
 
   it("handleBoardTimerToggle pauses when running", () => {
