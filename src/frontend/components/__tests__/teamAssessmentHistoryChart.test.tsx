@@ -1,18 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import {
-  TeamAssessmentHistoryChart,
-  IBoardAverageScore,
-  defaultNumberFormatter,
-  formatAxisDate,
-  formatTooltipDate,
-  calculateYScale,
-  calculateXScale,
-  shouldShowDateLabel,
-  truncateText,
-  defaultChartColors,
-} from "../teamAssessmentHistoryChart";
+import { TeamAssessmentHistoryChart, IBoardAverageScore, defaultNumberFormatter, formatAxisDate, formatTooltipDate, calculateYScale, calculateXScale, shouldShowDateLabel, truncateText, defaultChartColors } from "../teamAssessmentHistoryChart";
 
 // Mock the questions from effectivenessMeasurementQuestionHelper
 jest.mock("../../utilities/effectivenessMeasurementQuestionHelper", () => ({
@@ -204,7 +193,7 @@ describe("TeamAssessmentHistoryChart", () => {
         // Matches both 3-digit and 6-digit hex colors
         const hexColorRegex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
-        defaultChartColors.lines.forEach((color) => {
+        defaultChartColors.lines.forEach(color => {
           expect(color).toMatch(hexColorRegex);
         });
         expect(defaultChartColors.gridLines).toMatch(hexColorRegex);
@@ -226,9 +215,7 @@ describe("TeamAssessmentHistoryChart", () => {
 
     it("should render with custom dimensions", () => {
       const historyData = createTestData(3);
-      const { container } = render(
-        <TeamAssessmentHistoryChart historyData={historyData} width={800} height={400} />
-      );
+      const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} width={800} height={400} />);
 
       const svg = container.querySelector("svg");
       expect(svg).toHaveAttribute("width", "800");
@@ -249,7 +236,7 @@ describe("TeamAssessmentHistoryChart", () => {
       const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} />);
 
       const textElements = container.querySelectorAll("text");
-      const labelTexts = Array.from(textElements).map((el) => el.textContent);
+      const labelTexts = Array.from(textElements).map(el => el.textContent);
 
       expect(labelTexts).toContain("0");
       expect(labelTexts).toContain("2");
@@ -264,7 +251,7 @@ describe("TeamAssessmentHistoryChart", () => {
       const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} />);
 
       const textElements = container.querySelectorAll("text");
-      const labelTexts = Array.from(textElements).map((el) => el.textContent);
+      const labelTexts = Array.from(textElements).map(el => el.textContent);
 
       expect(labelTexts).toContain("Average Score");
     });
@@ -302,7 +289,7 @@ describe("TeamAssessmentHistoryChart", () => {
       const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} />);
 
       const textElements = container.querySelectorAll("text");
-      const labelTexts = Array.from(textElements).map((el) => el.textContent);
+      const labelTexts = Array.from(textElements).map(el => el.textContent);
 
       expect(labelTexts).toContain("Clarity");
       expect(labelTexts).toContain("Energy");
@@ -412,10 +399,10 @@ describe("TeamAssessmentHistoryChart", () => {
       const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} />);
 
       const titles = container.querySelectorAll("title");
-      const tooltipTexts = Array.from(titles).map((el) => el.textContent);
+      const tooltipTexts = Array.from(titles).map(el => el.textContent);
 
       // Find the tooltip for the data point
-      const dataTooltip = tooltipTexts.find((text) => text?.includes("Clarity"));
+      const dataTooltip = tooltipTexts.find(text => text?.includes("Clarity"));
       expect(dataTooltip).toContain("Test Retro");
       expect(dataTooltip).toContain("7.50");
     });
@@ -433,14 +420,12 @@ describe("TeamAssessmentHistoryChart", () => {
         },
       ];
 
-      const { container } = render(
-        <TeamAssessmentHistoryChart historyData={historyData} numberFormatter={customFormatter} />
-      );
+      const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} numberFormatter={customFormatter} />);
 
       const titles = container.querySelectorAll("title");
-      const tooltipTexts = Array.from(titles).map((el) => el.textContent);
+      const tooltipTexts = Array.from(titles).map(el => el.textContent);
 
-      const dataTooltip = tooltipTexts.find((text) => text?.includes("Clarity"));
+      const dataTooltip = tooltipTexts.find(text => text?.includes("Clarity"));
       expect(dataTooltip).toContain("8"); // Rounded from 7.567
     });
 
@@ -448,9 +433,7 @@ describe("TeamAssessmentHistoryChart", () => {
       const historyData = createTestData(3);
       const customPadding = { top: 60, right: 200, bottom: 100, left: 100 };
 
-      const { container } = render(
-        <TeamAssessmentHistoryChart historyData={historyData} padding={customPadding} />
-      );
+      const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} padding={customPadding} />);
 
       const svg = container.querySelector("svg");
       expect(svg).toBeInTheDocument();
@@ -463,9 +446,7 @@ describe("TeamAssessmentHistoryChart", () => {
         axis: "#333333",
       };
 
-      const { container } = render(
-        <TeamAssessmentHistoryChart historyData={historyData} colors={customColors} />
-      );
+      const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} colors={customColors} />);
 
       const gridLines = container.querySelectorAll("line[stroke='#cccccc']");
       expect(gridLines.length).toBe(6);
@@ -477,9 +458,7 @@ describe("TeamAssessmentHistoryChart", () => {
         lines: ["#ff0000", "#00ff00", "#0000ff"],
       };
 
-      const { container } = render(
-        <TeamAssessmentHistoryChart historyData={historyData} colors={customColors} />
-      );
+      const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} colors={customColors} />);
 
       // Check that at least one path uses the custom red color
       const redPaths = container.querySelectorAll("path[stroke='#ff0000']");
@@ -543,9 +522,7 @@ describe("TeamAssessmentHistoryChart", () => {
 
       // Find rotated text elements (x-axis labels)
       const rotatedTexts = container.querySelectorAll("text[transform]");
-      const xAxisLabels = Array.from(rotatedTexts).filter((el) =>
-        el.getAttribute("transform")?.includes("rotate(-45")
-      );
+      const xAxisLabels = Array.from(rotatedTexts).filter(el => el.getAttribute("transform")?.includes("rotate(-45"));
 
       expect(xAxisLabels.length).toBe(5);
     });
@@ -556,9 +533,7 @@ describe("TeamAssessmentHistoryChart", () => {
 
       // Find rotated text elements (x-axis labels)
       const rotatedTexts = container.querySelectorAll("text[transform]");
-      const xAxisLabels = Array.from(rotatedTexts).filter((el) =>
-        el.getAttribute("transform")?.includes("rotate(-45")
-      );
+      const xAxisLabels = Array.from(rotatedTexts).filter(el => el.getAttribute("transform")?.includes("rotate(-45"));
 
       // Should show fewer labels than data points
       expect(xAxisLabels.length).toBeLessThan(10);
@@ -572,11 +547,11 @@ describe("TeamAssessmentHistoryChart", () => {
       const { container } = render(<TeamAssessmentHistoryChart historyData={historyData} />);
 
       const textElements = container.querySelectorAll("text");
-      const allTexts = Array.from(textElements).map((el) => el.textContent);
+      const allTexts = Array.from(textElements).map(el => el.textContent);
 
       // The full title "I clearly understand what is expected of me on this team"
       // should be truncated to 25 chars + "..."
-      const truncatedTitles = allTexts.filter((text) => text?.includes("..."));
+      const truncatedTitles = allTexts.filter(text => text?.includes("..."));
       expect(truncatedTitles.length).toBeGreaterThan(0);
     });
   });

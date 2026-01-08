@@ -65,25 +65,11 @@ export const formatTooltipDate = (date: Date): string =>
     day: "numeric",
   }).format(date);
 
-export const calculateYScale = (
-  value: number,
-  chartHeight: number,
-  paddingTop: number,
-  maxValue: number = 10
-): number => paddingTop + chartHeight - (value / maxValue) * chartHeight;
+export const calculateYScale = (value: number, chartHeight: number, paddingTop: number, maxValue: number = 10): number => paddingTop + chartHeight - (value / maxValue) * chartHeight;
 
-export const calculateXScale = (
-  date: Date,
-  minDate: number,
-  dateRange: number,
-  chartWidth: number,
-  paddingLeft: number
-): number => paddingLeft + ((date.getTime() - minDate) / dateRange) * chartWidth;
+export const calculateXScale = (date: Date, minDate: number, dateRange: number, chartWidth: number, paddingLeft: number): number => paddingLeft + ((date.getTime() - minDate) / dateRange) * chartWidth;
 
-export const shouldShowDateLabel = (
-  index: number,
-  totalDataPoints: number
-): boolean => {
+export const shouldShowDateLabel = (index: number, totalDataPoints: number): boolean => {
   if (index === 0 || index === totalDataPoints - 1) {
     return true;
   }
@@ -101,14 +87,7 @@ export const truncateText = (text: string, maxLength: number): string => {
   return text.substring(0, maxLength) + "...";
 };
 
-export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProps> = ({
-  historyData,
-  numberFormatter = defaultNumberFormatter,
-  width = 1100,
-  height = 500,
-  padding = { top: 40, right: 230, bottom: 80, left: 80 },
-  colors = {},
-}) => {
+export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProps> = ({ historyData, numberFormatter = defaultNumberFormatter, width = 1100, height = 500, padding = { top: 40, right: 230, bottom: 80, left: 80 }, colors = {} }) => {
   const chartColors: IChartColors = { ...defaultChartColors, ...colors };
   if (colors.lines) {
     chartColors.lines = colors.lines;
@@ -119,7 +98,7 @@ export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProp
 
   const yScale = (value: number): number => calculateYScale(value, chartHeight, padding.top);
 
-  const allDates = historyData.map((board) => new Date(board.createdDate).getTime());
+  const allDates = historyData.map(board => new Date(board.createdDate).getTime());
   const minDate = Math.min(...allDates);
   const maxDate = Math.max(...allDates);
   const dateRange = maxDate - minDate || 1; // Avoid division by zero
@@ -130,66 +109,30 @@ export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProp
 
   return (
     <div>
-      <svg
-        width={width}
-        height={height}
-        className="team-assessment-history-svg"
-        role="img"
-        aria-label="Team assessment history line chart showing scores over time"
-      >
+      <svg width={width} height={height} className="team-assessment-history-svg" role="img" aria-label="Team assessment history line chart showing scores over time">
         {/* Y-axis grid lines and labels */}
-        {yAxisValues.map((value) => (
+        {yAxisValues.map(value => (
           <g key={value}>
-            <line
-              x1={padding.left}
-              y1={yScale(value)}
-              x2={width - padding.right}
-              y2={yScale(value)}
-              stroke={chartColors.gridLines}
-              strokeWidth="1"
-            />
-            <text
-              x={padding.left - 10}
-              y={yScale(value)}
-              textAnchor="end"
-              fontSize="14"
-              fill={chartColors.axis}
-              dominantBaseline="middle"
-            >
+            <line x1={padding.left} y1={yScale(value)} x2={width - padding.right} y2={yScale(value)} stroke={chartColors.gridLines} strokeWidth="1" />
+            <text x={padding.left - 10} y={yScale(value)} textAnchor="end" fontSize="14" fill={chartColors.axis} dominantBaseline="middle">
               {value}
             </text>
           </g>
         ))}
 
         {/* X-axis line */}
-        <line
-          x1={padding.left}
-          y1={height - padding.bottom}
-          x2={width - padding.right}
-          y2={height - padding.bottom}
-          stroke={chartColors.axis}
-          strokeWidth="2"
-        />
+        <line x1={padding.left} y1={height - padding.bottom} x2={width - padding.right} y2={height - padding.bottom} stroke={chartColors.axis} strokeWidth="2" />
 
         {/* Y-axis line */}
-        <line
-          x1={padding.left}
-          y1={padding.top}
-          x2={padding.left}
-          y2={height - padding.bottom}
-          stroke={chartColors.axis}
-          strokeWidth="2"
-        />
+        <line x1={padding.left} y1={padding.top} x2={padding.left} y2={height - padding.bottom} stroke={chartColors.axis} strokeWidth="2" />
 
         {/* Data lines for each question */}
         {questions.map((question, qIndex) => {
           const color = chartColors.lines[qIndex % chartColors.lines.length];
 
           const dataPoints = historyData
-            .map((board) => {
-              const questionData = board.questionAverages.find(
-                (qa) => qa.questionId === question.id
-              );
+            .map(board => {
+              const questionData = board.questionAverages.find(qa => qa.questionId === question.id);
               return questionData
                 ? {
                     date: new Date(board.createdDate),
@@ -198,51 +141,23 @@ export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProp
                   }
                 : null;
             })
-            .filter(
-              (point): point is { date: Date; average: number; boardTitle: string } =>
-                point !== null
-            );
+            .filter((point): point is { date: Date; average: number; boardTitle: string } => point !== null);
 
           if (dataPoints.length === 0) {
             return null;
           }
 
-          const linePath = dataPoints
-            .map(
-              (point, index) =>
-                `${index === 0 ? "M" : "L"} ${xScale(point.date)} ${yScale(
-                  point.average
-                )}`
-            )
-            .join(" ");
+          const linePath = dataPoints.map((point, index) => `${index === 0 ? "M" : "L"} ${xScale(point.date)} ${yScale(point.average)}`).join(" ");
 
           return (
             <g key={question.id}>
               {/* Line path */}
-              <path
-                d={linePath}
-                fill="none"
-                stroke={color}
-                strokeWidth="2.5"
-                opacity="0.8"
-              />
+              <path d={linePath} fill="none" stroke={color} strokeWidth="2.5" opacity="0.8" />
 
               {/* Data points */}
               {dataPoints.map((point, index) => (
-                <circle
-                  key={index}
-                  cx={xScale(point.date)}
-                  cy={yScale(point.average)}
-                  r="4"
-                  fill={color}
-                  stroke={chartColors.pointStroke}
-                  strokeWidth="2"
-                >
-                  <title>
-                    {`${question.shortTitle}\n${point.boardTitle}\nDate: ${formatTooltipDate(
-                      point.date
-                    )}\nAverage: ${numberFormatter(point.average)}`}
-                  </title>
+                <circle key={index} cx={xScale(point.date)} cy={yScale(point.average)} r="4" fill={color} stroke={chartColors.pointStroke} strokeWidth="2">
+                  <title>{`${question.shortTitle}\n${point.boardTitle}\nDate: ${formatTooltipDate(point.date)}\nAverage: ${numberFormatter(point.average)}`}</title>
                 </circle>
               ))}
             </g>
@@ -258,30 +173,14 @@ export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProp
           }
 
           return (
-            <text
-              key={index}
-              x={xScale(date)}
-              y={height - padding.bottom + 20}
-              textAnchor="end"
-              fontSize="12"
-              fill={chartColors.axis}
-              transform={`rotate(-45 ${xScale(date)} ${height - padding.bottom + 20})`}
-            >
+            <text key={index} x={xScale(date)} y={height - padding.bottom + 20} textAnchor="end" fontSize="12" fill={chartColors.axis} transform={`rotate(-45 ${xScale(date)} ${height - padding.bottom + 20})`}>
               {formatAxisDate(date)}
             </text>
           );
         })}
 
         {/* Y-axis label */}
-        <text
-          x={padding.left - 50}
-          y={height / 2}
-          textAnchor="middle"
-          fontSize="16"
-          fill={chartColors.axisLabel}
-          fontWeight="600"
-          transform={`rotate(-90 ${padding.left - 50} ${height / 2})`}
-        >
+        <text x={padding.left - 50} y={height / 2} textAnchor="middle" fontSize="16" fill={chartColors.axisLabel} fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${height / 2})`}>
           Average Score
         </text>
 
@@ -294,40 +193,15 @@ export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProp
           return (
             <g key={question.id}>
               {/* Legend line */}
-              <line
-                x1={legendX}
-                y1={legendY}
-                x2={legendX + 30}
-                y2={legendY}
-                stroke={color}
-                strokeWidth="2.5"
-              />
+              <line x1={legendX} y1={legendY} x2={legendX + 30} y2={legendY} stroke={color} strokeWidth="2.5" />
               {/* Legend point */}
-              <circle
-                cx={legendX + 15}
-                cy={legendY}
-                r="4"
-                fill={color}
-                stroke={chartColors.pointStroke}
-                strokeWidth="2"
-              />
+              <circle cx={legendX + 15} cy={legendY} r="4" fill={color} stroke={chartColors.pointStroke} strokeWidth="2" />
               {/* Legend short title */}
-              <text
-                x={legendX + 40}
-                y={legendY - 5}
-                fontSize="13"
-                fill={chartColors.legendText}
-                fontWeight="600"
-              >
+              <text x={legendX + 40} y={legendY - 5} fontSize="13" fill={chartColors.legendText} fontWeight="600">
                 <tspan>{question.shortTitle}</tspan>
               </text>
               {/* Legend full title (truncated) */}
-              <text
-                x={legendX + 40}
-                y={legendY + 10}
-                fontSize="10"
-                fill={chartColors.legendSubtext}
-              >
+              <text x={legendX + 40} y={legendY + 10} fontSize="10" fill={chartColors.legendSubtext}>
                 <tspan>{truncateText(question.title, 25)}</tspan>
               </text>
             </g>
