@@ -2,7 +2,7 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## v1.92.47
+## v1.92.48
 
 * Added Team Assessment History dialog with trend charts to review past assessment results. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
 * Enhanced timer with a configurable countdown, duration picker, start/stop chimes, and visibility that adapts by board phase. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392) and [GitHub PR #1405](https://github.com/microsoft/vsts-extension-retrospectives/pull/1405)
