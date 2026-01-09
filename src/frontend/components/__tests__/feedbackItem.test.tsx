@@ -365,7 +365,7 @@ describe("Feedback Item", () => {
         defaultActionItemAreaPath: "Area",
         defaultActionItemIteration: "Iter",
         onVoteCasted: jest.fn(),
-        requestTimerStart: jest.fn().mockResolvedValue(true),
+        requestTimerStart: jest.fn(),
         notifyTimerStopped: jest.fn(),
         refreshFeedbackItems: jest.fn(),
         addFeedbackItems: jest.fn(),
@@ -857,7 +857,7 @@ describe("Feedback Item", () => {
         defaultActionItemAreaPath: "Area",
         defaultActionItemIteration: "Iter",
         onVoteCasted: jest.fn(),
-        requestTimerStart: jest.fn().mockResolvedValue(true),
+        requestTimerStart: jest.fn(),
         notifyTimerStopped: jest.fn(),
         refreshFeedbackItems: jest.fn(),
         addFeedbackItems: jest.fn(),
@@ -894,24 +894,6 @@ describe("Feedback Item", () => {
     afterEach(() => {
       jest.restoreAllMocks();
       jest.useRealTimers();
-    });
-
-    test("does not start timer when board denies the request", async () => {
-      const props = buildActPhaseTimerProps();
-      props.requestTimerStart = jest.fn().mockResolvedValue(false);
-
-      const updateTimerSpy = jest.spyOn(itemDataService, "updateTimer").mockResolvedValue(undefined);
-      const flipTimerSpy = jest.spyOn(itemDataService, "flipTimer").mockResolvedValue(undefined);
-
-      const { getByTitle } = render(<FeedbackItem {...props} />);
-
-      await act(async () => {
-        fireEvent.click(getByTitle("Timer"));
-      });
-
-      expect(props.requestTimerStart).toHaveBeenCalledWith(props.id);
-      expect(updateTimerSpy).not.toHaveBeenCalled();
-      expect(flipTimerSpy).not.toHaveBeenCalled();
     });
 
     test("starts timer when board approves the request", async () => {
@@ -1048,7 +1030,7 @@ describe("Feedback Item", () => {
         defaultActionItemAreaPath: "Area",
         defaultActionItemIteration: "Iter",
         onVoteCasted: jest.fn(),
-        requestTimerStart: jest.fn().mockResolvedValue(true),
+        requestTimerStart: jest.fn(),
         notifyTimerStopped: jest.fn(),
         refreshFeedbackItems: jest.fn(),
         addFeedbackItems: jest.fn(),
@@ -1177,7 +1159,7 @@ describe("Feedback Item", () => {
         defaultActionItemAreaPath: "Area",
         defaultActionItemIteration: "Iter",
         onVoteCasted: jest.fn(),
-        requestTimerStart: jest.fn().mockResolvedValue(true),
+        requestTimerStart: jest.fn(),
         notifyTimerStopped: jest.fn(),
         refreshFeedbackItems: jest.fn(),
         addFeedbackItems: jest.fn(),
@@ -4542,7 +4524,7 @@ describe("Feedback Item", () => {
         defaultActionItemAreaPath: "Area",
         defaultActionItemIteration: "Iter",
         onVoteCasted: jest.fn(),
-        requestTimerStart: jest.fn().mockResolvedValue(true),
+        requestTimerStart: jest.fn(),
         notifyTimerStopped: jest.fn(),
         refreshFeedbackItems: jest.fn(),
         addFeedbackItems: jest.fn(),
@@ -6009,7 +5991,7 @@ describe("Feedback Item", () => {
         team: { id: "team-1" },
         onVoteCasted: jest.fn(),
         refreshFeedbackItems: mockRefreshFeedbackItems,
-        requestTimerStart: jest.fn().mockResolvedValue(true),
+        requestTimerStart: jest.fn(),
         notifyTimerStopped: mockNotifyTimerStopped,
       };
 
@@ -7865,100 +7847,6 @@ describe("Feedback Item", () => {
     });
   });
 
-  describe("Timer request denied", () => {
-    afterEach(() => {
-      jest.restoreAllMocks();
-    });
-
-    test("timer does not start when request is denied", async () => {
-      const mockRequestTimerStart = jest.fn().mockResolvedValue(false);
-      const mockRefreshFeedbackItems = jest.fn();
-      const mockItem: IFeedbackItemDocument = {
-        id: "timer-denied-item",
-        boardId: testBoardId,
-        title: "Timer Denied Test",
-        columnId: testColumnUuidOne,
-        originalColumnId: testColumnUuidOne,
-        upvotes: 0,
-        voteCollection: {},
-        createdDate: new Date(),
-        userIdRef: "user-1",
-        timerSecs: 0,
-        timerState: false,
-        timerId: null,
-        groupIds: [],
-        isGroupedCarouselItem: false,
-      };
-
-      const columns = {
-        [testColumnUuidOne]: {
-          columnProperties: {
-            id: testColumnUuidOne,
-            title: "Test Column",
-            iconClass: "far fa-smile",
-            accentColor: "#008000",
-          },
-          columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
-        },
-      };
-
-      const props: any = {
-        id: mockItem.id,
-        title: mockItem.title,
-        columnId: testColumnUuidOne,
-        columns,
-        columnIds: [testColumnUuidOne],
-        boardId: testBoardId,
-        createdDate: new Date(),
-        upvotes: 0,
-        groupIds: [],
-        userIdRef: "user-1",
-        actionItems: [] as any[],
-        newlyCreated: false,
-        showAddedAnimation: false,
-        shouldHaveFocus: false,
-        hideFeedbackItems: false,
-        nonHiddenWorkItemTypes: [],
-        allWorkItemTypes: [],
-        originalColumnId: testColumnUuidOne,
-        timerSecs: 0,
-        timerState: false,
-        timerId: null,
-        isGroupedCarouselItem: false,
-        workflowPhase: "Act",
-        team: { id: "team-1" },
-        onVoteCasted: jest.fn(),
-        refreshFeedbackItems: mockRefreshFeedbackItems,
-        requestTimerStart: mockRequestTimerStart,
-        notifyTimerStopped: jest.fn(),
-      };
-
-      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
-      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
-      jest.spyOn(itemDataService, "updateTimer").mockResolvedValue(mockItem);
-
-      const { container } = render(<FeedbackItem {...props} />);
-
-      await waitFor(() => {
-        expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
-      });
-
-      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
-      card.focus();
-
-      await act(async () => {
-        fireEvent.keyDown(card, { key: "t" });
-      });
-
-      await waitFor(() => {
-        expect(mockRequestTimerStart).toHaveBeenCalled();
-      });
-
-      // updateTimer should not be called since request was denied
-      expect(itemDataService.updateTimer).not.toHaveBeenCalled();
-    });
-  });
-
   describe("Creating new feedback item", () => {
     afterEach(() => {
       jest.restoreAllMocks();
@@ -8208,7 +8096,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
       isFocusModalHidden: true,
       activeTimerFeedbackItemId: null,
       onVoteCasted: jest.fn(),
-      requestTimerStart: jest.fn().mockResolvedValue(true),
+      requestTimerStart: jest.fn(),
       notifyTimerStopped: jest.fn(),
       addFeedbackItems: jest.fn(),
       removeFeedbackItemFromColumn: jest.fn(),
@@ -8406,37 +8294,23 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
   });
 
-  test("timer start denied returns early; start with interval covers incTimer path", async () => {
+  test("timer start with interval covers incTimer path", async () => {
     jest.useFakeTimers();
 
     const updateTimerSpy = jest.spyOn(itemDataService, "updateTimer");
     const flipTimerSpy = jest.spyOn(itemDataService, "flipTimer");
 
-    // Denied start
-    const deniedProps = makeProps({
-      workflowPhase: "Act",
-      timerState: false,
-      timerId: null,
-      requestTimerStart: jest.fn().mockResolvedValue(false),
-    });
-
-    const { container: cDenied } = render(<FeedbackItem {...deniedProps} />);
-    const timerDenied = cDenied.querySelector('button[title="Timer"]') as HTMLElement;
-    fireEvent.click(timerDenied);
-    await act(async () => undefined);
-    expect(updateTimerSpy).not.toHaveBeenCalled();
-
     // Start branch with timerId null -> setInterval + flipTimer + incTimer
-    updateTimerSpy.mockResolvedValue(makeDoc({ id: deniedProps.id, timerState: true }) as any);
-    flipTimerSpy.mockResolvedValue(makeDoc({ id: deniedProps.id, timerState: true }) as any);
-    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(makeDoc({ id: deniedProps.id, timerState: true }));
+    updateTimerSpy.mockResolvedValue(makeDoc({ id: "start-item", timerState: true }) as any);
+    flipTimerSpy.mockResolvedValue(makeDoc({ id: "start-item", timerState: true }) as any);
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(makeDoc({ id: "start-item", timerState: true }));
 
     const startProps = makeProps({
       id: "start-item",
       workflowPhase: "Act",
       timerState: false,
       timerId: null,
-      requestTimerStart: jest.fn().mockResolvedValue(true),
+      requestTimerStart: jest.fn(),
       refreshFeedbackItems: jest.fn(),
     });
 

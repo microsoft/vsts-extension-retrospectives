@@ -2,7 +2,7 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { IWorkItemFormNavigationService, WorkItemTrackingServiceIds } from "azure-devops-extension-api/WorkItemTracking";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { getService, getUser } from "azure-devops-extension-sdk";
-import React from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
@@ -30,235 +30,228 @@ export interface ActionItemDisplayProps {
   onUpdateActionItem: (feedbackItemId: IFeedbackItemDocument) => void;
 }
 
-export interface ActionItemDisplayState {
-  isLinkedWorkItemLoaded: boolean;
-  isWorkItemTypeListCalloutVisible: boolean;
-  linkedWorkItem: WorkItem;
-  initialRender: boolean;
-}
+export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackItemId, feedbackItemTitle, team, boardId, boardTitle, defaultIteration, defaultAreaPath, actionItems, nonHiddenWorkItemTypes, allWorkItemTypes, allowAddNewActionItem, onUpdateActionItem }) => {
+  const [isLinkedWorkItemLoaded, setIsLinkedWorkItemLoaded] = useState(false);
+  const [isWorkItemTypeListCalloutVisible, setIsWorkItemTypeListCalloutVisible] = useState(false);
+  const [linkedWorkItem, setLinkedWorkItem] = useState<WorkItem | null>(null);
+  const [initialRender, setInitialRender] = useState(true);
 
-class ActionItemDisplay extends React.Component<ActionItemDisplayProps, ActionItemDisplayState> {
-  constructor(props: ActionItemDisplayProps) {
-    super(props);
+  const addWorkItemButtonRef = useRef<HTMLButtonElement>(null);
+  const addWorkItemMenuRef = useRef<HTMLDivElement>(null);
+  const addWorkItemWrapperRef = useRef<HTMLDivElement>(null);
+  const linkExistingWorkItemDialogRef = useRef<HTMLDialogElement>(null);
 
-    this.state = {
-      isWorkItemTypeListCalloutVisible: false,
-      isLinkedWorkItemLoaded: false,
-      linkedWorkItem: null,
-      initialRender: true,
+  useEffect(() => {
+    if (initialRender) {
+      setInitialRender(false);
+    }
+  }, [initialRender]);
+
+  const hideSelectorCallout = useCallback(() => {
+    setIsWorkItemTypeListCalloutVisible(false);
+  }, []);
+
+  useEffect(() => {
+    const handleDocumentPointerDown = (event: PointerEvent) => {
+      if (!isWorkItemTypeListCalloutVisible) {
+        return;
+      }
+
+      const wrapper = addWorkItemWrapperRef.current;
+      const menu = addWorkItemMenuRef.current;
+      const target = event.target as Node | null;
+
+      if (!wrapper || !target) {
+        return;
+      }
+
+      if (wrapper.contains(target)) {
+        return;
+      }
+
+      if (menu && menu.contains(target)) {
+        return;
+      }
+
+      hideSelectorCallout();
     };
-  }
 
-  private readonly addWorkItemButtonRef = React.createRef<HTMLButtonElement>();
-  private readonly addWorkItemMenuRef = React.createRef<HTMLDivElement>();
-  private readonly addWorkItemWrapperRef = React.createRef<HTMLDivElement>();
-  private readonly linkExistingWorkItemDialogRef = React.createRef<HTMLDialogElement>();
+    document.addEventListener("pointerdown", handleDocumentPointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", handleDocumentPointerDown);
+    };
+  }, [isWorkItemTypeListCalloutVisible, hideSelectorCallout]);
 
-  componentDidMount() {
-    if (this.state.initialRender) {
-      this.setState({ initialRender: false });
-    }
+  const createAndLinkActionItem = useCallback(
+    async (workItemTypeName: string) => {
+      const boardUrl = await getBoardUrl(team.id, boardId, WorkflowPhase.Collect);
+      const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
 
-    document.addEventListener("pointerdown", this.handleDocumentPointerDown);
-  }
+      // Account for any users who are no longer a part of the org
+      const assignedUser: string | undefined = getUser().name === undefined ? "Former User" : getUser().name;
 
-  componentWillUnmount(): void {
-    document.removeEventListener("pointerdown", this.handleDocumentPointerDown);
-  }
+      const workItem = await workItemNavSvc.openNewWorkItem(workItemTypeName, {
+        "System.AssignedTo": assignedUser,
+        "Tags": "feedback",
+        "Title": "",
+        "Description": `${feedbackItemTitle}`,
+        "priority": 2,
+        "System.History": `Created by Retrospectives |` + ` Team [ ${team.name} ] Retrospective [ ${boardTitle} ] Item [ ${feedbackItemTitle} ]` + ` Link [ ${boardUrl} ]`,
+        "System.AreaPath": defaultAreaPath,
+        "System.IterationPath": defaultIteration,
+      });
 
-  private readonly createAndLinkActionItem = async (workItemTypeName: string) => {
-    const boardUrl = await getBoardUrl(this.props.team.id, this.props.boardId, WorkflowPhase.Collect);
-    const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+      if (workItem) {
+        const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(boardId, feedbackItemId, workItem.id);
+        appInsights.trackEvent({ name: TelemetryEvents.WorkItemCreated, properties: { workItemTypeName } });
+        onUpdateActionItem(updatedFeedbackItem);
+      }
+    },
+    [team, boardId, feedbackItemTitle, boardTitle, defaultAreaPath, defaultIteration, feedbackItemId, onUpdateActionItem],
+  );
 
-    // Account for any users who are no longer a part of the org
-    const assignedUser: string | undefined = getUser().name === undefined ? "Former User" : getUser().name;
+  const addActionItem = useCallback(
+    (workItemTypeName: string) => {
+      createAndLinkActionItem(workItemTypeName);
+    },
+    [createAndLinkActionItem],
+  );
 
-    const workItem = await workItemNavSvc.openNewWorkItem(workItemTypeName, {
-      "System.AssignedTo": assignedUser,
-      "Tags": "feedback",
-      "Title": "",
-      "Description": `${this.props.feedbackItemTitle}`,
-      "priority": 2,
-      "System.History": `Created by Retrospectives |` + ` Team [ ${this.props.team.name} ] Retrospective [ ${this.props.boardTitle} ] Item [ ${this.props.feedbackItemTitle} ]` + ` Link [ ${boardUrl} ]`,
-      "System.AreaPath": this.props.defaultAreaPath,
-      "System.IterationPath": this.props.defaultIteration,
-    });
+  const toggleSelectorCallout = useCallback(() => {
+    setIsWorkItemTypeListCalloutVisible(prev => !prev);
+  }, []);
 
-    if (workItem) {
-      const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(this.props.boardId, this.props.feedbackItemId, workItem.id);
-      appInsights.trackEvent({ name: TelemetryEvents.WorkItemCreated, properties: { workItemTypeName } });
-      this.props.onUpdateActionItem(updatedFeedbackItem);
-    }
-  };
+  const handleClickWorkItemType = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | HTMLSpanElement>, item: WorkItemType) => {
+      event && event.stopPropagation();
+      hideSelectorCallout();
+      addActionItem(item.name);
+    },
+    [hideSelectorCallout, addActionItem],
+  );
 
-  private readonly renderAllWorkItemCards = () => {
-    return this.props.actionItems.map(item => {
-      return this.renderWorkItemCard(item, false);
-    });
-  };
-
-  private readonly renderWorkItemCard = (item: WorkItem, areActionIconsHidden: boolean) => {
-    return <ActionItem key={item.id} feedbackItemId={this.props.feedbackItemId} boardId={this.props.boardId} actionItem={item} nonHiddenWorkItemTypes={this.props.nonHiddenWorkItemTypes} allWorkItemTypes={this.props.allWorkItemTypes} onUpdateActionItem={this.props.onUpdateActionItem} areActionIconsHidden={areActionIconsHidden} shouldFocus={!this.state.initialRender} />;
-  };
-
-  private readonly addActionItem = (workItemTypeName: string) => {
-    this.createAndLinkActionItem(workItemTypeName);
-  };
-
-  private readonly hideSelectorCallout = () => {
-    this.setState({
-      isWorkItemTypeListCalloutVisible: false,
-    });
-  };
-
-  private readonly toggleSelectorCallout = () => {
-    this.setState(prevState => ({ isWorkItemTypeListCalloutVisible: !prevState.isWorkItemTypeListCalloutVisible }));
-  };
-
-  private readonly handleDocumentPointerDown = (event: PointerEvent) => {
-    if (!this.state.isWorkItemTypeListCalloutVisible) {
-      return;
-    }
-
-    const wrapper = this.addWorkItemWrapperRef.current;
-    const menu = this.addWorkItemMenuRef.current;
-    const target = event.target as Node | null;
-
-    if (!wrapper || !target) {
-      return;
-    }
-
-    if (wrapper.contains(target)) {
-      return;
-    }
-
-    if (menu && menu.contains(target)) {
-      return;
-    }
-
-    this.hideSelectorCallout();
-  };
-
-  private readonly handleClickWorkItemType = (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | HTMLSpanElement>, item: WorkItemType) => {
-    event && event.stopPropagation();
-    this.hideSelectorCallout();
-    this.addActionItem(item.name);
-  };
-
-  private readonly handleInputChange = async (event?: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback(async (event?: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event?.target.value;
 
     if (!newValue?.trim()) {
-      this.setState({
-        isLinkedWorkItemLoaded: false,
-      });
+      setIsLinkedWorkItemLoaded(false);
       return;
     }
 
     const workItemId = Number(newValue.trim());
 
     if (!workItemId) {
-      this.setState({
-        isLinkedWorkItemLoaded: false,
-      });
+      setIsLinkedWorkItemLoaded(false);
       return;
     }
 
     const workItem = await workItemService.getWorkItemsByIds([workItemId]);
-    this.setState({
-      isLinkedWorkItemLoaded: true,
-      linkedWorkItem: workItem[0] ? workItem[0] : null,
+    setIsLinkedWorkItemLoaded(true);
+    setLinkedWorkItem(workItem[0] ? workItem[0] : null);
+  }, []);
+
+  const linkExistingWorkItem = useCallback(async () => {
+    if (linkedWorkItem) {
+      const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(boardId, feedbackItemId, linkedWorkItem.id);
+
+      appInsights.trackEvent({ name: TelemetryEvents.ExistingWorkItemLinked, properties: { workItemTypeName: linkedWorkItem.fields["System.WorkItemType"] } });
+
+      onUpdateActionItem(updatedFeedbackItem);
+    }
+
+    linkExistingWorkItemDialogRef.current?.close();
+  }, [linkedWorkItem, boardId, feedbackItemId, onUpdateActionItem]);
+
+  const handleLinkExistingWorkItemClick = useCallback(
+    (mouseEvent: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement> | undefined = undefined) => {
+      if (mouseEvent) {
+        mouseEvent.stopPropagation();
+      }
+
+      hideSelectorCallout();
+
+      linkExistingWorkItemDialogRef.current?.showModal();
+    },
+    [hideSelectorCallout],
+  );
+
+  const renderWorkItemCard = useCallback(
+    (item: WorkItem, areActionIconsHidden: boolean) => {
+      return <ActionItem key={item.id} feedbackItemId={feedbackItemId} boardId={boardId} actionItem={item} nonHiddenWorkItemTypes={nonHiddenWorkItemTypes} allWorkItemTypes={allWorkItemTypes} onUpdateActionItem={onUpdateActionItem} areActionIconsHidden={areActionIconsHidden} shouldFocus={!initialRender} />;
+    },
+    [feedbackItemId, boardId, nonHiddenWorkItemTypes, allWorkItemTypes, onUpdateActionItem, initialRender],
+  );
+
+  const renderAllWorkItemCards = useCallback(() => {
+    return actionItems.map(item => {
+      return renderWorkItemCard(item, false);
     });
-  };
+  }, [actionItems, renderWorkItemCard]);
 
-  private readonly linkExistingWorkItem = async () => {
-    if (this.state.linkedWorkItem) {
-      const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(this.props.boardId, this.props.feedbackItemId, this.state.linkedWorkItem.id);
-
-      appInsights.trackEvent({ name: TelemetryEvents.ExistingWorkItemLinked, properties: { workItemTypeName: this.state.linkedWorkItem.fields["System.WorkItemType"] } });
-
-      this.props.onUpdateActionItem(updatedFeedbackItem);
-    }
-
-    this.linkExistingWorkItemDialogRef.current?.close();
-  };
-
-  private readonly handleLinkExistingWorkItemClick = (mouseEvent: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement> = undefined) => {
-    if (mouseEvent) {
-      mouseEvent.stopPropagation();
-    }
-
-    this.hideSelectorCallout();
-
-    this.linkExistingWorkItemDialogRef.current?.showModal();
-  };
-
-  public render(): React.JSX.Element {
-    return (
-      <>
-        {this.props.allowAddNewActionItem && (
-          <div className="add-action-item-wrapper" ref={this.addWorkItemWrapperRef}>
-            <button ref={this.addWorkItemButtonRef} className="add-action-item-button" aria-label="Add work item" data-automation-id="actionItemDataAutomation" onClick={this.toggleSelectorCallout}>
-              {getIconElement("add")}
-              <span>Add work item</span>
-            </button>
-            {this.state.isWorkItemTypeListCalloutVisible && (
-              <div ref={this.addWorkItemMenuRef} className="popout-container" role="menu" aria-label="Add work item menu">
-                <button
-                  className="list-item"
-                  onClick={this.handleLinkExistingWorkItemClick}
-                  onKeyDown={e => {
-                    if (e.key === "Enter") {
-                      e.stopPropagation();
-                      this.handleLinkExistingWorkItemClick();
-                    }
-                  }}
-                >
-                  {getIconElement("link")}
-                  <span>Link existing work item</span>
-                </button>
-                <div role="separator" className="separator" />
-                {this.props.nonHiddenWorkItemTypes.map(item => {
-                  return (
-                    <button key={item.referenceName} className="list-item" onClick={e => this.handleClickWorkItemType(e, item)} aria-label={`Add work item type ${item.name}`}>
-                      <img className="work-item-type-icon" alt={`icon for work item type ${item.name}`} src={item.icon.url} />
-                      <div className="add-action-item-list-item-text">{item.name}</div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-        {this.renderAllWorkItemCards()}
-        <dialog ref={this.linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog" aria-label="Link existing work item" onClose={() => this.linkExistingWorkItemDialogRef.current?.close()}>
-          <div className="header">
-            <h2 className="title">Link existing work item</h2>
-            <button onClick={() => this.linkExistingWorkItemDialogRef.current?.close()} aria-label="Close">
-              {getIconElement("close")}
-            </button>
-          </div>
-          <div className="subText">
-            <div className="form-group">
-              <input className="search-box" placeholder="Enter the exact work item id" role="searchbox" onChange={this.handleInputChange}></input>
-              <div className="output-container">
-                {this.state.isLinkedWorkItemLoaded && this.state.linkedWorkItem && this.renderWorkItemCard(this.state.linkedWorkItem, true)}
-                {this.state.isLinkedWorkItemLoaded && !this.state.linkedWorkItem && <div className="work-item-not-found">The work item you are looking for was not found. Please verify the id.</div>}
-              </div>
+  return (
+    <>
+      {allowAddNewActionItem && (
+        <div className="add-action-item-wrapper" ref={addWorkItemWrapperRef}>
+          <button ref={addWorkItemButtonRef} className="add-action-item-button" aria-label="Add work item" data-automation-id="actionItemDataAutomation" onClick={toggleSelectorCallout}>
+            {getIconElement("add")}
+            <span>Add work item</span>
+          </button>
+          {isWorkItemTypeListCalloutVisible && (
+            <div ref={addWorkItemMenuRef} className="popout-container" role="menu" aria-label="Add work item menu">
+              <button
+                className="list-item"
+                onClick={handleLinkExistingWorkItemClick}
+                onKeyDown={e => {
+                  if (e.key === "Enter") {
+                    e.stopPropagation();
+                    handleLinkExistingWorkItemClick();
+                  }
+                }}
+              >
+                {getIconElement("link")}
+                <span>Link existing work item</span>
+              </button>
+              <div role="separator" className="separator" />
+              {nonHiddenWorkItemTypes.map(item => {
+                return (
+                  <button key={item.referenceName} className="list-item" onClick={e => handleClickWorkItemType(e, item)} aria-label={`Add work item type ${item.name}`}>
+                    <img className="work-item-type-icon" alt={`icon for work item type ${item.name}`} src={item.icon.url} />
+                    <div className="add-action-item-list-item-text">{item.name}</div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+      {renderAllWorkItemCards()}
+      <dialog ref={linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog" aria-label="Link existing work item" onClose={() => linkExistingWorkItemDialogRef.current?.close()}>
+        <div className="header">
+          <h2 className="title">Link existing work item</h2>
+          <button onClick={() => linkExistingWorkItemDialogRef.current?.close()} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">
+          <div className="form-group">
+            <input className="search-box" placeholder="Enter the exact work item id" role="searchbox" onChange={handleInputChange}></input>
+            <div className="output-container">
+              {isLinkedWorkItemLoaded && linkedWorkItem && renderWorkItemCard(linkedWorkItem, true)}
+              {isLinkedWorkItemLoaded && !linkedWorkItem && <div className="work-item-not-found">The work item you are looking for was not found. Please verify the id.</div>}
             </div>
           </div>
-          <div className="inner">
-            <button className="button" disabled={!this.state.linkedWorkItem} onClick={this.linkExistingWorkItem}>
-              Link work item
-            </button>
-            <button className="default button" onClick={() => this.linkExistingWorkItemDialogRef.current?.close()}>
-              Cancel
-            </button>
-          </div>
-        </dialog>
-      </>
-    );
-  }
-}
+        </div>
+        <div className="inner">
+          <button className="button" disabled={!linkedWorkItem} onClick={linkExistingWorkItem}>
+            Link work item
+          </button>
+          <button className="default button" onClick={() => linkExistingWorkItemDialogRef.current?.close()}>
+            Cancel
+          </button>
+        </div>
+      </dialog>
+    </>
+  );
+};
 
 export default withAITracking(reactPlugin, ActionItemDisplay);

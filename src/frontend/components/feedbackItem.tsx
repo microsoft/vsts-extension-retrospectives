@@ -67,7 +67,7 @@ export interface IFeedbackItemProps {
   isFocusModalHidden: boolean;
   onVoteCasted: () => void;
   activeTimerFeedbackItemId: string | null;
-  requestTimerStart: (feedbackItemId: string) => Promise<boolean>;
+  requestTimerStart: (feedbackItemId: string) => void;
   notifyTimerStopped: (feedbackItemId: string) => void;
 
   addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
@@ -613,10 +613,7 @@ class FeedbackItem extends React.Component<IFeedbackItemProps, IFeedbackItemStat
     const boardId: string = this.props.boardId;
 
     if (!this.props.timerState) {
-      const canStartTimer = await this.props.requestTimerStart(feedbackItemId);
-      if (!canStartTimer) {
-        return;
-      }
+      this.props.requestTimerStart(feedbackItemId);
     }
 
     const incTimer = async () => {

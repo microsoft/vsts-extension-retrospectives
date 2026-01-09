@@ -789,16 +789,6 @@ export const SpeedIcon = () => {
   );
 };
 
-export function getIconElement(iconId: string | undefined | null): React.ReactElement {
-  const foundIcon = availableIcons.find(icon => icon.id === iconId || icon.tags.includes(iconId));
-
-  if (!foundIcon) {
-    return <PlayCircleIcon />;
-  }
-
-  return foundIcon.icon;
-}
-
 export const availableIcons: { id: string; tags: string[]; name: string; icon: React.ReactElement }[] = [
   { id: "happy-face", tags: ["fas fa-cart-plus", "far fa-smile"], name: "Smile", icon: <HappyFaceIcon /> },
   { id: "sad-face", tags: ["far fa-frown"], name: "Frown", icon: <SadFaceIcon /> },
@@ -875,3 +865,13 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "report-problem", tags: [], name: "Report Problem", icon: <ReportProblemIcon /> },
   { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
 ];
+
+export function getIconElement(iconId: string | undefined | null): React.ReactElement {
+  const foundIcon = availableIcons.find(icon => icon.id === iconId || icon.tags.includes(iconId));
+
+  if (!foundIcon) {
+    return <PlayCircleIcon />;
+  }
+
+  return foundIcon.icon;
+}

@@ -738,78 +738,65 @@ describe("Action Item Display component", () => {
     });
   });
 
-  it("handles handleDocumentPointerDown when callout is visible", async () => {
+  it("closes menu when clicking outside after opening it", async () => {
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
-    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
-    render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
 
-    // Set callout visible
-    act(() => {
-      (ref.current as any).setState({ isWorkItemTypeListCalloutVisible: true });
-    });
+    // Open the menu
+    const addButton = container.querySelector(".add-action-item-button");
+    fireEvent.click(addButton!);
 
-    // Simulate pointer down outside
-    const mockEvent = {
-      target: document.body,
-    } as unknown as PointerEvent;
-
-    (ref.current as any).handleDocumentPointerDown(mockEvent);
-
-    // Should hide the callout
     await waitFor(() => {
-      expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
+      expect(container.querySelector(".popout-container")).toBeTruthy();
+    });
+
+    // Click outside (on document body) - should close the menu
+    fireEvent.pointerDown(document.body);
+
+    await waitFor(() => {
+      expect(container.querySelector(".popout-container")).toBeFalsy();
     });
   });
 
-  it("handleDocumentPointerDown does nothing when callout is not visible", async () => {
+  it("menu is not visible by default", () => {
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
-    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
-    render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
 
-    // Callout is not visible by default
-    expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
+    // Menu callout is not visible by default
+    expect(container.querySelector(".popout-container")).toBeFalsy();
 
-    // Simulate pointer down - should do nothing
-    const mockEvent = {
-      target: document.body,
-    } as unknown as PointerEvent;
+    // Pointer down on body should have no effect when menu is not open
+    fireEvent.pointerDown(document.body);
 
-    (ref.current as any).handleDocumentPointerDown(mockEvent);
-
-    // Still false
-    expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
+    expect(container.querySelector(".popout-container")).toBeFalsy();
   });
 
-  it("handleDocumentPointerDown returns early when wrapper is null", async () => {
+  it("handles clicks gracefully when menu is open", async () => {
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
-    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
-    render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
 
-    // Set callout visible
-    act(() => {
-      (ref.current as any).setState({ isWorkItemTypeListCalloutVisible: true });
+    // Open the menu
+    const addButton = container.querySelector(".add-action-item-button");
+    fireEvent.click(addButton!);
+
+    await waitFor(() => {
+      expect(container.querySelector(".popout-container")).toBeTruthy();
     });
 
-    // Simulate pointer down with null target
-    const mockEvent = {
-      target: null,
-    } as unknown as PointerEvent;
-
-    // Should not throw and callout should remain visible
-    (ref.current as any).handleDocumentPointerDown(mockEvent);
-    expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(true);
+    // Various pointer events should not throw
+    expect(() => fireEvent.pointerDown(document.body)).not.toThrow();
   });
 
   it("handleDocumentPointerDown does not close callout when clicking inside the menu", async () => {
@@ -838,21 +825,20 @@ describe("Action Item Display component", () => {
     });
   });
 
-  it("handleDocumentPointerDown closes callout when clicking outside the menu and wrapper", async () => {
+  it("closes callout when clicking outside the menu and wrapper", async () => {
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
-    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
-    const { container } = render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
 
     // Open the menu
     const addButton = container.querySelector(".add-action-item-button");
     fireEvent.click(addButton!);
 
     await waitFor(() => {
-      expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(true);
+      expect(container.querySelector(".popout-container")).toBeTruthy();
     });
 
     // Create an element outside both wrapper and menu
@@ -865,7 +851,7 @@ describe("Action Item Display component", () => {
 
     await waitFor(() => {
       // Callout should now be hidden
-      expect((ref.current as any).state.isWorkItemTypeListCalloutVisible).toBe(false);
+      expect(container.querySelector(".popout-container")).toBeFalsy();
     });
 
     // Cleanup
@@ -932,11 +918,16 @@ describe("Action Item Display component", () => {
       nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
 
-    const ref = React.createRef<InstanceType<typeof ActionItemDisplay>>();
-    render(<ActionItemDisplay {...propsWithAdd} ref={ref} />);
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
 
-    // Manually call linkExistingWorkItem with no linked work item
-    await (ref.current as any).linkExistingWorkItem();
+    // Open the Link Existing dialog
+    await openLinkExistingDialog(container);
+
+    // Click the Link button without entering any work item ID
+    const linkButton = container.querySelector(".link-existing-work-item-dialog .button") as HTMLButtonElement;
+
+    // The button should be disabled when no work item is entered
+    expect(linkButton?.disabled).toBe(true);
 
     // Should not call addAssociatedActionItem
     expect(mockAddAssociatedActionItem).not.toHaveBeenCalled();

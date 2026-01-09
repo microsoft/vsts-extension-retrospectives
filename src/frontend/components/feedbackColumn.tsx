@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
 import { cn } from "../utilities/classNameHelper";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
@@ -42,7 +42,7 @@ export interface FeedbackColumnProps {
   onColumnNotesChange: (notes: string) => void;
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
   activeTimerFeedbackItemId: string | null;
-  requestTimerStart: (feedbackItemId: string) => Promise<boolean>;
+  requestTimerStart: (feedbackItemId: string) => void;
   notifyTimerStopped: (feedbackItemId: string) => void;
 
   addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
@@ -50,71 +50,111 @@ export interface FeedbackColumnProps {
   refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void;
 }
 
-export interface FeedbackColumnState {
-  isCollapsed: boolean;
-  isCarouselHidden: boolean;
-  columnNotesDraft: string;
-  focusedItemIndex: number;
+export interface FeedbackColumnHandle {
+  navigateByKeyboard: (direction: "next" | "prev") => void;
+  focusColumn: () => void;
+  createEmptyFeedbackItem: () => void;
 }
 
-export default class FeedbackColumn extends React.Component<FeedbackColumnProps, FeedbackColumnState> {
-  private columnRef: React.RefObject<HTMLDivElement> = React.createRef();
-  private readonly editColumnNotesDialogRef = React.createRef<HTMLDialogElement>();
-  private itemRefs: Map<string, HTMLElement> = new Map();
-  private focusPreservation: {
-    elementId: string | null;
-    selectionStart: number | null;
-    selectionEnd: number | null;
-    isContentEditable: boolean;
-    cursorPosition: number | null;
-  } | null = null;
+interface FocusPreservation {
+  elementId: string | null;
+  selectionStart: number | null;
+  selectionEnd: number | null;
+  isContentEditable: boolean;
+  cursorPosition: number | null;
+}
 
-  constructor(props: FeedbackColumnProps) {
-    super(props);
-    this.state = {
-      isCarouselHidden: true,
-      isCollapsed: false,
-      columnNotesDraft: "",
-      focusedItemIndex: -1,
-    };
+export const moveFeedbackItem = async (refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void, boardId: string, feedbackItemId: string, columnId: string) => {
+  const updatedFeedbackItems = await itemDataService.addFeedbackItemAsMainItemToColumn(boardId, feedbackItemId, columnId);
+
+  if (updatedFeedbackItems) {
+    refreshFeedbackItems(
+      [updatedFeedbackItems.updatedOldParentFeedbackItem, updatedFeedbackItems.updatedFeedbackItem, ...updatedFeedbackItems.updatedChildFeedbackItems].filter(item => item),
+      true,
+    );
   }
 
-  public componentDidMount() {
-    if (this.columnRef.current) {
-      this.columnRef.current.addEventListener("keydown", this.handleColumnKeyDown);
-    }
+  appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemUngrouped, properties: { boardId, feedbackItemId, columnId } });
+};
+
+export const createFeedbackItemProps = (columnProps: FeedbackColumnProps, columnItem: IColumnItem): IFeedbackItemProps => {
+  let accentColor: string = columnProps.accentColor;
+  if (columnItem.feedbackItem.originalColumnId !== columnProps.columnId) {
+    accentColor = columnProps.columns[columnItem.feedbackItem.originalColumnId]?.columnProperties?.accentColor ?? columnProps.accentColor;
   }
 
-  public componentDidUpdate(prevProps: FeedbackColumnProps) {
-    const itemCountChanged = prevProps.columnItems.length !== this.props.columnItems.length;
+  return {
+    id: columnItem.feedbackItem.id,
+    title: columnItem.feedbackItem.title,
+    createdBy: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy.displayName : null,
+    createdByProfileImage: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy._links.avatar.href : null,
+    lastEditedDate: columnItem.feedbackItem.modifiedDate ? columnItem.feedbackItem.modifiedDate.toString() : "",
+    upvotes: columnItem.feedbackItem.upvotes,
+    timerSecs: columnItem.feedbackItem.timerSecs,
+    timerState: columnItem.feedbackItem.timerState,
+    timerId: columnItem.feedbackItem.timerId,
+    workflowPhase: columnProps.workflowPhase,
+    accentColor: accentColor,
+    icon: columnProps.icon,
+    createdDate: columnItem.feedbackItem.createdDate.toString(),
+    team: columnProps.team,
+    columnProps: columnProps,
+    columns: columnProps.columns,
+    columnIds: columnProps.columnIds,
+    columnId: columnProps.columnId,
+    originalColumnId: columnItem.feedbackItem.originalColumnId,
+    boardId: columnProps.boardId,
+    boardTitle: columnProps.boardTitle,
+    defaultActionItemAreaPath: columnProps.defaultActionItemAreaPath,
+    defaultActionItemIteration: columnProps.defaultActionItemIteration,
+    actionItems: columnItem.actionItems,
+    newlyCreated: columnItem.newlyCreated,
+    showAddedAnimation: columnItem.showAddedAnimation,
+    addFeedbackItems: columnProps.addFeedbackItems,
+    removeFeedbackItemFromColumn: columnProps.removeFeedbackItemFromColumn,
+    refreshFeedbackItems: columnProps.refreshFeedbackItems,
+    moveFeedbackItem: moveFeedbackItem,
+    nonHiddenWorkItemTypes: columnProps.nonHiddenWorkItemTypes,
+    allWorkItemTypes: columnProps.allWorkItemTypes,
+    shouldHaveFocus: columnItem.shouldHaveFocus,
+    hideFeedbackItems: columnProps.hideFeedbackItems,
+    userIdRef: columnItem.feedbackItem.userIdRef,
+    onVoteCasted: columnProps.onVoteCasted,
+    groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
+    groupIds: columnItem.feedbackItem.childFeedbackItemIds ?? [],
+    isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
+    isShowingGroupedChildrenTitles: false,
+    isFocusModalHidden: true,
+    activeTimerFeedbackItemId: columnProps.activeTimerFeedbackItemId,
+    requestTimerStart: columnProps.requestTimerStart,
+    notifyTimerStopped: columnProps.notifyTimerStopped,
+  };
+};
 
-    if (itemCountChanged && this.focusPreservation) {
-      this.restoreFocus();
-      this.focusPreservation = null;
-    }
-  }
+const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((props, ref) => {
+  const { columns, columnIds, columnName, columnId, accentColor, icon, workflowPhase, isDataLoaded, columnItems, team, boardId, boardTitle, defaultActionItemIteration, defaultActionItemAreaPath, nonHiddenWorkItemTypes, allWorkItemTypes, isBoardAnonymous, hideFeedbackItems, onVoteCasted, showColumnEditButton, columnNotes, onColumnNotesChange, activeTimerFeedbackItemId, requestTimerStart, notifyTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems } = props;
 
-  public getSnapshotBeforeUpdate(prevProps: FeedbackColumnProps): null {
-    if (prevProps.columnItems.length !== this.props.columnItems.length) {
-      this.preserveFocus();
-    }
-    return null;
-  }
+  const [isCollapsed] = useState(false);
+  const [columnNotesDraft, setColumnNotesDraft] = useState("");
+  const [focusedItemIndex, setFocusedItemIndex] = useState(-1);
 
-  public componentWillUnmount() {
-    if (this.columnRef.current) {
-      this.columnRef.current.removeEventListener("keydown", this.handleColumnKeyDown);
-    }
-  }
+  const columnRef = useRef<HTMLDivElement>(null);
+  const editColumnNotesDialogRef = useRef<HTMLDialogElement>(null);
+  const focusPreservation = useRef<FocusPreservation | null>(null);
+  const prevColumnItemsLength = useRef<number>(columnItems.length);
 
-  private preserveFocus = () => {
+  const getVisibleColumnItems = useCallback((): IColumnItem[] => {
+    return columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId);
+  }, [columnItems]);
+
+  const preserveFocus = useCallback(() => {
     const activeElement = document.activeElement as HTMLElement;
 
-    if (this.columnRef.current && this.columnRef.current.contains(activeElement)) {
+    if (columnRef.current && columnRef.current.contains(activeElement)) {
       const feedbackCard = activeElement.closest("[data-feedback-item-id]") as HTMLElement;
       const elementId = feedbackCard?.getAttribute("data-feedback-item-id") || activeElement.id;
 
-      this.focusPreservation = {
+      focusPreservation.current = {
         elementId: elementId || null,
         selectionStart: null,
         selectionEnd: null,
@@ -124,32 +164,33 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
 
       if (activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA") {
         const inputElement = activeElement as HTMLInputElement | HTMLTextAreaElement;
-        this.focusPreservation.selectionStart = inputElement.selectionStart;
-        this.focusPreservation.selectionEnd = inputElement.selectionEnd;
+        focusPreservation.current.selectionStart = inputElement.selectionStart;
+        focusPreservation.current.selectionEnd = inputElement.selectionEnd;
       } else if (activeElement.isContentEditable) {
         const selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
           const range = selection.getRangeAt(0);
-          this.focusPreservation.cursorPosition = range.startOffset;
+          focusPreservation.current.cursorPosition = range.startOffset;
         }
       }
     }
-  };
+  }, []);
 
-  private restoreFocus = () => {
-    if (!this.focusPreservation) {
+  const restoreFocus = useCallback(() => {
+    if (!focusPreservation.current) {
       return;
     }
 
     setTimeout(() => {
-      if (!this.focusPreservation) {
+      const preserved = focusPreservation.current;
+      if (!preserved) {
         return;
       }
 
       let elementToFocus: HTMLElement | null = null;
 
-      if (this.focusPreservation.elementId) {
-        const feedbackCard = this.columnRef.current?.querySelector(`[data-feedback-item-id="${this.focusPreservation.elementId}"]`) as HTMLElement;
+      if (preserved.elementId) {
+        const feedbackCard = columnRef.current?.querySelector(`[data-feedback-item-id="${preserved.elementId}"]`) as HTMLElement;
         if (feedbackCard) {
           elementToFocus = feedbackCard.querySelector('input, textarea, [contenteditable="true"]') as HTMLElement;
           if (!elementToFocus) {
@@ -161,15 +202,15 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       if (elementToFocus) {
         elementToFocus.focus();
 
-        if ((elementToFocus.tagName === "INPUT" || elementToFocus.tagName === "TEXTAREA") && this.focusPreservation.selectionStart !== null) {
+        if ((elementToFocus.tagName === "INPUT" || elementToFocus.tagName === "TEXTAREA") && preserved.selectionStart !== null) {
           const inputElement = elementToFocus as HTMLInputElement | HTMLTextAreaElement;
-          inputElement.setSelectionRange(this.focusPreservation.selectionStart, this.focusPreservation.selectionEnd || this.focusPreservation.selectionStart);
-        } else if (elementToFocus.isContentEditable && this.focusPreservation.cursorPosition !== null) {
+          inputElement.setSelectionRange(preserved.selectionStart, preserved.selectionEnd || preserved.selectionStart);
+        } else if (elementToFocus.isContentEditable && preserved.cursorPosition !== null) {
           try {
             const range = document.createRange();
             const selection = window.getSelection();
             if (elementToFocus.firstChild && selection) {
-              range.setStart(elementToFocus.firstChild, Math.min(this.focusPreservation.cursorPosition, elementToFocus.firstChild.textContent?.length || 0));
+              range.setStart(elementToFocus.firstChild, Math.min(preserved.cursorPosition, elementToFocus.firstChild.textContent?.length || 0));
               range.collapse(true);
               selection.removeAllRanges();
               selection.addRange(range);
@@ -180,118 +221,43 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
         }
       }
     }, 0);
-  };
+  }, []);
 
-  private handleColumnKeyDown = (e: KeyboardEvent) => {
-    const target = e.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || isAnyModalDialogOpen()) {
-      return;
-    }
-
-    const visibleItems = this.getVisibleColumnItems();
-
-    switch (e.key) {
-      case "ArrowUp":
-        e.preventDefault();
-        this.navigateItems("prev", visibleItems);
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        this.navigateItems("next", visibleItems);
-        break;
-      case "Insert":
-        if (this.props.workflowPhase === WorkflowPhase.Collect) {
-          e.preventDefault();
-          this.createEmptyFeedbackItem();
-        }
-        break;
-      case "e":
-      case "E":
-        if (this.props.showColumnEditButton) {
-          e.preventDefault();
-          this.openEditDialog();
-        }
-        break;
-    }
-  };
-
-  private getVisibleColumnItems = (): IColumnItem[] => {
-    return this.props.columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId);
-  };
-
-  private navigateItems = (direction: "next" | "prev", visibleItems: IColumnItem[]) => {
+  const navigateItems = useCallback((direction: "next" | "prev", visibleItems: IColumnItem[]) => {
     if (visibleItems.length === 0) {
       return;
     }
 
-    let newIndex = this.state.focusedItemIndex;
+    setFocusedItemIndex(prevIndex => {
+      let newIndex = prevIndex;
 
-    switch (direction) {
-      case "next":
-        newIndex = this.state.focusedItemIndex < 0 ? 0 : Math.min(this.state.focusedItemIndex + 1, visibleItems.length - 1);
-        break;
-      case "prev":
-        newIndex = this.state.focusedItemIndex < 0 ? -1 : this.state.focusedItemIndex <= 0 ? 0 : this.state.focusedItemIndex - 1;
-        break;
-    }
-
-    if (newIndex < 0) {
-      return;
-    }
-
-    this.setState({ focusedItemIndex: newIndex });
-    const itemId = visibleItems[newIndex]?.feedbackItem.id;
-    if (itemId) {
-      const itemElement = this.itemRefs.get(itemId);
-      if (itemElement) {
-        itemElement.focus();
+      switch (direction) {
+        case "next":
+          newIndex = prevIndex < 0 ? 0 : Math.min(prevIndex + 1, visibleItems.length - 1);
+          break;
+        case "prev":
+          newIndex = prevIndex < 0 ? -1 : prevIndex <= 0 ? 0 : prevIndex - 1;
+          break;
       }
-    }
-  };
 
-  public navigateByKeyboard = (direction: "next" | "prev") => {
-    const visibleItems = this.getVisibleColumnItems();
-    this.navigateItems(direction, visibleItems);
-  };
+      return newIndex;
+    });
+  }, []);
 
-  public focusColumn = () => {
-    if (this.columnRef.current) {
-      this.columnRef.current.focus();
+  const createEmptyFeedbackItem = useCallback(() => {
+    if (workflowPhase !== WorkflowPhase.Collect) return;
 
-      const visibleItems = this.getVisibleColumnItems();
-      if (visibleItems.length > 0) {
-        this.setState({ focusedItemIndex: 0 });
-        const firstItemId = visibleItems[0].feedbackItem.id;
-        const itemElement = this.itemRefs.get(firstItemId);
-        if (itemElement) {
-          itemElement.focus();
-        }
-      }
-    }
-  };
-
-  public registerItemRef = (itemId: string, element: HTMLElement | null) => {
-    if (element) {
-      this.itemRefs.set(itemId, element);
-    } else {
-      this.itemRefs.delete(itemId);
-    }
-  };
-
-  public createEmptyFeedbackItem = () => {
-    if (this.props.workflowPhase !== WorkflowPhase.Collect) return;
-
-    const item = this.props.columnItems.find(x => x.feedbackItem.id === "emptyFeedbackItem");
+    const item = columnItems.find(x => x.feedbackItem.id === "emptyFeedbackItem");
     if (item) {
       return;
     }
 
     const userIdentity = getUserIdentity();
     const feedbackItem: IFeedbackItemDocument = {
-      boardId: this.props.boardId,
-      columnId: this.props.columnId,
-      originalColumnId: this.props.columnId,
-      createdBy: this.props.isBoardAnonymous ? null : userIdentity,
+      boardId: boardId,
+      columnId: columnId,
+      originalColumnId: columnId,
+      createdBy: isBoardAnonymous ? null : userIdentity,
       createdDate: new Date(Date.now()),
       id: "emptyFeedbackItem",
       title: "",
@@ -305,197 +271,220 @@ export default class FeedbackColumn extends React.Component<FeedbackColumnProps,
       isGroupedCarouselItem: false,
     };
 
-    this.props.addFeedbackItems(this.props.columnId, [feedbackItem], /*shouldBroadcast*/ false, /*newlyCreated*/ true, /*showAddedAnimation*/ false, /*shouldHaveFocus*/ false, /*hideFeedbackItems*/ false);
-  };
+    addFeedbackItems(columnId, [feedbackItem], /*shouldBroadcast*/ false, /*newlyCreated*/ true, /*showAddedAnimation*/ false, /*shouldHaveFocus*/ false, /*hideFeedbackItems*/ false);
+  }, [workflowPhase, columnItems, boardId, columnId, isBoardAnonymous, addFeedbackItems]);
 
-  public dragFeedbackItemOverColumn = (e: React.DragEvent<HTMLDivElement>) => {
+  const openEditDialog = useCallback(() => {
+    setColumnNotesDraft(columnNotes);
+    editColumnNotesDialogRef.current?.showModal();
+  }, [columnNotes]);
+
+  const handleColumnKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || isAnyModalDialogOpen()) {
+        return;
+      }
+
+      const visibleItems = getVisibleColumnItems();
+
+      switch (e.key) {
+        case "ArrowUp":
+          e.preventDefault();
+          navigateItems("prev", visibleItems);
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          navigateItems("next", visibleItems);
+          break;
+        case "Insert":
+          if (workflowPhase === WorkflowPhase.Collect) {
+            e.preventDefault();
+            createEmptyFeedbackItem();
+          }
+          break;
+        case "e":
+        case "E":
+          if (showColumnEditButton) {
+            e.preventDefault();
+            openEditDialog();
+          }
+          break;
+      }
+    },
+    [getVisibleColumnItems, navigateItems, workflowPhase, createEmptyFeedbackItem, showColumnEditButton, openEditDialog],
+  );
+
+  const navigateByKeyboard = useCallback(
+    (direction: "next" | "prev") => {
+      const visibleItems = getVisibleColumnItems();
+      navigateItems(direction, visibleItems);
+    },
+    [getVisibleColumnItems, navigateItems],
+  );
+
+  const focusColumn = useCallback(() => {
+    if (columnRef.current) {
+      columnRef.current.focus();
+
+      const visibleItems = getVisibleColumnItems();
+      if (visibleItems.length > 0) {
+        setFocusedItemIndex(0);
+      }
+    }
+  }, [getVisibleColumnItems]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      navigateByKeyboard,
+      focusColumn,
+      createEmptyFeedbackItem,
+    }),
+    [navigateByKeyboard, focusColumn, createEmptyFeedbackItem],
+  );
+
+  useEffect(() => {
+    const column = columnRef.current;
+    if (column) {
+      column.addEventListener("keydown", handleColumnKeyDown);
+    }
+
+    return () => {
+      if (column) {
+        column.removeEventListener("keydown", handleColumnKeyDown);
+      }
+    };
+  }, [handleColumnKeyDown]);
+
+  useEffect(() => {
+    const itemCountChanged = prevColumnItemsLength.current !== columnItems.length;
+
+    if (itemCountChanged) {
+      preserveFocus();
+    }
+
+    prevColumnItemsLength.current = columnItems.length;
+  }, [columnItems.length, preserveFocus]);
+
+  useEffect(() => {
+    const itemCountChanged = prevColumnItemsLength.current !== columnItems.length;
+
+    if (itemCountChanged && focusPreservation.current) {
+      restoreFocus();
+      focusPreservation.current = null;
+    }
+  }, [columnItems.length, restoreFocus]);
+
+  const dragFeedbackItemOverColumn = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = "move";
-  };
+  }, []);
 
-  // Handle unlinking/ungrouping workitems and reload any updated items.
-  private readonly handleDropFeedbackItemOnColumnSpace = async () => {
-    // Using localStorage as a temporary solution for Edge issue
-    // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
-    // const draggedItemId = e.dataTransfer.getData('id');
+  const handleDropFeedbackItemOnColumnSpace = useCallback(async () => {
     const droppedItemId = localStorageHelper.getIdValue();
+    await moveFeedbackItem(refreshFeedbackItems, boardId, droppedItemId, columnId);
+  }, [refreshFeedbackItems, boardId, columnId]);
 
-    await FeedbackColumn.moveFeedbackItem(this.props.refreshFeedbackItems, this.props.boardId, droppedItemId, this.props.columnId);
-  };
-
-  private readonly openEditDialog = () => {
-    this.setState(
-      (state, props) => ({
-        columnNotesDraft: props.columnNotes,
-      }),
-      () => {
-        this.editColumnNotesDialogRef.current?.showModal();
-      },
-    );
-  };
-
-  private readonly handleColumnNotesDraftChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+  const handleColumnNotesDraftChange = useCallback((event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
     const target = event.target as HTMLInputElement | HTMLTextAreaElement | null;
     const value = newValue ?? target?.value ?? "";
-    this.setState({ columnNotesDraft: value });
-  };
+    setColumnNotesDraft(value);
+  }, []);
 
-  private readonly saveColumnNotes = () => {
-    this.props.onColumnNotesChange(this.state.columnNotesDraft);
-    this.editColumnNotesDialogRef.current?.close();
-  };
+  const saveColumnNotes = useCallback(() => {
+    onColumnNotesChange(columnNotesDraft);
+    editColumnNotesDialogRef.current?.close();
+  }, [onColumnNotesChange, columnNotesDraft]);
 
-  public static readonly moveFeedbackItem = async (refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void, boardId: string, feedbackItemId: string, columnId: string) => {
-    const updatedFeedbackItems = await itemDataService.addFeedbackItemAsMainItemToColumn(boardId, feedbackItemId, columnId);
-
-    refreshFeedbackItems(
-      [updatedFeedbackItems.updatedOldParentFeedbackItem, updatedFeedbackItems.updatedFeedbackItem, ...updatedFeedbackItems.updatedChildFeedbackItems].filter(item => item),
-      true,
-    );
-
-    appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemUngrouped, properties: { boardId, feedbackItemId, columnId } });
-  };
-
-  public static readonly createFeedbackItemProps = (columnProps: FeedbackColumnProps, columnItem: IColumnItem): IFeedbackItemProps => {
-    let accentColor: string = columnProps.accentColor;
-    if (columnItem.feedbackItem.originalColumnId !== columnProps.columnId) {
-      accentColor = columnProps.columns[columnItem.feedbackItem.originalColumnId]?.columnProperties?.accentColor ?? columnProps.accentColor;
-    }
-
-    return {
-      id: columnItem.feedbackItem.id,
-      title: columnItem.feedbackItem.title,
-      createdBy: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy.displayName : null,
-      createdByProfileImage: columnItem.feedbackItem.createdBy ? columnItem.feedbackItem.createdBy._links.avatar.href : null,
-      lastEditedDate: columnItem.feedbackItem.modifiedDate ? columnItem.feedbackItem.modifiedDate.toString() : "",
-      upvotes: columnItem.feedbackItem.upvotes,
-      timerSecs: columnItem.feedbackItem.timerSecs,
-      timerState: columnItem.feedbackItem.timerState,
-      timerId: columnItem.feedbackItem.timerId,
-      workflowPhase: columnProps.workflowPhase,
-      accentColor: accentColor,
-      icon: columnProps.icon,
-      createdDate: columnItem.feedbackItem.createdDate.toString(),
-      team: columnProps.team,
-      columnProps: columnProps,
-      columns: columnProps.columns,
-      columnIds: columnProps.columnIds,
-      columnId: columnProps.columnId,
-      originalColumnId: columnItem.feedbackItem.originalColumnId,
-      boardId: columnProps.boardId,
-      boardTitle: columnProps.boardTitle,
-      defaultActionItemAreaPath: columnProps.defaultActionItemAreaPath,
-      defaultActionItemIteration: columnProps.defaultActionItemIteration,
-      actionItems: columnItem.actionItems,
-      newlyCreated: columnItem.newlyCreated,
-      showAddedAnimation: columnItem.showAddedAnimation,
-      addFeedbackItems: columnProps.addFeedbackItems,
-      removeFeedbackItemFromColumn: columnProps.removeFeedbackItemFromColumn,
-      refreshFeedbackItems: columnProps.refreshFeedbackItems,
-      moveFeedbackItem: FeedbackColumn.moveFeedbackItem,
-      nonHiddenWorkItemTypes: columnProps.nonHiddenWorkItemTypes,
-      allWorkItemTypes: columnProps.allWorkItemTypes,
-      shouldHaveFocus: columnItem.shouldHaveFocus,
-      hideFeedbackItems: columnProps.hideFeedbackItems,
-      userIdRef: columnItem.feedbackItem.userIdRef,
-      onVoteCasted: columnProps.onVoteCasted,
-      groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
-      groupIds: columnItem.feedbackItem.childFeedbackItemIds ?? [],
-      isGroupedCarouselItem: columnItem.feedbackItem.isGroupedCarouselItem,
-      isShowingGroupedChildrenTitles: false,
-      isFocusModalHidden: true,
-      activeTimerFeedbackItemId: columnProps.activeTimerFeedbackItemId,
-      requestTimerStart: columnProps.requestTimerStart,
-      notifyTimerStopped: columnProps.notifyTimerStopped,
-    };
-  };
-
-  private readonly renderFeedbackItems = () => {
-    const sourceColumnItems: IColumnItem[] = this.props.columnItems || [];
-    let columnItems: IColumnItem[] = sourceColumnItems;
+  const renderFeedbackItems = useCallback(() => {
+    const sourceColumnItems: IColumnItem[] = columnItems || [];
+    let sortedItems: IColumnItem[] = sourceColumnItems;
 
     // Sort by grouped total votes if Act workflow else sort by created date
-    if (this.props.workflowPhase === WorkflowPhase.Act) {
-      columnItems = itemDataService.sortItemsByVotesAndDate(columnItems, this.props.columnItems);
+    if (workflowPhase === WorkflowPhase.Act) {
+      sortedItems = itemDataService.sortItemsByVotesAndDate(sortedItems, columnItems);
     } else {
-      columnItems = columnItems.sort((item1, item2) => new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime());
+      sortedItems = sortedItems.sort((item1, item2) => new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime());
     }
 
-    columnItems = columnItems || [];
+    sortedItems = sortedItems || [];
 
-    return columnItems
+    return sortedItems
       .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId) // Exclude child items
       .map(columnItem => {
-        const feedbackItemProps = FeedbackColumn.createFeedbackItemProps(this.props, columnItem);
+        const feedbackItemProps = createFeedbackItemProps(props, columnItem);
 
         if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
-          const childItemsToGroup = sourceColumnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => FeedbackColumn.createFeedbackItemProps(this.props, childColumnItem));
+          const childItemsToGroup = sourceColumnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => createFeedbackItemProps(props, childColumnItem));
 
-          return <FeedbackItemGroup key={feedbackItemProps.id} mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={this.props.workflowPhase} />;
+          return <FeedbackItemGroup key={feedbackItemProps.id} mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={workflowPhase} />;
         } else {
           return <FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />;
         }
       });
-  };
+  }, [columnItems, workflowPhase, props]);
 
-  public render() {
-    const columnItems = this.props.columnItems || [];
+  const currentColumnItems = columnItems || [];
 
-    return (
-      <div ref={this.columnRef} className="feedback-column" role="region" aria-label={`${this.props.columnName} column with ${columnItems.length} feedback items`} tabIndex={0} onDoubleClick={this.createEmptyFeedbackItem} onDrop={this.handleDropFeedbackItemOnColumnSpace} onDragOver={this.dragFeedbackItemOverColumn}>
-        <div className="feedback-column-header">
-          <div className="feedback-column-title" aria-label={`${this.props.columnName} (${columnItems.length} feedback items)`}>
-            <div className="feedback-column-icon">{this.props.icon}</div>
-            <h2 className="feedback-column-name">{this.props.columnName}</h2>
-          </div>
-          <div className="feedback-column-actions">
-            {this.props.showColumnEditButton && (
-              <button className="feedback-column-edit-button" title="Edit column notes" aria-label={`Edit column ${this.props.columnName}`} onClick={this.openEditDialog}>
-                {getIconElement("reviews")}
-              </button>
-            )}
-            {this.props.columnNotes && (
-              <button className="feedback-column-info-button" title={this.props.columnNotes} aria-label={`Column notes: ${this.props.columnNotes}`}>
-                {getIconElement("info")}
-              </button>
-            )}
-          </div>
+  return (
+    <div ref={columnRef} className="feedback-column" role="region" aria-label={`${columnName} column with ${currentColumnItems.length} feedback items`} tabIndex={0} onDoubleClick={createEmptyFeedbackItem} onDrop={handleDropFeedbackItemOnColumnSpace} onDragOver={dragFeedbackItemOverColumn}>
+      <div className="feedback-column-header">
+        <div className="feedback-column-title" aria-label={`${columnName} (${currentColumnItems.length} feedback items)`}>
+          <div className="feedback-column-icon">{icon}</div>
+          <h2 className="feedback-column-name">{columnName}</h2>
         </div>
-        <div className={cn("feedback-column-content", this.state.isCollapsed && "hide-collapse")}>
-          {this.props.workflowPhase === WorkflowPhase.Collect && (
-            <button className="create-button" title="Add new feedback" aria-label="Add new feedback" onClick={this.createEmptyFeedbackItem}>
-              {getIconElement("add")}
-              Add new feedback
+        <div className="feedback-column-actions">
+          {showColumnEditButton && (
+            <button className="feedback-column-edit-button" title="Edit column notes" aria-label={`Edit column ${columnName}`} onClick={openEditDialog}>
+              {getIconElement("reviews")}
             </button>
           )}
-          {this.props.isDataLoaded && <div className="feedback-items-container">{this.renderFeedbackItems()}</div>}
+          {columnNotes && (
+            <button className="feedback-column-info-button" title={columnNotes} aria-label={`Column notes: ${columnNotes}`}>
+              {getIconElement("info")}
+            </button>
+          )}
         </div>
-        <dialog ref={this.editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label="Edit column notes">
-          <div className="header">
-            <h2 className="title">Edit column notes</h2>
-            <button type="button" onClick={() => this.editColumnNotesDialogRef.current?.close()} aria-label="Close">
-              {getIconElement("close")}
-            </button>
-          </div>
-          <div className="subText">
-            <div className="form-group">
-              <label id="column-notes-label" htmlFor="column-notes-textarea">
-                Column notes
-              </label>
-              <textarea id="column-notes-textarea" aria-labelledby="column-notes-label" aria-invalid="false" value={this.state.columnNotesDraft} onChange={this.handleColumnNotesDraftChange} />
-            </div>
-          </div>
-          <div className="inner">
-            <button type="button" className="button" onClick={this.saveColumnNotes}>
-              Save
-            </button>
-            <button type="button" className="button default" onClick={() => this.editColumnNotesDialogRef.current?.close()}>
-              Cancel
-            </button>
-          </div>
-        </dialog>
       </div>
-    );
-  }
-}
+      <div className={cn("feedback-column-content", isCollapsed && "hide-collapse")}>
+        {workflowPhase === WorkflowPhase.Collect && (
+          <button className="create-button" title="Add new feedback" aria-label="Add new feedback" onClick={createEmptyFeedbackItem}>
+            {getIconElement("add")}
+            Add new feedback
+          </button>
+        )}
+        {isDataLoaded && <div className="feedback-items-container">{renderFeedbackItems()}</div>}
+      </div>
+      <dialog ref={editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label="Edit column notes">
+        <div className="header">
+          <h2 className="title">Edit column notes</h2>
+          <button type="button" onClick={() => editColumnNotesDialogRef.current?.close()} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">
+          <div className="form-group">
+            <label id="column-notes-label" htmlFor="column-notes-textarea">
+              Column notes
+            </label>
+            <textarea id="column-notes-textarea" aria-labelledby="column-notes-label" aria-invalid="false" value={columnNotesDraft} onChange={handleColumnNotesDraftChange} />
+          </div>
+        </div>
+        <div className="inner">
+          <button type="button" className="button" onClick={saveColumnNotes}>
+            Save
+          </button>
+          <button type="button" className="button default" onClick={() => editColumnNotesDialogRef.current?.close()}>
+            Cancel
+          </button>
+        </div>
+      </dialog>
+    </div>
+  );
+});
+
+FeedbackColumn.displayName = "FeedbackColumn";
+
+export default FeedbackColumn;

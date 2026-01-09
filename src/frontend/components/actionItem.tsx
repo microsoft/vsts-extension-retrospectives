@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useRef, useEffect, useCallback, useMemo } from "react";
 import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
 
-import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
@@ -22,145 +21,129 @@ export interface ActionItemProps {
   onUpdateActionItem: (feedbackItemId: IFeedbackItemDocument) => void;
 }
 
-export interface ActionItemState {
-  linkedWorkItem: WorkItem;
-  workItemSearchTextboxHasErrors: boolean;
-}
+export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId, actionItem, allWorkItemTypes, areActionIconsHidden, shouldFocus, onUpdateActionItem }) => {
+  const openWorkItemButtonRef = useRef<HTMLDivElement>(null);
+  const unlinkWorkItemDialogRef = useRef<HTMLDialogElement>(null);
 
-export class ActionItem extends React.Component<ActionItemProps, ActionItemState> {
-  constructor(props: ActionItemProps) {
-    super(props);
-
-    this.state = {
-      linkedWorkItem: null as WorkItem,
-      workItemSearchTextboxHasErrors: false,
-    };
-
-    this.openWorkItemButton = null;
-  }
-
-  componentDidMount() {
-    if (this.props.shouldFocus && this.openWorkItemButton) {
-      this.openWorkItemButton.focus();
+  useEffect(() => {
+    if (shouldFocus && openWorkItemButtonRef.current) {
+      openWorkItemButtonRef.current.focus();
     }
-  }
+  }, [shouldFocus]);
 
-  public openWorkItemButton: HTMLElement;
-  private readonly unlinkWorkItemDialogRef = React.createRef<HTMLDialogElement>();
+  const onActionItemClick = useCallback(
+    async (workItemId: number) => {
+      const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
 
-  private readonly onActionItemClick = async (workItemId: number) => {
-    const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+      await workItemNavSvc.openWorkItem(workItemId);
 
-    await workItemNavSvc.openWorkItem(workItemId);
+      // TODO: TASK 20104107 - When a work item is deleted, remove it as a link from all feedback items that it is linked to.
 
-    // TODO: TASK 20104107 - When a work item is deleted, remove it as a link from all feedback items that it is linked to.
+      const updatedFeedbackItem = await itemDataService.removeAssociatedItemIfNotExistsInVsts(boardId, feedbackItemId, workItemId);
+      onUpdateActionItem(updatedFeedbackItem);
 
-    const updatedFeedbackItem = await itemDataService.removeAssociatedItemIfNotExistsInVsts(this.props.boardId, this.props.feedbackItemId, workItemId);
-    this.props.onUpdateActionItem(updatedFeedbackItem);
-    this.updateLinkedItem(workItemId);
-
-    if (this.openWorkItemButton) {
-      this.openWorkItemButton.focus();
-    }
-  };
-
-  private readonly onUnlinkWorkItemClick = async (workItemId: number) => {
-    const updatedFeedbackItem = await itemDataService.removeAssociatedActionItem(this.props.boardId, this.props.feedbackItemId, workItemId);
-    this.props.onUpdateActionItem(updatedFeedbackItem);
-  };
-
-  private readonly onConfirmUnlinkWorkItem = async (workItemId: number) => {
-    this.onUnlinkWorkItemClick(workItemId);
-    this.unlinkWorkItemDialogRef.current?.close();
-  };
-
-  private readonly updateLinkedItem = async (workItemId: number) => {
-    if (this.state.linkedWorkItem && this.state.linkedWorkItem.id === workItemId) {
-      const updatedLinkedWorkItem: WorkItem[] = await workItemService.getWorkItemsByIds([workItemId]);
-      if (updatedLinkedWorkItem) {
-        this.setState({
-          linkedWorkItem: updatedLinkedWorkItem[0],
-        });
+      if (openWorkItemButtonRef.current) {
+        openWorkItemButtonRef.current.focus();
       }
-    }
-  };
+    },
+    [boardId, feedbackItemId, onUpdateActionItem],
+  );
 
-  private readonly showWorkItemForm = (event: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    event && event.stopPropagation();
-    this.onActionItemClick(this.props.actionItem.id);
-  };
+  const onUnlinkWorkItemClick = useCallback(
+    async (workItemId: number) => {
+      const updatedFeedbackItem = await itemDataService.removeAssociatedActionItem(boardId, feedbackItemId, workItemId);
+      onUpdateActionItem(updatedFeedbackItem);
+    },
+    [boardId, feedbackItemId, onUpdateActionItem],
+  );
 
-  public render() {
-    const workItemType: WorkItemType = this.props.allWorkItemTypes.find(wit => wit.name === this.props.actionItem.fields["System.WorkItemType"]);
+  const onConfirmUnlinkWorkItem = useCallback(
+    async (workItemId: number) => {
+      onUnlinkWorkItemClick(workItemId);
+      unlinkWorkItemDialogRef.current?.close();
+    },
+    [onUnlinkWorkItemClick],
+  );
 
-    const workItemStates: WorkItemStateColor[] = workItemType?.states ? workItemType.states : null;
-    const workItemState: WorkItemStateColor = workItemStates ? workItemStates.find(wisc => wisc.name === this.props.actionItem.fields["System.State"]) : null;
+  const showWorkItemForm = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      event && event.stopPropagation();
+      onActionItemClick(actionItem.id);
+    },
+    [actionItem.id, onActionItemClick],
+  );
 
-    const systemTitle: string = this.props.actionItem.fields["System.Title"];
+  const workItemType: WorkItemType | undefined = useMemo(() => {
+    return allWorkItemTypes.find(wit => wit.name === actionItem.fields["System.WorkItemType"]);
+  }, [allWorkItemTypes, actionItem.fields]);
 
-    return (
-      <div key={`${this.props.actionItem.id}card`} role="group" className="related-task-sub-card" style={{ borderRightColor: `#${workItemState?.color ?? ""}` }}>
-        <img className="work-item-type-icon" alt={`icon for work item type ${workItemType?.name}`} src={workItemType?.icon?.url} />
-        <div
-          ref={(element: HTMLElement) => {
-            this.openWorkItemButton = element;
+  const workItemState: WorkItemStateColor | null = useMemo(() => {
+    const workItemStates: WorkItemStateColor[] | null = workItemType?.states ?? null;
+    return workItemStates ? (workItemStates.find(wisc => wisc.name === actionItem.fields["System.State"]) ?? null) : null;
+  }, [workItemType, actionItem.fields]);
+
+  const systemTitle: string = actionItem.fields["System.Title"];
+
+  return (
+    <div key={`${actionItem.id}card`} role="group" className="related-task-sub-card" style={{ borderRightColor: `#${workItemState?.color ?? ""}` }}>
+      <img className="work-item-type-icon" alt={`icon for work item type ${workItemType?.name}`} src={workItemType?.icon?.url} />
+      <div
+        ref={openWorkItemButtonRef}
+        key={`${actionItem.id}details`}
+        className="details"
+        tabIndex={0}
+        role="button"
+        title={actionItem.fields["System.Title"]}
+        aria-label={`${actionItem.fields["System.WorkItemType"]} ${actionItem.fields["System.Title"]}, click to open work item`}
+        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Enter") {
+            showWorkItemForm(e);
+          }
+        }}
+        onClick={showWorkItemForm}
+      >
+        {systemTitle}
+      </div>
+      {!areActionIconsHidden && (
+        <button
+          type="button"
+          title="Remove link to work item"
+          className="action"
+          aria-label="Remove link to work item button"
+          onClick={event => {
+            event.stopPropagation();
+            unlinkWorkItemDialogRef.current?.showModal();
           }}
-          key={`${this.props.actionItem.id}details`}
-          className="details"
-          tabIndex={0}
-          role="button"
-          title={this.props.actionItem.fields["System.Title"]}
-          aria-label={`${this.props.actionItem.fields["System.WorkItemType"]} ${this.props.actionItem.fields["System.Title"]}, click to open work item`}
-          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === "Enter") {
-              this.showWorkItemForm(e);
-            }
-          }}
-          onClick={this.showWorkItemForm}
+          aria-haspopup="dialog"
         >
-          {systemTitle}
+          {getIconElement("link-off")}
+        </button>
+      )}
+      <dialog className="unlink-work-item-confirmation-dialog" aria-label="Remove Work Item Link" ref={unlinkWorkItemDialogRef} onClose={() => unlinkWorkItemDialogRef.current?.close()}>
+        <div className="header">
+          <h2 className="title">Remove Work Item Link</h2>
+          <button onClick={() => unlinkWorkItemDialogRef.current?.close()} aria-label="Close">
+            {getIconElement("close")}
+          </button>
         </div>
-        {!this.props.areActionIconsHidden && (
+        <div className="subText">Are you sure you want to remove the link to work item &apos;{actionItem.fields["System.Title"]}&apos;?</div>
+        <div className="inner">
           <button
-            type="button"
-            title="Remove link to work item"
-            className="action"
-            aria-label="Remove link to work item button"
+            className="button"
             onClick={event => {
               event.stopPropagation();
-              this.unlinkWorkItemDialogRef.current?.showModal();
+              onConfirmUnlinkWorkItem(actionItem.id);
             }}
-            aria-haspopup="dialog"
           >
-            {getIconElement("link-off")}
+            Remove
           </button>
-        )}
-        <dialog className="unlink-work-item-confirmation-dialog" aria-label="Remove Work Item Link" ref={this.unlinkWorkItemDialogRef} onClose={() => this.unlinkWorkItemDialogRef.current?.close()}>
-          <div className="header">
-            <h2 className="title">Remove Work Item Link</h2>
-            <button onClick={() => this.unlinkWorkItemDialogRef.current?.close()} aria-label="Close">
-              {getIconElement("close")}
-            </button>
-          </div>
-          <div className="subText">Are you sure you want to remove the link to work item &apos;{this.props.actionItem.fields["System.Title"]}&apos;?</div>
-          <div className="inner">
-            <button
-              className="button"
-              onClick={event => {
-                event.stopPropagation();
-                this.onConfirmUnlinkWorkItem(this.props.actionItem.id);
-              }}
-            >
-              Remove
-            </button>
-            <button className="default button" onClick={() => this.unlinkWorkItemDialogRef.current?.close()}>
-              Cancel
-            </button>
-          </div>
-        </dialog>
-      </div>
-    );
-  }
-}
+          <button className="default button" onClick={() => unlinkWorkItemDialogRef.current?.close()}>
+            Cancel
+          </button>
+        </div>
+      </dialog>
+    </div>
+  );
+};
 
 export default withAITracking(reactPlugin, ActionItem);

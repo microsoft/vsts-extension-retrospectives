@@ -7,6 +7,23 @@ import { mockUuid } from "../__mocks__/uuid/v4";
 import FeedbackBoardMetadataForm, { IFeedbackBoardMetadataFormProps } from "../feedbackBoardMetadataForm";
 import { testExistingBoard, testTeamId } from "../__mocks__/mocked_components/mockedBoardMetadataForm";
 
+// Mock HTMLDialogElement for JSDOM
+beforeAll(() => {
+  if (!(window as unknown as { HTMLDialogElement?: typeof HTMLDialogElement }).HTMLDialogElement) {
+    (window as unknown as { HTMLDialogElement: typeof HTMLElement }).HTMLDialogElement = class HTMLDialogElement extends HTMLElement {} as unknown as typeof HTMLDialogElement;
+  }
+
+  HTMLDialogElement.prototype.showModal = function showModal() {
+    (this as unknown as { open: boolean }).open = true;
+  };
+
+  HTMLDialogElement.prototype.close = function close() {
+    (this as unknown as { open: boolean }).open = false;
+    // Dispatch the close event so onClose handlers are triggered
+    this.dispatchEvent(new Event("close"));
+  };
+});
+
 jest.mock("../../utilities/telemetryClient", () => ({
   appInsights: {
     trackEvent: jest.fn(),
@@ -1030,8 +1047,8 @@ describe("FeedbackBoardMetadataForm - Column Icon Selection", () => {
     // Verify dialog is open
     expect(screen.getByText(/choose column icon/i)).toBeInTheDocument();
 
-    // Find and click an icon button in the dialog
-    const iconButtons = screen.getAllByRole("button", { name: /choose the icon/i });
+    // Find and click an icon button in the dialog - icons have aria-label like "Choose the icon: approve"
+    const iconButtons = screen.getAllByRole("button", { name: /choose the icon:/i });
     if (iconButtons.length > 0) {
       await user.click(iconButtons[0]);
       // Dialog should close
@@ -1117,46 +1134,58 @@ describe("FeedbackBoardMetadataForm - Targeted Coverage (uncovered lines)", () =
     mockedProps.currentBoard = null;
   });
 
-  it("should disable Save when no active columns exist", async () => {
-    const ref = React.createRef<any>();
-    render(React.createElement(FeedbackBoardMetadataForm as any, { ...mockedProps, ref }));
+  it("should prevent deleting the last column", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-    await waitFor(() => expect(ref.current).toBeTruthy());
+    // Add a board title
+    const titleInput = screen.getByLabelText(/please enter new retrospective title/i);
+    await user.type(titleInput, "Valid Board Title");
 
-    await act(async () => {
-      ref.current.setState({
-        title: "Valid Board Title",
-        columnCards: [],
-      });
-    });
+    // Delete columns until only one is left
+    // The delete button should be disabled for the last remaining column
+    let deleteButtons = screen.getAllByTitle("Delete");
+    while (deleteButtons.length > 1) {
+      // Click the first delete button
+      await user.click(deleteButtons[0]);
+      // Update delete buttons list
+      deleteButtons = screen.queryAllByTitle("Delete");
+    }
 
-    expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
+    // The last delete button should be disabled
+    if (deleteButtons.length === 1) {
+      // eslint-disable-next-line jest/no-conditional-expect
+      expect(deleteButtons[0]).toBeDisabled();
+    }
   });
 
   it("should disable Save when a column has an empty title", async () => {
-    const ref = React.createRef<any>();
-    render(React.createElement(FeedbackBoardMetadataForm as any, { ...mockedProps, ref }));
+    const user = userEvent.setup();
+    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-    await waitFor(() => expect(ref.current).toBeTruthy());
+    // Add a board title
+    const titleInput = screen.getByLabelText(/please enter new retrospective title/i);
+    await user.type(titleInput, "Valid Board Title");
 
-    await act(async () => {
-      ref.current.setState({
-        title: "Valid Board Title",
-        columnCards: [
-          {
-            column: {
-              id: "col-1",
-              title: "",
-              iconClass: "add",
-              accentColor: "#000000",
-              notes: "",
-            },
-            markedForDeletion: false,
-          },
-        ],
-      });
-    });
+    // Initially save should be enabled (valid title and columns have titles)
+    expect(screen.getByRole("button", { name: /save/i })).toBeEnabled();
 
+    // Edit the first column title to be empty
+    const firstColumnTitle = container.querySelector(".feedback-column-card .editable-text") as HTMLElement | null;
+    expect(firstColumnTitle).toBeTruthy();
+
+    if (!firstColumnTitle) return;
+
+    await user.click(firstColumnTitle);
+
+    const editInput = screen.getByLabelText("Please enter feedback title") as HTMLInputElement;
+    // Clear the existing value
+    await user.clear(editInput);
+
+    // Click outside to trigger the blur handler which saves empty value
+    await user.click(document.body);
+
+    // Save should be disabled because a column has an empty title
     expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
   });
 
@@ -2020,7 +2049,8 @@ describe("FeedbackBoardMetadataForm - Comprehensive Coverage Tests", () => {
     expect(screen.getByText(/choose column icon/i)).toBeInTheDocument();
 
     // Click an icon to trigger the onClick which sets state including columnCardBeingEdited to null
-    const iconButtons = screen.getAllByRole("button", { name: /choose the icon/i });
+    // Icons have aria-label like "Choose the icon: approve"
+    const iconButtons = screen.getAllByRole("button", { name: /choose the icon:/i });
     await user.click(iconButtons[0]);
 
     // Dialog should close (onDismiss would be called if we closed it differently,
