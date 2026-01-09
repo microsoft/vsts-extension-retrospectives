@@ -12,6 +12,8 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkflowPhase } from "../interfaces/workItem";
 import ActionItemDisplay from "./actionItemDisplay";
 import EditableDocumentCardTitle from "./editableDocumentCardTitle";
+import FeedbackItemTimer from "./feedbackItemTimer";
+import GroupedFeedbackList from "./groupedFeedbackList";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { itemDataService } from "../dal/itemDataService";
 import localStorageHelper from "../utilities/localStorageHelper";
@@ -532,12 +534,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
     return <DocumentCardActivity activity={formattedCreatedDate} people={[{ name: props.createdBy, profileImageSrc: props.createdByProfileImage }]} />;
   }, [props.createdBy, props.createdByProfileImage, props.createdDate]);
-
-  const formatTimer = useCallback((timeInSeconds: number) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  }, []);
 
   const deleteFeedbackItem = useCallback(() => {
     showDeleteItemConfirmationDialog();
@@ -1095,26 +1091,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
               )}
             </div>
             <div className="card-content">
-              {workflowState.isActPhase && isMainItem && (
-                <div className="card-action-timer">
-                  <button
-                    title="Timer"
-                    aria-live="polite"
-                    aria-label="Start/stop"
-                    tabIndex={-1}
-                    data-card-control="true"
-                    className="feedback-action-button"
-                    onClick={e => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      timerSwitch(props.id);
-                    }}
-                  >
-                    {curTimerState ? getIconElement("stop-circle") : getIconElement("play-circle")}
-                    <span>{formatTimer(props.timerSecs)} elapsed</span>
-                  </button>
-                </div>
-              )}
+              {workflowState.isActPhase && isMainItem && <FeedbackItemTimer feedbackItemId={props.id} timerSecs={props.timerSecs} timerState={curTimerState} onTimerToggle={timerSwitch} />}
               <EditableDocumentCardTitle isDisabled={hideFeedbackItems} isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={onDocumentCardTitleSave} />
               {props.isFocusModalHidden && !workflowState.isCollectPhase && props.columnId !== props.originalColumnId && <div className="original-column-info">Original Column: {props.columns[props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
             </div>
@@ -1124,33 +1101,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
               {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && props.groupedItemProps?.isGroupExpanded) ? <span className="feedback-yourvote-count">[My Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[My Votes: {groupedVotesByUser}]</span>}</div>}
             </div>
           </div>
-          {isGroupedCarouselItem && isMainItem && state.isShowingGroupedChildrenTitles && (
-            <div className="group-child-feedback-stack">
-              <div className="grouped-feedback-header">{getIconElement("forum")} Grouped Feedback</div>
-              <ul aria-label="List of Grouped Feedback" role="list">
-                {childrenIds.map((id: string) => {
-                  const childCard: IColumnItem | undefined = columnItems?.find(c => c.feedbackItem.id === id);
-                  const originalColumn = childCard ? props.columns[childCard.feedbackItem.originalColumnId] : null;
-                  const childItemHidden = !!childCard && props.hideFeedbackItems && childCard.feedbackItem.userIdRef !== getUserIdentity().id;
-                  const childDisplayTitle = childItemHidden ? "[Hidden Feedback]" : childCard?.feedbackItem.title;
-
-                  return (
-                    childCard && (
-                      <li key={id} role="listitem">
-                        <div className="icon" style={{ borderRightColor: originalColumn?.columnProperties?.accentColor }}>
-                          {getIconElement("sms")}
-                        </div>
-                        <div className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
-                          {childDisplayTitle}
-                        </div>
-                        {props.isFocusModalHidden && props.columnId !== originalColumn?.columnProperties?.id && originalColumn && <div className="original-column-info">Original Column: {originalColumn.columnProperties.title}</div>}
-                      </li>
-                    )
-                  );
-                })}
-              </ul>
-            </div>
-          )}
+          {isGroupedCarouselItem && isMainItem && state.isShowingGroupedChildrenTitles && <GroupedFeedbackList childrenIds={childrenIds} columnItems={columnItems} columns={props.columns} currentColumnId={props.columnId} hideFeedbackItems={props.hideFeedbackItems} isFocusModalHidden={props.isFocusModalHidden} />}
           <div className="action-items">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={props.id} feedbackItemTitle={displayTitle} team={props.team} boardId={props.boardId} boardTitle={props.boardTitle} defaultAreaPath={props.defaultActionItemAreaPath} defaultIteration={props.defaultActionItemIteration} actionItems={props.actionItems} onUpdateActionItem={onUpdateActionItem} nonHiddenWorkItemTypes={props.nonHiddenWorkItemTypes} allWorkItemTypes={props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
         </DocumentCard>
       </div>
