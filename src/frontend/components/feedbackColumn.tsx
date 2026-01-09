@@ -365,16 +365,12 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
     }
 
     prevColumnItemsLength.current = columnItems.length;
-  }, [columnItems.length, preserveFocus]);
-
-  useEffect(() => {
-    const itemCountChanged = prevColumnItemsLength.current !== columnItems.length;
 
     if (itemCountChanged && focusPreservation.current) {
       restoreFocus();
       focusPreservation.current = null;
     }
-  }, [columnItems.length, restoreFocus]);
+  }, [columnItems.length, preserveFocus, restoreFocus]);
 
   const dragFeedbackItemOverColumn = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
