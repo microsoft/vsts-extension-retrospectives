@@ -176,13 +176,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
     }
   }, []);
 
-  const restoreFocus = useCallback((preserved: {
-    elementId: string | null;
-    selectionStart: number | null;
-    selectionEnd: number | null;
-    isContentEditable: boolean;
-    cursorPosition: number | null;
-  }) => {
+  const restoreFocus = useCallback((preserved: { elementId: string | null; selectionStart: number | null; selectionEnd: number | null; isContentEditable: boolean; cursorPosition: number | null }) => {
     if (!preserved) {
       return;
     }

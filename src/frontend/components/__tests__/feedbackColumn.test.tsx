@@ -3172,14 +3172,14 @@ describe("Feedback Column ", () => {
       // Create a div that simulates a feedback card with data-feedback-item-id
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "test-item-for-input");
-      
+
       // Create an input inside the mock feedback card
       const input = document.createElement("input");
       input.type = "text";
       input.id = "test-preserve-input";
       input.value = "test input value for preservation";
       mockFeedbackCard.appendChild(input);
-      
+
       // Append to the column directly (not column-content which gets re-rendered)
       column.appendChild(mockFeedbackCard);
 
@@ -3227,12 +3227,12 @@ describe("Feedback Column ", () => {
       // Create a mock feedback card with textarea
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "test-item-for-textarea");
-      
+
       const textarea = document.createElement("textarea");
       textarea.id = "test-preserve-textarea";
       textarea.value = "multiline\ntext\nfor\ntesting\npreservation";
       mockFeedbackCard.appendChild(textarea);
-      
+
       // Append to column directly
       column.appendChild(mockFeedbackCard);
 
@@ -3277,20 +3277,20 @@ describe("Feedback Column ", () => {
       // Create a mock feedback card with contenteditable
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "test-item-for-contenteditable");
-      
+
       const contentEditable = document.createElement("div");
       contentEditable.contentEditable = "true";
       contentEditable.id = "test-preserve-contenteditable";
       contentEditable.textContent = "Editable content for cursor preservation testing";
       contentEditable.tabIndex = 0; // Make it focusable in jsdom
       mockFeedbackCard.appendChild(contentEditable);
-      
+
       const columnContent = column.querySelector(".feedback-column-content") || column;
       columnContent.appendChild(mockFeedbackCard);
 
       // Focus contenteditable and set cursor position
       contentEditable.focus();
-      
+
       // Set up selection if focus worked
       if (document.activeElement === contentEditable) {
         const selection = window.getSelection();
@@ -3334,14 +3334,14 @@ describe("Feedback Column ", () => {
       // Create a mock feedback card with empty contenteditable
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "test-empty-contenteditable");
-      
+
       const contentEditable = document.createElement("div");
       contentEditable.contentEditable = "true";
       contentEditable.id = "test-empty-ce";
       contentEditable.tabIndex = 0; // Make it focusable in jsdom
       // Leave textContent empty - no firstChild
       mockFeedbackCard.appendChild(contentEditable);
-      
+
       const columnContent = column.querySelector(".feedback-column-content") || column;
       columnContent.appendChild(mockFeedbackCard);
 
@@ -3381,7 +3381,7 @@ describe("Feedback Column ", () => {
       mockFeedbackCard.setAttribute("data-feedback-item-id", "test-card-only");
       mockFeedbackCard.tabIndex = 0;
       mockFeedbackCard.id = "test-focusable-card";
-      
+
       const columnContent = column.querySelector(".feedback-column-content") || column;
       columnContent.appendChild(mockFeedbackCard);
 
@@ -3410,7 +3410,7 @@ describe("Feedback Column ", () => {
 
     test("restoreFocus handles error in cursor restoration gracefully", async () => {
       const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
-      
+
       const initialItems = [...testColumnProps.columnItems];
       const props = { ...testColumnProps, columnItems: initialItems, isDataLoaded: true };
       const { container, rerender } = render(<FeedbackColumn {...props} />);
@@ -3421,12 +3421,12 @@ describe("Feedback Column ", () => {
       // Create a mock feedback card with contenteditable
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "test-error-handling");
-      
+
       const contentEditable = document.createElement("div");
       contentEditable.contentEditable = "true";
       contentEditable.textContent = "Test content";
       mockFeedbackCard.appendChild(contentEditable);
-      
+
       const columnContent = column.querySelector(".feedback-column-content") || column;
       columnContent.appendChild(mockFeedbackCard);
 
@@ -3498,7 +3498,7 @@ describe("Feedback Column ", () => {
     let originalActiveElement: PropertyDescriptor | undefined;
     let originalContains: typeof Element.prototype.contains;
     let mockActiveElement: HTMLElement | null = null;
-    
+
     beforeEach(() => {
       jest.useFakeTimers();
       // Store original activeElement descriptor
@@ -3531,12 +3531,12 @@ describe("Feedback Column ", () => {
       // Create a mock contentEditable element
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "mock-ce-item");
-      
+
       const mockContentEditable = document.createElement("div");
       (mockContentEditable as any).isContentEditable = true;
       mockContentEditable.textContent = "Editable content text";
       mockFeedbackCard.appendChild(mockContentEditable);
-      
+
       // Append to document body for selection API to work
       document.body.appendChild(mockFeedbackCard);
 
@@ -3560,7 +3560,7 @@ describe("Feedback Column ", () => {
       });
 
       // Mock Element.prototype.contains globally to return true for our element
-      Element.prototype.contains = function(node) {
+      Element.prototype.contains = function (node) {
         if (this.classList?.contains("feedback-column") && (node === mockActiveElement || node === mockFeedbackCard)) {
           return true;
         }
@@ -3597,14 +3597,14 @@ describe("Feedback Column ", () => {
       // Create a mock input element
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "mock-input-item");
-      
+
       const mockInput = document.createElement("input");
       mockInput.type = "text";
       mockInput.value = "Test input for selection";
       (mockInput as any).selectionStart = 5;
       (mockInput as any).selectionEnd = 10;
       mockFeedbackCard.appendChild(mockInput);
-      
+
       document.body.appendChild(mockFeedbackCard);
 
       // Mock document.activeElement
@@ -3615,7 +3615,7 @@ describe("Feedback Column ", () => {
       });
 
       // Mock Element.prototype.contains globally
-      Element.prototype.contains = function(node) {
+      Element.prototype.contains = function (node) {
         if (this.classList?.contains("feedback-column") && (node === mockActiveElement || node === mockFeedbackCard)) {
           return true;
         }
@@ -3658,13 +3658,13 @@ describe("Feedback Column ", () => {
       // Create a mock textarea element
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "mock-textarea-item");
-      
+
       const mockTextarea = document.createElement("textarea");
       mockTextarea.value = "Test textarea content";
       (mockTextarea as any).selectionStart = 3;
       (mockTextarea as any).selectionEnd = 8;
       mockFeedbackCard.appendChild(mockTextarea);
-      
+
       document.body.appendChild(mockFeedbackCard);
 
       // Mock document.activeElement
@@ -3675,7 +3675,7 @@ describe("Feedback Column ", () => {
       });
 
       // Mock Element.prototype.contains globally
-      Element.prototype.contains = function(node) {
+      Element.prototype.contains = function (node) {
         if (this.classList?.contains("feedback-column") && (node === mockActiveElement || node === mockFeedbackCard)) {
           return true;
         }
@@ -3716,13 +3716,13 @@ describe("Feedback Column ", () => {
       // Create a mock contentEditable
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "mock-ce-cursor-item");
-      
+
       const mockContentEditable = document.createElement("div");
       mockContentEditable.setAttribute("contenteditable", "true");
       (mockContentEditable as any).isContentEditable = true;
       mockContentEditable.textContent = "Content for cursor test";
       mockFeedbackCard.appendChild(mockContentEditable);
-      
+
       document.body.appendChild(mockFeedbackCard);
 
       // Set up selection
@@ -3745,7 +3745,7 @@ describe("Feedback Column ", () => {
       });
 
       // Mock Element.prototype.contains globally
-      Element.prototype.contains = function(node) {
+      Element.prototype.contains = function (node) {
         if (this.classList?.contains("feedback-column") && (node === mockActiveElement || node === mockFeedbackCard)) {
           return true;
         }
@@ -3787,7 +3787,7 @@ describe("Feedback Column ", () => {
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "mock-card-only-item");
       mockFeedbackCard.tabIndex = 0;
-      
+
       document.body.appendChild(mockFeedbackCard);
 
       // Mock document.activeElement
@@ -3798,7 +3798,7 @@ describe("Feedback Column ", () => {
       });
 
       // Mock Element.prototype.contains globally
-      Element.prototype.contains = function(node) {
+      Element.prototype.contains = function (node) {
         if (this.classList?.contains("feedback-column") && node === mockFeedbackCard) {
           return true;
         }
@@ -3843,7 +3843,7 @@ describe("Feedback Column ", () => {
       mockInput.value = "Standalone value";
       (mockInput as any).selectionStart = 2;
       (mockInput as any).selectionEnd = 5;
-      
+
       document.body.appendChild(mockInput);
 
       // Mock document.activeElement
@@ -3854,7 +3854,7 @@ describe("Feedback Column ", () => {
       });
 
       // Mock Element.prototype.contains globally
-      Element.prototype.contains = function(node) {
+      Element.prototype.contains = function (node) {
         if (this.classList?.contains("feedback-column") && node === mockInput) {
           return true;
         }
@@ -3892,13 +3892,13 @@ describe("Feedback Column ", () => {
       // Create a contentEditable element
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "mock-error-item");
-      
+
       const mockContentEditable = document.createElement("div");
       mockContentEditable.setAttribute("contenteditable", "true");
       (mockContentEditable as any).isContentEditable = true;
       mockContentEditable.textContent = "Error test content that is long enough";
       mockFeedbackCard.appendChild(mockContentEditable);
-      
+
       document.body.appendChild(mockFeedbackCard);
 
       // Set up selection with a valid position first
@@ -3921,7 +3921,7 @@ describe("Feedback Column ", () => {
       });
 
       // Mock Element.prototype.contains globally
-      Element.prototype.contains = function(node) {
+      Element.prototype.contains = function (node) {
         if (this.classList?.contains("feedback-column") && (node === mockActiveElement || node === mockFeedbackCard)) {
           return true;
         }
@@ -3942,7 +3942,7 @@ describe("Feedback Column ", () => {
       });
 
       const column = container.querySelector(".feedback-column") as HTMLElement;
-      
+
       // After rerender, change the text content to be shorter so cursor position becomes invalid
       mockContentEditable.textContent = "Short";
       column.appendChild(mockFeedbackCard);
@@ -3969,13 +3969,13 @@ describe("Feedback Column ", () => {
       // Create a contentEditable element
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "mock-error-throw-item");
-      
+
       const mockContentEditable = document.createElement("div");
       mockContentEditable.setAttribute("contenteditable", "true");
       (mockContentEditable as any).isContentEditable = true;
       mockContentEditable.textContent = "Content for error throw test";
       mockFeedbackCard.appendChild(mockContentEditable);
-      
+
       document.body.appendChild(mockFeedbackCard);
 
       // Set up selection with a valid position
@@ -3998,7 +3998,7 @@ describe("Feedback Column ", () => {
       });
 
       // Mock Element.prototype.contains globally
-      Element.prototype.contains = function(node) {
+      Element.prototype.contains = function (node) {
         if (this.classList?.contains("feedback-column") && (node === mockActiveElement || node === mockFeedbackCard)) {
           return true;
         }
@@ -4036,7 +4036,7 @@ describe("Feedback Column ", () => {
       if (mockFeedbackCard.parentNode) {
         mockFeedbackCard.parentNode.removeChild(mockFeedbackCard);
       }
-      
+
       // Check that console.warn was called
       expect(consoleWarnSpy).toHaveBeenCalledWith("Failed to restore cursor position:", expect.any(Error));
       consoleWarnSpy.mockRestore();
@@ -4062,7 +4062,7 @@ describe("Feedback Column ", () => {
       // Create a contentEditable element inside a feedback card
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "content-editable-test-id");
-      
+
       const contentEditable = document.createElement("div");
       contentEditable.contentEditable = "true";
       contentEditable.textContent = "Some editable content text here";
@@ -4115,7 +4115,7 @@ describe("Feedback Column ", () => {
       // Create an input element inside a feedback card
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "input-restore-test-id");
-      
+
       const input = document.createElement("input");
       input.type = "text";
       input.value = "Test input value for selection restoration";
@@ -4160,7 +4160,7 @@ describe("Feedback Column ", () => {
       // Create a textarea element inside a feedback card
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "textarea-restore-test-id");
-      
+
       const textarea = document.createElement("textarea");
       textarea.value = "Multiline\ntext\nfor\ntesting\nselection";
       mockFeedbackCard.appendChild(textarea);
@@ -4202,7 +4202,7 @@ describe("Feedback Column ", () => {
       // Create a contentEditable element inside a feedback card
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "ce-cursor-restore-test-id");
-      
+
       const contentEditable = document.createElement("div");
       contentEditable.contentEditable = "true";
       contentEditable.textContent = "Content for cursor position testing";
@@ -4212,7 +4212,7 @@ describe("Feedback Column ", () => {
 
       // Focus and set cursor position
       contentEditable.focus();
-      
+
       const selection = window.getSelection();
       if (selection && contentEditable.firstChild) {
         selection.removeAllRanges();
@@ -4291,7 +4291,7 @@ describe("Feedback Column ", () => {
       // Create a contentEditable element
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "ce-error-test-id");
-      
+
       const contentEditable = document.createElement("div");
       contentEditable.contentEditable = "true";
       contentEditable.textContent = "Content for error testing";
@@ -4301,7 +4301,7 @@ describe("Feedback Column ", () => {
 
       // Focus and set cursor position
       contentEditable.focus();
-      
+
       const selection = window.getSelection();
       if (selection && contentEditable.firstChild) {
         selection.removeAllRanges();
@@ -4382,7 +4382,7 @@ describe("Feedback Column ", () => {
       // Create a contentEditable element
       const mockFeedbackCard = document.createElement("div");
       mockFeedbackCard.setAttribute("data-feedback-item-id", "ce-overflow-test-id");
-      
+
       const contentEditable = document.createElement("div");
       contentEditable.contentEditable = "true";
       contentEditable.textContent = "Short";
@@ -4392,7 +4392,7 @@ describe("Feedback Column ", () => {
 
       // Focus and try to set cursor beyond text length
       contentEditable.focus();
-      
+
       const selection = window.getSelection();
       if (selection && contentEditable.firstChild) {
         selection.removeAllRanges();
