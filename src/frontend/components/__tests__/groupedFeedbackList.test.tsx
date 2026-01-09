@@ -279,5 +279,71 @@ describe("GroupedFeedbackList", () => {
       const list = screen.getByRole("list");
       expect(list.querySelectorAll("li")).toHaveLength(1);
     });
+
+    it("should not show original column info when originalColumn is not in columns map", () => {
+      const childItem = createFeedbackItem({
+        id: "child-1",
+        title: "Orphaned Feedback",
+        originalColumnId: "non-existent-column",
+        columnId: "column-1",
+      });
+      const columnItems = [createColumnItem(childItem)];
+
+      render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} isFocusModalHidden={true} />);
+
+      expect(screen.queryByText(/Original Column:/)).not.toBeInTheDocument();
+      expect(screen.getByText("Orphaned Feedback")).toBeInTheDocument();
+    });
+
+    it("should show title when hideFeedbackItems is false regardless of user", () => {
+      const childItem = createFeedbackItem({
+        id: "child-1",
+        title: "Visible Feedback",
+        userIdRef: "other-user-id",
+      });
+      const columnItems = [createColumnItem(childItem)];
+
+      render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} hideFeedbackItems={false} />);
+
+      expect(screen.getByText("Visible Feedback")).toBeInTheDocument();
+      expect(screen.queryByText("[Hidden Feedback]")).not.toBeInTheDocument();
+    });
+
+    it("should not have aria-hidden when item is not hidden", () => {
+      const childItem = createFeedbackItem({
+        id: "child-1",
+        title: "Visible Item",
+        userIdRef: "other-user-id",
+      });
+      const columnItems = [createColumnItem(childItem)];
+
+      render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} hideFeedbackItems={false} />);
+
+      const titleElement = screen.getByTitle("Visible Item");
+      expect(titleElement).not.toHaveAttribute("aria-hidden");
+    });
+
+    it("should handle item in same column as current but with different originalColumnId gracefully", () => {
+      const childItem = createFeedbackItem({
+        id: "child-1",
+        title: "Same Column Item",
+        originalColumnId: "column-1",
+        columnId: "column-1",
+      });
+      const columnItems = [createColumnItem(childItem)];
+
+      render(
+        <GroupedFeedbackList
+          {...defaultProps}
+          childrenIds={["child-1"]}
+          columnItems={columnItems}
+          currentColumnId="column-1"
+          isFocusModalHidden={true}
+        />
+      );
+
+      // originalColumnId matches currentColumnId, so no "Original Column" should be shown
+      expect(screen.queryByText(/Original Column:/)).not.toBeInTheDocument();
+    });
   });
 });
