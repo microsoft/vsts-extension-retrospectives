@@ -1,3 +1,4 @@
+import * as pdfHelper from "../pdfHelper";
 import { escapePdfText, wrapParagraph, createPdfFromText, generatePdfFileName, downloadPdf, downloadPdfBlob } from "../pdfHelper";
 import { TextEncoder, TextDecoder } from "util";
 
@@ -228,6 +229,20 @@ describe("pdfHelper", () => {
       const result = createPdfFromText("\n\n\n", "Newlines");
       expect(result).toBeInstanceOf(Blob);
       expect(result.size).toBeGreaterThan(0);
+    });
+
+    it("should handle case where lines array results in zero pages and push empty page (line 81)", async () => {
+      // Mock wrapParagraph to return an empty array to trigger pages.length === 0
+      const wrapParagraphSpy = jest.spyOn(pdfHelper, "wrapParagraph").mockReturnValue([]);
+
+      const result = createPdfFromText("any text", "Test");
+      const text = await blobToText(result);
+
+      // The defensive code should push [" "] when pages.length === 0
+      expect(text).toContain("/Count 1"); // Exactly one page
+      expect(result).toBeInstanceOf(Blob);
+
+      wrapParagraphSpy.mockRestore();
     });
 
     it("should handle custom line height", async () => {

@@ -341,6 +341,28 @@ describe("markdownUtils", () => {
       tokenizeSpy.mockRestore();
     });
 
+    it("should use empty string fallback when image token.alt is undefined (line 105 branch)", () => {
+      // Mock tokenizeMarkdown to return an image token without the alt property at all
+      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([
+        { type: "image", content: "alt content", url: "https://example.com/img.png" },
+        // Note: alt property is intentionally omitted to test the || "" fallback
+      ] as unknown as ReturnType<typeof tokenizeMarkdown>);
+
+      const result = parseMarkdown("![](https://example.com/img.png)");
+
+      expect(Array.isArray(result)).toBe(true);
+      if (Array.isArray(result) && result.length > 0) {
+        const element = result[0];
+        expect(React.isValidElement(element)).toBe(true);
+        if (React.isValidElement(element)) {
+          // The alt should fallback to empty string when token.alt is undefined
+          expect((element.props as { alt: string }).alt).toBe("");
+        }
+      }
+
+      tokenizeSpy.mockRestore();
+    });
+
     it("should return array of elements for mixed formatting", () => {
       const result = parseMarkdown("**bold** text");
       expect(Array.isArray(result)).toBe(true);

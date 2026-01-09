@@ -74,6 +74,43 @@ describe("BoardDataService - createBoardForTeam", () => {
     expect(result).toEqual(mockBoard);
     expect(createDocument).toHaveBeenCalledWith("team-123", expect.any(Object));
   });
+
+  it("should use default false for optional boolean parameters when undefined (lines 24-26)", async () => {
+    (createDocument as jest.Mock).mockImplementation(async (teamId, board) => board);
+    
+    // Call without optional parameters to test ?? false branches
+    const result = await BoardDataService.createBoardForTeam(
+      "team-123", 
+      "Test Board", 
+      5, 
+      [],
+      undefined, // isIncludeTeamEffectivenessMeasurement - should default to false
+      undefined, // shouldShowFeedbackAfterCollect - should default to false  
+      undefined  // isAnonymous - should default to false
+    );
+    
+    expect(result.isIncludeTeamEffectivenessMeasurement).toBe(false);
+    expect(result.shouldShowFeedbackAfterCollect).toBe(false);
+    expect(result.isAnonymous).toBe(false);
+  });
+
+  it("should use provided values for optional boolean parameters when specified", async () => {
+    (createDocument as jest.Mock).mockImplementation(async (teamId, board) => board);
+    
+    const result = await BoardDataService.createBoardForTeam(
+      "team-123",
+      "Test Board",
+      5,
+      [],
+      true, // isIncludeTeamEffectivenessMeasurement
+      true, // shouldShowFeedbackAfterCollect
+      true  // isAnonymous
+    );
+    
+    expect(result.isIncludeTeamEffectivenessMeasurement).toBe(true);
+    expect(result.shouldShowFeedbackAfterCollect).toBe(true);
+    expect(result.isAnonymous).toBe(true);
+  });
 });
 
 describe("BoardDataService - checkIfBoardNameIsTaken", () => {
@@ -155,6 +192,55 @@ describe("BoardDataService - updateBoardMetadata", () => {
     const result = await BoardDataService.updateBoardMetadata("team-123", "board-1", 10, "New Title", [], mockPermissions);
     expect(result).toBeUndefined();
     expect(updateDocument).not.toHaveBeenCalled();
+  });
+
+  it("should set isPublic to true when permissions is undefined (line 148)", async () => {
+    (readDocument as jest.Mock).mockResolvedValue(mockBoard);
+    (updateDocument as jest.Mock).mockImplementation(async (teamId, board) => board);
+    
+    const result = await BoardDataService.updateBoardMetadata(
+      "team-123", 
+      "board-1", 
+      10, 
+      "New Title", 
+      [], 
+      undefined // permissions undefined should make board public
+    );
+    
+    expect(result.isPublic).toBe(true);
+  });
+
+  it("should set isPublic to true when permissions has empty Teams and Members (line 148)", async () => {
+    (readDocument as jest.Mock).mockResolvedValue(mockBoard);
+    (updateDocument as jest.Mock).mockImplementation(async (teamId, board) => board);
+    
+    const emptyPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: [] };
+    const result = await BoardDataService.updateBoardMetadata(
+      "team-123", 
+      "board-1", 
+      10, 
+      "New Title", 
+      [], 
+      emptyPermissions
+    );
+    
+    expect(result.isPublic).toBe(true);
+  });
+
+  it("should set isPublic to false when permissions has Teams or Members", async () => {
+    (readDocument as jest.Mock).mockResolvedValue(mockBoard);
+    (updateDocument as jest.Mock).mockImplementation(async (teamId, board) => board);
+    
+    const result = await BoardDataService.updateBoardMetadata(
+      "team-123", 
+      "board-1", 
+      10, 
+      "New Title", 
+      [], 
+      mockPermissions // Has Teams: ["team1"], Members: ["user1"]
+    );
+    
+    expect(result.isPublic).toBe(false);
   });
 });
 

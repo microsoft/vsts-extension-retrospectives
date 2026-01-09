@@ -390,6 +390,31 @@ describe("ItemDataService - updateVote", () => {
     expect(result.voteCollection[mockObfuscatedUserId]).toBe(1);
   });
 
+  it("should increment vote when decrement parameter is not provided (default false - line 260)", async () => {
+    const mockFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      id: mockFeedbackItemId,
+      voteCollection: {},
+      upvotes: 0,
+    };
+
+    const mockBoardItem: IFeedbackBoardDocument = {
+      id: mockBoardId,
+      boardVoteCollection: {},
+      maxVotesPerUser: 5,
+    } as any;
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
+    jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(mockBoardItem);
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockObfuscatedUserId]: 1 }, upvotes: 1 }).mockResolvedValueOnce({ ...mockBoardItem, boardVoteCollection: { [mockObfuscatedUserId]: 1 } });
+
+    // Call without the decrement parameter to test the default value branch
+    const result = await itemDataService.updateVote(mockBoardId, mockTeamId, mockUserId, mockFeedbackItemId);
+
+    expect(result).toBeDefined();
+    expect(result.upvotes).toBe(1);
+  });
+
   it("should decrement vote successfully", async () => {
     const mockFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
@@ -622,6 +647,21 @@ describe("ItemDataService - updateTimer", () => {
     const result = await itemDataService.updateTimer("board-1", "item-1", false);
 
     expect(result.timerSecs).toBe(6);
+  });
+
+  it("should increment timer when setZero parameter is not provided (default false - line 354)", async () => {
+    const mockFeedbackItem: IFeedbackItemDocument = {
+      ...baseFeedbackItem,
+      timerSecs: 10,
+    };
+
+    jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
+    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerSecs: 11 });
+
+    // Call without setZero parameter to test the default value branch
+    const result = await itemDataService.updateTimer("board-1", "item-1");
+
+    expect(result.timerSecs).toBe(11);
   });
 
   it("should set timer to zero when setZero is true", async () => {

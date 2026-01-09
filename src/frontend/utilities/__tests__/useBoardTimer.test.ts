@@ -344,6 +344,22 @@ describe("useBoardTimer hook", () => {
         jest.advanceTimersByTime(5000);
       });
     });
+
+    it("should handle unmount when timer is NOT running (line 52 branch)", () => {
+      const { result, unmount } = renderHook(() => useBoardTimer({ countdownDurationMinutes: 5 }));
+
+      // Timer is not started, so intervalRef.current is undefined
+      expect(result.current[0].isRunning).toBe(false);
+
+      // Unmount without starting - should not throw and should cover the
+      // branch where intervalRef.current === undefined
+      unmount();
+
+      // No errors should occur
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+    });
   });
 });
 
