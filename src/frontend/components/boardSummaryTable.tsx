@@ -34,11 +34,11 @@ export interface IBoardSummaryTableItem {
   boardName: string;
   createdDate: Date;
   isArchived?: boolean;
-  archivedDate?: Date; // archivedDate not set for legacy archived boards
+  archivedDate?: Date;
   pendingWorkItemsCount: number;
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
-  id: string; // Board ID
+  id: string;
   teamId: string;
   ownerId: string;
 }
@@ -51,12 +51,6 @@ export interface IBoardActionItemsData {
 export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-});
 
 export async function handleArchiveToggle(teamId: string, boardId: string, toggleIsArchived: boolean, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, onArchiveToggle: () => void) {
   try {
@@ -144,7 +138,7 @@ export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[])
       isDataLoaded: true,
       feedbackBoards: [],
       actionItemsByBoard: {},
-      allDataLoaded: false, // <-- include required property
+      allDataLoaded: false,
     };
   }
 
@@ -175,7 +169,7 @@ export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[])
     isDataLoaded: true,
     feedbackBoards: boardDocuments,
     actionItemsByBoard: actionItems,
-    allDataLoaded: false, // <-- include required property
+    allDataLoaded: false,
   };
 }
 

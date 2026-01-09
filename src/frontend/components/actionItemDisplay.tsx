@@ -87,7 +87,6 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
       const boardUrl = await getBoardUrl(team.id, boardId, WorkflowPhase.Collect);
       const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
 
-      // Account for any users who are no longer a part of the org
       const assignedUser: string | undefined = getUser().name === undefined ? "Former User" : getUser().name;
 
       const workItem = await workItemNavSvc.openNewWorkItem(workItemTypeName, {

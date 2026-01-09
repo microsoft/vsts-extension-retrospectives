@@ -176,17 +176,18 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
     }
   }, []);
 
-  const restoreFocus = useCallback(() => {
-    if (!focusPreservation.current) {
+  const restoreFocus = useCallback((preserved: {
+    elementId: string | null;
+    selectionStart: number | null;
+    selectionEnd: number | null;
+    isContentEditable: boolean;
+    cursorPosition: number | null;
+  }) => {
+    if (!preserved) {
       return;
     }
 
     setTimeout(() => {
-      const preserved = focusPreservation.current;
-      if (!preserved) {
-        return;
-      }
-
       let elementToFocus: HTMLElement | null = null;
 
       if (preserved.elementId) {
@@ -367,8 +368,9 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
     prevColumnItemsLength.current = columnItems.length;
 
     if (itemCountChanged && focusPreservation.current) {
-      restoreFocus();
+      const preservedFocus = focusPreservation.current;
       focusPreservation.current = null;
+      restoreFocus(preservedFocus);
     }
   }, [columnItems.length, preserveFocus, restoreFocus]);
 

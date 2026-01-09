@@ -88,7 +88,6 @@ export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultil
     (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       event.stopPropagation();
 
-      // ESC
       if (event.key === "Escape") {
         setIsEditing(false);
         setNewText(text);
@@ -96,7 +95,6 @@ export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultil
         return;
       }
 
-      // Shift+Enter or Ctrl+Enter adds a newline (multiline support)
       if (event.key === "Enter" && (event.shiftKey || event.ctrlKey)) {
         if (!newText.trim()) {
           setHasErrors(true);
