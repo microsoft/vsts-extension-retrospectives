@@ -45,7 +45,73 @@ import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
   projectId: string;
+  deferInitialization?: boolean;
 }
+
+export type FeedbackBoardContainerHandle = {
+  readonly state: FeedbackBoardContainerState;
+  setState: (updater: Partial<FeedbackBoardContainerState> | ((prevState: FeedbackBoardContainerState) => Partial<FeedbackBoardContainerState>), callback?: () => void) => void;
+  componentDidMount: () => Promise<void>;
+  componentDidUpdate: (prevProps: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) => void;
+  componentWillUnmount: () => void;
+
+  get boardTimerIntervalId(): number | undefined;
+  set boardTimerIntervalId(value: number | undefined);
+
+  previewEmailDialogRef: React.RefObject<HTMLDialogElement>;
+  archiveBoardDialogRef: React.RefObject<HTMLDialogElement>;
+
+  handleBoardCreated: (teamId: string, boardId: string) => Promise<void>;
+  handleBoardUpdated: (teamId: string, updatedBoardId: string) => Promise<void>;
+  handleBoardDeleted: (teamId: string, deletedBoardId: string) => Promise<void>;
+  handlePivotClick: (tab: "Board" | "History") => Promise<void>;
+  persistColumnNotes: (columnId: string, notes: string) => Promise<void>;
+  setSupportedWorkItemTypesForProject: () => Promise<void>;
+  loadRecentlyVisitedOrDefaultTeamAndBoardState: (defaultTeam: WebApiTeam, userTeams: WebApiTeam[]) => Promise<{ currentTeam: WebApiTeam; currentBoard: IFeedbackBoardDocument; boards: IFeedbackBoardDocument[] }>;
+  reloadBoardsForCurrentTeam: () => Promise<void>;
+
+  startBoardTimer: () => void;
+  pauseBoardTimer: () => void;
+  resetBoardTimer: () => void;
+  clearBoardTimerInterval: () => void;
+  renderWorkflowTimerControls: () => React.ReactNode;
+  handleCountdownDurationChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleBoardTimerToggle: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  handleBoardTimerReset: (event: React.MouseEvent<HTMLButtonElement>) => void;
+
+  parseUrlForBoardAndTeamInformation: () => Promise<{ teamId: string; boardId: string; phase?: WorkflowPhase }>;
+  updateUrlWithBoardAndTeamInformation: (teamId: string, boardId: string) => Promise<void>;
+
+  createBoard: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, permissions: IFeedbackBoardDocumentPermissions) => Promise<IFeedbackBoardDocument>;
+  updateBoardMetadata: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => Promise<void>;
+  archiveCurrentBoard: () => Promise<void>;
+  generateEmailSummaryContent: () => Promise<void>;
+
+  showBoardCreationDialog: () => void;
+  hideBoardCreationDialog: () => void;
+  showBoardDuplicateDialog: () => void;
+  hideBoardDuplicateDialog: () => void;
+  showBoardUpdateDialog: () => void;
+  hideBoardUpdateDialog: () => void;
+  showArchiveBoardConfirmationDialog: () => void;
+  showRetroSummaryDialog: () => void;
+  hideRetroSummaryDialog: () => void;
+  showCarouselDialog: () => void;
+  hideCarouselDialog: () => void;
+  showTeamAssessmentHistoryDialog: () => void;
+  hideTeamAssessmentHistoryDialog: () => void;
+  hideLiveSyncInTfsIssueMessageBar: () => void;
+  hideDropIssueInEdgeMessageBar: () => void;
+
+  changeSelectedTeam: (team: WebApiTeam) => Promise<void>;
+  changeSelectedBoard: (board: IFeedbackBoardDocument) => Promise<void>;
+
+  getVoteMetricsState: (board: IFeedbackBoardDocument | undefined) => Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity">;
+  updateFeedbackItemsAndContributors: (team: WebApiTeam, board: IFeedbackBoardDocument) => Promise<void>;
+
+  numberFormatter: (value: number) => string;
+  percentageFormatter: (value: number) => string;
+};
 
 export interface FeedbackBoardContainerState {
   boards: IFeedbackBoardDocument[];
@@ -126,73 +192,93 @@ export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember
   });
 }
 
-class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps, FeedbackBoardContainerState> {
-  constructor(props: FeedbackBoardContainerProps) {
-    super(props);
-    this.state = {
-      allWorkItemTypes: [],
-      allowCrossColumnGroups: false,
-      boards: [],
-      currentUserId: getUserIdentity().id,
-      currentBoard: undefined,
-      currentTeam: undefined,
-      filteredProjectTeams: [],
-      filteredUserTeams: [],
-      hasToggledArchive: false,
-      isAllTeamsLoaded: false,
-      isAppInitialized: false,
-      isBackendServiceConnected: false,
-      isBoardCreationDialogHidden: true,
-      isBoardDuplicateDialogHidden: true,
-      isBoardUpdateDialogHidden: true,
-      isCarouselDialogHidden: true,
-      focusModeModel: null,
-      isIncludeTeamEffectivenessMeasurementDialogHidden: true,
-      isTeamAssessmentHistoryDialogHidden: true,
-      isArchiveBoardConfirmationDialogHidden: true,
-      isDropIssueInEdgeMessageBarVisible: true,
-      isLiveSyncInTfsIssueMessageBarVisible: true,
-      isMobileBoardActionsDialogHidden: true,
-      isMobileTeamSelectorDialogHidden: true,
-      isRetroSummaryDialogHidden: true,
-      isTeamBoardDeletedInfoDialogHidden: true,
-      isTeamDataLoaded: false,
-      isTeamSelectorCalloutVisible: false,
-      nonHiddenWorkItemTypes: [],
-      projectTeams: [],
-      teamBoardDeletedDialogMessage: "",
-      teamBoardDeletedDialogTitle: "",
-      userTeams: [],
-      maxVotesPerUser: 5,
-      feedbackItems: [],
-      contributors: [],
-      effectivenessMeasurementSummary: [],
-      effectivenessMeasurementChartData: [],
-      teamEffectivenessMeasurementAverageVisibilityClassName: "hidden",
-      actionItemIds: [],
-      allMembers: [],
-      castedVoteCount: 0,
-      currentVoteCount: "0",
-      teamVoteCapacity: 0,
-      boardColumns: [],
-      questionIdForDiscussAndActBoardUpdate: -1,
-      activeTab: "Board",
-      boardTimerSeconds: 0,
-      isBoardTimerRunning: false,
-      countdownDurationMinutes: 5,
-      hasPlayedStopChime: false,
-      teamAssessmentHistoryData: [],
-    };
-  }
+const initialState: FeedbackBoardContainerState = {
+  allWorkItemTypes: [],
+  allowCrossColumnGroups: false,
+  boards: [],
+  currentUserId: getUserIdentity()?.id ?? "",
+  currentBoard: undefined,
+  currentTeam: undefined,
+  filteredProjectTeams: [],
+  filteredUserTeams: [],
+  hasToggledArchive: false,
+  isAllTeamsLoaded: false,
+  isAppInitialized: false,
+  isBackendServiceConnected: false,
+  isBoardCreationDialogHidden: true,
+  isBoardDuplicateDialogHidden: true,
+  isBoardUpdateDialogHidden: true,
+  isCarouselDialogHidden: true,
+  focusModeModel: null,
+  isIncludeTeamEffectivenessMeasurementDialogHidden: true,
+  isTeamAssessmentHistoryDialogHidden: true,
+  isArchiveBoardConfirmationDialogHidden: true,
+  isDropIssueInEdgeMessageBarVisible: true,
+  isLiveSyncInTfsIssueMessageBarVisible: true,
+  isMobileBoardActionsDialogHidden: true,
+  isMobileTeamSelectorDialogHidden: true,
+  isRetroSummaryDialogHidden: true,
+  isTeamBoardDeletedInfoDialogHidden: true,
+  isTeamDataLoaded: false,
+  isTeamSelectorCalloutVisible: false,
+  nonHiddenWorkItemTypes: [],
+  projectTeams: [],
+  teamBoardDeletedDialogMessage: "",
+  teamBoardDeletedDialogTitle: "",
+  userTeams: [],
+  maxVotesPerUser: 5,
+  feedbackItems: [],
+  contributors: [],
+  effectivenessMeasurementSummary: [],
+  effectivenessMeasurementChartData: [],
+  teamEffectivenessMeasurementAverageVisibilityClassName: "hidden",
+  actionItemIds: [],
+  allMembers: [],
+  castedVoteCount: 0,
+  currentVoteCount: "0",
+  teamVoteCapacity: 0,
+  boardColumns: [],
+  questionIdForDiscussAndActBoardUpdate: -1,
+  activeTab: "Board",
+  boardTimerSeconds: 0,
+  isBoardTimerRunning: false,
+  countdownDurationMinutes: 5,
+  hasPlayedStopChime: false,
+  teamAssessmentHistoryData: [],
+};
 
-  private boardTimerIntervalId?: number;
-  private carouselDialogRef: HTMLDialogElement | null = null;
-  private readonly previewEmailDialogRef = React.createRef<HTMLDialogElement>();
-  private readonly boardActionsMenuRootRef = React.createRef<HTMLDivElement>();
-  private readonly archiveBoardDialogRef = React.createRef<HTMLDialogElement>();
+export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHandle, FeedbackBoardContainerProps>(function FeedbackBoardContainer(props, ref) {
+  const handleRef = React.useRef<FeedbackBoardContainerHandle | null>(null);
+  const stateRef = React.useRef<FeedbackBoardContainerState>({ ...initialState });
+  const [, forceRender] = React.useReducer((x: number) => x + 1, 0);
 
-  private readonly handleBoardActionsDocumentPointerDown = (event: PointerEvent) => {
-    const root = this.boardActionsMenuRootRef.current;
+  const boardTimerIntervalIdRef = React.useRef<number | undefined>(undefined);
+  const didMountRef = React.useRef(false);
+
+  const prevCurrentTeamRef = React.useRef<WebApiTeam | undefined>(undefined);
+  const prevCurrentBoardRef = React.useRef<IFeedbackBoardDocument | undefined>(undefined);
+  const prevActiveTabRef = React.useRef<FeedbackBoardContainerState["activeTab"]>(initialState.activeTab);
+  const prevIsCarouselDialogHiddenRef = React.useRef<boolean>(initialState.isCarouselDialogHidden);
+
+  const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
+  const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
+
+  const setState: FeedbackBoardContainerHandle["setState"] = React.useCallback((updater, callback) => {
+    const currentState = stateRef.current;
+    const updatePartial = typeof updater === "function" ? updater(currentState) : updater;
+    if (updatePartial) {
+      Object.assign(currentState, updatePartial);
+    }
+    forceRender();
+    if (callback) {
+      callback();
+    }
+  }, []);
+
+  const handleBoardActionsDocumentPointerDown = React.useCallback((event: PointerEvent) => {
+    const root = boardActionsMenuRootRef.current;
     if (!root) {
       return;
     }
@@ -208,21 +294,42 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         detailsElement.removeAttribute("open");
       }
     }
-  };
+  }, []);
 
-  private readonly handleBoardActionMenuItemClick = async (handler: () => void | Promise<void>, event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleBoardActionMenuItemClick = React.useCallback(async (handler: () => void | Promise<void>, event: React.MouseEvent<HTMLButtonElement>) => {
     const detailsElement = event.currentTarget.closest("details");
     detailsElement?.removeAttribute("open");
     await handler();
-  };
+  }, []);
 
-  public async componentDidMount() {
+  const openDialog = React.useCallback((dialog: HTMLDialogElement) => {
+    if (typeof dialog.showModal === "function") {
+      dialog.showModal();
+    } else {
+      dialog.setAttribute("open", "");
+    }
+  }, []);
+
+  const closeDialog = React.useCallback((dialog: HTMLDialogElement) => {
+    if (typeof dialog.close === "function") {
+      dialog.close();
+    } else {
+      dialog.removeAttribute("open");
+    }
+  }, []);
+
+  const componentDidMount = React.useCallback(async () => {
+    if (didMountRef.current) {
+      return;
+    }
+    didMountRef.current = true;
+
     let initialCurrentTeam: WebApiTeam | undefined;
     let initialCurrentBoard: IFeedbackBoardDocument | undefined;
 
     try {
       const isBackendServiceConnected = await reflectBackendService.startConnection();
-      this.setState({ isBackendServiceConnected });
+      setState({ isBackendServiceConnected });
     } catch (error) {
       appInsights.trackException(error, {
         action: "connect",
@@ -230,13 +337,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      const initializedTeamAndBoardState = await this.initializeFeedbackBoard();
+      const initializedTeamAndBoardState = await initializeFeedbackBoard();
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
-      await this.initializeProjectTeams(initialCurrentTeam);
+      await initializeProjectTeams(initialCurrentTeam);
 
-      this.setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true });
+      setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true });
     } catch (error) {
       appInsights.trackException(error, {
         action: "initializeTeamAndBoardState",
@@ -244,7 +351,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      await this.setSupportedWorkItemTypesForProject();
+      await setSupportedWorkItemTypesForProject();
     } catch (error) {
       appInsights.trackException(error, {
         action: "setSupportedWorkItemTypesForProject",
@@ -252,7 +359,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      await this.updateFeedbackItemsAndContributors(initialCurrentTeam, initialCurrentBoard);
+      await updateFeedbackItemsAndContributors(initialCurrentTeam, initialCurrentBoard);
     } catch (error) {
       appInsights.trackException(error, {
         action: "updateFeedbackItemsAndContributors",
@@ -260,7 +367,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
 
     try {
-      this.setState(this.getVoteMetricsState(initialCurrentBoard));
+      setState(getVoteMetricsState(initialCurrentBoard));
     } catch (error) {
       appInsights.trackException(error, {
         action: "votes",
@@ -269,97 +376,106 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     try {
       reflectBackendService.onConnectionClose(() => {
-        this.setState({ isBackendServiceConnected: false });
+        setState({ isBackendServiceConnected: false });
       });
 
-      reflectBackendService.onReceiveNewBoard(this.handleBoardCreated);
-      reflectBackendService.onReceiveDeletedBoard(this.handleBoardDeleted);
-      reflectBackendService.onReceiveUpdatedBoard(this.handleBoardUpdated);
+      reflectBackendService.onReceiveNewBoard(handleBoardCreated);
+      reflectBackendService.onReceiveDeletedBoard(handleBoardDeleted);
+      reflectBackendService.onReceiveUpdatedBoard(handleBoardUpdated);
     } catch (e) {
       appInsights.trackException(e, {
         action: "catchError",
       });
     }
 
-    this.setState({ isAppInitialized: true });
+    setState({ isAppInitialized: true });
 
-    document.addEventListener("pointerdown", this.handleBoardActionsDocumentPointerDown);
-  }
+    document.addEventListener("pointerdown", handleBoardActionsDocumentPointerDown);
+  }, [handleBoardActionsDocumentPointerDown, setState]);
 
-  public componentDidUpdate(_: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) {
-    if (prevState.currentTeam !== this.state.currentTeam) {
-      appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: this.state.currentTeam.id } });
+  const componentWillUnmount = React.useCallback(() => {
+    reflectBackendService.removeOnReceiveNewBoard(handleBoardCreated);
+    reflectBackendService.removeOnReceiveDeletedBoard(handleBoardDeleted);
+    reflectBackendService.removeOnReceiveUpdatedBoard(handleBoardUpdated);
+    clearBoardTimerInterval();
+
+    document.removeEventListener("pointerdown", handleBoardActionsDocumentPointerDown);
+  }, [handleBoardActionsDocumentPointerDown]);
+
+  React.useEffect(() => {
+    if (!props.deferInitialization) {
+      void componentDidMount();
     }
-    if (prevState.currentBoard !== this.state.currentBoard) {
-      reflectBackendService.switchToBoard(this.state.currentBoard ? this.state.currentBoard.id : undefined);
-      appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardSelectionChanged, properties: { boardId: this.state.currentBoard?.id } });
-      if (this.state.isAppInitialized) {
-        userDataService.addVisit(this.state.currentTeam.id, this.state.currentBoard ? this.state.currentBoard.id : undefined);
+    return () => {
+      componentWillUnmount();
+    };
+  }, [componentDidMount, componentWillUnmount, props.deferInitialization]);
+
+  React.useEffect(() => {
+    const state = stateRef.current;
+
+    const prevCurrentTeam = prevCurrentTeamRef.current;
+    const prevCurrentBoard = prevCurrentBoardRef.current;
+    const prevActiveTab = prevActiveTabRef.current;
+    const prevIsCarouselDialogHidden = prevIsCarouselDialogHiddenRef.current;
+
+    if (prevCurrentTeam !== undefined && prevCurrentTeam !== state.currentTeam && state.currentTeam) {
+      appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: state.currentTeam.id } });
+    }
+
+    if (prevCurrentBoard !== undefined && prevCurrentBoard !== state.currentBoard) {
+      reflectBackendService.switchToBoard(state.currentBoard ? state.currentBoard.id : undefined);
+      appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardSelectionChanged, properties: { boardId: state.currentBoard?.id } });
+      if (state.isAppInitialized && state.currentTeam) {
+        userDataService.addVisit(state.currentTeam.id, state.currentBoard ? state.currentBoard.id : undefined);
       }
-      if (this.state.currentTeam && this.state.currentBoard) {
-        this.updateFeedbackItemsAndContributors(this.state.currentTeam, this.state.currentBoard);
+      if (state.currentTeam && state.currentBoard) {
+        void updateFeedbackItemsAndContributors(state.currentTeam, state.currentBoard);
       }
-      if (prevState.currentBoard?.id !== this.state.currentBoard?.id) {
-        this.resetBoardTimer();
-      }
-    }
-    if (prevState.activeTab !== this.state.activeTab && this.state.activeTab !== "Board") {
-      this.pauseBoardTimer();
-    }
-
-    if (prevState.isCarouselDialogHidden !== this.state.isCarouselDialogHidden && this.carouselDialogRef) {
-      if (!this.state.isCarouselDialogHidden && !this.carouselDialogRef.open) {
-        this.openDialog(this.carouselDialogRef);
-      } else if (this.state.isCarouselDialogHidden && this.carouselDialogRef.open) {
-        this.closeDialog(this.carouselDialogRef);
+      if (prevCurrentBoard?.id !== state.currentBoard?.id) {
+        resetBoardTimer();
       }
     }
-  }
 
-  private openDialog(dialog: HTMLDialogElement) {
-    if (typeof dialog.showModal === "function") {
-      dialog.showModal();
-    } else {
-      dialog.setAttribute("open", "");
+    if (prevActiveTab !== state.activeTab && state.activeTab !== "Board") {
+      pauseBoardTimer();
     }
-  }
 
-  private closeDialog(dialog: HTMLDialogElement) {
-    if (typeof dialog.close === "function") {
-      dialog.close();
-    } else {
-      dialog.removeAttribute("open");
+    if (prevIsCarouselDialogHidden !== state.isCarouselDialogHidden && carouselDialogRef.current) {
+      const dialog = carouselDialogRef.current;
+      if (!state.isCarouselDialogHidden && !dialog.open) {
+        openDialog(dialog);
+      } else if (state.isCarouselDialogHidden && dialog.open) {
+        closeDialog(dialog);
+      }
     }
-  }
 
-  public componentWillUnmount() {
-    reflectBackendService.removeOnReceiveNewBoard(this.handleBoardCreated);
-    reflectBackendService.removeOnReceiveDeletedBoard(this.handleBoardDeleted);
-    reflectBackendService.removeOnReceiveUpdatedBoard(this.handleBoardUpdated);
-    this.clearBoardTimerInterval();
+    prevCurrentTeamRef.current = state.currentTeam;
+    prevCurrentBoardRef.current = state.currentBoard;
+    prevActiveTabRef.current = state.activeTab;
+    prevIsCarouselDialogHiddenRef.current = state.isCarouselDialogHidden;
+  });
 
-    document.removeEventListener("pointerdown", this.handleBoardActionsDocumentPointerDown);
-  }
-
-  private readonly clearBoardTimerInterval = () => {
-    if (this.boardTimerIntervalId !== undefined) {
-      window.clearInterval(this.boardTimerIntervalId);
-      this.boardTimerIntervalId = undefined;
+  const clearBoardTimerInterval = React.useCallback(() => {
+    if (boardTimerIntervalIdRef.current !== undefined) {
+      window.clearInterval(boardTimerIntervalIdRef.current);
+      boardTimerIntervalIdRef.current = undefined;
     }
-  };
+  }, []);
 
-  private readonly startBoardTimer = () => {
-    if (this.boardTimerIntervalId !== undefined) {
+  const startBoardTimer = React.useCallback(() => {
+    const state = stateRef.current;
+    if (boardTimerIntervalIdRef.current !== undefined) {
       return;
     }
 
-    const isTimerMode = this.state.countdownDurationMinutes === 0;
+    const isTimerMode = state.countdownDurationMinutes === 0;
 
-    if (this.state.boardTimerSeconds === 0 && !isTimerMode) {
+    if (state.boardTimerSeconds === 0 && !isTimerMode) {
       playStartChime();
-      this.setState({ boardTimerSeconds: this.state.countdownDurationMinutes * 60, hasPlayedStopChime: false }, () => {
-        this.boardTimerIntervalId = window.setInterval(() => {
-          this.setState(previousState => {
+      setState({ boardTimerSeconds: state.countdownDurationMinutes * 60, hasPlayedStopChime: false }, () => {
+        boardTimerIntervalIdRef.current = window.setInterval(() => {
+          setState(previousState => {
             const newSeconds = previousState.boardTimerSeconds - 1;
             if (newSeconds === 0 && !previousState.hasPlayedStopChime) {
               playStopChime();
@@ -371,9 +487,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     } else {
       playStartChime();
-      this.boardTimerIntervalId = window.setInterval(() => {
-        this.setState(previousState => {
-          const isTimerMode = this.state.countdownDurationMinutes === 0;
+      boardTimerIntervalIdRef.current = window.setInterval(() => {
+        setState(previousState => {
+          const isTimerMode = stateRef.current.countdownDurationMinutes === 0;
 
           if (isTimerMode) {
             return { boardTimerSeconds: previousState.boardTimerSeconds + 1, hasPlayedStopChime: previousState.hasPlayedStopChime };
@@ -389,68 +505,115 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       }, 1000);
     }
 
-    if (!this.state.isBoardTimerRunning) {
-      this.setState({ isBoardTimerRunning: true });
+    if (!state.isBoardTimerRunning) {
+      setState({ isBoardTimerRunning: true });
     }
-  };
+  }, [clearBoardTimerInterval, setState]);
 
-  private readonly pauseBoardTimer = () => {
-    const wasRunning = this.state.isBoardTimerRunning;
-    const hadInterval = this.boardTimerIntervalId !== undefined;
-    this.clearBoardTimerInterval();
+  const pauseBoardTimer = React.useCallback(() => {
+    const state = stateRef.current;
+    const wasRunning = state.isBoardTimerRunning;
+    const hadInterval = boardTimerIntervalIdRef.current !== undefined;
+    clearBoardTimerInterval();
 
     if (wasRunning || hadInterval) {
-      this.setState({ isBoardTimerRunning: false });
+      setState({ isBoardTimerRunning: false });
     }
-  };
+  }, [clearBoardTimerInterval, setState]);
 
-  private readonly resetBoardTimer = () => {
-    const shouldReset = this.state.boardTimerSeconds !== 0 || this.state.isBoardTimerRunning || this.boardTimerIntervalId !== undefined;
+  const resetBoardTimer = React.useCallback(() => {
+    const state = stateRef.current;
+    const shouldReset = state.boardTimerSeconds !== 0 || state.isBoardTimerRunning || boardTimerIntervalIdRef.current !== undefined;
 
     if (!shouldReset) {
       return;
     }
 
-    this.clearBoardTimerInterval();
-    this.setState({ boardTimerSeconds: 0, isBoardTimerRunning: false, hasPlayedStopChime: false });
-  };
+    clearBoardTimerInterval();
+    setState({ boardTimerSeconds: 0, isBoardTimerRunning: false, hasPlayedStopChime: false });
+  }, [clearBoardTimerInterval, setState]);
 
-  private readonly handleBoardTimerToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const componentDidUpdate = React.useCallback(
+    (_prevProps: FeedbackBoardContainerProps, prevState: FeedbackBoardContainerState) => {
+      const state = stateRef.current;
+
+      if (prevState.currentTeam !== state.currentTeam && state.currentTeam) {
+        appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: state.currentTeam.id } });
+      }
+
+      if (prevState.currentBoard !== state.currentBoard) {
+        reflectBackendService.switchToBoard(state.currentBoard ? state.currentBoard.id : undefined);
+        appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardSelectionChanged, properties: { boardId: state.currentBoard?.id } });
+
+        if (state.isAppInitialized && state.currentTeam) {
+          userDataService.addVisit(state.currentTeam.id, state.currentBoard ? state.currentBoard.id : undefined);
+        }
+
+        if (state.currentTeam && state.currentBoard) {
+          const updateFn = handleRef.current?.updateFeedbackItemsAndContributors ?? updateFeedbackItemsAndContributors;
+          void updateFn(state.currentTeam, state.currentBoard);
+        }
+
+        if (prevState.currentBoard?.id !== state.currentBoard?.id) {
+          const resetFn = handleRef.current?.resetBoardTimer ?? resetBoardTimer;
+          resetFn();
+        }
+      }
+
+      if (prevState.activeTab !== state.activeTab && state.activeTab !== "Board") {
+        const pauseFn = handleRef.current?.pauseBoardTimer ?? pauseBoardTimer;
+        pauseFn();
+      }
+
+      if (prevState.isCarouselDialogHidden !== state.isCarouselDialogHidden && carouselDialogRef.current) {
+        const dialog = carouselDialogRef.current;
+        if (!state.isCarouselDialogHidden && !dialog.open) {
+          openDialog(dialog);
+        } else if (state.isCarouselDialogHidden && dialog.open) {
+          closeDialog(dialog);
+        }
+      }
+    },
+    [pauseBoardTimer, resetBoardTimer],
+  );
+
+  const handleBoardTimerToggle = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
-    if (this.state.isBoardTimerRunning) {
-      this.pauseBoardTimer();
+    if (stateRef.current.isBoardTimerRunning) {
+      pauseBoardTimer();
       return;
     }
 
-    this.startBoardTimer();
-  };
+    startBoardTimer();
+  }, [pauseBoardTimer, startBoardTimer]);
 
-  private readonly handleBoardTimerReset = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleBoardTimerReset = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
-    this.resetBoardTimer();
-  };
+    resetBoardTimer();
+  }, [resetBoardTimer]);
 
-  private readonly handleCountdownDurationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCountdownDurationChange = React.useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
     const duration = parseInt(event.target.value, 10);
-    this.setState({ countdownDurationMinutes: duration });
-  };
+    setState({ countdownDurationMinutes: duration });
+  }, [setState]);
 
-  private readonly renderWorkflowTimerControls = () => {
-    if (!this.state.currentBoard) {
+  const renderWorkflowTimerControls = React.useCallback(() => {
+    const state = stateRef.current;
+    if (!state.currentBoard) {
       return null;
     }
 
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
-        <button type="button" className="workflow-stage-timer-toggle" title={this.state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={this.state.isBoardTimerRunning} aria-label={`${this.state.isBoardTimerRunning ? "Pause" : "Start"}. ${formatBoardTimer(this.state.boardTimerSeconds)} ${this.state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={this.handleBoardTimerToggle}>
-          {this.state.isBoardTimerRunning ? getIconElement("pause-circle") : getIconElement("play-circle")}
+        <button type="button" className="workflow-stage-timer-toggle" title={state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={state.isBoardTimerRunning} aria-label={`${state.isBoardTimerRunning ? "Pause" : "Start"}. ${formatBoardTimer(state.boardTimerSeconds)} ${state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={handleBoardTimerToggle}>
+          {state.isBoardTimerRunning ? getIconElement("pause-circle") : getIconElement("play-circle")}
         </button>
-        {!this.state.isBoardTimerRunning && this.state.boardTimerSeconds === 0 ? (
-          <select value={this.state.countdownDurationMinutes} onChange={this.handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
+        {!state.isBoardTimerRunning && state.boardTimerSeconds === 0 ? (
+          <select value={state.countdownDurationMinutes} onChange={handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
             <option value={0}>Stopwatch</option>
             {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
               <option key={num} value={num}>
@@ -459,22 +622,23 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             ))}
           </select>
         ) : (
-          <span className={this.state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{formatBoardTimer(this.state.boardTimerSeconds)}</span>
+          <span className={state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{formatBoardTimer(state.boardTimerSeconds)}</span>
         )}
-        <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!this.state.boardTimerSeconds && !this.state.isBoardTimerRunning} onClick={this.handleBoardTimerReset}>
+        <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!state.boardTimerSeconds && !state.isBoardTimerRunning} onClick={handleBoardTimerReset}>
           {getIconElement("refresh")}
         </button>
       </div>
     );
-  };
+  }, [handleBoardTimerReset, handleBoardTimerToggle, handleCountdownDurationChange]);
 
-  private async updateUrlWithBoardAndTeamInformation(teamId: string, boardId: string) {
+  const updateUrlWithBoardAndTeamInformation = React.useCallback(async (teamId: string, boardId: string) => {
     getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
-      service.setHash(`teamId=${teamId}&boardId=${boardId}&phase=${this.state.currentBoard.activePhase}`);
+      const phase = stateRef.current.currentBoard?.activePhase;
+      service.setHash(`teamId=${teamId}&boardId=${boardId}${phase ? `&phase=${phase}` : ""}`);
     });
-  }
+  }, []);
 
-  private async parseUrlForBoardAndTeamInformation(): Promise<{ teamId: string; boardId: string; phase?: WorkflowPhase }> {
+  const parseUrlForBoardAndTeamInformation = React.useCallback(async (): Promise<{ teamId: string; boardId: string; phase?: WorkflowPhase }> => {
     const service = await getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
     let hash = await service.getHash();
     if (hash.startsWith("#")) {
@@ -486,18 +650,21 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const phase = hashParams.get("phase") as WorkflowPhase;
 
     return { teamId, boardId, phase };
-  }
+  }, []);
 
-  private async updateFeedbackItemsAndContributors(currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) {
+  const updateFeedbackItemsAndContributors = React.useCallback(async (currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) => {
     if (!currentTeam || !currentBoard) {
       return;
     }
 
     const board: IFeedbackBoardDocument = await itemDataService.getBoardItem(currentTeam.id, currentBoard.id);
+    if (!board) {
+      return;
+    }
 
     const feedbackItems = (await itemDataService.getFeedbackItemsForBoard(board?.id)) ?? [];
 
-    await this.updateUrlWithBoardAndTeamInformation(currentTeam.id, board.id);
+    await updateUrlWithBoardAndTeamInformation(currentTeam.id, board.id);
 
     let actionItemIds: number[] = [];
     feedbackItems.forEach(item => {
@@ -510,18 +677,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       })
       .filter((v, i, a) => a.indexOf(v) === i);
 
-    const voteMetricsState = this.getVoteMetricsState(board);
+    const voteMetricsState = getVoteMetricsState(board);
 
-    this.setState({
+    setState({
       actionItemIds: actionItemIds.filter(item => item !== undefined),
       feedbackItems,
       contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
       ...voteMetricsState,
     });
-  }
+  }, [setState, updateUrlWithBoardAndTeamInformation]);
 
-  private readonly getVoteMetricsState = (board: IFeedbackBoardDocument | undefined): Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity"> => {
-    if (!board || !this.state.currentUserId) {
+  const getVoteMetricsState = React.useCallback((board: IFeedbackBoardDocument | undefined): Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity"> => {
+    if (!board || !stateRef.current.currentUserId) {
       return {
         castedVoteCount: 0,
         currentVoteCount: "0",
@@ -533,7 +700,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const votes = Object.values(voteCollection);
     const totalVotesUsed = votes.length > 0 ? votes.reduce((sum, vote) => sum + vote, 0) : 0;
 
-    const userIdKey = obfuscateUserId(this.state.currentUserId);
+    const userIdKey = obfuscateUserId(stateRef.current.currentUserId);
     const currentUserVotes = voteCollection[userIdKey]?.toString() || "0";
 
     const voterCount = Object.keys(voteCollection).length;
@@ -545,38 +712,39 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       currentVoteCount: currentUserVotes,
       teamVoteCapacity,
     };
-  };
+  }, []);
 
-  private readonly numberFormatter = (value: number) => {
+  const numberFormatter = React.useCallback((value: number) => {
     const formatter = new Intl.NumberFormat("en-US", { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     return formatter.format(value);
-  };
+  }, []);
 
-  private readonly percentageFormatter = (value: number) => {
+  const percentageFormatter = React.useCallback((value: number) => {
     const formatter = new Intl.NumberFormat("en-US", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     return formatter.format(value / 100);
-  };
+  }, []);
 
-  private readonly handleBoardCreated = async (teamId: string, boardId: string) => {
-    if (!teamId || this.state.currentTeam.id !== teamId) {
+  const handleBoardCreated = React.useCallback(async (teamId: string, boardId: string) => {
+    const state = stateRef.current;
+    if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
       return;
     }
 
-    const boardToAdd = await BoardDataService.getBoardForTeamById(this.state.currentTeam.id, boardId);
+    const boardToAdd = await BoardDataService.getBoardForTeamById(state.currentTeam.id, boardId);
 
     if (!boardToAdd) {
       return;
     }
 
-    this.setState(prevState => {
+    setState(prevState => {
       const boardsForTeam = [...prevState.boards, boardToAdd]
         .filter((board: IFeedbackBoardDocument) =>
           FeedbackBoardDocumentHelper.filter(
             board,
-            this.state.userTeams.map(t => t.id),
-            this.state.currentUserId,
+            stateRef.current.userTeams.map(t => t.id),
+            stateRef.current.currentUserId,
           ),
         )
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
@@ -589,9 +757,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         isTeamBoardDeletedInfoDialogHidden: true,
       };
     });
-  };
+  }, [setState]);
 
-  private readonly setSupportedWorkItemTypesForProject = async (): Promise<void> => {
+  const setSupportedWorkItemTypesForProject = React.useCallback(async (): Promise<void> => {
     const allWorkItemTypes: WorkItemType[] = await workItemService.getWorkItemTypesForCurrentProject();
     const hiddenWorkItemTypes: WorkItemTypeReference[] = await workItemService.getHiddenWorkItemTypes();
 
@@ -599,49 +767,51 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     const nonHiddenWorkItemTypes = allWorkItemTypes.filter(workItemType => hiddenWorkItemTypeNames.indexOf(workItemType.name) === -1);
 
-    this.setState({
+    setState({
       nonHiddenWorkItemTypes: nonHiddenWorkItemTypes,
       allWorkItemTypes: allWorkItemTypes,
     });
-  };
+  }, [setState]);
 
-  private readonly replaceBoard = (updatedBoard: IFeedbackBoardDocument) => {
-    this.setState(prevState => {
+  const replaceBoard = React.useCallback((updatedBoard: IFeedbackBoardDocument) => {
+    setState(prevState => {
       const newBoards = prevState.boards.map(board => (board.id === updatedBoard.id ? updatedBoard : board));
 
-      const newCurrentBoard = this.state.currentBoard && this.state.currentBoard.id === updatedBoard.id ? updatedBoard : this.state.currentBoard;
+      const currentBoard = stateRef.current.currentBoard;
+      const newCurrentBoard = currentBoard && currentBoard.id === updatedBoard.id ? updatedBoard : currentBoard;
 
       return {
         boards: newBoards,
         currentBoard: newCurrentBoard,
       };
     });
-  };
+  }, [setState]);
 
-  private readonly handleBoardUpdated = async (teamId: string, updatedBoardId: string) => {
-    if (!teamId || this.state.currentTeam.id !== teamId) {
+  const handleBoardUpdated = React.useCallback(async (teamId: string, updatedBoardId: string) => {
+    const state = stateRef.current;
+    if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
       return;
     }
 
-    const updatedBoard = await BoardDataService.getBoardForTeamById(this.state.currentTeam.id, updatedBoardId);
+    const updatedBoard = await BoardDataService.getBoardForTeamById(state.currentTeam.id, updatedBoardId);
 
     if (!updatedBoard) {
       // Board has been deleted after the update. Just ignore the update. The delete should be handled on its own.
       return;
     }
 
-    this.replaceBoard(updatedBoard);
-  };
+    replaceBoard(updatedBoard);
+  }, [replaceBoard]);
 
-  private readonly handleBoardDeleted = async (teamId: string, deletedBoardId: string) => {
-    if (!teamId || this.state.currentTeam.id !== teamId) {
+  const handleBoardDeleted = React.useCallback(async (teamId: string, deletedBoardId: string) => {
+    const state = stateRef.current;
+    if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
       return;
     }
 
-    this.setState(
+    setState(
       (prevState): Pick<FeedbackBoardContainerState, "boards" | "currentBoard" | "isBoardUpdateDialogHidden" | "isTeamBoardDeletedInfoDialogHidden" | "isCarouselDialogHidden" | "teamBoardDeletedDialogTitle" | "teamBoardDeletedDialogMessage"> => {
         const currentBoards = prevState.boards;
-        // Note: Javascript filter maintains order.
         const boardsForTeam = currentBoards.filter(board => board.id !== deletedBoardId);
 
         if (prevState.currentBoard && deletedBoardId === prevState.currentBoard.id) {
@@ -682,10 +852,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         };
       },
       async () => {
-        await userDataService.addVisit(this.state.currentTeam?.id, this.state.currentBoard?.id);
+        await userDataService.addVisit(stateRef.current.currentTeam?.id, stateRef.current.currentBoard?.id);
       },
     );
-  };
+  }, [setState]);
 
   /**
    * @description Loads team data for this project and the current user. Attempts to use query
@@ -693,7 +863,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
    * the current user is a part of and most recently created board.
    * @returns An object to update the state with initialized team and board data.
    */
-  private readonly initializeFeedbackBoard = async (): Promise<{
+  const initializeFeedbackBoard = async (): Promise<{
     userTeams: WebApiTeam[];
     filteredUserTeams: WebApiTeam[];
     currentTeam: WebApiTeam;
@@ -703,13 +873,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     teamBoardDeletedDialogTitle: string;
     teamBoardDeletedDialogMessage: string;
   }> => {
-    const userTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
+    const userTeams = await azureDevOpsCoreService.getAllTeams(props.projectId, true);
     userTeams?.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
 
-    // Default to select first user team or the project's default team.
-    const defaultTeam = userTeams?.length ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(this.props.projectId);
+    const defaultTeam = userTeams?.length ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(props.projectId);
 
     const baseTeamState = {
       userTeams,
@@ -728,24 +897,24 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       const columns = getColumnsByTemplateId(searchParams.get("templateId") || "start-stop-continue");
       const teamId = searchParams.get("teamId");
       if (teamId) {
-        const matchedTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, teamId);
+        const matchedTeam = await azureDevOpsCoreService.getTeam(props.projectId, teamId);
         if (matchedTeam) {
-          this.setState({ currentTeam: matchedTeam });
+          setState({ currentTeam: matchedTeam });
         }
       }
-      if (this.state.currentTeam === undefined) {
-        this.setState({ currentTeam: defaultTeam });
+      if (stateRef.current.currentTeam === undefined) {
+        setState({ currentTeam: defaultTeam });
       }
 
-      const newBoard = await this.createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, { Members: [], Teams: [] });
+      const newBoard = await createBoard(name, parseInt(maxVotes), columns, isTeamAssessment === "true", false, false, { Members: [], Teams: [] });
 
-      parent.location.href = await getBoardUrl(this.state.currentTeam.id, newBoard.id, newBoard.activePhase);
+      parent.location.href = await getBoardUrl(stateRef.current.currentTeam.id, newBoard.id, newBoard.activePhase);
     }
 
-    const info = await this.parseUrlForBoardAndTeamInformation();
+    const info = await parseUrlForBoardAndTeamInformation();
     try {
       if (!info) {
-        if (!this.props.isHostedAzureDevOps) {
+        if (!props.isHostedAzureDevOps) {
           throw new Error("URL-related issue occurred with on-premise Azure DevOps");
         } else if (!document.referrer) {
           throw new Error("URL-related issue occurred with this URL: (Empty URL)");
@@ -772,7 +941,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     if (!info?.teamId) {
       // If the teamId query param doesn't exist, attempt to pre-select a team and board by last
       // visited user records.
-      const recentVisitState = await this.loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
+      const recentVisitState = await loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
 
       return {
         ...baseTeamState,
@@ -782,12 +951,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
 
     // Attempt to pre-select the team based on the teamId query param.
     const teamIdQueryParam = info.teamId;
-    const matchedTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, teamIdQueryParam);
+    const matchedTeam = await azureDevOpsCoreService.getTeam(props.projectId, teamIdQueryParam);
 
     if (!matchedTeam) {
       // If the teamId query param wasn't valid attempt to pre-select a team and board by last
       // visited user records.
-      const recentVisitState = await this.loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
+      const recentVisitState = await loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
       const recentVisitWithDialogState = {
         ...recentVisitState,
         isTeamBoardDeletedInfoDialogHidden: false,
@@ -807,8 +976,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         .filter((board: IFeedbackBoardDocument) =>
           FeedbackBoardDocumentHelper.filter(
             board,
-            this.state.userTeams.map(t => t.id),
-            this.state.currentUserId,
+            stateRef.current.userTeams.map(t => t.id),
+            stateRef.current.currentUserId,
           ),
         )
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
@@ -859,18 +1028,18 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   };
 
-  private readonly initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
+  const initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
     // true returns all teams that user is a member in the project
     // false returns all teams that are in project
     // intentionally restricting to teams the user is a member
-    const allTeams = await azureDevOpsCoreService.getAllTeams(this.props.projectId, true);
+    const allTeams = await azureDevOpsCoreService.getAllTeams(props.projectId, true);
     allTeams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
 
     const promises = [];
     for (const team of allTeams) {
-      promises.push(azureDevOpsCoreService.getMembers(this.props.projectId, team.id));
+      promises.push(azureDevOpsCoreService.getMembers(props.projectId, team.id));
     }
     // if user is member of more than one team, then will return duplicates
     Promise.all(promises).then(values => {
@@ -881,7 +1050,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       // Use the helper function
       const uniqueTeamMembers = deduplicateTeamMembers(allTeamMembers);
 
-      this.setState({
+      setState({
         allMembers: uniqueTeamMembers,
         projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
         filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
@@ -890,15 +1059,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   };
 
-  private isCurrentUserTeamAdmin(): boolean {
-    return this.state.allMembers?.some(m => m.identity.id === this.state.currentUserId && m.isTeamAdmin) ?? false;
-  }
+  const isCurrentUserTeamAdmin = (): boolean => {
+    const state = stateRef.current;
+    return state.allMembers?.some(m => m.identity.id === state.currentUserId && m.isTeamAdmin) ?? false;
+  };
 
   /**
    * @description Load the last team and board that this user visited, if such records exist.
    * @returns An object to update the state with recently visited or default team and board data.
    */
-  private readonly loadRecentlyVisitedOrDefaultTeamAndBoardState = async (
+  const loadRecentlyVisitedOrDefaultTeamAndBoardState = async (
     defaultTeam: WebApiTeam,
     userTeams: WebApiTeam[],
   ): Promise<{
@@ -909,7 +1079,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const mostRecentUserVisit = await userDataService.getMostRecentVisit();
 
     if (mostRecentUserVisit) {
-      const mostRecentTeam = await azureDevOpsCoreService.getTeam(this.props.projectId, mostRecentUserVisit.teamId);
+      const mostRecentTeam = await azureDevOpsCoreService.getTeam(props.projectId, mostRecentUserVisit.teamId);
 
       if (mostRecentTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
@@ -919,7 +1089,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
               FeedbackBoardDocumentHelper.filter(
                 board,
                 userTeams.map(t => t.id),
-                this.state.currentUserId,
+                stateRef.current.currentUserId,
               ),
             )
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
@@ -948,7 +1118,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           FeedbackBoardDocumentHelper.filter(
             board,
             userTeams.map(t => t.id),
-            this.state.currentUserId,
+            stateRef.current.currentUserId,
           ),
         )
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
@@ -966,9 +1136,10 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
    * currentTeam is set to the new team and that team's boards are loaded.
    * @param teamId The id of the team to select.
    */
-  private readonly setCurrentTeam = async (teamId: string) => {
-    this.setState({ isTeamDataLoaded: false });
-    const matchedTeam = this.state.projectTeams.find(team => team.id === teamId) || this.state.userTeams.find(team => team.id === teamId);
+  const setCurrentTeam = async (teamId: string) => {
+    setState({ isTeamDataLoaded: false });
+    const state = stateRef.current;
+    const matchedTeam = state.projectTeams.find(team => team.id === teamId) || state.userTeams.find(team => team.id === teamId);
 
     if (matchedTeam) {
       let boardsForTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
@@ -977,14 +1148,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           .filter((board: IFeedbackBoardDocument) =>
             FeedbackBoardDocumentHelper.filter(
               board,
-              this.state.userTeams.map(t => t.id),
-              this.state.currentUserId,
+              stateRef.current.userTeams.map(t => t.id),
+              stateRef.current.currentUserId,
             ),
           )
           .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
       }
 
-      this.setState(prevState => {
+      setState(prevState => {
         // Ensure that we are actually changing teams to prevent needless rerenders.
         if (!prevState.currentTeam || prevState.currentTeam.id !== matchedTeam.id) {
           return {
@@ -1000,20 +1171,21 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   };
 
-  private readonly handleArchiveToggle = (): void => {
-    this.setState({ hasToggledArchive: true });
+  const handleArchiveToggle = (): void => {
+    setState({ hasToggledArchive: true });
   };
 
   // Handle when "Board" tab is clicked
-  private readonly handlePivotClick = async (tabName: "Board" | "History"): Promise<void> => {
-    this.setState({ activeTab: tabName });
+  const handlePivotClick = async (tabName: "Board" | "History"): Promise<void> => {
+    setState({ activeTab: tabName });
 
     if (tabName === "Board") {
       // Check if "Board" tab is clicked
-      if (this.state.hasToggledArchive) {
+      if (stateRef.current.hasToggledArchive) {
         // Reload only if archive was toggled
-        await this.reloadBoardsForCurrentTeam();
-        this.setState({ hasToggledArchive: false }); // Reset the flag after reload
+        const reloadFn = handleRef.current?.reloadBoardsForCurrentTeam ?? reloadBoardsForCurrentTeam;
+        await reloadFn();
+        setState({ hasToggledArchive: false }); // Reset the flag after reload
       }
     }
   };
@@ -1022,13 +1194,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
    * @description Loads all feedback boards for the current team. Defaults the selected board to
    * the most recently created board.
    */
-  private readonly reloadBoardsForCurrentTeam = async () => {
-    this.setState({ isTeamDataLoaded: false });
+  const reloadBoardsForCurrentTeam = async () => {
+    setState({ isTeamDataLoaded: false });
 
-    let boardsForTeam = await BoardDataService.getBoardsForTeam(this.state.currentTeam.id);
+    let boardsForTeam = await BoardDataService.getBoardsForTeam(stateRef.current.currentTeam.id);
 
     if (!boardsForTeam.length) {
-      this.setState({
+      setState({
         isTeamDataLoaded: true,
         boards: [],
         currentBoard: null,
@@ -1041,13 +1213,13 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       .filter((board: IFeedbackBoardDocument) =>
         FeedbackBoardDocumentHelper.filter(
           board,
-          this.state.userTeams.map(t => t.id),
-          this.state.currentUserId,
+          stateRef.current.userTeams.map(t => t.id),
+          stateRef.current.currentUserId,
         ),
       )
       .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
-    this.setState({
+    setState({
       isTeamDataLoaded: true,
       boards: boardsForTeam,
       currentBoard: boardsForTeam[0],
@@ -1059,15 +1231,15 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
    * currentBoard is set to the new board. If not, nothing changes.
    * @param boardId The id of the board to select.
    */
-  private readonly setCurrentBoard = (selectedBoard: IFeedbackBoardDocument) => {
-    const matchedBoard = this.state.boards.find(board => board.id === selectedBoard.id);
+  const setCurrentBoard = (selectedBoard: IFeedbackBoardDocument) => {
+    const matchedBoard = stateRef.current.boards.find(board => board.id === selectedBoard.id);
 
     if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
       matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
     }
 
     if (matchedBoard) {
-      this.setState(prevState => {
+      setState(prevState => {
         // Ensure that we are actually changing boards to prevent needless rerenders.
         if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {
           return {
@@ -1080,29 +1252,29 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   };
 
-  private readonly changeSelectedTeam = (team: WebApiTeam) => {
+  const changeSelectedTeam = async (team: WebApiTeam) => {
     if (team) {
-      if (this.state.currentTeam.id === team.id) {
+      if (stateRef.current.currentTeam.id === team.id) {
         return;
       }
 
-      this.setCurrentTeam(team.id);
+      await setCurrentTeam(team.id);
       appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: team.id } });
     }
   };
 
-  private readonly changeSelectedBoard = async (board: IFeedbackBoardDocument) => {
+  const changeSelectedBoard = async (board: IFeedbackBoardDocument) => {
     if (board) {
-      this.setCurrentBoard(board);
-      this.updateUrlWithBoardAndTeamInformation(this.state.currentTeam.id, board.id);
+      setCurrentBoard(board);
+      await updateUrlWithBoardAndTeamInformation(stateRef.current.currentTeam.id, board.id);
       appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardSelectionChanged, properties: { boardId: board.id } });
     }
   };
 
-  private readonly clickWorkflowStateCallback = (_: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => {
-    appInsights.trackEvent({ name: TelemetryEvents.WorkflowPhaseChanged, properties: { oldWorkflowPhase: this.state.currentBoard.activePhase, newWorkflowPhase: newPhase } });
+  const clickWorkflowStateCallback = (_: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => {
+    appInsights.trackEvent({ name: TelemetryEvents.WorkflowPhaseChanged, properties: { oldWorkflowPhase: stateRef.current.currentBoard.activePhase, newWorkflowPhase: newPhase } });
 
-    this.setState(prevState => {
+    setState(prevState => {
       const updatedCurrentBoard = prevState.currentBoard;
       updatedCurrentBoard.activePhase = newPhase;
 
@@ -1112,9 +1284,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   };
 
-  private readonly createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+  const createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
     const createdBoard = await BoardDataService.createBoardForTeam(
-      this.state.currentTeam.id,
+      stateRef.current.currentTeam.id,
       title,
       maxVotesPerUser,
       columns,
@@ -1125,26 +1297,27 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       undefined, // End Date
       permissions,
     );
-    await this.reloadBoardsForCurrentTeam();
-    this.hideBoardCreationDialog();
-    this.hideBoardDuplicateDialog();
-    reflectBackendService.broadcastNewBoard(this.state.currentTeam.id, createdBoard.id);
+    await reloadBoardsForCurrentTeam();
+    hideBoardCreationDialog();
+    hideBoardDuplicateDialog();
+    reflectBackendService.broadcastNewBoard(stateRef.current.currentTeam.id, createdBoard.id);
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardCreated, properties: { boardId: createdBoard.id } });
     return createdBoard;
   };
 
-  private readonly showBoardCreationDialog = (): void => {
-    this.setState({ isBoardCreationDialogHidden: false });
+  const showBoardCreationDialog = (): void => {
+    setState({ isBoardCreationDialogHidden: false });
   };
 
-  private readonly hideBoardCreationDialog = (): void => {
-    this.setState({ isBoardCreationDialogHidden: true });
+  const hideBoardCreationDialog = (): void => {
+    setState({ isBoardCreationDialogHidden: true });
   };
 
-  private readonly showRetroSummaryDialog = async () => {
+  const showRetroSummaryDialog = async () => {
     const measurements: { id: number; selected: number }[] = [];
 
-    const board = await BoardDataService.getBoardForTeamById(this.state.currentTeam.id, this.state.currentBoard.id);
+    const state = stateRef.current;
+    const board = await BoardDataService.getBoardForTeamById(state.currentTeam.id, state.currentBoard.id);
     const voteCollection = board.teamEffectivenessMeasurementVoteCollection || [];
 
     voteCollection.forEach(vote => {
@@ -1197,9 +1370,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       return 0;
     });
 
-    await this.updateFeedbackItemsAndContributors(this.state.currentTeam, board);
+    await updateFeedbackItemsAndContributors(stateRef.current.currentTeam, board);
 
-    this.setState({
+    setState({
       currentBoard: board,
       isRetroSummaryDialogHidden: false,
       effectivenessMeasurementChartData: chartData,
@@ -1207,12 +1380,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     });
   };
 
-  private readonly hideRetroSummaryDialog = (): void => {
-    this.setState({ isRetroSummaryDialogHidden: true });
+  const hideRetroSummaryDialog = (): void => {
+    setState({ isRetroSummaryDialogHidden: true });
   };
 
-  private readonly showTeamAssessmentHistoryDialog = async () => {
-    const allBoards = await BoardDataService.getBoardsForTeam(this.state.currentTeam.id);
+  const showTeamAssessmentHistoryDialog = async () => {
+    const allBoards = await BoardDataService.getBoardsForTeam(stateRef.current.currentTeam.id);
 
     const boardsWithAssessments = allBoards.filter(board => board.isIncludeTeamEffectivenessMeasurement && board.teamEffectivenessMeasurementVoteCollection && board.teamEffectivenessMeasurementVoteCollection.length > 0);
 
@@ -1243,7 +1416,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       };
     });
 
-    this.setState({
+    setState({
       teamAssessmentHistoryData: historyData,
       isTeamAssessmentHistoryDialogHidden: false,
     });
@@ -1251,75 +1424,81 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     appInsights.trackEvent({ name: TelemetryEvents.TeamAssessmentHistoryViewed });
   };
 
-  private readonly hideTeamAssessmentHistoryDialog = (): void => {
-    this.setState({ isTeamAssessmentHistoryDialogHidden: true });
+  const hideTeamAssessmentHistoryDialog = (): void => {
+    setState({ isTeamAssessmentHistoryDialogHidden: true });
   };
 
-  private readonly updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
-    const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
+  const updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+    const state = stateRef.current;
+    const updatedBoard = await BoardDataService.updateBoardMetadata(state.currentTeam.id, state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
 
-    this.updateBoardAndBroadcast(updatedBoard);
+    updateBoardAndBroadcast(updatedBoard);
   };
 
-  private readonly showBoardUpdateDialog = (): void => {
-    this.setState({ isBoardUpdateDialogHidden: false });
+  const showBoardUpdateDialog = (): void => {
+    setState({ isBoardUpdateDialogHidden: false });
   };
 
-  private readonly hideBoardUpdateDialog = (): void => {
-    this.setState({ isBoardUpdateDialogHidden: true });
+  const hideBoardUpdateDialog = (): void => {
+    setState({ isBoardUpdateDialogHidden: true });
   };
 
-  private readonly showBoardDuplicateDialog = (): void => {
-    this.setState({ isBoardDuplicateDialogHidden: false });
+  const showBoardDuplicateDialog = (): void => {
+    setState({ isBoardDuplicateDialogHidden: false });
   };
 
-  private readonly hideBoardDuplicateDialog = (): void => {
-    this.setState({ isBoardDuplicateDialogHidden: true });
+  const hideBoardDuplicateDialog = (): void => {
+    setState({ isBoardDuplicateDialogHidden: true });
   };
 
-  private readonly showArchiveBoardConfirmationDialog = () => {
-    this.archiveBoardDialogRef?.current?.showModal();
+  const showArchiveBoardConfirmationDialog = () => {
+    (handleRef.current?.archiveBoardDialogRef ?? archiveBoardDialogRef)?.current?.showModal();
   };
 
-  private readonly showBoardUrlCopiedToast = () => {
-    toast(`The link to retrospective ${this.state.currentBoard.title} (${this.state.currentBoard.activePhase} phase) has been copied to your clipboard.`);
+  const showBoardUrlCopiedToast = () => {
+    const board = stateRef.current.currentBoard;
+    toast(`The link to retrospective ${board.title} (${board.activePhase} phase) has been copied to your clipboard.`);
   };
 
-  private readonly showEmailCopiedToast = () => {
-    copyToClipboard(this.state.currentBoard.emailContent);
-    toast(`The email summary for "${this.state.currentBoard.title}" has been copied to your clipboard.`);
+  const showEmailCopiedToast = () => {
+    const board = stateRef.current.currentBoard;
+    copyToClipboard(board.emailContent);
+    toast(`The email summary for "${board.title}" has been copied to your clipboard.`);
   };
 
-  private readonly archiveCurrentBoard = async () => {
-    await BoardDataService.archiveFeedbackBoard(this.state.currentTeam.id, this.state.currentBoard.id);
-    reflectBackendService.broadcastDeletedBoard(this.state.currentTeam.id, this.state.currentBoard.id);
-    this.archiveBoardDialogRef?.current?.close();
-    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: this.state.currentBoard.id } });
-    await this.reloadBoardsForCurrentTeam();
+  const archiveCurrentBoard = async () => {
+    const state = stateRef.current;
+    await BoardDataService.archiveFeedbackBoard(state.currentTeam.id, state.currentBoard.id);
+    reflectBackendService.broadcastDeletedBoard(state.currentTeam.id, state.currentBoard.id);
+    (handleRef.current?.archiveBoardDialogRef ?? archiveBoardDialogRef)?.current?.close();
+    appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: state.currentBoard.id } });
+    await reloadBoardsForCurrentTeam();
   };
 
-  private readonly copyBoardUrl = async () => {
-    const boardDeepLinkUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
+  const copyBoardUrl = async () => {
+    const state = stateRef.current;
+    const boardDeepLinkUrl = await getBoardUrl(state.currentTeam.id, state.currentBoard.id, state.currentBoard.activePhase);
     copyToClipboard(boardDeepLinkUrl);
-    this.showBoardUrlCopiedToast();
+    showBoardUrlCopiedToast();
   };
 
-  private readonly generateCSVContent = async () => {
-    await shareBoardHelper.generateCSVContent(this.state.currentBoard);
+  const generateCSVContent = async () => {
+    await shareBoardHelper.generateCSVContent(stateRef.current.currentBoard);
   };
 
-  private readonly generateEmailSummaryContent = async () => {
-    const boardUrl = await getBoardUrl(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.activePhase);
-    const emailContent = await shareBoardHelper.generateEmailText(this.state.currentBoard, boardUrl, false);
-    this.setState(prevState => ({
+  const generateEmailSummaryContent = async () => {
+    const state = stateRef.current;
+    const boardUrl = await getBoardUrl(state.currentTeam.id, state.currentBoard.id, state.currentBoard.activePhase);
+    const emailContent = await shareBoardHelper.generateEmailText(state.currentBoard, boardUrl, false);
+    setState(prevState => ({
       currentBoard: { ...prevState.currentBoard, emailContent: emailContent },
     }));
 
-    this.previewEmailDialogRef?.current?.showModal();
+    previewEmailDialogRef?.current?.showModal();
   };
 
-  private readonly downloadEmailSummaryPdf = (): void => {
-    const board = this.state.currentBoard;
+  const downloadEmailSummaryPdf = (): void => {
+    const board = stateRef.current.currentBoard;
     if (!board) {
       return;
     }
@@ -1329,10 +1508,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     downloadPdfBlob(pdfBlob, fileName);
   };
 
-  private readonly renderBoardUpdateMetadataFormDialog = (isNewBoardCreation: boolean, isDuplicatingBoard: boolean, hidden: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => void, onCancel: () => void) => {
+  const renderBoardUpdateMetadataFormDialog = (isNewBoardCreation: boolean, isDuplicatingBoard: boolean, hidden: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => void, onCancel: () => void) => {
     const permissionOptions: FeedbackBoardPermissionOption[] = [];
 
-    for (const team of this.state.projectTeams) {
+    const state = stateRef.current;
+
+    for (const team of state.projectTeams) {
       permissionOptions.push({
         id: team.id,
         name: team.name,
@@ -1341,7 +1522,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       });
     }
 
-    for (const member of this.state.allMembers) {
+    for (const member of state.allMembers) {
       permissionOptions.push({
         id: member.identity.id,
         name: member.identity.displayName,
@@ -1365,52 +1546,54 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           className: "retrospectives-dialog-modal",
         }}
       >
-        <FeedbackBoardMetadataForm isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={this.state.currentBoard} teamId={this.state.currentTeam.id} maxVotesPerUser={this.state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={this.state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
+        <FeedbackBoardMetadataForm isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
       </Dialog>
     );
   };
 
-  private readonly updateCurrentVoteCount = async () => {
-    const boardItem = await itemDataService.getBoardItem(this.state.currentTeam.id, this.state.currentBoard.id);
+  const updateCurrentVoteCount = async () => {
+    const state = stateRef.current;
+    const boardItem = await itemDataService.getBoardItem(state.currentTeam.id, state.currentBoard.id);
     if (!boardItem) {
       return;
     }
 
-    this.setState(this.getVoteMetricsState(boardItem));
+    setState(getVoteMetricsState(boardItem));
   };
 
-  private readonly updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
+  const updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
     if (!updatedBoard) {
-      this.handleBoardDeleted(this.state.currentTeam.id, this.state.currentBoard.id);
+      void handleBoardDeleted(stateRef.current.currentTeam.id, stateRef.current.currentBoard.id);
     }
 
-    this.replaceBoard(updatedBoard);
+    replaceBoard(updatedBoard);
 
-    this.hideBoardUpdateDialog();
-    reflectBackendService.broadcastUpdatedBoard(this.state.currentTeam.id, updatedBoard.id);
+    hideBoardUpdateDialog();
+    reflectBackendService.broadcastUpdatedBoard(stateRef.current.currentTeam.id, updatedBoard.id);
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardMetadataUpdated, properties: { boardId: updatedBoard.id } });
   };
 
-  private readonly persistColumnNotes = async (columnId: string, notes: string): Promise<void> => {
-    if (!this.state.currentTeam || !this.state.currentBoard) {
+  const persistColumnNotes = async (columnId: string, notes: string): Promise<void> => {
+    const state = stateRef.current;
+    if (!state.currentTeam || !state.currentBoard) {
       return;
     }
 
-    const updatedColumns = this.state.currentBoard.columns.map(column => (column.id === columnId ? { ...column, notes } : column));
+    const updatedColumns = state.currentBoard.columns.map(column => (column.id === columnId ? { ...column, notes } : column));
 
     try {
-      const updatedBoard = await BoardDataService.updateBoardMetadata(this.state.currentTeam.id, this.state.currentBoard.id, this.state.currentBoard.maxVotesPerUser, this.state.currentBoard.title, updatedColumns, this.state.currentBoard.permissions);
+      const updatedBoard = await BoardDataService.updateBoardMetadata(state.currentTeam.id, state.currentBoard.id, state.currentBoard.maxVotesPerUser, state.currentBoard.title, updatedColumns, state.currentBoard.permissions);
 
       if (!updatedBoard) {
         throw new Error("Failed to update board with new column notes.");
       }
 
-      this.replaceBoard(updatedBoard);
-      reflectBackendService.broadcastUpdatedBoard(this.state.currentTeam.id, updatedBoard.id);
+      replaceBoard(updatedBoard);
+      reflectBackendService.broadcastUpdatedBoard(state.currentTeam.id, updatedBoard.id);
     } catch (error) {
       appInsights.trackException(error, {
         action: "updateColumnNotes",
-        boardId: this.state.currentBoard?.id,
+        boardId: state.currentBoard?.id,
         columnId,
       });
 
@@ -1418,25 +1601,92 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     }
   };
 
-  private readonly showCarouselDialog = () => {
-    this.setState({ isCarouselDialogHidden: false });
+  const showCarouselDialog = () => {
+    setState({ isCarouselDialogHidden: false });
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemCarouselLaunched });
   };
 
-  private readonly hideCarouselDialog = () => {
-    this.setState({ isCarouselDialogHidden: true });
+  const hideCarouselDialog = () => {
+    setState({ isCarouselDialogHidden: true });
   };
 
-  private readonly hideLiveSyncInTfsIssueMessageBar = () => {
-    this.setState({ isLiveSyncInTfsIssueMessageBarVisible: false });
+  const hideLiveSyncInTfsIssueMessageBar = () => {
+    setState({ isLiveSyncInTfsIssueMessageBarVisible: false });
   };
 
-  private readonly hideDropIssueInEdgeMessageBar = () => {
-    this.setState({ isDropIssueInEdgeMessageBarVisible: false });
+  const hideDropIssueInEdgeMessageBar = () => {
+    setState({ isDropIssueInEdgeMessageBarVisible: false });
   };
 
-  public render() {
-    if (!this.state.isAppInitialized || !this.state.isTeamDataLoaded) {
+  React.useImperativeHandle(ref, () => {
+    const handle: FeedbackBoardContainerHandle = {
+      get state() {
+        return stateRef.current;
+      },
+      setState,
+      componentDidMount,
+      componentDidUpdate,
+      componentWillUnmount,
+      get boardTimerIntervalId() {
+        return boardTimerIntervalIdRef.current;
+      },
+      set boardTimerIntervalId(value: number | undefined) {
+        boardTimerIntervalIdRef.current = value;
+      },
+      previewEmailDialogRef,
+      archiveBoardDialogRef,
+      handleBoardCreated,
+      handleBoardUpdated,
+      handleBoardDeleted,
+      handlePivotClick,
+      persistColumnNotes,
+      setSupportedWorkItemTypesForProject,
+      loadRecentlyVisitedOrDefaultTeamAndBoardState,
+      reloadBoardsForCurrentTeam,
+      startBoardTimer,
+      pauseBoardTimer,
+      resetBoardTimer,
+      clearBoardTimerInterval,
+      renderWorkflowTimerControls,
+      handleCountdownDurationChange,
+      handleBoardTimerToggle,
+      handleBoardTimerReset,
+      parseUrlForBoardAndTeamInformation,
+      updateUrlWithBoardAndTeamInformation,
+      createBoard,
+      updateBoardMetadata,
+      archiveCurrentBoard,
+      generateEmailSummaryContent,
+      showBoardCreationDialog,
+      hideBoardCreationDialog,
+      showBoardDuplicateDialog,
+      hideBoardDuplicateDialog,
+      showBoardUpdateDialog,
+      hideBoardUpdateDialog,
+      showArchiveBoardConfirmationDialog,
+      showRetroSummaryDialog,
+      hideRetroSummaryDialog,
+      showCarouselDialog,
+      hideCarouselDialog,
+      showTeamAssessmentHistoryDialog,
+      hideTeamAssessmentHistoryDialog,
+      hideLiveSyncInTfsIssueMessageBar,
+      hideDropIssueInEdgeMessageBar,
+      changeSelectedTeam,
+      changeSelectedBoard,
+      getVoteMetricsState,
+      updateFeedbackItemsAndContributors,
+      numberFormatter,
+      percentageFormatter,
+    };
+
+    handleRef.current = handle;
+    return handle;
+  });
+
+  const state = stateRef.current;
+
+  if (!state.isAppInitialized || !state.isTeamDataLoaded) {
       return (
         <div className="spinner" aria-live="assertive">
           <div></div>
@@ -1445,21 +1695,21 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
       );
     }
 
-    if (!this.state.currentTeam) {
+    if (!state.currentTeam) {
       return <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>;
     }
 
-    if (!this.state.currentBoard) {
+    if (!state.currentBoard) {
       return (
         <>
           <div className="no-boards-container">
             <div className="no-boards-text">Get started with your first Retrospective</div>
             <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
-            <button title="Create Board" onClick={this.showBoardCreationDialog} className="create-new-board-button">
+            <button title="Create Board" onClick={showBoardCreationDialog} className="create-new-board-button">
               Create Board
             </button>
           </div>
-          {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
+          {renderBoardUpdateMetadataFormDialog(true, false, state.isBoardCreationDialogHidden, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
         </>
       );
     }
@@ -1467,9 +1717,9 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
     const teamSelectorList: ISelectorList<WebApiTeam> = {
       selectorListItems: [
         {
-          finishedLoading: this.state.isAppInitialized,
+          finishedLoading: state.isAppInitialized,
           header: { id: "My Teams", title: "My Teams" },
-          items: this.state.userTeams,
+          items: state.userTeams,
         },
         // Removed All Teams
         // Retrospectives should be safe space for team members to share feedback.
@@ -1482,14 +1732,14 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         {
           finishedLoading: true,
           header: { id: "All Retrospectives", isHidden: true, title: "All Retrospectives" },
-          items: this.state.boards,
+          items: state.boards,
         },
       ],
     };
 
     const saveTeamEffectivenessMeasurement = () => {
-      const teamEffectivenessMeasurementVoteCollection = this.state.currentBoard.teamEffectivenessMeasurementVoteCollection;
-      const currentUserId = obfuscateUserId(this.state.currentUserId);
+      const teamEffectivenessMeasurementVoteCollection = state.currentBoard.teamEffectivenessMeasurementVoteCollection;
+      const currentUserId = obfuscateUserId(state.currentUserId);
       const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
       const responseCount = currentUserVote?.responses?.length || 0;
 
@@ -1498,19 +1748,19 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         return;
       }
 
-      itemDataService.updateTeamEffectivenessMeasurement(this.state.currentBoard.id, this.state.currentTeam.id, currentUserId, this.state.currentBoard.teamEffectivenessMeasurementVoteCollection);
+      itemDataService.updateTeamEffectivenessMeasurement(state.currentBoard.id, state.currentTeam.id, currentUserId, state.currentBoard.teamEffectivenessMeasurementVoteCollection);
 
-      this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+      setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
     };
 
     const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
-      const currentBoard = this.state.currentBoard;
+      const currentBoard = stateRef.current.currentBoard;
 
       if (currentBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection = [];
       }
 
-      const currentUserId = obfuscateUserId(this.state.currentUserId);
+      const currentUserId = obfuscateUserId(stateRef.current.currentUserId);
       if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
         currentBoard.teamEffectivenessMeasurementVoteCollection.push({
           userId: currentUserId,
@@ -1531,17 +1781,17 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
         currentVote.selection = selected;
       }
 
-      this.setState({ currentBoard });
+      setState({ currentBoard });
     };
 
-    const teamEffectivenessResponseCount = this.state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
+    const teamEffectivenessResponseCount = state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
     return (
       <div className="flex flex-col h-screen">
         <div className="flex items-center shrink-0 mt-2 ml-4">
           <Dialog
-            hidden={this.state.questionIdForDiscussAndActBoardUpdate === -1}
-            onDismiss={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
+            hidden={state.questionIdForDiscussAndActBoardUpdate === -1}
+            onDismiss={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
             dialogContentProps={{
               type: DialogType.close,
               title: "Discuss and Act",
@@ -1556,87 +1806,87 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             <DialogFooter>
               <PrimaryButton
                 onClick={async () => {
-                  const question = questions.filter(question => question.id === this.state.questionIdForDiscussAndActBoardUpdate)[0];
+                  const question = questions.filter(question => question.id === state.questionIdForDiscussAndActBoardUpdate)[0];
                   const templateName = question.discussActTemplate;
                   const columns = getColumnsByTemplateId(templateName);
 
-                  const board = this.state.currentBoard;
+                  const board = state.currentBoard;
 
-                  await this.updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
+                  await updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
 
-                  this.setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
+                  setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
                 }}
                 text="Proceed"
               />
-              <DefaultButton onClick={() => this.setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
+              <DefaultButton onClick={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
             </DialogFooter>
           </Dialog>
 
           <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
             Retrospectives
           </h1>
-          <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={this.state.currentTeam} iconName="people" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={this.changeSelectedTeam} title={"Team"} />
+          <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={state.currentTeam} iconName="people" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={changeSelectedTeam} title={"Team"} />
           <div className="flex-grow-spacer"></div>
           <div className="header-menu-with-timer">
-            {this.renderWorkflowTimerControls()}
+            {renderWorkflowTimerControls()}
             <ExtensionSettingsMenu />
           </div>
         </div>
         <div className="flex items-center justify-start shrink-0">
           <div className="w-full">
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className={`pivot-tab board ${this.state.activeTab === "Board" ? "active" : ""}`} onClick={() => this.handlePivotClick("Board")}>
+              <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
                 Board
               </div>
-              <div className={`pivot-tab history ${this.state.activeTab === "History" ? "active" : ""}`} onClick={() => this.handlePivotClick("History")}>
+              <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
                 History
               </div>
-              {this.state.activeTab === "Board" && (
+              {state.activeTab === "Board" && (
                 <>
                   <div className="mx-4 vertical-tab-separator" />
                   <div className="flex items-center justify-start">
                     <div className="board-selector">
-                      <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={this.state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={this.changeSelectedBoard} title={"Retrospective Board"} />
+                      <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={changeSelectedBoard} title={"Retrospective Board"} />
                     </div>
-                    <div className="board-actions-menu" ref={this.boardActionsMenuRootRef}>
+                    <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
                       <details className="flex items-center relative">
                         <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
                           {getIconElement("more-horizontal")}
                         </summary>
                         <div className="callout-menu left" role="menu" aria-label="Board Actions">
-                          <button key="createBoard" type="button" title="Create new retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardCreationDialog, event)}>
+                          <button key="createBoard" type="button" title="Create new retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
                             {getIconElement("add")}
                             Create new retrospective
                           </button>
-                          <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardDuplicateDialog, event)}>
+                          <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
                             {getIconElement("content-copy")}
                             Create copy of retrospective
                           </button>
-                          <button key="editBoard" type="button" title="Edit retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showBoardUpdateDialog, event)}>
+                          <button key="editBoard" type="button" title="Edit retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
                             {getIconElement("edit")}
                             Edit retrospective
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="copyLink" type="button" title={`Copy link to ${this.state.currentBoard.activePhase} phase`} onClick={event => this.handleBoardActionMenuItemClick(this.copyBoardUrl, event)}>
+                          <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
                             {getIconElement("link")}
-                            {`Copy link to ${this.state.currentBoard.activePhase} phase`}
+                            {`Copy link to ${state.currentBoard.activePhase} phase`}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="exportCSV" type="button" title="Export CSV content" onClick={event => this.handleBoardActionMenuItemClick(this.generateCSVContent, event)}>
+                          <button key="exportCSV" type="button" title="Export CSV content" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
                             {getIconElement("sim-card-download")}
                             Export CSV content
                           </button>
-                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => this.handleBoardActionMenuItemClick(this.generateEmailSummaryContent, event)}>
+                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
                             {getIconElement("forward-to-inbox")}
                             Create email summary
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => this.handleBoardActionMenuItemClick(this.showRetroSummaryDialog, event)}>
+                          <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
                             {getIconElement("source")}
                             Show retrospective summary
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => this.handleBoardActionMenuItemClick(this.showArchiveBoardConfirmationDialog, event)}>
+                          <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
                             {getIconElement("inventory")}
                             Archive retrospective
                           </button>
@@ -1646,12 +1896,12 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   </div>
                   <div className="flex items-center justify-start">
                     <div className="flex flex-row items-center workflow-stage-header 3">
-                      {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+                      {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                         <>
                           <Dialog
-                            hidden={this.state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                            hidden={state.isIncludeTeamEffectivenessMeasurementDialogHidden}
                             onDismiss={() => {
-                              this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                              setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
                             }}
                             dialogContentProps={{
                               type: DialogType.close,
@@ -1724,7 +1974,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                                 </thead>
                                 <tbody>
                                   {questions.map(question => {
-                                    return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={this.state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                                    return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
                                   })}
                                 </tbody>
                               </table>
@@ -1739,7 +1989,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               />
                               <DefaultButton
                                 onClick={() => {
-                                  this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                                  setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
                                 }}
                                 text="Cancel"
                               />
@@ -1748,7 +1998,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           <button
                             className="team-assessment-button"
                             onClick={() => {
-                              this.setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
+                              setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
                             }}
                             title="Team Assessment"
                             aria-label="Team Assessment"
@@ -1760,51 +2010,49 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                         </>
                       )}
                       <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
-                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={this.clickWorkflowStateCallback} />
-                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={this.clickWorkflowStateCallback} />
-                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={this.clickWorkflowStateCallback} />
-                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={this.state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={this.clickWorkflowStateCallback} />
+                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} />
+                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} />
+                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} />
+                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={clickWorkflowStateCallback} />
                       </div>
-                      {this.state.currentBoard.activePhase === WorkflowPhase.Vote && (
+                      {state.currentBoard.activePhase === WorkflowPhase.Vote && (
                         <div className="feedback-votes-count" role="status" aria-live="polite">
-                          <span className="entry" title={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${this.state.currentVoteCount} of ${this.state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
+                          <span className="entry" title={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
                             {getIconElement("person")}
-                            <span className="hidden lg:inline">My Votes:</span> {this.state.currentVoteCount}/{this.state.currentBoard.maxVotesPerUser?.toString() || "0"}
+                            <span className="hidden lg:inline">My Votes:</span> {state.currentVoteCount}/{state.currentBoard.maxVotesPerUser?.toString() || "0"}
                           </span>
-                          {this.state.castedVoteCount > 0 && this.state.teamVoteCapacity > 0 && (
+                          {state.castedVoteCount > 0 && state.teamVoteCapacity > 0 && (
                             <>
                               <span className="separator" aria-hidden="true">
                                 |
                               </span>
-                              <span className="entry" title={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`} aria-label={`The team has used ${this.state.castedVoteCount} of ${this.state.teamVoteCapacity} votes`}>
+                              <span className="entry" title={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`} aria-label={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`}>
                                 {getIconElement("people")}
-                                <span className="hidden lg:inline">Team Votes:</span> {this.state.castedVoteCount}/{this.state.teamVoteCapacity}
+                                <span className="hidden lg:inline">Team Votes:</span> {state.castedVoteCount}/{state.teamVoteCapacity}
                               </span>
                             </>
                           )}
                         </div>
                       )}
-                      {this.state.currentBoard.activePhase === WorkflowPhase.Act && (
+                      {state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
-                          <button className="focus-mode-button" onClick={this.showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
+                          <button className="focus-mode-button" onClick={showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
                             {getIconElement("adjust")}
                             <span>Focus Mode</span>
                           </button>
                           <dialog
-                            ref={ref => {
-                              this.carouselDialogRef = ref;
-                            }}
+                            ref={carouselDialogRef}
                             className="retrospectives-carousel-dialog"
-                            onClose={this.hideCarouselDialog}
+                            onClose={hideCarouselDialog}
                           >
                             <div className="header">
                               <h2 className="title">Focus Mode</h2>
-                              <button onClick={this.hideCarouselDialog} aria-label="Close">
+                              <button onClick={hideCarouselDialog} aria-label="Close">
                                 {getIconElement("close")}
                               </button>
                             </div>
                             <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
-                            <div className="subText">{this.state.focusModeModel && <FeedbackCarousel focusModeModel={this.state.focusModeModel} isFocusModalHidden={this.state.isCarouselDialogHidden} />}</div>
+                            <div className="subText">{state.focusModeModel && <FeedbackCarousel focusModeModel={state.focusModeModel} isFocusModalHidden={state.isCarouselDialogHidden} />}</div>
                           </dialog>
                         </>
                       )}
@@ -1812,26 +2060,26 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                   </div>
                 </>
               )}
-              {this.state.activeTab === "History" && (
+              {state.activeTab === "History" && (
                 <>
                   <div className="mx-4 vertical-tab-separator" />
-                  <button className="team-assessment-history-button" onClick={this.showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
+                  <button className="team-assessment-history-button" onClick={showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
                     {getIconElement("insights")}
                     <span className="hidden lg:inline">Team Assessment History</span>
                   </button>
                 </>
               )}
             </div>
-            {this.state.activeTab === "History" && (
+            {state.activeTab === "History" && (
               <div className="flex-1 min-h-0 overflow-auto border-t-4 border-(--nav-header-active-item-background)">
-                <BoardSummaryTable teamId={this.state.currentTeam.id} currentUserId={this.state.currentUserId} currentUserIsTeamAdmin={this.isCurrentUserTeamAdmin()} supportedWorkItemTypes={this.state.allWorkItemTypes} onArchiveToggle={this.handleArchiveToggle} />
+                <BoardSummaryTable teamId={state.currentTeam.id} currentUserId={state.currentUserId} currentUserIsTeamAdmin={isCurrentUserTeamAdmin()} supportedWorkItemTypes={state.allWorkItemTypes} onArchiveToggle={handleArchiveToggle} />
               </div>
             )}
-            {this.state.activeTab === "Board" && (
+            {state.activeTab === "Board" && (
               <div className="feedback-board-container">
-                {this.state.currentTeam && this.state.currentBoard && (
+                {state.currentTeam && state.currentBoard && (
                   <>
-                    {!this.props.isHostedAzureDevOps && this.state.isLiveSyncInTfsIssueMessageBarVisible && !this.state.isBackendServiceConnected && (
+                    {!props.isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
                       <>
                         <div className="retro-message-bar">
                           <span>
@@ -1839,30 +2087,30 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                           </span>
                         </div>
                         <div className="actions">
-                          <button type="button" className="dismiss" onClick={this.hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
+                          <button type="button" className="dismiss" onClick={hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
                             <span aria-hidden="true">×</span>
                           </button>
                         </div>
                       </>
                     )}
-                    {!this.props.isHostedAzureDevOps && this.state.isDropIssueInEdgeMessageBarVisible && !this.state.isBackendServiceConnected && (
+                    {!props.isHostedAzureDevOps && state.isDropIssueInEdgeMessageBarVisible && !state.isBackendServiceConnected && (
                       <div className="retro-message-bar" role="alert" aria-live="assertive">
                         <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
                         <div className="actions">
-                          <button type="button" className="dismiss" onClick={this.hideDropIssueInEdgeMessageBar} aria-label="Dismiss notification">
+                          <button type="button" className="dismiss" onClick={hideDropIssueInEdgeMessageBar} aria-label="Dismiss notification">
                             <span aria-hidden="true">×</span>
                           </button>
                         </div>
                       </div>
                     )}
-                    {this.props.isHostedAzureDevOps && !this.state.isBackendServiceConnected && (
+                    {props.isHostedAzureDevOps && !state.isBackendServiceConnected && (
                       <div className="retro-message-bar" role="alert" aria-live="assertive">
                         <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
                         <div className="actions">
                           <button
                             type="button"
                             onClick={() => {
-                              this.setState({ isBackendServiceConnected: true });
+                              setState({ isBackendServiceConnected: true });
                             }}
                             aria-label="Hide"
                             title="Hide"
@@ -1873,20 +2121,20 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                       </div>
                     )}
                     <FeedbackBoard
-                      board={this.state.currentBoard}
-                      team={this.state.currentTeam}
+                      board={state.currentBoard}
+                      team={state.currentTeam}
                       displayBoard={true}
-                      workflowPhase={this.state.currentBoard.activePhase}
-                      nonHiddenWorkItemTypes={this.state.nonHiddenWorkItemTypes}
-                      allWorkItemTypes={this.state.allWorkItemTypes}
+                      workflowPhase={state.currentBoard.activePhase}
+                      nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
+                      allWorkItemTypes={state.allWorkItemTypes}
                       onFocusModeModelChange={focusModeModel => {
-                        this.setState({ focusModeModel });
+                        setState({ focusModeModel });
                       }}
-                      isAnonymous={this.state.currentBoard.isAnonymous ? this.state.currentBoard.isAnonymous : false}
-                      hideFeedbackItems={this.state.currentBoard.shouldShowFeedbackAfterCollect ? this.state.currentBoard.activePhase == WorkflowPhase.Collect && this.state.currentBoard.shouldShowFeedbackAfterCollect : false}
-                      userId={this.state.currentUserId}
-                      onVoteCasted={this.updateCurrentVoteCount}
-                      onColumnNotesChange={this.persistColumnNotes}
+                      isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
+                      hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
+                      userId={state.currentUserId}
+                      onVoteCasted={updateCurrentVoteCount}
+                      onColumnNotesChange={persistColumnNotes}
                     />
                   </>
                 )}
@@ -1894,55 +2142,55 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             )}
           </div>
         </div>
-        <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={this.archiveBoardDialogRef} onClose={() => this.archiveBoardDialogRef.current?.close()}>
+        <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={archiveBoardDialogRef} onClose={() => archiveBoardDialogRef.current?.close()}>
           <div className="header">
             <h2 className="title">Archive Retrospective</h2>
-            <button onClick={() => this.archiveBoardDialogRef.current?.close()} aria-label="Close">
+            <button onClick={() => archiveBoardDialogRef.current?.close()} aria-label="Close">
               {getIconElement("close")}
             </button>
           </div>
           <div className="subText">
-            The retrospective board <strong>{this.state.currentBoard.title}</strong> with its feedback will be archived.
+            The retrospective board <strong>{state.currentBoard.title}</strong> with its feedback will be archived.
           </div>
           <div className="subText">
             <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
           </div>
           <div className="inner">
-            <button className="button" onClick={() => this.archiveCurrentBoard()}>
+            <button className="button" onClick={() => archiveCurrentBoard()}>
               Archive
             </button>
-            <button className="default button" onClick={() => this.archiveBoardDialogRef.current?.close()}>
+            <button className="default button" onClick={() => archiveBoardDialogRef.current?.close()}>
               Cancel
             </button>
           </div>
         </dialog>
-        {this.renderBoardUpdateMetadataFormDialog(true, false, this.state.isBoardCreationDialogHidden, this.hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, this.createBoard, this.hideBoardCreationDialog)}
-        {this.renderBoardUpdateMetadataFormDialog(true, true, this.state.isBoardDuplicateDialogHidden, this.hideBoardDuplicateDialog, "Create copy of retrospective", "", this.createBoard, this.hideBoardDuplicateDialog)}
-        {this.state.currentBoard && this.renderBoardUpdateMetadataFormDialog(false, false, this.state.isBoardUpdateDialogHidden, this.hideBoardUpdateDialog, "Edit retrospective", "", this.updateBoardMetadata, this.hideBoardUpdateDialog)}
-        <dialog ref={this.previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" onClose={() => this.previewEmailDialogRef.current?.close()}>
+        {renderBoardUpdateMetadataFormDialog(true, false, state.isBoardCreationDialogHidden, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
+        {renderBoardUpdateMetadataFormDialog(true, true, state.isBoardDuplicateDialogHidden, hideBoardDuplicateDialog, "Create copy of retrospective", "", createBoard, hideBoardDuplicateDialog)}
+        {state.currentBoard && renderBoardUpdateMetadataFormDialog(false, false, state.isBoardUpdateDialogHidden, hideBoardUpdateDialog, "Edit retrospective", "", updateBoardMetadata, hideBoardUpdateDialog)}
+        <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" onClose={() => previewEmailDialogRef.current?.close()}>
           <div className="header">
             <h2 className="title">Email summary</h2>
-            <button onClick={() => this.previewEmailDialogRef.current?.close()} aria-label="Close">
+            <button onClick={() => previewEmailDialogRef.current?.close()} aria-label="Close">
               {getIconElement("close")}
             </button>
           </div>
           <div className="subText">
-            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={this.state.currentBoard.emailContent}></textarea>
+            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={state.currentBoard.emailContent}></textarea>
           </div>
           <div className="inner">
-            <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={this.showEmailCopiedToast}>
+            <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={showEmailCopiedToast}>
               {getIconElement("content-copy")}
               Copy to clipboard
             </button>
-            <button title="Download PDF" aria-label="Download email summary as PDF" onClick={this.downloadEmailSummaryPdf} className="default button">
+            <button title="Download PDF" aria-label="Download email summary as PDF" onClick={downloadEmailSummaryPdf} className="default button">
               {getIconElement("sim-card-download")}
               Download PDF
             </button>
           </div>
         </dialog>
         <Dialog
-          hidden={this.state.isRetroSummaryDialogHidden}
-          onDismiss={this.hideRetroSummaryDialog}
+          hidden={state.isRetroSummaryDialogHidden}
+          onDismiss={hideRetroSummaryDialog}
           dialogContentProps={{
             type: DialogType.normal,
             title: `Retrospective Board Summary`,
@@ -1952,22 +2200,22 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             className: "retrospectives-dialog-modal",
           }}
         >
-          {this.state.currentBoard && (
+          {state.currentBoard && (
             <>
               <section className="retro-summary-section">
                 <div className="retro-summary-section-header">Basic Settings</div>
-                <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(this.state.currentBoard.createdDate))}</div>
+                <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(state.currentBoard.createdDate))}</div>
                 <div id="retro-summary-created-by">
-                  Created by <img className="avatar" src={this.state.currentBoard?.createdBy.imageUrl} alt={this.state.currentBoard?.createdBy.displayName} /> {this.state.currentBoard?.createdBy.displayName}{" "}
+                  Created by <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
                 </div>
               </section>
               <section className="retro-summary-section">
                 <div className="retro-summary-section-header">Participant Summary</div>
-                <div className="retro-summary-section-item">Contributors: {this.state.contributors.length} participant(s)</div>
+                <div className="retro-summary-section-item">Contributors: {state.contributors.length} participant(s)</div>
 
-                {!this.state.currentBoard.isAnonymous && this.state.contributors.length > 0 && (
+                {!state.currentBoard.isAnonymous && state.contributors.length > 0 && (
                   <div className="retro-summary-contributors-section">
-                    {this.state.contributors.map(contributor => (
+                    {state.contributors.map(contributor => (
                       <div key={contributor.id} className="retro-summary-contributor">
                         <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
                       </div>
@@ -1976,21 +2224,21 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                 )}
                 <div className="retro-summary-item-horizontal-group">
                   <div className="retro-summary-section-item horizontal-group-item">
-                    {Object.keys(this.state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {this.state.castedVoteCount} vote(s)
+                    {Object.keys(state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {state.castedVoteCount} vote(s)
                   </div>
-                  <div className="retro-summary-section-item horizontal-group-item">{this.state.feedbackItems.length} feedback item(s) created</div>
-                  <div className="retro-summary-section-item horizontal-group-item">{this.state.actionItemIds.length} action item(s) created</div>
+                  <div className="retro-summary-section-item horizontal-group-item">{state.feedbackItems.length} feedback item(s) created</div>
+                  <div className="retro-summary-section-item horizontal-group-item">{state.actionItemIds.length} action item(s) created</div>
                 </div>
               </section>
-              {this.state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+              {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                 <section className="retro-summary-section">
                   <div className="retro-summary-section-header">Team Assessment</div>
                   <div>
                     Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
                     <div className="retro-summary-effectiveness-scores">
                       <ul className="chart">
-                        {this.state.effectivenessMeasurementChartData.map(data => {
-                          const averageScore = this.state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
+                        {state.effectivenessMeasurementChartData.map(data => {
+                          const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
                           const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
                           const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
                           const redScore = (data.red * 100) / teamEffectivenessResponseCount;
@@ -2002,25 +2250,25 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
                               </div>
                               {data.red > 0 && (
                                 <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
-                                  {this.percentageFormatter(redScore)}
+                                  {percentageFormatter(redScore)}
                                 </div>
                               )}
                               {data.yellow > 0 && (
                                 <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
-                                  {this.percentageFormatter(yellowScore)}
+                                  {percentageFormatter(yellowScore)}
                                 </div>
                               )}
                               {data.green > 0 && (
                                 <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
-                                  {this.percentageFormatter(greenScore)}
+                                  {percentageFormatter(greenScore)}
                                 </div>
                               )}
                               {averageScore > 0 && (
-                                <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${this.numberFormatter(averageScore)}`}>
-                                  {this.numberFormatter(averageScore)}
+                                <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${numberFormatter(averageScore)}`}>
+                                  {numberFormatter(averageScore)}
                                 </div>
                               )}
-                              <button className="assessment-chart-action" title={`${this.state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={this.state.feedbackItems.length > 0} onClick={() => this.setState({ questionIdForDiscussAndActBoardUpdate: data.questionId })}>
+                              <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => setState({ questionIdForDiscussAndActBoardUpdate: data.questionId })}>
                                 Discuss and Act
                               </button>
                             </li>
@@ -2051,8 +2299,8 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           )}
         </Dialog>
         <Dialog
-          hidden={this.state.isTeamAssessmentHistoryDialogHidden}
-          onDismiss={this.hideTeamAssessmentHistoryDialog}
+          hidden={state.isTeamAssessmentHistoryDialogHidden}
+          onDismiss={hideTeamAssessmentHistoryDialog}
           dialogContentProps={{
             type: DialogType.normal,
             title: "Team Assessment History",
@@ -2062,7 +2310,7 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
             className: "retrospectives-dialog-modal",
           }}
         >
-          {this.state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
+          {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
             <div className="team-assessment-no-data">
               <p>No team assessment history available.</p>
               <p>Create retrospectives with team assessments to see historical trends.</p>
@@ -2070,16 +2318,16 @@ class FeedbackBoardContainer extends React.Component<FeedbackBoardContainerProps
           ) : (
             <>
               <p className="team-assessment-info-text">
-                Showing average scores over time across {this.state.teamAssessmentHistoryData.slice(-13).length} retrospective{this.state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
+                Showing average scores over time across {state.teamAssessmentHistoryData.slice(-13).length} retrospective{state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
               </p>
-              <TeamAssessmentHistoryChart historyData={this.state.teamAssessmentHistoryData.slice(-13)} numberFormatter={this.numberFormatter} />
+              <TeamAssessmentHistoryChart historyData={state.teamAssessmentHistoryData.slice(-13)} numberFormatter={numberFormatter} />
             </>
           )}
         </Dialog>
         <ToastContainer className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
       </div>
     );
-  }
-}
+  },
+);
 
 export default withAITracking(reactPlugin, FeedbackBoardContainer);

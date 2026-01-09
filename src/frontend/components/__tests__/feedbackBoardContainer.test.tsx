@@ -5,7 +5,7 @@ import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import type { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import FeedbackBoardContainer, { FeedbackBoardContainerProps, FeedbackBoardContainerState, deduplicateTeamMembers } from "../feedbackBoardContainer";
+import { FeedbackBoardContainer, type FeedbackBoardContainerHandle, FeedbackBoardContainerProps, FeedbackBoardContainerState, deduplicateTeamMembers } from "../feedbackBoardContainer";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
@@ -219,9 +219,23 @@ const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
   projectId: "1",
 };
 
+const renderContainerWithHandle = (overrideProps: Partial<FeedbackBoardContainerProps> = {}) => {
+  const ref = React.createRef<FeedbackBoardContainerHandle>();
+  const props: FeedbackBoardContainerProps = {
+    ...feedbackBoardContainerProps,
+    deferInitialization: true,
+    ...overrideProps,
+  };
+  const utils = render(<FeedbackBoardContainer {...props} ref={ref} />);
+  if (!ref.current) {
+    throw new Error("FeedbackBoardContainer ref was not set");
+  }
+  return { ...utils, ref, instance: ref.current };
+};
+
 describe("Feedback Board Container ", () => {
   it("can be rendered without content.", () => {
-    render(<FeedbackBoardContainer {...feedbackBoardContainerProps} />);
+    render(<FeedbackBoardContainer {...feedbackBoardContainerProps} deferInitialization={true} />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
@@ -372,9 +386,7 @@ describe("FeedbackBoardContainer additional coverage", () => {
   });
 
   it("renders initialized board and history views", async () => {
-    const componentDidMountSpy = jest.spyOn(FeedbackBoardContainer.prototype, "componentDidMount").mockImplementation(async () => {});
-    const ref = React.createRef<FeedbackBoardContainerInstance>();
-    render(<FeedbackBoardContainer {...feedbackBoardContainerProps} ref={ref} />);
+    const { ref } = renderContainerWithHandle();
 
     const board = {
       ...baseBoard,
@@ -404,7 +416,6 @@ describe("FeedbackBoardContainer additional coverage", () => {
         isBoardCreationDialogHidden: false,
         isBoardDuplicateDialogHidden: false,
         isBoardUpdateDialogHidden: false,
-        isPreviewEmailDialogHidden: false,
         isRetroSummaryDialogHidden: false,
         isTeamAssessmentHistoryDialogHidden: false,
         effectivenessMeasurementChartData: [{ questionId: 1, red: 1, yellow: 0, green: 0 }],
@@ -427,8 +438,6 @@ describe("FeedbackBoardContainer additional coverage", () => {
       ref.current?.setState({ activeTab: "History" });
     });
     expect(screen.getByTestId("board-summary-table")).toBeInTheDocument();
-
-    componentDidMountSpy.mockRestore();
   });
 });
 
@@ -698,12 +707,12 @@ describe("Vote Count Display", () => {
 });
 
 describe("vote metrics state", () => {
-  type TestableContainer = InstanceType<typeof FeedbackBoardContainer> & {
+  type TestableContainer = FeedbackBoardContainerHandle & {
     getVoteMetricsState: (board: IFeedbackBoardDocument | undefined) => Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity">;
   };
 
   const createContainer = (): TestableContainer => {
-    return new FeedbackBoardContainer(feedbackBoardContainerProps) as TestableContainer;
+    return renderContainerWithHandle().instance as unknown as TestableContainer;
   };
 
   const baseBoard: Partial<IFeedbackBoardDocument> = {
@@ -729,6 +738,7 @@ describe("vote metrics state", () => {
 
   it("derives counts for current user and team", () => {
     const instance = createContainer();
+    instance.setState({ currentUserId: "mock-user-id" });
     const board = {
       ...baseBoard,
       boardVoteCollection: {
@@ -747,7 +757,7 @@ describe("vote metrics state", () => {
 
 describe("FeedbackBoardContainer - Component lifecycle", () => {
   it("should handle screen resolution changes", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Simulate resize to mobile width
     global.innerWidth = 500;
@@ -758,7 +768,7 @@ describe("FeedbackBoardContainer - Component lifecycle", () => {
   });
 
   it("should handle backend service connection states", () => {
-    const { container } = render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    const { container } = render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should render with loading state
     expect(container.querySelector(".initialization-spinner") || screen.getByText("Loading...")).toBeTruthy();
@@ -766,72 +776,72 @@ describe("FeedbackBoardContainer - Component lifecycle", () => {
 
   it("should initialize with correct project ID", () => {
     const projectId = "project-123";
-    render(<FeedbackBoardContainer isHostedAzureDevOps={true} projectId={projectId} />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={true} projectId={projectId} deferInitialization={true} />);
 
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle hosted vs on-premise Azure DevOps", () => {
-    const { rerender } = render(<FeedbackBoardContainer isHostedAzureDevOps={true} projectId="test" />);
+    const { rerender } = render(<FeedbackBoardContainer isHostedAzureDevOps={true} projectId="test" deferInitialization={true} />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
 
-    rerender(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test" />);
+    rerender(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test" deferInitialization={true} />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
 
 describe("FeedbackBoardContainer - State management", () => {
   it("should initialize with default state values", () => {
-    const { container } = render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    const { container } = render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should be in loading/initialization state
     expect(container.querySelector(".initialization-spinner") || screen.getByText("Loading...")).toBeTruthy();
   });
 
   it("should handle board creation dialog state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component initializes with dialogs hidden
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle team selection state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should be loading team data
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should manage feedback items state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should initialize feedback items as empty array
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should track contributors state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should initialize with empty contributors
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should manage action items state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should track action items
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle archive toggle state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage archive state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should manage mobile vs desktop view state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should detect viewport size
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -840,21 +850,21 @@ describe("FeedbackBoardContainer - State management", () => {
 
 describe("FeedbackBoardContainer - Team effectiveness measurement", () => {
   it("should handle effectiveness measurement dialog state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage effectiveness measurement dialogs
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should initialize effectiveness measurement summary", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should initialize with empty effectiveness data
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle effectiveness measurement chart data", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should initialize chart data
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -863,28 +873,28 @@ describe("FeedbackBoardContainer - Team effectiveness measurement", () => {
 
 describe("FeedbackBoardContainer - Board operations", () => {
   it("should handle board duplication", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage duplicate dialog state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle board update operations", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage update dialog state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle board archive confirmation", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage archive confirmation dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle board deletion notifications", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage board deleted dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -893,21 +903,21 @@ describe("FeedbackBoardContainer - Board operations", () => {
 
 describe("FeedbackBoardContainer - Mobile support", () => {
   it("should handle mobile board actions dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage mobile actions dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle mobile team selector dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage mobile team selector
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should manage auto-resize functionality", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should handle auto-resize state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -916,14 +926,14 @@ describe("FeedbackBoardContainer - Mobile support", () => {
 
 describe("FeedbackBoardContainer - Browser compatibility", () => {
   it("should show Edge drop issue message bar when needed", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage Edge compatibility message
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should show TFS live sync issue message when needed", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage TFS sync message
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -932,21 +942,21 @@ describe("FeedbackBoardContainer - Browser compatibility", () => {
 
 describe("FeedbackBoardContainer - Email and summary features", () => {
   it("should handle preview email dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage preview email dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle retro summary dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage retro summary dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should toggle summary dashboard visibility", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage summary dashboard state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -955,14 +965,14 @@ describe("FeedbackBoardContainer - Email and summary features", () => {
 
 describe("FeedbackBoardContainer - Carousel and focus features", () => {
   it("should handle carousel dialog state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage carousel dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should support cross-column groups", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage cross-column groups setting
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -971,14 +981,14 @@ describe("FeedbackBoardContainer - Carousel and focus features", () => {
 
 describe("FeedbackBoardContainer - Work item integration", () => {
   it("should load work item types for project", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should load work item types
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should filter hidden work item types", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage non-hidden work items
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -987,7 +997,7 @@ describe("FeedbackBoardContainer - Work item integration", () => {
 
 describe("FeedbackBoardContainer - Tab navigation", () => {
   it("should handle Board and History tab switching", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage active tab state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -996,51 +1006,29 @@ describe("FeedbackBoardContainer - Tab navigation", () => {
 
 describe("FeedbackBoardContainer - Real-time collaboration", () => {
   it("should handle backend service reconnection", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage reconnection state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should track backend connection status", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should track connection status
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
 
-type FeedbackBoardContainerInstance = InstanceType<typeof FeedbackBoardContainer>;
-type TestableFeedbackBoardContainer = FeedbackBoardContainerInstance & { setState: (updater: any) => void };
+type FeedbackBoardContainerInstance = FeedbackBoardContainerHandle;
+type TestableFeedbackBoardContainer = FeedbackBoardContainerInstance;
 
 const createStandaloneTimerInstance = (): TestableFeedbackBoardContainer => {
-  const instance = new FeedbackBoardContainer(feedbackBoardContainerProps) as TestableFeedbackBoardContainer;
-  instance.setState = ((updater: React.SetStateAction<FeedbackBoardContainerState>, callback?: () => void) => {
-    const currentState = instance.state as unknown as FeedbackBoardContainerState;
-    const updatePartial = typeof updater === "function" ? updater(currentState) : updater;
-    if (updatePartial) {
-      Object.assign(currentState, updatePartial as Partial<FeedbackBoardContainerState>);
-    }
-    if (callback) {
-      callback();
-    }
-  }) as typeof instance.setState;
-  return instance;
+  return renderContainerWithHandle().instance as TestableFeedbackBoardContainer;
 };
 
 const createSynchronousContainer = (): TestableFeedbackBoardContainer => {
-  const instance = new FeedbackBoardContainer(feedbackBoardContainerProps) as TestableFeedbackBoardContainer;
-  instance.setState = ((updater: React.SetStateAction<FeedbackBoardContainerState>, callback?: () => void) => {
-    const currentState = instance.state as unknown as FeedbackBoardContainerState;
-    const updatePartial = typeof updater === "function" ? updater(currentState) : updater;
-    if (updatePartial) {
-      Object.assign(currentState, updatePartial as Partial<FeedbackBoardContainerState>);
-    }
-    if (callback) {
-      callback();
-    }
-  }) as typeof instance.setState;
-  return instance;
+  return renderContainerWithHandle().instance as TestableFeedbackBoardContainer;
 };
 
 describe("Facilitation timer", () => {
@@ -1122,15 +1110,9 @@ describe("Facilitation timer", () => {
 
   it("renders timer controls and handles user interactions", () => {
     jest.useFakeTimers();
-    const componentDidMountSpy = jest.spyOn(FeedbackBoardContainer.prototype, "componentDidMount").mockImplementation(async () => {});
-    const componentDidUpdateSpy = jest.spyOn(FeedbackBoardContainer.prototype, "componentDidUpdate").mockImplementation(() => {});
-
     try {
-      const ref = React.createRef<FeedbackBoardContainerInstance>();
-      const { container } = render(<FeedbackBoardContainer {...feedbackBoardContainerProps} ref={ref} />);
-      const instance = ref.current as FeedbackBoardContainerInstance | null;
-      expect(instance).not.toBeNull();
-      const componentInstance = instance as FeedbackBoardContainerInstance;
+      const { ref } = renderContainerWithHandle();
+      const componentInstance = ref.current as FeedbackBoardContainerInstance;
 
       // Clear the mock before testing
       mockPlayStartChime.mockClear();
@@ -1208,8 +1190,6 @@ describe("Facilitation timer", () => {
       expect(componentInstance.state.boardTimerSeconds).toBe(0);
       expect(resetButton).toBeDisabled();
     } finally {
-      componentDidMountSpy.mockRestore();
-      componentDidUpdateSpy.mockRestore();
       jest.clearAllTimers();
     }
   });
@@ -1958,7 +1938,7 @@ describe("componentDidUpdate", () => {
     const addVisitMock = userDataService.addVisit as jest.Mock;
     const switchToBoardMock = reflectBackendService.switchToBoard as jest.Mock;
 
-    instance.componentDidUpdate(instance.props, previousState);
+    instance.componentDidUpdate({ ...feedbackBoardContainerProps, deferInitialization: true }, previousState);
 
     expect(trackEventMock).toHaveBeenCalledTimes(2);
     expect(trackEventMock).toHaveBeenNthCalledWith(1, {
@@ -2020,7 +2000,7 @@ describe("componentDidUpdate", () => {
     const addVisitMock = userDataService.addVisit as jest.Mock;
     const switchToBoardMock = reflectBackendService.switchToBoard as jest.Mock;
 
-    instance.componentDidUpdate(instance.props, previousState);
+    instance.componentDidUpdate({ ...feedbackBoardContainerProps, deferInitialization: true }, previousState);
 
     expect(trackEventMock).toHaveBeenCalledTimes(1);
     expect(trackEventMock).toHaveBeenCalledWith({
@@ -2049,7 +2029,7 @@ describe("componentDidUpdate", () => {
 
     const pauseBoardTimerSpy = jest.spyOn(instance as any, "pauseBoardTimer").mockImplementation(() => {});
 
-    instance.componentDidUpdate(instance.props, previousState);
+    instance.componentDidUpdate({ ...feedbackBoardContainerProps, deferInitialization: true }, previousState);
 
     expect(pauseBoardTimerSpy).toHaveBeenCalledTimes(1);
   });
@@ -3087,12 +3067,12 @@ describe("FeedbackBoardContainer - Board Management", () => {
     const instance = createStandaloneTimerInstance();
 
     instance.setState({
-      timerSecs: 60,
-      timerState: true,
+      boardTimerSeconds: 60,
+      isBoardTimerRunning: true,
     });
 
-    expect(instance.state.timerSecs).toBe(60);
-    expect(instance.state.timerState).toBe(true);
+    expect(instance.state.boardTimerSeconds).toBe(60);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
   });
 
   it("should handle setState for board selection", () => {

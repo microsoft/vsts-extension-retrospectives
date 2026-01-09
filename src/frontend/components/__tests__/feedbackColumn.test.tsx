@@ -3972,7 +3972,10 @@ describe("Feedback Column ", () => {
 
       const mockContentEditable = document.createElement("div");
       mockContentEditable.setAttribute("contenteditable", "true");
-      (mockContentEditable as any).isContentEditable = true;
+      Object.defineProperty(mockContentEditable, "isContentEditable", {
+        get: () => true,
+        configurable: true,
+      });
       mockContentEditable.textContent = "Content for error throw test";
       mockFeedbackCard.appendChild(mockContentEditable);
 

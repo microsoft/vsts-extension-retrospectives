@@ -565,7 +565,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     [getColumnIndexFromElement, focusedColumnIndex, navigateToColumn, navigateToColumnByIndex, columnIds.length],
   );
 
-  // Initialize columns and load data on mount
   useEffect(() => {
     initColumns();
   }, [initColumns]);
@@ -577,7 +576,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     }
   }, [columnIds.length > 0 ? null : columnIds, getAllBoardFeedbackItems, setDefaultIterationAndAreaPath, team.id]);
 
-  // Handle board change
   useEffect(() => {
     if (prevBoardIdRef.current !== board.id) {
       setIsDataLoaded(false);
@@ -590,7 +588,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     }
   }, [board.id, initColumns]);
 
-  // Handle board modified date change
   useEffect(() => {
     if (prevBoardModifiedDateRef.current !== board.modifiedDate) {
       setColumnNotes({});
@@ -600,7 +597,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     }
   }, [board.modifiedDate, initColumns]);
 
-  // Handle team change
   useEffect(() => {
     if (prevTeamIdRef.current !== team.id) {
       setDefaultIterationAndAreaPath(team.id);
@@ -608,7 +604,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     }
   }, [team.id, setDefaultIterationAndAreaPath]);
 
-  // Signal R handlers
   useEffect(() => {
     const receiveNewItemHandler = async (columnId: string, feedbackItemId: string) => {
       const newItem = await itemDataService.getFeedbackItem(board.id, feedbackItemId);
@@ -629,7 +624,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     };
   }, [board.id, hideFeedbackItems, addFeedbackItems, refreshFeedbackItems]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     document.addEventListener("keydown", handleBoardKeyDown);
 
@@ -638,7 +632,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     };
   }, [handleBoardKeyDown]);
 
-  // Notify focus mode model changes
   useEffect(() => {
     onFocusModeModelChange?.(getFocusModeModel());
   }, [getFocusModeModel, onFocusModeModelChange]);
@@ -696,14 +689,12 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   const feedbackColumnPropsList = getFeedbackColumnPropsList();
 
   return (
-    <>
-      <div className="feedback-board" role="main" aria-label="Feedback board with columns">
-        {isDataLoaded &&
-          feedbackColumnPropsList.map(columnProps => {
-            return <FeedbackColumn key={columnProps.columnId} ref={columnRefsRef.current[columnIds.indexOf(columnProps.columnId)]} {...columnProps} />;
-          })}
-      </div>
-    </>
+    <div className="feedback-board" role="main" aria-label="Feedback board with columns">
+      {isDataLoaded &&
+        feedbackColumnPropsList.map(columnProps => {
+          return <FeedbackColumn key={columnProps.columnId} ref={columnRefsRef.current[columnIds.indexOf(columnProps.columnId)]} {...columnProps} />;
+        })}
+    </div>
   );
 };
 

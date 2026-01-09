@@ -151,7 +151,6 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
 
   const chooseColumnIconDialogRef = useRef<HTMLDialogElement>(null);
 
-  // Open the icon dialog after the columnCardBeingEdited state is set and rendered
   useEffect(() => {
     if (columnCardBeingEdited && isChooseColumnIconDialogOpen) {
       chooseColumnIconDialogRef.current?.showModal();

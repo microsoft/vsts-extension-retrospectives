@@ -46,7 +46,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
   const handleSelectAllClicked = (checked: boolean) => {
-    if (!canEditPermissions) return; // Block unauthorized users from selecting/unselecting all
+    if (!canEditPermissions) return;
 
     if (checked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === "team" && !teamPermissions.includes(o.id)).map(o => o.id)]);
@@ -60,7 +60,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
-    if (!canEditPermissions) return; // Block unauthorized changes
+    if (!canEditPermissions) return;
 
     let permissionList: string[] = option.type === "team" ? teamPermissions : memberPermissions;
 
@@ -190,9 +190,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
             </thead>
             <tbody>
               {filteredPermissionOptions.map(option => {
-                const isBoardOwner: boolean = props.isNewBoardCreation
-                  ? option.id === props.currentUserId // New board: Current user is the proposed owner
-                  : option.id === props.board?.createdBy?.id; // Existing board: Use saved owner
+                const isBoardOwner: boolean = props.isNewBoardCreation ? option.id === props.currentUserId : option.id === props.board?.createdBy?.id;
                 return (
                   <tr key={option.id} className="option-row">
                     <td>
@@ -203,7 +201,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                         boxSide="start"
                         disabled={isBoardOwner}
                         checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
-                        indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} // Set indeterminate only if no permissions exist
+                        indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner}
                         onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
                       />
                     </td>
