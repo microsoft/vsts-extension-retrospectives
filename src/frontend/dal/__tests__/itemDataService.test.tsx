@@ -601,34 +601,38 @@ describe("ItemDataService - flipTimer", () => {
       timerId: null,
     };
 
+    const mockTimerId = setInterval(() => {}, 1000);
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
-    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerState: true, timerId: "timer-123" });
+    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerState: true, timerId: mockTimerId });
 
-    const result = await itemDataService.flipTimer("board-1", "item-1", "timer-123");
+    const result = await itemDataService.flipTimer("board-1", "item-1", mockTimerId);
 
     expect(result.timerState).toBe(true);
-    expect(result.timerId).toBe("timer-123");
+    expect(result.timerId).toBe(mockTimerId);
+    clearInterval(mockTimerId);
   });
 
   it("should flip timer state from true to false", async () => {
+    const mockTimerId = setInterval(() => {}, 1000);
     const mockFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
       timerState: true,
-      timerId: "timer-123",
+      timerId: mockTimerId,
     };
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
-    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerState: false, timerId: "timer-123" });
+    (dataService.updateDocument as jest.Mock).mockResolvedValue({ ...mockFeedbackItem, timerState: false, timerId: mockTimerId });
 
-    const result = await itemDataService.flipTimer("board-1", "item-1", "timer-123");
+    const result = await itemDataService.flipTimer("board-1", "item-1", mockTimerId);
 
     expect(result.timerState).toBe(false);
+    clearInterval(mockTimerId);
   });
 
   it("should return undefined when feedback item not found", async () => {
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(null);
 
-    const result = await itemDataService.flipTimer("board-1", "item-1", "timer-123");
+    const result = await itemDataService.flipTimer("board-1", "item-1", null);
 
     expect(result).toBeUndefined();
   });

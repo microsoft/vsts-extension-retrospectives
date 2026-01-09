@@ -814,7 +814,7 @@ describe("Feedback Item", () => {
       const feedbackItem = createTimerFeedbackItem({
         timerSecs: (overrides.timerSecs as number) ?? undefined,
         timerState: (overrides.timerState as boolean) ?? undefined,
-        timerId: overrides.timerId ?? undefined,
+        timerId: (overrides.timerId as ReturnType<typeof setInterval> | null | undefined) ?? null,
       });
 
       const columns = {
@@ -907,7 +907,7 @@ describe("Feedback Item", () => {
       const updatedItem = {
         ...props.columns[testColumnUuidOne].columnItems[0].feedbackItem,
         timerState: true,
-        timerId: 123,
+        timerId: null,
       } as IFeedbackItemDocument;
 
       const updateTimerSpy = jest.spyOn(itemDataService, "updateTimer").mockResolvedValue(updatedItem);
@@ -929,7 +929,7 @@ describe("Feedback Item", () => {
     });
 
     test("stops timer and notifies board when already running", async () => {
-      const props = buildActPhaseTimerProps({ timerState: true, timerId: 456 });
+      const props = buildActPhaseTimerProps({ timerState: true, timerId: null });
       props.requestTimerStart = jest.fn();
 
       const stoppedItem = {
@@ -1087,7 +1087,7 @@ describe("Feedback Item", () => {
     });
 
     test("pressing t triggers the timer start flow in Act phase", async () => {
-      const props = buildKeyboardTestProps({ workflowPhase: "Act", timerId: 789, timerState: false });
+      const props = buildKeyboardTestProps({ workflowPhase: "Act", timerId: null, timerState: false });
 
       const updatedItem = createKeyboardTestItem({ id: props.id, timerState: true, timerId: props.timerId });
       const getFeedbackItemSpy = jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(updatedItem);
@@ -4302,7 +4302,7 @@ describe("Feedback Item", () => {
         originalColumnId: testColumnUuidOne,
         timerSecs: 120,
         timerState: true,
-        timerId: 12345,
+        timerId: null,
         isGroupedCarouselItem: false,
         workflowPhase: "Act",
         team: { id: "team-1" },
@@ -5951,7 +5951,7 @@ describe("Feedback Item", () => {
         userIdRef: "user-1",
         timerSecs: 60,
         timerState: true,
-        timerId: 123,
+        timerId: null,
         groupIds: [],
         isGroupedCarouselItem: false,
       };
@@ -5989,7 +5989,7 @@ describe("Feedback Item", () => {
         originalColumnId: testColumnUuidOne,
         timerSecs: 60,
         timerState: true,
-        timerId: 123,
+        timerId: null,
         isGroupedCarouselItem: false,
         workflowPhase: "Act",
         team: { id: "team-1" },
@@ -7375,7 +7375,7 @@ describe("Feedback Item", () => {
         userIdRef: "user-1",
         timerSecs: 30,
         timerState: false,
-        timerId: 456,
+        timerId: null,
         groupIds: [],
         isGroupedCarouselItem: false,
       };
@@ -7413,7 +7413,7 @@ describe("Feedback Item", () => {
         originalColumnId: testColumnUuidOne,
         timerSecs: 30,
         timerState: false,
-        timerId: 456,
+        timerId: null,
         isGroupedCarouselItem: false,
         workflowPhase: "Act",
         team: { id: "team-1" },

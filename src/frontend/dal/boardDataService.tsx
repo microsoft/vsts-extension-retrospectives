@@ -4,6 +4,7 @@ import { WorkflowPhase } from "../interfaces/workItem";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { generateUUID } from "../utilities/random";
 import { appInsights, TelemetryExceptions } from "../utilities/telemetryClient";
+import { isAzureDevOpsError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
 
 class BoardDataService {
   public readonly legacyPositiveColumnId: string = "whatwentwell";
@@ -52,10 +53,9 @@ class BoardDataService {
 
     try {
       teamBoards = await readDocuments<IFeedbackBoardDocument>(teamId, false, true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
+    } catch (e: unknown) {
       appInsights.trackException(e);
-      if (e.serverError?.typeKey === "DocumentCollectionDoesNotExistException") {
+      if (isAzureDevOpsError(e) && e.serverError?.typeKey === AzureDevOpsErrorTypes.DocumentCollectionDoesNotExist) {
         appInsights.trackTrace({ message: TelemetryExceptions.BoardsNotFoundForTeam, properties: { teamId, e } });
       }
     }

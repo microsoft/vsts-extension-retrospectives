@@ -58,8 +58,7 @@ export interface IFeedbackItemProps {
   userIdRef: string;
   timerSecs: number;
   timerState: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  timerId: any;
+  timerId: ReturnType<typeof setInterval> | null;
   groupCount: number;
   isGroupedCarouselItem: boolean;
   groupIds: string[];

@@ -23,8 +23,7 @@ interface IIconProps {
 }
 
 interface IActionItemsTableProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]: string | number | IIconProps | ((id: number) => void);
   icon: IIconProps;
   title: string;
   state: string;

@@ -679,7 +679,7 @@ describe("FeedbackBoard Component", () => {
         ...mockFeedbackItems[0],
         id: "active-item",
         timerState: true,
-        timerId: 123 as any,
+        timerId: null,
       };
       const nextItem: IFeedbackItemDocument = {
         ...mockFeedbackItems[1],
@@ -1112,7 +1112,7 @@ describe("FeedbackBoard Component", () => {
       const itemWithTimerId: IFeedbackItemDocument = {
         ...mockFeedbackItems[0],
         timerState: true,
-        timerId: 12345 as any,
+        timerId: null,
       };
 
       (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithTimerId]);
@@ -1418,7 +1418,7 @@ describe("FeedbackBoard Component", () => {
       const itemWithTimer: IFeedbackItemDocument = {
         ...mockFeedbackItems[0],
         timerState: true,
-        timerId: 999 as any,
+        timerId: null,
       };
 
       const flipError = new Error("flip timer failed");
@@ -1453,7 +1453,7 @@ describe("FeedbackBoard Component", () => {
       const itemWithTimer: IFeedbackItemDocument = {
         ...mockFeedbackItems[0],
         timerState: true,
-        timerId: 888 as any,
+        timerId: null,
       };
 
       (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithTimer]);
@@ -1869,10 +1869,12 @@ describe("FeedbackBoard Component", () => {
     it("stops an existing active timer when starting another", async () => {
       const clearIntervalSpy = jest.spyOn(window, "clearInterval");
 
+      const mockTimerId = setInterval(() => {}, 1000);
+
       const itemWithActiveTimer: IFeedbackItemDocument = {
         ...mockFeedbackItems[0],
         timerState: true,
-        timerId: 123 as any,
+        timerId: mockTimerId,
       };
 
       const otherItem: IFeedbackItemDocument = {
@@ -1899,10 +1901,11 @@ describe("FeedbackBoard Component", () => {
         await columnProps.requestTimerStart(otherItem.id);
       });
 
-      expect(clearIntervalSpy).toHaveBeenCalledWith(123);
+      expect(clearIntervalSpy).toHaveBeenCalledWith(mockTimerId);
       expect(itemDataService.flipTimer).toHaveBeenCalledWith(mockedBoard.id, itemWithActiveTimer.id, null);
       expect(reflectBackendService.broadcastUpdatedItem).toHaveBeenCalledWith("dummyColumn", itemWithActiveTimer.id);
 
+      clearInterval(mockTimerId);
       clearIntervalSpy.mockRestore();
     });
 
@@ -2014,7 +2017,7 @@ describe("FeedbackBoard Component", () => {
       const itemWithActiveTimer: IFeedbackItemDocument = {
         ...mockFeedbackItems[0],
         timerState: true,
-        timerId: 777 as any,
+        timerId: null,
       };
 
       (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithActiveTimer]);
@@ -2031,7 +2034,7 @@ describe("FeedbackBoard Component", () => {
       const itemWithActiveTimer: IFeedbackItemDocument = {
         ...mockFeedbackItems[0],
         timerState: true,
-        timerId: 666 as any,
+        timerId: null,
       };
 
       (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithActiveTimer]);
@@ -2289,7 +2292,7 @@ describe("FeedbackBoard Component", () => {
       const itemWithActiveTimer: IFeedbackItemDocument = {
         ...mockFeedbackItems[0],
         timerState: true,
-        timerId: 999 as any,
+        timerId: null,
       };
 
       (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithActiveTimer]);
@@ -2734,7 +2737,7 @@ describe("FeedbackBoard Component", () => {
         ...mockFeedbackItems[0],
         id: "active-timer-item",
         timerState: true,
-        timerId: 111 as any,
+        timerId: null,
       };
 
       (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemWithActiveTimer]);

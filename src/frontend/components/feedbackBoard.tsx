@@ -182,7 +182,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         }
 
         if (columnItem.feedbackItem.timerId !== null && columnItem.feedbackItem.timerId !== undefined) {
-          window.clearInterval(columnItem.feedbackItem.timerId as number);
+          window.clearInterval(columnItem.feedbackItem.timerId);
         }
 
         return currentColumns;

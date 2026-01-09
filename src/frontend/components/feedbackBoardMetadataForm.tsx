@@ -174,8 +174,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     loadSettings();
   }, [isNewBoardCreation, isDuplicatingBoard]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleInputChange = useCallback((_: any, newValue: string) => {
+  const handleInputChange = useCallback((_event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string) => {
     setTitle(newValue);
     setIsBoardNameTaken(false);
   }, []);

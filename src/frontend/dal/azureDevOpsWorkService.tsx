@@ -4,6 +4,7 @@ import { getClient } from "azure-devops-extension-api/Common";
 
 import { getProjectId } from "../utilities/servicesHelper";
 import { appInsights, TelemetryExceptions } from "../utilities/telemetryClient";
+import { isAzureDevOpsError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
 
 class WorkService {
   private _httpWorkClient: WorkRestClient;
@@ -30,10 +31,9 @@ class WorkService {
 
     try {
       teamIterations = await this._httpWorkClient.getTeamIterations(teamContext, timeframe);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      appInsights.trackException({ exception: e, properties: { teamId } });
-      if (e.serverError?.typeKey === "CurrentIterationDoesNotExistException") {
+    } catch (e: unknown) {
+      appInsights.trackException({ exception: e instanceof Error ? e : new Error(String(e)), properties: { teamId } });
+      if (isAzureDevOpsError(e) && e.serverError?.typeKey === AzureDevOpsErrorTypes.CurrentIterationDoesNotExist) {
         appInsights.trackTrace({ message: TelemetryExceptions.CurrentTeamIterationNotFound, properties: { teamId, e } });
       }
     }

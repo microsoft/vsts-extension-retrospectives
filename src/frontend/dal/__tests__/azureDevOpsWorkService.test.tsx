@@ -135,7 +135,7 @@ describe("WorkService", () => {
 
       expect(result).toEqual([]);
       expect(mockTrackException).toHaveBeenCalledWith({
-        exception: error,
+        exception: expect.any(Error),
         properties: { teamId: "team-no-iteration" },
       });
       expect(mockTrackTrace).toHaveBeenCalledWith({

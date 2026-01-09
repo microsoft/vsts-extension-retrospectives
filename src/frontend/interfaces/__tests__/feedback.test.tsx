@@ -349,7 +349,7 @@ describe("feedback interfaces and helpers", () => {
         userIdRef: "user456",
         timerSecs: 120,
         timerState: true,
-        timerId: 12345,
+        timerId: null,
         groupIds: ["group1", "group2"],
         isGroupedCarouselItem: true,
       };
