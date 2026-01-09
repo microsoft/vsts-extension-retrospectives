@@ -577,29 +577,38 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     [pauseBoardTimer, resetBoardTimer],
   );
 
-  const handleBoardTimerToggle = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleBoardTimerToggle = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-    if (stateRef.current.isBoardTimerRunning) {
-      pauseBoardTimer();
-      return;
-    }
+      if (stateRef.current.isBoardTimerRunning) {
+        pauseBoardTimer();
+        return;
+      }
 
-    startBoardTimer();
-  }, [pauseBoardTimer, startBoardTimer]);
+      startBoardTimer();
+    },
+    [pauseBoardTimer, startBoardTimer],
+  );
 
-  const handleBoardTimerReset = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleBoardTimerReset = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-    resetBoardTimer();
-  }, [resetBoardTimer]);
+      resetBoardTimer();
+    },
+    [resetBoardTimer],
+  );
 
-  const handleCountdownDurationChange = React.useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    const duration = parseInt(event.target.value, 10);
-    setState({ countdownDurationMinutes: duration });
-  }, [setState]);
+  const handleCountdownDurationChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      const duration = parseInt(event.target.value, 10);
+      setState({ countdownDurationMinutes: duration });
+    },
+    [setState],
+  );
 
   const renderWorkflowTimerControls = React.useCallback(() => {
     const state = stateRef.current;
@@ -652,40 +661,43 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return { teamId, boardId, phase };
   }, []);
 
-  const updateFeedbackItemsAndContributors = React.useCallback(async (currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) => {
-    if (!currentTeam || !currentBoard) {
-      return;
-    }
+  const updateFeedbackItemsAndContributors = React.useCallback(
+    async (currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) => {
+      if (!currentTeam || !currentBoard) {
+        return;
+      }
 
-    const board: IFeedbackBoardDocument = await itemDataService.getBoardItem(currentTeam.id, currentBoard.id);
-    if (!board) {
-      return;
-    }
+      const board: IFeedbackBoardDocument = await itemDataService.getBoardItem(currentTeam.id, currentBoard.id);
+      if (!board) {
+        return;
+      }
 
-    const feedbackItems = (await itemDataService.getFeedbackItemsForBoard(board?.id)) ?? [];
+      const feedbackItems = (await itemDataService.getFeedbackItemsForBoard(board?.id)) ?? [];
 
-    await updateUrlWithBoardAndTeamInformation(currentTeam.id, board.id);
+      await updateUrlWithBoardAndTeamInformation(currentTeam.id, board.id);
 
-    let actionItemIds: number[] = [];
-    feedbackItems.forEach(item => {
-      actionItemIds = actionItemIds.concat(item.associatedActionItemIds);
-    });
+      let actionItemIds: number[] = [];
+      feedbackItems.forEach(item => {
+        actionItemIds = actionItemIds.concat(item.associatedActionItemIds);
+      });
 
-    const contributors = feedbackItems
-      .map(e => {
-        return { id: e.userIdRef, name: e?.createdBy?.displayName, imageUrl: e?.createdBy?.imageUrl };
-      })
-      .filter((v, i, a) => a.indexOf(v) === i);
+      const contributors = feedbackItems
+        .map(e => {
+          return { id: e.userIdRef, name: e?.createdBy?.displayName, imageUrl: e?.createdBy?.imageUrl };
+        })
+        .filter((v, i, a) => a.indexOf(v) === i);
 
-    const voteMetricsState = getVoteMetricsState(board);
+      const voteMetricsState = getVoteMetricsState(board);
 
-    setState({
-      actionItemIds: actionItemIds.filter(item => item !== undefined),
-      feedbackItems,
-      contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
-      ...voteMetricsState,
-    });
-  }, [setState, updateUrlWithBoardAndTeamInformation]);
+      setState({
+        actionItemIds: actionItemIds.filter(item => item !== undefined),
+        feedbackItems,
+        contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
+        ...voteMetricsState,
+      });
+    },
+    [setState, updateUrlWithBoardAndTeamInformation],
+  );
 
   const getVoteMetricsState = React.useCallback((board: IFeedbackBoardDocument | undefined): Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity"> => {
     if (!board || !stateRef.current.currentUserId) {
@@ -726,38 +738,41 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return formatter.format(value / 100);
   }, []);
 
-  const handleBoardCreated = React.useCallback(async (teamId: string, boardId: string) => {
-    const state = stateRef.current;
-    if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
-      return;
-    }
+  const handleBoardCreated = React.useCallback(
+    async (teamId: string, boardId: string) => {
+      const state = stateRef.current;
+      if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
+        return;
+      }
 
-    const boardToAdd = await BoardDataService.getBoardForTeamById(state.currentTeam.id, boardId);
+      const boardToAdd = await BoardDataService.getBoardForTeamById(state.currentTeam.id, boardId);
 
-    if (!boardToAdd) {
-      return;
-    }
+      if (!boardToAdd) {
+        return;
+      }
 
-    setState(prevState => {
-      const boardsForTeam = [...prevState.boards, boardToAdd]
-        .filter((board: IFeedbackBoardDocument) =>
-          FeedbackBoardDocumentHelper.filter(
-            board,
-            stateRef.current.userTeams.map(t => t.id),
-            stateRef.current.currentUserId,
-          ),
-        )
-        .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+      setState(prevState => {
+        const boardsForTeam = [...prevState.boards, boardToAdd]
+          .filter((board: IFeedbackBoardDocument) =>
+            FeedbackBoardDocumentHelper.filter(
+              board,
+              stateRef.current.userTeams.map(t => t.id),
+              stateRef.current.currentUserId,
+            ),
+          )
+          .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
-      const newCurrentBoard = boardsForTeam.length === 1 ? boardsForTeam[0] : prevState.currentBoard;
+        const newCurrentBoard = boardsForTeam.length === 1 ? boardsForTeam[0] : prevState.currentBoard;
 
-      return {
-        boards: boardsForTeam,
-        currentBoard: newCurrentBoard,
-        isTeamBoardDeletedInfoDialogHidden: true,
-      };
-    });
-  }, [setState]);
+        return {
+          boards: boardsForTeam,
+          currentBoard: newCurrentBoard,
+          isTeamBoardDeletedInfoDialogHidden: true,
+        };
+      });
+    },
+    [setState],
+  );
 
   const setSupportedWorkItemTypesForProject = React.useCallback(async (): Promise<void> => {
     const allWorkItemTypes: WorkItemType[] = await workItemService.getWorkItemTypesForCurrentProject();
@@ -773,89 +788,98 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     });
   }, [setState]);
 
-  const replaceBoard = React.useCallback((updatedBoard: IFeedbackBoardDocument) => {
-    setState(prevState => {
-      const newBoards = prevState.boards.map(board => (board.id === updatedBoard.id ? updatedBoard : board));
+  const replaceBoard = React.useCallback(
+    (updatedBoard: IFeedbackBoardDocument) => {
+      setState(prevState => {
+        const newBoards = prevState.boards.map(board => (board.id === updatedBoard.id ? updatedBoard : board));
 
-      const currentBoard = stateRef.current.currentBoard;
-      const newCurrentBoard = currentBoard && currentBoard.id === updatedBoard.id ? updatedBoard : currentBoard;
+        const currentBoard = stateRef.current.currentBoard;
+        const newCurrentBoard = currentBoard && currentBoard.id === updatedBoard.id ? updatedBoard : currentBoard;
 
-      return {
-        boards: newBoards,
-        currentBoard: newCurrentBoard,
-      };
-    });
-  }, [setState]);
+        return {
+          boards: newBoards,
+          currentBoard: newCurrentBoard,
+        };
+      });
+    },
+    [setState],
+  );
 
-  const handleBoardUpdated = React.useCallback(async (teamId: string, updatedBoardId: string) => {
-    const state = stateRef.current;
-    if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
-      return;
-    }
+  const handleBoardUpdated = React.useCallback(
+    async (teamId: string, updatedBoardId: string) => {
+      const state = stateRef.current;
+      if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
+        return;
+      }
 
-    const updatedBoard = await BoardDataService.getBoardForTeamById(state.currentTeam.id, updatedBoardId);
+      const updatedBoard = await BoardDataService.getBoardForTeamById(state.currentTeam.id, updatedBoardId);
 
-    if (!updatedBoard) {
-      // Board has been deleted after the update. Just ignore the update. The delete should be handled on its own.
-      return;
-    }
+      if (!updatedBoard) {
+        // Board has been deleted after the update. Just ignore the update. The delete should be handled on its own.
+        return;
+      }
 
-    replaceBoard(updatedBoard);
-  }, [replaceBoard]);
+      replaceBoard(updatedBoard);
+    },
+    [replaceBoard],
+  );
 
-  const handleBoardDeleted = React.useCallback(async (teamId: string, deletedBoardId: string) => {
-    const state = stateRef.current;
-    if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
-      return;
-    }
+  const handleBoardDeleted = React.useCallback(
+    async (teamId: string, deletedBoardId: string) => {
+      const state = stateRef.current;
+      if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
+        return;
+      }
 
-    setState(
-      (prevState): Pick<FeedbackBoardContainerState, "boards" | "currentBoard" | "isBoardUpdateDialogHidden" | "isTeamBoardDeletedInfoDialogHidden" | "isCarouselDialogHidden" | "teamBoardDeletedDialogTitle" | "teamBoardDeletedDialogMessage"> => {
-        const currentBoards = prevState.boards;
-        const boardsForTeam = currentBoards.filter(board => board.id !== deletedBoardId);
+      setState(
+        (prevState): Pick<FeedbackBoardContainerState, "boards" | "currentBoard" | "isBoardUpdateDialogHidden" | "isTeamBoardDeletedInfoDialogHidden" | "isCarouselDialogHidden" | "teamBoardDeletedDialogTitle" | "teamBoardDeletedDialogMessage"> => {
+          const currentBoards = prevState.boards;
+          const boardsForTeam = currentBoards.filter(board => board.id !== deletedBoardId);
 
-        if (prevState.currentBoard && deletedBoardId === prevState.currentBoard.id) {
-          if (!boardsForTeam || boardsForTeam.length === 0) {
-            reflectBackendService.switchToBoard(undefined);
+          if (prevState.currentBoard && deletedBoardId === prevState.currentBoard.id) {
+            if (!boardsForTeam || boardsForTeam.length === 0) {
+              reflectBackendService.switchToBoard(undefined);
+              return {
+                boards: [],
+                currentBoard: null,
+                isBoardUpdateDialogHidden: true,
+                isTeamBoardDeletedInfoDialogHidden: false,
+                isCarouselDialogHidden: true,
+                teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
+                teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user.",
+              };
+            }
+
+            const currentBoard = boardsForTeam[0];
+            reflectBackendService.switchToBoard(currentBoard.id);
             return {
-              boards: [],
-              currentBoard: null,
+              boards: boardsForTeam,
+              currentBoard: currentBoard,
               isBoardUpdateDialogHidden: true,
               isTeamBoardDeletedInfoDialogHidden: false,
               isCarouselDialogHidden: true,
               teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
-              teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user.",
+              teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.",
             };
           }
 
-          const currentBoard = boardsForTeam[0];
-          reflectBackendService.switchToBoard(currentBoard.id);
           return {
             boards: boardsForTeam,
-            currentBoard: currentBoard,
-            isBoardUpdateDialogHidden: true,
-            isTeamBoardDeletedInfoDialogHidden: false,
-            isCarouselDialogHidden: true,
-            teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
-            teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.",
+            currentBoard: prevState.currentBoard,
+            isBoardUpdateDialogHidden: prevState.isBoardUpdateDialogHidden,
+            isTeamBoardDeletedInfoDialogHidden: prevState.isTeamBoardDeletedInfoDialogHidden,
+            isCarouselDialogHidden: prevState.isCarouselDialogHidden,
+            teamBoardDeletedDialogTitle: prevState.teamBoardDeletedDialogTitle,
+            teamBoardDeletedDialogMessage: prevState.teamBoardDeletedDialogMessage,
           };
-        }
-
-        return {
-          boards: boardsForTeam,
-          currentBoard: prevState.currentBoard,
-          isBoardUpdateDialogHidden: prevState.isBoardUpdateDialogHidden,
-          isTeamBoardDeletedInfoDialogHidden: prevState.isTeamBoardDeletedInfoDialogHidden,
-          isCarouselDialogHidden: prevState.isCarouselDialogHidden,
-          teamBoardDeletedDialogTitle: prevState.teamBoardDeletedDialogTitle,
-          teamBoardDeletedDialogMessage: prevState.teamBoardDeletedDialogMessage,
-        };
-      },
-      async () => {
-        await userDataService.addVisit(stateRef.current.currentTeam?.id, stateRef.current.currentBoard?.id);
-      },
-    );
-  }, [setState]);
+        },
+        async () => {
+          await userDataService.addVisit(stateRef.current.currentTeam?.id, stateRef.current.currentBoard?.id);
+        },
+      );
+    },
+    [setState],
+  );
 
   /**
    * @description Loads team data for this project and the current user. Attempts to use query
@@ -1687,647 +1711,642 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const state = stateRef.current;
 
   if (!state.isAppInitialized || !state.isTeamDataLoaded) {
-      return (
-        <div className="spinner" aria-live="assertive">
-          <div></div>
-          <span>Loading...</span>
-        </div>
-      );
-    }
-
-    if (!state.currentTeam) {
-      return <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>;
-    }
-
-    if (!state.currentBoard) {
-      return (
-        <>
-          <div className="no-boards-container">
-            <div className="no-boards-text">Get started with your first Retrospective</div>
-            <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
-            <button title="Create Board" onClick={showBoardCreationDialog} className="create-new-board-button">
-              Create Board
-            </button>
-          </div>
-          {renderBoardUpdateMetadataFormDialog(true, false, state.isBoardCreationDialogHidden, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
-        </>
-      );
-    }
-
-    const teamSelectorList: ISelectorList<WebApiTeam> = {
-      selectorListItems: [
-        {
-          finishedLoading: state.isAppInitialized,
-          header: { id: "My Teams", title: "My Teams" },
-          items: state.userTeams,
-        },
-        // Removed All Teams
-        // Retrospectives should be safe space for team members to share feedback.
-        // Therefore, should not have access to other teams's retrospective boards.
-      ],
-    };
-
-    const boardSelectorList: ISelectorList<IFeedbackBoardDocument> = {
-      selectorListItems: [
-        {
-          finishedLoading: true,
-          header: { id: "All Retrospectives", isHidden: true, title: "All Retrospectives" },
-          items: state.boards,
-        },
-      ],
-    };
-
-    const saveTeamEffectivenessMeasurement = () => {
-      const teamEffectivenessMeasurementVoteCollection = state.currentBoard.teamEffectivenessMeasurementVoteCollection;
-      const currentUserId = obfuscateUserId(state.currentUserId);
-      const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
-      const responseCount = currentUserVote?.responses?.length || 0;
-
-      if (responseCount < questions.length) {
-        toast("Please answer all questions before saving");
-        return;
-      }
-
-      itemDataService.updateTeamEffectivenessMeasurement(state.currentBoard.id, state.currentTeam.id, currentUserId, state.currentBoard.teamEffectivenessMeasurementVoteCollection);
-
-      setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-    };
-
-    const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
-      const currentBoard = stateRef.current.currentBoard;
-
-      if (currentBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
-        currentBoard.teamEffectivenessMeasurementVoteCollection = [];
-      }
-
-      const currentUserId = obfuscateUserId(stateRef.current.currentUserId);
-      if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
-        currentBoard.teamEffectivenessMeasurementVoteCollection.push({
-          userId: currentUserId,
-          responses: [],
-        });
-      }
-
-      const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
-
-      if (!currentVote) {
-        currentBoard.teamEffectivenessMeasurementVoteCollection
-          .find(e => e.userId === currentUserId)
-          .responses.push({
-            questionId: questionId,
-            selection: selected,
-          });
-      } else {
-        currentVote.selection = selected;
-      }
-
-      setState({ currentBoard });
-    };
-
-    const teamEffectivenessResponseCount = state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
-
     return (
-      <div className="flex flex-col h-screen">
-        <div className="flex items-center shrink-0 mt-2 ml-4">
-          <Dialog
-            hidden={state.questionIdForDiscussAndActBoardUpdate === -1}
-            onDismiss={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
-            dialogContentProps={{
-              type: DialogType.close,
-              title: "Discuss and Act",
-              subText: `Are you sure you want to change the template of this board?`,
-            }}
-            modalProps={{
-              isBlocking: true,
-              containerClassName: "retrospectives-delete-feedback-item-dialog",
-              className: "retrospectives-dialog-modal",
-            }}
-          >
-            <DialogFooter>
-              <PrimaryButton
-                onClick={async () => {
-                  const question = questions.filter(question => question.id === state.questionIdForDiscussAndActBoardUpdate)[0];
-                  const templateName = question.discussActTemplate;
-                  const columns = getColumnsByTemplateId(templateName);
-
-                  const board = state.currentBoard;
-
-                  await updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
-
-                  setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
-                }}
-                text="Proceed"
-              />
-              <DefaultButton onClick={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
-            </DialogFooter>
-          </Dialog>
-
-          <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
-            Retrospectives
-          </h1>
-          <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={state.currentTeam} iconName="people" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={changeSelectedTeam} title={"Team"} />
-          <div className="flex-grow-spacer"></div>
-          <div className="header-menu-with-timer">
-            {renderWorkflowTimerControls()}
-            <ExtensionSettingsMenu />
-          </div>
-        </div>
-        <div className="flex items-center justify-start shrink-0">
-          <div className="w-full">
-            <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
-                Board
-              </div>
-              <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
-                History
-              </div>
-              {state.activeTab === "Board" && (
-                <>
-                  <div className="mx-4 vertical-tab-separator" />
-                  <div className="flex items-center justify-start">
-                    <div className="board-selector">
-                      <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={changeSelectedBoard} title={"Retrospective Board"} />
-                    </div>
-                    <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
-                      <details className="flex items-center relative">
-                        <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
-                          {getIconElement("more-horizontal")}
-                        </summary>
-                        <div className="callout-menu left" role="menu" aria-label="Board Actions">
-                          <button key="createBoard" type="button" title="Create new retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
-                            {getIconElement("add")}
-                            Create new retrospective
-                          </button>
-                          <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
-                            {getIconElement("content-copy")}
-                            Create copy of retrospective
-                          </button>
-                          <button key="editBoard" type="button" title="Edit retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
-                            {getIconElement("edit")}
-                            Edit retrospective
-                          </button>
-                          <div key="seperator" className="divider" role="separator" />
-                          <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
-                            {getIconElement("link")}
-                            {`Copy link to ${state.currentBoard.activePhase} phase`}
-                          </button>
-                          <div key="seperator" className="divider" role="separator" />
-                          <button key="exportCSV" type="button" title="Export CSV content" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
-                            {getIconElement("sim-card-download")}
-                            Export CSV content
-                          </button>
-                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
-                            {getIconElement("forward-to-inbox")}
-                            Create email summary
-                          </button>
-                          <div key="seperator" className="divider" role="separator" />
-                          <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
-                            {getIconElement("source")}
-                            Show retrospective summary
-                          </button>
-                          <div key="seperator" className="divider" role="separator" />
-                          <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
-                            {getIconElement("inventory")}
-                            Archive retrospective
-                          </button>
-                        </div>
-                      </details>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-start">
-                    <div className="flex flex-row items-center workflow-stage-header 3">
-                      {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                        <>
-                          <Dialog
-                            hidden={state.isIncludeTeamEffectivenessMeasurementDialogHidden}
-                            onDismiss={() => {
-                              setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                            }}
-                            dialogContentProps={{
-                              type: DialogType.close,
-                            }}
-                            minWidth={640}
-                            modalProps={{
-                              isBlocking: true,
-                              containerClassName: "team-effectiveness-dialog",
-                              className: "retrospectives-dialog-modal",
-                            }}
-                          >
-                            <DialogContent>
-                              <div className="team-effectiveness-section-information">
-                                {getIconElement("info")}
-                                &nbsp;All answers will be saved anonymously
-                              </div>
-                              <table className="team-effectiveness-measurement-table">
-                                <thead>
-                                  <tr>
-                                    <th scope="col" className="text-left">
-                                      Question
-                                    </th>
-                                    <th scope="col" className="text-left min-w-13">
-                                      Details
-                                    </th>
-                                    <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
-                                      Unfavorable
-                                    </th>
-                                    <th scope="colgroup" colSpan={2} className="team-effectiveness-favorability-label">
-                                      Neutral
-                                    </th>
-                                    <th scope="colgroup" colSpan={2} className="team-effectiveness-favorability-label">
-                                      Favorable
-                                    </th>
-                                  </tr>
-                                  <tr>
-                                    <th scope="col" className="text-left"></th>
-                                    <th scope="col" className="text-left"></th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">
-                                      1
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">
-                                      2
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">
-                                      3
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">
-                                      4
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">
-                                      5
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">
-                                      6
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">
-                                      7
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">
-                                      8
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">
-                                      9
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">
-                                      10
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {questions.map(question => {
-                                    return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
-                                  })}
-                                </tbody>
-                              </table>
-                            </DialogContent>
-                            <DialogFooter>
-                              <PrimaryButton
-                                className="team-effectiveness-submit-button"
-                                onClick={() => {
-                                  saveTeamEffectivenessMeasurement();
-                                }}
-                                text="Submit"
-                              />
-                              <DefaultButton
-                                onClick={() => {
-                                  setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
-                                }}
-                                text="Cancel"
-                              />
-                            </DialogFooter>
-                          </Dialog>
-                          <button
-                            className="team-assessment-button"
-                            onClick={() => {
-                              setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
-                            }}
-                            title="Team Assessment"
-                            aria-label="Team Assessment"
-                            type="button"
-                          >
-                            {getIconElement("assessment")}
-                            <span className="hidden lg:inline">Team Assessment</span>
-                          </button>
-                        </>
-                      )}
-                      <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
-                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} />
-                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} />
-                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} />
-                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={clickWorkflowStateCallback} />
-                      </div>
-                      {state.currentBoard.activePhase === WorkflowPhase.Vote && (
-                        <div className="feedback-votes-count" role="status" aria-live="polite">
-                          <span className="entry" title={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
-                            {getIconElement("person")}
-                            <span className="hidden lg:inline">My Votes:</span> {state.currentVoteCount}/{state.currentBoard.maxVotesPerUser?.toString() || "0"}
-                          </span>
-                          {state.castedVoteCount > 0 && state.teamVoteCapacity > 0 && (
-                            <>
-                              <span className="separator" aria-hidden="true">
-                                |
-                              </span>
-                              <span className="entry" title={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`} aria-label={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`}>
-                                {getIconElement("people")}
-                                <span className="hidden lg:inline">Team Votes:</span> {state.castedVoteCount}/{state.teamVoteCapacity}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      )}
-                      {state.currentBoard.activePhase === WorkflowPhase.Act && (
-                        <>
-                          <button className="focus-mode-button" onClick={showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
-                            {getIconElement("adjust")}
-                            <span>Focus Mode</span>
-                          </button>
-                          <dialog
-                            ref={carouselDialogRef}
-                            className="retrospectives-carousel-dialog"
-                            onClose={hideCarouselDialog}
-                          >
-                            <div className="header">
-                              <h2 className="title">Focus Mode</h2>
-                              <button onClick={hideCarouselDialog} aria-label="Close">
-                                {getIconElement("close")}
-                              </button>
-                            </div>
-                            <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
-                            <div className="subText">{state.focusModeModel && <FeedbackCarousel focusModeModel={state.focusModeModel} isFocusModalHidden={state.isCarouselDialogHidden} />}</div>
-                          </dialog>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-              {state.activeTab === "History" && (
-                <>
-                  <div className="mx-4 vertical-tab-separator" />
-                  <button className="team-assessment-history-button" onClick={showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
-                    {getIconElement("insights")}
-                    <span className="hidden lg:inline">Team Assessment History</span>
-                  </button>
-                </>
-              )}
-            </div>
-            {state.activeTab === "History" && (
-              <div className="flex-1 min-h-0 overflow-auto border-t-4 border-(--nav-header-active-item-background)">
-                <BoardSummaryTable teamId={state.currentTeam.id} currentUserId={state.currentUserId} currentUserIsTeamAdmin={isCurrentUserTeamAdmin()} supportedWorkItemTypes={state.allWorkItemTypes} onArchiveToggle={handleArchiveToggle} />
-              </div>
-            )}
-            {state.activeTab === "Board" && (
-              <div className="feedback-board-container">
-                {state.currentTeam && state.currentBoard && (
-                  <>
-                    {!props.isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
-                      <>
-                        <div className="retro-message-bar">
-                          <span>
-                            <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
-                          </span>
-                        </div>
-                        <div className="actions">
-                          <button type="button" className="dismiss" onClick={hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
-                            <span aria-hidden="true">×</span>
-                          </button>
-                        </div>
-                      </>
-                    )}
-                    {!props.isHostedAzureDevOps && state.isDropIssueInEdgeMessageBarVisible && !state.isBackendServiceConnected && (
-                      <div className="retro-message-bar" role="alert" aria-live="assertive">
-                        <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
-                        <div className="actions">
-                          <button type="button" className="dismiss" onClick={hideDropIssueInEdgeMessageBar} aria-label="Dismiss notification">
-                            <span aria-hidden="true">×</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    {props.isHostedAzureDevOps && !state.isBackendServiceConnected && (
-                      <div className="retro-message-bar" role="alert" aria-live="assertive">
-                        <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
-                        <div className="actions">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setState({ isBackendServiceConnected: true });
-                            }}
-                            aria-label="Hide"
-                            title="Hide"
-                          >
-                            <span aria-hidden="true">×</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    <FeedbackBoard
-                      board={state.currentBoard}
-                      team={state.currentTeam}
-                      displayBoard={true}
-                      workflowPhase={state.currentBoard.activePhase}
-                      nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
-                      allWorkItemTypes={state.allWorkItemTypes}
-                      onFocusModeModelChange={focusModeModel => {
-                        setState({ focusModeModel });
-                      }}
-                      isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
-                      hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
-                      userId={state.currentUserId}
-                      onVoteCasted={updateCurrentVoteCount}
-                      onColumnNotesChange={persistColumnNotes}
-                    />
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-        <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={archiveBoardDialogRef} onClose={() => archiveBoardDialogRef.current?.close()}>
-          <div className="header">
-            <h2 className="title">Archive Retrospective</h2>
-            <button onClick={() => archiveBoardDialogRef.current?.close()} aria-label="Close">
-              {getIconElement("close")}
-            </button>
-          </div>
-          <div className="subText">
-            The retrospective board <strong>{state.currentBoard.title}</strong> with its feedback will be archived.
-          </div>
-          <div className="subText">
-            <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-          </div>
-          <div className="inner">
-            <button className="button" onClick={() => archiveCurrentBoard()}>
-              Archive
-            </button>
-            <button className="default button" onClick={() => archiveBoardDialogRef.current?.close()}>
-              Cancel
-            </button>
-          </div>
-        </dialog>
-        {renderBoardUpdateMetadataFormDialog(true, false, state.isBoardCreationDialogHidden, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
-        {renderBoardUpdateMetadataFormDialog(true, true, state.isBoardDuplicateDialogHidden, hideBoardDuplicateDialog, "Create copy of retrospective", "", createBoard, hideBoardDuplicateDialog)}
-        {state.currentBoard && renderBoardUpdateMetadataFormDialog(false, false, state.isBoardUpdateDialogHidden, hideBoardUpdateDialog, "Edit retrospective", "", updateBoardMetadata, hideBoardUpdateDialog)}
-        <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" onClose={() => previewEmailDialogRef.current?.close()}>
-          <div className="header">
-            <h2 className="title">Email summary</h2>
-            <button onClick={() => previewEmailDialogRef.current?.close()} aria-label="Close">
-              {getIconElement("close")}
-            </button>
-          </div>
-          <div className="subText">
-            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={state.currentBoard.emailContent}></textarea>
-          </div>
-          <div className="inner">
-            <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={showEmailCopiedToast}>
-              {getIconElement("content-copy")}
-              Copy to clipboard
-            </button>
-            <button title="Download PDF" aria-label="Download email summary as PDF" onClick={downloadEmailSummaryPdf} className="default button">
-              {getIconElement("sim-card-download")}
-              Download PDF
-            </button>
-          </div>
-        </dialog>
-        <Dialog
-          hidden={state.isRetroSummaryDialogHidden}
-          onDismiss={hideRetroSummaryDialog}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: `Retrospective Board Summary`,
-          }}
-          modalProps={{
-            containerClassName: "retrospectives-retro-summary-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          {state.currentBoard && (
-            <>
-              <section className="retro-summary-section">
-                <div className="retro-summary-section-header">Basic Settings</div>
-                <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(state.currentBoard.createdDate))}</div>
-                <div id="retro-summary-created-by">
-                  Created by <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
-                </div>
-              </section>
-              <section className="retro-summary-section">
-                <div className="retro-summary-section-header">Participant Summary</div>
-                <div className="retro-summary-section-item">Contributors: {state.contributors.length} participant(s)</div>
-
-                {!state.currentBoard.isAnonymous && state.contributors.length > 0 && (
-                  <div className="retro-summary-contributors-section">
-                    {state.contributors.map(contributor => (
-                      <div key={contributor.id} className="retro-summary-contributor">
-                        <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <div className="retro-summary-item-horizontal-group">
-                  <div className="retro-summary-section-item horizontal-group-item">
-                    {Object.keys(state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {state.castedVoteCount} vote(s)
-                  </div>
-                  <div className="retro-summary-section-item horizontal-group-item">{state.feedbackItems.length} feedback item(s) created</div>
-                  <div className="retro-summary-section-item horizontal-group-item">{state.actionItemIds.length} action item(s) created</div>
-                </div>
-              </section>
-              {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                <section className="retro-summary-section">
-                  <div className="retro-summary-section-header">Team Assessment</div>
-                  <div>
-                    Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
-                    <div className="retro-summary-effectiveness-scores">
-                      <ul className="chart">
-                        {state.effectivenessMeasurementChartData.map(data => {
-                          const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
-                          const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
-                          const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
-                          const redScore = (data.red * 100) / teamEffectivenessResponseCount;
-                          return (
-                            <li className="chart-question-block" key={data.questionId}>
-                              <div className="chart-question">
-                                <i className={getQuestionIconClassName(data.questionId)} /> &nbsp;
-                                {getQuestionShortName(data.questionId)}
-                              </div>
-                              {data.red > 0 && (
-                                <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
-                                  {percentageFormatter(redScore)}
-                                </div>
-                              )}
-                              {data.yellow > 0 && (
-                                <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
-                                  {percentageFormatter(yellowScore)}
-                                </div>
-                              )}
-                              {data.green > 0 && (
-                                <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
-                                  {percentageFormatter(greenScore)}
-                                </div>
-                              )}
-                              {averageScore > 0 && (
-                                <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${numberFormatter(averageScore)}`}>
-                                  {numberFormatter(averageScore)}
-                                </div>
-                              )}
-                              <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => setState({ questionIdForDiscussAndActBoardUpdate: data.questionId })}>
-                                Discuss and Act
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      <div className="chart-legend-section">
-                        <div className="chart-legend-group">
-                          <section>
-                            <div className="chart-legend-color-unfavorable"></div>
-                            <span>Unfavorable</span>
-                          </section>
-                          <section>
-                            <div className="chart-legend-color-neutral"></div>
-                            <span>Neutral</span>
-                          </section>
-                          <section>
-                            <div className="chart-legend-color-favorable"></div>
-                            <span>Favorable</span>
-                          </section>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              )}
-            </>
-          )}
-        </Dialog>
-        <Dialog
-          hidden={state.isTeamAssessmentHistoryDialogHidden}
-          onDismiss={hideTeamAssessmentHistoryDialog}
-          dialogContentProps={{
-            type: DialogType.normal,
-            title: "Team Assessment History",
-          }}
-          modalProps={{
-            containerClassName: "retrospectives-team-assessment-history-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
-            <div className="team-assessment-no-data">
-              <p>No team assessment history available.</p>
-              <p>Create retrospectives with team assessments to see historical trends.</p>
-            </div>
-          ) : (
-            <>
-              <p className="team-assessment-info-text">
-                Showing average scores over time across {state.teamAssessmentHistoryData.slice(-13).length} retrospective{state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
-              </p>
-              <TeamAssessmentHistoryChart historyData={state.teamAssessmentHistoryData.slice(-13)} numberFormatter={numberFormatter} />
-            </>
-          )}
-        </Dialog>
-        <ToastContainer className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
+      <div className="spinner" aria-live="assertive">
+        <div></div>
+        <span>Loading...</span>
       </div>
     );
-  },
-);
+  }
+
+  if (!state.currentTeam) {
+    return <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>;
+  }
+
+  if (!state.currentBoard) {
+    return (
+      <>
+        <div className="no-boards-container">
+          <div className="no-boards-text">Get started with your first Retrospective</div>
+          <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
+          <button title="Create Board" onClick={showBoardCreationDialog} className="create-new-board-button">
+            Create Board
+          </button>
+        </div>
+        {renderBoardUpdateMetadataFormDialog(true, false, state.isBoardCreationDialogHidden, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
+      </>
+    );
+  }
+
+  const teamSelectorList: ISelectorList<WebApiTeam> = {
+    selectorListItems: [
+      {
+        finishedLoading: state.isAppInitialized,
+        header: { id: "My Teams", title: "My Teams" },
+        items: state.userTeams,
+      },
+      // Removed All Teams
+      // Retrospectives should be safe space for team members to share feedback.
+      // Therefore, should not have access to other teams's retrospective boards.
+    ],
+  };
+
+  const boardSelectorList: ISelectorList<IFeedbackBoardDocument> = {
+    selectorListItems: [
+      {
+        finishedLoading: true,
+        header: { id: "All Retrospectives", isHidden: true, title: "All Retrospectives" },
+        items: state.boards,
+      },
+    ],
+  };
+
+  const saveTeamEffectivenessMeasurement = () => {
+    const teamEffectivenessMeasurementVoteCollection = state.currentBoard.teamEffectivenessMeasurementVoteCollection;
+    const currentUserId = obfuscateUserId(state.currentUserId);
+    const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
+    const responseCount = currentUserVote?.responses?.length || 0;
+
+    if (responseCount < questions.length) {
+      toast("Please answer all questions before saving");
+      return;
+    }
+
+    itemDataService.updateTeamEffectivenessMeasurement(state.currentBoard.id, state.currentTeam.id, currentUserId, state.currentBoard.teamEffectivenessMeasurementVoteCollection);
+
+    setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+  };
+
+  const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
+    const currentBoard = stateRef.current.currentBoard;
+
+    if (currentBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
+      currentBoard.teamEffectivenessMeasurementVoteCollection = [];
+    }
+
+    const currentUserId = obfuscateUserId(stateRef.current.currentUserId);
+    if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
+      currentBoard.teamEffectivenessMeasurementVoteCollection.push({
+        userId: currentUserId,
+        responses: [],
+      });
+    }
+
+    const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
+
+    if (!currentVote) {
+      currentBoard.teamEffectivenessMeasurementVoteCollection
+        .find(e => e.userId === currentUserId)
+        .responses.push({
+          questionId: questionId,
+          selection: selected,
+        });
+    } else {
+      currentVote.selection = selected;
+    }
+
+    setState({ currentBoard });
+  };
+
+  const teamEffectivenessResponseCount = state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
+
+  return (
+    <div className="flex flex-col h-screen">
+      <div className="flex items-center shrink-0 mt-2 ml-4">
+        <Dialog
+          hidden={state.questionIdForDiscussAndActBoardUpdate === -1}
+          onDismiss={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
+          dialogContentProps={{
+            type: DialogType.close,
+            title: "Discuss and Act",
+            subText: `Are you sure you want to change the template of this board?`,
+          }}
+          modalProps={{
+            isBlocking: true,
+            containerClassName: "retrospectives-delete-feedback-item-dialog",
+            className: "retrospectives-dialog-modal",
+          }}
+        >
+          <DialogFooter>
+            <PrimaryButton
+              onClick={async () => {
+                const question = questions.filter(question => question.id === state.questionIdForDiscussAndActBoardUpdate)[0];
+                const templateName = question.discussActTemplate;
+                const columns = getColumnsByTemplateId(templateName);
+
+                const board = state.currentBoard;
+
+                await updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
+
+                setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
+              }}
+              text="Proceed"
+            />
+            <DefaultButton onClick={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
+          </DialogFooter>
+        </Dialog>
+
+        <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
+          Retrospectives
+        </h1>
+        <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={state.currentTeam} iconName="people" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={changeSelectedTeam} title={"Team"} />
+        <div className="flex-grow-spacer"></div>
+        <div className="header-menu-with-timer">
+          {renderWorkflowTimerControls()}
+          <ExtensionSettingsMenu />
+        </div>
+      </div>
+      <div className="flex items-center justify-start shrink-0">
+        <div className="w-full">
+          <div className="flex items-center justify-start mt-2 ml-4 h-10">
+            <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
+              Board
+            </div>
+            <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
+              History
+            </div>
+            {state.activeTab === "Board" && (
+              <>
+                <div className="mx-4 vertical-tab-separator" />
+                <div className="flex items-center justify-start">
+                  <div className="board-selector">
+                    <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={changeSelectedBoard} title={"Retrospective Board"} />
+                  </div>
+                  <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
+                    <details className="flex items-center relative">
+                      <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
+                        {getIconElement("more-horizontal")}
+                      </summary>
+                      <div className="callout-menu left" role="menu" aria-label="Board Actions">
+                        <button key="createBoard" type="button" title="Create new retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
+                          {getIconElement("add")}
+                          Create new retrospective
+                        </button>
+                        <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
+                          {getIconElement("content-copy")}
+                          Create copy of retrospective
+                        </button>
+                        <button key="editBoard" type="button" title="Edit retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
+                          {getIconElement("edit")}
+                          Edit retrospective
+                        </button>
+                        <div key="seperator" className="divider" role="separator" />
+                        <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
+                          {getIconElement("link")}
+                          {`Copy link to ${state.currentBoard.activePhase} phase`}
+                        </button>
+                        <div key="seperator" className="divider" role="separator" />
+                        <button key="exportCSV" type="button" title="Export CSV content" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
+                          {getIconElement("sim-card-download")}
+                          Export CSV content
+                        </button>
+                        <button key="emailPreview" type="button" title="Create email summary" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
+                          {getIconElement("forward-to-inbox")}
+                          Create email summary
+                        </button>
+                        <div key="seperator" className="divider" role="separator" />
+                        <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
+                          {getIconElement("source")}
+                          Show retrospective summary
+                        </button>
+                        <div key="seperator" className="divider" role="separator" />
+                        <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
+                          {getIconElement("inventory")}
+                          Archive retrospective
+                        </button>
+                      </div>
+                    </details>
+                  </div>
+                </div>
+                <div className="flex items-center justify-start">
+                  <div className="flex flex-row items-center workflow-stage-header 3">
+                    {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+                      <>
+                        <Dialog
+                          hidden={state.isIncludeTeamEffectivenessMeasurementDialogHidden}
+                          onDismiss={() => {
+                            setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                          }}
+                          dialogContentProps={{
+                            type: DialogType.close,
+                          }}
+                          minWidth={640}
+                          modalProps={{
+                            isBlocking: true,
+                            containerClassName: "team-effectiveness-dialog",
+                            className: "retrospectives-dialog-modal",
+                          }}
+                        >
+                          <DialogContent>
+                            <div className="team-effectiveness-section-information">
+                              {getIconElement("info")}
+                              &nbsp;All answers will be saved anonymously
+                            </div>
+                            <table className="team-effectiveness-measurement-table">
+                              <thead>
+                                <tr>
+                                  <th scope="col" className="text-left">
+                                    Question
+                                  </th>
+                                  <th scope="col" className="text-left min-w-13">
+                                    Details
+                                  </th>
+                                  <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
+                                    Unfavorable
+                                  </th>
+                                  <th scope="colgroup" colSpan={2} className="team-effectiveness-favorability-label">
+                                    Neutral
+                                  </th>
+                                  <th scope="colgroup" colSpan={2} className="team-effectiveness-favorability-label">
+                                    Favorable
+                                  </th>
+                                </tr>
+                                <tr>
+                                  <th scope="col" className="text-left"></th>
+                                  <th scope="col" className="text-left"></th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">
+                                    1
+                                  </th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">
+                                    2
+                                  </th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">
+                                    3
+                                  </th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">
+                                    4
+                                  </th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">
+                                    5
+                                  </th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">
+                                    6
+                                  </th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">
+                                    7
+                                  </th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">
+                                    8
+                                  </th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">
+                                    9
+                                  </th>
+                                  <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">
+                                    10
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {questions.map(question => {
+                                  return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                                })}
+                              </tbody>
+                            </table>
+                          </DialogContent>
+                          <DialogFooter>
+                            <PrimaryButton
+                              className="team-effectiveness-submit-button"
+                              onClick={() => {
+                                saveTeamEffectivenessMeasurement();
+                              }}
+                              text="Submit"
+                            />
+                            <DefaultButton
+                              onClick={() => {
+                                setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
+                              }}
+                              text="Cancel"
+                            />
+                          </DialogFooter>
+                        </Dialog>
+                        <button
+                          className="team-assessment-button"
+                          onClick={() => {
+                            setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: false });
+                          }}
+                          title="Team Assessment"
+                          aria-label="Team Assessment"
+                          type="button"
+                        >
+                          {getIconElement("assessment")}
+                          <span className="hidden lg:inline">Team Assessment</span>
+                        </button>
+                      </>
+                    )}
+                    <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
+                      <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} />
+                      <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} />
+                      <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} />
+                      <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={clickWorkflowStateCallback} />
+                    </div>
+                    {state.currentBoard.activePhase === WorkflowPhase.Vote && (
+                      <div className="feedback-votes-count" role="status" aria-live="polite">
+                        <span className="entry" title={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
+                          {getIconElement("person")}
+                          <span className="hidden lg:inline">My Votes:</span> {state.currentVoteCount}/{state.currentBoard.maxVotesPerUser?.toString() || "0"}
+                        </span>
+                        {state.castedVoteCount > 0 && state.teamVoteCapacity > 0 && (
+                          <>
+                            <span className="separator" aria-hidden="true">
+                              |
+                            </span>
+                            <span className="entry" title={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`} aria-label={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`}>
+                              {getIconElement("people")}
+                              <span className="hidden lg:inline">Team Votes:</span> {state.castedVoteCount}/{state.teamVoteCapacity}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {state.currentBoard.activePhase === WorkflowPhase.Act && (
+                      <>
+                        <button className="focus-mode-button" onClick={showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
+                          {getIconElement("adjust")}
+                          <span>Focus Mode</span>
+                        </button>
+                        <dialog ref={carouselDialogRef} className="retrospectives-carousel-dialog" onClose={hideCarouselDialog}>
+                          <div className="header">
+                            <h2 className="title">Focus Mode</h2>
+                            <button onClick={hideCarouselDialog} aria-label="Close">
+                              {getIconElement("close")}
+                            </button>
+                          </div>
+                          <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
+                          <div className="subText">{state.focusModeModel && <FeedbackCarousel focusModeModel={state.focusModeModel} isFocusModalHidden={state.isCarouselDialogHidden} />}</div>
+                        </dialog>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+            {state.activeTab === "History" && (
+              <>
+                <div className="mx-4 vertical-tab-separator" />
+                <button className="team-assessment-history-button" onClick={showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
+                  {getIconElement("insights")}
+                  <span className="hidden lg:inline">Team Assessment History</span>
+                </button>
+              </>
+            )}
+          </div>
+          {state.activeTab === "History" && (
+            <div className="flex-1 min-h-0 overflow-auto border-t-4 border-(--nav-header-active-item-background)">
+              <BoardSummaryTable teamId={state.currentTeam.id} currentUserId={state.currentUserId} currentUserIsTeamAdmin={isCurrentUserTeamAdmin()} supportedWorkItemTypes={state.allWorkItemTypes} onArchiveToggle={handleArchiveToggle} />
+            </div>
+          )}
+          {state.activeTab === "Board" && (
+            <div className="feedback-board-container">
+              {state.currentTeam && state.currentBoard && (
+                <>
+                  {!props.isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
+                    <>
+                      <div className="retro-message-bar">
+                        <span>
+                          <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
+                        </span>
+                      </div>
+                      <div className="actions">
+                        <button type="button" className="dismiss" onClick={hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </div>
+                    </>
+                  )}
+                  {!props.isHostedAzureDevOps && state.isDropIssueInEdgeMessageBarVisible && !state.isBackendServiceConnected && (
+                    <div className="retro-message-bar" role="alert" aria-live="assertive">
+                      <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
+                      <div className="actions">
+                        <button type="button" className="dismiss" onClick={hideDropIssueInEdgeMessageBar} aria-label="Dismiss notification">
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {props.isHostedAzureDevOps && !state.isBackendServiceConnected && (
+                    <div className="retro-message-bar" role="alert" aria-live="assertive">
+                      <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
+                      <div className="actions">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setState({ isBackendServiceConnected: true });
+                          }}
+                          aria-label="Hide"
+                          title="Hide"
+                        >
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  <FeedbackBoard
+                    board={state.currentBoard}
+                    team={state.currentTeam}
+                    displayBoard={true}
+                    workflowPhase={state.currentBoard.activePhase}
+                    nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
+                    allWorkItemTypes={state.allWorkItemTypes}
+                    onFocusModeModelChange={focusModeModel => {
+                      setState({ focusModeModel });
+                    }}
+                    isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
+                    hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
+                    userId={state.currentUserId}
+                    onVoteCasted={updateCurrentVoteCount}
+                    onColumnNotesChange={persistColumnNotes}
+                  />
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={archiveBoardDialogRef} onClose={() => archiveBoardDialogRef.current?.close()}>
+        <div className="header">
+          <h2 className="title">Archive Retrospective</h2>
+          <button onClick={() => archiveBoardDialogRef.current?.close()} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">
+          The retrospective board <strong>{state.currentBoard.title}</strong> with its feedback will be archived.
+        </div>
+        <div className="subText">
+          <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
+        </div>
+        <div className="inner">
+          <button className="button" onClick={() => archiveCurrentBoard()}>
+            Archive
+          </button>
+          <button className="default button" onClick={() => archiveBoardDialogRef.current?.close()}>
+            Cancel
+          </button>
+        </div>
+      </dialog>
+      {renderBoardUpdateMetadataFormDialog(true, false, state.isBoardCreationDialogHidden, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
+      {renderBoardUpdateMetadataFormDialog(true, true, state.isBoardDuplicateDialogHidden, hideBoardDuplicateDialog, "Create copy of retrospective", "", createBoard, hideBoardDuplicateDialog)}
+      {state.currentBoard && renderBoardUpdateMetadataFormDialog(false, false, state.isBoardUpdateDialogHidden, hideBoardUpdateDialog, "Edit retrospective", "", updateBoardMetadata, hideBoardUpdateDialog)}
+      <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" onClose={() => previewEmailDialogRef.current?.close()}>
+        <div className="header">
+          <h2 className="title">Email summary</h2>
+          <button onClick={() => previewEmailDialogRef.current?.close()} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">
+          <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={state.currentBoard.emailContent}></textarea>
+        </div>
+        <div className="inner">
+          <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={showEmailCopiedToast}>
+            {getIconElement("content-copy")}
+            Copy to clipboard
+          </button>
+          <button title="Download PDF" aria-label="Download email summary as PDF" onClick={downloadEmailSummaryPdf} className="default button">
+            {getIconElement("sim-card-download")}
+            Download PDF
+          </button>
+        </div>
+      </dialog>
+      <Dialog
+        hidden={state.isRetroSummaryDialogHidden}
+        onDismiss={hideRetroSummaryDialog}
+        dialogContentProps={{
+          type: DialogType.normal,
+          title: `Retrospective Board Summary`,
+        }}
+        modalProps={{
+          containerClassName: "retrospectives-retro-summary-dialog",
+          className: "retrospectives-dialog-modal",
+        }}
+      >
+        {state.currentBoard && (
+          <>
+            <section className="retro-summary-section">
+              <div className="retro-summary-section-header">Basic Settings</div>
+              <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(state.currentBoard.createdDate))}</div>
+              <div id="retro-summary-created-by">
+                Created by <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
+              </div>
+            </section>
+            <section className="retro-summary-section">
+              <div className="retro-summary-section-header">Participant Summary</div>
+              <div className="retro-summary-section-item">Contributors: {state.contributors.length} participant(s)</div>
+
+              {!state.currentBoard.isAnonymous && state.contributors.length > 0 && (
+                <div className="retro-summary-contributors-section">
+                  {state.contributors.map(contributor => (
+                    <div key={contributor.id} className="retro-summary-contributor">
+                      <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="retro-summary-item-horizontal-group">
+                <div className="retro-summary-section-item horizontal-group-item">
+                  {Object.keys(state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {state.castedVoteCount} vote(s)
+                </div>
+                <div className="retro-summary-section-item horizontal-group-item">{state.feedbackItems.length} feedback item(s) created</div>
+                <div className="retro-summary-section-item horizontal-group-item">{state.actionItemIds.length} action item(s) created</div>
+              </div>
+            </section>
+            {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+              <section className="retro-summary-section">
+                <div className="retro-summary-section-header">Team Assessment</div>
+                <div>
+                  Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
+                  <div className="retro-summary-effectiveness-scores">
+                    <ul className="chart">
+                      {state.effectivenessMeasurementChartData.map(data => {
+                        const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
+                        const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
+                        const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
+                        const redScore = (data.red * 100) / teamEffectivenessResponseCount;
+                        return (
+                          <li className="chart-question-block" key={data.questionId}>
+                            <div className="chart-question">
+                              <i className={getQuestionIconClassName(data.questionId)} /> &nbsp;
+                              {getQuestionShortName(data.questionId)}
+                            </div>
+                            {data.red > 0 && (
+                              <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
+                                {percentageFormatter(redScore)}
+                              </div>
+                            )}
+                            {data.yellow > 0 && (
+                              <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
+                                {percentageFormatter(yellowScore)}
+                              </div>
+                            )}
+                            {data.green > 0 && (
+                              <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
+                                {percentageFormatter(greenScore)}
+                              </div>
+                            )}
+                            {averageScore > 0 && (
+                              <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${numberFormatter(averageScore)}`}>
+                                {numberFormatter(averageScore)}
+                              </div>
+                            )}
+                            <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => setState({ questionIdForDiscussAndActBoardUpdate: data.questionId })}>
+                              Discuss and Act
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <div className="chart-legend-section">
+                      <div className="chart-legend-group">
+                        <section>
+                          <div className="chart-legend-color-unfavorable"></div>
+                          <span>Unfavorable</span>
+                        </section>
+                        <section>
+                          <div className="chart-legend-color-neutral"></div>
+                          <span>Neutral</span>
+                        </section>
+                        <section>
+                          <div className="chart-legend-color-favorable"></div>
+                          <span>Favorable</span>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+          </>
+        )}
+      </Dialog>
+      <Dialog
+        hidden={state.isTeamAssessmentHistoryDialogHidden}
+        onDismiss={hideTeamAssessmentHistoryDialog}
+        dialogContentProps={{
+          type: DialogType.normal,
+          title: "Team Assessment History",
+        }}
+        modalProps={{
+          containerClassName: "retrospectives-team-assessment-history-dialog",
+          className: "retrospectives-dialog-modal",
+        }}
+      >
+        {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
+          <div className="team-assessment-no-data">
+            <p>No team assessment history available.</p>
+            <p>Create retrospectives with team assessments to see historical trends.</p>
+          </div>
+        ) : (
+          <>
+            <p className="team-assessment-info-text">
+              Showing average scores over time across {state.teamAssessmentHistoryData.slice(-13).length} retrospective{state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
+            </p>
+            <TeamAssessmentHistoryChart historyData={state.teamAssessmentHistoryData.slice(-13)} numberFormatter={numberFormatter} />
+          </>
+        )}
+      </Dialog>
+      <ToastContainer className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
+    </div>
+  );
+});
 
 export default withAITracking(reactPlugin, FeedbackBoardContainer);

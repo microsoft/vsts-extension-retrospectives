@@ -136,16 +136,83 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
   const [isCollapsed] = useState(false);
   const [columnNotesDraft, setColumnNotesDraft] = useState("");
-  const [focusedItemIndex, setFocusedItemIndex] = useState(-1);
+  const [, setFocusedItemIndex] = useState(-1);
 
   const columnRef = useRef<HTMLDivElement>(null);
   const editColumnNotesDialogRef = useRef<HTMLDialogElement>(null);
   const focusPreservation = useRef<FocusPreservation | null>(null);
   const prevColumnItemsLength = useRef<number>(columnItems.length);
 
-  const getVisibleColumnItems = useCallback((): IColumnItem[] => {
-    return columnItems.filter(item => !item.feedbackItem.parentFeedbackItemId);
-  }, [columnItems]);
+  const getNavigableColumnItems = useCallback((): IColumnItem[] => {
+    const sourceColumnItems: IColumnItem[] = columnItems || [];
+
+    let sortedItems: IColumnItem[] = sourceColumnItems;
+
+    // Keep ordering consistent with renderFeedbackItems
+    if (workflowPhase === WorkflowPhase.Act) {
+      sortedItems = itemDataService.sortItemsByVotesAndDate(sortedItems, sourceColumnItems);
+    } else {
+      sortedItems = sortedItems.sort((item1, item2) => new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime());
+    }
+
+    return (sortedItems || []).filter(item => !item.feedbackItem.parentFeedbackItemId);
+  }, [columnItems, workflowPhase]);
+
+  const focusFeedbackItemById = useCallback((feedbackItemId: string) => {
+    const elementToFocus = columnRef.current?.querySelector(`[data-feedback-item-id="${feedbackItemId}"]`) as HTMLElement | null;
+    if (!elementToFocus) {
+      return;
+    }
+
+    elementToFocus.focus();
+    elementToFocus.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+  }, []);
+
+  const focusFeedbackItemAtIndex = useCallback(
+    (index: number) => {
+      if (index < 0) {
+        return;
+      }
+
+      const navigableItems = getNavigableColumnItems();
+      if (index >= navigableItems.length) {
+        return;
+      }
+
+      const feedbackItemId = navigableItems[index]?.feedbackItem?.id;
+      if (!feedbackItemId) {
+        return;
+      }
+
+      focusFeedbackItemById(feedbackItemId);
+    },
+    [focusFeedbackItemById, getNavigableColumnItems],
+  );
+
+  const moveFocus = useCallback(
+    (direction: "next" | "prev") => {
+      const navigableItems = getNavigableColumnItems();
+      if (navigableItems.length === 0) {
+        return;
+      }
+
+      const activeElement = document.activeElement as HTMLElement | null;
+      const activeCard = activeElement?.closest?.("[data-feedback-item-id]") as HTMLElement | null;
+      const activeId = activeCard?.getAttribute?.("data-feedback-item-id") ?? null;
+
+      const currentIndex = activeId ? navigableItems.findIndex(item => item.feedbackItem.id === activeId) : -1;
+
+      if (direction === "prev" && currentIndex < 0) {
+        return;
+      }
+
+      const newIndex = direction === "next" ? (currentIndex < 0 ? 0 : Math.min(currentIndex + 1, navigableItems.length - 1)) : Math.max(currentIndex - 1, 0);
+
+      setFocusedItemIndex(newIndex);
+      focusFeedbackItemAtIndex(newIndex);
+    },
+    [focusFeedbackItemAtIndex, getNavigableColumnItems],
+  );
 
   const preserveFocus = useCallback(() => {
     const activeElement = document.activeElement as HTMLElement;
@@ -177,16 +244,12 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   }, []);
 
   const restoreFocus = useCallback(() => {
-    if (!focusPreservation.current) {
+    const preserved = focusPreservation.current;
+    if (!preserved) {
       return;
     }
 
     setTimeout(() => {
-      const preserved = focusPreservation.current;
-      if (!preserved) {
-        return;
-      }
-
       let elementToFocus: HTMLElement | null = null;
 
       if (preserved.elementId) {
@@ -221,27 +284,6 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
         }
       }
     }, 0);
-  }, []);
-
-  const navigateItems = useCallback((direction: "next" | "prev", visibleItems: IColumnItem[]) => {
-    if (visibleItems.length === 0) {
-      return;
-    }
-
-    setFocusedItemIndex(prevIndex => {
-      let newIndex = prevIndex;
-
-      switch (direction) {
-        case "next":
-          newIndex = prevIndex < 0 ? 0 : Math.min(prevIndex + 1, visibleItems.length - 1);
-          break;
-        case "prev":
-          newIndex = prevIndex < 0 ? -1 : prevIndex <= 0 ? 0 : prevIndex - 1;
-          break;
-      }
-
-      return newIndex;
-    });
   }, []);
 
   const createEmptyFeedbackItem = useCallback(() => {
@@ -286,16 +328,14 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
         return;
       }
 
-      const visibleItems = getVisibleColumnItems();
-
       switch (e.key) {
         case "ArrowUp":
           e.preventDefault();
-          navigateItems("prev", visibleItems);
+          moveFocus("prev");
           break;
         case "ArrowDown":
           e.preventDefault();
-          navigateItems("next", visibleItems);
+          moveFocus("next");
           break;
         case "Insert":
           if (workflowPhase === WorkflowPhase.Collect) {
@@ -312,27 +352,27 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
           break;
       }
     },
-    [getVisibleColumnItems, navigateItems, workflowPhase, createEmptyFeedbackItem, showColumnEditButton, openEditDialog],
+    [moveFocus, workflowPhase, createEmptyFeedbackItem, showColumnEditButton, openEditDialog],
   );
 
   const navigateByKeyboard = useCallback(
     (direction: "next" | "prev") => {
-      const visibleItems = getVisibleColumnItems();
-      navigateItems(direction, visibleItems);
+      moveFocus(direction);
     },
-    [getVisibleColumnItems, navigateItems],
+    [moveFocus],
   );
 
   const focusColumn = useCallback(() => {
     if (columnRef.current) {
       columnRef.current.focus();
 
-      const visibleItems = getVisibleColumnItems();
+      const visibleItems = getNavigableColumnItems();
       if (visibleItems.length > 0) {
         setFocusedItemIndex(0);
+        focusFeedbackItemAtIndex(0);
       }
     }
-  }, [getVisibleColumnItems]);
+  }, [focusFeedbackItemAtIndex, getNavigableColumnItems]);
 
   useImperativeHandle(
     ref,
@@ -397,31 +437,20 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
   const renderFeedbackItems = useCallback(() => {
     const sourceColumnItems: IColumnItem[] = columnItems || [];
-    let sortedItems: IColumnItem[] = sourceColumnItems;
+    const navigableItems = getNavigableColumnItems();
 
-    // Sort by grouped total votes if Act workflow else sort by created date
-    if (workflowPhase === WorkflowPhase.Act) {
-      sortedItems = itemDataService.sortItemsByVotesAndDate(sortedItems, columnItems);
-    } else {
-      sortedItems = sortedItems.sort((item1, item2) => new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime());
-    }
+    return navigableItems.map(columnItem => {
+      const feedbackItemProps = createFeedbackItemProps(props, columnItem);
 
-    sortedItems = sortedItems || [];
+      if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
+        const childItemsToGroup = sourceColumnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => createFeedbackItemProps(props, childColumnItem));
 
-    return sortedItems
-      .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId) // Exclude child items
-      .map(columnItem => {
-        const feedbackItemProps = createFeedbackItemProps(props, columnItem);
-
-        if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
-          const childItemsToGroup = sourceColumnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => createFeedbackItemProps(props, childColumnItem));
-
-          return <FeedbackItemGroup key={feedbackItemProps.id} mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={workflowPhase} />;
-        } else {
-          return <FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />;
-        }
-      });
-  }, [columnItems, workflowPhase, props]);
+        return <FeedbackItemGroup key={feedbackItemProps.id} mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={workflowPhase} />;
+      } else {
+        return <FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />;
+      }
+    });
+  }, [columnItems, getNavigableColumnItems, props, workflowPhase]);
 
   const currentColumnItems = columnItems || [];
 

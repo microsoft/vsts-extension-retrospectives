@@ -194,16 +194,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                 return (
                   <tr key={option.id} className="option-row">
                     <td>
-                      <Checkbox
-                        className="my-2"
-                        id={`permission-option-${option.id}`}
-                        ariaLabel="Add permission to every team or member in the table"
-                        boxSide="start"
-                        disabled={isBoardOwner}
-                        checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
-                        indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner}
-                        onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
-                      />
+                      <Checkbox className="my-2" id={`permission-option-${option.id}`} ariaLabel="Add permission to every team or member in the table" boxSide="start" disabled={isBoardOwner} checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)} indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)} />
                     </td>
                     <td className="cell-content flex flex-row flex-nowrap">
                       <div className="content-image">{PermissionImage({ option })}</div>

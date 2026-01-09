@@ -906,6 +906,44 @@ describe("Feedback Column ", () => {
   });
 
   describe("Navigate Items - Edge Cases", () => {
+    test("ArrowDown/ArrowUp moves focus between items", async () => {
+      const items = [
+        { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1" } },
+        { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2" } },
+      ];
+
+      const props = { ...testColumnProps, isDataLoaded: true, workflowPhase: WorkflowPhase.Collect, columnItems: items };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const renderedItems = Array.from(container.querySelectorAll("[data-feedback-item-id]")) as HTMLElement[];
+      const item1 = renderedItems[0];
+      const item2 = renderedItems[1];
+
+      expect(column).toBeTruthy();
+      expect(renderedItems.length).toBeGreaterThanOrEqual(2);
+      expect(item1).toBeTruthy();
+      expect(item2).toBeTruthy();
+
+      await act(async () => {
+        column.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      expect(document.activeElement).toBe(item1);
+
+      await act(async () => {
+        column.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      expect(document.activeElement).toBe(item2);
+
+      await act(async () => {
+        column.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true }));
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      expect(document.activeElement).toBe(item1);
+    });
+
     test("navigates to last item with End key", () => {
       const items = [
         { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1" } },
