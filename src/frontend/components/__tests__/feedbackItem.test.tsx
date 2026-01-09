@@ -1,12 +1,16 @@
 import React from "react";
 import { render, fireEvent, act, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import FeedbackItem, { FeedbackItemHelper } from "../feedbackItem";
+import FeedbackItem, { FeedbackItemHelper, FeedbackItemHandle } from "../feedbackItem";
 import { testColumns, testBoardId, testColumnUuidOne, testColumnIds, testFeedbackItem } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { itemDataService } from "../../dal/itemDataService";
 import { reflectBackendService } from "../../dal/reflectBackendService";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
 import * as dialogHelper from "../../utilities/dialogHelper";
+
+// `feedbackItem` is now a functional component (forwardRef), so TS's built-in `InstanceType<>`
+// no longer applies. These tests use refs to access an imperative surface.
+type InstanceType<T> = FeedbackItemHandle;
 
 // Make default export be the real class component (no HOC), so refs and instance behaviors are testable when needed.
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
