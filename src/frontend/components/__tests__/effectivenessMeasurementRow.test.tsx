@@ -253,7 +253,6 @@ describe("EffectivenessMeasurementRow", () => {
 
       // Should show no selection since questionId is undefined
       for (let i = 1; i <= 10; i++) {
-        const button = container.querySelector(`button[aria-label="${i}"]`);
         // Button 7 might be selected if the comparison works with undefined === undefined
         // This test covers the || "" fallback branch on line 21
       }
