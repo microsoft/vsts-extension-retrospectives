@@ -196,7 +196,7 @@ const initialState: FeedbackBoardContainerState = {
   allWorkItemTypes: [],
   allowCrossColumnGroups: false,
   boards: [],
-  currentUserId: getUserIdentity()?.id ?? "",
+  currentUserId: "",
   currentBoard: undefined,
   currentTeam: undefined,
   filteredProjectTeams: [],
@@ -325,6 +325,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       return;
     }
     didMountRef.current = true;
+
+    const currentUserId = getUserIdentity()?.id ?? "";
+    setState({ currentUserId });
 
     let initialCurrentTeam: WebApiTeam | undefined;
     let initialCurrentBoard: IFeedbackBoardDocument | undefined;
