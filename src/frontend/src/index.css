@@ -1755,6 +1755,92 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .team-effectiveness-measurement-table {
   @apply w-full border-separate [border-spacing:0_0.5em];
+
+  & thead {
+    @apply text-center;
+
+    & .team-effectiveness-favorability-label {
+      @apply border-b border-solid border-(--text-primary-color) outline-4 outline-(--background-color) font-light;
+    }
+
+    & .voting-measurement-index {
+      @apply w-9 text-white;
+
+      &.voting-measurement-index-unfavorable,
+      &.voting-measurement-index-neutral,
+      &.voting-measurement-index-favorable {
+        @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
+
+        &.voting-index-1 {
+          @apply bg-[#db4d4f];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
+        }
+
+        &.voting-index-2 {
+          @apply bg-[#e1664f];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc4127 9px, #cc4127 10px);
+        }
+
+        &.voting-index-3 {
+          @apply bg-[#ee794f];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e15927 9px, #e15927 10px);
+        }
+
+        &.voting-index-4 {
+          @apply bg-[rgb(240,155,79)];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc7424 9px, #cc7424 10px);
+        }
+
+        &.voting-index-5 {
+          @apply bg-[rgb(251,177,79)];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e89c37 9px, #e89c37 10px);
+        }
+
+        &.voting-index-6 {
+          @apply bg-[rgb(253,193,79)];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #df9e24 9px, #df9e24 10px);
+        }
+
+        &.voting-index-7 {
+          @apply bg-[rgb(255,211,92)];
+          background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #ecc503 7px, #ecc503 8px);
+        }
+
+        &.voting-index-8 {
+          @apply bg-[rgb(242,227,92)];
+          background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #f7d113 7px, #f7d113 8px);
+        }
+
+        &.voting-index-9 {
+          @apply bg-success bg-[radial-gradient(var(--color-success-lighter)_10%,transparent_10%),radial-gradient(var(--color-success-lighter)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
+        }
+
+        &.voting-index-10 {
+          @apply bg-success bg-[radial-gradient(var(--color-success)_10%,transparent_10%),radial-gradient(var(--color-success)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
+        }
+      }
+    }
+  }
+
+  & tbody .effectiveness-measurement-row:nth-child(odd) {
+    @apply bg-(--border-subtle-color);
+  }
+
+  & tbody .effectiveness-measurement-row th {
+    @apply font-normal p-2;
+
+    & p {
+      @apply flex items-center gap-1;
+    }
+  }
+
+  & tbody .effectiveness-measurement-row .team-assessment-score-button {
+    @apply text-(--text-primary-color);
+  }
+
+  & tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
+    @apply border-r-2 border-solid border-primary text-center;
+  }
 }
 
 .team-assessment-score-button {
@@ -1763,104 +1849,19 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   &:focus-visible {
     @apply outline-2 outline-(--nav-header-active-item-background) outline-offset-2;
   }
+  
+&:hover .team-assessment-score-circle {
+  @apply border-primary;
+}
+
 }
 
 .team-assessment-score-circle {
   @apply inline-block w-4 h-4 border-2 rounded-full border-(--nav-header-active-item-background) transition-[background-color,border-color] duration-200 ease-in;
 }
 
-.team-assessment-score-button:hover .team-assessment-score-circle {
-  @apply border-primary;
-}
-
 .team-assessment-score-button-selected .team-assessment-score-circle {
   @apply bg-primary;
-}
-
-.team-effectiveness-measurement-table thead {
-  @apply text-center;
-}
-
-.team-effectiveness-measurement-table thead .team-effectiveness-favorability-label {
-  @apply border-b border-solid border-(--text-primary-color) outline-4 outline-(--background-color) font-light;
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index {
-  @apply w-9 text-white;
-
-  &.voting-measurement-index-unfavorable,
-  &.voting-measurement-index-neutral,
-  &.voting-measurement-index-favorable {
-    @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
-  }
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-1 {
-  @apply bg-[#db4d4f];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-2 {
-  @apply bg-[#e1664f];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc4127 9px, #cc4127 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-3 {
-  @apply bg-[#ee794f];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e15927 9px, #e15927 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-4 {
-  @apply bg-[rgb(240,155,79)];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc7424 9px, #cc7424 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-5 {
-  @apply bg-[rgb(251,177,79)];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e89c37 9px, #e89c37 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-6 {
-  @apply bg-[rgb(253,193,79)];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #df9e24 9px, #df9e24 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-neutral.voting-index-7 {
-  @apply bg-[rgb(255,211,92)];
-  background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #ecc503 7px, #ecc503 8px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-neutral.voting-index-8 {
-  @apply bg-[rgb(242,227,92)];
-  background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #f7d113 7px, #f7d113 8px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-9 {
-  @apply bg-success bg-[radial-gradient(var(--color-success-lighter)_10%,transparent_10%),radial-gradient(var(--color-success-lighter)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-10 {
-  @apply bg-success bg-[radial-gradient(var(--color-success)_10%,transparent_10%),radial-gradient(var(--color-success)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
-}
-
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row:nth-child(odd) {
-  @apply bg-(--border-subtle-color);
-}
-
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row th {
-  @apply font-normal p-2;
-
-  & p {
-    @apply flex items-center gap-1;
-  }
-}
-
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row .team-assessment-score-button {
-  @apply text-(--text-primary-color);
-}
-
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
-  @apply border-r-2 border-solid border-primary text-center;
 }
 
 .team-effectiveness-dialog {
