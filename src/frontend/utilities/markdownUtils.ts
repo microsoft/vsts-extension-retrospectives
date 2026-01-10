@@ -38,8 +38,6 @@ export const tokenizeMarkdown = (text: string): Token[] => {
   const italicUnderscorePattern = /^_([^_]+)_/;
 
   while (remaining.length > 0) {
-    let matched = false;
-
     const imageMatch = imagePattern.exec(remaining);
     if (imageMatch) {
       const [fullMatch, alt, url] = imageMatch;
@@ -49,7 +47,6 @@ export const tokenizeMarkdown = (text: string): Token[] => {
         tokens.push({ type: "text", content: fullMatch });
       }
       remaining = remaining.slice(fullMatch.length);
-      matched = true;
       continue;
     }
 
@@ -62,7 +59,6 @@ export const tokenizeMarkdown = (text: string): Token[] => {
         tokens.push({ type: "text", content: fullMatch });
       }
       remaining = remaining.slice(fullMatch.length);
-      matched = true;
       continue;
     }
 
@@ -71,7 +67,6 @@ export const tokenizeMarkdown = (text: string): Token[] => {
       const [fullMatch, content] = boldAsteriskMatch;
       tokens.push({ type: "bold", content });
       remaining = remaining.slice(fullMatch.length);
-      matched = true;
       continue;
     }
 
@@ -80,7 +75,6 @@ export const tokenizeMarkdown = (text: string): Token[] => {
       const [fullMatch, content] = boldUnderscoreMatch;
       tokens.push({ type: "bold", content });
       remaining = remaining.slice(fullMatch.length);
-      matched = true;
       continue;
     }
 
@@ -89,7 +83,6 @@ export const tokenizeMarkdown = (text: string): Token[] => {
       const [fullMatch, content] = italicAsteriskMatch;
       tokens.push({ type: "italic", content });
       remaining = remaining.slice(fullMatch.length);
-      matched = true;
       continue;
     }
 
@@ -98,20 +91,17 @@ export const tokenizeMarkdown = (text: string): Token[] => {
       const [fullMatch, content] = italicUnderscoreMatch;
       tokens.push({ type: "italic", content });
       remaining = remaining.slice(fullMatch.length);
-      matched = true;
       continue;
     }
 
-    if (!matched) {
-      const nextSpecialIndex = remaining.slice(1).search(/[*_[!]/);
-      if (nextSpecialIndex === -1) {
-        tokens.push({ type: "text", content: remaining });
-        remaining = "";
-      } else {
-        const textContent = remaining.slice(0, nextSpecialIndex + 1);
-        tokens.push({ type: "text", content: textContent });
-        remaining = remaining.slice(nextSpecialIndex + 1);
-      }
+    const nextSpecialIndex = remaining.slice(1).search(/[*_[!]/);
+    if (nextSpecialIndex === -1) {
+      tokens.push({ type: "text", content: remaining });
+      remaining = "";
+    } else {
+      const textContent = remaining.slice(0, nextSpecialIndex + 1);
+      tokens.push({ type: "text", content: textContent });
+      remaining = remaining.slice(nextSpecialIndex + 1);
     }
   }
 

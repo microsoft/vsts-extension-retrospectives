@@ -141,33 +141,22 @@ export const ExtensionSettingsMenu: React.FC = () => {
     }
 
     const keyboardDialog = keyboardShortcutsDialogRef.current;
-    if (!keyboardDialog) {
-      return;
-    }
-
     const openDialog = document.querySelector("dialog[open]") as HTMLDialogElement | null;
     if (openDialog && openDialog !== keyboardDialog) {
       return;
     }
 
     event.preventDefault();
-    if (!keyboardDialog.hasAttribute("open")) {
-      keyboardDialog.showModal();
+    if (!keyboardDialog?.hasAttribute("open")) {
+      keyboardDialog?.showModal();
     }
   }, []);
 
   const handleDocumentPointerDown = useCallback((event: PointerEvent) => {
     const root = menuRootRef.current;
-    if (!root) {
-      return;
-    }
+    const target = event.target as Node;
 
-    const target = event.target as Node | null;
-    if (!target) {
-      return;
-    }
-
-    const openDetails = Array.from(root.querySelectorAll("details[open]"));
+    const openDetails = Array.from(root?.querySelectorAll("details[open]") ?? []);
     for (const detailsElement of openDetails) {
       if (!detailsElement.contains(target)) {
         detailsElement.removeAttribute("open");

@@ -12,9 +12,7 @@ class WorkItemService {
   private _httpClient: WorkItemTrackingRestClient;
 
   constructor() {
-    if (!this._httpClient) {
-      this._httpClient = getClient(WorkItemTrackingRestClient);
-    }
+    this._httpClient = getClient(WorkItemTrackingRestClient);
   }
 
   public getAllFields = () => {

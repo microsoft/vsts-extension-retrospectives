@@ -47,11 +47,6 @@ jest.mock("../../utilities/tokenHelper", () => ({
   decodeJwt: mockDecodeJwt,
 }));
 
-const mockIsHostedAzureDevOps = jest.fn().mockResolvedValue(true);
-jest.mock("../../utilities/azureDevOpsContextHelper", () => ({
-  isHostedAzureDevOps: () => mockIsHostedAzureDevOps(),
-}));
-
 const mockTrackException = jest.fn();
 jest.mock("../../utilities/telemetryClient", () => ({
   appInsights: {
@@ -76,7 +71,6 @@ describe("ReflectBackendService", () => {
     mockOff.mockClear();
     mockTrackException.mockClear();
 
-    mockIsHostedAzureDevOps.mockResolvedValue(true);
     mockStart.mockResolvedValue(undefined);
     mockSend.mockResolvedValue(undefined);
     mockGetAppToken.mockResolvedValue("mock-token");
@@ -448,6 +442,10 @@ describe("ReflectBackendService - Token retrieval edge cases", () => {
     mockGetAppToken.mockClear();
     mockDecodeJwt.mockClear();
 
+    // Reset the cached token state to force a new fetch
+    (reflectBackendService as unknown as { _tokenExpiry?: Date; _appToken?: string })._tokenExpiry = undefined;
+    (reflectBackendService as unknown as { _tokenExpiry?: Date; _appToken?: string })._appToken = undefined;
+
     const futureExpiry = Math.floor(Date.now() / 1000) + 3600;
     mockDecodeJwt.mockReturnValue({ exp: futureExpiry });
     mockGetAppToken.mockResolvedValue("test-token");
@@ -470,6 +468,27 @@ describe("ReflectBackendService - Token retrieval edge cases", () => {
     // Should return cached token without making new API calls
     expect(token).toBe("test-token");
     expect(mockGetAppToken).not.toHaveBeenCalled();
+  });
+
+  it("should refetch token when token is expired", async () => {
+    // Set up an expired token state
+    const pastExpiry = new Date(Date.now() - 1000); // 1 second in the past
+    (reflectBackendService as unknown as { _tokenExpiry: Date; _appToken: string })._tokenExpiry = pastExpiry;
+    (reflectBackendService as unknown as { _tokenExpiry: Date; _appToken: string })._appToken = "old-token";
+
+    mockGetAppToken.mockClear();
+    mockDecodeJwt.mockClear();
+
+    const futureExpiry = Math.floor(Date.now() / 1000) + 3600;
+    mockDecodeJwt.mockReturnValue({ exp: futureExpiry });
+    mockGetAppToken.mockResolvedValue("new-token");
+
+    const token = await capturedAccessTokenFactory!();
+
+    // Should fetch a new token since the old one is expired
+    expect(token).toBe("new-token");
+    expect(mockGetAppToken).toHaveBeenCalled();
+    expect(mockDecodeJwt).toHaveBeenCalledWith("new-token");
   });
 
   it("should track exception and throw when token decoding returns null", async () => {
@@ -554,13 +573,5 @@ describe("ReflectBackendService - Malformed token handling", () => {
     // The singleton already has a connection, so we'll verify the happy path
     await reflectBackendService.startConnection();
     expect(mockStart).toHaveBeenCalled();
-  });
-});
-
-describe("ReflectBackendService - isHostedAzureDevOps handling", () => {
-  it("should handle non-hosted Azure DevOps environment gracefully", () => {
-    // The isHostedAzureDevOps check is in constructor, which has already run
-    // This tests that the mock was called
-    expect(mockIsHostedAzureDevOps).toBeDefined();
   });
 });
