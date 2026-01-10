@@ -58,7 +58,7 @@ export const wrapParagraph = (paragraph: string, maxCharsPerLine: number): strin
   }
 
   pushCurrent();
-  return lines.length ? lines : [" "];
+  return lines;
 };
 
 export const createPdfFromText = (text: string, title: string, options: PdfOptions = {}): Blob => {
