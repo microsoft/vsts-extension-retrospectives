@@ -2180,7 +2180,7 @@ describe("Board Summary", () => {
         openWorkItem: mockOpenWorkItem,
       } as any);
 
-      const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+      render(<BoardSummary {...mockedPropsWithActionItems} />);
 
       expect(capturedOnItemInvoked).toBeDefined();
 
