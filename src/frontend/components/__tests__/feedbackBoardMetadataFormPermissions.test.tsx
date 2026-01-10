@@ -10,6 +10,12 @@ jest.mock("../../utilities/telemetryClient", () => ({
   trackTrace: jest.fn(),
   trackEvent: jest.fn(),
   trackException: jest.fn(),
+  reactPlugin: {},
+}));
+
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: (_plugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
 }));
 
 jest.mock("applicationinsights-js", () => ({

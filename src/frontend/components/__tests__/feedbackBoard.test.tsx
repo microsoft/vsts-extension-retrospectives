@@ -28,6 +28,7 @@ jest.mock("../../utilities/telemetryClient", () => ({
 
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: jest.fn((_plugin, Component) => Component),
+  useTrackMetric: () => jest.fn(),
 }));
 
 jest.mock("../feedbackBoardMetadataForm", () => mocked({}));
@@ -248,9 +249,8 @@ const getLatestColumnPropsById = (columnId: string) => {
 };
 
 const renderWithRef = (props: FeedbackBoardProps = mockedProps) => {
-  const ref = React.createRef<any>();
-  const renderResult = render(<FeedbackBoard {...props} ref={ref} />);
-  return { ref, ...renderResult };
+  const renderResult = render(<FeedbackBoard {...props} />);
+  return { ...renderResult };
 };
 
 // In production, key events usually target a focused Element.

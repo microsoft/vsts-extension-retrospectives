@@ -3,7 +3,7 @@ import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { moveFeedbackItem } from "./feedbackColumn";
 import FeedbackItem, { IFeedbackItemProps } from "./feedbackItem";
 import { reactPlugin } from "../utilities/telemetryClient";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkflowPhase } from "../interfaces/workItem";
@@ -78,6 +78,8 @@ const buildFeedbackColumns = (focusModeModel: FocusModeModel): FocusModeColumn[]
 };
 
 export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeModel, isFocusModalHidden }) => {
+  const trackActivity = useTrackMetric(reactPlugin, "FeedbackCarousel");
+
   const [feedbackColumns, setFeedbackColumns] = useState<FocusModeColumn[]>(() => buildFeedbackColumns(focusModeModel));
 
   useEffect(() => {
@@ -159,7 +161,7 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
   );
 
   return (
-    <Pivot className="feedback-carousel-pivot">
+    <Pivot className="feedback-carousel-pivot" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {feedbackColumns.map(column => {
         const feedbackCarouselItems = renderFeedbackCarouselItems(column);
         const slideIds = feedbackCarouselItems.map((_, index) => `slide-${column.columnId}-${index}`);
@@ -203,4 +205,4 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
   );
 };
 
-export default withAITracking(reactPlugin, FeedbackCarousel);
+export default FeedbackCarousel;

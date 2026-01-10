@@ -34,6 +34,7 @@ jest.mock("../../utilities/telemetryClient", () => ({
 
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: (_plugin: any, component: any) => component,
+  useTrackMetric: () => jest.fn(),
 }));
 
 jest.mock("../../dal/azureDevOpsCoreService", () => ({

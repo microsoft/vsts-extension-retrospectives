@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect, useRef, useCallback } from "react";
 import { TextField } from "@fluentui/react/lib/TextField";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { parseMarkdown, hasMarkdownFormatting } from "../utilities/markdownUtils";
 
@@ -14,6 +14,8 @@ export interface EditableTextProps {
 }
 
 export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultiline, maxLength, text, isChangeEventRequired, onSave }) => {
+  const trackActivity = useTrackMetric(reactPlugin, "EditableText");
+
   const [isEditing, setIsEditing] = useState(!text.trim());
   const [newText, setNewText] = useState(text);
   const [hasErrors, setHasErrors] = useState(false);
@@ -121,7 +123,7 @@ export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultil
 
   if (isEditing) {
     return (
-      <div className="editable-text-container" ref={editableTextRef}>
+      <div className="editable-text-container" ref={editableTextRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
         <TextField
           autoFocus
           ariaLabel="Please enter feedback title"
@@ -149,7 +151,7 @@ export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultil
   }
 
   return (
-    <div className="editable-text-container">
+    <div className="editable-text-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <p className="editable-text" tabIndex={0} onKeyDown={isDisabled ? () => {} : handleEditKeyDown} onClick={isDisabled ? () => {} : handleEdit} role="textbox" title="Click to edit" aria-required={true} aria-label={`Feedback title is ${isDisabled ? "obscured during collection." : text + ". Click to edit."}`}>
         {hasMarkdownFormatting(text) ? parseMarkdown(text) : text}
       </p>
@@ -157,4 +159,4 @@ export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultil
   );
 };
 
-export default withAITracking(reactPlugin, EditableText);
+export default EditableText;

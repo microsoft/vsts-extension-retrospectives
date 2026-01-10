@@ -698,6 +698,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-(--border-subtle-color);
 }
 
+.action-item-display-container {
+  display: contents;
+}
+
 .action-items {
   @apply border-l-3 border-border-gray;
 

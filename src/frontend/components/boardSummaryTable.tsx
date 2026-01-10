@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
 import BoardSummary from "./boardSummary";
 import { IFeedbackBoardDocument } from "../interfaces/feedback";
@@ -174,6 +174,8 @@ export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[])
 }
 
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.Element {
+  const trackActivity = useTrackMetric(reactPlugin, "BoardSummaryTable");
+
   const [openDialogBoardId, setOpenDialogBoardId] = useState<string | null>(null);
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
@@ -466,7 +468,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
   });
 
   return (
-    <div className="board-summary-table-container">
+    <div className="board-summary-table-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <table>
         <BoardSummaryTableHeader columns={columnList} sortColumn={sortColumn} sortDirection={sortDirection} onSort={toggleSort} />
         <BoardSummaryTableBody columns={columnList} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
@@ -517,4 +519,4 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
   );
 }
 
-export default withAITracking(reactPlugin, BoardSummaryTable);
+export default BoardSummaryTable;

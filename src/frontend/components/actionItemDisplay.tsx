@@ -4,7 +4,7 @@ import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTrack
 import { getService, getUser } from "azure-devops-extension-sdk";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
@@ -31,6 +31,8 @@ export interface ActionItemDisplayProps {
 }
 
 export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackItemId, feedbackItemTitle, team, boardId, boardTitle, defaultIteration, defaultAreaPath, actionItems, nonHiddenWorkItemTypes, allWorkItemTypes, allowAddNewActionItem, onUpdateActionItem }) => {
+  const trackActivity = useTrackMetric(reactPlugin, "ActionItemDisplay");
+
   const [isLinkedWorkItemLoaded, setIsLinkedWorkItemLoaded] = useState(false);
   const [isWorkItemTypeListCalloutVisible, setIsWorkItemTypeListCalloutVisible] = useState(false);
   const [linkedWorkItem, setLinkedWorkItem] = useState<WorkItem | null>(null);
@@ -188,7 +190,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
   }, [actionItems, renderWorkItemCard]);
 
   return (
-    <>
+    <div className="action-item-display-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {allowAddNewActionItem && (
         <div className="add-action-item-wrapper" ref={addWorkItemWrapperRef}>
           <button ref={addWorkItemButtonRef} className="add-action-item-button" aria-label="Add work item" data-automation-id="actionItemDataAutomation" onClick={toggleSelectorCallout}>
@@ -249,8 +251,8 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
           </button>
         </div>
       </dialog>
-    </>
+    </div>
   );
 };
 
-export default withAITracking(reactPlugin, ActionItemDisplay);
+export default ActionItemDisplay;

@@ -5,7 +5,7 @@ import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
 import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
 import { DocumentCard, DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
 import { SearchBox } from "@fluentui/react/lib/SearchBox";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 
@@ -152,6 +152,8 @@ interface FeedbackItemEllipsisMenuItem {
 }
 
 const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, ref) => {
+  const trackActivity = useTrackMetric(reactPlugin, "FeedbackItem");
+
   const [state, setState] = useState<IFeedbackItemState>(() => ({
     hideFeedbackItems: false,
     isBeingDragged: false,
@@ -974,6 +976,9 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       onDragOver={isNotGroupedItem ? dragFeedbackItemOverFeedbackItem : undefined}
       onDragEnd={dragFeedbackItemEnd}
       onDrop={isNotGroupedItem ? dropFeedbackItemOnFeedbackItem : undefined}
+      onKeyDown={trackActivity}
+      onMouseMove={trackActivity}
+      onTouchStart={trackActivity}
       onAnimationEnd={async () => {
         if (state.isMarkedForDeletion) {
           if (state.isLocalDelete) {
@@ -1222,4 +1227,4 @@ export class FeedbackItemHelper {
   };
 }
 
-export default withAITracking(reactPlugin, FeedbackItem);
+export default FeedbackItem;

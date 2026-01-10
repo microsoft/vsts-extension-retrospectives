@@ -167,6 +167,7 @@ jest.mock("../../utilities/audioHelper", () => ({
 
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: jest.fn((plugin, component) => component),
+  useTrackMetric: () => jest.fn(),
 }));
 
 const getTeamIterationsMock = () => {

@@ -1,6 +1,6 @@
 ﻿import React from "react";
 import EditableText from "./editableText";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 
 export interface EditableDocumentCardTitleProps {
@@ -13,11 +13,13 @@ export interface EditableDocumentCardTitleProps {
 }
 
 const EditableDocumentCardTitle: React.FC<EditableDocumentCardTitleProps> = ({ isDisabled, isMultiline, maxLength, title, isChangeEventRequired, onSave }) => {
+  const trackActivity = useTrackMetric(reactPlugin, "EditableDocumentCardTitle");
+
   return (
-    <div className="editable-document-card-title">
+    <div className="editable-document-card-title" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <EditableText isDisabled={isDisabled} isMultiline={isMultiline} maxLength={maxLength} text={title} isChangeEventRequired={isChangeEventRequired} onSave={onSave} />
     </div>
   );
 };
 
-export default withAITracking(reactPlugin, EditableDocumentCardTitle);
+export default EditableDocumentCardTitle;

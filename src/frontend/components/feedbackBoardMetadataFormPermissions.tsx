@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { TextField } from "@fluentui/react/lib/TextField";
 import { Checkbox } from "@fluentui/react/lib/Checkbox";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../interfaces/feedback";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getIconElement } from "./icons";
 
@@ -30,6 +30,8 @@ export interface FeedbackBoardPermissionOption {
 }
 
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): React.JSX.Element {
+  const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardMetadataFormPermissions");
+
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
@@ -168,7 +170,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }, [teamPermissions, memberPermissions]);
 
   return (
-    <div className="board-metadata-form board-metadata-form-permissions">
+    <div className="board-metadata-form board-metadata-form-permissions" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
         <PublicWarningBanner />
 
@@ -222,4 +224,4 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   );
 }
 
-export default withAITracking(reactPlugin, FeedbackBoardMetadataFormPermissions);
+export default FeedbackBoardMetadataFormPermissions;

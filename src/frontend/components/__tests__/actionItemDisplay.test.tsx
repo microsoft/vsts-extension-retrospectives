@@ -44,6 +44,11 @@ jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {},
 }));
 
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: (_plugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
+}));
+
 const mockGetWorkItemsByIds = jest.fn();
 const mockCreateWorkItem = jest.fn();
 jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
@@ -55,6 +60,7 @@ jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
 
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: (reactPlugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
 }));
 
 import ActionItemDisplay, { ActionItemDisplayProps } from "../actionItemDisplay";

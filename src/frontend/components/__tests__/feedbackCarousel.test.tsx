@@ -11,6 +11,11 @@ jest.mock("../../utilities/telemetryClient", () => ({
   },
 }));
 
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: (_plugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
+}));
+
 const buildFocusModeModel = (columnPropsList: Array<typeof testColumnProps>): FocusModeModel => {
   const first = columnPropsList[0] ?? testColumnProps;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

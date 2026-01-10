@@ -7,7 +7,7 @@ import { List } from "@fluentui/react/lib/List";
 import { DocumentCardType, DocumentCard } from "@fluentui/react/lib/DocumentCard";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { cn } from "../utilities/classNameHelper";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
 import BoardDataService from "../dal/boardDataService";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn } from "../interfaces/feedback";
@@ -132,6 +132,7 @@ const getInitialState = (props: IFeedbackBoardMetadataFormProps) => {
 
 export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps> = props => {
   const { isNewBoardCreation, isDuplicatingBoard, currentBoard, teamId, placeholderText, availablePermissionOptions, currentUserId, onFormSubmit, onFormCancel } = props;
+  const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardMetadataForm");
 
   const initialState = getInitialState(props);
 
@@ -289,7 +290,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   }, []);
 
   return (
-    <div className="flex flex-col flex-nowrap">
+    <div className="flex flex-col flex-nowrap" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <Pivot>
         <PivotItem headerText={"General"} aria-label="Board General Settings">
           <div className="board-metadata-form">
@@ -600,4 +601,4 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   );
 };
 
-export default withAITracking(reactPlugin, FeedbackBoardMetadataForm);
+export default FeedbackBoardMetadataForm;

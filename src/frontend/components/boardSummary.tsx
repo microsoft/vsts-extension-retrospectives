@@ -3,7 +3,7 @@ import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
 import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from "@fluentui/react/lib/DetailsList";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getIconElement } from "./icons";
 
@@ -70,6 +70,8 @@ export const sortActionItemsByColumn = (actionItems: IActionItemsTableProps[], c
 };
 
 export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendingWorkItemsCount, resolvedActionItemsCount, boardName, feedbackItemsCount, supportedWorkItemTypes }) => {
+  const trackActivity = useTrackMetric(reactPlugin, "BoardSummary");
+
   const buildActionItemsList = useCallback(() => {
     const actionItemsList = new Array<IActionItemsTableProps>();
 
@@ -244,7 +246,7 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
   }, []);
 
   return (
-    <div className="board-summary-container" aria-label="Retrospective history container">
+    <div className="board-summary-container" aria-label="Retrospective history container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <div className="board-summary-card" aria-label="Retrospective history card">
         <h2 title={boardName} aria-label="Retrospective name">
           {boardName}
@@ -294,4 +296,4 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
   );
 };
 
-export default withAITracking(reactPlugin, BoardSummary);
+export default BoardSummary;

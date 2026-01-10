@@ -29,7 +29,7 @@ import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { copyToClipboard } from "../utilities/clipboardHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
@@ -248,6 +248,8 @@ const initialState: FeedbackBoardContainerState = {
 };
 
 export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHandle, FeedbackBoardContainerProps>(function FeedbackBoardContainer(props, ref) {
+  const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardContainer");
+
   const handleRef = React.useRef<FeedbackBoardContainerHandle | null>(null);
   const stateRef = React.useRef<FeedbackBoardContainerState>({ ...initialState });
   const [, forceRender] = React.useReducer((x: number) => x + 1, 0);
@@ -1811,7 +1813,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const teamEffectivenessResponseCount = state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <div className="flex items-center shrink-0 mt-2 ml-4">
         <Dialog
           hidden={state.questionIdForDiscussAndActBoardUpdate === -1}
@@ -2349,4 +2351,4 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   );
 });
 
-export default withAITracking(reactPlugin, FeedbackBoardContainer);
+export default FeedbackBoardContainer;

@@ -132,7 +132,7 @@ export const createFeedbackItemProps = (columnProps: FeedbackColumnProps, column
 };
 
 const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((props, ref) => {
-  const { columns, columnIds, columnName, columnId, accentColor, icon, workflowPhase, isDataLoaded, columnItems, team, boardId, boardTitle, defaultActionItemIteration, defaultActionItemAreaPath, nonHiddenWorkItemTypes, allWorkItemTypes, isBoardAnonymous, hideFeedbackItems, onVoteCasted, showColumnEditButton, columnNotes, onColumnNotesChange, activeTimerFeedbackItemId, requestTimerStart, notifyTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems } = props;
+  const { columnName, columnId, icon, workflowPhase, isDataLoaded, columnItems, boardId, isBoardAnonymous, showColumnEditButton, columnNotes, onColumnNotesChange, addFeedbackItems, refreshFeedbackItems } = props;
 
   const [isCollapsed] = useState(false);
   const [columnNotesDraft, setColumnNotesDraft] = useState("");
@@ -148,7 +148,6 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
     let sortedItems: IColumnItem[] = sourceColumnItems;
 
-    // Keep ordering consistent with renderFeedbackItems
     if (workflowPhase === WorkflowPhase.Act) {
       sortedItems = itemDataService.sortItemsByVotesAndDate(sortedItems, sourceColumnItems);
     } else {
@@ -406,7 +405,6 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
     prevColumnItemsLength.current = columnItems.length;
 
-    // Schedule restoreFocus for after this effect completes
     if (itemCountChanged && focusPreservation.current) {
       restoreFocus();
       focusPreservation.current = null;

@@ -25,6 +25,11 @@ jest.mock("../../utilities/telemetryClient", () => ({
   },
 }));
 
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: (_plugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
+}));
+
 jest.mock("../../dal/itemDataService", () => {
   const actual = jest.requireActual("../../dal/itemDataService");
   return {

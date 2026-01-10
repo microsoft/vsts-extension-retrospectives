@@ -12,7 +12,7 @@ import { ExceptionCode } from "../interfaces/retrospectiveState";
 import { WorkflowPhase } from "../interfaces/workItem";
 import type { FocusModeModel } from "./feedbackCarousel";
 
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement } from "./icons";
@@ -83,6 +83,8 @@ const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
 };
 
 export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange }) => {
+  const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoard");
+
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [columns, setColumns] = useState<{ [id: string]: IColumn }>({});
   const [columnIds, setColumnIds] = useState<string[]>([]);
@@ -689,7 +691,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   const feedbackColumnPropsList = getFeedbackColumnPropsList();
 
   return (
-    <div className="feedback-board" role="main" aria-label="Feedback board with columns">
+    <div className="feedback-board" role="main" aria-label="Feedback board with columns" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {isDataLoaded &&
         feedbackColumnPropsList.map(columnProps => {
           return <FeedbackColumn key={columnProps.columnId} ref={columnRefsRef.current[columnIds.indexOf(columnProps.columnId)]} {...columnProps} />;
@@ -698,4 +700,4 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   );
 };
 
-export default withAITracking(reactPlugin, FeedbackBoard);
+export default FeedbackBoard;

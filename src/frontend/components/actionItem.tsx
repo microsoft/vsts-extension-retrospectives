@@ -5,7 +5,7 @@ import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azur
 
 import { itemDataService } from "../dal/itemDataService";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getIconElement } from "./icons";
 
@@ -22,6 +22,8 @@ export interface ActionItemProps {
 }
 
 export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId, actionItem, allWorkItemTypes, areActionIconsHidden, shouldFocus, onUpdateActionItem }) => {
+  const trackActivity = useTrackMetric(reactPlugin, "ActionItem");
+
   const openWorkItemButtonRef = useRef<HTMLDivElement>(null);
   const unlinkWorkItemDialogRef = useRef<HTMLDialogElement>(null);
 
@@ -85,7 +87,7 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
   const systemTitle: string = actionItem.fields["System.Title"];
 
   return (
-    <div key={`${actionItem.id}card`} role="group" className="related-task-sub-card" style={{ borderRightColor: `#${workItemState?.color ?? ""}` }}>
+    <div key={`${actionItem.id}card`} role="group" className="related-task-sub-card" style={{ borderRightColor: `#${workItemState?.color ?? ""}` }} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <img className="work-item-type-icon" alt={`icon for work item type ${workItemType?.name}`} src={workItemType?.icon?.url} />
       <div
         ref={openWorkItemButtonRef}
@@ -146,4 +148,4 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
   );
 };
 
-export default withAITracking(reactPlugin, ActionItem);
+export default ActionItem;

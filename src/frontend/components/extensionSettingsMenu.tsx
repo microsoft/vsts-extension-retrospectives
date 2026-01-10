@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback } from "react";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import boardDataService from "../dal/boardDataService";
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
@@ -116,6 +116,8 @@ const importData = async () => {
 };
 
 export const ExtensionSettingsMenu: React.FC = () => {
+  const trackActivity = useTrackMetric(reactPlugin, "ExtensionSettingsMenu");
+
   const menuRootRef = useRef<HTMLDivElement>(null);
   const primeDirectiveDialogRef = useRef<HTMLDialogElement>(null);
   const whatsNewDialogRef = useRef<HTMLDialogElement>(null);
@@ -184,7 +186,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
   }, [handleDocumentPointerDown, handleDocumentKeyDown]);
 
   return (
-    <div className="extension-settings-menu" ref={menuRootRef}>
+    <div className="extension-settings-menu" ref={menuRootRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <button onClick={() => primeDirectiveDialogRef.current?.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
         {getIconElement("privacy-tip")}
         <span className="hidden lg:inline">Directive</span>
@@ -410,4 +412,4 @@ export const ExtensionSettingsMenu: React.FC = () => {
   );
 };
 
-export default withAITracking(reactPlugin, ExtensionSettingsMenu);
+export default ExtensionSettingsMenu;

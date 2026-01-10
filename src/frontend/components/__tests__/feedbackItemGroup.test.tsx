@@ -44,6 +44,10 @@ jest.mock("../../utilities/telemetryClient", () => ({
     trackException: jest.fn(),
   },
 }));
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: (_plugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
+}));
 
 describe("FeedbackItemGroup", () => {
   const mockMainItem: any = {

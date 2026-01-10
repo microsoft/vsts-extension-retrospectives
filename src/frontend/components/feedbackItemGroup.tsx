@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { WorkflowPhase } from "../interfaces/workItem";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { reactPlugin } from "../utilities/telemetryClient";
@@ -13,6 +13,8 @@ export interface IFeedbackItemGroupProps {
 }
 
 const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({ groupedWorkItems, mainFeedbackItem }) => {
+  const trackActivity = useTrackMetric(reactPlugin, "FeedbackItemGroup");
+
   const [isBeingDragged, setIsBeingDragged] = useState(false);
   const [isGroupExpanded, setIsGroupExpanded] = useState(false);
   const groupRef = useRef<HTMLDivElement>(null);
@@ -78,7 +80,7 @@ const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({ groupedWorkItems
   const groupTitle = mainFeedbackItem.title || "Untitled feedback";
 
   return (
-    <div ref={groupRef} className={`feedback-item-group ${isGroupExpanded ? "feedback-item-group-expanded" : ""}`} onDragOver={handleDragOver} onDrop={handleDrop} role="group" aria-label={`${groupTitle}. Feedback group with ${groupedWorkItems.length + 1} items${isGroupExpanded ? ", expanded" : ", collapsed"}`}>
+    <div ref={groupRef} className={`feedback-item-group ${isGroupExpanded ? "feedback-item-group-expanded" : ""}`} onDragOver={handleDragOver} onDrop={handleDrop} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity} role="group" aria-label={`${groupTitle}. Feedback group with ${groupedWorkItems.length + 1} items${isGroupExpanded ? ", expanded" : ", collapsed"}`}>
       <div className="item-cards" aria-label="Group Feedback Items">
         <FeedbackItem
           {...mainFeedbackItem}
@@ -111,4 +113,4 @@ const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({ groupedWorkItems
   );
 };
 
-export default withAITracking(reactPlugin, FeedbackItemGroup);
+export default FeedbackItemGroup;

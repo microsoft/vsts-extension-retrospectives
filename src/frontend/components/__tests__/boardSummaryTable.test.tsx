@@ -24,8 +24,17 @@ jest.mock("../../utilities/telemetryClient", () => {
       FeedbackBoardRestored: "FeedbackBoardRestored",
       FeedbackBoardDeleted: "FeedbackBoardDeleted",
     },
+    reactPlugin: {
+      trackMetric: jest.fn(),
+      trackEvent: jest.fn(),
+    },
   };
 });
+
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: (_plugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
+}));
 
 jest.mock("../../dal/itemDataService", () => {
   const originalModule = jest.requireActual("../../dal/itemDataService");

@@ -15,6 +15,7 @@ type InstanceType<T> = FeedbackItemHandle;
 // Make default export be the real class component (no HOC), so refs and instance behaviors are testable when needed.
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: (_plugin: unknown, Component: unknown) => Component,
+  useTrackMetric: () => jest.fn(),
 }));
 
 jest.mock("../../utilities/telemetryClient", () => ({

@@ -14,6 +14,11 @@ jest.mock("../../utilities/telemetryClient", () => ({
   },
 }));
 
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: (_plugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
+}));
+
 const mockedProps = mocked({
   display: "Sample Workflow Stage Text",
   ariaPosInSet: 1,
