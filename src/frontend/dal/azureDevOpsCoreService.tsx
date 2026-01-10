@@ -7,9 +7,7 @@ class AzureDevOpsCoreService {
   private _httpCoreClient: CoreRestClient;
 
   constructor() {
-    if (!this._httpCoreClient) {
-      this._httpCoreClient = getClient(CoreRestClient);
-    }
+    this._httpCoreClient = getClient(CoreRestClient);
   }
 
   public async getDefaultTeam(projectId: string): Promise<WebApiTeam> {
