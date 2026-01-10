@@ -1,5 +1,4 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { TeamAssessmentHistoryChart, IBoardAverageScore, defaultNumberFormatter, formatAxisDate, formatTooltipDate, calculateYScale, calculateXScale, shouldShowDateLabel, truncateText, defaultChartColors } from "../teamAssessmentHistoryChart";
 
