@@ -805,7 +805,7 @@ describe("SelectorCombo", () => {
         className: "board-selector",
       };
 
-      const { container, getByText } = render(<SelectorCombo {...mobileProps} />);
+      const { container } = render(<SelectorCombo {...mobileProps} />);
 
       // Click to open the selector, then press Escape
       const button = container.querySelector(".selector-button") as HTMLElement;
@@ -903,7 +903,7 @@ describe("SelectorCombo", () => {
       fireEvent.keyDown(selectorButton, { keyCode: 13 });
 
       // Verify callout is visible by checking for selector-list
-      let callout = document.body.querySelector(".selector-list");
+      const callout = document.body.querySelector(".selector-list");
       expect(callout).toBeTruthy();
 
       // Press Enter again to close (should also clear filter text)
