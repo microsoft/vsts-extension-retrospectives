@@ -1,10 +1,9 @@
 import React from "react";
-import { render, fireEvent, waitFor, screen, act } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, fireEvent, waitFor, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { getService } from "azure-devops-extension-sdk";
 import { mockWorkItem, mockWorkItemType } from "../__mocks__/mocked_components/mockedWorkItemTracking";
-import BoardSummary, { BoardSummary as BoardSummaryComponent, IBoardSummaryProps, sortActionItemsByColumn } from "../boardSummary";
+import BoardSummary, { IBoardSummaryProps, sortActionItemsByColumn } from "../boardSummary";
 import { IColumn } from "@fluentui/react/lib/DetailsList";
 
 // Store the onColumnClick callback for testing
@@ -1147,7 +1146,6 @@ describe("Board Summary", () => {
       const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
 
       // Find the Title column header button (Fluent UI DetailsList uses buttons for sortable columns)
-      const columnButtons = container.querySelectorAll('[role="columnheader"] button, [role="columnheader"] [data-automationid="DetailsHeader"]');
 
       // Find all column headers
       const columnHeaders = container.querySelectorAll('[role="columnheader"]');
@@ -1519,7 +1517,7 @@ describe("Board Summary", () => {
         actionItems: [item1, item2],
       };
 
-      const { container, rerender } = render(<BoardSummary {...propsForSort} />);
+      const { container } = render(<BoardSummary {...propsForSort} />);
 
       // DetailsList renders column headers with specific data-automationid
       const headerCells = container.querySelectorAll('[data-automationid="ColumnsHeaderColumn"]');
