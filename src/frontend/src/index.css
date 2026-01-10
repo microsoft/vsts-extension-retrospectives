@@ -431,7 +431,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board {
-  @apply w-full table table-fixed h-[calc(100vh-132px)];
+  @apply w-full table table-fixed h-[calc(100vh-92px)];
 }
 
 .keyboard-shortcuts-dialog {
