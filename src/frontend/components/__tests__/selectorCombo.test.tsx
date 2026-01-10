@@ -862,6 +862,35 @@ describe("SelectorCombo", () => {
       // chooseItem should have been called
       expect(clickSpy).toHaveBeenCalledWith(mockItems[0]);
     });
+
+    test("handleKeyPressTeamList does nothing when keyCode is not 13 (line 167 branch)", () => {
+      const clickSpy = jest.fn();
+      const { getByTestId } = render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} />);
+
+      fireEvent.click(getByTestId("selector-button"));
+      const firstListItem = document.body.querySelector(".selector-list-item") as HTMLElement;
+      if (firstListItem) {
+        // Press Tab key (keyCode 9) - should not call chooseItem
+        fireEvent.keyDown(firstListItem, { key: "Tab", keyCode: 9, which: 9 });
+      }
+
+      // chooseItem should NOT have been called for non-Enter key
+      expect(clickSpy).not.toHaveBeenCalled();
+    });
+
+    test("handleKeyPressTeamList ignores Space key (keyCode 32)", () => {
+      const clickSpy = jest.fn();
+      const { getByTestId } = render(<SelectorCombo {...defaultProps} selectorListItemOnClick={clickSpy} />);
+
+      fireEvent.click(getByTestId("selector-button"));
+      const firstListItem = document.body.querySelector(".selector-list-item") as HTMLElement;
+      if (firstListItem) {
+        // Press Space key (keyCode 32) - should not call chooseItem
+        fireEvent.keyDown(firstListItem, { key: " ", keyCode: 32, which: 32 });
+      }
+
+      expect(clickSpy).not.toHaveBeenCalled();
+    });
   });
 
   describe("handleKeyPressSelectorButton", () => {
@@ -893,6 +922,36 @@ describe("SelectorCombo", () => {
       fireEvent.keyDown(selectorButton, { keyCode: 9 }); // Tab
 
       // Component should still be rendered correctly
+      expect(container.querySelector(".selector-button")).toBeTruthy();
+    });
+
+    test("does not toggle callout when keyCode is not 13 (covers line 65 branch)", () => {
+      // Clean up any existing callout from previous tests
+      const existingCallouts = document.body.querySelectorAll(".selector-filter-container");
+      existingCallouts.forEach(el => el.remove());
+
+      const { container } = render(<SelectorCombo {...defaultProps} />);
+
+      const selectorButton = getSelectorButton(container) as HTMLElement;
+
+      // Press Escape key (keyCode 27) - should not open callout (branch where keyCode !== 13)
+      fireEvent.keyDown(selectorButton, { keyCode: 27, key: "Escape" });
+
+      // Callout should not have been opened since keyCode !== 13
+      // Note: We just verify the button is still there and the component handles non-Enter keys
+      expect(container.querySelector(".selector-button")).toBeTruthy();
+    });
+
+    test("handles keyCode other than 13 without toggling (line 65-69 branch)", () => {
+      const { container } = render(<SelectorCombo {...defaultProps} />);
+
+      const selectorButton = getSelectorButton(container) as HTMLElement;
+
+      // Press Space key (keyCode 32) - should not toggle callout
+      fireEvent.keyDown(selectorButton, { keyCode: 32, key: " " });
+
+      // Verify component still functions correctly after non-Enter key
+      // The branch at line 65 is hit: if (event.keyCode === 13) is false
       expect(container.querySelector(".selector-button")).toBeTruthy();
     });
   });

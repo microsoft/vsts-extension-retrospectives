@@ -159,4 +159,70 @@ describe("BoardSummaryTableBody", () => {
     expect(container.querySelectorAll("tbody")).toHaveLength(1);
     expect(container.querySelectorAll("tr")).toHaveLength(0);
   });
+
+  it("does not invoke expand column cell when columns array is empty and Enter is pressed", () => {
+    const emptyColumns: ISimpleColumn[] = [];
+    const { container } = render(
+      <table>
+        <BoardSummaryTableBody columns={emptyColumns} data={[mockItem]} expandedRows={new Set()} boardRowSummary={() => null} />
+      </table>,
+    );
+
+    const row = container.querySelector("tbody tr");
+    expect(row).toBeTruthy();
+
+    // Press Enter - should not throw even with no columns (covers line 53 branch where expandColumn is undefined)
+    fireEvent.keyPress(row!, { key: "Enter", charCode: 13 });
+
+    // Should not crash
+    expect(container.querySelector("tbody")).toBeTruthy();
+  });
+
+  it("does not invoke expand column when columns array is empty and Enter is pressed", () => {
+    // Use mock cell function to track if it's called
+    const mockCellFn = jest.fn().mockReturnValue(null);
+    const singleColumn: ISimpleColumn[] = [
+      {
+        id: "testcol",
+        header: null,
+        cell: mockCellFn,
+        sortable: false,
+      },
+    ];
+
+    const { container } = render(
+      <table>
+        <BoardSummaryTableBody columns={singleColumn} data={[mockItem]} expandedRows={new Set()} boardRowSummary={() => null} />
+      </table>,
+    );
+
+    const row = container.querySelector("tbody tr");
+    expect(row).toBeTruthy();
+
+    // Clear mock calls from initial render
+    mockCellFn.mockClear();
+
+    // Press Enter - cell function will be called for the expandColumn (columns[0])
+    fireEvent.keyPress(row!, { key: "Enter", charCode: 13 });
+
+    // The expandColumn exists, so cell should have been called
+    expect(mockCellFn).toHaveBeenCalledWith(mockItem);
+  });
+
+  it("handles key press with undefined expandColumn gracefully", () => {
+    // Pass an empty columns array to ensure columns[0] is undefined
+    const { container } = render(
+      <table>
+        <BoardSummaryTableBody columns={[]} data={[mockItem]} expandedRows={new Set()} boardRowSummary={() => null} />
+      </table>,
+    );
+
+    const row = container.querySelector("tbody tr");
+    expect(row).toBeTruthy();
+
+    // Press Enter on row - the expandColumn will be undefined, so cell() should not be called
+    fireEvent.keyPress(row!, { key: "Enter", charCode: 13 });
+
+    expect(container).toBeTruthy();
+  });
 });

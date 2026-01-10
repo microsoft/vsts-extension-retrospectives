@@ -332,15 +332,7 @@ describe("GroupedFeedbackList", () => {
       });
       const columnItems = [createColumnItem(childItem)];
 
-      render(
-        <GroupedFeedbackList
-          {...defaultProps}
-          childrenIds={["child-1"]}
-          columnItems={columnItems}
-          currentColumnId="column-1"
-          isFocusModalHidden={true}
-        />
-      );
+      render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} currentColumnId="column-1" isFocusModalHidden={true} />);
 
       // originalColumnId matches currentColumnId, so no "Original Column" should be shown
       expect(screen.queryByText(/Original Column:/)).not.toBeInTheDocument();

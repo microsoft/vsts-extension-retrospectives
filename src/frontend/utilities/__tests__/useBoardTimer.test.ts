@@ -242,6 +242,25 @@ describe("useBoardTimer hook", () => {
 
       expect(result.current[0].seconds).toBe(secondsAtPause);
     });
+
+    it("should handle pause when timer is not running (covers line 52 falsy branch)", () => {
+      const clearIntervalSpy = jest.spyOn(window, "clearInterval");
+      const { result } = renderHook(() => useBoardTimer({ countdownDurationMinutes: 5 }));
+
+      // Timer is not started
+      expect(result.current[0].isRunning).toBe(false);
+
+      // Call pause anyway - this calls clearTimerInterval when intervalRef.current is undefined
+      act(() => {
+        result.current[1].pause();
+      });
+
+      // Should not crash, and clearInterval should NOT be called since no interval exists
+      expect(clearIntervalSpy).not.toHaveBeenCalled();
+      expect(result.current[0].isRunning).toBe(false);
+
+      clearIntervalSpy.mockRestore();
+    });
   });
 
   describe("reset", () => {
@@ -331,21 +350,31 @@ describe("useBoardTimer hook", () => {
 
   describe("cleanup", () => {
     it("should clean up interval on unmount", () => {
+      const clearIntervalSpy = jest.spyOn(window, "clearInterval");
       const { result, unmount } = renderHook(() => useBoardTimer({ countdownDurationMinutes: 5 }));
 
       act(() => {
         result.current[1].start();
       });
 
+      // Verify the timer is running
+      expect(result.current[0].isRunning).toBe(true);
+
       unmount();
+
+      // clearInterval should have been called on unmount
+      expect(clearIntervalSpy).toHaveBeenCalled();
 
       // Interval should be cleared, no errors should occur
       act(() => {
         jest.advanceTimersByTime(5000);
       });
+
+      clearIntervalSpy.mockRestore();
     });
 
     it("should handle unmount when timer is NOT running (line 52 branch)", () => {
+      const clearIntervalSpy = jest.spyOn(window, "clearInterval");
       const { result, unmount } = renderHook(() => useBoardTimer({ countdownDurationMinutes: 5 }));
 
       // Timer is not started, so intervalRef.current is undefined
@@ -355,10 +384,16 @@ describe("useBoardTimer hook", () => {
       // branch where intervalRef.current === undefined
       unmount();
 
+      // clearInterval should NOT have been called since timer wasn't running
+      // This covers the falsy branch of the if (intervalRef.current !== undefined)
+      expect(clearIntervalSpy).not.toHaveBeenCalled();
+
       // No errors should occur
       act(() => {
         jest.advanceTimersByTime(1000);
       });
+
+      clearIntervalSpy.mockRestore();
     });
   });
 });
