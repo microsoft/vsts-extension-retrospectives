@@ -182,3 +182,5 @@ test-report.xml
 dist/
 
 .playwright-mcp
+
+stats.json

@@ -17,7 +17,8 @@
     "pack:d": "npm run build && npx tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
     "pack:p": "npm run build && npx tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
     "publish:d": "npm run pack:d && npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}",
-    "publish:p": "npm run pack:p && npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}"
+    "publish:p": "npm run pack:p && npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}",
+    "stats": "CODECOV_TOKEN= npx webpack --mode=production --profile --json > stats.json && npx webpack-bundle-analyzer stats.json dist"
   },
   "repository": {
     "type": "git",
@@ -78,6 +79,7 @@
     "ts-loader": "9.5.4",
     "typescript": "5.9.3",
     "webpack": "5.104.1",
+    "webpack-bundle-analyzer": "5.1.1",
     "webpack-cli": "6.0.1",
     "webpack-dev-server": "5.2.2"
   },
