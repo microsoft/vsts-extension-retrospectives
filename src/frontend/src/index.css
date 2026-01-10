@@ -379,7 +379,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .editable-document-card-title {
-  @apply overflow-hidden wrap-break-word flex-1 flex-col justify-center min-h-25 text-(--text-primary-color);
+  @apply overflow-hidden wrap-break-word min-h-25 text-(--text-primary-color);
 
   & .editable-text {
     @apply inline-block max-w-full align-middle whitespace-pre-wrap wrap-break-word cursor-text text-base;
