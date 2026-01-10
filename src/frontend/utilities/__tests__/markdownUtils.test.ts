@@ -224,6 +224,15 @@ describe("markdownUtils", () => {
         expect(tokens[0].type).toBe("text");
         expect(tokens[0].content).toBe("start *incomplete");
       });
+
+      it("should handle unmatched special char followed by valid markdown", () => {
+        // This tests line 105: nextSpecialIndex !== -1 branch
+        // The '[' doesn't form a complete link pattern, but there's a valid **bold** later
+        const tokens = tokenizeMarkdown("x[y **bold**");
+        expect(tokens).toHaveLength(2);
+        expect(tokens[0]).toEqual({ type: "text", content: "x[y " });
+        expect(tokens[1]).toEqual({ type: "bold", content: "bold" });
+      });
     });
   });
 
@@ -288,6 +297,20 @@ describe("markdownUtils", () => {
           expect(props.target).toBe("_blank");
           expect(props.rel).toBe("noopener noreferrer");
           expect(props.children).toBe("link");
+        }
+      }
+    });
+
+    it("should stop propagation when clicking on a link", () => {
+      const result = parseMarkdown("[link](https://example.com)");
+      expect(Array.isArray(result)).toBe(true);
+      if (Array.isArray(result) && result.length > 0) {
+        const element = result[0];
+        if (React.isValidElement(element)) {
+          const props = element.props as { onClick: (e: React.MouseEvent) => void };
+          const mockEvent = { stopPropagation: jest.fn() } as unknown as React.MouseEvent;
+          props.onClick(mockEvent);
+          expect(mockEvent.stopPropagation).toHaveBeenCalled();
         }
       }
     });
