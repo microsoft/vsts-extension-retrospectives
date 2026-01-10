@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { moveFeedbackItem } from "./feedbackColumn";
 import FeedbackItem, { IFeedbackItemProps } from "./feedbackItem";
