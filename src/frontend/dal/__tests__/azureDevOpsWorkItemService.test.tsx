@@ -183,6 +183,25 @@ describe("WorkItemService", () => {
 
       expect(result).toEqual([]);
     });
+
+    it("should handle URL ending with slash (empty string fallback on line 67)", async () => {
+      // This tests the || "" branch when url.split("/").pop() returns empty string
+      const mockWorkItem = {
+        id: 1,
+        relations: [
+          {
+            rel: RelationshipType.ReferencedByReverse,
+            url: "https://api.com/workitems/",
+          } as WorkItemRelation,
+        ],
+      } as WorkItem;
+      mockHttpClient.getWorkItems.mockResolvedValue([mockWorkItem]);
+
+      const result = await workItemService.getReferencedByReverseItemIds(1);
+
+      // Empty string filtered out by .filter(id => id)
+      expect(result).toEqual([]);
+    });
   });
 
   describe("getRelatedItemsForItemsIds", () => {

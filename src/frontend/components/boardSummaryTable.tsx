@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
 import BoardSummary from "./boardSummary";
 import { IFeedbackBoardDocument } from "../interfaces/feedback";
@@ -9,7 +9,7 @@ import { itemDataService } from "../dal/itemDataService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { reflectBackendService } from "../dal/reflectBackendService";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
-import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
+import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import BoardSummaryTableHeader from "./boardSummaryTableHeader";
 import BoardSummaryTableBody from "./boardSummaryTableBody";
 import { getIconElement } from "./icons";
@@ -34,11 +34,11 @@ export interface IBoardSummaryTableItem {
   boardName: string;
   createdDate: Date;
   isArchived?: boolean;
-  archivedDate?: Date; // archivedDate not set for legacy archived boards
+  archivedDate?: Date;
   pendingWorkItemsCount: number;
   totalWorkItemsCount: number;
   feedbackItemsCount: number;
-  id: string; // Board ID
+  id: string;
   teamId: string;
   ownerId: string;
 }
@@ -51,12 +51,6 @@ export interface IBoardActionItemsData {
 export interface IActionItemsTableItems {
   [key: string]: IBoardActionItemsData;
 }
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-});
 
 export async function handleArchiveToggle(teamId: string, boardId: string, toggleIsArchived: boolean, setTableData: React.Dispatch<React.SetStateAction<IBoardSummaryTableItem[]>>, onArchiveToggle: () => void) {
   try {
@@ -144,7 +138,7 @@ export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[])
       isDataLoaded: true,
       feedbackBoards: [],
       actionItemsByBoard: {},
-      allDataLoaded: false, // <-- include required property
+      allDataLoaded: false,
     };
   }
 
@@ -175,11 +169,13 @@ export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[])
     isDataLoaded: true,
     feedbackBoards: boardDocuments,
     actionItemsByBoard: actionItems,
-    allDataLoaded: false, // <-- include required property
+    allDataLoaded: false,
   };
 }
 
 function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.Element {
+  const trackActivity = useTrackMetric(reactPlugin, "BoardSummaryTable");
+
   const [openDialogBoardId, setOpenDialogBoardId] = useState<string | null>(null);
   const [teamId, setTeamId] = useState<string>();
   const [boardSummaryState, setBoardSummaryState] = useState<IBoardSummaryTableState>({
@@ -406,7 +402,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           boardId: openDialogBoardId,
           boardName: selectedBoardForDelete?.boardName || "Unknown Board",
           feedbackItemsCount: selectedBoardForDelete?.feedbackItemsCount || 0,
-          deletedByUserId: encrypt(getUserIdentity().id),
+          deletedByUserId: obfuscateUserId(getUserIdentity().id),
         },
       });
     } catch (error) {
@@ -472,7 +468,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
   });
 
   return (
-    <div className="board-summary-table-container">
+    <div className="board-summary-table-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <table>
         <BoardSummaryTableHeader columns={columnList} sortColumn={sortColumn} sortDirection={sortDirection} onSort={toggleSort} />
         <BoardSummaryTableBody columns={columnList} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
@@ -523,4 +519,4 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
   );
 }
 
-export default withAITracking(reactPlugin, BoardSummaryTable);
+export default BoardSummaryTable;

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { TextField } from "@fluentui/react/lib/TextField";
 import { Checkbox } from "@fluentui/react/lib/Checkbox";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../interfaces/feedback";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getIconElement } from "./icons";
 
@@ -30,6 +30,8 @@ export interface FeedbackBoardPermissionOption {
 }
 
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): React.JSX.Element {
+  const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardMetadataFormPermissions");
+
   const [teamPermissions, setTeamPermissions] = React.useState(props.permissions?.Teams ?? []);
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
@@ -46,7 +48,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
   const handleSelectAllClicked = (checked: boolean) => {
-    if (!canEditPermissions) return; // Block unauthorized users from selecting/unselecting all
+    if (!canEditPermissions) return;
 
     if (checked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === "team" && !teamPermissions.includes(o.id)).map(o => o.id)]);
@@ -60,7 +62,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
-    if (!canEditPermissions) return; // Block unauthorized changes
+    if (!canEditPermissions) return;
 
     let permissionList: string[] = option.type === "team" ? teamPermissions : memberPermissions;
 
@@ -168,7 +170,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }, [teamPermissions, memberPermissions]);
 
   return (
-    <div className="board-metadata-form board-metadata-form-permissions">
+    <div className="board-metadata-form board-metadata-form-permissions" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
         <PublicWarningBanner />
 
@@ -190,22 +192,11 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
             </thead>
             <tbody>
               {filteredPermissionOptions.map(option => {
-                const isBoardOwner: boolean = props.isNewBoardCreation
-                  ? option.id === props.currentUserId // New board: Current user is the proposed owner
-                  : option.id === props.board?.createdBy?.id; // Existing board: Use saved owner
+                const isBoardOwner: boolean = props.isNewBoardCreation ? option.id === props.currentUserId : option.id === props.board?.createdBy?.id;
                 return (
                   <tr key={option.id} className="option-row">
                     <td>
-                      <Checkbox
-                        className="my-2"
-                        id={`permission-option-${option.id}`}
-                        ariaLabel="Add permission to every team or member in the table"
-                        boxSide="start"
-                        disabled={isBoardOwner}
-                        checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
-                        indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} // Set indeterminate only if no permissions exist
-                        onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)}
-                      />
+                      <Checkbox className="my-2" id={`permission-option-${option.id}`} ariaLabel="Add permission to every team or member in the table" boxSide="start" disabled={isBoardOwner} checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)} indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)} />
                     </td>
                     <td className="cell-content flex flex-row flex-nowrap">
                       <div className="content-image">{PermissionImage({ option })}</div>
@@ -233,4 +224,4 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   );
 }
 
-export default withAITracking(reactPlugin, FeedbackBoardMetadataFormPermissions);
+export default FeedbackBoardMetadataFormPermissions;

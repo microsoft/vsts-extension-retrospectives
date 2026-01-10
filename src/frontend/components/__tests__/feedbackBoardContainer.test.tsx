@@ -5,7 +5,7 @@ import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import type { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
-import FeedbackBoardContainer, { FeedbackBoardContainerProps, FeedbackBoardContainerState, deduplicateTeamMembers } from "../feedbackBoardContainer";
+import { FeedbackBoardContainer, type FeedbackBoardContainerHandle, FeedbackBoardContainerProps, FeedbackBoardContainerState, deduplicateTeamMembers } from "../feedbackBoardContainer";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
@@ -19,6 +19,7 @@ import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { getService } from "azure-devops-extension-sdk";
 import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
+import { formatBoardTimer } from "../../utilities/useBoardTimer";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -34,6 +35,8 @@ const mockUserIdentity = {
 
 jest.mock("../../utilities/userIdentityHelper", () => ({
   getUserIdentity: () => mockUserIdentity,
+  obfuscateUserId: () => "encrypted-data",
+  deobfuscateUserId: (id: string) => id,
   encrypt: () => "encrypted-data",
 }));
 
@@ -153,8 +156,18 @@ jest.mock("../../utilities/clipboardHelper", () => ({
   copyToClipboard: jest.fn(),
 }));
 
+// Mock audioHelper module
+const mockPlayStartChime = jest.fn().mockReturnValue(true);
+const mockPlayStopChime = jest.fn().mockReturnValue(true);
+jest.mock("../../utilities/audioHelper", () => ({
+  playStartChime: (...args: unknown[]) => mockPlayStartChime(...args),
+  playStopChime: (...args: unknown[]) => mockPlayStopChime(...args),
+  isAudioSupported: jest.fn().mockReturnValue(true),
+}));
+
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: jest.fn((plugin, component) => component),
+  useTrackMetric: () => jest.fn(),
 }));
 
 const getTeamIterationsMock = () => {
@@ -207,9 +220,23 @@ const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
   projectId: "1",
 };
 
+const renderContainerWithHandle = (overrideProps: Partial<FeedbackBoardContainerProps> = {}) => {
+  const ref = React.createRef<FeedbackBoardContainerHandle>();
+  const props: FeedbackBoardContainerProps = {
+    ...feedbackBoardContainerProps,
+    deferInitialization: true,
+    ...overrideProps,
+  };
+  const utils = render(<FeedbackBoardContainer {...props} ref={ref} />);
+  if (!ref.current) {
+    throw new Error("FeedbackBoardContainer ref was not set");
+  }
+  return { ...utils, ref, instance: ref.current };
+};
+
 describe("Feedback Board Container ", () => {
   it("can be rendered without content.", () => {
-    render(<FeedbackBoardContainer {...feedbackBoardContainerProps} />);
+    render(<FeedbackBoardContainer {...feedbackBoardContainerProps} deferInitialization={true} />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
@@ -360,9 +387,7 @@ describe("FeedbackBoardContainer additional coverage", () => {
   });
 
   it("renders initialized board and history views", async () => {
-    const componentDidMountSpy = jest.spyOn(FeedbackBoardContainer.prototype, "componentDidMount").mockImplementation(async () => {});
-    const ref = React.createRef<FeedbackBoardContainerInstance>();
-    render(<FeedbackBoardContainer {...feedbackBoardContainerProps} ref={ref} />);
+    const { ref } = renderContainerWithHandle();
 
     const board = {
       ...baseBoard,
@@ -392,7 +417,6 @@ describe("FeedbackBoardContainer additional coverage", () => {
         isBoardCreationDialogHidden: false,
         isBoardDuplicateDialogHidden: false,
         isBoardUpdateDialogHidden: false,
-        isPreviewEmailDialogHidden: false,
         isRetroSummaryDialogHidden: false,
         isTeamAssessmentHistoryDialogHidden: false,
         effectivenessMeasurementChartData: [{ questionId: 1, red: 1, yellow: 0, green: 0 }],
@@ -415,8 +439,6 @@ describe("FeedbackBoardContainer additional coverage", () => {
       ref.current?.setState({ activeTab: "History" });
     });
     expect(screen.getByTestId("board-summary-table")).toBeInTheDocument();
-
-    componentDidMountSpy.mockRestore();
   });
 });
 
@@ -686,12 +708,12 @@ describe("Vote Count Display", () => {
 });
 
 describe("vote metrics state", () => {
-  type TestableContainer = InstanceType<typeof FeedbackBoardContainer> & {
+  type TestableContainer = FeedbackBoardContainerHandle & {
     getVoteMetricsState: (board: IFeedbackBoardDocument | undefined) => Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity">;
   };
 
   const createContainer = (): TestableContainer => {
-    return new FeedbackBoardContainer(feedbackBoardContainerProps) as TestableContainer;
+    return renderContainerWithHandle().instance as unknown as TestableContainer;
   };
 
   const baseBoard: Partial<IFeedbackBoardDocument> = {
@@ -717,6 +739,7 @@ describe("vote metrics state", () => {
 
   it("derives counts for current user and team", () => {
     const instance = createContainer();
+    instance.setState({ currentUserId: "mock-user-id" });
     const board = {
       ...baseBoard,
       boardVoteCollection: {
@@ -735,7 +758,7 @@ describe("vote metrics state", () => {
 
 describe("FeedbackBoardContainer - Component lifecycle", () => {
   it("should handle screen resolution changes", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Simulate resize to mobile width
     global.innerWidth = 500;
@@ -746,7 +769,7 @@ describe("FeedbackBoardContainer - Component lifecycle", () => {
   });
 
   it("should handle backend service connection states", () => {
-    const { container } = render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    const { container } = render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should render with loading state
     expect(container.querySelector(".initialization-spinner") || screen.getByText("Loading...")).toBeTruthy();
@@ -754,72 +777,72 @@ describe("FeedbackBoardContainer - Component lifecycle", () => {
 
   it("should initialize with correct project ID", () => {
     const projectId = "project-123";
-    render(<FeedbackBoardContainer isHostedAzureDevOps={true} projectId={projectId} />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={true} projectId={projectId} deferInitialization={true} />);
 
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle hosted vs on-premise Azure DevOps", () => {
-    const { rerender } = render(<FeedbackBoardContainer isHostedAzureDevOps={true} projectId="test" />);
+    const { rerender } = render(<FeedbackBoardContainer isHostedAzureDevOps={true} projectId="test" deferInitialization={true} />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
 
-    rerender(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test" />);
+    rerender(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test" deferInitialization={true} />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
 
 describe("FeedbackBoardContainer - State management", () => {
   it("should initialize with default state values", () => {
-    const { container } = render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    const { container } = render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should be in loading/initialization state
     expect(container.querySelector(".initialization-spinner") || screen.getByText("Loading...")).toBeTruthy();
   });
 
   it("should handle board creation dialog state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component initializes with dialogs hidden
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle team selection state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should be loading team data
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should manage feedback items state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should initialize feedback items as empty array
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should track contributors state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should initialize with empty contributors
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should manage action items state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should track action items
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle archive toggle state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage archive state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should manage mobile vs desktop view state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should detect viewport size
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -828,21 +851,21 @@ describe("FeedbackBoardContainer - State management", () => {
 
 describe("FeedbackBoardContainer - Team effectiveness measurement", () => {
   it("should handle effectiveness measurement dialog state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage effectiveness measurement dialogs
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should initialize effectiveness measurement summary", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should initialize with empty effectiveness data
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle effectiveness measurement chart data", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should initialize chart data
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -851,28 +874,28 @@ describe("FeedbackBoardContainer - Team effectiveness measurement", () => {
 
 describe("FeedbackBoardContainer - Board operations", () => {
   it("should handle board duplication", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage duplicate dialog state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle board update operations", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage update dialog state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle board archive confirmation", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage archive confirmation dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle board deletion notifications", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage board deleted dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -881,21 +904,21 @@ describe("FeedbackBoardContainer - Board operations", () => {
 
 describe("FeedbackBoardContainer - Mobile support", () => {
   it("should handle mobile board actions dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage mobile actions dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle mobile team selector dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage mobile team selector
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should manage auto-resize functionality", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should handle auto-resize state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -904,14 +927,14 @@ describe("FeedbackBoardContainer - Mobile support", () => {
 
 describe("FeedbackBoardContainer - Browser compatibility", () => {
   it("should show Edge drop issue message bar when needed", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage Edge compatibility message
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should show TFS live sync issue message when needed", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage TFS sync message
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -920,21 +943,21 @@ describe("FeedbackBoardContainer - Browser compatibility", () => {
 
 describe("FeedbackBoardContainer - Email and summary features", () => {
   it("should handle preview email dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage preview email dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should handle retro summary dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage retro summary dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should toggle summary dashboard visibility", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage summary dashboard state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -943,14 +966,14 @@ describe("FeedbackBoardContainer - Email and summary features", () => {
 
 describe("FeedbackBoardContainer - Carousel and focus features", () => {
   it("should handle carousel dialog state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage carousel dialog
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should support cross-column groups", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage cross-column groups setting
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -959,14 +982,14 @@ describe("FeedbackBoardContainer - Carousel and focus features", () => {
 
 describe("FeedbackBoardContainer - Work item integration", () => {
   it("should load work item types for project", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should load work item types
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should filter hidden work item types", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage non-hidden work items
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -975,7 +998,7 @@ describe("FeedbackBoardContainer - Work item integration", () => {
 
 describe("FeedbackBoardContainer - Tab navigation", () => {
   it("should handle Board and History tab switching", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage active tab state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -984,51 +1007,29 @@ describe("FeedbackBoardContainer - Tab navigation", () => {
 
 describe("FeedbackBoardContainer - Real-time collaboration", () => {
   it("should handle backend service reconnection", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage reconnection state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("should track backend connection status", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should track connection status
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
 
-type FeedbackBoardContainerInstance = InstanceType<typeof FeedbackBoardContainer>;
-type TestableFeedbackBoardContainer = FeedbackBoardContainerInstance & { setState: (updater: any) => void };
+type FeedbackBoardContainerInstance = FeedbackBoardContainerHandle;
+type TestableFeedbackBoardContainer = FeedbackBoardContainerInstance;
 
 const createStandaloneTimerInstance = (): TestableFeedbackBoardContainer => {
-  const instance = new FeedbackBoardContainer(feedbackBoardContainerProps) as TestableFeedbackBoardContainer;
-  instance.setState = ((updater: React.SetStateAction<FeedbackBoardContainerState>, callback?: () => void) => {
-    const currentState = instance.state as unknown as FeedbackBoardContainerState;
-    const updatePartial = typeof updater === "function" ? updater(currentState) : updater;
-    if (updatePartial) {
-      Object.assign(currentState, updatePartial as Partial<FeedbackBoardContainerState>);
-    }
-    if (callback) {
-      callback();
-    }
-  }) as typeof instance.setState;
-  return instance;
+  return renderContainerWithHandle().instance as TestableFeedbackBoardContainer;
 };
 
 const createSynchronousContainer = (): TestableFeedbackBoardContainer => {
-  const instance = new FeedbackBoardContainer(feedbackBoardContainerProps) as TestableFeedbackBoardContainer;
-  instance.setState = ((updater: React.SetStateAction<FeedbackBoardContainerState>, callback?: () => void) => {
-    const currentState = instance.state as unknown as FeedbackBoardContainerState;
-    const updatePartial = typeof updater === "function" ? updater(currentState) : updater;
-    if (updatePartial) {
-      Object.assign(currentState, updatePartial as Partial<FeedbackBoardContainerState>);
-    }
-    if (callback) {
-      callback();
-    }
-  }) as typeof instance.setState;
-  return instance;
+  return renderContainerWithHandle().instance as TestableFeedbackBoardContainer;
 };
 
 describe("Facilitation timer", () => {
@@ -1038,23 +1039,23 @@ describe("Facilitation timer", () => {
   });
 
   it("formats board timer output", () => {
-    const instance = createStandaloneTimerInstance();
-    expect((instance as any).formatBoardTimer(0)).toBe("0:00");
-    expect((instance as any).formatBoardTimer(9)).toBe("0:09");
-    expect((instance as any).formatBoardTimer(65)).toBe("1:05");
+    // formatBoardTimer is now an exported utility function from useBoardTimer
+    expect(formatBoardTimer(0)).toBe("0:00");
+    expect(formatBoardTimer(9)).toBe("0:09");
+    expect(formatBoardTimer(65)).toBe("1:05");
     // Test negative values
-    expect((instance as any).formatBoardTimer(-1)).toBe("-0:01");
-    expect((instance as any).formatBoardTimer(-9)).toBe("-0:09");
-    expect((instance as any).formatBoardTimer(-65)).toBe("-1:05");
-    expect((instance as any).formatBoardTimer(-125)).toBe("-2:05");
+    expect(formatBoardTimer(-1)).toBe("-0:01");
+    expect(formatBoardTimer(-9)).toBe("-0:09");
+    expect(formatBoardTimer(-65)).toBe("-1:05");
+    expect(formatBoardTimer(-125)).toBe("-2:05");
   });
 
   it("starts, advances, and pauses the board timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime to prevent AudioContext errors
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     (instance as any).startBoardTimer();
     expect(instance.state.isBoardTimerRunning).toBe(true);
@@ -1072,7 +1073,6 @@ describe("Facilitation timer", () => {
     expect(instance.state.isBoardTimerRunning).toBe(false);
     expect((instance as any).boardTimerIntervalId).toBeUndefined();
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1080,8 +1080,8 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime to prevent AudioContext errors
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     (instance as any).startBoardTimer();
     const firstIntervalId = (instance as any).boardTimerIntervalId;
@@ -1089,7 +1089,6 @@ describe("Facilitation timer", () => {
     (instance as any).startBoardTimer();
     expect((instance as any).boardTimerIntervalId).toBe(firstIntervalId);
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1112,18 +1111,12 @@ describe("Facilitation timer", () => {
 
   it("renders timer controls and handles user interactions", () => {
     jest.useFakeTimers();
-    const componentDidMountSpy = jest.spyOn(FeedbackBoardContainer.prototype, "componentDidMount").mockImplementation(async () => {});
-    const componentDidUpdateSpy = jest.spyOn(FeedbackBoardContainer.prototype, "componentDidUpdate").mockImplementation(() => {});
-
     try {
-      const ref = React.createRef<FeedbackBoardContainerInstance>();
-      const { container } = render(<FeedbackBoardContainer {...feedbackBoardContainerProps} ref={ref} />);
-      const instance = ref.current as FeedbackBoardContainerInstance | null;
-      expect(instance).not.toBeNull();
-      const componentInstance = instance as FeedbackBoardContainerInstance;
+      const { ref } = renderContainerWithHandle();
+      const componentInstance = ref.current as FeedbackBoardContainerInstance;
 
-      // Spy on playStartChime after instance is created
-      const playStartChimeSpy = jest.spyOn(componentInstance as any, "playStartChime").mockImplementation(() => {});
+      // Clear the mock before testing
+      mockPlayStartChime.mockClear();
 
       const board = {
         id: "board-1",
@@ -1197,11 +1190,7 @@ describe("Facilitation timer", () => {
 
       expect(componentInstance.state.boardTimerSeconds).toBe(0);
       expect(resetButton).toBeDisabled();
-
-      playStartChimeSpy.mockRestore();
     } finally {
-      componentDidMountSpy.mockRestore();
-      componentDidUpdateSpy.mockRestore();
       jest.clearAllTimers();
     }
   });
@@ -1210,8 +1199,8 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime to prevent AudioContext errors
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     act(() => {
       instance.setState({
@@ -1245,7 +1234,6 @@ describe("Facilitation timer", () => {
     expect(instance.state.boardTimerSeconds).toBe(15);
     expect(instance.state.isBoardTimerRunning).toBe(true); // Should keep running
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1253,9 +1241,9 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStopChime and playStartChime methods to prevent AudioContext errors
-    const playStopChimeSpy = jest.spyOn(instance as any, "playStopChime").mockImplementation(() => {});
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mocks before testing
+    mockPlayStopChime.mockClear();
+    mockPlayStartChime.mockClear();
 
     act(() => {
       instance.setState({
@@ -1299,7 +1287,7 @@ describe("Facilitation timer", () => {
     expect(instance.state.boardTimerSeconds).toBe(0);
     expect(instance.state.isBoardTimerRunning).toBe(true); // Timer continues
     expect(instance.state.hasPlayedStopChime).toBe(true);
-    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+    expect(mockPlayStopChime).toHaveBeenCalledTimes(1);
 
     // Continue past zero - should go negative
     act(() => {
@@ -1310,10 +1298,8 @@ describe("Facilitation timer", () => {
     expect(instance.state.isBoardTimerRunning).toBe(true);
 
     // Verify chime was played only once
-    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+    expect(mockPlayStopChime).toHaveBeenCalledTimes(1);
 
-    playStopChimeSpy.mockRestore();
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1321,8 +1307,9 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    const playStopChimeSpy = jest.spyOn(instance as any, "playStopChime").mockImplementation(() => {});
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mocks before testing
+    mockPlayStopChime.mockClear();
+    mockPlayStartChime.mockClear();
 
     act(() => {
       instance.setState({
@@ -1345,10 +1332,8 @@ describe("Facilitation timer", () => {
 
     expect(instance.state.boardTimerSeconds).toBe(-10);
     // Chime should only be called once
-    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+    expect(mockPlayStopChime).toHaveBeenCalledTimes(1);
 
-    playStopChimeSpy.mockRestore();
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1374,8 +1359,8 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime to prevent AudioContext errors
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     // Start with countdown mode (5 minutes)
     act(() => {
@@ -1430,7 +1415,6 @@ describe("Facilitation timer", () => {
     // Should count up in timer mode
     expect(instance.state.boardTimerSeconds).toBe(15);
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1439,9 +1423,9 @@ describe("Facilitation timer", () => {
 
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStopChime and playStartChime methods
-    const playStopChimeSpy = jest.spyOn(instance as any, "playStopChime").mockImplementation(() => {});
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mocks before testing
+    mockPlayStopChime.mockClear();
+    mockPlayStartChime.mockClear();
 
     act(() => {
       instance.setState({
@@ -1465,7 +1449,7 @@ describe("Facilitation timer", () => {
     });
 
     expect(instance.state.boardTimerSeconds).toBe(1);
-    expect(playStopChimeSpy).not.toHaveBeenCalled();
+    expect(mockPlayStopChime).not.toHaveBeenCalled();
 
     // Advance one more second to trigger countdown completion and chime
     act(() => {
@@ -1478,7 +1462,7 @@ describe("Facilitation timer", () => {
     expect(instance.state.hasPlayedStopChime).toBe(true);
 
     // Verify chime was played
-    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+    expect(mockPlayStopChime).toHaveBeenCalledTimes(1);
 
     // Continue past 0 into negative
     act(() => {
@@ -1488,10 +1472,8 @@ describe("Facilitation timer", () => {
     expect(instance.state.boardTimerSeconds).toBe(-3);
     expect(instance.state.isBoardTimerRunning).toBe(true);
     // Chime should only have been called once
-    expect(playStopChimeSpy).toHaveBeenCalledTimes(1);
+    expect(mockPlayStopChime).toHaveBeenCalledTimes(1);
 
-    playStopChimeSpy.mockRestore();
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1500,9 +1482,9 @@ describe("Facilitation timer", () => {
 
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStopChime and playStartChime methods
-    const playStopChimeSpy = jest.spyOn(instance as any, "playStopChime").mockImplementation(() => {});
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mocks before testing
+    mockPlayStopChime.mockClear();
+    mockPlayStartChime.mockClear();
 
     act(() => {
       instance.setState({
@@ -1525,10 +1507,8 @@ describe("Facilitation timer", () => {
     // Timer should count up and NOT play chime
     expect(instance.state.boardTimerSeconds).toBe(60);
     expect(instance.state.isBoardTimerRunning).toBe(true);
-    expect(playStopChimeSpy).not.toHaveBeenCalled();
+    expect(mockPlayStopChime).not.toHaveBeenCalled();
 
-    playStopChimeSpy.mockRestore();
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1537,8 +1517,8 @@ describe("Facilitation timer", () => {
 
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime method
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     act(() => {
       instance.setState({
@@ -1554,11 +1534,10 @@ describe("Facilitation timer", () => {
     });
 
     // Verify start chime was played
-    expect(playStartChimeSpy).toHaveBeenCalledTimes(1);
+    expect(mockPlayStartChime).toHaveBeenCalledTimes(1);
     expect(instance.state.isBoardTimerRunning).toBe(true);
     expect(instance.state.boardTimerSeconds).toBe(300);
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1567,8 +1546,8 @@ describe("Facilitation timer", () => {
 
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime method
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     act(() => {
       instance.setState({
@@ -1584,11 +1563,10 @@ describe("Facilitation timer", () => {
     });
 
     // Verify start chime was played
-    expect(playStartChimeSpy).toHaveBeenCalledTimes(1);
+    expect(mockPlayStartChime).toHaveBeenCalledTimes(1);
     expect(instance.state.isBoardTimerRunning).toBe(true);
     expect(instance.state.boardTimerSeconds).toBe(0);
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1597,8 +1575,8 @@ describe("Facilitation timer", () => {
 
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime method
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     act(() => {
       instance.setState({
@@ -1614,97 +1592,15 @@ describe("Facilitation timer", () => {
     });
 
     // Verify start chime was played when resuming
-    expect(playStartChimeSpy).toHaveBeenCalledTimes(1);
+    expect(mockPlayStartChime).toHaveBeenCalledTimes(1);
     expect(instance.state.isBoardTimerRunning).toBe(true);
     expect(instance.state.boardTimerSeconds).toBe(150); // Should not reset
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
-  it("playStopChime creates audio context and plays ascending notes", () => {
-    const instance = createStandaloneTimerInstance();
-
-    // Mock AudioContext methods
-    const mockOscillator = {
-      connect: jest.fn(),
-      start: jest.fn(),
-      stop: jest.fn(),
-      type: "sine",
-      frequency: { value: 0 },
-    };
-
-    const mockGainNode = {
-      connect: jest.fn(),
-      gain: {
-        setValueAtTime: jest.fn(),
-        linearRampToValueAtTime: jest.fn(),
-        exponentialRampToValueAtTime: jest.fn(),
-      },
-    };
-
-    const mockAudioContext = {
-      createOscillator: jest.fn(() => mockOscillator),
-      createGain: jest.fn(() => mockGainNode),
-      destination: {},
-      currentTime: 0,
-    };
-
-    global.AudioContext = jest.fn(() => mockAudioContext) as any;
-
-    // Call the actual method
-    (instance as any).playStopChime();
-
-    // Verify audio context was created and used correctly
-    expect(mockAudioContext.createOscillator).toHaveBeenCalledTimes(3);
-    expect(mockAudioContext.createGain).toHaveBeenCalledTimes(3);
-    expect(mockOscillator.connect).toHaveBeenCalledTimes(3);
-    expect(mockGainNode.connect).toHaveBeenCalledTimes(3);
-    expect(mockOscillator.start).toHaveBeenCalledTimes(3);
-    expect(mockOscillator.stop).toHaveBeenCalledTimes(3);
-  });
-
-  it("playStartChime creates audio context and plays descending notes", () => {
-    const instance = createStandaloneTimerInstance();
-
-    // Mock AudioContext methods
-    const mockOscillator = {
-      connect: jest.fn(),
-      start: jest.fn(),
-      stop: jest.fn(),
-      type: "sine",
-      frequency: { value: 0 },
-    };
-
-    const mockGainNode = {
-      connect: jest.fn(),
-      gain: {
-        setValueAtTime: jest.fn(),
-        linearRampToValueAtTime: jest.fn(),
-        exponentialRampToValueAtTime: jest.fn(),
-      },
-    };
-
-    const mockAudioContext = {
-      createOscillator: jest.fn(() => mockOscillator),
-      createGain: jest.fn(() => mockGainNode),
-      destination: {},
-      currentTime: 0,
-    };
-
-    global.AudioContext = jest.fn(() => mockAudioContext) as any;
-
-    // Call the actual method
-    (instance as any).playStartChime();
-
-    // Verify audio context was created and used correctly
-    expect(mockAudioContext.createOscillator).toHaveBeenCalledTimes(3);
-    expect(mockAudioContext.createGain).toHaveBeenCalledTimes(3);
-    expect(mockOscillator.connect).toHaveBeenCalledTimes(3);
-    expect(mockGainNode.connect).toHaveBeenCalledTimes(3);
-    expect(mockOscillator.start).toHaveBeenCalledTimes(3);
-    expect(mockOscillator.stop).toHaveBeenCalledTimes(3);
-  });
+  // NOTE: Tests for playStopChime and playStartChime audio context creation have been removed
+  // as these methods are now in the audioHelper module and are tested in audioHelper.test.ts
 
   it("handleCountdownDurationChange updates state", () => {
     const instance = createStandaloneTimerInstance();
@@ -1719,22 +1615,21 @@ describe("Facilitation timer", () => {
   });
 
   it("formatBoardTimer formats time correctly", () => {
-    const instance = createStandaloneTimerInstance();
-
-    expect((instance as any).formatBoardTimer(0)).toBe("0:00");
-    expect((instance as any).formatBoardTimer(5)).toBe("0:05");
-    expect((instance as any).formatBoardTimer(59)).toBe("0:59");
-    expect((instance as any).formatBoardTimer(60)).toBe("1:00");
-    expect((instance as any).formatBoardTimer(125)).toBe("2:05");
-    expect((instance as any).formatBoardTimer(3661)).toBe("61:01");
+    // formatBoardTimer is now an exported utility function from useBoardTimer
+    expect(formatBoardTimer(0)).toBe("0:00");
+    expect(formatBoardTimer(5)).toBe("0:05");
+    expect(formatBoardTimer(59)).toBe("0:59");
+    expect(formatBoardTimer(60)).toBe("1:00");
+    expect(formatBoardTimer(125)).toBe("2:05");
+    expect(formatBoardTimer(3661)).toBe("61:01");
   });
 
   it("handleBoardTimerToggle pauses when running", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     // Start the timer
     act(() => {
@@ -1758,7 +1653,6 @@ describe("Facilitation timer", () => {
     expect(event.stopPropagation).toHaveBeenCalled();
     expect(instance.state.isBoardTimerRunning).toBe(false);
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1766,8 +1660,8 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     expect(instance.state.isBoardTimerRunning).toBe(false);
 
@@ -1786,7 +1680,6 @@ describe("Facilitation timer", () => {
     expect(event.stopPropagation).toHaveBeenCalled();
     expect(instance.state.isBoardTimerRunning).toBe(true);
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1794,8 +1687,8 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    // Spy on playStartChime
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     // Start and advance timer
     act(() => {
@@ -1824,7 +1717,6 @@ describe("Facilitation timer", () => {
     expect(instance.state.boardTimerSeconds).toBe(0);
     expect(instance.state.isBoardTimerRunning).toBe(false);
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1873,7 +1765,8 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     // Start timer
     act(() => {
@@ -1892,7 +1785,6 @@ describe("Facilitation timer", () => {
     expect(instance.state.isBoardTimerRunning).toBe(false);
     expect((instance as any).boardTimerIntervalId).toBeUndefined();
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -1943,7 +1835,8 @@ describe("Facilitation timer", () => {
     jest.useFakeTimers();
     const instance = createStandaloneTimerInstance();
 
-    const playStartChimeSpy = jest.spyOn(instance as any, "playStartChime").mockImplementation(() => {});
+    // Clear the mock before testing
+    mockPlayStartChime.mockClear();
 
     // Start timer
     act(() => {
@@ -1960,7 +1853,6 @@ describe("Facilitation timer", () => {
     expect(instance.state.boardTimerSeconds).toBe(0);
     expect(instance.state.isBoardTimerRunning).toBe(false);
 
-    playStartChimeSpy.mockRestore();
     jest.clearAllTimers();
   });
 
@@ -2047,7 +1939,7 @@ describe("componentDidUpdate", () => {
     const addVisitMock = userDataService.addVisit as jest.Mock;
     const switchToBoardMock = reflectBackendService.switchToBoard as jest.Mock;
 
-    instance.componentDidUpdate(instance.props, previousState);
+    instance.componentDidUpdate({ ...feedbackBoardContainerProps, deferInitialization: true }, previousState);
 
     expect(trackEventMock).toHaveBeenCalledTimes(2);
     expect(trackEventMock).toHaveBeenNthCalledWith(1, {
@@ -2109,7 +2001,7 @@ describe("componentDidUpdate", () => {
     const addVisitMock = userDataService.addVisit as jest.Mock;
     const switchToBoardMock = reflectBackendService.switchToBoard as jest.Mock;
 
-    instance.componentDidUpdate(instance.props, previousState);
+    instance.componentDidUpdate({ ...feedbackBoardContainerProps, deferInitialization: true }, previousState);
 
     expect(trackEventMock).toHaveBeenCalledTimes(1);
     expect(trackEventMock).toHaveBeenCalledWith({
@@ -2138,7 +2030,7 @@ describe("componentDidUpdate", () => {
 
     const pauseBoardTimerSpy = jest.spyOn(instance as any, "pauseBoardTimer").mockImplementation(() => {});
 
-    instance.componentDidUpdate(instance.props, previousState);
+    instance.componentDidUpdate({ ...feedbackBoardContainerProps, deferInitialization: true }, previousState);
 
     expect(pauseBoardTimerSpy).toHaveBeenCalledTimes(1);
   });
@@ -3176,12 +3068,12 @@ describe("FeedbackBoardContainer - Board Management", () => {
     const instance = createStandaloneTimerInstance();
 
     instance.setState({
-      timerSecs: 60,
-      timerState: true,
+      boardTimerSeconds: 60,
+      isBoardTimerRunning: true,
     });
 
-    expect(instance.state.timerSecs).toBe(60);
-    expect(instance.state.timerState).toBe(true);
+    expect(instance.state.boardTimerSeconds).toBe(60);
+    expect(instance.state.isBoardTimerRunning).toBe(true);
   });
 
   it("should handle setState for board selection", () => {

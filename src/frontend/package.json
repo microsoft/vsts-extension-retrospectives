@@ -17,7 +17,8 @@
     "pack:d": "npm run build && npx tfx extension create --manifests vss-extension-dev.json --rev-version --output-path ./dist/",
     "pack:p": "npm run build && npx tfx extension create --manifests vss-extension-prod.json --rev-version --output-path ./dist/",
     "publish:d": "npm run pack:d && npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}",
-    "publish:p": "npm run pack:p && npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}"
+    "publish:p": "npm run pack:p && npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}",
+    "stats": "CODECOV_TOKEN= npx webpack --mode=production --profile --json > stats.json && npx webpack-bundle-analyzer stats.json dist"
   },
   "repository": {
     "type": "git",
@@ -46,8 +47,8 @@
     "@testing-library/react": "16.3.1",
     "@testing-library/user-event": "14.6.1",
     "@types/jest": "30.0.0",
-    "@types/node": "25.0.3",
-    "@types/react": "19.2.7",
+    "@types/node": "25.0.5",
+    "@types/react": "19.2.8",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "8.52.0",
     "@typescript-eslint/parser": "8.52.0",
@@ -73,11 +74,12 @@
     "stream-browserify": "3.0.0",
     "style-loader": "4.0.0",
     "tailwindcss": "4.1.18",
-    "tfx-cli": "0.22.6",
+    "tfx-cli": "0.23.1",
     "ts-jest": "29.4.6",
     "ts-loader": "9.5.4",
     "typescript": "5.9.3",
     "webpack": "5.104.1",
+    "webpack-bundle-analyzer": "5.1.1",
     "webpack-cli": "6.0.1",
     "webpack-dev-server": "5.2.2"
   },

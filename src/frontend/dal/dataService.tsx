@@ -1,6 +1,7 @@
 import { getAccessToken, getExtensionContext, getService } from "azure-devops-extension-sdk";
 import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from "azure-devops-extension-api";
 import { appInsights } from "../utilities/telemetryClient";
+import { isAzureDevOpsError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
 
 let extensionDataManager: IExtensionDataManager;
 
@@ -24,11 +25,9 @@ export async function readDocuments<T>(collectionName: string, isPrivate?: boole
   try {
     // Attempt to fetch documents
     data = await dataService.getDocuments(collectionName, isPrivate ? { scopeType: "User" } : undefined);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
-    // Check for specific exception type
-    if (e.serverError?.typeKey === "DocumentCollectionDoesNotExistException") {
-      console.warn(`Collection ${collectionName} does not exist or contains no documents.`); // expect no documents for new collections
+  } catch (e: unknown) {
+    if (isAzureDevOpsError(e) && e.serverError?.typeKey === AzureDevOpsErrorTypes.DocumentCollectionDoesNotExist) {
+      console.warn(`Collection ${collectionName} does not exist or contains no documents.`);
       appInsights.trackTrace({
         message: `Collection ${collectionName} is missing or empty.`,
         properties: { collectionName },

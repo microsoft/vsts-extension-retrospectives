@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import { cn } from "../utilities/classNameHelper";
 import { FocusTrapCallout, DirectionalHint } from "@fluentui/react/lib/Callout";
 import { List } from "@fluentui/react/lib/List";
@@ -33,205 +33,182 @@ export interface ISelectorListItemHeader {
   title: string;
 }
 
-export interface ISelectorComboState {
-  currentFilterText: string;
-  isSelectorCalloutVisible: boolean;
-  isSelectorDialogHidden: boolean;
-}
+function SelectorCombo<T>({ className, currentValue, iconName, selectorList, title, nameGetter, selectorListItemOnClick }: ISelectorComboProps<T>): React.JSX.Element {
+  const [currentFilterText, setCurrentFilterText] = useState("");
+  const [isSelectorCalloutVisible, setIsSelectorCalloutVisible] = useState(false);
+  const [isSelectorDialogHidden, setIsSelectorDialogHidden] = useState(true);
 
-class SelectorCombo<T> extends React.Component<ISelectorComboProps<T>, ISelectorComboState> {
-  private selectorButton: HTMLElement | null;
+  const selectorButton = useRef<HTMLDivElement>(null);
 
-  constructor(props: ISelectorComboProps<T>) {
-    super(props);
-
-    this.state = {
-      currentFilterText: "",
-      isSelectorCalloutVisible: false,
-      isSelectorDialogHidden: true,
-    };
-  }
-
-  public render(): React.JSX.Element {
-    const selectorButtonText: string = this.props.nameGetter(this.props.currentValue);
-
-    return (
-      <div className={this.props.className}>
-        <div
-          className="selector-button"
-          aria-label={"Click to search and select " + this.props.title + ". Current selection is " + selectorButtonText}
-          aria-expanded={this.state.isSelectorCalloutVisible}
-          aria-haspopup="true"
-          role="button"
-          data-testid="selector-button"
-          ref={selectorButton => {
-            this.selectorButton = selectorButton;
-          }}
-          onClick={this.toggleSelectorCallout}
-          tabIndex={0}
-          onKeyDown={this.handleKeyPressSelectorButton}
-        >
-          {getIconElement(this.props.iconName)}
-          <div>
-            <span>{selectorButtonText}</span>
-          </div>
-          {getIconElement("chevron-down")}
-        </div>
-        <FocusTrapCallout className={cn("selector-callout", this.props.className)} target={this.selectorButton} directionalHint={DirectionalHint.bottomLeftEdge} gapSpace={0} focusTrapProps={{ isClickableOutsideFocusTrap: true }} isBeakVisible={false} onDismiss={this.hideSelectorCallout} hidden={!this.state.isSelectorCalloutVisible}>
-          {this.renderSelectorCombo(this.getFilteredValues(), true)}
-        </FocusTrapCallout>
-      </div>
-    );
-  }
-
-  private handleKeyPressSelectorButton = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyPressSelectorButton = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.keyCode === 13) {
-      this.toggleSelectorCallout();
+      setIsSelectorCalloutVisible(prev => {
+        if (prev) {
+          setCurrentFilterText("");
+        }
+        return !prev;
+      });
     }
-  };
+  }, []);
 
-  private chooseItem = (item: T) => {
-    this.props.selectorListItemOnClick(item);
-    if (this.state.isSelectorCalloutVisible) {
-      this.hideSelectorCallout();
-    }
+  const hideSelectorCallout = useCallback(() => {
+    setIsSelectorCalloutVisible(false);
+  }, []);
 
-    if (!this.state.isSelectorDialogHidden) {
-      this.closeMobileSelectorDialog();
-    }
-  };
+  const closeMobileSelectorDialog = useCallback(() => {
+    setIsSelectorDialogHidden(true);
+  }, []);
 
-  private handleKeyPressTeamList = (event: React.KeyboardEvent<HTMLDivElement>, item: T) => {
-    if (event.keyCode === 13) {
-      this.chooseItem(item);
-    }
-  };
+  const chooseItem = useCallback(
+    (item: T) => {
+      selectorListItemOnClick(item);
+      if (isSelectorCalloutVisible) {
+        hideSelectorCallout();
+      }
 
-  private closeMobileSelectorDialog = () => {
-    this.setState({
-      isSelectorDialogHidden: true,
-    });
-  };
+      if (!isSelectorDialogHidden) {
+        closeMobileSelectorDialog();
+      }
+    },
+    [selectorListItemOnClick, isSelectorCalloutVisible, isSelectorDialogHidden, hideSelectorCallout, closeMobileSelectorDialog],
+  );
 
-  private hideSelectorCallout = () => {
-    this.setState({
-      isSelectorCalloutVisible: false,
-    });
-  };
+  const handleKeyPressTeamList = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>, item: T) => {
+      if (event.keyCode === 13) {
+        chooseItem(item);
+      }
+    },
+    [chooseItem],
+  );
 
-  private renderSelectorList = (finishedLoading: boolean, header: ISelectorListItemHeader, items: T[], shouldVirtualizeItems: boolean) => {
-    return (
-      <div className="selector-list" key={header.id}>
-        {!header.isHidden && (
-          <div className="selector-list-header">
-            <div className="selector-list-header-text">{header.title}</div>
-          </div>
-        )}
-        <List
-          className="selector-list-items"
-          items={items}
-          // Not virtualizing the list for mobile views due to bug on fabricUI blocking scroll events
-          // on elements other than the modal plane
-          onShouldVirtualize={() => shouldVirtualizeItems}
-          onRenderCell={(item: T, itemIndex: number) => {
-            const itemName: string = this.props.nameGetter(item);
-            const itemPosition: number = itemIndex + 1;
-            const ariaLabel: string = header.isHidden ? this.props.title + " " + itemPosition + " of " + items.length + ". " + itemName : header.title + " collection. " + this.props.title + " " + itemPosition + " of " + items.length + ". " + itemName;
-            return (
-              <div
-                className="selector-list-item"
-                onClick={() => {
-                  this.chooseItem(item);
-                }}
-                onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => this.handleKeyPressTeamList(e, item)}
-                tabIndex={0}
-                aria-label={ariaLabel}
-              >
-                <i className={"fa-solid fa-" + this.props.iconName}></i>
-                <div title={itemName} className="selector-list-item-text">
-                  {itemName}
-                </div>
-              </div>
-            );
-          }}
-        />
-        {!finishedLoading && (
-          <>
-            <Shimmer className="list-item-shimmer" />
-            <Shimmer className="list-item-shimmer" />
-            <Shimmer className="list-item-shimmer" />
-            <Shimmer className="list-item-shimmer" />
-            <Shimmer className="list-item-shimmer" />
-          </>
-        )}
-      </div>
-    );
-  };
+  const updateFilterText = useCallback((event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, filterText: string) => {
+    setCurrentFilterText(filterText);
+  }, []);
 
-  private updateFilterText = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, filterText: string) => {
-    this.setState({
-      currentFilterText: filterText,
-    });
-  };
+  const getFilteredValues = useMemo((): ISelectorList<T> => {
+    const trimmedFilterText = currentFilterText.trim();
 
-  private getFilteredValues = () => {
-    const trimmedFilterText = this.state.currentFilterText.trim();
-
-    const newSelectorList: ISelectorList<T> = {
-      selectorListItems: this.props.selectorList.selectorListItems.map(selectorListItem => {
+    return {
+      selectorListItems: selectorList.selectorListItems.map(selectorListItem => {
+        const items = selectorListItem.items ?? [];
         const newSelectorListItem: ISelectorListItem<T> = {
           finishedLoading: selectorListItem.finishedLoading,
           header: selectorListItem.header,
-          items: selectorListItem.items.filter(item => {
-            return this.props.nameGetter(item).toLocaleLowerCase().includes(trimmedFilterText.toLocaleLowerCase());
+          items: items.filter(item => {
+            return nameGetter(item).toLocaleLowerCase().includes(trimmedFilterText.toLocaleLowerCase());
           }),
         };
 
         return newSelectorListItem;
       }),
     };
+  }, [currentFilterText, selectorList, nameGetter]);
 
-    return newSelectorList;
-  };
-
-  private renderSelectorCombo = (selectorList: ISelectorList<T>, shouldVirtualizeItems: boolean) => {
-    let itemCount = 0;
-    let searchResultsAriaLabel: string = "";
-
-    if (this.state && this.state.currentFilterText) {
-      selectorList.selectorListItems.map(selectorListItem => {
-        if (selectorListItem && selectorListItem.items) {
-          itemCount += selectorListItem.items.length;
-        }
-      });
-
-      searchResultsAriaLabel = itemCount === 1 ? "Found 1 result." : "Found " + itemCount + " results.";
-    }
-
-    return (
-      <div className="selector-filter-container">
-        <TextField autoFocus ariaLabel={searchResultsAriaLabel + " Please enter text here to search."} placeholder="Search" onChange={this.updateFilterText} tabIndex={0} />
-        <div className="selector-list-container" data-is-scrollable={true}>
-          {selectorList.selectorListItems.map(selectorListItem => this.renderSelectorList(selectorListItem.finishedLoading, selectorListItem.header, selectorListItem.items, shouldVirtualizeItems))}
+  const renderSelectorList = useCallback(
+    (finishedLoading: boolean, header: ISelectorListItemHeader, items: T[], shouldVirtualizeItems: boolean) => {
+      return (
+        <div className="selector-list" key={header.id}>
+          {!header.isHidden && (
+            <div className="selector-list-header">
+              <div className="selector-list-header-text">{header.title}</div>
+            </div>
+          )}
+          <List
+            className="selector-list-items"
+            items={items}
+            // Not virtualizing the list for mobile views due to bug on fabricUI blocking scroll events
+            // on elements other than the modal plane
+            onShouldVirtualize={() => shouldVirtualizeItems}
+            onRenderCell={(item: T, itemIndex: number) => {
+              const itemName: string = nameGetter(item);
+              const itemPosition: number = itemIndex + 1;
+              const ariaLabel: string = header.isHidden ? title + " " + itemPosition + " of " + items.length + ". " + itemName : header.title + " collection. " + title + " " + itemPosition + " of " + items.length + ". " + itemName;
+              return (
+                <div
+                  className="selector-list-item"
+                  onClick={() => {
+                    chooseItem(item);
+                  }}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => handleKeyPressTeamList(e, item)}
+                  tabIndex={0}
+                  aria-label={ariaLabel}
+                >
+                  <i className={"fa-solid fa-" + iconName}></i>
+                  <div title={itemName} className="selector-list-item-text">
+                    {itemName}
+                  </div>
+                </div>
+              );
+            }}
+          />
+          {!finishedLoading && (
+            <>
+              <Shimmer className="list-item-shimmer" />
+              <Shimmer className="list-item-shimmer" />
+              <Shimmer className="list-item-shimmer" />
+              <Shimmer className="list-item-shimmer" />
+              <Shimmer className="list-item-shimmer" />
+            </>
+          )}
         </div>
-      </div>
-    );
-  };
+      );
+    },
+    [nameGetter, title, iconName, chooseItem, handleKeyPressTeamList],
+  );
 
-  private toggleSelectorCallout = () => {
-    this.setState(
-      prevState => {
-        return { isSelectorCalloutVisible: !prevState.isSelectorCalloutVisible };
-      },
-      () => {
-        if (!this.state.isSelectorCalloutVisible) {
-          this.setState({
-            currentFilterText: "",
-          });
-        }
-      },
-    );
-  };
+  const renderSelectorCombo = useCallback(
+    (selectorListData: ISelectorList<T>, shouldVirtualizeItems: boolean) => {
+      let itemCount = 0;
+      let searchResultsAriaLabel: string = "";
+
+      if (currentFilterText) {
+        selectorListData.selectorListItems.map(selectorListItem => {
+          if (selectorListItem && selectorListItem.items) {
+            itemCount += selectorListItem.items.length;
+          }
+        });
+
+        searchResultsAriaLabel = itemCount === 1 ? "Found 1 result." : "Found " + itemCount + " results.";
+      }
+
+      return (
+        <div className="selector-filter-container">
+          <TextField autoFocus ariaLabel={searchResultsAriaLabel + " Please enter text here to search."} placeholder="Search" onChange={updateFilterText} tabIndex={0} />
+          <div className="selector-list-container" data-is-scrollable={true}>
+            {selectorListData.selectorListItems.map(selectorListItem => renderSelectorList(selectorListItem.finishedLoading, selectorListItem.header, selectorListItem.items, shouldVirtualizeItems))}
+          </div>
+        </div>
+      );
+    },
+    [currentFilterText, updateFilterText, renderSelectorList],
+  );
+
+  const toggleSelectorCallout = useCallback(() => {
+    setIsSelectorCalloutVisible(prev => {
+      if (prev) {
+        setCurrentFilterText("");
+      }
+      return !prev;
+    });
+  }, []);
+
+  const selectorButtonText: string = nameGetter(currentValue);
+
+  return (
+    <div className={className}>
+      <div className="selector-button" aria-label={"Click to search and select " + title + ". Current selection is " + selectorButtonText} aria-expanded={isSelectorCalloutVisible} aria-haspopup="true" role="button" data-testid="selector-button" ref={selectorButton} onClick={toggleSelectorCallout} tabIndex={0} onKeyDown={handleKeyPressSelectorButton}>
+        {getIconElement(iconName)}
+        <div>
+          <span>{selectorButtonText}</span>
+        </div>
+        {getIconElement("chevron-down")}
+      </div>
+      <FocusTrapCallout className={cn("selector-callout", className)} target={selectorButton.current} directionalHint={DirectionalHint.bottomLeftEdge} gapSpace={0} focusTrapProps={{ isClickableOutsideFocusTrap: true }} isBeakVisible={false} onDismiss={hideSelectorCallout} hidden={!isSelectorCalloutVisible}>
+        {renderSelectorCombo(getFilteredValues, true)}
+      </FocusTrapCallout>
+    </div>
+  );
 }
 
 export default SelectorCombo;

@@ -24,8 +24,17 @@ jest.mock("../../utilities/telemetryClient", () => {
       FeedbackBoardRestored: "FeedbackBoardRestored",
       FeedbackBoardDeleted: "FeedbackBoardDeleted",
     },
+    reactPlugin: {
+      trackMetric: jest.fn(),
+      trackEvent: jest.fn(),
+    },
   };
 });
+
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: (_plugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
+}));
 
 jest.mock("../../dal/itemDataService", () => {
   const originalModule = jest.requireActual("../../dal/itemDataService");
@@ -334,7 +343,7 @@ jest.spyOn(userIdentityHelper, "getUserIdentity").mockReturnValue({
   id: "user-1", // make sure the id matches your test
 });
 
-jest.spyOn(userIdentityHelper, "encrypt").mockImplementation(id => `encrypted-${id}`);
+jest.spyOn(userIdentityHelper, "obfuscateUserId").mockImplementation(id => `encrypted-${id}`);
 
 describe("buildBoardSummaryState", () => {
   it("returns empty state when no boards exist", () => {

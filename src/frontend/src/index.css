@@ -303,10 +303,35 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .unlink-work-item-confirmation-dialog,
 .preview-email-dialog,
 .retrospectives-carousel-dialog {
-  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
+  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
+
+  & table {
+    @apply w-full border-collapse text-left;
+
+    & tr {
+      @apply border-b border-(--border-subtle-color);
+
+      &:hover {
+        @apply bg-(--border-subtle-color);
+      }
+
+      & td:first-child,
+      & th:first-child {
+        @apply py-2 px-3 w-2/5;
+      }
+    }
+
+    & kbd {
+      @apply py-0.5 px-1.5 mx-0.5 text-(--text-primary-color) rounded bg-(--border-subtle-color) font-mono text-xs shadow-sm;
+    }
+  }
+
+  & .keyboard-shortcuts-key-separator {
+    @apply mx-1 text-(--text-secondary-color);
+  }
 
   & .header {
-    @apply flex justify-between items-center px-5 py-3 text-(--text-primary-color);
+    @apply flex justify-between items-center px-5 py-3 text-(--text-primary-color) shrink-0;
 
     & .title {
       @apply m-0 text-xl font-semibold;
@@ -350,7 +375,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .inner {
-    @apply flex items-center justify-end gap-3 px-5 py-3;
+    @apply flex items-center justify-end gap-3 px-5 py-3 shrink-0;
 
     & button {
       @apply flex items-center gap-1 px-4 py-2 rounded text-sm border border-(--border-subtle-color) cursor-pointer bg-(--text-primary-color) text-[rgb(var(--palette-neutral-0))];
@@ -379,7 +404,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .editable-document-card-title {
-  @apply overflow-hidden wrap-break-word flex-1 flex-col justify-center min-h-25 text-(--text-primary-color);
+  @apply overflow-hidden wrap-break-word min-h-25 text-(--text-primary-color);
 
   & .editable-text {
     @apply inline-block max-w-full align-middle whitespace-pre-wrap wrap-break-word cursor-text text-base;
@@ -431,45 +456,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board {
-  @apply w-full table table-fixed h-[calc(100vh-132px)];
-}
-
-.keyboard-shortcuts-dialog {
-  @apply max-h-4/5 bg-(--background-color);
-
-  & .ms-Dialog-title,
-  & .ms-Dialog-subText {
-    @apply text-(--text-primary-color);
-  }
-
-  & table tr:hover {
-    @apply bg-(--border-subtle-color);
-  }
-
-  & .keyboard-shortcuts-content {
-    @apply max-h-1/2 overflow-y-auto flex flex-col gap-5 text-(--text-primary-color);
-  }
-
-  & .keyboard-shortcuts-table {
-    @apply w-full border-collapse text-left;
-
-    & tr {
-      @apply border-b border-(--border-subtle-color);
-
-      & td:first-child,
-      & th:first-child {
-        @apply py-2 px-3 w-2/5;
-      }
-    }
-
-    & kbd {
-      @apply py-0.5 px-1.5 mx-0.5 text-(--text-primary-color) rounded bg-(--border-subtle-color) font-mono text-xs shadow-sm;
-    }
-  }
-
-  & .keyboard-shortcuts-key-separator {
-    @apply mx-1 text-(--text-secondary-color);
-  }
+  @apply w-full table table-fixed h-[calc(100vh-92px)];
 }
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
@@ -542,7 +529,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .item-cards {
-    @apply flex flex-col;
+    @apply flex flex-col w-full;
 
     & .feedbackItemGroupItem.removeFeedbackItem .ms-DocumentCard {
       @apply animate-[fadeOutToRed_1000ms_ease-in_1_forwards];
@@ -696,6 +683,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .add-action-item-list-items .ms-List-cell:hover {
   @apply bg-(--border-subtle-color);
+}
+
+.action-item-display-container {
+  display: contents;
 }
 
 .action-items {
@@ -1667,18 +1658,18 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .workflow-stage-tab {
   @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent transition-colors duration-150 leading-none;
-}
 
-.workflow-stage-tab:hover {
-  @apply text-primary;
+  &:hover {
+    @apply text-primary;
+  }
+
+  &:focus-visible {
+    @apply outline-2 outline-primary outline-offset-2;
+  }
 }
 
 .workflow-stage-tab--active {
   @apply text-primary border-b-primary;
-}
-
-.workflow-stage-tab:focus-visible {
-  @apply outline-2 outline-primary outline-offset-2;
 }
 
 .workflow-stage-timer {
@@ -1751,13 +1742,99 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .team-effectiveness-measurement-table {
   @apply w-full border-separate [border-spacing:0_0.5em];
-}
 
-.team-assessment-score-button {
-  @apply inline-flex items-center justify-center bg-transparent border-none cursor-pointer p-1;
+  & thead {
+    @apply text-center;
 
-  &:focus-visible {
-    @apply outline-2 outline-(--nav-header-active-item-background) outline-offset-2;
+    & .team-effectiveness-favorability-label {
+      @apply border-b border-solid border-(--text-primary-color) outline-4 outline-(--background-color) font-light;
+    }
+
+    & .voting-measurement-index {
+      @apply w-9 text-white;
+
+      &.voting-measurement-index-unfavorable,
+      &.voting-measurement-index-neutral,
+      &.voting-measurement-index-favorable {
+        @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
+
+        &.voting-index-1 {
+          @apply bg-[#db4d4f];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
+        }
+
+        &.voting-index-2 {
+          @apply bg-[#e1664f];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc4127 9px, #cc4127 10px);
+        }
+
+        &.voting-index-3 {
+          @apply bg-[#ee794f];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e15927 9px, #e15927 10px);
+        }
+
+        &.voting-index-4 {
+          @apply bg-[rgb(240,155,79)];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc7424 9px, #cc7424 10px);
+        }
+
+        &.voting-index-5 {
+          @apply bg-[rgb(251,177,79)];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e89c37 9px, #e89c37 10px);
+        }
+
+        &.voting-index-6 {
+          @apply bg-[rgb(253,193,79)];
+          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #df9e24 9px, #df9e24 10px);
+        }
+
+        &.voting-index-7 {
+          @apply bg-[rgb(255,211,92)];
+          background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #ecc503 7px, #ecc503 8px);
+        }
+
+        &.voting-index-8 {
+          @apply bg-[rgb(242,227,92)];
+          background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #f7d113 7px, #f7d113 8px);
+        }
+
+        &.voting-index-9 {
+          @apply bg-success bg-[radial-gradient(var(--color-success-lighter)_10%,transparent_10%),radial-gradient(var(--color-success-lighter)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
+        }
+
+        &.voting-index-10 {
+          @apply bg-success bg-[radial-gradient(var(--color-success)_10%,transparent_10%),radial-gradient(var(--color-success)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
+        }
+      }
+    }
+  }
+
+  & tbody .effectiveness-measurement-row:nth-child(odd) {
+    @apply bg-(--border-subtle-color);
+  }
+
+  & tbody .effectiveness-measurement-row th {
+    @apply font-normal p-2;
+
+    & p {
+      @apply flex items-center gap-1;
+    }
+  }
+
+  & tbody .effectiveness-measurement-row .team-assessment-score-button {
+    @apply text-(--text-primary-color) inline-flex items-center justify-center bg-transparent border-none cursor-pointer p-1;
+
+    &:focus-visible {
+      @apply outline-2 outline-(--nav-header-active-item-background) outline-offset-2;
+    }
+
+    &:hover .team-assessment-score-circle {
+      @apply border-primary;
+    }
+  }
+
+  & tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
+    @apply border-r-2 border-solid border-primary text-center;
   }
 }
 
@@ -1765,118 +1842,28 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply inline-block w-4 h-4 border-2 rounded-full border-(--nav-header-active-item-background) transition-[background-color,border-color] duration-200 ease-in;
 }
 
-.team-assessment-score-button:hover .team-assessment-score-circle {
-  @apply border-primary;
-}
-
 .team-assessment-score-button-selected .team-assessment-score-circle {
   @apply bg-primary;
 }
 
-.team-effectiveness-measurement-table thead {
-  @apply text-center;
-}
-
-.team-effectiveness-measurement-table thead .team-effectiveness-favorability-label {
-  @apply border-b border-solid border-(--text-primary-color) outline-4 outline-(--background-color) font-light;
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index {
-  @apply w-9 text-white;
-
-  &.voting-measurement-index-unfavorable,
-  &.voting-measurement-index-neutral,
-  &.voting-measurement-index-favorable {
-    @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
-  }
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-1 {
-  @apply bg-[#db4d4f];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-2 {
-  @apply bg-[#e1664f];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc4127 9px, #cc4127 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-3 {
-  @apply bg-[#ee794f];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e15927 9px, #e15927 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-4 {
-  @apply bg-[rgb(240,155,79)];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc7424 9px, #cc7424 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-5 {
-  @apply bg-[rgb(251,177,79)];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e89c37 9px, #e89c37 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-unfavorable.voting-index-6 {
-  @apply bg-[rgb(253,193,79)];
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #df9e24 9px, #df9e24 10px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-neutral.voting-index-7 {
-  @apply bg-[rgb(255,211,92)];
-  background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #ecc503 7px, #ecc503 8px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-neutral.voting-index-8 {
-  @apply bg-[rgb(242,227,92)];
-  background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #f7d113 7px, #f7d113 8px);
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-9 {
-  @apply bg-success bg-[radial-gradient(var(--color-success-lighter)_10%,transparent_10%),radial-gradient(var(--color-success-lighter)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
-}
-
-.team-effectiveness-measurement-table thead .voting-measurement-index.voting-measurement-index-favorable.voting-index-10 {
-  @apply bg-success bg-[radial-gradient(var(--color-success)_10%,transparent_10%),radial-gradient(var(--color-success)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
-}
-
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row:nth-child(odd) {
-  @apply bg-(--border-subtle-color);
-}
-
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row th {
-  @apply font-normal p-2;
-
-  & p {
-    @apply flex items-center gap-1;
-  }
-}
-
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row .team-assessment-score-button {
-  @apply text-(--text-primary-color);
-}
-
-.team-effectiveness-measurement-table tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
-  @apply border-r-2 border-solid border-primary text-center;
-}
-
 .team-effectiveness-dialog {
   @apply bg-(--background-color) border-[3px] border-solid border-(--border-subtle-color) max-w-210 text-(--text-primary-color);
-}
 
-.team-effectiveness-dialog .ms-Dialog-title {
-  @apply text-(--text-primary-color);
-}
+  & .ms-Dialog-title {
+    @apply text-(--text-primary-color);
+  }
 
-.team-effectiveness-dialog .ms-Dialog-content .ms-Dialog-header {
-  @apply hidden;
-}
+  & .ms-Dialog-content .ms-Dialog-header {
+    @apply hidden;
+  }
 
-.team-effectiveness-dialog .ms-Dialog-content .ms-Dialog-inner {
-  @apply py-0 px-1 pb-1.5;
-}
+  & .ms-Dialog-content .ms-Dialog-inner {
+    @apply py-0 px-1 pb-1.5;
+  }
 
-.team-effectiveness-dialog .ms-Dialog-content i.accent3 {
-  @apply text-[rgba(var(--palette-accent3),0.5)];
+  & .ms-Dialog-content i.accent3 {
+    @apply text-[rgba(var(--palette-accent3),0.5)];
+  }
 }
 
 .metadata-form-save-button,
@@ -1887,10 +1874,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedbackItem {
   @apply m-0 mr-3 mb-3 break-inside-avoid inline-block align-top w-full min-w-64 box-border;
-}
 
-.feedbackItem:focus {
-  @apply outline-none;
+  &:focus {
+    @apply outline-none;
+  }
 }
 
 .feedbackItem:focus-visible .mainItemCard {
@@ -1915,8 +1902,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply blur-xs pointer-events-none;
 }
 
+.feedback-item-group .document-card-wrapper,
+.feedbackItemGroupItem .document-card-wrapper,
 .feedbackItem .document-card-wrapper {
-  @apply relative;
+  @apply relative w-full;
 }
 
 .feedbackItem .mainItemCard {
@@ -2071,15 +2060,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.dialog-feedback-base {
-  @apply bg-(--background-color);
-}
-
-.dialog-feedback-base .ms-Dialog-title,
-.dialog-feedback-base .ms-Dialog-subText {
-  @apply text-(--text-primary-color);
-}
-
 .retrospectives-move-feedback-item-dialog {
   @apply bg-(--background-color);
 }
@@ -2178,44 +2158,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link.is-disabled .ms-ContextualMenu-itemText {
   @apply text-(--text-disabled-color);
-}
-
-.dialog-confirmation-base {
-  @apply bg-(--background-color) max-w-md w-9/10;
-}
-
-.dialog-confirmation-base .ms-Dialog-title,
-.dialog-confirmation-base .ms-Dialog-subText {
-  @apply text-(--text-primary-color);
-}
-
-.dialog-confirmation-base .ms-Button--primary {
-  @apply bg-primary text-white;
-}
-
-.retrospectives-archive-board-confirmation-dialog,
-.retrospectives-remove-feedback-item-from-group-dialog,
-.retrospectives-delete-board-confirmation-dialog,
-.retrospectives-delete-feedback-item-dialog {
-  @apply bg-(--background-color) max-w-md w-9/10;
-}
-
-.retrospectives-archive-board-confirmation-dialog .ms-Dialog-title,
-.retrospectives-archive-board-confirmation-dialog .ms-Dialog-subText,
-.retrospectives-remove-feedback-item-from-group-dialog .ms-Dialog-title,
-.retrospectives-remove-feedback-item-from-group-dialog .ms-Dialog-subText,
-.retrospectives-delete-board-confirmation-dialog .ms-Dialog-title,
-.retrospectives-delete-board-confirmation-dialog .ms-Dialog-subText,
-.retrospectives-delete-feedback-item-dialog .ms-Dialog-title,
-.retrospectives-delete-feedback-item-dialog .ms-Dialog-subText {
-  @apply text-(--text-primary-color);
-}
-
-.retrospectives-archive-board-confirmation-dialog .ms-Button--primary,
-.retrospectives-remove-feedback-item-from-group-dialog .ms-Button--primary,
-.retrospectives-delete-board-confirmation-dialog .ms-Button--primary,
-.retrospectives-delete-feedback-item-dialog .ms-Button--primary {
-  @apply bg-primary text-white;
 }
 
 .retro-toast {

@@ -1,8 +1,7 @@
 import { Buffer } from "buffer";
 
 export interface JwtPayload {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]: string | number | string[] | undefined;
   iss?: string | undefined;
   sub?: string | undefined;
   aud?: string | string[] | undefined;

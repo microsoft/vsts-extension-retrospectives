@@ -1,11 +1,12 @@
 import { WorkItem } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
 import { appInsights } from "../utilities/telemetryClient";
-import { encrypt, getUserIdentity } from "../utilities/userIdentityHelper";
+import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { workItemService } from "./azureDevOpsWorkItemService";
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from "./dataService";
 import { generateUUID } from "../utilities/random";
 import { IColumnItem } from "../../frontend/components/feedbackBoard";
+import { isAzureDevOpsError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
 
 class ItemDataService {
   /**
@@ -71,9 +72,8 @@ class ItemDataService {
     try {
       // Attempt to fetch feedback items
       feedbackItems = await readDocuments<IFeedbackItemDocument>(boardId, false, true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      if (e.serverError?.typeKey === "DocumentCollectionDoesNotExistException") {
+    } catch (e: unknown) {
+      if (isAzureDevOpsError(e) && e.serverError?.typeKey === AzureDevOpsErrorTypes.DocumentCollectionDoesNotExist) {
         console.warn(`No feedback items found for board ${boardId}—expected for new or unused boards.`);
 
         appInsights.trackTrace({
@@ -258,7 +258,7 @@ class ItemDataService {
    * Increment or decrement the vote of the feedback item.
    */
   public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
-    const encryptedUserId = encrypt(userId);
+    const encryptedUserId = obfuscateUserId(userId);
 
     // Step 1: Fetch Feedback and Board Items
     const feedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
@@ -326,8 +326,7 @@ class ItemDataService {
   /**
    * flip the timer state.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: any): Promise<IFeedbackItemDocument> => {
+  public flipTimer = async (boardId: string, feedbackItemId: string, timerid: ReturnType<typeof setInterval> | null): Promise<IFeedbackItemDocument> => {
     const feedbackItem: IFeedbackItemDocument = await this.getFeedbackItem(boardId, feedbackItemId);
 
     if (!feedbackItem) {

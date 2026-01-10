@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useState, useEffect, useRef, useCallback } from "react";
 import { PrimaryButton, DefaultButton, IconButton } from "@fluentui/react/lib/Button";
 import { TextField } from "@fluentui/react/lib/TextField";
 import Dialog, { DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
@@ -7,7 +7,7 @@ import { List } from "@fluentui/react/lib/List";
 import { DocumentCardType, DocumentCard } from "@fluentui/react/lib/DocumentCard";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { cn } from "../utilities/classNameHelper";
-import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
 import BoardDataService from "../dal/boardDataService";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn } from "../interfaces/feedback";
@@ -31,228 +31,253 @@ export interface IFeedbackBoardMetadataFormProps {
   onFormCancel: () => void;
 }
 
-interface IFeedbackBoardMetadataFormState {
-  initialTitle: string;
-  title: string;
-  isBoardNameTaken: boolean;
-  placeholderText: string;
-  columnCards: IFeedbackColumnCard[];
-  maxVotesPerUser: number;
-  isIncludeTeamEffectivenessMeasurement: boolean;
-  shouldShowFeedbackAfterCollect: boolean;
-  isBoardAnonymous: boolean;
-  isDeleteColumnConfirmationDialogHidden: boolean;
-  isChooseColumnIconDialogHidden: boolean;
-  isChooseColumnAccentColorDialogHidden: boolean;
-  columnCardBeingEdited: IFeedbackColumnCard;
-  selectedIconKey: string;
-  selectedAccentColorKey: string;
-  permissions: IFeedbackBoardDocumentPermissions;
-}
-
 export interface IFeedbackColumnCard {
   column: IFeedbackColumn;
   markedForDeletion: boolean;
 }
 
-class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFormProps, IFeedbackBoardMetadataFormState> {
-  private readonly chooseColumnIconDialogRef = React.createRef<HTMLDialogElement>();
+const maxColumnCount = 5;
 
-  constructor(props: IFeedbackBoardMetadataFormProps) {
-    super(props);
+const allIconClassNames = availableIcons.filter(icon => icon.tags && icon.tags.length > 0);
 
-    // Define retrospective types
-    const isCopyRetrospective = props.isNewBoardCreation && props.isDuplicatingBoard;
-    const isEditRetrospective = !props.isNewBoardCreation;
+const allAccentColors: { friendlyName: string; colorCode: string }[] = [
+  {
+    friendlyName: "green",
+    colorCode: "#008000",
+  },
+  {
+    friendlyName: "red",
+    colorCode: "#cc293d",
+  },
+  {
+    friendlyName: "navy",
+    colorCode: "#174170",
+  },
+  {
+    friendlyName: "orange",
+    colorCode: "#F78A53",
+  },
+  {
+    friendlyName: "pink",
+    colorCode: "#ff00cc",
+  },
+  {
+    friendlyName: "yellow",
+    colorCode: "#f6af08",
+  },
+  {
+    friendlyName: "blue",
+    colorCode: "#0078d4",
+  },
+  {
+    friendlyName: "purple",
+    colorCode: "#8063bf",
+  },
+  {
+    friendlyName: "grey",
+    colorCode: "#555555",
+  },
+];
 
-    // Set temporary values used first time user creates a new board
-    let defaultMaxVotes = 5;
-    let defaultIncludeTeamEffectivenessMeasurement = true;
-    let defaultShowFeedbackAfterCollect = false;
-    let defaultIsAnonymous = false;
+const getRandomArrayElement = <T extends {}>(array: T[]) => {
+  return array[Math.floor(Math.random() * array.length)];
+};
 
-    // Set defaults for a new retrospective
-    let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => ({
+const getInitialState = (props: IFeedbackBoardMetadataFormProps) => {
+  const isCopyRetrospective = props.isNewBoardCreation && props.isDuplicatingBoard;
+  const isEditRetrospective = !props.isNewBoardCreation;
+
+  let defaultMaxVotes = 5;
+  let defaultIncludeTeamEffectivenessMeasurement = true;
+  let defaultShowFeedbackAfterCollect = false;
+  let defaultIsAnonymous = false;
+
+  let defaultColumns: IFeedbackColumnCard[] = getColumnsByTemplateId("").map(column => ({
+    column: {
+      ...column,
+      icon: getIconElement(column.iconClass),
+    },
+    markedForDeletion: false,
+  }));
+  let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: [] };
+
+  if (isCopyRetrospective || isEditRetrospective) {
+    defaultColumns = props.currentBoard.columns.map(column => ({
       column: {
         ...column,
         icon: getIconElement(column.iconClass),
       },
       markedForDeletion: false,
     }));
-    let defaultPermissions: IFeedbackBoardDocumentPermissions = { Teams: [], Members: [] };
+    defaultMaxVotes = props.currentBoard.maxVotesPerUser;
+    defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
+    defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
+    defaultIsAnonymous = props.currentBoard.isAnonymous;
+    defaultPermissions = props.currentBoard.permissions;
+  }
 
-    // Override shared values for Copy or Edit retrospectives
-    if (isCopyRetrospective || isEditRetrospective) {
-      defaultColumns = props.currentBoard.columns.map(column => ({
-        column: {
-          ...column,
-          icon: getIconElement(column.iconClass),
-        },
-        markedForDeletion: false,
-      }));
-      defaultMaxVotes = props.currentBoard.maxVotesPerUser;
-      defaultIncludeTeamEffectivenessMeasurement = props.currentBoard.isIncludeTeamEffectivenessMeasurement;
-      defaultShowFeedbackAfterCollect = props.currentBoard.shouldShowFeedbackAfterCollect;
-      defaultIsAnonymous = props.currentBoard.isAnonymous;
-      defaultPermissions = props.currentBoard.permissions;
+  const defaultTitle = isCopyRetrospective ? `${props.currentBoard.title} - copy` : isEditRetrospective ? props.currentBoard.title : "";
+
+  return {
+    columnCards: defaultColumns,
+    maxVotesPerUser: defaultMaxVotes,
+    isIncludeTeamEffectivenessMeasurement: defaultIncludeTeamEffectivenessMeasurement,
+    shouldShowFeedbackAfterCollect: defaultShowFeedbackAfterCollect,
+    isBoardAnonymous: defaultIsAnonymous,
+    permissions: defaultPermissions,
+    initialTitle: defaultTitle,
+    title: defaultTitle,
+  };
+};
+
+export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps> = props => {
+  const { isNewBoardCreation, isDuplicatingBoard, currentBoard, teamId, placeholderText, availablePermissionOptions, currentUserId, onFormSubmit, onFormCancel } = props;
+  const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardMetadataForm");
+
+  const initialState = getInitialState(props);
+
+  const [title, setTitle] = useState(initialState.title);
+  const [initialTitle] = useState(initialState.initialTitle);
+  const [isBoardNameTaken, setIsBoardNameTaken] = useState(false);
+  const [columnCards, setColumnCards] = useState<IFeedbackColumnCard[]>(initialState.columnCards);
+  const [maxVotesPerUser, setMaxVotesPerUser] = useState(initialState.maxVotesPerUser);
+  const [isIncludeTeamEffectivenessMeasurement, setIsIncludeTeamEffectivenessMeasurement] = useState(initialState.isIncludeTeamEffectivenessMeasurement);
+  const [shouldShowFeedbackAfterCollect, setShouldShowFeedbackAfterCollect] = useState(initialState.shouldShowFeedbackAfterCollect);
+  const [isBoardAnonymous, setIsBoardAnonymous] = useState(initialState.isBoardAnonymous);
+  const [isDeleteColumnConfirmationDialogHidden, setIsDeleteColumnConfirmationDialogHidden] = useState(true);
+  const [isChooseColumnAccentColorDialogHidden, setIsChooseColumnAccentColorDialogHidden] = useState(true);
+  const [columnCardBeingEdited, setColumnCardBeingEdited] = useState<IFeedbackColumnCard | null>(null);
+  const [isChooseColumnIconDialogOpen, setIsChooseColumnIconDialogOpen] = useState(false);
+  const [permissions, setPermissions] = useState<IFeedbackBoardDocumentPermissions>(initialState.permissions);
+
+  const chooseColumnIconDialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    if (columnCardBeingEdited && isChooseColumnIconDialogOpen) {
+      chooseColumnIconDialogRef.current?.showModal();
     }
+  }, [columnCardBeingEdited, isChooseColumnIconDialogOpen]);
 
-    // Set default title for copy, edit or new retrospective
-    const defaultTitle = isCopyRetrospective ? `${props.currentBoard.title} - copy` : isEditRetrospective ? props.currentBoard.title : "";
+  useEffect(() => {
+    const loadSettings = async () => {
+      if (isNewBoardCreation && !isDuplicatingBoard) {
+        const settingsToLoad = [BoardDataService.getSetting<number>("lastVotes"), BoardDataService.getSetting<boolean>("lastTeamEffectiveness"), BoardDataService.getSetting<boolean>("lastShowFeedback"), BoardDataService.getSetting<boolean>("lastAnonymous")];
 
-    this.state = {
-      columnCardBeingEdited: undefined,
-      columnCards: defaultColumns,
-      isBoardNameTaken: false,
-      isChooseColumnAccentColorDialogHidden: true,
-      isChooseColumnIconDialogHidden: true,
-      isDeleteColumnConfirmationDialogHidden: true,
-      placeholderText: props.placeholderText,
-      selectedAccentColorKey: undefined,
-      selectedIconKey: undefined,
-      isIncludeTeamEffectivenessMeasurement: defaultIncludeTeamEffectivenessMeasurement,
-      shouldShowFeedbackAfterCollect: defaultShowFeedbackAfterCollect,
-      isBoardAnonymous: defaultIsAnonymous,
-      maxVotesPerUser: defaultMaxVotes,
-      initialTitle: defaultTitle,
-      title: defaultTitle,
-      permissions: defaultPermissions,
+        const [lastVotes, lastTeamEffectiveness, lastShowFeedback, lastAnonymous] = await Promise.all(settingsToLoad);
+
+        if (typeof lastVotes === "number") setMaxVotesPerUser(lastVotes);
+        if (typeof lastTeamEffectiveness === "boolean") setIsIncludeTeamEffectivenessMeasurement(lastTeamEffectiveness);
+        if (typeof lastShowFeedback === "boolean") setShouldShowFeedbackAfterCollect(lastShowFeedback);
+        if (typeof lastAnonymous === "boolean") setIsBoardAnonymous(lastAnonymous);
+      }
     };
-  }
 
-  async componentDidMount() {
-    if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
-      const settingsToLoad = [BoardDataService.getSetting<number>("lastVotes"), BoardDataService.getSetting<boolean>("lastTeamEffectiveness"), BoardDataService.getSetting<boolean>("lastShowFeedback"), BoardDataService.getSetting<boolean>("lastAnonymous")];
+    loadSettings();
+  }, [isNewBoardCreation, isDuplicatingBoard]);
 
-      const [lastVotes, lastTeamEffectiveness, lastShowFeedback, lastAnonymous] = await Promise.all(settingsToLoad);
+  const handleInputChange = useCallback((_event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string) => {
+    setTitle(newValue);
+    setIsBoardNameTaken(false);
+  }, []);
 
-      this.setState({
-        maxVotesPerUser: typeof lastVotes === "number" ? lastVotes : this.state.maxVotesPerUser,
-        isIncludeTeamEffectivenessMeasurement: typeof lastTeamEffectiveness === "boolean" ? lastTeamEffectiveness : this.state.isIncludeTeamEffectivenessMeasurement,
-        shouldShowFeedbackAfterCollect: typeof lastShowFeedback === "boolean" ? lastShowFeedback : this.state.shouldShowFeedbackAfterCollect,
-        isBoardAnonymous: typeof lastAnonymous === "boolean" ? lastAnonymous : this.state.isBoardAnonymous,
-      });
-    }
-  }
+  const handleFormSubmit = useCallback(
+    async (event: Pick<React.SyntheticEvent, "preventDefault" | "stopPropagation">) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-  private maxColumnCount = 5;
+      if (title.trim() === "") return;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public handleInputChange = (_: any, newValue: string) => {
-    this.setState({
-      title: newValue,
-      isBoardNameTaken: false,
-    });
-  };
+      const isTaken = await BoardDataService.checkIfBoardNameIsTaken(teamId, title);
+      if (isTaken && initialTitle !== title) {
+        setIsBoardNameTaken(true);
+        return;
+      }
 
-  handleDeleteColumnConfirm = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
+      if (isNewBoardCreation && !isDuplicatingBoard) {
+        await BoardDataService.saveSetting("lastVotes", maxVotesPerUser);
+        await BoardDataService.saveSetting("lastTeamEffectiveness", isIncludeTeamEffectivenessMeasurement);
+        await BoardDataService.saveSetting("lastShowFeedback", shouldShowFeedbackAfterCollect);
+        await BoardDataService.saveSetting("lastAnonymous", isBoardAnonymous);
+      }
 
-    this.setState({ isDeleteColumnConfirmationDialogHidden: true }, () => {
-      this.handleFormSubmit(event); // Now passes MouseEvent
-    });
-  };
+      onFormSubmit(
+        title.trim(),
+        maxVotesPerUser,
+        columnCards.filter(columnCard => !columnCard.markedForDeletion).map(columnCard => columnCard.column),
+        isIncludeTeamEffectivenessMeasurement,
+        shouldShowFeedbackAfterCollect,
+        isBoardAnonymous,
+        permissions,
+      );
+    },
+    [title, teamId, initialTitle, isNewBoardCreation, isDuplicatingBoard, maxVotesPerUser, isIncludeTeamEffectivenessMeasurement, shouldShowFeedbackAfterCollect, isBoardAnonymous, onFormSubmit, columnCards, permissions],
+  );
 
-  // Accept either MouseEvent or FormEvent
-  public async handleFormSubmit(event: Pick<React.SyntheticEvent, "preventDefault" | "stopPropagation">) {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleDeleteColumnConfirm = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-    if (this.state.title.trim() === "") return;
+      setIsDeleteColumnConfirmationDialogHidden(true);
+      handleFormSubmit(event);
+    },
+    [handleFormSubmit],
+  );
 
-    const isBoardNameTaken = await BoardDataService.checkIfBoardNameIsTaken(this.props.teamId, this.state.title);
-    if (isBoardNameTaken && this.state.initialTitle !== this.state.title) {
-      this.setState({ isBoardNameTaken: true });
-      return;
-    }
+  const handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+    setIsIncludeTeamEffectivenessMeasurement(checked ?? false);
+  }, []);
 
-    // Save user preferences only if creating new board
-    if (this.props.isNewBoardCreation && !this.props.isDuplicatingBoard) {
-      await BoardDataService.saveSetting("lastVotes", this.state.maxVotesPerUser);
-      await BoardDataService.saveSetting("lastTeamEffectiveness", this.state.isIncludeTeamEffectivenessMeasurement);
-      await BoardDataService.saveSetting("lastShowFeedback", this.state.shouldShowFeedbackAfterCollect);
-      await BoardDataService.saveSetting("lastAnonymous", this.state.isBoardAnonymous);
-    }
+  const handleShouldShowFeedbackAfterCollectChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+    setShouldShowFeedbackAfterCollect(checked ?? false);
+  }, []);
 
-    this.props.onFormSubmit(
-      this.state.title.trim(),
-      this.state.maxVotesPerUser,
-      this.state.columnCards.filter(columnCard => !columnCard.markedForDeletion).map(columnCard => columnCard.column),
-      this.state.isIncludeTeamEffectivenessMeasurement,
-      this.state.shouldShowFeedbackAfterCollect,
-      this.state.isBoardAnonymous,
-      this.state.permissions,
-    );
-  }
+  const handleIsAnonymousCheckboxChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+    setIsBoardAnonymous(checked ?? false);
+  }, []);
 
-  private handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = (_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    this.setState({ isIncludeTeamEffectivenessMeasurement: checked });
-  };
+  const handleMaxVotePerUserChange = useCallback((event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setMaxVotesPerUser(Number((event.target as HTMLInputElement | HTMLTextAreaElement)?.value));
+  }, []);
 
-  private handleShouldShowFeedbackAfterCollectChange = (_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    this.setState({ shouldShowFeedbackAfterCollect: checked });
-  };
+  const showDeleteColumnConfirmationDialog = useCallback(() => {
+    setIsDeleteColumnConfirmationDialogHidden(false);
+  }, []);
 
-  private handleIsAnonymousCheckboxChange = (_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    this.setState({ isBoardAnonymous: checked });
-  };
+  const hideDeleteColumnConfirmationDialog = useCallback(() => {
+    setIsDeleteColumnConfirmationDialogHidden(true);
+  }, []);
 
-  private handleMaxVotePerUserChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    this.setState({ maxVotesPerUser: Number((event.target as HTMLInputElement | HTMLTextAreaElement)?.value) });
-  };
+  const openChooseColumnIconDialog = useCallback((columnCard: IFeedbackColumnCard) => {
+    setColumnCardBeingEdited(columnCard);
+    setIsChooseColumnIconDialogOpen(true);
+  }, []);
 
-  private showDeleteColumnConfirmationDialog = () => {
-    this.setState({ isDeleteColumnConfirmationDialogHidden: false });
-  };
+  const handleChooseColumnIconDialogClose = useCallback(() => {
+    setIsChooseColumnIconDialogOpen(false);
+    setColumnCardBeingEdited(null);
+  }, []);
 
-  private hideDeleteColumnConfirmationDialog = () => {
-    this.setState({ isDeleteColumnConfirmationDialogHidden: true });
-  };
-
-  private openChooseColumnIconDialog = (columnCard: IFeedbackColumnCard) => {
-    this.setState(
-      {
-        columnCardBeingEdited: columnCard,
-        isChooseColumnIconDialogHidden: false,
-      },
-      () => {
-        this.chooseColumnIconDialogRef.current?.showModal();
-      },
-    );
-  };
-
-  private handleChooseColumnIconDialogClose = () => {
-    this.setState({
-      isChooseColumnIconDialogHidden: true,
-      columnCardBeingEdited: null,
-    });
-  };
-
-  private isSaveButtonEnabled = () => {
-    if (!this.state.title.trim()) {
+  const isSaveButtonEnabled = useCallback(() => {
+    if (!title.trim()) {
       return false;
     }
 
-    if (!this.state.columnCards.filter(columnCard => !columnCard.markedForDeletion).length) {
+    if (!columnCards.filter(columnCard => !columnCard.markedForDeletion).length) {
       return false;
     }
 
-    if (this.state.columnCards.find(columnCard => !columnCard.column.title.trim())) {
+    if (columnCards.find(columnCard => !columnCard.column.title.trim())) {
       return false;
     }
 
     return true;
-  };
+  }, [title, columnCards]);
 
-  private getRandomArrayElement = <T extends {}>(array: T[]) => {
-    return array[Math.floor(Math.random() * array.length)];
-  };
-
-  private handleColumnsTemplateChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleColumnsTemplateChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
     const columns = getColumnsByTemplateId(event.target.value);
-    this.setState({
-      columnCards: columns.map(column => {
+    setColumnCards(
+      columns.map(column => {
         return {
           column: {
             ...column,
@@ -261,380 +286,319 @@ class FeedbackBoardMetadataForm extends React.Component<IFeedbackBoardMetadataFo
           markedForDeletion: false,
         };
       }),
-    });
-  };
+    );
+  }, []);
 
-  private allIconClassNames = availableIcons.filter(icon => icon.tags && icon.tags.length > 0);
-
-  private allAccentColors: { friendlyName: string; colorCode: string }[] = [
-    {
-      friendlyName: "green",
-      colorCode: "#008000",
-    },
-    {
-      friendlyName: "red",
-      colorCode: "#cc293d",
-    },
-    {
-      friendlyName: "navy",
-      colorCode: "#174170",
-    },
-    {
-      friendlyName: "orange",
-      colorCode: "#F78A53",
-    },
-    {
-      friendlyName: "pink",
-      colorCode: "#ff00cc",
-    },
-    {
-      friendlyName: "yellow",
-      colorCode: "#f6af08",
-    },
-    {
-      friendlyName: "blue",
-      colorCode: "#0078d4",
-    },
-    {
-      friendlyName: "purple",
-      colorCode: "#8063bf",
-    },
-    {
-      friendlyName: "grey",
-      colorCode: "#555555",
-    },
-  ];
-
-  public render() {
-    return (
-      <div className="flex flex-col flex-nowrap">
-        <Pivot>
-          <PivotItem headerText={"General"} aria-label="Board General Settings">
-            <div className="board-metadata-form">
-              <section className="board-metadata-edit-column-settings">
-                <h2 className="board-metadata-form-section-header">Board Settings</h2>
-                <div className="board-metadata-form-section-subheader">
-                  <label htmlFor="title-input-container">
-                    Retrospective Name<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:
-                  </label>
-                  <TextField ariaLabel="Please enter new retrospective title" aria-required={true} placeholder={this.props.placeholderText} className="title-input-container" id="retrospective-title-input" value={this.state.title} maxLength={100} onChange={this.handleInputChange} />
-                  {this.state.isBoardNameTaken && <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>}
+  return (
+    <div className="flex flex-col flex-nowrap" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+      <Pivot>
+        <PivotItem headerText={"General"} aria-label="Board General Settings">
+          <div className="board-metadata-form">
+            <section className="board-metadata-edit-column-settings">
+              <h2 className="board-metadata-form-section-header">Board Settings</h2>
+              <div className="board-metadata-form-section-subheader">
+                <label htmlFor="title-input-container">
+                  Retrospective Name<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:
+                </label>
+                <TextField ariaLabel="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} className="title-input-container" id="retrospective-title-input" value={title} maxLength={100} onChange={handleInputChange} />
+                {isBoardNameTaken && <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>}
+              </div>
+              <hr></hr>
+              <div className="board-metadata-form-section-subheader">
+                <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
+                  Max Votes per User (Current: {isNewBoardCreation ? maxVotesPerUser : isDuplicatingBoard ? currentBoard.maxVotesPerUser : currentBoard.maxVotesPerUser}):
+                </label>
+                <TextField className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={maxVotesPerUser?.toString()} onChange={handleMaxVotePerUserChange} />
+              </div>
+              <hr></hr>
+              <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation</div>
+              <div className="board-metadata-form-section-subheader">
+                <div className="flex flex-col">
+                  <Checkbox id="include-team-assessment-checkbox" label="Include Team Assessment" ariaLabel="Include Team Assessment. This selection cannot be modified after board creation." boxSide="start" checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />
+                  <div className="italic text-sm font-thin text-left">Note: All responses for team assessment are stored anonymously.</div>
                 </div>
-                <hr></hr>
-                <div className="board-metadata-form-section-subheader">
-                  <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                    Max Votes per User (Current: {this.props.isNewBoardCreation ? this.state.maxVotesPerUser : this.props.isDuplicatingBoard ? this.props.currentBoard.maxVotesPerUser : this.props.currentBoard.maxVotesPerUser}):
-                  </label>
-                  <TextField className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={this.state.maxVotesPerUser?.toString()} onChange={this.handleMaxVotePerUserChange} />
-                </div>
-                <hr></hr>
-                <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation</div>
-                <div className="board-metadata-form-section-subheader">
-                  <div className="flex flex-col">
-                    <Checkbox id="include-team-assessment-checkbox" label="Include Team Assessment" ariaLabel="Include Team Assessment. This selection cannot be modified after board creation." boxSide="start" checked={this.state.isIncludeTeamEffectivenessMeasurement} disabled={!this.props.isNewBoardCreation} onChange={this.handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />
-                    <div className="italic text-sm font-thin text-left">Note: All responses for team assessment are stored anonymously.</div>
-                  </div>
-                </div>
-                <div className="board-metadata-form-section-subheader">
-                  <Checkbox id="obscure-feedback-checkbox" label="Hide the feedback of others until after Collect phase" ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation." boxSide="start" checked={this.state.shouldShowFeedbackAfterCollect} disabled={!this.props.isNewBoardCreation} onChange={this.handleShouldShowFeedbackAfterCollectChange} />
-                </div>
-                <div className="board-metadata-form-section-subheader">
-                  <Checkbox id="feedback-display-names-checkbox" label="Do not display names in feedback" ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation." boxSide="start" checked={this.state.isBoardAnonymous} disabled={!this.props.isNewBoardCreation} onChange={this.handleIsAnonymousCheckboxChange} />
-                </div>
-              </section>
-              <section className="board-metadata-edit-column-settings">
-                <h2 className="board-metadata-form-section-header">Column Settings</h2>
-                <div className="board-metadata-form-section-information">
-                  {getIconElement("exclamation")} You can create a maximum of {this.maxColumnCount} columns in a retrospective
-                </div>
-                {!this.props.isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Warning: Existing feedback items may not be available after changing the board template!</div>}
-                <div className="board-metadata-form-section-subheader">
-                  <label htmlFor="column-template-dropdown">Apply template:</label>
-                  <select onChange={this.handleColumnsTemplateChange} id="column-template-dropdown" className="title-input-container column-template-dropdown">
-                    <option value="">Select a template</option>
-                    <option disabled>─────────────</option>
-                    <option value="start-stop-continue">Start-Stop-Continue</option>
-                    <option value="good-improve-ideas-thanks">Good-Improve-Ideas-Thanks</option>
-                    <option value="mad-sad-glad">Mad-Sad-Glad</option>
-                    <option value="4ls">4Ls</option>
-                    <option value="daki">Drop-Add-Keep-Improve</option>
-                    <option value="kalm">Keep-Add-Less-More</option>
-                    <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
-                    <option value="1to1">Good-to-Done</option>
-                    <option value="speedboat">Speedboat</option>
-                    <option disabled>─────────────</option>
-                    <option value="clarity">Clarity</option>
-                    <option value="energy">Energy</option>
-                    <option value="psy-safety">Psychological Safety</option>
-                    <option value="wlb">Work-life Balance</option>
-                    <option value="confidence">Confidence</option>
-                    <option value="efficiency">Efficiency</option>
-                  </select>
-                </div>
-                <List
-                  items={this.state.columnCards}
-                  onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
-                    return (
-                      <DocumentCard className={cn("feedback-column-card", columnCard.markedForDeletion && "marked-for-deletion")} type={DocumentCardType.compact}>
-                        <div className="flex grow items-center">
-                          <button
-                            className="feedback-column-card-icon-button"
-                            aria-label="Change column icon"
-                            title="Change column icon"
-                            disabled={columnCard.markedForDeletion}
-                            onClick={() => {
-                              this.openChooseColumnIconDialog(columnCard);
-                            }}
-                          >
-                            {getIconElement(columnCard.column.iconClass)}
-                          </button>
-                          <button
-                            className="feedback-column-card-accent-color-button"
-                            aria-label="Change column color"
-                            title="Change column color"
-                            disabled={columnCard.markedForDeletion}
-                            onClick={() => {
-                              this.setState({
-                                columnCardBeingEdited: columnCard,
-                                isChooseColumnAccentColorDialogHidden: false,
-                              });
-                            }}
-                          >
-                            <i className={cn("feedback-column-card-accent-color", "fas fa-square")} style={{ color: columnCard.column.accentColor }} />
-                          </button>
-                          <EditableDocumentCardTitle
-                            isDisabled={columnCard.markedForDeletion}
-                            isMultiline={false}
-                            maxLength={25}
-                            title={columnCard.column.title}
-                            isChangeEventRequired={true}
-                            onSave={(newText: string) => {
-                              columnCard.column.title = newText;
-                              this.setState({
-                                columnCards: [].concat(this.state.columnCards),
-                              });
-                            }}
-                          />
-                        </div>
-                        <div className="flex flex-none items-center">
-                          <IconButton
-                            className="feedback-column-card-move-up-button"
-                            iconProps={{ iconName: "Up" }}
-                            title="Move Up"
-                            ariaLabel="Move Up"
-                            disabled={columnCard.markedForDeletion || index === 0}
-                            onClick={() => {
-                              const newColumns = [].concat(this.state.columnCards);
-                              [newColumns[index], newColumns[index - 1]] = [newColumns[index - 1], newColumns[index]];
-                              this.setState({
-                                columnCards: newColumns,
-                              });
-                            }}
-                          />
-                          <IconButton
-                            className="feedback-column-card-move-down-button"
-                            iconProps={{ iconName: "Down" }}
-                            title="Move Down"
-                            ariaLabel="Move Down"
-                            disabled={columnCard.markedForDeletion || index === this.state.columnCards.length - 1}
-                            onClick={() => {
-                              const newColumns = [].concat(this.state.columnCards);
-                              [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
-                              this.setState({
-                                columnCards: newColumns,
-                              });
-                            }}
-                          />
-                          {!columnCard.markedForDeletion && (
-                            <IconButton
-                              className="feedback-column-card-delete-button"
-                              iconProps={{ iconName: "Delete" }}
-                              title="Delete"
-                              ariaLabel="Delete"
-                              disabled={this.state.columnCards.filter(columnCard => !columnCard.markedForDeletion).length <= 1}
-                              onClick={() => {
-                                const newColumns = [].concat(this.state.columnCards);
-                                newColumns[index].markedForDeletion = true;
-                                this.setState({
-                                  columnCards: newColumns,
-                                });
-                              }}
-                            />
-                          )}
-                          {columnCard.markedForDeletion && (
-                            <IconButton
-                              className="feedback-column-card-undelete-button"
-                              iconProps={{ iconName: "Undo" }}
-                              title="Undo Delete"
-                              ariaLabel="Undo Delete"
-                              disabled={this.state.columnCards.filter(columnCard => !columnCard.markedForDeletion).length >= this.maxColumnCount}
-                              onClick={() => {
-                                const newColumns = [].concat(this.state.columnCards);
-                                newColumns[index].markedForDeletion = false;
-                                this.setState({
-                                  columnCards: newColumns,
-                                });
-                              }}
-                            />
-                          )}
-                        </div>
-                      </DocumentCard>
-                    );
-                  }}
-                />
-                <button
-                  className="create-feedback-column-card-button"
-                  aria-label="Add new column"
-                  disabled={this.state.columnCards.filter(columnCard => !columnCard.markedForDeletion).length >= this.maxColumnCount}
-                  onClick={() => {
-                    const newColumns: IFeedbackColumnCard[] = [].concat(this.state.columnCards);
-                    newColumns.push({
-                      column: {
-                        id: generateUUID(),
-                        title: "New Column",
-                        iconClass: this.getRandomArrayElement(this.allIconClassNames).id,
-                        accentColor: this.getRandomArrayElement(this.allAccentColors).colorCode,
-                        notes: "",
-                      },
-                      markedForDeletion: false,
-                    });
-                    this.setState({ columnCards: newColumns });
-                  }}
-                >
-                  {getIconElement("add")}
-                  Add new column
-                </button>
-              </section>
-              {this.props.currentBoard && (
-                <Dialog
-                  hidden={this.state.isDeleteColumnConfirmationDialogHidden}
-                  onDismiss={this.hideDeleteColumnConfirmationDialog}
-                  dialogContentProps={{
-                    type: DialogType.close,
-                    title: "Confirm Changes",
-                    subText: `Are you sure you want to remove columns from '${this.props.currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`,
-                  }}
-                  modalProps={{
-                    isBlocking: true,
-                    containerClassName: "retrospectives-confirm-changes-dialog",
-                    className: "retrospectives-dialog-modal",
-                  }}
-                >
-                  <DialogFooter>
-                    <PrimaryButton onClick={this.handleDeleteColumnConfirm} text="Confirm" />
-                    <DefaultButton onClick={this.hideDeleteColumnConfirmationDialog} text="Cancel" />
-                  </DialogFooter>
-                </Dialog>
-              )}
-              {this.state.columnCardBeingEdited && (
-                <dialog className="retrospectives-choose-column-icon-dialog" aria-label="Choose Column Icon" ref={this.chooseColumnIconDialogRef} onClose={this.handleChooseColumnIconDialogClose}>
-                  <div className="header">
-                    <h2 className="title">Choose Column Icon</h2>
-                    <button onClick={() => this.chooseColumnIconDialogRef.current?.close()} aria-label="Close">
-                      {getIconElement("close")}
-                    </button>
-                  </div>
-                  <div className="subText">{`Choose the column icon for column '${this.state.columnCardBeingEdited.column.title}'`}</div>
-                  <div className="subText">
-                    <div className="grid grid-cols-7 gap-2 justify-items-center items-center">
-                      {this.allIconClassNames.map(iconOption => {
-                        return (
-                          <button
-                            title={`Choose the icon: ${iconOption.name}`}
-                            aria-label={`Choose the icon: ${iconOption.name}`}
-                            className="choose-feedback-column-icon-button"
-                            key={iconOption.id}
-                            onClick={() => {
-                              this.state.columnCardBeingEdited.column.iconClass = iconOption.id;
-                              this.setState({ columnCards: [].concat(this.state.columnCards) }, () => {
-                                this.chooseColumnIconDialogRef.current?.close();
-                              });
-                            }}
-                          >
-                            {getIconElement(iconOption.id)}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="inner">
-                    <button className="default button" onClick={() => this.chooseColumnIconDialogRef.current?.close()}>
-                      Close
-                    </button>
-                  </div>
-                </dialog>
-              )}
-              {this.state.columnCardBeingEdited && (
-                <Dialog
-                  hidden={this.state.isChooseColumnAccentColorDialogHidden}
-                  dialogContentProps={{
-                    type: DialogType.normal,
-                    title: "Choose Column Color",
-                    subText: `Choose the column color for column '${this.state.columnCardBeingEdited.column.title}'`,
-                  }}
-                  modalProps={{
-                    isBlocking: false,
-                    containerClassName: "retrospectives-choose-column-accent-color-dialog",
-                    className: "retrospectives-dialog-modal",
-                  }}
-                  onDismiss={() => {
-                    this.setState({
-                      isChooseColumnAccentColorDialogHidden: true,
-                      columnCardBeingEdited: null,
-                    });
-                  }}
-                >
-                  {this.allAccentColors.map(accentColor => {
-                    return (
-                      <DefaultButton
-                        key={accentColor.friendlyName}
-                        ariaLabel={"Choose the color " + accentColor.friendlyName}
-                        className="choose-feedback-column-accent-color-button"
-                        onClick={() => {
-                          this.state.columnCardBeingEdited.column.accentColor = accentColor.colorCode;
-                          this.setState({
-                            isChooseColumnAccentColorDialogHidden: true,
-                            columnCardBeingEdited: undefined,
-                            columnCards: [].concat(this.state.columnCards),
-                          });
-                        }}
-                      >
-                        <i
-                          className={"fas fa-square"}
-                          style={{
-                            color: accentColor.colorCode,
+              </div>
+              <div className="board-metadata-form-section-subheader">
+                <Checkbox id="obscure-feedback-checkbox" label="Hide the feedback of others until after Collect phase" ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation." boxSide="start" checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />
+              </div>
+              <div className="board-metadata-form-section-subheader">
+                <Checkbox id="feedback-display-names-checkbox" label="Do not display names in feedback" ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation." boxSide="start" checked={isBoardAnonymous} disabled={!isNewBoardCreation} onChange={handleIsAnonymousCheckboxChange} />
+              </div>
+            </section>
+            <section className="board-metadata-edit-column-settings">
+              <h2 className="board-metadata-form-section-header">Column Settings</h2>
+              <div className="board-metadata-form-section-information">
+                {getIconElement("exclamation")} You can create a maximum of {maxColumnCount} columns in a retrospective
+              </div>
+              {!isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Warning: Existing feedback items may not be available after changing the board template!</div>}
+              <div className="board-metadata-form-section-subheader">
+                <label htmlFor="column-template-dropdown">Apply template:</label>
+                <select onChange={handleColumnsTemplateChange} id="column-template-dropdown" className="title-input-container column-template-dropdown">
+                  <option value="">Select a template</option>
+                  <option disabled>─────────────</option>
+                  <option value="start-stop-continue">Start-Stop-Continue</option>
+                  <option value="good-improve-ideas-thanks">Good-Improve-Ideas-Thanks</option>
+                  <option value="mad-sad-glad">Mad-Sad-Glad</option>
+                  <option value="4ls">4Ls</option>
+                  <option value="daki">Drop-Add-Keep-Improve</option>
+                  <option value="kalm">Keep-Add-Less-More</option>
+                  <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
+                  <option value="1to1">Good-to-Done</option>
+                  <option value="speedboat">Speedboat</option>
+                  <option disabled>─────────────</option>
+                  <option value="clarity">Clarity</option>
+                  <option value="energy">Energy</option>
+                  <option value="psy-safety">Psychological Safety</option>
+                  <option value="wlb">Work-life Balance</option>
+                  <option value="confidence">Confidence</option>
+                  <option value="efficiency">Efficiency</option>
+                </select>
+              </div>
+              <List
+                items={columnCards}
+                onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
+                  return (
+                    <DocumentCard className={cn("feedback-column-card", columnCard.markedForDeletion && "marked-for-deletion")} type={DocumentCardType.compact}>
+                      <div className="flex grow items-center">
+                        <button
+                          className="feedback-column-card-icon-button"
+                          aria-label="Change column icon"
+                          title="Change column icon"
+                          disabled={columnCard.markedForDeletion}
+                          onClick={() => {
+                            openChooseColumnIconDialog(columnCard);
+                          }}
+                        >
+                          {getIconElement(columnCard.column.iconClass)}
+                        </button>
+                        <button
+                          className="feedback-column-card-accent-color-button"
+                          aria-label="Change column color"
+                          title="Change column color"
+                          disabled={columnCard.markedForDeletion}
+                          onClick={() => {
+                            setColumnCardBeingEdited(columnCard);
+                            setIsChooseColumnAccentColorDialogHidden(false);
+                          }}
+                        >
+                          <i className={cn("feedback-column-card-accent-color", "fas fa-square")} style={{ color: columnCard.column.accentColor }} />
+                        </button>
+                        <EditableDocumentCardTitle
+                          isDisabled={columnCard.markedForDeletion}
+                          isMultiline={false}
+                          maxLength={25}
+                          title={columnCard.column.title}
+                          isChangeEventRequired={true}
+                          onSave={(newText: string) => {
+                            columnCard.column.title = newText;
+                            setColumnCards([...columnCards]);
                           }}
                         />
-                      </DefaultButton>
-                    );
-                  })}
-                </Dialog>
-              )}
-            </div>
-          </PivotItem>
-          <PivotItem headerText={"Permissions"} aria-label="Board Permission Settings">
-            <FeedbackBoardMetadataFormPermissions board={this.props.currentBoard} permissions={this.state.permissions} permissionOptions={this.props.availablePermissionOptions} currentUserId={this.props.currentUserId} isNewBoardCreation={this.props.isNewBoardCreation} onPermissionChanged={(s: FeedbackBoardPermissionState) => this.setState({ permissions: s.permissions })} />
-          </PivotItem>
-        </Pivot>
-        <DialogFooter>
-          <PrimaryButton
-            disabled={!this.isSaveButtonEnabled()}
-            onClick={event => {
-              if (this.props.isNewBoardCreation || this.state.columnCards.every(columnCard => !columnCard.markedForDeletion)) {
-                this.handleFormSubmit(event);
-              } else {
-                // Ask for confirmation if user is deleting existing column(s).
-                this.showDeleteColumnConfirmationDialog();
-              }
-            }}
-            text="Save"
-            className="metadata-form-save-button"
-          />
-          <DefaultButton onClick={this.props.onFormCancel} text="Cancel" />
-        </DialogFooter>
-      </div>
-    );
-  }
-}
+                      </div>
+                      <div className="flex flex-none items-center">
+                        <IconButton
+                          className="feedback-column-card-move-up-button"
+                          iconProps={{ iconName: "Up" }}
+                          title="Move Up"
+                          ariaLabel="Move Up"
+                          disabled={columnCard.markedForDeletion || index === 0}
+                          onClick={() => {
+                            const newColumns = [...columnCards];
+                            [newColumns[index], newColumns[index - 1]] = [newColumns[index - 1], newColumns[index]];
+                            setColumnCards(newColumns);
+                          }}
+                        />
+                        <IconButton
+                          className="feedback-column-card-move-down-button"
+                          iconProps={{ iconName: "Down" }}
+                          title="Move Down"
+                          ariaLabel="Move Down"
+                          disabled={columnCard.markedForDeletion || index === columnCards.length - 1}
+                          onClick={() => {
+                            const newColumns = [...columnCards];
+                            [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
+                            setColumnCards(newColumns);
+                          }}
+                        />
+                        {!columnCard.markedForDeletion && (
+                          <IconButton
+                            className="feedback-column-card-delete-button"
+                            iconProps={{ iconName: "Delete" }}
+                            title="Delete"
+                            ariaLabel="Delete"
+                            disabled={columnCards.filter(cc => !cc.markedForDeletion).length <= 1}
+                            onClick={() => {
+                              const newColumns = [...columnCards];
+                              newColumns[index].markedForDeletion = true;
+                              setColumnCards(newColumns);
+                            }}
+                          />
+                        )}
+                        {columnCard.markedForDeletion && (
+                          <IconButton
+                            className="feedback-column-card-undelete-button"
+                            iconProps={{ iconName: "Undo" }}
+                            title="Undo Delete"
+                            ariaLabel="Undo Delete"
+                            disabled={columnCards.filter(cc => !cc.markedForDeletion).length >= maxColumnCount}
+                            onClick={() => {
+                              const newColumns = [...columnCards];
+                              newColumns[index].markedForDeletion = false;
+                              setColumnCards(newColumns);
+                            }}
+                          />
+                        )}
+                      </div>
+                    </DocumentCard>
+                  );
+                }}
+              />
+              <button
+                className="create-feedback-column-card-button"
+                aria-label="Add new column"
+                disabled={columnCards.filter(columnCard => !columnCard.markedForDeletion).length >= maxColumnCount}
+                onClick={() => {
+                  const newColumns: IFeedbackColumnCard[] = [...columnCards];
+                  newColumns.push({
+                    column: {
+                      id: generateUUID(),
+                      title: "New Column",
+                      iconClass: getRandomArrayElement(allIconClassNames).id,
+                      accentColor: getRandomArrayElement(allAccentColors).colorCode,
+                      notes: "",
+                    },
+                    markedForDeletion: false,
+                  });
+                  setColumnCards(newColumns);
+                }}
+              >
+                {getIconElement("add")}
+                Add new column
+              </button>
+            </section>
+            {currentBoard && (
+              <Dialog
+                hidden={isDeleteColumnConfirmationDialogHidden}
+                onDismiss={hideDeleteColumnConfirmationDialog}
+                dialogContentProps={{
+                  type: DialogType.close,
+                  title: "Confirm Changes",
+                  subText: `Are you sure you want to remove columns from '${currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`,
+                }}
+                modalProps={{
+                  isBlocking: true,
+                  containerClassName: "retrospectives-confirm-changes-dialog",
+                  className: "retrospectives-dialog-modal",
+                }}
+              >
+                <DialogFooter>
+                  <PrimaryButton onClick={handleDeleteColumnConfirm} text="Confirm" />
+                  <DefaultButton onClick={hideDeleteColumnConfirmationDialog} text="Cancel" />
+                </DialogFooter>
+              </Dialog>
+            )}
+            {columnCardBeingEdited && isChooseColumnIconDialogOpen && (
+              <dialog className="retrospectives-choose-column-icon-dialog" aria-label="Choose Column Icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
+                <div className="header">
+                  <h2 className="title">Choose Column Icon</h2>
+                  <button onClick={() => chooseColumnIconDialogRef.current?.close()} aria-label="Close">
+                    {getIconElement("close")}
+                  </button>
+                </div>
+                <div className="subText">{`Choose the column icon for column '${columnCardBeingEdited.column.title}'`}</div>
+                <div className="subText">
+                  <div className="grid grid-cols-7 gap-2 justify-items-center items-center">
+                    {allIconClassNames.map(iconOption => {
+                      return (
+                        <button
+                          title={`Choose the icon: ${iconOption.name}`}
+                          aria-label={`Choose the icon: ${iconOption.name}`}
+                          className="choose-feedback-column-icon-button"
+                          key={iconOption.id}
+                          onClick={() => {
+                            columnCardBeingEdited.column.iconClass = iconOption.id;
+                            setColumnCards([...columnCards]);
+                            chooseColumnIconDialogRef.current?.close();
+                          }}
+                        >
+                          {getIconElement(iconOption.id)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="inner">
+                  <button className="default button" onClick={() => chooseColumnIconDialogRef.current?.close()}>
+                    Close
+                  </button>
+                </div>
+              </dialog>
+            )}
+            {columnCardBeingEdited && (
+              <Dialog
+                hidden={isChooseColumnAccentColorDialogHidden}
+                dialogContentProps={{
+                  type: DialogType.normal,
+                  title: "Choose Column Color",
+                  subText: `Choose the column color for column '${columnCardBeingEdited.column.title}'`,
+                }}
+                modalProps={{
+                  isBlocking: false,
+                  containerClassName: "retrospectives-choose-column-accent-color-dialog",
+                  className: "retrospectives-dialog-modal",
+                }}
+                onDismiss={() => {
+                  setIsChooseColumnAccentColorDialogHidden(true);
+                  setColumnCardBeingEdited(null);
+                }}
+              >
+                {allAccentColors.map(accentColor => {
+                  return (
+                    <DefaultButton
+                      key={accentColor.friendlyName}
+                      ariaLabel={"Choose the color " + accentColor.friendlyName}
+                      className="choose-feedback-column-accent-color-button"
+                      onClick={() => {
+                        columnCardBeingEdited.column.accentColor = accentColor.colorCode;
+                        setIsChooseColumnAccentColorDialogHidden(true);
+                        setColumnCardBeingEdited(null);
+                        setColumnCards([...columnCards]);
+                      }}
+                    >
+                      <i
+                        className={"fas fa-square"}
+                        style={{
+                          color: accentColor.colorCode,
+                        }}
+                      />
+                    </DefaultButton>
+                  );
+                })}
+              </Dialog>
+            )}
+          </div>
+        </PivotItem>
+        <PivotItem headerText={"Permissions"} aria-label="Board Permission Settings">
+          <FeedbackBoardMetadataFormPermissions board={currentBoard} permissions={permissions} permissionOptions={availablePermissionOptions} currentUserId={currentUserId} isNewBoardCreation={isNewBoardCreation} onPermissionChanged={(s: FeedbackBoardPermissionState) => setPermissions(s.permissions)} />
+        </PivotItem>
+      </Pivot>
+      <DialogFooter>
+        <PrimaryButton
+          disabled={!isSaveButtonEnabled()}
+          onClick={event => {
+            if (isNewBoardCreation || columnCards.every(columnCard => !columnCard.markedForDeletion)) {
+              handleFormSubmit(event);
+            } else {
+              showDeleteColumnConfirmationDialog();
+            }
+          }}
+          text="Save"
+          className="metadata-form-save-button"
+        />
+        <DefaultButton onClick={onFormCancel} text="Cancel" />
+      </DialogFooter>
+    </div>
+  );
+};
 
-export default withAITracking(reactPlugin, FeedbackBoardMetadataForm);
+export default FeedbackBoardMetadataForm;

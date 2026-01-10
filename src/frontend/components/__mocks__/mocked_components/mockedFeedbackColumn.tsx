@@ -147,7 +147,7 @@ export const testColumnProps = mocked({
   removeFeedbackItemFromColumn: jest.fn(() => {}),
   refreshFeedbackItems: jest.fn(() => {}),
   activeTimerFeedbackItemId: null,
-  requestTimerStart: jest.fn().mockResolvedValue(true),
+  requestTimerStart: jest.fn(),
   notifyTimerStopped: jest.fn(() => {}),
 });
 
@@ -345,6 +345,6 @@ export const testGroupColumnProps = mocked({
   removeFeedbackItemFromColumn: jest.fn(() => {}),
   refreshFeedbackItems: jest.fn(() => {}),
   activeTimerFeedbackItemId: null,
-  requestTimerStart: jest.fn().mockResolvedValue(true),
+  requestTimerStart: jest.fn(),
   notifyTimerStopped: jest.fn(() => {}),
 });

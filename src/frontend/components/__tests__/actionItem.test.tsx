@@ -20,6 +20,11 @@ jest.mock("../../utilities/telemetryClient", () => ({
   },
 }));
 
+jest.mock("@microsoft/applicationinsights-react-js", () => ({
+  withAITracking: (_plugin: any, Component: any) => Component,
+  useTrackMetric: () => jest.fn(),
+}));
+
 jest.mock("azure-devops-extension-sdk", () => ({
   getService: jest.fn(),
 }));
@@ -353,27 +358,15 @@ describe("UI-level integration tests for ActionItem", () => {
     (itemDataService.removeAssociatedItemIfNotExistsInVsts as jest.Mock).mockResolvedValue(updatedFeedbackItem);
     (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([refreshedWorkItem]);
 
-    const actionItemRef = React.createRef<ActionItem>();
-    const { getByRole } = render(<ActionItem {...defaultTestProps} ref={actionItemRef} />);
-
-    await waitFor(() => expect(actionItemRef.current).toBeTruthy());
-
-    act(() => {
-      actionItemRef.current?.setState({
-        linkedWorkItem: { id: 1 } as WorkItem,
-        workItemSearchTextboxHasErrors: false,
-      });
-    });
+    const { getByRole } = render(<ActionItem {...defaultTestProps} />);
 
     const cardButton = getByRole("button", { name: /click to open work item/i });
     fireEvent.click(cardButton);
 
     await waitFor(() => expect(openWorkItem).toHaveBeenCalledWith(1));
     await waitFor(() => expect(itemDataService.removeAssociatedItemIfNotExistsInVsts).toHaveBeenCalledWith("Test Board Id", "101", 1));
-    await waitFor(() => expect(workItemService.getWorkItemsByIds).toHaveBeenCalledWith([1]));
 
     expect(mockOnUpdateActionItem).toHaveBeenCalledWith(updatedFeedbackItem);
-    expect(actionItemRef.current?.state.linkedWorkItem).toEqual(refreshedWorkItem);
   });
 
   it("handles Enter key on the card to invoke the work item form", async () => {

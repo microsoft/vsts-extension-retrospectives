@@ -195,6 +195,21 @@ describe("markdownUtils", () => {
         expect(tokens[0]).toEqual({ type: "text", content: "abc" });
       });
 
+      it("should not merge text tokens when non-text token is between them", () => {
+        // This tests the branch when mergedTokens has tokens but the last one is not a text token
+        const tokens = tokenizeMarkdown("**bold**text after");
+        expect(tokens).toHaveLength(2);
+        expect(tokens[0]).toEqual({ type: "bold", content: "bold" });
+        expect(tokens[1]).toEqual({ type: "text", content: "text after" });
+      });
+
+      it("should push first text token when mergedTokens is empty", () => {
+        // This tests the branch when mergedTokens.length === 0 and we push the first token
+        const tokens = tokenizeMarkdown("just text");
+        expect(tokens).toHaveLength(1);
+        expect(tokens[0]).toEqual({ type: "text", content: "just text" });
+      });
+
       it("should handle text ending without special characters after special char in middle", () => {
         // This tests the branch when nextSpecialIndex === -1 (no more special chars after the current position)
         const tokens = tokenizeMarkdown("text with a trailing asterisk* at end");
@@ -277,6 +292,23 @@ describe("markdownUtils", () => {
       }
     });
 
+    it("should have onClick handler that stops propagation on link elements", () => {
+      const result = parseMarkdown("[link](https://example.com)");
+      expect(Array.isArray(result)).toBe(true);
+      if (Array.isArray(result) && result.length > 0) {
+        const element = result[0];
+        expect(React.isValidElement(element)).toBe(true);
+        if (React.isValidElement(element)) {
+          const props = element.props as { onClick: (e: React.MouseEvent) => void };
+          expect(typeof props.onClick).toBe("function");
+          // Call the onClick handler with a mock event to cover line 159
+          const mockEvent = { stopPropagation: jest.fn() } as unknown as React.MouseEvent;
+          props.onClick(mockEvent);
+          expect(mockEvent.stopPropagation).toHaveBeenCalled();
+        }
+      }
+    });
+
     it("should parse images to img elements with proper attributes", () => {
       const result = parseMarkdown("![alt](https://example.com/img.png)");
       expect(Array.isArray(result)).toBe(true);
@@ -302,6 +334,47 @@ describe("markdownUtils", () => {
         const element = result[0];
         expect(React.isValidElement(element)).toBe(true);
         if (React.isValidElement(element)) {
+          expect((element.props as { alt: string }).alt).toBe("");
+        }
+      }
+
+      tokenizeSpy.mockRestore();
+    });
+
+    it("should use empty string fallback when image token.alt is undefined (line 105 branch)", () => {
+      // Mock tokenizeMarkdown to return an image token without the alt property at all
+      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([
+        { type: "image", content: "alt content", url: "https://example.com/img.png" },
+        // Note: alt property is intentionally omitted to test the || "" fallback
+      ] as unknown as ReturnType<typeof tokenizeMarkdown>);
+
+      const result = parseMarkdown("![](https://example.com/img.png)");
+
+      expect(Array.isArray(result)).toBe(true);
+      if (Array.isArray(result) && result.length > 0) {
+        const element = result[0];
+        expect(React.isValidElement(element)).toBe(true);
+        if (React.isValidElement(element)) {
+          // The alt should fallback to empty string when token.alt is undefined
+          expect((element.props as { alt: string }).alt).toBe("");
+        }
+      }
+
+      tokenizeSpy.mockRestore();
+    });
+
+    it("should use empty string when token.alt is explicitly undefined (line 105)", () => {
+      // Create a token where alt property is explicitly undefined
+      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([{ type: "image", content: "test", url: "https://example.com/img.png", alt: undefined }] as unknown as ReturnType<typeof tokenizeMarkdown>);
+
+      const result = parseMarkdown("![undefined-alt](https://example.com/img.png)");
+
+      expect(Array.isArray(result)).toBe(true);
+      if (Array.isArray(result) && result.length > 0) {
+        const element = result[0];
+        expect(React.isValidElement(element)).toBe(true);
+        if (React.isValidElement(element)) {
+          // The || "" fallback on line 105 should convert undefined to ""
           expect((element.props as { alt: string }).alt).toBe("");
         }
       }
