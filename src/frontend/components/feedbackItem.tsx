@@ -1049,7 +1049,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                 <div className="item-actions-menu">
                   <DefaultButton
                     className="contextual-menu-button"
-                    aria-label="Feedback Options Menu"
+                    aria-label="Feedback options menu"
                     data-card-control="true"
                     tabIndex={-1}
                     iconProps={{ iconName: "MoreVertical" }}
