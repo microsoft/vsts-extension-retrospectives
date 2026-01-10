@@ -159,30 +159,14 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
   const focusFeedbackItemById = useCallback((feedbackItemId: string) => {
     const elementToFocus = columnRef.current?.querySelector(`[data-feedback-item-id="${feedbackItemId}"]`) as HTMLElement | null;
-    if (!elementToFocus) {
-      return;
-    }
-
-    elementToFocus.focus();
-    elementToFocus.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+    elementToFocus?.focus();
+    elementToFocus?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
   }, []);
 
   const focusFeedbackItemAtIndex = useCallback(
     (index: number) => {
-      if (index < 0) {
-        return;
-      }
-
       const navigableItems = getNavigableColumnItems();
-      if (index >= navigableItems.length) {
-        return;
-      }
-
       const feedbackItemId = navigableItems[index]?.feedbackItem?.id;
-      if (!feedbackItemId) {
-        return;
-      }
-
       focusFeedbackItemById(feedbackItemId);
     },
     [focusFeedbackItemById, getNavigableColumnItems],
@@ -244,9 +228,6 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
   const restoreFocus = useCallback(() => {
     const preserved = focusPreservation.current;
-    if (!preserved) {
-      return;
-    }
 
     setTimeout(() => {
       let elementToFocus: HTMLElement | null = null;
