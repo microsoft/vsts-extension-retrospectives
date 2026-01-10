@@ -3,7 +3,6 @@ import { getAppToken } from "azure-devops-extension-sdk";
 
 import { config } from "../config/config";
 import { decodeJwt } from "../utilities/tokenHelper";
-import { isHostedAzureDevOps } from "../utilities/azureDevOpsContextHelper";
 import { appInsights } from "../utilities/telemetryClient";
 import { IExceptionTelemetry } from "@microsoft/applicationinsights-web";
 
@@ -34,20 +33,12 @@ class ReflectBackendService {
   private _connectionAvailable: boolean;
 
   constructor() {
-    isHostedAzureDevOps().then(isHosted => {
-      if (!isHosted) {
-        return;
-      }
-    });
+    this._signalRConnection = new HubConnectionBuilder().withUrl(ReflectBackendService.signalRHubUrl.href, { accessTokenFactory: this.retrieveValidToken }).configureLogging(LogLevel.Error).build();
+    this._connectionAvailable = false;
 
-    if (!this._signalRConnection) {
-      this._signalRConnection = new HubConnectionBuilder().withUrl(ReflectBackendService.signalRHubUrl.href, { accessTokenFactory: this.retrieveValidToken }).configureLogging(LogLevel.Error).build();
+    this._signalRConnection.onclose(() => {
       this._connectionAvailable = false;
-
-      this._signalRConnection.onclose(() => {
-        this._connectionAvailable = false;
-      });
-    }
+    });
   }
 
   /**
@@ -69,19 +60,19 @@ class ReflectBackendService {
     return this._connectionAvailable;
   };
 
-  private retrieveValidToken = (that = this) => {
-    if (that._tokenExpiry && new Date() < that._tokenExpiry) {
-      return that._appToken;
+  private retrieveValidToken = () => {
+    if (this._tokenExpiry && new Date() < this._tokenExpiry) {
+      return this._appToken;
     }
 
     return Promise.resolve(
       getAppToken().then(appToken => {
-        that._appToken = appToken;
+        this._appToken = appToken;
 
-        const tokenData = decodeJwt(that._appToken);
+        const tokenData = decodeJwt(this._appToken);
         if (tokenData) {
-          that._tokenExpiry = new Date(tokenData.exp * 1000);
-          return that._appToken;
+          this._tokenExpiry = new Date(tokenData.exp * 1000);
+          return this._appToken;
         }
 
         const e: IExceptionTelemetry = {
