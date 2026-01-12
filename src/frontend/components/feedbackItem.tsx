@@ -408,17 +408,10 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         if (updatedFeedbackItem) {
           props.refreshFeedbackItems([updatedFeedbackItem], true);
         }
-        if (props.timerId == null) {
-          const tid = setInterval(incTimer, 1000);
-          updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, tid);
-          if (updatedFeedbackItem) {
-            props.refreshFeedbackItems([updatedFeedbackItem], true);
-          }
-        } else {
-          updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, props.timerId);
-          if (updatedFeedbackItem) {
-            props.refreshFeedbackItems([updatedFeedbackItem], true);
-          }
+        const tid = props.timerId ?? setInterval(incTimer, 1000);
+        updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, tid);
+        if (updatedFeedbackItem) {
+          props.refreshFeedbackItems([updatedFeedbackItem], true);
         }
       } else {
         clearInterval(props.timerId);

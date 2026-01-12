@@ -9824,6 +9824,21 @@ describe("FeedbackItem additional coverage (merged)", () => {
     expect(true).toBe(true);
   });
 
+  test("itemElement getter returns override ref when set to non-null value", async () => {
+    const props = makeProps();
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    // Set itemElement to a custom element
+    const customElement = document.createElement("div");
+    (ref.current as any).itemElement = customElement;
+
+    // Reading the getter should return the override element
+    expect((ref.current as any).itemElement).toBe(customElement);
+  });
+
   test("focusCardControl returns early when no visible controls", async () => {
     const props = makeProps();
     const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
