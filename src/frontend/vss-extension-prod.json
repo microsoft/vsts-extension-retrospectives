@@ -64,10 +64,6 @@
       "addressable": true
     },
     {
-      "path": "node_modules/applicationinsights-js/dist",
-      "addressable": true
-    },
-    {
       "path": "images/logos",
       "addressable": true
     },
