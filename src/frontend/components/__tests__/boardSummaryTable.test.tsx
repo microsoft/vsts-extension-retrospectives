@@ -684,6 +684,26 @@ describe("BoardSummaryTable, additional coverage", () => {
 
       expect(result.boardsTableItems).toHaveLength(1);
     });
+
+    it("buildBoardSummaryState handles undefined isArchived", () => {
+      const boardWithUndefinedIsArchived: IFeedbackBoardDocument = {
+        id: "board-undefined-isarchived",
+        teamId: "team-1",
+        title: "Board with undefined isArchived",
+        createdDate: new Date("2023-01-01"),
+        createdBy: mockedIdentity,
+        columns: [],
+        activePhase: "Collect",
+        maxVotesPerUser: 5,
+        boardVoteCollection: {},
+        teamEffectivenessMeasurementVoteCollection: [],
+      };
+
+      const result = buildBoardSummaryState([boardWithUndefinedIsArchived]);
+
+      expect(result.boardsTableItems).toHaveLength(1);
+      expect(result.boardsTableItems[0].isArchived).toBe(false);
+    });
   });
 
   describe("Row expansion", () => {
@@ -769,6 +789,22 @@ describe("BoardSummaryTable - Sorting Functionality", () => {
 
     await waitFor(() => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    // Find the Retrospective Name header and click to sort
+    const nameHeader = Array.from(container.querySelectorAll('th[role="columnheader"]')).find(th => th.textContent?.includes("Retrospective Name")) as HTMLElement;
+    expect(nameHeader).toBeTruthy();
+
+    // Click to sort ascending by name
+    nameHeader.click();
+    await waitFor(() => {
+      expect(nameHeader.getAttribute("aria-sort")).toBe("ascending");
+    });
+
+    // Click again to sort descending by name
+    nameHeader.click();
+    await waitFor(() => {
+      expect(nameHeader.getAttribute("aria-sort")).toBe("descending");
     });
   });
 
