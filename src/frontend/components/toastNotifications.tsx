@@ -37,11 +37,12 @@ class ToastStore {
 
   public add(content: React.ReactNode, options?: ToastOptions): string {
     const id = options?.id ?? this.createId();
+    const autoClose = options?.autoClose;
     const toastRecord: ToastRecord = {
       id,
       content,
       intent: options?.intent ?? "info",
-      autoClose: typeof options?.autoClose === "undefined" ? DEFAULT_AUTO_CLOSE_MS : options?.autoClose,
+      autoClose: typeof autoClose === "undefined" ? DEFAULT_AUTO_CLOSE_MS : autoClose,
       createdAt: Date.now(),
     };
 

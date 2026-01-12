@@ -149,5 +149,198 @@ describe("toastNotifications", () => {
       // Original toast should still be there
       expect(container.querySelectorAll(".retro-toast").length).toBe(1);
     });
+
+    it("updates only render when only render is passed", () => {
+      const { container } = render(<ToastContainer />);
+
+      let toastId = "";
+      act(() => {
+        toastId = toast("Initial", { autoClose: null });
+      });
+
+      act(() => {
+        toast.update(toastId, { render: <span>Updated content</span> });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+      expect(container.textContent).toContain("Updated content");
+    });
+
+    it("updates only intent when only intent is passed", () => {
+      const { container } = render(<ToastContainer />);
+
+      let toastId = "";
+      act(() => {
+        toastId = toast("Test message", { autoClose: null });
+      });
+
+      act(() => {
+        toast.update(toastId, { intent: "error" });
+      });
+
+      expect(container.querySelector(".retro-message-bar--error")).toBeTruthy();
+    });
+
+    it("updates only autoClose when only autoClose is passed", () => {
+      const { container } = render(<ToastContainer />);
+
+      let toastId = "";
+      act(() => {
+        toastId = toast("Test", { autoClose: null });
+      });
+
+      act(() => {
+        toast.update(toastId, { autoClose: 500 });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+
+      act(() => {
+        jest.advanceTimersByTime(500);
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(0);
+    });
+  });
+
+  describe("toast options defaults", () => {
+    it("uses all defaults when no options are specified", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast("No options at all");
+      });
+
+      // Should use default intent (info)
+      expect(container.querySelector(".retro-message-bar--info")).toBeTruthy();
+      // Should have toast visible
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+
+      // Default is 5000ms - should auto dismiss
+      act(() => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(0);
+    });
+
+    it("uses default autoClose when autoClose is not specified", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast("Default auto close");
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+
+      // Default is 5000ms
+      act(() => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(0);
+    });
+
+    it("uses default intent (info) when intent is not specified", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast("No intent specified", { autoClose: null });
+      });
+
+      expect(container.querySelector(".retro-message-bar--info")).toBeTruthy();
+    });
+
+    it("uses custom id when provided", () => {
+      render(<ToastContainer />);
+
+      let returnedId = "";
+      act(() => {
+        returnedId = toast("Custom ID toast", { id: "my-custom-id", autoClose: null });
+      });
+
+      expect(returnedId).toBe("my-custom-id");
+    });
+
+    it("uses default autoClose when options object exists but autoClose is not set", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        // Pass options object with intent only, autoClose not specified
+        toast("With partial options", { intent: "success" });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+      expect(container.querySelector(".retro-message-bar--success")).toBeTruthy();
+
+      // Default is 5000ms
+      act(() => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(0);
+    });
+
+    it("uses explicit autoClose value when provided", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast("Explicit auto close", { autoClose: 2000 });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+
+      // Should not dismiss before 2000ms
+      act(() => {
+        jest.advanceTimersByTime(1999);
+      });
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+
+      // Should dismiss at 2000ms
+      act(() => {
+        jest.advanceTimersByTime(1);
+      });
+      expect(container.querySelectorAll(".retro-toast").length).toBe(0);
+    });
+  });
+
+  describe("dismiss functionality", () => {
+    it("dismisses a specific toast by id", () => {
+      const { container } = render(<ToastContainer />);
+
+      let firstId = "";
+      let secondId = "";
+      act(() => {
+        firstId = toast(<span>First</span>, { autoClose: null });
+        secondId = toast(<span>Second</span>, { autoClose: null });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(2);
+
+      act(() => {
+        toast.dismiss(firstId);
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+      expect(container.textContent).toContain("Second");
+      expect(container.textContent).not.toContain("First");
+    });
+
+    it("does nothing when dismissing a non-existent toast id", () => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast("Existing toast", { autoClose: null });
+      });
+
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+
+      act(() => {
+        toast.dismiss("non-existent-id");
+      });
+
+      // Toast should still be there
+      expect(container.querySelectorAll(".retro-toast").length).toBe(1);
+    });
   });
 });
