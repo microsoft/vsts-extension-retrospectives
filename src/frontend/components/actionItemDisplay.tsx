@@ -61,17 +61,9 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
 
       const wrapper = addWorkItemWrapperRef.current;
       const menu = addWorkItemMenuRef.current;
-      const target = event.target as Node | null;
+      const target = event.target as Node;
 
-      if (!wrapper || !target) {
-        return;
-      }
-
-      if (wrapper.contains(target)) {
-        return;
-      }
-
-      if (menu && menu.contains(target)) {
+      if (wrapper?.contains(target) || menu?.contains(target)) {
         return;
       }
 
