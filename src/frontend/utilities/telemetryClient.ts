@@ -10,10 +10,17 @@ const appInsights = new ApplicationInsights({
   config: {
     instrumentationKey: environment.AppInsightsInstrumentKey,
     extensions: [reactPlugin as never],
-    loggingLevelConsole: hasValidKey ? 0 : 0,
+    loggingLevelConsole: 0,
     loggingLevelTelemetry: hasValidKey ? 2 : 0,
     disableTelemetry: !hasValidKey,
     disableExceptionTracking: !hasValidKey,
+    enableCorsCorrelation: true,
+    disableFetchTracking: true,
+    disableAjaxTracking: true,
+    enableRequestHeaderTracking: true,
+    enableResponseHeaderTracking: true,
+    maxBatchInterval: 15000,
+    maxBatchSizeInBytes: 102400,
     extensionConfig: {
       [reactPlugin.identifier]: { history: null },
     },
