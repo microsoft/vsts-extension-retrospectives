@@ -1,5 +1,5 @@
 import { getService } from "azure-devops-extension-sdk";
-import { CommonServiceIds, IProjectPageService, IProjectInfo, ILocationService } from "azure-devops-extension-api";
+import { CommonServiceIds, IProjectPageService, IProjectInfo, ILocationService } from "azure-devops-extension-api/Common";
 import { CoreRestClient } from "azure-devops-extension-api/Core";
 
 /**

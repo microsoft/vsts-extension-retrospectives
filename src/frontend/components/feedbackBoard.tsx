@@ -50,12 +50,7 @@ export interface IColumnItem {
 
 const findActiveTimerFeedbackItemId = (columns: { [id: string]: IColumn }): string | null => {
   for (const columnId of Object.keys(columns)) {
-    const column = columns[columnId];
-    if (!column) {
-      continue;
-    }
-
-    const activeItem = column.columnItems.find(columnItem => columnItem.feedbackItem.timerState);
+    const activeItem = columns[columnId]?.columnItems.find(columnItem => columnItem.feedbackItem.timerState);
     if (activeItem) {
       return activeItem.feedbackItem.id;
     }
@@ -101,12 +96,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
 
   const findColumnItemById = useCallback((feedbackItemId: string, currentColumns: { [id: string]: IColumn }, currentColumnIds: string[]): IColumnItem | undefined => {
     for (const columnId of currentColumnIds) {
-      const column = currentColumns[columnId];
-      if (!column) {
-        continue;
-      }
-
-      const columnItem = column.columnItems.find(item => item.feedbackItem.id === feedbackItemId);
+      const columnItem = currentColumns[columnId]?.columnItems.find(item => item.feedbackItem.id === feedbackItemId);
       if (columnItem) {
         return columnItem;
       }

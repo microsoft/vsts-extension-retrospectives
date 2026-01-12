@@ -59,19 +59,11 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
         return;
       }
 
-      const wrapper = addWorkItemWrapperRef.current;
-      const menu = addWorkItemMenuRef.current;
-      const target = event.target as Node | null;
+      const wrapper = addWorkItemWrapperRef.current!;
+      const menu = addWorkItemMenuRef.current!;
+      const target = event.target as Node;
 
-      if (!wrapper || !target) {
-        return;
-      }
-
-      if (wrapper.contains(target)) {
-        return;
-      }
-
-      if (menu && menu.contains(target)) {
+      if (wrapper.contains(target) || menu.contains(target)) {
         return;
       }
 
@@ -131,10 +123,10 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
     [hideSelectorCallout, addActionItem],
   );
 
-  const handleInputChange = useCallback(async (event?: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = event?.target.value;
+  const handleInputChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
 
-    if (!newValue?.trim()) {
+    if (!newValue.trim()) {
       setIsLinkedWorkItemLoaded(false);
       return;
     }
@@ -152,15 +144,12 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
   }, []);
 
   const linkExistingWorkItem = useCallback(async () => {
-    if (linkedWorkItem) {
-      const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(boardId, feedbackItemId, linkedWorkItem.id);
+    const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(boardId, feedbackItemId, linkedWorkItem!.id);
 
-      appInsights.trackEvent({ name: TelemetryEvents.ExistingWorkItemLinked, properties: { workItemTypeName: linkedWorkItem.fields["System.WorkItemType"] } });
+    appInsights.trackEvent({ name: TelemetryEvents.ExistingWorkItemLinked, properties: { workItemTypeName: linkedWorkItem!.fields["System.WorkItemType"] } });
 
-      onUpdateActionItem(updatedFeedbackItem);
-    }
-
-    linkExistingWorkItemDialogRef.current?.close();
+    onUpdateActionItem(updatedFeedbackItem);
+    linkExistingWorkItemDialogRef.current!.close();
   }, [linkedWorkItem, boardId, feedbackItemId, onUpdateActionItem]);
 
   const handleLinkExistingWorkItemClick = useCallback(
@@ -171,7 +160,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
 
       hideSelectorCallout();
 
-      linkExistingWorkItemDialogRef.current?.showModal();
+      linkExistingWorkItemDialogRef.current!.showModal();
     },
     [hideSelectorCallout],
   );
@@ -226,10 +215,10 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
         </div>
       )}
       {renderAllWorkItemCards()}
-      <dialog ref={linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog" aria-label="Link existing work item" onClose={() => linkExistingWorkItemDialogRef.current?.close()}>
+      <dialog ref={linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog" aria-label="Link existing work item" onClose={() => linkExistingWorkItemDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">Link existing work item</h2>
-          <button onClick={() => linkExistingWorkItemDialogRef.current?.close()} aria-label="Close">
+          <button onClick={() => linkExistingWorkItemDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
@@ -246,7 +235,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
           <button className="button" disabled={!linkedWorkItem} onClick={linkExistingWorkItem}>
             Link work item
           </button>
-          <button className="default button" onClick={() => linkExistingWorkItemDialogRef.current?.close()}>
+          <button className="default button" onClick={() => linkExistingWorkItemDialogRef.current!.close()}>
             Cancel
           </button>
         </div>

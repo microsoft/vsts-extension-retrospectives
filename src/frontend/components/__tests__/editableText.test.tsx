@@ -68,6 +68,36 @@ describe("Editable Text Component", () => {
     expect(document.querySelector('input[value="Test Text"], textarea[value="Test Text"]')).toBeTruthy();
   });
 
+  it("does not switch to edit mode when non-Enter key is pressed in display mode", async () => {
+    const propsWithText = { ...mockedTestProps, text: "Test Text" };
+    render(<EditableText {...propsWithText} />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    clickableElement.focus();
+    await userEvent.keyboard("a");
+
+    // Should still be in display mode
+    expect(document.querySelector('[title="Click to edit"]')).toBeTruthy();
+    expect(document.querySelector("textarea, input")).toBeNull();
+  });
+
+  it("does not switch to edit mode when isDisabled is true", async () => {
+    const propsWithDisabled = { ...mockedTestProps, text: "Test Text", isDisabled: true };
+    render(<EditableText {...propsWithDisabled} />);
+
+    const clickableElement = document.querySelector(".editable-text") as HTMLElement;
+    expect(clickableElement).toBeTruthy();
+
+    // Try clicking
+    await userEvent.click(clickableElement);
+    expect(document.querySelector("textarea, input")).toBeNull();
+
+    // Try pressing Enter
+    clickableElement.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(document.querySelector("textarea, input")).toBeNull();
+  });
+
   it("calls onSave when text changes and isChangeEventRequired is true", async () => {
     const propsWithChangeEvent = { ...mockedTestProps, isChangeEventRequired: true, text: "Initial" };
     render(<EditableText {...propsWithChangeEvent} />);

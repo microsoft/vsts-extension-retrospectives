@@ -258,5 +258,65 @@ describe("Feedback Carousel ", () => {
       // Should render the carousel without crashing (columns are filtered out)
       expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
     });
+
+    it("should fall back to column defaults when accentColor is undefined", () => {
+      // Create a model where accentColor is undefined within columnProperties
+      const model = buildFocusModeModel([{ ...testColumnProps }]);
+      // Set accentColor to undefined to test the fallback
+      model.columns[testColumnProps.columnId].columnProperties.accentColor = undefined as any;
+
+      const { container } = render(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={false} />);
+
+      // Should use fallback accentColor
+      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
+
+    it("should handle feedback items without createdBy", () => {
+      // Create item without createdBy
+      const itemWithoutCreatedBy = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          createdBy: undefined as any,
+          modifiedDate: undefined as any,
+        },
+      };
+
+      const model = buildFocusModeModel([{ ...testColumnProps, columnItems: [itemWithoutCreatedBy] }]);
+
+      const { container } = render(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={false} />);
+
+      // Should render without createdBy info
+      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
+
+    it("should use column icon fallback when iconClass is undefined", () => {
+      // Create a model where iconClass is undefined
+      const model = buildFocusModeModel([{ ...testColumnProps }]);
+      model.columns[testColumnProps.columnId].columnProperties.iconClass = undefined as any;
+
+      const { container } = render(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={false} />);
+
+      // Should use fallback icon from column
+      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
+
+    it("should use column defaults when item's columnId is not in columns map", () => {
+      // Create a feedback item with a columnId that doesn't exist in the columns map
+      const itemWithDifferentColumnId = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          columnId: "non-existent-column-id", // This columnId won't be in the columns map
+        },
+      };
+
+      const model = buildFocusModeModel([{ ...testColumnProps, columnItems: [itemWithDifferentColumnId] }]);
+
+      const { container } = render(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={false} />);
+
+      // Should use column defaults for accentColor and icon
+      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
   });
 });

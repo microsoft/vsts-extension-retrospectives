@@ -36,7 +36,6 @@ export interface ISelectorListItemHeader {
 function SelectorCombo<T>({ className, currentValue, iconName, selectorList, title, nameGetter, selectorListItemOnClick }: ISelectorComboProps<T>): React.JSX.Element {
   const [currentFilterText, setCurrentFilterText] = useState("");
   const [isSelectorCalloutVisible, setIsSelectorCalloutVisible] = useState(false);
-  const [isSelectorDialogHidden, setIsSelectorDialogHidden] = useState(true);
 
   const selectorButton = useRef<HTMLDivElement>(null);
 
@@ -55,22 +54,12 @@ function SelectorCombo<T>({ className, currentValue, iconName, selectorList, tit
     setIsSelectorCalloutVisible(false);
   }, []);
 
-  const closeMobileSelectorDialog = useCallback(() => {
-    setIsSelectorDialogHidden(true);
-  }, []);
-
   const chooseItem = useCallback(
     (item: T) => {
       selectorListItemOnClick(item);
-      if (isSelectorCalloutVisible) {
-        hideSelectorCallout();
-      }
-
-      if (!isSelectorDialogHidden) {
-        closeMobileSelectorDialog();
-      }
+      hideSelectorCallout();
     },
-    [selectorListItemOnClick, isSelectorCalloutVisible, isSelectorDialogHidden, hideSelectorCallout, closeMobileSelectorDialog],
+    [selectorListItemOnClick, hideSelectorCallout],
   );
 
   const handleKeyPressTeamList = useCallback(
@@ -163,10 +152,8 @@ function SelectorCombo<T>({ className, currentValue, iconName, selectorList, tit
       let searchResultsAriaLabel: string = "";
 
       if (currentFilterText) {
-        selectorListData.selectorListItems.map(selectorListItem => {
-          if (selectorListItem && selectorListItem.items) {
-            itemCount += selectorListItem.items.length;
-          }
+        selectorListData.selectorListItems.forEach(selectorListItem => {
+          itemCount += selectorListItem.items.length;
         });
 
         searchResultsAriaLabel = itemCount === 1 ? "Found 1 result." : "Found " + itemCount + " results.";

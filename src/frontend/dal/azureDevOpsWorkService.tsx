@@ -10,9 +10,7 @@ class WorkService {
   private _httpWorkClient: WorkRestClient;
 
   constructor() {
-    if (!this._httpWorkClient) {
-      this._httpWorkClient = getClient(WorkRestClient);
-    }
+    this._httpWorkClient = getClient(WorkRestClient);
   }
 
   /**

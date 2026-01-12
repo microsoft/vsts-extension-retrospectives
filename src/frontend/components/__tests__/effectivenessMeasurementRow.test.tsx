@@ -279,6 +279,18 @@ describe("EffectivenessMeasurementRow", () => {
       }
     });
 
+    it("uses default empty array when votes prop is undefined", () => {
+      // Omit votes from props to trigger default parameter
+      const { votes, ...propsWithoutVotes } = defaultProps;
+      const { container } = render(<EffectivenessMeasurementRow {...propsWithoutVotes} />);
+
+      // All buttons should have no selection since votes defaults to []
+      for (let i = 1; i <= 10; i++) {
+        const button = container.querySelector(`button[aria-label="${i}"]`);
+        expect(button).not.toHaveClass("team-assessment-score-button-selected");
+      }
+    });
+
     it("finds matching vote when questionId matches exactly (covers line 21 truthy branch)", () => {
       // Ensure questionId in response matches component's questionId
       const votesWithMatchingQuestionId: ITeamEffectivenessMeasurementVoteCollection[] = [

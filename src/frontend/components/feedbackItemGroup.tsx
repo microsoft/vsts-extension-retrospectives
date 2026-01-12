@@ -44,14 +44,10 @@ const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({ groupedWorkItems
   );
 
   useEffect(() => {
-    const currentRef = groupRef.current;
-    if (currentRef) {
-      currentRef.addEventListener("keydown", handleGroupKeyDown);
-    }
+    const currentRef = groupRef.current!;
+    currentRef.addEventListener("keydown", handleGroupKeyDown);
     return () => {
-      if (currentRef) {
-        currentRef.removeEventListener("keydown", handleGroupKeyDown);
-      }
+      currentRef.removeEventListener("keydown", handleGroupKeyDown);
     };
   }, [handleGroupKeyDown]);
 

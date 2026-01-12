@@ -1,23 +1,36 @@
-import { createBrowserHistory } from "history";
 import { ApplicationInsights } from "@microsoft/applicationinsights-web";
 import { ReactPlugin } from "@microsoft/applicationinsights-react-js";
 import { config as environment } from "../config/config";
 
-const browserHistory = createBrowserHistory();
 const reactPlugin = new ReactPlugin();
+
+const hasValidKey = Boolean(environment.AppInsightsInstrumentKey);
+
 const appInsights = new ApplicationInsights({
   config: {
     instrumentationKey: environment.AppInsightsInstrumentKey,
     extensions: [reactPlugin as never],
-    loggingLevelConsole: 2,
-    loggingLevelTelemetry: 2,
+    loggingLevelConsole: 0,
+    loggingLevelTelemetry: hasValidKey ? 2 : 0,
+    disableTelemetry: !hasValidKey,
+    disableExceptionTracking: !hasValidKey,
+    enableCorsCorrelation: true,
+    disableFetchTracking: true,
+    disableAjaxTracking: true,
+    enableRequestHeaderTracking: true,
+    enableResponseHeaderTracking: true,
+    maxBatchInterval: 15000,
+    maxBatchSizeInBytes: 102400,
     extensionConfig: {
-      [reactPlugin.identifier]: { history: browserHistory },
+      [reactPlugin.identifier]: { history: null },
     },
   },
 });
-appInsights.loadAppInsights();
-appInsights.trackPageView();
+
+if (hasValidKey) {
+  appInsights.loadAppInsights();
+  appInsights.trackPageView();
+}
 
 export const TelemetryExceptions = {
   BoardsNotFoundForTeam: "Feedback boards not found for team",

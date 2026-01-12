@@ -141,31 +141,20 @@ export const ExtensionSettingsMenu: React.FC = () => {
     }
 
     const keyboardDialog = keyboardShortcutsDialogRef.current;
-    if (!keyboardDialog) {
-      return;
-    }
-
     const openDialog = document.querySelector("dialog[open]") as HTMLDialogElement | null;
     if (openDialog && openDialog !== keyboardDialog) {
       return;
     }
 
     event.preventDefault();
-    if (!keyboardDialog.hasAttribute("open")) {
-      keyboardDialog.showModal();
+    if (!keyboardDialog!.hasAttribute("open")) {
+      keyboardDialog!.showModal();
     }
   }, []);
 
   const handleDocumentPointerDown = useCallback((event: PointerEvent) => {
-    const root = menuRootRef.current;
-    if (!root) {
-      return;
-    }
-
-    const target = event.target as Node | null;
-    if (!target) {
-      return;
-    }
+    const root = menuRootRef.current!;
+    const target = event.target as Node;
 
     const openDetails = Array.from(root.querySelectorAll("details[open]"));
     for (const detailsElement of openDetails) {
@@ -187,7 +176,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
 
   return (
     <div className="extension-settings-menu" ref={menuRootRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
-      <button onClick={() => primeDirectiveDialogRef.current?.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
+      <button onClick={() => primeDirectiveDialogRef.current!.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
         {getIconElement("privacy-tip")}
         <span className="hidden lg:inline">Directive</span>
       </button>
@@ -227,7 +216,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         <div className="callout-menu right">
           <button
             onClick={() => {
-              whatsNewDialogRef.current?.showModal();
+              whatsNewDialogRef.current!.showModal();
             }}
           >
             {getIconElement("celebration")}
@@ -235,7 +224,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
           </button>
           <button
             onClick={() => {
-              keyboardShortcutsDialogRef.current?.showModal();
+              keyboardShortcutsDialogRef.current!.showModal();
             }}
           >
             {getIconElement("keyboard")}
@@ -243,7 +232,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
           </button>
           <button
             onClick={() => {
-              userGuideDialogRef.current?.showModal();
+              userGuideDialogRef.current!.showModal();
             }}
           >
             {getIconElement("menu-book")}
@@ -251,7 +240,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
           </button>
           <button
             onClick={() => {
-              volunteerDialogRef.current?.showModal();
+              volunteerDialogRef.current!.showModal();
             }}
           >
             {getIconElement("volunteer-activism")}
@@ -268,10 +257,10 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </details>
 
-      <dialog className="prime-directive-dialog" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onClose={() => primeDirectiveDialogRef.current?.close()}>
+      <dialog className="prime-directive-dialog" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onClose={() => primeDirectiveDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">The Prime Directive</h2>
-          <button onClick={() => primeDirectiveDialogRef.current?.close()} aria-label="Close">
+          <button onClick={() => primeDirectiveDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
@@ -282,16 +271,16 @@ export const ExtensionSettingsMenu: React.FC = () => {
           <button className="button" onClick={() => window.open("https://retrospectivewiki.com", "_blank")}>
             Open Retrospective Wiki
           </button>
-          <button className="default button" onClick={() => primeDirectiveDialogRef.current?.close()}>
+          <button className="default button" onClick={() => primeDirectiveDialogRef.current!.close()}>
             Close
           </button>
         </div>
       </dialog>
 
-      <dialog className="whats-new-dialog" aria-label="What is New" ref={whatsNewDialogRef} onClose={() => whatsNewDialogRef.current?.close()}>
+      <dialog className="whats-new-dialog" aria-label="What is New" ref={whatsNewDialogRef} onClose={() => whatsNewDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">What&apos;s New</h2>
-          <button onClick={() => whatsNewDialogRef.current?.close()} aria-label="Close">
+          <button onClick={() => whatsNewDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
@@ -309,16 +298,16 @@ export const ExtensionSettingsMenu: React.FC = () => {
           <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>
             Open change log
           </button>
-          <button className="default button" onClick={() => whatsNewDialogRef.current?.close()}>
+          <button className="default button" onClick={() => whatsNewDialogRef.current!.close()}>
             Close
           </button>
         </div>
       </dialog>
 
-      <dialog className="user-guide-dialog" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onClose={() => userGuideDialogRef.current?.close()}>
+      <dialog className="user-guide-dialog" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onClose={() => userGuideDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">Retrospectives User Guide</h2>
-          <button onClick={() => userGuideDialogRef.current?.close()} aria-label="Close">
+          <button onClick={() => userGuideDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
@@ -328,16 +317,16 @@ export const ExtensionSettingsMenu: React.FC = () => {
           <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md", "_blank")}>
             Open user guide
           </button>
-          <button className="default button" onClick={() => userGuideDialogRef.current?.close()}>
+          <button className="default button" onClick={() => userGuideDialogRef.current!.close()}>
             Close
           </button>
         </div>
       </dialog>
 
-      <dialog className="volunteer-dialog" aria-label="Volunteer" ref={volunteerDialogRef} onClose={() => volunteerDialogRef.current?.close()}>
+      <dialog className="volunteer-dialog" aria-label="Volunteer" ref={volunteerDialogRef} onClose={() => volunteerDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">Volunteer</h2>
-          <button onClick={() => volunteerDialogRef.current?.close()} aria-label="Close">
+          <button onClick={() => volunteerDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
@@ -348,16 +337,16 @@ export const ExtensionSettingsMenu: React.FC = () => {
           <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md", "_blank")}>
             Open contributing guidelines
           </button>
-          <button className="default button" onClick={() => volunteerDialogRef.current?.close()}>
+          <button className="default button" onClick={() => volunteerDialogRef.current!.close()}>
             Close
           </button>
         </div>
       </dialog>
 
-      <dialog className="keyboard-shortcuts-dialog" aria-label="Keyboard Shortcuts" ref={keyboardShortcutsDialogRef} onClose={() => keyboardShortcutsDialogRef.current?.close()}>
+      <dialog className="keyboard-shortcuts-dialog" aria-label="Keyboard Shortcuts" ref={keyboardShortcutsDialogRef} onClose={() => keyboardShortcutsDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">Keyboard Shortcuts</h2>
-          <button onClick={() => keyboardShortcutsDialogRef.current?.close()} aria-label="Close">
+          <button onClick={() => keyboardShortcutsDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
@@ -403,7 +392,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
           ))}
         </div>
         <div className="inner">
-          <button className="default button" onClick={() => keyboardShortcutsDialogRef.current?.close()}>
+          <button className="default button" onClick={() => keyboardShortcutsDialogRef.current!.close()}>
             Close
           </button>
         </div>

@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import React from "react";
 import { render, waitFor, fireEvent } from "@testing-library/react";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
@@ -684,6 +687,26 @@ describe("BoardSummaryTable, additional coverage", () => {
 
       expect(result.boardsTableItems).toHaveLength(1);
     });
+
+    it("buildBoardSummaryState handles undefined isArchived", () => {
+      const boardWithUndefinedIsArchived: IFeedbackBoardDocument = {
+        id: "board-undefined-isarchived",
+        teamId: "team-1",
+        title: "Board with undefined isArchived",
+        createdDate: new Date("2023-01-01"),
+        createdBy: mockedIdentity,
+        columns: [],
+        activePhase: "Collect",
+        maxVotesPerUser: 5,
+        boardVoteCollection: {},
+        teamEffectivenessMeasurementVoteCollection: [],
+      };
+
+      const result = buildBoardSummaryState([boardWithUndefinedIsArchived]);
+
+      expect(result.boardsTableItems).toHaveLength(1);
+      expect(result.boardsTableItems[0].isArchived).toBe(false);
+    });
   });
 
   describe("Row expansion", () => {
@@ -769,6 +792,22 @@ describe("BoardSummaryTable - Sorting Functionality", () => {
 
     await waitFor(() => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    // Find the Retrospective Name header and click to sort
+    const nameHeader = Array.from(container.querySelectorAll('th[role="columnheader"]')).find(th => th.textContent?.includes("Retrospective Name")) as HTMLElement;
+    expect(nameHeader).toBeTruthy();
+
+    // Click to sort ascending by name
+    nameHeader.click();
+    await waitFor(() => {
+      expect(nameHeader.getAttribute("aria-sort")).toBe("ascending");
+    });
+
+    // Click again to sort descending by name
+    nameHeader.click();
+    await waitFor(() => {
+      expect(nameHeader.getAttribute("aria-sort")).toBe("descending");
     });
   });
 
@@ -2074,6 +2113,43 @@ describe("BoardSummaryTable - sortedData with equal values and edge cases", () =
 
     await waitFor(() => {
       expect(titleHeaderCell.getAttribute("aria-sort")).toBe("ascending");
+    });
+  });
+
+  it("covers non-date sort descending when aVal > bVal", async () => {
+    const boardAlpha: IFeedbackBoardDocument = {
+      ...mockBoards[0],
+      id: "board-alpha",
+      title: "Alpha",
+      createdDate: new Date("2024-02-02"),
+    };
+
+    const boardZeta: IFeedbackBoardDocument = {
+      ...mockBoards[1],
+      id: "board-zeta",
+      title: "Zeta",
+      createdDate: new Date("2024-02-01"),
+    };
+
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce([boardAlpha, boardZeta]);
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+    const { container, getByText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    const titleHeaderCell = getByText("Retrospective Name").closest("th") as HTMLTableCellElement;
+    // Click once for ascending
+    fireEvent.click(titleHeaderCell);
+    await waitFor(() => {
+      expect(titleHeaderCell.getAttribute("aria-sort")).toBe("ascending");
+    });
+    // Click again for descending - this covers aVal > bVal with desc direction
+    fireEvent.click(titleHeaderCell);
+    await waitFor(() => {
+      expect(titleHeaderCell.getAttribute("aria-sort")).toBe("descending");
     });
   });
 });

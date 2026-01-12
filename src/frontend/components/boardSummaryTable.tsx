@@ -323,18 +323,21 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       }),
     );
 
+    const boardIdToIndex: { [key: string]: number } = {};
+    updatedBoardsTableItems.forEach((item, index) => {
+      boardIdToIndex[item.id] = index;
+    });
+
     await Promise.all(
       state.feedbackBoards.map(async feedbackBoard => {
         const feedbackBoardId: string = feedbackBoard.id;
         const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
 
-        const boardIndex = updatedBoardsTableItems.findIndex(item => item.id === feedbackBoardId);
-        if (boardIndex !== -1) {
-          updatedBoardsTableItems[boardIndex] = {
-            ...updatedBoardsTableItems[boardIndex],
-            feedbackItemsCount: feedbackItems.length,
-          };
-        }
+        const boardIndex = boardIdToIndex[feedbackBoardId];
+        updatedBoardsTableItems[boardIndex] = {
+          ...updatedBoardsTableItems[boardIndex],
+          feedbackItemsCount: feedbackItems.length,
+        };
 
         if (!feedbackItems.length) return;
 
@@ -364,13 +367,11 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           return !states.length || (states[0].category !== "Completed" && states[0].category !== "Removed");
         });
 
-        if (boardIndex !== -1) {
-          updatedBoardsTableItems[boardIndex] = {
-            ...updatedBoardsTableItems[boardIndex],
-            pendingWorkItemsCount: pendingWorkItems.length,
-            totalWorkItemsCount: aggregatedWorkItems.length,
-          };
-        }
+        updatedBoardsTableItems[boardIndex] = {
+          ...updatedBoardsTableItems[boardIndex],
+          pendingWorkItemsCount: pendingWorkItems.length,
+          totalWorkItemsCount: aggregatedWorkItems.length,
+        };
       }),
     );
 
@@ -386,7 +387,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     const currentBoard = boardSummaryState.boardsTableItems.find(board => board.id === item.id);
     if (!currentBoard) return null;
     const actionItems = boardSummaryState.actionItemsByBoard[currentBoard.id];
-    return <BoardSummary actionItems={actionItems?.actionItems} pendingWorkItemsCount={currentBoard?.pendingWorkItemsCount} resolvedActionItemsCount={currentBoard?.totalWorkItemsCount - currentBoard?.pendingWorkItemsCount} boardName={currentBoard?.boardName} feedbackItemsCount={currentBoard?.feedbackItemsCount} supportedWorkItemTypes={props.supportedWorkItemTypes} />;
+    return <BoardSummary actionItems={actionItems.actionItems} pendingWorkItemsCount={currentBoard.pendingWorkItemsCount} resolvedActionItemsCount={currentBoard.totalWorkItemsCount - currentBoard.pendingWorkItemsCount} boardName={currentBoard.boardName} feedbackItemsCount={currentBoard.feedbackItemsCount} supportedWorkItemTypes={props.supportedWorkItemTypes} />;
   };
 
   const handleConfirmDelete = async () => {
@@ -400,16 +401,16 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
         name: TelemetryEvents.FeedbackBoardDeleted,
         properties: {
           boardId: openDialogBoardId,
-          boardName: selectedBoardForDelete?.boardName || "Unknown Board",
-          feedbackItemsCount: selectedBoardForDelete?.feedbackItemsCount || 0,
+          boardName: selectedBoardForDelete!.boardName,
+          feedbackItemsCount: selectedBoardForDelete!.feedbackItemsCount,
           deletedByUserId: obfuscateUserId(getUserIdentity().id),
         },
       });
     } catch (error) {
       appInsights.trackException(error, {
         boardId: openDialogBoardId,
-        boardName: selectedBoardForDelete?.boardName || "Unknown Board",
-        feedbackItemsCount: selectedBoardForDelete?.feedbackItemsCount || 0,
+        boardName: selectedBoardForDelete!.boardName,
+        feedbackItemsCount: selectedBoardForDelete!.feedbackItemsCount,
         action: "delete",
       });
     }

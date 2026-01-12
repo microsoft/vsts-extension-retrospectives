@@ -197,24 +197,21 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const startEditingTitle = useCallback(() => {
     const element = (itemElementOverrideRef.current ?? itemElementRef.current) as HTMLElement | null;
-    if (!element) {
-      return;
-    }
 
-    const activeEditor = element.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
+    const activeEditor = element?.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
     if (activeEditor) {
       activeEditor.focus();
       return;
     }
 
-    const titleText = element.querySelector(".editable-text") as HTMLElement | null;
+    const titleText = element?.querySelector(".editable-text") as HTMLElement | null;
     if (titleText) {
       titleText.focus();
       titleText.click();
       return;
     }
 
-    const container = element.querySelector(".non-editable-text-container, .editable-text-container") as HTMLElement | null;
+    const container = element?.querySelector(".non-editable-text-container, .editable-text-container") as HTMLElement | null;
     if (container) {
       container.focus();
       container.click();
@@ -246,11 +243,8 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const focusCardControl = useCallback((direction: "prev" | "next") => {
     const element = (itemElementOverrideRef.current ?? itemElementRef.current) as HTMLElement | null;
-    if (!element) {
-      return;
-    }
 
-    const focusableControls = Array.from(element.querySelectorAll(['[data-card-control="true"]', ".editable-text-container", ".non-editable-text-container"].join(","))) as HTMLElement[];
+    const focusableControls = Array.from(element?.querySelectorAll(['[data-card-control="true"]', ".editable-text-container", ".non-editable-text-container"].join(",")) ?? []) as HTMLElement[];
     const visibleControls = focusableControls.filter(control => control.getAttribute("aria-hidden") !== "true" && !control.hasAttribute("disabled"));
 
     if (!visibleControls.length) {
@@ -414,17 +408,10 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         if (updatedFeedbackItem) {
           props.refreshFeedbackItems([updatedFeedbackItem], true);
         }
-        if (props.timerId == null) {
-          const tid = setInterval(incTimer, 1000);
-          updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, tid);
-          if (updatedFeedbackItem) {
-            props.refreshFeedbackItems([updatedFeedbackItem], true);
-          }
-        } else {
-          updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, props.timerId);
-          if (updatedFeedbackItem) {
-            props.refreshFeedbackItems([updatedFeedbackItem], true);
-          }
+        const tid = props.timerId ?? setInterval(incTimer, 1000);
+        updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, tid);
+        if (updatedFeedbackItem) {
+          props.refreshFeedbackItems([updatedFeedbackItem], true);
         }
       } else {
         clearInterval(props.timerId);
@@ -753,17 +740,14 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   useEffect(() => {
     const element = itemElementRef.current;
-    if (!element) {
-      return undefined;
-    }
 
     const listener = (event: KeyboardEvent) => {
       handleItemKeyDown(event);
     };
 
-    element.addEventListener("keydown", listener);
+    element?.addEventListener("keydown", listener);
     return () => {
-      element.removeEventListener("keydown", listener);
+      element?.removeEventListener("keydown", listener);
     };
   }, [handleItemKeyDown]);
 

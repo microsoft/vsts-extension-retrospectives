@@ -22,7 +22,7 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
   const initialSelection = useMemo(() => {
     const currentUserId = obfuscateUserId(getUserIdentity().id);
     const vote = votes.find(e => e.userId === currentUserId)?.responses || [];
-    const currentVote = vote.filter(v => v.questionId === questionId || "");
+    const currentVote = vote.filter(v => v.questionId === questionId);
     return currentVote.length > 0 ? currentVote[0].selection : 0;
   }, [votes, questionId]);
 

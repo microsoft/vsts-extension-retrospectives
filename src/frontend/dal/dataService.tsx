@@ -1,5 +1,5 @@
 import { getAccessToken, getExtensionContext, getService } from "azure-devops-extension-sdk";
-import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from "azure-devops-extension-api";
+import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from "azure-devops-extension-api/Common";
 import { appInsights } from "../utilities/telemetryClient";
 import { isAzureDevOpsError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
 
