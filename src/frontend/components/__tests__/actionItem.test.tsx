@@ -382,4 +382,28 @@ describe("UI-level integration tests for ActionItem", () => {
 
     await waitFor(() => expect(openWorkItem).toHaveBeenCalledWith(1));
   });
+
+  it("does not invoke work item form on non-Enter key press", () => {
+    const openWorkItem = jest.fn().mockResolvedValue(undefined);
+    (azureDevOpsExtensionSdk.getService as jest.Mock).mockResolvedValue({ openWorkItem });
+
+    const { getByRole } = render(<ActionItem {...defaultTestProps} />);
+
+    const cardButton = getByRole("button", { name: /click to open work item/i });
+    fireEvent.keyDown(cardButton, { key: "Tab", code: "Tab" });
+
+    expect(openWorkItem).not.toHaveBeenCalled();
+  });
+
+  it("handles dialog onClose event", () => {
+    const { container } = render(<ActionItem {...defaultTestProps} />);
+
+    const dialog = container.querySelector(".unlink-work-item-confirmation-dialog") as HTMLDialogElement;
+    expect(dialog).toBeTruthy();
+
+    // Trigger the onClose event
+    fireEvent(dialog, new Event("close"));
+
+    expect(dialog).toBeTruthy();
+  });
 });

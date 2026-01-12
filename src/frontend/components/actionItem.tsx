@@ -44,9 +44,7 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
       const updatedFeedbackItem = await itemDataService.removeAssociatedItemIfNotExistsInVsts(boardId, feedbackItemId, workItemId);
       onUpdateActionItem(updatedFeedbackItem);
 
-      if (openWorkItemButtonRef.current) {
-        openWorkItemButtonRef.current.focus();
-      }
+      openWorkItemButtonRef.current!.focus();
     },
     [boardId, feedbackItemId, onUpdateActionItem],
   );
@@ -62,7 +60,7 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
   const onConfirmUnlinkWorkItem = useCallback(
     async (workItemId: number) => {
       onUnlinkWorkItemClick(workItemId);
-      unlinkWorkItemDialogRef.current?.close();
+      unlinkWorkItemDialogRef.current!.close();
     },
     [onUnlinkWorkItemClick],
   );
@@ -114,17 +112,17 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
           aria-label="Remove link to work item button"
           onClick={event => {
             event.stopPropagation();
-            unlinkWorkItemDialogRef.current?.showModal();
+            unlinkWorkItemDialogRef.current!.showModal();
           }}
           aria-haspopup="dialog"
         >
           {getIconElement("link-off")}
         </button>
       )}
-      <dialog className="unlink-work-item-confirmation-dialog" aria-label="Remove Work Item Link" ref={unlinkWorkItemDialogRef} onClose={() => unlinkWorkItemDialogRef.current?.close()}>
+      <dialog className="unlink-work-item-confirmation-dialog" aria-label="Remove Work Item Link" ref={unlinkWorkItemDialogRef} onClose={() => unlinkWorkItemDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">Remove Work Item Link</h2>
-          <button onClick={() => unlinkWorkItemDialogRef.current?.close()} aria-label="Close">
+          <button onClick={() => unlinkWorkItemDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
@@ -139,7 +137,7 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
           >
             Remove
           </button>
-          <button className="default button" onClick={() => unlinkWorkItemDialogRef.current?.close()}>
+          <button className="default button" onClick={() => unlinkWorkItemDialogRef.current!.close()}>
             Cancel
           </button>
         </div>

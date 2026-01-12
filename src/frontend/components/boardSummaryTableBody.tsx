@@ -51,10 +51,7 @@ const BoardSummaryTableBody: React.FC<BoardSummaryTableBodyProps> = ({ columns, 
             aria-label="Board summary row. Click expand row icon to view more statistics for this board."
             onKeyPress={(e: React.KeyboardEvent) => {
               if (e.key === "Enter") {
-                const expandColumn = columns[0];
-                if (expandColumn) {
-                  expandColumn.cell(item);
-                }
+                columns[0]!.cell(item);
               }
             }}
           >

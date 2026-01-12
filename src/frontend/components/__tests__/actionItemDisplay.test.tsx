@@ -1017,4 +1017,47 @@ describe("Action Item Display component", () => {
       expect(menu).toBeTruthy();
     });
   });
+
+  it("does not open dialog when non-Enter key is pressed on Link existing work item button", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    const menu = await openAddWorkItemMenu(container);
+
+    const linkButton = menu.querySelector("button.list-item");
+    expect(linkButton).toBeTruthy();
+
+    // Press a non-Enter key
+    fireEvent.keyDown(linkButton!, { key: "Tab", code: "Tab" });
+
+    // Dialog should NOT be open
+    const dialog = container.querySelector(".link-existing-work-item-dialog") as HTMLDialogElement;
+    expect(dialog.open).toBe(false);
+  });
+
+  it("handleClickOutside returns early when pointerdown target is inside wrapper", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const { container } = render(<ActionItemDisplay {...propsWithAdd} />);
+
+    await openAddWorkItemMenu(container);
+
+    // Click on the wrapper element
+    const wrapper = container.querySelector(".add-action-item-wrapper");
+    expect(wrapper).toBeTruthy();
+    fireEvent.pointerDown(wrapper!);
+
+    // Menu should still be open
+    await waitFor(() => {
+      const menu = container.querySelector(".popout-container");
+      expect(menu).toBeTruthy();
+    });
+  });
 });

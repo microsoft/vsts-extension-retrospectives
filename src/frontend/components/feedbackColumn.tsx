@@ -298,7 +298,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
   const openEditDialog = useCallback(() => {
     setColumnNotesDraft(columnNotes);
-    editColumnNotesDialogRef.current?.showModal();
+    editColumnNotesDialogRef.current!.showModal();
   }, [columnNotes]);
 
   const handleColumnKeyDown = useCallback(
@@ -411,7 +411,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
   const saveColumnNotes = useCallback(() => {
     onColumnNotesChange(columnNotesDraft);
-    editColumnNotesDialogRef.current?.close();
+    editColumnNotesDialogRef.current!.close();
   }, [onColumnNotesChange, columnNotesDraft]);
 
   const renderFeedbackItems = useCallback(() => {
@@ -465,7 +465,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
       <dialog ref={editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label="Edit column notes">
         <div className="header">
           <h2 className="title">Edit column notes</h2>
-          <button type="button" onClick={() => editColumnNotesDialogRef.current?.close()} aria-label="Close">
+          <button type="button" onClick={() => editColumnNotesDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
@@ -481,7 +481,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
           <button type="button" className="button" onClick={saveColumnNotes}>
             Save
           </button>
-          <button type="button" className="button default" onClick={() => editColumnNotesDialogRef.current?.close()}>
+          <button type="button" className="button default" onClick={() => editColumnNotesDialogRef.current!.close()}>
             Cancel
           </button>
         </div>

@@ -642,6 +642,20 @@ describe("ExtensionSettingsMenu", () => {
     appendSpy.mockRestore();
   });
 
+  it("does not reopen keyboard shortcuts dialog when already open", () => {
+    const { container } = render(<ExtensionSettingsMenu />);
+    const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
+
+    // Open the dialog first
+    fireEvent.keyDown(document, { key: "?", code: "Slash", shiftKey: true });
+    expect(dialog).toHaveAttribute("open");
+
+    // Press ? again while dialog is already open - should not call showModal again
+    // The dialog should remain open
+    fireEvent.keyDown(document, { key: "?", code: "Slash", shiftKey: true });
+    expect(dialog).toHaveAttribute("open");
+  });
+
   it("opens keyboard shortcuts with '/' and shiftKey", () => {
     const { container } = render(<ExtensionSettingsMenu />);
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
@@ -1064,6 +1078,82 @@ describe("ExtensionSettingsMenu", () => {
       createBoardSpy.mockRestore();
       appendSpy.mockRestore();
       global.FileReader = originalFileReader;
+    });
+
+    it("falls back to default team when imported team is not found", async () => {
+      // Mock file reader with data for a team that does not exist
+      const mockFileReader: Partial<FileReader> = {
+        readAsText: jest.fn(),
+        result: JSON.stringify([
+          {
+            team: { id: "nonexistent-team", name: "Nonexistent Team" },
+            board: { id: "board-1", title: "Board One", maxVotesPerUser: 5, columns: [], isIncludeTeamEffectivenessMeasurement: false, shouldShowFeedbackAfterCollect: false, isAnonymous: false },
+            items: [{ id: "item-1", boardId: "board-1" }],
+          },
+        ]),
+        onload: null as any,
+      };
+      const originalFileReader = global.FileReader;
+      global.FileReader = jest.fn(() => mockFileReader) as any;
+
+      // Set up mocks - team list does NOT contain the imported team
+      (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([{ id: "other-team", name: "Other Team" }]);
+      (azureDevOpsCoreService.getDefaultTeam as jest.Mock).mockResolvedValue({ id: "default-team", name: "Default Team" });
+      const createBoardSpy = jest.spyOn(boardDataService, "createBoardForTeam").mockResolvedValue({ id: "new-board", title: "Board One" } as any);
+      const appendSpy = jest.spyOn(itemDataService, "appendItemToBoard").mockResolvedValue({} as any);
+
+      const { container } = render(<ExtensionSettingsMenu />);
+
+      // Open the Data menu and click Import
+      const dataButton = screen.getByTitle("Data Import/Export");
+      fireEvent.click(dataButton);
+
+      // Set up document.createElement mock AFTER render
+      const originalCreateElement = document.createElement.bind(document);
+      const fakeInput = originalCreateElement("input");
+      fakeInput.setAttribute("type", "file");
+
+      const createElementSpy = jest.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+        if (tagName === "input") {
+          return fakeInput;
+        }
+        return originalCreateElement(tagName);
+      });
+
+      try {
+        const calloutMenu = container.querySelector("details[open] .callout-menu");
+        const importButton = calloutMenu?.querySelectorAll("button")[0];
+        fireEvent.click(importButton!);
+
+        // Simulate file selection
+        const mockFile = new File(["[]"], "test.json", { type: "application/json" });
+        Object.defineProperty(fakeInput, "files", {
+          value: [mockFile],
+          writable: false,
+        });
+
+        // Trigger change event - this registers the handler
+        fireEvent.change(fakeInput);
+
+        // Trigger the file reader onload to invoke processImportedData
+        // This executes the branch where team is not found and falls back to defaultTeam
+        if (typeof mockFileReader.onload === "function") {
+          (mockFileReader.onload as (event: ProgressEvent<FileReader>) => void).call(mockFileReader, { target: { result: mockFileReader.result } } as unknown as ProgressEvent<FileReader>);
+        }
+
+        // Wait for async operations to complete
+        await waitFor(() => {
+          expect(appendSpy).toHaveBeenCalled();
+        });
+
+        // Verify file reader was called
+        expect(mockFileReader.readAsText).toHaveBeenCalled();
+      } finally {
+        createElementSpy.mockRestore();
+        createBoardSpy.mockRestore();
+        appendSpy.mockRestore();
+        global.FileReader = originalFileReader;
+      }
     });
 
     it("processes imported data and creates boards with items", async () => {

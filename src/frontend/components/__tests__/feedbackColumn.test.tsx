@@ -1095,6 +1095,53 @@ describe("Feedback Column ", () => {
 
       expect(addFeedbackItems).toHaveBeenCalled();
     });
+
+    test("Insert key does nothing when not in Collect phase", () => {
+      const addFeedbackItems = jest.fn();
+      // Use Act phase - Insert key should NOT create feedback
+      const props = { ...testColumnProps, workflowPhase: "Act" as any, addFeedbackItems, columnItems: [] as IColumnItem[] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+
+      const event = new KeyboardEvent("keydown", { key: "Insert", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      expect(addFeedbackItems).not.toHaveBeenCalled();
+    });
+
+    test("'e' key does nothing when showColumnEditButton is false", () => {
+      const onColumnNotesChange = jest.fn();
+      const props = { ...testColumnProps, showColumnEditButton: false, onColumnNotesChange, columnItems: [] as IColumnItem[] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+
+      const event = new KeyboardEvent("keydown", { key: "e", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      // Dialog should not be opened, column notes should not be accessed
+      const dialog = container.querySelector(".edit-column-notes-dialog") as HTMLDialogElement;
+      expect(dialog?.hasAttribute("open")).toBeFalsy();
+    });
+
+    test("creates anonymous feedback item when isBoardAnonymous is true", () => {
+      const addFeedbackItems = jest.fn();
+      const props = { ...testColumnProps, workflowPhase: "Collect" as any, isBoardAnonymous: true, addFeedbackItems, columnItems: [] as IColumnItem[] };
+      const { container } = render(<FeedbackColumn {...props} />);
+
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+
+      // Trigger Insert key to create feedback item
+      const event = new KeyboardEvent("keydown", { key: "Insert", bubbles: true, cancelable: true });
+      column.dispatchEvent(event);
+
+      expect(addFeedbackItems).toHaveBeenCalled();
+      // When isBoardAnonymous is true, createdBy should be null
+      const call = addFeedbackItems.mock.calls[0];
+      const feedbackItems = call[1];
+      expect(feedbackItems[0].createdBy).toBeNull();
+    });
   });
 
   describe("Drop Feedback Item", () => {

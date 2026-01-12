@@ -123,7 +123,7 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
           }
         });
 
-        newActionItems = sortActionItemsByColumn(newActionItems, currColumn.fieldName || "", currColumn.isSortedDescending);
+        newActionItems = sortActionItemsByColumn(newActionItems, currColumn.fieldName!, currColumn.isSortedDescending);
         return newTableColumns;
       });
 
