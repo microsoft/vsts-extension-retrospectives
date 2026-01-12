@@ -31,11 +31,11 @@ export default (_, argv) => {
     },
     resolve: {
       fallback: {
-        assert: require.resolve("assert"),
-        buffer: require.resolve("buffer"),
-        crypto: require.resolve("crypto-browserify"),
+        assert: false,
+        buffer: false,
+        crypto: false,
         process: "process/browser",
-        stream: require.resolve("stream-browserify"),
+        stream: false,
       },
       extensions: [".ts", ".js", ".jsx", ".tsx"],
     },

@@ -34,8 +34,7 @@
     "azure-devops-extension-api": "1.152.0",
     "azure-devops-extension-sdk": "2.0.11",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "telemetryclient-team-services-extension": "1.0.10"
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@codecov/webpack-plugin": "1.9.1",

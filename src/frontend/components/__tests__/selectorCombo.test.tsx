@@ -9,14 +9,6 @@ jest.mock("../../utilities/telemetryClient", () => ({
   trackException: jest.fn(),
 }));
 
-jest.mock("applicationinsights-js", () => ({
-  AppInsights: {
-    trackEvent: jest.fn(),
-    trackTrace: jest.fn(),
-    trackException: jest.fn(),
-  },
-}));
-
 jest.mock("azure-devops-extension-sdk", () => ({
   getConfiguration: () => ({}),
   notifyLoadSucceeded: jest.fn(),

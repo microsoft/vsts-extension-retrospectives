@@ -1,9 +1,7 @@
-import { createBrowserHistory } from "history";
 import { ApplicationInsights } from "@microsoft/applicationinsights-web";
 import { ReactPlugin } from "@microsoft/applicationinsights-react-js";
 import { config as environment } from "../config/config";
 
-const browserHistory = createBrowserHistory();
 const reactPlugin = new ReactPlugin();
 const appInsights = new ApplicationInsights({
   config: {
@@ -12,7 +10,7 @@ const appInsights = new ApplicationInsights({
     loggingLevelConsole: 2,
     loggingLevelTelemetry: 2,
     extensionConfig: {
-      [reactPlugin.identifier]: { history: browserHistory },
+      [reactPlugin.identifier]: { history: null },
     },
   },
 });
