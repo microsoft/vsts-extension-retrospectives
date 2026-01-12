@@ -263,11 +263,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
       return false;
     }
 
-    if (!columnCards.filter(columnCard => !columnCard.markedForDeletion).length) {
-      return false;
-    }
-
-    if (columnCards.find(columnCard => !columnCard.column.title.trim())) {
+    const nonDeletedColumns = columnCards.filter(columnCard => !columnCard.markedForDeletion);
+    if (nonDeletedColumns.find(columnCard => !columnCard.column.title.trim())) {
       return false;
     }
 
