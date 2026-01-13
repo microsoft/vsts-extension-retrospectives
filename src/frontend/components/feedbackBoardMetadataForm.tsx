@@ -185,12 +185,12 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
       event.preventDefault();
       event.stopPropagation();
 
-      if (title.trim() === "") return;
-
       const isTaken = await BoardDataService.checkIfBoardNameIsTaken(teamId, title);
-      if (isTaken && initialTitle !== title) {
-        setIsBoardNameTaken(true);
-        return;
+      if (isTaken) {
+        if (initialTitle !== title) {
+          setIsBoardNameTaken(true);
+          return;
+        }
       }
 
       if (isNewBoardCreation && !isDuplicatingBoard) {
