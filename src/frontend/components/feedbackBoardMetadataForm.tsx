@@ -154,7 +154,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
 
   useEffect(() => {
     if (columnCardBeingEdited && isChooseColumnIconDialogOpen) {
-      chooseColumnIconDialogRef.current?.showModal();
+      chooseColumnIconDialogRef.current!.showModal();
     }
   }, [columnCardBeingEdited, isChooseColumnIconDialogOpen]);
 
@@ -185,12 +185,12 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
       event.preventDefault();
       event.stopPropagation();
 
-      if (title.trim() === "") return;
-
       const isTaken = await BoardDataService.checkIfBoardNameIsTaken(teamId, title);
-      if (isTaken && initialTitle !== title) {
-        setIsBoardNameTaken(true);
-        return;
+      if (isTaken) {
+        if (initialTitle !== title) {
+          setIsBoardNameTaken(true);
+          return;
+        }
       }
 
       if (isNewBoardCreation && !isDuplicatingBoard) {
@@ -225,19 +225,19 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   );
 
   const handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setIsIncludeTeamEffectivenessMeasurement(checked ?? false);
+    setIsIncludeTeamEffectivenessMeasurement(Boolean(checked));
   }, []);
 
   const handleShouldShowFeedbackAfterCollectChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setShouldShowFeedbackAfterCollect(checked ?? false);
+    setShouldShowFeedbackAfterCollect(Boolean(checked));
   }, []);
 
   const handleIsAnonymousCheckboxChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setIsBoardAnonymous(checked ?? false);
+    setIsBoardAnonymous(Boolean(checked));
   }, []);
 
   const handleMaxVotePerUserChange = useCallback((event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setMaxVotesPerUser(Number((event.target as HTMLInputElement | HTMLTextAreaElement)?.value));
+    setMaxVotesPerUser(Number((event.target as HTMLInputElement | HTMLTextAreaElement).value));
   }, []);
 
   const showDeleteColumnConfirmationDialog = useCallback(() => {
@@ -303,9 +303,9 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               <hr></hr>
               <div className="board-metadata-form-section-subheader">
                 <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                  Max Votes per User (Current: {isNewBoardCreation ? maxVotesPerUser : isDuplicatingBoard ? currentBoard.maxVotesPerUser : currentBoard.maxVotesPerUser}):
+                  Max Votes per User (Current: {isNewBoardCreation ? maxVotesPerUser : currentBoard.maxVotesPerUser}):
                 </label>
-                <TextField className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={maxVotesPerUser?.toString()} onChange={handleMaxVotePerUserChange} />
+                <TextField className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />
               </div>
               <hr></hr>
               <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation</div>
@@ -498,7 +498,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               <dialog className="retrospectives-choose-column-icon-dialog" aria-label="Choose Column Icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
                 <div className="header">
                   <h2 className="title">Choose Column Icon</h2>
-                  <button onClick={() => chooseColumnIconDialogRef.current?.close()} aria-label="Close">
+                  <button onClick={() => chooseColumnIconDialogRef.current!.close()} aria-label="Close">
                     {getIconElement("close")}
                   </button>
                 </div>
@@ -515,7 +515,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                           onClick={() => {
                             columnCardBeingEdited.column.iconClass = iconOption.id;
                             setColumnCards([...columnCards]);
-                            chooseColumnIconDialogRef.current?.close();
+                            chooseColumnIconDialogRef.current!.close();
                           }}
                         >
                           {getIconElement(iconOption.id)}
@@ -525,7 +525,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                   </div>
                 </div>
                 <div className="inner">
-                  <button className="default button" onClick={() => chooseColumnIconDialogRef.current?.close()}>
+                  <button className="default button" onClick={() => chooseColumnIconDialogRef.current!.close()}>
                     Close
                   </button>
                 </div>

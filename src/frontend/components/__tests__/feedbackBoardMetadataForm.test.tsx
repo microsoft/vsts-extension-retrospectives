@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from "react";
 import { render, screen, waitFor, act } from "@testing-library/react";
@@ -1155,7 +1158,6 @@ describe("FeedbackBoardMetadataForm - Targeted Coverage (uncovered lines)", () =
 
     // The last delete button should be disabled
     if (deleteButtons.length === 1) {
-      // eslint-disable-next-line jest/no-conditional-expect
       expect(deleteButtons[0]).toBeDisabled();
     }
   });

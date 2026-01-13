@@ -3,35 +3,43 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
   - package-ecosystem: "docker"
     directory: "/src/frontend"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
   - package-ecosystem: "docker"
     directory: "/src/backend"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
   - package-ecosystem: "docker"
     directory: "/src/backend.tests"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
   - package-ecosystem: "npm"
     directory: "/src/frontend"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
     ignore:
       - dependency-name: "azure-devops-extension-api"
       - dependency-name: "azure-devops-extension-sdk"
   - package-ecosystem: "nuget"
     directory: "/src/backend"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
   - package-ecosystem: "nuget"
     directory: "/src/backend.tests"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
