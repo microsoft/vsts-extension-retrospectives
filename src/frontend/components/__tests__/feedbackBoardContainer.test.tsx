@@ -35,6 +35,7 @@ const mockUserIdentity = {
 
 jest.mock("../../utilities/userIdentityHelper", () => ({
   getUserIdentity: () => mockUserIdentity,
+  hashUserId: jest.fn().mockResolvedValue("hashed-user-id"),
   obfuscateUserId: () => "encrypted-data",
   deobfuscateUserId: (id: string) => id,
   encrypt: () => "encrypted-data",
@@ -2211,6 +2212,12 @@ describe("FeedbackBoardContainer - Board operations", () => {
 });
 
 describe("FeedbackBoardContainer - Team and Board selection", () => {
+  beforeEach(() => {
+    // Re-setup hashUserId mock since clearAllMocks may have cleared it
+    const userIdentityHelper = require("../../utilities/userIdentityHelper");
+    userIdentityHelper.hashUserId.mockResolvedValue("hashed-user-id");
+  });
+
   it("should change selected team", async () => {
     const instance = createStandaloneTimerInstance();
     const team1 = { id: "team-1", name: "Team 1" } as WebApiTeam;

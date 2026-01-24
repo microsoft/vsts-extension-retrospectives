@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
-import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
+import { hashUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
 import { getIconElement } from "./icons";
 
@@ -10,6 +10,7 @@ export interface EffectivenessMeasurementRowProps {
   iconClassName: string;
   tooltip: string;
   questionId?: number;
+  boardId: string;
   votes?: ITeamEffectivenessMeasurementVoteCollection[];
   selected?: number;
 
@@ -18,15 +19,28 @@ export interface EffectivenessMeasurementRowProps {
 
 const VOTING_SCALE = Array.from({ length: 10 }, (_, index) => index + 1);
 
-const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = ({ title, subtitle, iconClassName, tooltip, questionId, votes = [], onSelectedChange }) => {
-  const initialSelection = useMemo(() => {
-    const currentUserId = obfuscateUserId(getUserIdentity().id);
-    const vote = votes.find(e => e.userId === currentUserId)?.responses || [];
-    const currentVote = vote.filter(v => v.questionId === questionId);
-    return currentVote.length > 0 ? currentVote[0].selection : 0;
-  }, [votes, questionId]);
+const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = ({ title, subtitle, iconClassName, tooltip, questionId, boardId, votes = [], onSelectedChange }) => {
+  const [selected, setSelected] = useState(0);
+  const [hashedUserId, setHashedUserId] = useState<string>("");
 
-  const [selected, setSelected] = useState(initialSelection);
+  // Compute hashed user ID asynchronously
+  useEffect(() => {
+    const computeHash = async () => {
+      const hashed = await hashUserId(getUserIdentity().id, boardId);
+      setHashedUserId(hashed);
+    };
+    computeHash();
+  }, [boardId]);
+
+  // Determine initial selection based on hashed user ID
+  useEffect(() => {
+    if (!hashedUserId) return;
+    const vote = votes.find(e => e.userId === hashedUserId)?.responses || [];
+    const currentVote = vote.filter(v => v.questionId === questionId);
+    if (currentVote.length > 0) {
+      setSelected(currentVote[0].selection);
+    }
+  }, [hashedUserId, votes, questionId]);
 
   const handleSelect = useCallback(
     (value: number) => {
