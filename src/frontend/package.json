@@ -8,7 +8,7 @@
     "test:fuzz": "jest --env=jsdom --testMatch='**/*.fuzz.test.{ts,tsx}' --verbose",
     "build": "npm run clean && npm run compile && npx webpack --mode=production",
     "check": "npm run ncu && npm run lint && npm run format && cd ../../ && pre-commit run --all-files && cd - && npm run test",
-    "clean": "npx rimraf ./dist ./coverage ./reports ./node_modules/applicationinsights-js/dist/*.map",
+    "clean": "npx rimraf ./dist ./coverage ./reports",
     "compile": "npx postcss ./src/index.css -o ./src/bundle.css --config ./postcss.config.js --no-map",
     "format": "npx prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "lint": "npx eslint **/*.ts* --no-warn-ignored",
