@@ -1,4 +1,5 @@
-import { randomUUID } from "crypto";
+import { randomUUID, webcrypto } from "crypto";
+import { TextEncoder, TextDecoder } from "util";
 
 import { mockCore } from "../__mocks__/azure-devops-extension-api/Core/Core";
 import { mockCommon } from "../__mocks__/azure-devops-extension-api/Common/Common";
@@ -6,11 +7,19 @@ import { mockUuid } from "../__mocks__/uuid/v4";
 import { MockSDK } from "../__mocks__/azure-devops-extension-sdk/sdk";
 
 // Ensure global/window is available in jsdom environment
-const globalAny = global as typeof globalThis & { crypto: Crypto; matchMedia: jest.Mock };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const globalAny = global as any;
 
+// Polyfill TextEncoder/TextDecoder for Node.js test environment
+globalAny.TextEncoder = TextEncoder;
+globalAny.TextDecoder = TextDecoder;
+
+// Polyfill crypto with subtle for SHA-256 hashing
 globalAny.crypto = {
-  randomUUID: () => randomUUID() as `${string}-${string}-${string}-${string}-${string}`,
-} as Crypto;
+  randomUUID: () => randomUUID(),
+  subtle: webcrypto.subtle,
+  getRandomValues: (array: unknown) => webcrypto.getRandomValues(array as Parameters<typeof webcrypto.getRandomValues>[0]),
+};
 
 globalAny.matchMedia = jest.fn().mockImplementation(query => {
   return {

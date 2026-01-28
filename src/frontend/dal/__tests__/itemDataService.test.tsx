@@ -357,12 +357,12 @@ describe("ItemDataService - updateVote", () => {
   const mockBoardId = "board-1";
   const mockTeamId = "team-1";
   const mockUserId = "user-1";
-  const mockObfuscatedUserId = "encrypted-user-1";
+  const mockHashedUserId = "hashed-user-1";
   const mockFeedbackItemId = "item-1";
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (userIdentityHelper.obfuscateUserId as jest.Mock).mockReturnValue(mockObfuscatedUserId);
+    (userIdentityHelper.hashUserId as jest.Mock).mockResolvedValue(mockHashedUserId);
   });
 
   it("should increment vote successfully", async () => {
@@ -381,13 +381,13 @@ describe("ItemDataService - updateVote", () => {
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
     jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(mockBoardItem);
-    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockObfuscatedUserId]: 1 }, upvotes: 1 }).mockResolvedValueOnce({ ...mockBoardItem, boardVoteCollection: { [mockObfuscatedUserId]: 1 } });
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockHashedUserId]: 1 }, upvotes: 1 }).mockResolvedValueOnce({ ...mockBoardItem, boardVoteCollection: { [mockHashedUserId]: 1 } });
 
     const result = await itemDataService.updateVote(mockBoardId, mockTeamId, mockUserId, mockFeedbackItemId, false);
 
     expect(result).toBeDefined();
     expect(result.upvotes).toBe(1);
-    expect(result.voteCollection[mockObfuscatedUserId]).toBe(1);
+    expect(result.voteCollection[mockHashedUserId]).toBe(1);
   });
 
   it("should increment vote when decrement parameter is not provided (default false - line 260)", async () => {
@@ -406,7 +406,7 @@ describe("ItemDataService - updateVote", () => {
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
     jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(mockBoardItem);
-    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockObfuscatedUserId]: 1 }, upvotes: 1 }).mockResolvedValueOnce({ ...mockBoardItem, boardVoteCollection: { [mockObfuscatedUserId]: 1 } });
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockHashedUserId]: 1 }, upvotes: 1 }).mockResolvedValueOnce({ ...mockBoardItem, boardVoteCollection: { [mockHashedUserId]: 1 } });
 
     // Call without the decrement parameter to test the default value branch
     const result = await itemDataService.updateVote(mockBoardId, mockTeamId, mockUserId, mockFeedbackItemId);
@@ -419,19 +419,19 @@ describe("ItemDataService - updateVote", () => {
     const mockFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
       id: mockFeedbackItemId,
-      voteCollection: { [mockObfuscatedUserId]: 2 },
+      voteCollection: { [mockHashedUserId]: 2 },
       upvotes: 2,
     };
 
     const mockBoardItem: IFeedbackBoardDocument = {
       id: mockBoardId,
-      boardVoteCollection: { [mockObfuscatedUserId]: 2 },
+      boardVoteCollection: { [mockHashedUserId]: 2 },
       maxVotesPerUser: 5,
     } as any;
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
     jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(mockBoardItem);
-    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockObfuscatedUserId]: 1 }, upvotes: 1 }).mockResolvedValueOnce({ ...mockBoardItem, boardVoteCollection: { [mockObfuscatedUserId]: 1 } });
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockHashedUserId]: 1 }, upvotes: 1 }).mockResolvedValueOnce({ ...mockBoardItem, boardVoteCollection: { [mockHashedUserId]: 1 } });
 
     const result = await itemDataService.updateVote(mockBoardId, mockTeamId, mockUserId, mockFeedbackItemId, true);
 
@@ -455,7 +455,7 @@ describe("ItemDataService - updateVote", () => {
 
     const mockBoardItem: IFeedbackBoardDocument = {
       id: mockBoardId,
-      boardVoteCollection: { [mockObfuscatedUserId]: 5 },
+      boardVoteCollection: { [mockHashedUserId]: 5 },
       maxVotesPerUser: 5,
     } as any;
 
@@ -483,7 +483,7 @@ describe("ItemDataService - updateVote", () => {
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
     jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(mockBoardItem);
     (dataService.updateDocument as jest.Mock)
-      .mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockObfuscatedUserId]: 1 }, upvotes: 1 })
+      .mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockHashedUserId]: 1 }, upvotes: 1 })
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: {}, upvotes: 0 });
 
@@ -509,39 +509,39 @@ describe("ItemDataService - updateVote", () => {
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
     jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(mockBoardItem);
-    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockObfuscatedUserId]: 1 }, upvotes: 1 }).mockResolvedValueOnce({ ...mockBoardItem, boardVoteCollection: { [mockObfuscatedUserId]: 1 } });
+    (dataService.updateDocument as jest.Mock).mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockHashedUserId]: 1 }, upvotes: 1 }).mockResolvedValueOnce({ ...mockBoardItem, boardVoteCollection: { [mockHashedUserId]: 1 } });
 
     const result = await itemDataService.updateVote(mockBoardId, mockTeamId, mockUserId, mockFeedbackItemId, false);
 
     expect(result.upvotes).toBe(1);
-    expect(result.voteCollection[mockObfuscatedUserId]).toBe(1);
+    expect(result.voteCollection[mockHashedUserId]).toBe(1);
   });
 
   it("should rollback correctly for decrement path when board update fails", async () => {
     const mockFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
       id: mockFeedbackItemId,
-      voteCollection: { [mockObfuscatedUserId]: 1 },
+      voteCollection: { [mockHashedUserId]: 1 },
       upvotes: 1,
     };
 
     const mockBoardItem: IFeedbackBoardDocument = {
       id: mockBoardId,
-      boardVoteCollection: { [mockObfuscatedUserId]: 1 },
+      boardVoteCollection: { [mockHashedUserId]: 1 },
       maxVotesPerUser: 5,
     } as any;
 
     jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockFeedbackItem);
     jest.spyOn(itemDataService, "getBoardItem").mockResolvedValue(mockBoardItem);
     (dataService.updateDocument as jest.Mock)
-      .mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockObfuscatedUserId]: 0 }, upvotes: 0 })
+      .mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockHashedUserId]: 0 }, upvotes: 0 })
       .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockObfuscatedUserId]: 1 }, upvotes: 1 });
+      .mockResolvedValueOnce({ ...mockFeedbackItem, voteCollection: { [mockHashedUserId]: 1 }, upvotes: 1 });
 
     const result = await itemDataService.updateVote(mockBoardId, mockTeamId, mockUserId, mockFeedbackItemId, true);
 
     expect(result.upvotes).toBe(1);
-    expect(result.voteCollection[mockObfuscatedUserId]).toBe(1);
+    expect(result.voteCollection[mockHashedUserId]).toBe(1);
     expect(dataService.updateDocument).toHaveBeenCalledTimes(3);
   });
 
@@ -549,13 +549,13 @@ describe("ItemDataService - updateVote", () => {
     const mockFeedbackItem: IFeedbackItemDocument = {
       ...baseFeedbackItem,
       id: mockFeedbackItemId,
-      voteCollection: { [mockObfuscatedUserId]: 0 },
+      voteCollection: { [mockHashedUserId]: 0 },
       upvotes: 0,
     };
 
     const mockBoardItem: IFeedbackBoardDocument = {
       id: mockBoardId,
-      boardVoteCollection: { [mockObfuscatedUserId]: 0 },
+      boardVoteCollection: { [mockHashedUserId]: 0 },
       maxVotesPerUser: 5,
     } as any;
 

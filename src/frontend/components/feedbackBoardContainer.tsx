@@ -26,7 +26,7 @@ import { itemDataService } from "../dal/itemDataService";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
-import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
+import { obfuscateUserId, hashUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
@@ -266,6 +266,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
+
+  // Hashed user ID for anonymous vote tracking (computed asynchronously)
+  const hashedUserIdRef = React.useRef<string | null>(null);
 
   const setState: FeedbackBoardContainerHandle["setState"] = React.useCallback((updater, callback) => {
     const currentState = stateRef.current;
@@ -717,8 +720,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     const votes = Object.values(voteCollection);
     const totalVotesUsed = votes.length > 0 ? votes.reduce((sum, vote) => sum + vote, 0) : 0;
 
-    const userIdKey = obfuscateUserId(stateRef.current.currentUserId);
-    const currentUserVotes = voteCollection[userIdKey]?.toString() || "0";
+    // Check both legacy (obfuscated) and new (hashed) user ID formats for backward compatibility
+    const legacyUserIdKey = obfuscateUserId(stateRef.current.currentUserId);
+    const legacyVotes = voteCollection[legacyUserIdKey] || 0;
+    // Note: New hashed votes are tracked asynchronously via hashedUserIdRef
+    const newVotes = hashedUserIdRef.current ? (voteCollection[hashedUserIdRef.current] || 0) : 0;
+    const currentUserVotes = (legacyVotes + newVotes).toString();
 
     const voterCount = Object.keys(voteCollection).length;
     const maxVotesPerUser = board.maxVotesPerUser ?? 0;
@@ -1268,6 +1275,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     }
 
     if (matchedBoard) {
+      // Compute hashed user ID for this board (SHA-256)
+      hashUserId(stateRef.current.currentUserId, matchedBoard.id).then(hashed => {
+        hashedUserIdRef.current = hashed;
+      });
+
       setState(prevState => {
         // Ensure that we are actually changing boards to prevent needless rerenders.
         if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {
@@ -1766,9 +1778,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     ],
   };
 
-  const saveTeamEffectivenessMeasurement = () => {
+  const saveTeamEffectivenessMeasurement = async () => {
     const teamEffectivenessMeasurementVoteCollection = state.currentBoard.teamEffectivenessMeasurementVoteCollection;
-    const currentUserId = obfuscateUserId(state.currentUserId);
+    // Use SHA-256 hashed user ID for anonymous tracking
+    const currentUserId = hashedUserIdRef.current || await hashUserId(state.currentUserId, state.currentBoard.id);
     const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
     const responseCount = currentUserVote?.responses?.length || 0;
 
@@ -1782,14 +1795,15 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     setState({ isIncludeTeamEffectivenessMeasurementDialogHidden: true });
   };
 
-  const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
+  const effectivenessMeasurementSelectionChanged = async (questionId: number, selected: number) => {
     const currentBoard = stateRef.current.currentBoard;
 
     if (currentBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
       currentBoard.teamEffectivenessMeasurementVoteCollection = [];
     }
 
-    const currentUserId = obfuscateUserId(stateRef.current.currentUserId);
+    // Use SHA-256 hashed user ID for anonymous tracking
+    const currentUserId = hashedUserIdRef.current || await hashUserId(stateRef.current.currentUserId, currentBoard.id);
     if (currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
       currentBoard.teamEffectivenessMeasurementVoteCollection.push({
         userId: currentUserId,
@@ -2003,7 +2017,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                               </thead>
                               <tbody>
                                 {questions.map(question => {
-                                  return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                                  return <EffectivenessMeasurementRow key={question.id} questionId={question.id} boardId={state.currentBoard.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
                                 })}
                               </tbody>
                             </table>

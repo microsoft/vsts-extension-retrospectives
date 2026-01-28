@@ -9,7 +9,7 @@ import { itemDataService } from "../dal/itemDataService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { reflectBackendService } from "../dal/reflectBackendService";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
-import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
+import { hashUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import BoardSummaryTableHeader from "./boardSummaryTableHeader";
 import BoardSummaryTableBody from "./boardSummaryTableBody";
 import { getIconElement } from "./icons";
@@ -397,13 +397,15 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
 
       setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
 
+      // Use SHA-256 hash for anonymous telemetry
+      const hashedUserId = await hashUserId(getUserIdentity().id, openDialogBoardId);
       appInsights.trackEvent({
         name: TelemetryEvents.FeedbackBoardDeleted,
         properties: {
           boardId: openDialogBoardId,
           boardName: selectedBoardForDelete!.boardName,
           feedbackItemsCount: selectedBoardForDelete!.feedbackItemsCount,
-          deletedByUserId: obfuscateUserId(getUserIdentity().id),
+          deletedByUserId: hashedUserId,
         },
       });
     } catch (error) {

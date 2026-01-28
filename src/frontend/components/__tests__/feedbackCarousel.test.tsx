@@ -16,6 +16,11 @@ jest.mock("@microsoft/applicationinsights-react-js", () => ({
   useTrackMetric: () => jest.fn(),
 }));
 
+jest.mock("../../utilities/userIdentityHelper", () => ({
+  ...jest.requireActual("../../utilities/userIdentityHelper"),
+  hashUserId: jest.fn().mockResolvedValue("hashed-user-id"),
+}));
+
 const buildFocusModeModel = (columnPropsList: Array<typeof testColumnProps>): FocusModeModel => {
   const first = columnPropsList[0] ?? testColumnProps;
   const columns: any = {};
