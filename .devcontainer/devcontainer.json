@@ -7,7 +7,7 @@
     "ghcr.io/devcontainers/features/common-utils:2.5.6": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2.14.0": {},
     "ghcr.io/devcontainers/features/dotnet:2.4.2": {},
-    "ghcr.io/devcontainers/features/github-cli:1.0.15": {},
+    "ghcr.io/devcontainers/features/github-cli:1.1.0": {},
     "ghcr.io/devcontainers/features/node:1.7.1": {}
   },
   "customizations": {
