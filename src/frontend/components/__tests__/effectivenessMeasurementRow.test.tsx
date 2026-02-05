@@ -3,15 +3,15 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import EffectivenessMeasurementRow, { EffectivenessMeasurementRowProps } from "../effectivenessMeasurementRow";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../../interfaces/feedback";
-import { obfuscateUserId, getUserIdentity } from "../../utilities/userIdentityHelper";
+import { hashUserId, getUserIdentity } from "../../utilities/userIdentityHelper";
 
 jest.mock("../../utilities/userIdentityHelper", () => ({
   getUserIdentity: jest.fn(),
-  obfuscateUserId: jest.fn(),
+  hashUserId: jest.fn(),
 }));
 
 const mockGetUserIdentity = getUserIdentity as jest.MockedFunction<typeof getUserIdentity>;
-const mockObfuscateUserId = obfuscateUserId as jest.MockedFunction<typeof obfuscateUserId>;
+const mockHashUserId = hashUserId as jest.MockedFunction<typeof hashUserId>;
 
 const defaultProps: EffectivenessMeasurementRowProps = {
   questionId: 1,
@@ -19,6 +19,7 @@ const defaultProps: EffectivenessMeasurementRowProps = {
   subtitle: "Test subtitle for the question",
   iconClassName: "fa-solid fa-magnifying-glass",
   tooltip: "This is a test tooltip",
+  boardId: "test-board-id",
   votes: [],
   onSelectedChange: jest.fn(),
 };
@@ -37,7 +38,7 @@ describe("EffectivenessMeasurementRow", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetUserIdentity.mockReturnValue({ id: "test-user-id" } as any);
-    mockObfuscateUserId.mockReturnValue("encrypted-test-user-id");
+    mockHashUserId.mockResolvedValue("encrypted-test-user-id");
   });
 
   describe("Component Rendering", () => {
@@ -135,13 +136,16 @@ describe("EffectivenessMeasurementRow", () => {
       });
     });
 
-    it("marks selected values with the selected class", () => {
+    it("marks selected values with the selected class", async () => {
       const props = { ...defaultProps, votes: mockVotes };
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
-      // Button 5 should be selected (from mockVotes)
-      const button5 = container.querySelector('button[aria-label="5"]');
-      expect(button5).toHaveClass("team-assessment-score-button-selected");
+      // Wait for async hash computation to complete
+      await waitFor(() => {
+        // Button 5 should be selected (from mockVotes)
+        const button5 = container.querySelector('button[aria-label="5"]');
+        expect(button5).toHaveClass("team-assessment-score-button-selected");
+      });
 
       // Other buttons should have CircleRing
       const button1 = container.querySelector('button[aria-label="1"]');
@@ -167,22 +171,26 @@ describe("EffectivenessMeasurementRow", () => {
   });
 
   describe("Vote Initialization", () => {
-    it("initializes with existing vote for the current user and question", () => {
+    it("initializes with existing vote for the current user and question", async () => {
       const props = { ...defaultProps, questionId: 1, votes: mockVotes };
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
-      // User's vote for question 1 is 5, so button 5 should show CircleFill
-      const button5 = container.querySelector('button[aria-label="5"]');
-      expect(button5).toHaveClass("team-assessment-score-button-selected");
+      // Wait for async hash computation, then check button 5
+      await waitFor(() => {
+        const button5 = container.querySelector('button[aria-label="5"]');
+        expect(button5).toHaveClass("team-assessment-score-button-selected");
+      });
     });
 
-    it("initializes with different vote for different question", () => {
+    it("initializes with different vote for different question", async () => {
       const props = { ...defaultProps, questionId: 2, votes: mockVotes };
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
-      // User's vote for question 2 is 8, so button 8 should show CircleFill
-      const button8 = container.querySelector('button[aria-label="8"]');
-      expect(button8).toHaveClass("team-assessment-score-button-selected");
+      // Wait for async hash computation, then check button 8
+      await waitFor(() => {
+        const button8 = container.querySelector('button[aria-label="8"]');
+        expect(button8).toHaveClass("team-assessment-score-button-selected");
+      });
     });
 
     it("initializes with no selection when no votes exist", () => {
@@ -291,7 +299,7 @@ describe("EffectivenessMeasurementRow", () => {
       }
     });
 
-    it("finds matching vote when questionId matches exactly (covers line 21 truthy branch)", () => {
+    it("finds matching vote when questionId matches exactly (covers line 21 truthy branch)", async () => {
       // Ensure questionId in response matches component's questionId
       const votesWithMatchingQuestionId: ITeamEffectivenessMeasurementVoteCollection[] = [
         {
@@ -304,12 +312,14 @@ describe("EffectivenessMeasurementRow", () => {
       const props = { ...defaultProps, questionId: 1, votes: votesWithMatchingQuestionId };
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
-      // Button 7 should be selected since the questionId matches and selection is 7
-      const selectedButton = container.querySelector('button[aria-label="7"]');
-      expect(selectedButton).toHaveClass("team-assessment-score-button-selected");
+      // Wait for async hash computation, then check button 7 is selected
+      await waitFor(() => {
+        const selectedButton = container.querySelector('button[aria-label="7"]');
+        expect(selectedButton).toHaveClass("team-assessment-score-button-selected");
+      });
     });
 
-    it("verifies filter works correctly for matching questionId (explicit test)", () => {
+    it("verifies filter works correctly for matching questionId (explicit test)", async () => {
       // This test verifies the filter's truthy branch by checking that matching vote IS selected
       const matchingVotes: ITeamEffectivenessMeasurementVoteCollection[] = [
         {
@@ -323,9 +333,12 @@ describe("EffectivenessMeasurementRow", () => {
       const props = { ...defaultProps, questionId: 1, votes: matchingVotes };
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
-      // Button 3 should be selected (matches questionId 1)
-      const button3 = container.querySelector('button[aria-label="3"]');
-      expect(button3).toHaveClass("team-assessment-score-button-selected");
+      // Wait for async hash computation, then check selection
+      await waitFor(() => {
+        // Button 3 should be selected (matches questionId 1)
+        const button3 = container.querySelector('button[aria-label="3"]');
+        expect(button3).toHaveClass("team-assessment-score-button-selected");
+      });
 
       // Button 8 should NOT be selected (matches questionId 2, not 1)
       const button8 = container.querySelector('button[aria-label="8"]');

@@ -19,7 +19,7 @@ import { itemDataService } from "../dal/itemDataService";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { reflectBackendService } from "../dal/reflectBackendService";
 import { IColumn, IColumnItem } from "./feedbackBoard";
-import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
+import { hashUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement } from "./icons";
@@ -172,6 +172,18 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     userVotes: "0",
     isShowingGroupedChildrenTitles: false,
   }));
+
+  // Hashed user ID for anonymous vote tracking (SHA-256)
+  const [hashedUserId, setHashedUserId] = useState<string>("");
+
+  // Compute hashed user ID when board changes
+  useEffect(() => {
+    const computeHashedUserId = async () => {
+      const hashed = await hashUserId(getUserIdentity().id, props.boardId);
+      setHashedUserId(hashed);
+    };
+    computeHashedUserId();
+  }, [props.boardId]);
 
   const stateRef = useRef(state);
   useEffect(() => {
@@ -363,8 +375,9 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const isVoted = useCallback(
     async (feedbackItemId: string) => {
-      const userId = obfuscateUserId(getUserIdentity().id);
-      const result = await itemDataService.isVoted(props.boardId, userId, feedbackItemId);
+      // Use SHA-256 hashed user ID for anonymous vote tracking
+      const hashed = await hashUserId(getUserIdentity().id, props.boardId);
+      const result = await itemDataService.isVoted(props.boardId, hashed, feedbackItemId);
       setStateMerge({ userVotes: result });
     },
     [props.boardId, setStateMerge],
@@ -899,12 +912,12 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const columnItems = props.columns[props.columnId]?.columnItems;
   const mainFeedbackItem = columnItems?.find(c => c.feedbackItem.id === props.id)?.feedbackItem;
   const groupedFeedbackItems = props.groupIds.map(id => columnItems?.find(c => c.feedbackItem.id === id)?.feedbackItem).filter(item => item !== undefined) as IFeedbackItemDocument[];
-  const userId = obfuscateUserId(getUserIdentity().id);
 
   const votes = mainFeedbackItem ? itemDataService.getVotes(mainFeedbackItem) : 0;
   const votesByUser = state.userVotes;
   const groupedVotes = mainFeedbackItem ? itemDataService.getVotesForGroupedItems(mainFeedbackItem, groupedFeedbackItems) : votes;
-  const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, userId) : votesByUser;
+  // Use hashed user ID (SHA-256) for anonymous vote tracking
+  const groupedVotesByUser = mainFeedbackItem ? itemDataService.getVotesForGroupedItemsByUser(mainFeedbackItem, groupedFeedbackItems, hashedUserId) : votesByUser;
 
   let totalVotes = isMainCollapsedItem ? groupedVotes : votes;
   if (mainGroupedItemInFocusMode) {
