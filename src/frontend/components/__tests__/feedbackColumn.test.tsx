@@ -45,6 +45,11 @@ jest.mock("../../dal/itemDataService", () => {
   };
 });
 
+jest.mock("../../utilities/userIdentityHelper", () => ({
+  ...jest.requireActual("../../utilities/userIdentityHelper"),
+  hashUserId: jest.fn().mockResolvedValue("hashed-user-id"),
+}));
+
 const baseColumnItems = [...testColumnProps.columnItems];
 
 beforeEach(() => {

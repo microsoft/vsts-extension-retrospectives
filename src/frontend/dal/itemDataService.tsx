@@ -1,7 +1,7 @@
 import { WorkItem } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
 import { appInsights } from "../utilities/telemetryClient";
-import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
+import { hashUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { workItemService } from "./azureDevOpsWorkItemService";
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from "./dataService";
 import { generateUUID } from "../utilities/random";
@@ -258,7 +258,8 @@ class ItemDataService {
    * Increment or decrement the vote of the feedback item.
    */
   public updateVote = async (boardId: string, teamId: string, userId: string, feedbackItemId: string, decrement: boolean = false): Promise<IFeedbackItemDocument> => {
-    const encryptedUserId = obfuscateUserId(userId);
+    // Use SHA-256 hash with board-specific salt for anonymous voting
+    const hashedUserId = await hashUserId(userId, boardId);
 
     // Step 1: Fetch Feedback and Board Items
     const feedbackItem = await this.getFeedbackItem(boardId, feedbackItemId);
@@ -270,12 +271,12 @@ class ItemDataService {
     }
 
     // Step 2: Validate Voting Eligibility
-    if (!this.validateVotingEligibility(feedbackItem, boardItem, encryptedUserId, decrement)) {
+    if (!this.validateVotingEligibility(feedbackItem, boardItem, hashedUserId, decrement)) {
       return undefined;
     }
 
     // Step 3: Modify Votes
-    this.modifyVotes(feedbackItem, boardItem, encryptedUserId, decrement);
+    this.modifyVotes(feedbackItem, boardItem, hashedUserId, decrement);
 
     // Step 4: Update Feedback and Board Items
     const updatedFeedbackItem = await this.updateFeedbackItem(boardId, feedbackItem);
@@ -283,7 +284,7 @@ class ItemDataService {
 
     // Handle rollback in case of update failure
     if (!updatedBoardItem) {
-      this.rollbackVotes(feedbackItem, encryptedUserId, decrement);
+      this.rollbackVotes(feedbackItem, hashedUserId, decrement);
       return await this.updateFeedbackItem(boardId, feedbackItem);
     }
 
