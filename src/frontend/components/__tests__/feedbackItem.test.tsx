@@ -9,6 +9,22 @@ import { IFeedbackItemDocument } from "../../interfaces/feedback";
 import localStorageHelper from "../../utilities/localStorageHelper";
 import * as dialogHelper from "../../utilities/dialogHelper";
 
+// Mock HTMLDialogElement for JSDOM
+beforeAll(() => {
+  if (!(window as unknown as { HTMLDialogElement?: typeof HTMLDialogElement }).HTMLDialogElement) {
+    (window as unknown as { HTMLDialogElement: typeof HTMLElement }).HTMLDialogElement = class HTMLDialogElement extends HTMLElement {} as unknown as typeof HTMLDialogElement;
+  }
+
+  HTMLDialogElement.prototype.showModal = function showModal() {
+    (this as unknown as { open: boolean }).open = true;
+  };
+
+  HTMLDialogElement.prototype.close = function close() {
+    (this as unknown as { open: boolean }).open = false;
+    this.dispatchEvent(new Event("close"));
+  };
+});
+
 // `feedbackItem` is now a functional component (forwardRef), so TS's built-in `InstanceType<>`
 // no longer applies. These tests use refs to access an imperative surface.
 type InstanceType<T> = FeedbackItemHandle;
@@ -429,7 +445,9 @@ describe("Feedback Item", () => {
       const props = { ...baseProps, workflowPhase: "Group", isInteractable: true };
       const { container } = render(<FeedbackItem {...(props as any)} />);
       const item = container.querySelector(".feedbackItem");
+      const card = container.querySelector(".ms-DocumentCard");
       expect(item?.getAttribute("draggable")).toBe("true");
+      expect(card?.getAttribute("draggable")).toBe("true");
     });
 
     test("renders in Vote phase with vote buttons", () => {
@@ -5323,7 +5341,6 @@ describe("Feedback Item", () => {
       });
     });
 
-
     test("opens move feedback dialog with m key in Group phase", async () => {
       const mockItem: IFeedbackItemDocument = {
         id: "move-dialog-item",
@@ -5419,7 +5436,6 @@ describe("Feedback Item", () => {
         expect(screen.getByText(/Move Feedback to Different Column/i)).toBeInTheDocument();
       });
     });
-
 
     test("shows search results in group feedback dialog", async () => {
       const mockItem: IFeedbackItemDocument = {
@@ -5727,7 +5743,8 @@ describe("Feedback Item", () => {
 
       // Dialog should close
       await waitFor(() => {
-        expect(screen.queryByText("Delete Feedback")).not.toBeInTheDocument();
+        const dialog = document.querySelector('dialog[aria-label="Delete Feedback"]') as HTMLDialogElement | null;
+        expect(dialog?.open).toBe(false);
       });
     });
   });
@@ -8195,6 +8212,65 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
   });
 
+  describe("Mobile actions menu pointer handling", () => {
+    test("pointerdown inside menu or button keeps menu open; outside closes it", async () => {
+      const props = makeProps({ workflowPhase: "Collect", newlyCreated: false });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        (ref.current as any).setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+
+      const menu = container.querySelector(".item-actions-menu .callout-menu") as HTMLElement | null;
+      const button = container.querySelector(".item-actions-menu .contextual-menu-button") as HTMLElement | null;
+
+      expect(menu).toBeInTheDocument();
+      expect(button).toBeInTheDocument();
+
+      if (menu) {
+        fireEvent.pointerDown(menu);
+        expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
+      }
+
+      if (button) {
+        fireEvent.pointerDown(button);
+        expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
+      }
+
+      fireEvent.pointerDown(document.body);
+      expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+    });
+  });
+
+  describe("Escape closes remove-from-group dialog", () => {
+    test("Escape hides the remove feedback from group dialog", async () => {
+      const props = makeProps({ workflowPhase: "Group" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        (ref.current as any).showRemoveFeedbackItemFromGroupConfirmationDialog();
+      });
+
+      const dialog = document.querySelector('dialog[aria-label="Remove Feedback from Group"]') as HTMLDialogElement | null;
+      expect(dialog?.open).toBe(true);
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      fireEvent.keyDown(card, { key: "Escape" });
+
+      await waitFor(() => {
+        expect(dialog?.open).toBe(false);
+      });
+    });
+  });
+
   test("component mount/unmount registers item ref and reflect backend callbacks", async () => {
     const addListenerSpy = jest.spyOn(HTMLElement.prototype, "addEventListener");
     const removeListenerSpy = jest.spyOn(HTMLElement.prototype, "removeEventListener");
@@ -8338,7 +8414,8 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     fireEvent.keyDown(root, { key: "Escape" });
     await waitFor(() => {
-      expect(screen.queryByText("Delete Feedback")).not.toBeInTheDocument();
+      const dialog = document.querySelector('dialog[aria-label="Delete Feedback"]') as HTMLDialogElement | null;
+      expect(dialog?.open).toBe(false);
     });
   });
 

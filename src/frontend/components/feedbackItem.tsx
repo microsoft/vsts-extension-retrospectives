@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
 import { cn } from "../utilities/classNameHelper";
-import { ActionButton, PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
+import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
 import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
 import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
 import { DocumentCard, DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
@@ -22,7 +22,7 @@ import { IColumn, IColumnItem } from "./feedbackBoard";
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
-import { getIconElement } from "./icons";
+import { getIconElement, MoreVerticalIcon } from "./icons";
 
 export interface IFeedbackItemColumnContext {
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
@@ -145,10 +145,12 @@ export interface FeedbackItemHandle {
 }
 
 interface FeedbackItemEllipsisMenuItem {
-  menuItem: IContextualMenuItem;
-  workflowPhases: WorkflowPhase[];
-  hideMobile?: boolean;
-  hideMainItem?: boolean;
+  key: string;
+  iconName: string;
+  onClick: () => void;
+  text: string;
+  title: string;
+  hideMainItem: boolean;
 }
 
 const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, ref) => {
@@ -180,6 +182,11 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const itemElementRef = useRef<HTMLDivElement | null>(null);
   const itemElementOverrideRef = useRef<HTMLElement | null | undefined>(undefined);
+  const mobileActionsButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileActionsMenuRef = useRef<HTMLDivElement>(null);
+  const deleteFeedbackDialogRef = useRef<HTMLDialogElement>(null);
+  const moveFeedbackDialogRef = useRef<HTMLDialogElement>(null);
+  const removeFeedbackFromGroupDialogRef = useRef<HTMLDialogElement>(null);
 
   const setStateMerge = useCallback((stateUpdate: Partial<IFeedbackItemState> | ((prev: IFeedbackItemState) => Partial<IFeedbackItemState>)) => {
     setState(prev => {
@@ -268,18 +275,28 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const showDeleteItemConfirmationDialog = useCallback(() => {
     setStateMerge({ isDeleteItemConfirmationDialogHidden: false });
+    const dialog = deleteFeedbackDialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
   }, [setStateMerge]);
 
   const hideDeleteItemConfirmationDialog = useCallback(() => {
     setStateMerge({ isDeleteItemConfirmationDialogHidden: true });
+    deleteFeedbackDialogRef.current?.close();
   }, [setStateMerge]);
 
   const showRemoveFeedbackItemFromGroupConfirmationDialog = useCallback(() => {
     setStateMerge({ isRemoveFeedbackItemFromGroupConfirmationDialogHidden: false });
+    const dialog = removeFeedbackFromGroupDialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
   }, [setStateMerge]);
 
   const hideRemoveFeedbackItemFromGroupConfirmationDialog = useCallback(() => {
     setStateMerge({ isRemoveFeedbackItemFromGroupConfirmationDialogHidden: true });
+    removeFeedbackFromGroupDialogRef.current?.close();
   }, [setStateMerge]);
 
   const onConfirmRemoveFeedbackItemFromGroup = useCallback(() => {
@@ -339,12 +356,21 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     setStateMerge({ isMobileFeedbackItemActionsDialogHidden: true });
   }, [setStateMerge]);
 
+  const toggleMobileFeedbackItemActionsMenu = useCallback(() => {
+    setStateMerge(previousState => ({ isMobileFeedbackItemActionsDialogHidden: !previousState.isMobileFeedbackItemActionsDialogHidden }));
+  }, [setStateMerge]);
+
   const showMoveFeedbackItemDialog = useCallback(() => {
     setStateMerge({ isMoveFeedbackItemDialogHidden: false });
+    const dialog = moveFeedbackDialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
   }, [setStateMerge]);
 
   const hideMoveFeedbackItemDialog = useCallback(() => {
     setStateMerge({ isMoveFeedbackItemDialogHidden: true });
+    moveFeedbackDialogRef.current?.close();
   }, [setStateMerge]);
 
   const showGroupFeedbackItemDialog = useCallback(() => {
@@ -610,6 +636,25 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   }, [props.columnProps, props.id]);
 
   useEffect(() => {
+    const handleDocumentPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      const menu = mobileActionsMenuRef.current;
+      const button = mobileActionsButtonRef.current;
+
+      if (menu?.contains(target) || button?.contains(target)) {
+        return;
+      }
+
+      hideMobileFeedbackItemActionsDialog();
+    };
+
+    document.addEventListener("pointerdown", handleDocumentPointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", handleDocumentPointerDown);
+    };
+  }, [state.isMobileFeedbackItemActionsDialogHidden, hideMobileFeedbackItemActionsDialog]);
+
+  useEffect(() => {
     reflectBackendService.onReceiveDeletedItem(receiveDeletedItemHandler);
     return () => {
       reflectBackendService.removeOnReceiveDeletedItem(receiveDeletedItemHandler);
@@ -634,10 +679,10 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       const isTextInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
       const isDialogOpen = isAnyModalDialogOpen();
 
-      if (isDialogOpen && key !== "tab") {
+      if (isDialogOpen && key !== "tab" && key !== "escape") {
         return;
       }
-      if (isTextInput && key !== "tab") {
+      if (isTextInput && key !== "tab" && key !== "escape") {
         return;
       }
 
@@ -723,6 +768,9 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           if (!stateRef.current.isDeleteItemConfirmationDialogHidden) {
             e.preventDefault();
             hideDeleteItemConfirmationDialog();
+          } else if (!stateRef.current.isMobileFeedbackItemActionsDialogHidden) {
+            e.preventDefault();
+            hideMobileFeedbackItemActionsDialog();
           } else if (!stateRef.current.isMoveFeedbackItemDialogHidden) {
             e.preventDefault();
             hideMoveFeedbackItemDialog();
@@ -755,47 +803,35 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const feedbackItemEllipsisMenuItems: FeedbackItemEllipsisMenuItem[] = useMemo(
     () => [
       {
-        menuItem: {
-          key: "deleteFeedback",
-          iconProps: { iconName: "Delete" },
-          onClick: deleteFeedbackItem,
-          text: "Delete feedback",
-          title: "Delete feedback (disabled when there are active votes)",
-        },
-        workflowPhases: [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act],
+        key: "deleteFeedback",
+        iconName: "delete",
+        onClick: deleteFeedbackItem,
+        text: "Delete feedback",
+        title: "Delete feedback (disabled when there are active votes)",
+        hideMainItem: false,
       },
       {
-        menuItem: {
-          key: "moveFeedback",
-          iconProps: { iconName: "Move" },
-          onClick: showMoveFeedbackItemDialog,
-          text: "Move feedback to different column",
-          title: "Move feedback to different column",
-        },
-        workflowPhases: [WorkflowPhase.Group],
-        hideMobile: true,
+        key: "moveFeedback",
+        iconName: "open-with",
+        onClick: showMoveFeedbackItemDialog,
+        text: "Move feedback to different column",
+        title: "Move feedback to different column",
+        hideMainItem: false,
       },
       {
-        menuItem: {
-          key: "groupFeedback",
-          iconProps: { iconName: "RowsGroup" },
-          onClick: showGroupFeedbackItemDialog,
-          text: "Group feedback",
-          title: "Group feedback",
-        },
-        workflowPhases: [WorkflowPhase.Group],
-        hideMobile: true,
+        key: "groupFeedback",
+        iconName: "group-work",
+        onClick: showGroupFeedbackItemDialog,
+        text: "Group feedback",
+        title: "Group feedback",
+        hideMainItem: false,
       },
       {
-        menuItem: {
-          key: "removeFeedbackFromGroup",
-          iconProps: { iconName: "Remove" },
-          onClick: showRemoveFeedbackItemFromGroupConfirmationDialog,
-          text: "Remove feedback from group",
-          title: "Remove feedback from group",
-        },
-        workflowPhases: [WorkflowPhase.Group],
-        hideMobile: true,
+        key: "removeFeedbackFromGroup",
+        iconName: "delete",
+        onClick: showRemoveFeedbackItemFromGroupConfirmationDialog,
+        text: "Remove feedback from group",
+        title: "Remove feedback from group",
         hideMainItem: true,
       },
     ],
@@ -980,7 +1016,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       }}
     >
       <div className="document-card-wrapper">
-        <DocumentCard className={cn("feedback-card-surface", isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")}>
+        <DocumentCard className={cn("feedback-card-surface", isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")} draggable={isDraggable}>
           <div className="card-integral-part" style={{ borderLeftColor: props.accentColor }}>
             <div className="card-header">
               {mainGroupedItemInFocusMode && renderGroupButton(groupItemsCount, true)}
@@ -1031,52 +1067,52 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                 </>
               )}
               {!props.newlyCreated && (
-                <div className="item-actions-menu">
-                  <DefaultButton
+                <div className="item-actions-menu relative">
+                  <button
+                    ref={mobileActionsButtonRef}
                     className="contextual-menu-button"
                     aria-label="Feedback options menu"
+                    aria-expanded={!state.isMobileFeedbackItemActionsDialogHidden}
+                    aria-haspopup="menu"
+                    aria-controls={`feedback-item-actions-${props.id}`}
                     data-card-control="true"
                     tabIndex={-1}
-                    iconProps={{ iconName: "MoreVertical" }}
                     title="Feedback actions"
-                      menuProps={{
-                        className: "feedback-action-menu",
-                        items: feedbackItemEllipsisMenuItems
-                          .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
-                          .map(menuItem => ({
-                            ...menuItem.menuItem,
-                            disabled: (menuItem.menuItem.key === "deleteFeedback" && state.isDeletionDisabled) || menuItem.workflowPhases.indexOf(props.workflowPhase) === -1,
-                          })),
-                      }}
-                  />
-                  <Dialog hidden={state.isMobileFeedbackItemActionsDialogHidden} onDismiss={hideMobileFeedbackItemActionsDialog} modalProps={{ isBlocking: false, containerClassName: "ms-dialogMainOverride", className: "retrospectives-dialog-modal" }}>
-                    <div className="mobile-contextual-menu-list">
-                        {feedbackItemEllipsisMenuItems
-                          .filter(menuItem => !menuItem.hideMobile)
-                          .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
-                          .map(menuItem => {
-                            const disabled = (menuItem.menuItem.key === "deleteFeedback" && state.isDeletionDisabled) || menuItem.workflowPhases.indexOf(props.workflowPhase) === -1;
-                            return (
-                            <ActionButton
-                              key={menuItem.menuItem.key}
-                              className={menuItem.menuItem.className}
-                              iconProps={menuItem.menuItem.iconProps}
+                    type="button"
+                    onClick={e => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleMobileFeedbackItemActionsMenu();
+                    }}
+                  >
+                    <MoreVerticalIcon />
+                  </button>
+                  {!state.isMobileFeedbackItemActionsDialogHidden && (
+                    <div ref={mobileActionsMenuRef} id={`feedback-item-actions-${props.id}`} className="callout-menu right" role="menu" aria-label="Feedback actions">
+                      {feedbackItemEllipsisMenuItems
+                        .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
+                        .map(menuItem => {
+                          const disabled = menuItem.key === "deleteFeedback" && state.isDeletionDisabled;
+                          return (
+                            <button
+                              key={menuItem.key}
                               disabled={disabled}
-                              aria-label={menuItem.menuItem.text}
+                              aria-label={menuItem.text}
+                              title={menuItem.title}
+                              type="button"
+                              role="menuitem"
                               onClick={() => {
                                 hideMobileFeedbackItemActionsDialog();
-                                menuItem.menuItem.onClick?.(undefined, menuItem.menuItem);
+                                menuItem.onClick?.();
                               }}
-                              text={menuItem.menuItem.text}
-                              title={menuItem.menuItem.title}
-                            />
+                            >
+                              {getIconElement(menuItem.iconName)}
+                              {menuItem.text}
+                            </button>
                           );
                         })}
                     </div>
-                    <DialogFooter>
-                      <DefaultButton onClick={hideMobileFeedbackItemActionsDialog} text="Close" />
-                    </DialogFooter>
-                  </Dialog>
+                  )}
                 </div>
               )}
             </div>
@@ -1095,37 +1131,56 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           <div className="action-items">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={props.id} feedbackItemTitle={displayTitle} team={props.team} boardId={props.boardId} boardTitle={props.boardTitle} defaultAreaPath={props.defaultActionItemAreaPath} defaultIteration={props.defaultActionItemIteration} actionItems={props.actionItems} onUpdateActionItem={onUpdateActionItem} nonHiddenWorkItemTypes={props.nonHiddenWorkItemTypes} allWorkItemTypes={props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
         </DocumentCard>
       </div>
-      <Dialog
-        hidden={state.isDeleteItemConfirmationDialogHidden}
-        onDismiss={hideDeleteItemConfirmationDialog}
-        dialogContentProps={{
-          type: DialogType.close,
-          title: "Delete Feedback",
-          subText: `Are you sure you want to delete the feedback "${displayTitle}"?\n            ${!isNotGroupedItem && isMainItem ? "Any feedback grouped underneath this one will be ungrouped." : ""}`,
-        }}
-        modalProps={{ isBlocking: true, containerClassName: "retrospectives-delete-feedback-item-dialog", className: "retrospectives-dialog-modal" }}
-      >
-        <DialogFooter>
-          <PrimaryButton onClick={onConfirmDeleteFeedbackItem} text="Delete" />
-          <DefaultButton onClick={hideDeleteItemConfirmationDialog} text="Cancel" />
-        </DialogFooter>
-      </Dialog>
-      <Dialog hidden={state.isMoveFeedbackItemDialogHidden} maxWidth={500} minWidth={500} onDismiss={hideMoveFeedbackItemDialog} dialogContentProps={{ type: DialogType.close, title: "Move Feedback to Different Column", subText: "Choose the column you want to move this feedback to" }} modalProps={{ isBlocking: false, containerClassName: "retrospectives-move-feedback-item-dialog", className: "retrospectives-dialog-modal" }}>
-        {props.columnIds
-          .filter(columnId => columnId != props.columnId)
-          .map(columnId => (
-            <DefaultButton
-              key={columnId}
-              className="move-feedback-item-column-button"
-              onClick={() => {
-                props.moveFeedbackItem(props.refreshFeedbackItems, props.boardId, props.id, columnId);
-              }}
-            >
-              {getIconElement(props.columns[columnId].columnProperties.iconClass)}
-              {props.columns[columnId].columnProperties.title}
-            </DefaultButton>
-          ))}
-      </Dialog>
+      <dialog ref={deleteFeedbackDialogRef} className="delete-feedback-item-dialog" aria-label="Delete Feedback" onClose={() => setStateMerge({ isDeleteItemConfirmationDialogHidden: true })}>
+        <div className="header">
+          <h2 className="title">Delete Feedback</h2>
+          <button onClick={hideDeleteItemConfirmationDialog} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">
+          {`Are you sure you want to delete the feedback "${displayTitle}"?`}
+          {!isNotGroupedItem && isMainItem ? " Any feedback grouped underneath this one will be ungrouped." : ""}
+        </div>
+        <div className="inner">
+          <button className="button" onClick={onConfirmDeleteFeedbackItem}>
+            Delete
+          </button>
+          <button className="default button" onClick={hideDeleteItemConfirmationDialog}>
+            Cancel
+          </button>
+        </div>
+      </dialog>
+      <dialog ref={moveFeedbackDialogRef} className="move-feedback-item-dialog" aria-label="Move Feedback to Different Column" onClose={() => setStateMerge({ isMoveFeedbackItemDialogHidden: true })}>
+        <div className="header">
+          <h2 className="title">Move Feedback to Different Column</h2>
+          <button onClick={hideMoveFeedbackItemDialog} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">Choose the column you want to move this feedback to</div>
+        <div className="inner">
+          {props.columnIds
+            .filter(columnId => columnId != props.columnId)
+            .map(columnId => (
+              <button
+                key={columnId}
+                className="move-feedback-item-column-button"
+                type="button"
+                onClick={() => {
+                  props.moveFeedbackItem(props.refreshFeedbackItems, props.boardId, props.id, columnId);
+                  hideMoveFeedbackItemDialog();
+                }}
+              >
+                {getIconElement(props.columns[columnId].columnProperties.iconClass)}
+                {props.columns[columnId].columnProperties.title}
+              </button>
+            ))}
+          <button className="default button" onClick={hideMoveFeedbackItemDialog}>
+            Cancel
+          </button>
+        </div>
+      </dialog>
       <Dialog hidden={state.isGroupFeedbackItemDialogHidden} maxWidth={600} minWidth={600} onDismiss={hideGroupFeedbackItemDialog} dialogContentProps={{ type: DialogType.close, title: "Group Feedback" }} modalProps={{ isBlocking: false, containerClassName: "retrospectives-group-feedback-item-dialog", className: "retrospectives-dialog-modal" }}>
         <label className="ms-Dialog-subText" htmlFor="feedback-item-search-input">
           Search and select the feedback under which to group the current feedback.
@@ -1188,12 +1243,23 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           })}
         </div>
       </Dialog>
-      <Dialog hidden={state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden} onDismiss={hideRemoveFeedbackItemFromGroupConfirmationDialog} dialogContentProps={{ type: DialogType.close, title: "Remove Feedback from Group", subText: `Are you sure you want to remove the feedback "${displayTitle}" from its current group?` }} modalProps={{ isBlocking: true, containerClassName: "retrospectives-remove-feedback-item-from-group-dialog", className: "retrospectives-dialog-modal" }}>
-        <DialogFooter>
-          <PrimaryButton onClick={onConfirmRemoveFeedbackItemFromGroup} text="Remove Feedback from Group" />
-          <DefaultButton onClick={hideRemoveFeedbackItemFromGroupConfirmationDialog} text="Cancel" />
-        </DialogFooter>
-      </Dialog>
+      <dialog ref={removeFeedbackFromGroupDialogRef} className="remove-feedback-item-from-group-dialog" aria-label="Remove Feedback from Group" onClose={() => setStateMerge({ isRemoveFeedbackItemFromGroupConfirmationDialogHidden: true })}>
+        <div className="header">
+          <h2 className="title">Remove Feedback from Group</h2>
+          <button onClick={hideRemoveFeedbackItemFromGroupConfirmationDialog} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">{`Are you sure you want to remove the feedback "${displayTitle}" from its current group?`}</div>
+        <div className="inner">
+          <button className="button" onClick={onConfirmRemoveFeedbackItemFromGroup}>
+            Remove Feedback from Group
+          </button>
+          <button className="default button" onClick={hideRemoveFeedbackItemFromGroupConfirmationDialog}>
+            Cancel
+          </button>
+        </div>
+      </dialog>
     </div>
   );
 });
