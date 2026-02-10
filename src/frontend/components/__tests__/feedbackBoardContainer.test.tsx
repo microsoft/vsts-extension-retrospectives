@@ -386,6 +386,14 @@ describe("FeedbackBoardContainer additional coverage", () => {
     expect(visitState.currentTeam.id).toBe(team.id);
   });
 
+  it("skips live sync connection on on-prem", async () => {
+    const instance = createSynchronousContainer();
+    await instance.componentDidMount();
+
+    expect(reflectMock.startConnection).not.toHaveBeenCalled();
+    expect(instance.state.isBackendServiceConnected).toBe(false);
+  });
+
   it("renders initialized board and history views", async () => {
     const { ref } = renderContainerWithHandle();
 

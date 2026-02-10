@@ -332,13 +332,17 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     let initialCurrentTeam: WebApiTeam | undefined;
     let initialCurrentBoard: IFeedbackBoardDocument | undefined;
 
-    try {
-      const isBackendServiceConnected = await reflectBackendService.startConnection();
-      setState({ isBackendServiceConnected });
-    } catch (error) {
-      appInsights.trackException(error, {
-        action: "connect",
-      });
+    if (props.isHostedAzureDevOps) {
+      try {
+        const isBackendServiceConnected = await reflectBackendService.startConnection();
+        setState({ isBackendServiceConnected });
+      } catch (error) {
+        appInsights.trackException(error, {
+          action: "connect",
+        });
+      }
+    } else {
+      setState({ isBackendServiceConnected: false });
     }
 
     try {
