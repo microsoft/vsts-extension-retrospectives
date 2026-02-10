@@ -5322,6 +5322,7 @@ describe("Feedback Item", () => {
       });
     });
 
+
     test("opens move feedback dialog with m key in Group phase", async () => {
       const mockItem: IFeedbackItemDocument = {
         id: "move-dialog-item",
@@ -5417,6 +5418,7 @@ describe("Feedback Item", () => {
         expect(screen.getByText(/Move Feedback to Different Column/i)).toBeInTheDocument();
       });
     });
+
 
     test("shows search results in group feedback dialog", async () => {
       const mockItem: IFeedbackItemDocument = {
@@ -8116,6 +8118,80 @@ describe("FeedbackItem additional coverage (merged)", () => {
     jest.useRealTimers();
     jest.restoreAllMocks();
     document.body.innerHTML = "";
+  });
+
+  describe("Keyboard shortcuts when deletion is disabled", () => {
+    test("opens group feedback dialog with g key", async () => {
+      const mockItem = makeDoc({ id: "group-disabled-item", upvotes: 3 });
+      const columns = makeColumns([mockItem]);
+
+      const props = makeProps({
+        id: mockItem.id,
+        title: mockItem.title,
+        workflowPhase: "Group",
+        columns,
+        columnIds: testColumnIds,
+      });
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+      await waitFor(() => expect((ref.current as any).state.isDeletionDisabled).toBe(true));
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "g" });
+      });
+
+      expect(await screen.findByText(/Group Feedback/i)).toBeInTheDocument();
+    });
+
+    test("opens move feedback dialog with m key", async () => {
+      const mockItem = makeDoc({ id: "move-disabled-item", upvotes: 2 });
+      const secondColumnId = "second-column-uuid";
+      const columns = {
+        ...makeColumns([mockItem]),
+        [secondColumnId]: {
+          columnProperties: {
+            id: secondColumnId,
+            title: "Second Column",
+            iconClass: "far fa-frown",
+            accentColor: "#ff0000",
+          },
+          columnItems: [] as any[],
+        },
+      };
+
+      const props = makeProps({
+        id: mockItem.id,
+        title: mockItem.title,
+        workflowPhase: "Group",
+        columns,
+        columnIds: [testColumnUuidOne, secondColumnId],
+      });
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+      await waitFor(() => expect((ref.current as any).state.isDeletionDisabled).toBe(true));
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "m" });
+      });
+
+      expect(await screen.findByText(/Move Feedback to Different Column/i)).toBeInTheDocument();
+    });
   });
 
   test("component mount/unmount registers item ref and reflect backend callbacks", async () => {

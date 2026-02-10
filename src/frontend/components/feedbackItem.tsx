@@ -693,13 +693,13 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           }
           break;
         case "g":
-          if (props.workflowPhase === WorkflowPhase.Group && !stateRef.current.isDeletionDisabled) {
+          if (props.workflowPhase === WorkflowPhase.Group) {
             e.preventDefault();
             showGroupFeedbackItemDialog();
           }
           break;
         case "m":
-          if (props.workflowPhase === WorkflowPhase.Group && !stateRef.current.isDeletionDisabled) {
+          if (props.workflowPhase === WorkflowPhase.Group) {
             e.preventDefault();
             showMoveFeedbackItemDialog();
           }
@@ -1038,24 +1038,24 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                     tabIndex={-1}
                     iconProps={{ iconName: "MoreVertical" }}
                     title="Feedback actions"
-                    menuProps={{
-                      className: "feedback-action-menu",
-                      items: feedbackItemEllipsisMenuItems
-                        .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
-                        .map(menuItem => ({
-                          ...menuItem.menuItem,
-                          disabled: state.isDeletionDisabled || menuItem.workflowPhases.indexOf(props.workflowPhase) === -1,
-                        })),
-                    }}
+                      menuProps={{
+                        className: "feedback-action-menu",
+                        items: feedbackItemEllipsisMenuItems
+                          .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
+                          .map(menuItem => ({
+                            ...menuItem.menuItem,
+                            disabled: (menuItem.menuItem.key === "deleteFeedback" && state.isDeletionDisabled) || menuItem.workflowPhases.indexOf(props.workflowPhase) === -1,
+                          })),
+                      }}
                   />
                   <Dialog hidden={state.isMobileFeedbackItemActionsDialogHidden} onDismiss={hideMobileFeedbackItemActionsDialog} modalProps={{ isBlocking: false, containerClassName: "ms-dialogMainOverride", className: "retrospectives-dialog-modal" }}>
                     <div className="mobile-contextual-menu-list">
-                      {feedbackItemEllipsisMenuItems
-                        .filter(menuItem => !menuItem.hideMobile)
-                        .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
-                        .map(menuItem => {
-                          const disabled = state.isDeletionDisabled || menuItem.workflowPhases.indexOf(props.workflowPhase) === -1;
-                          return (
+                        {feedbackItemEllipsisMenuItems
+                          .filter(menuItem => !menuItem.hideMobile)
+                          .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
+                          .map(menuItem => {
+                            const disabled = (menuItem.menuItem.key === "deleteFeedback" && state.isDeletionDisabled) || menuItem.workflowPhases.indexOf(props.workflowPhase) === -1;
+                            return (
                             <ActionButton
                               key={menuItem.menuItem.key}
                               className={menuItem.menuItem.className}
