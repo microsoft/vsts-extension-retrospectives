@@ -259,18 +259,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .contextual-menu-button {
-  @apply w-4 min-w-6 bg-inherit p-0 border-0 text-(--text-primary-color);
-
-  & i[data-icon-name="ChevronDown"] {
-    @apply hidden;
-  }
-
-  &:hover {
-    @apply bg-(--background-color) text-(--text-primary-color);
-  }
+  @apply cursor-pointer;
 
   &:focus-visible {
     @apply outline-2 outline-primary outline-offset-2 rounded;
+  }
+
+  & svg {
+    @apply w-5 h-5;
   }
 }
 
@@ -290,6 +286,9 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-(--callout-background-color);
 }
 
+.delete-feedback-item-dialog,
+.move-feedback-item-dialog,
+.remove-feedback-item-from-group-dialog,
 .whats-new-dialog,
 .prime-directive-dialog,
 .user-guide-dialog,
@@ -1967,8 +1966,36 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-(--text-secondary-color);
 }
 
-.feedbackItem .mainItemCard .card-integral-part .card-header .item-actions-menu {
-  @apply pr-1;
+.item-actions-menu {
+  @apply mt-2 mr-2;
+
+  & .callout-menu {
+    @apply absolute bg-[rgb(var(--palette-neutral-2))] text-sm shadow-lg drop-shadow-lg min-w-60 z-10;
+
+    &.left {
+      @apply left-0;
+    }
+
+    &.right {
+      @apply right-0;
+    }
+
+    & button {
+      @apply flex items-center gap-2 w-full text-left px-2 py-2 bg-inherit border-0 text-(--text-primary-color) cursor-pointer;
+
+      &:hover {
+        @apply text-primary;
+      }
+
+      &:disabled {
+        @apply opacity-60 cursor-default;
+      }
+
+      & svg {
+        @apply min-w-4 max-w-4 h-4;
+      }
+    }
+  }
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-content,

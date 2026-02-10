@@ -18,6 +18,15 @@ export const CoffeeIcon = () => {
   );
 };
 
+export const OpenWithIcon = () => {
+  return (
+    <svg className="icon-open-with" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z" />
+    </svg>
+  );
+};
+
 export const PrivacyTipIcon = () => {
   return (
     <svg className="icon-privacy-tip" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -691,6 +700,15 @@ export const ChevronDownIcon = () => {
   );
 };
 
+export const ChevronUpIcon = () => {
+  return (
+    <svg className="icon-chevron-up" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14l-6-6z" />
+    </svg>
+  );
+};
+
 export const ChevronRightIcon = () => {
   return (
     <svg className="icon-chevron-right" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -789,6 +807,36 @@ export const SpeedIcon = () => {
   );
 };
 
+export const MoreVerticalIcon = () => {
+  return (
+    <svg className="icon-more-vertical" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+    </svg>
+  );
+};
+
+export const GroupWorkIcon = () => {
+  return (
+    <svg className="icon-group-work" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+      <circle cx="8" cy="14" r="2" />
+      <circle cx="12" cy="8" r="2" />
+      <circle cx="16" cy="14" r="2" />
+    </svg>
+  );
+};
+
+export const UndoIcon = () => {
+  return (
+    <svg className="icon-undo" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" />
+    </svg>
+  );
+};
+
 export const availableIcons: { id: string; tags: string[]; name: string; icon: React.ReactElement }[] = [
   { id: "happy-face", tags: ["fas fa-cart-plus", "far fa-smile"], name: "Smile", icon: <HappyFaceIcon /> },
   { id: "sad-face", tags: ["far fa-frown"], name: "Frown", icon: <SadFaceIcon /> },
@@ -844,8 +892,9 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "insights", tags: [], name: "Insights", icon: <InsightsIcon /> },
   { id: "assessment", tags: [], name: "Assessment", icon: <AssessmentIcon /> },
   { id: "reviews", tags: [], name: "Reviews", icon: <ReviewsIcon /> },
-  { id: "chevron-left", tags: [], name: "Chevron Left", icon: <ChevronLeftIcon /> },
+  { id: "chevron-up", tags: [], name: "Chevron Up", icon: <ChevronUpIcon /> },
   { id: "chevron-down", tags: [], name: "Chevron Down", icon: <ChevronDownIcon /> },
+  { id: "chevron-left", tags: [], name: "Chevron Left", icon: <ChevronLeftIcon /> },
   { id: "chevron-right", tags: [], name: "Chevron Right", icon: <ChevronRightIcon /> },
   { id: "privacy-tip", tags: [], name: "Privacy Tip", icon: <PrivacyTipIcon /> },
   { id: "keyboard", tags: [], name: "Keyboard", icon: <KeyboardIcon /> },
@@ -864,6 +913,10 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "more-horizontal", tags: [], name: "More Horizontal", icon: <MoreHorizontalIcon /> },
   { id: "report-problem", tags: [], name: "Report Problem", icon: <ReportProblemIcon /> },
   { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
+  { id: "more-vertical", tags: ["fa-solid fa-ellipsis-v"], name: "More Vertical", icon: <MoreVerticalIcon /> },
+  { id: "open-with", tags: ["fa-solid fa-open-with"], name: "Open With", icon: <OpenWithIcon /> },
+  { id: "group-work", tags: ["fa-solid fa-group-work"], name: "Group Work", icon: <GroupWorkIcon /> },
+  { id: "undo", tags: ["fa-solid fa-undo"], name: "Undo", icon: <UndoIcon /> },
 ];
 
 export function getIconElement(iconId: string | undefined | null): React.ReactElement {

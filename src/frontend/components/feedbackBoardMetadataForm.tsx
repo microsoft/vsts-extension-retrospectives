@@ -1,8 +1,6 @@
 import React, { ChangeEvent, useState, useEffect, useRef, useCallback } from "react";
-import { PrimaryButton, DefaultButton, IconButton } from "@fluentui/react/lib/Button";
-import { TextField } from "@fluentui/react/lib/TextField";
+import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
 import Dialog, { DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
-import { Checkbox } from "@fluentui/react/lib/Checkbox";
 import { List } from "@fluentui/react/lib/List";
 import { DocumentCardType, DocumentCard } from "@fluentui/react/lib/DocumentCard";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
@@ -175,8 +173,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     loadSettings();
   }, [isNewBoardCreation, isDuplicatingBoard]);
 
-  const handleInputChange = useCallback((_event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string) => {
-    setTitle(newValue);
+  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value);
     setIsBoardNameTaken(false);
   }, []);
 
@@ -224,16 +222,16 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     [handleFormSubmit],
   );
 
-  const handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setIsIncludeTeamEffectivenessMeasurement(Boolean(checked));
+  const handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsIncludeTeamEffectivenessMeasurement(event.target.checked);
   }, []);
 
-  const handleShouldShowFeedbackAfterCollectChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setShouldShowFeedbackAfterCollect(Boolean(checked));
+  const handleShouldShowFeedbackAfterCollectChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setShouldShowFeedbackAfterCollect(event.target.checked);
   }, []);
 
-  const handleIsAnonymousCheckboxChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setIsBoardAnonymous(Boolean(checked));
+  const handleIsAnonymousCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsBoardAnonymous(event.target.checked);
   }, []);
 
   const handleMaxVotePerUserChange = useCallback((event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -297,7 +295,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 <label htmlFor="title-input-container">
                   Retrospective Name<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:
                 </label>
-                <TextField ariaLabel="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} className="title-input-container" id="retrospective-title-input" value={title} maxLength={100} onChange={handleInputChange} />
+                <input aria-label="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} className="title-input-container" id="retrospective-title-input" value={title} maxLength={100} onChange={handleInputChange} />
                 {isBoardNameTaken && <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>}
               </div>
               <hr></hr>
@@ -305,21 +303,30 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
                   Max Votes per User (Current: {isNewBoardCreation ? maxVotesPerUser : currentBoard.maxVotesPerUser}):
                 </label>
-                <TextField className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />
+                <input className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />
               </div>
               <hr></hr>
               <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation</div>
               <div className="board-metadata-form-section-subheader">
                 <div className="flex flex-col">
-                  <Checkbox id="include-team-assessment-checkbox" label="Include Team Assessment" ariaLabel="Include Team Assessment. This selection cannot be modified after board creation." boxSide="start" checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />
+                  <label className="flex items-center gap-2" htmlFor="include-team-assessment-checkbox">
+                    <input id="include-team-assessment-checkbox" type="checkbox" aria-label="Include Team Assessment. This selection cannot be modified after board creation." checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />
+                    <span>Include Team Assessment</span>
+                  </label>
                   <div className="italic text-sm font-thin text-left">Note: All responses for team assessment are stored anonymously.</div>
                 </div>
               </div>
               <div className="board-metadata-form-section-subheader">
-                <Checkbox id="obscure-feedback-checkbox" label="Hide the feedback of others until after Collect phase" ariaLabel="Only show feedback after Collect phase. This selection cannot be modified after board creation." boxSide="start" checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />
+                <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">
+                  <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />
+                  <span>Hide the feedback of others until after Collect phase</span>
+                </label>
               </div>
               <div className="board-metadata-form-section-subheader">
-                <Checkbox id="feedback-display-names-checkbox" label="Do not display names in feedback" ariaLabel="Do not display names in feedback. This selection cannot be modified after board creation." boxSide="start" checked={isBoardAnonymous} disabled={!isNewBoardCreation} onChange={handleIsAnonymousCheckboxChange} />
+                <label className="flex items-center gap-2" htmlFor="feedback-display-names-checkbox">
+                  <input id="feedback-display-names-checkbox" type="checkbox" aria-label="Do not display names in feedback. This selection cannot be modified after board creation." checked={isBoardAnonymous} disabled={!isNewBoardCreation} onChange={handleIsAnonymousCheckboxChange} />
+                  <span>Do not display names in feedback</span>
+                </label>
               </div>
             </section>
             <section className="board-metadata-edit-column-settings">
@@ -393,57 +400,65 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                         />
                       </div>
                       <div className="flex flex-none items-center">
-                        <IconButton
+                        <button
                           className="feedback-column-card-move-up-button"
-                          iconProps={{ iconName: "Up" }}
                           title="Move Up"
-                          ariaLabel="Move Up"
+                          aria-label="Move Up"
                           disabled={columnCard.markedForDeletion || index === 0}
+                          type="button"
                           onClick={() => {
                             const newColumns = [...columnCards];
                             [newColumns[index], newColumns[index - 1]] = [newColumns[index - 1], newColumns[index]];
                             setColumnCards(newColumns);
                           }}
-                        />
-                        <IconButton
+                        >
+                          {getIconElement("chevron-up")}
+                        </button>
+                        <button
                           className="feedback-column-card-move-down-button"
-                          iconProps={{ iconName: "Down" }}
                           title="Move Down"
-                          ariaLabel="Move Down"
+                          aria-label="Move Down"
                           disabled={columnCard.markedForDeletion || index === columnCards.length - 1}
+                          type="button"
                           onClick={() => {
                             const newColumns = [...columnCards];
                             [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
                             setColumnCards(newColumns);
                           }}
-                        />
+                        >
+                          {getIconElement("chevron-down")}
+                        </button>
                         {!columnCard.markedForDeletion && (
-                          <IconButton
+                          <button
                             className="feedback-column-card-delete-button"
-                            iconProps={{ iconName: "Delete" }}
                             title="Delete"
-                            ariaLabel="Delete"
+                            aria-label="Delete"
                             disabled={columnCards.filter(cc => !cc.markedForDeletion).length <= 1}
+                            type="button"
                             onClick={() => {
                               const newColumns = [...columnCards];
                               newColumns[index].markedForDeletion = true;
                               setColumnCards(newColumns);
                             }}
-                          />
+                          >
+                            {getIconElement("delete")}
+                          </button>
                         )}
                         {columnCard.markedForDeletion && (
-                          <IconButton
+                          <button
                             className="feedback-column-card-undelete-button"
-                            iconProps={{ iconName: "Undo" }}
                             title="Undo Delete"
-                            ariaLabel="Undo Delete"
+                            aria-label="Undo Delete"
                             disabled={columnCards.filter(cc => !cc.markedForDeletion).length >= maxColumnCount}
+                            type="button"
                             onClick={() => {
                               const newColumns = [...columnCards];
                               newColumns[index].markedForDeletion = false;
                               setColumnCards(newColumns);
                             }}
-                          />
+                          >
+                            {getIconElement("undo")}
+                          </button>
                         )}
                       </div>
                     </DocumentCard>

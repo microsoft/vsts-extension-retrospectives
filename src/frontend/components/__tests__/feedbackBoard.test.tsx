@@ -810,6 +810,36 @@ describe("FeedbackBoard Component", () => {
         });
       }
     });
+
+    it("fetches action items when updated item includes action IDs", async () => {
+      let updatedItemHandler: ((columnId: string, feedbackItemId: string) => Promise<void>) | null = null;
+
+      (reflectBackendService.onReceiveUpdatedItem as jest.Mock).mockImplementation(handler => {
+        updatedItemHandler = handler;
+      });
+
+      const updatedItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        associatedActionItemIds: [123],
+      };
+
+      (itemDataService.getFeedbackItem as jest.Mock).mockResolvedValue(updatedItem);
+      (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValue([{ id: 123, title: "Action Item" }]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(reflectBackendService.onReceiveUpdatedItem).toHaveBeenCalled();
+      });
+
+      if (updatedItemHandler) {
+        await updatedItemHandler(testColumnProps.columnIds[0], mockFeedbackItems[0].id);
+      }
+
+      await waitFor(() => {
+        expect(workItemService.getWorkItemsByIds).toHaveBeenCalledWith([123]);
+      });
+    });
   });
 
   describe("Keyboard Navigation", () => {

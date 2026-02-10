@@ -6,7 +6,24 @@ import { testColumns, testBoardId, testColumnUuidOne, testColumnIds, testFeedbac
 import { itemDataService } from "../../dal/itemDataService";
 import { reflectBackendService } from "../../dal/reflectBackendService";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
+import localStorageHelper from "../../utilities/localStorageHelper";
 import * as dialogHelper from "../../utilities/dialogHelper";
+
+// Mock HTMLDialogElement for JSDOM
+beforeAll(() => {
+  if (!(window as unknown as { HTMLDialogElement?: typeof HTMLDialogElement }).HTMLDialogElement) {
+    (window as unknown as { HTMLDialogElement: typeof HTMLElement }).HTMLDialogElement = class HTMLDialogElement extends HTMLElement {} as unknown as typeof HTMLDialogElement;
+  }
+
+  HTMLDialogElement.prototype.showModal = function showModal() {
+    (this as unknown as { open: boolean }).open = true;
+  };
+
+  HTMLDialogElement.prototype.close = function close() {
+    (this as unknown as { open: boolean }).open = false;
+    this.dispatchEvent(new Event("close"));
+  };
+});
 
 // `feedbackItem` is now a functional component (forwardRef), so TS's built-in `InstanceType<>`
 // no longer applies. These tests use refs to access an imperative surface.
@@ -428,7 +445,9 @@ describe("Feedback Item", () => {
       const props = { ...baseProps, workflowPhase: "Group", isInteractable: true };
       const { container } = render(<FeedbackItem {...(props as any)} />);
       const item = container.querySelector(".feedbackItem");
+      const card = container.querySelector(".ms-DocumentCard");
       expect(item?.getAttribute("draggable")).toBe("true");
+      expect(card?.getAttribute("draggable")).toBe("true");
     });
 
     test("renders in Vote phase with vote buttons", () => {
@@ -5724,7 +5743,8 @@ describe("Feedback Item", () => {
 
       // Dialog should close
       await waitFor(() => {
-        expect(screen.queryByText("Delete Feedback")).not.toBeInTheDocument();
+        const dialog = document.querySelector('dialog[aria-label="Delete Feedback"]') as HTMLDialogElement | null;
+        expect(dialog?.open).toBe(false);
       });
     });
   });
@@ -8118,6 +8138,158 @@ describe("FeedbackItem additional coverage (merged)", () => {
     document.body.innerHTML = "";
   });
 
+  describe("Keyboard shortcuts when deletion is disabled", () => {
+    test("opens group feedback dialog with g key", async () => {
+      const mockItem = makeDoc({ id: "group-disabled-item", upvotes: 3 });
+      const columns = makeColumns([mockItem]);
+
+      const props = makeProps({
+        id: mockItem.id,
+        title: mockItem.title,
+        workflowPhase: "Group",
+        columns,
+        columnIds: testColumnIds,
+      });
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+      await waitFor(() => expect((ref.current as any).state.isDeletionDisabled).toBe(true));
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "g" });
+      });
+
+      expect(await screen.findByText(/Group Feedback/i)).toBeInTheDocument();
+    });
+
+    test("opens move feedback dialog with m key", async () => {
+      const mockItem = makeDoc({ id: "move-disabled-item", upvotes: 2 });
+      const secondColumnId = "second-column-uuid";
+      const columns = {
+        ...makeColumns([mockItem]),
+        [secondColumnId]: {
+          columnProperties: {
+            id: secondColumnId,
+            title: "Second Column",
+            iconClass: "far fa-frown",
+            accentColor: "#ff0000",
+          },
+          columnItems: [] as any[],
+        },
+      };
+
+      const props = makeProps({
+        id: mockItem.id,
+        title: mockItem.title,
+        workflowPhase: "Group",
+        columns,
+        columnIds: [testColumnUuidOne, secondColumnId],
+      });
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mockItem);
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+      await waitFor(() => expect((ref.current as any).state.isDeletionDisabled).toBe(true));
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "m" });
+      });
+
+      expect(await screen.findByText(/Move Feedback to Different Column/i)).toBeInTheDocument();
+    });
+  });
+
+  describe("Mobile actions menu pointer handling", () => {
+    test("pointerdown inside menu or button keeps menu open; outside closes it", async () => {
+      const props = makeProps({ workflowPhase: "Collect", newlyCreated: false });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        (ref.current as any).setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+
+      const menu = container.querySelector(".item-actions-menu .callout-menu") as HTMLElement | null;
+      const button = container.querySelector(".item-actions-menu .contextual-menu-button") as HTMLElement | null;
+
+      expect(menu).toBeInTheDocument();
+      expect(button).toBeInTheDocument();
+
+      if (menu) {
+        fireEvent.pointerDown(menu);
+        expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
+      }
+
+      if (button) {
+        fireEvent.pointerDown(button);
+        expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
+      }
+
+      fireEvent.pointerDown(document.body);
+      expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+    });
+
+    test("Escape closes the mobile actions menu when it is open", async () => {
+      jest.spyOn(dialogHelper, "isAnyModalDialogOpen").mockReturnValue(false);
+
+      const props = makeProps();
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        (ref.current as any).setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      fireEvent.keyDown(card, { key: "Escape" });
+
+      expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+    });
+  });
+
+  describe("Escape closes remove-from-group dialog", () => {
+    test("Escape hides the remove feedback from group dialog", async () => {
+      const props = makeProps({ workflowPhase: "Group" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        (ref.current as any).showRemoveFeedbackItemFromGroupConfirmationDialog();
+      });
+
+      const dialog = document.querySelector('dialog[aria-label="Remove Feedback from Group"]') as HTMLDialogElement | null;
+      expect(dialog?.open).toBe(true);
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      fireEvent.keyDown(card, { key: "Escape" });
+
+      await waitFor(() => {
+        expect(dialog?.open).toBe(false);
+      });
+    });
+  });
+
   test("component mount/unmount registers item ref and reflect backend callbacks", async () => {
     const addListenerSpy = jest.spyOn(HTMLElement.prototype, "addEventListener");
     const removeListenerSpy = jest.spyOn(HTMLElement.prototype, "removeEventListener");
@@ -8261,7 +8433,8 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     fireEvent.keyDown(root, { key: "Escape" });
     await waitFor(() => {
-      expect(screen.queryByText("Delete Feedback")).not.toBeInTheDocument();
+      const dialog = document.querySelector('dialog[aria-label="Delete Feedback"]') as HTMLDialogElement | null;
+      expect(dialog?.open).toBe(false);
     });
   });
 
@@ -8844,6 +9017,61 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // Simulate drag end
     fireEvent.dragEnd(root);
+  });
+
+  test("drop uses dataTransfer text/plain when provided", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const { container } = render(<FeedbackItem {...props} />);
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const dropSpy = jest.spyOn(FeedbackItemHelper, "handleDropFeedbackItemOnFeedbackItem");
+
+    fireEvent.drop(root, {
+      dataTransfer: {
+        getData: () => "drag-source-id",
+      },
+    });
+
+    expect(dropSpy).toHaveBeenCalledWith(props, "drag-source-id", props.id);
+  });
+
+  test("drop uses dataTransfer text when text/plain is empty", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const { container } = render(<FeedbackItem {...props} />);
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const dropSpy = jest.spyOn(FeedbackItemHelper, "handleDropFeedbackItemOnFeedbackItem");
+
+    fireEvent.drop(root, {
+      dataTransfer: {
+        getData: (format: string) => (format === "text" ? "drag-text-id" : ""),
+      },
+    });
+
+    expect(dropSpy).toHaveBeenCalledWith(props, "drag-text-id", props.id);
+  });
+
+  test("drop falls back to localStorage when dataTransfer is empty", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const { container } = render(<FeedbackItem {...props} />);
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const dropSpy = jest.spyOn(FeedbackItemHelper, "handleDropFeedbackItemOnFeedbackItem");
+    (localStorageHelper.getIdValue as jest.Mock).mockReturnValue("local-storage-id");
+
+    fireEvent.drop(root, {
+      dataTransfer: {
+        getData: () => "",
+      },
+    });
+
+    expect(dropSpy).toHaveBeenCalledWith(props, "local-storage-id", props.id);
   });
 
   test("startEditingTitle when active editor already exists", async () => {
