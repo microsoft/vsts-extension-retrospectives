@@ -259,14 +259,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .contextual-menu-button {
-  @apply w-4 bg-inherit p-0 border-0 text-(--text-primary-color) cursor-pointer;
-
-  &:hover {
-    @apply bg-(--background-color);
-  }
+  @apply cursor-pointer;
 
   &:focus-visible {
     @apply outline-2 outline-primary outline-offset-2 rounded;
+  }
+
+  & svg {
+    @apply w-5 h-5;
   }
 }
 
@@ -1967,10 +1967,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .item-actions-menu {
-  @apply pr-2;
+  @apply mt-2 mr-2;
 
   & .callout-menu {
-    @apply absolute bg-[rgb(var(--palette-neutral-2))] text-sm shadow-lg drop-shadow-lg min-w-48 z-10;
+    @apply absolute bg-[rgb(var(--palette-neutral-2))] text-sm shadow-lg drop-shadow-lg min-w-60 z-10;
 
     &.left {
       @apply left-0;
