@@ -2,6 +2,10 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.49
+
+* Fixing regression issues. From [GitHub PR #1545](https://github.com/microsoft/vsts-extension-retrospectives/pull/1545)
+
 ## v1.92.48
 
 * Added Team Assessment History dialog with trend charts to review past assessment results. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
