@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
 import { cn } from "../utilities/classNameHelper";
-import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
-import { IContextualMenuItem } from "@fluentui/react/lib/ContextualMenu";
-import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
+import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { DocumentCard, DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
 import { SearchBox } from "@fluentui/react/lib/SearchBox";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
@@ -18,7 +16,7 @@ import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { itemDataService } from "../dal/itemDataService";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { reflectBackendService } from "../dal/reflectBackendService";
-import { IColumn, IColumnItem } from "./feedbackBoard";
+import { IColumn } from "./feedbackBoard";
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
