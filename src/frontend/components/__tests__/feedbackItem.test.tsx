@@ -8244,6 +8244,25 @@ describe("FeedbackItem additional coverage (merged)", () => {
       fireEvent.pointerDown(document.body);
       expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
     });
+
+    test("Escape closes the mobile actions menu when it is open", async () => {
+      jest.spyOn(dialogHelper, "isAnyModalDialogOpen").mockReturnValue(false);
+
+      const props = makeProps();
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        (ref.current as any).setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      fireEvent.keyDown(card, { key: "Escape" });
+
+      expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+    });
   });
 
   describe("Escape closes remove-from-group dialog", () => {

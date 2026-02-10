@@ -404,6 +404,21 @@ describe("BoardSummaryTable, additional coverage", () => {
     });
   });
 
+  it("renders board summary when a row is expanded", async () => {
+    const { container, getAllByLabelText } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.textContent).toContain(mockBoards[0].title);
+    });
+
+    const expandButtons = getAllByLabelText("Expand Row");
+    fireEvent.click(expandButtons[0]);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-container")).toBeTruthy();
+    });
+  });
+
   it("handleActionItems, handles feedback items early return paths", async () => {
     // First board: no feedback items
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([]);
