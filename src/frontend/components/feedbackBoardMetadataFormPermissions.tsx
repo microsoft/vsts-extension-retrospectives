@@ -47,10 +47,11 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const cleanPermissionOptions = props.permissionOptions.filter(option => !isGroupOption(option)); // removes groups
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
-  const handleSelectAllClicked = (checked: boolean) => {
+  const handleSelectAllClicked = (event: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     if (!canEditPermissions) return;
+    const nextChecked = typeof checked === "boolean" ? checked : Boolean((event.target as HTMLInputElement | null)?.checked);
 
-    if (checked) {
+    if (nextChecked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === "team" && !teamPermissions.includes(o.id)).map(o => o.id)]);
       setMemberPermissions([...memberPermissions, ...filteredPermissionOptions.filter(o => o.type === "member" && !memberPermissions.includes(o.id)).map(o => o.id)]);
     } else {
@@ -183,7 +184,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
             <thead>
               <tr>
                 <th className="cell-checkbox" scope="col">
-                  <Checkbox className="my-2" id="select-all-permission-options-visible" ariaLabel="Add permission to every team or member in the table." boxSide="start" disabled={!canEditPermissions} checked={selectAllChecked} onChange={(_, checked) => handleSelectAllClicked(checked)} />
+                  <Checkbox className="my-2" id="select-all-permission-options-visible" ariaLabel="Add permission to every team or member in the table." boxSide="start" disabled={!canEditPermissions} checked={selectAllChecked} onChange={(event, checked) => handleSelectAllClicked(event, checked)} />
                 </th>
                 <th className={"text-left"} scope="col">
                   <span aria-label="Permission option name table header">{"Name"}</span>
@@ -196,7 +197,19 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                 return (
                   <tr key={option.id} className="option-row">
                     <td>
-                      <Checkbox className="my-2" id={`permission-option-${option.id}`} ariaLabel="Add permission to every team or member in the table" boxSide="start" disabled={isBoardOwner} checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)} indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner} onChange={(_, isChecked) => handlePermissionClicked(option, isChecked)} />
+                      <Checkbox
+                        className="my-2"
+                        id={`permission-option-${option.id}`}
+                        ariaLabel="Add permission to every team or member in the table"
+                        boxSide="start"
+                        disabled={isBoardOwner}
+                        checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
+                        indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner}
+                        onChange={(event, isChecked) => {
+                          const nextChecked = typeof isChecked === "boolean" ? isChecked : Boolean((event.target as HTMLInputElement | null)?.checked);
+                          handlePermissionClicked(option, nextChecked);
+                        }}
+                      />
                     </td>
                     <td className="cell-content flex flex-row flex-nowrap">
                       <div className="content-image">{PermissionImage({ option })}</div>

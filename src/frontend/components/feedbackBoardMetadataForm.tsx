@@ -225,15 +225,18 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   );
 
   const handleIsIncludeTeamEffectivenessMeasurementCheckboxChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setIsIncludeTeamEffectivenessMeasurement(Boolean(checked));
+    const nextChecked = typeof checked === "boolean" ? checked : Boolean((_.target as HTMLInputElement | null)?.checked);
+    setIsIncludeTeamEffectivenessMeasurement(nextChecked);
   }, []);
 
   const handleShouldShowFeedbackAfterCollectChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setShouldShowFeedbackAfterCollect(Boolean(checked));
+    const nextChecked = typeof checked === "boolean" ? checked : Boolean((_.target as HTMLInputElement | null)?.checked);
+    setShouldShowFeedbackAfterCollect(nextChecked);
   }, []);
 
   const handleIsAnonymousCheckboxChange = useCallback((_: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setIsBoardAnonymous(Boolean(checked));
+    const nextChecked = typeof checked === "boolean" ? checked : Boolean((_.target as HTMLInputElement | null)?.checked);
+    setIsBoardAnonymous(nextChecked);
   }, []);
 
   const handleMaxVotePerUserChange = useCallback((event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
