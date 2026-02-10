@@ -8941,6 +8941,24 @@ describe("FeedbackItem additional coverage (merged)", () => {
     expect(dropSpy).toHaveBeenCalledWith(props, "drag-source-id", props.id);
   });
 
+  test("drop uses dataTransfer text when text/plain is empty", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const { container } = render(<FeedbackItem {...props} />);
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const dropSpy = jest.spyOn(FeedbackItemHelper, "handleDropFeedbackItemOnFeedbackItem");
+
+    fireEvent.drop(root, {
+      dataTransfer: {
+        getData: (format: string) => (format === "text" ? "drag-text-id" : ""),
+      },
+    });
+
+    expect(dropSpy).toHaveBeenCalledWith(props, "drag-text-id", props.id);
+  });
+
   test("drop falls back to localStorage when dataTransfer is empty", async () => {
     const props = makeProps({ workflowPhase: "Group" });
     const { container } = render(<FeedbackItem {...props} />);
