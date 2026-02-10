@@ -66,7 +66,7 @@ const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({ groupedWorkItems
     (e: React.DragEvent<HTMLDivElement>) => {
       // Using localStorage as a temporary solution for Edge issue
       // Bug 19016440: Edge drag and drop dataTransfer protocol is bugged
-      const droppedItemId = localStorageHelper.getIdValue();
+      const droppedItemId = e.dataTransfer?.getData("text/plain") || localStorageHelper.getIdValue();
       FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(mainFeedbackItem, droppedItemId, mainFeedbackItem.id);
       e.stopPropagation();
     },

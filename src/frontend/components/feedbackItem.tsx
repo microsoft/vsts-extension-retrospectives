@@ -561,6 +561,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         props.groupedItemProps.setIsGroupBeingDragged(true);
       }
       e.dataTransfer.effectAllowed = "linkMove";
+      e.dataTransfer.setData("text/plain", props.id);
       e.dataTransfer.setData("foo", "bar");
       localStorageHelper.setIdValue(props.id);
       setStateMerge({ isBeingDragged: true });
@@ -577,7 +578,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const dropFeedbackItemOnFeedbackItem = useCallback(
     async (e: React.DragEvent<HTMLDivElement>) => {
-      const droppedItemId = localStorageHelper.getIdValue();
+      const droppedItemId = e.dataTransfer?.getData("text/plain") || localStorageHelper.getIdValue();
       if (props.id !== droppedItemId) {
         FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(props, droppedItemId, props.id);
       }

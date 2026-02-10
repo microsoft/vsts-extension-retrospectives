@@ -6,6 +6,7 @@ import { testColumns, testBoardId, testColumnUuidOne, testColumnIds, testFeedbac
 import { itemDataService } from "../../dal/itemDataService";
 import { reflectBackendService } from "../../dal/reflectBackendService";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
+import localStorageHelper from "../../utilities/localStorageHelper";
 import * as dialogHelper from "../../utilities/dialogHelper";
 
 // `feedbackItem` is now a functional component (forwardRef), so TS's built-in `InstanceType<>`
@@ -8920,6 +8921,43 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     // Simulate drag end
     fireEvent.dragEnd(root);
+  });
+
+  test("drop uses dataTransfer text/plain when provided", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const { container } = render(<FeedbackItem {...props} />);
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const dropSpy = jest.spyOn(FeedbackItemHelper, "handleDropFeedbackItemOnFeedbackItem");
+
+    fireEvent.drop(root, {
+      dataTransfer: {
+        getData: () => "drag-source-id",
+      },
+    });
+
+    expect(dropSpy).toHaveBeenCalledWith(props, "drag-source-id", props.id);
+  });
+
+  test("drop falls back to localStorage when dataTransfer is empty", async () => {
+    const props = makeProps({ workflowPhase: "Group" });
+    const { container } = render(<FeedbackItem {...props} />);
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const dropSpy = jest.spyOn(FeedbackItemHelper, "handleDropFeedbackItemOnFeedbackItem");
+    (localStorageHelper.getIdValue as jest.Mock).mockReturnValue("local-storage-id");
+
+    fireEvent.drop(root, {
+      dataTransfer: {
+        getData: () => "",
+      },
+    });
+
+    expect(dropSpy).toHaveBeenCalledWith(props, "local-storage-id", props.id);
   });
 
   test("startEditingTitle when active editor already exists", async () => {

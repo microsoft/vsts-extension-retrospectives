@@ -150,6 +150,28 @@ describe("FeedbackItemGroup", () => {
     expect(stopPropagationSpy).toHaveBeenCalled();
   });
 
+  it("should use dataTransfer id when dropping", () => {
+    const mockGetIdValue = localStorageHelper.getIdValue as jest.Mock;
+    mockGetIdValue.mockReturnValue("fallback-id");
+
+    const FeedbackItemHelper = jest.requireMock("../feedbackItem").FeedbackItemHelper;
+    const mockHandleDrop = FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem;
+
+    const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group");
+    const dropEvent = new Event("drop", { bubbles: true });
+    const mockDataTransfer = { getData: jest.fn().mockReturnValue("dropped-from-data-transfer") };
+    Object.defineProperty(dropEvent, "dataTransfer", {
+      value: mockDataTransfer,
+      writable: true,
+    });
+
+    groupDiv?.dispatchEvent(dropEvent);
+
+    expect(mockHandleDrop).toHaveBeenCalledWith(mockMainItem, "dropped-from-data-transfer", "main-item-1");
+  });
+
   it("should handle Space key press without crashing", () => {
     const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
 
