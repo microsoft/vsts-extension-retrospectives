@@ -107,6 +107,17 @@ export type FeedbackBoardContainerHandle = {
 
   numberFormatter: (value: number) => string;
   percentageFormatter: (value: number) => string;
+
+  archiveBoardDialogRef: React.RefObject<HTMLDialogElement>;
+  previewEmailDialogRef: React.RefObject<HTMLDialogElement>;
+  boardCreationDialogRef: React.RefObject<HTMLDialogElement>;
+  boardDuplicateDialogRef: React.RefObject<HTMLDialogElement>;
+  boardUpdateDialogRef: React.RefObject<HTMLDialogElement>;
+  discussAndActDialogRef: React.RefObject<HTMLDialogElement>;
+  teamEffectivenessDialogRef: React.RefObject<HTMLDialogElement>;
+  retroSummaryDialogRef: React.RefObject<HTMLDialogElement>;
+  teamAssessmentHistoryDialogRef: React.RefObject<HTMLDialogElement>;
+  carouselDialogRef: React.RefObject<HTMLDialogElement>;
 };
 
 export interface FeedbackBoardContainerState {
@@ -132,21 +143,14 @@ export interface FeedbackBoardContainerState {
   projectTeams: WebApiTeam[];
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
-  isRetroSummaryDialogHidden: boolean;
-  isBoardCreationDialogHidden: boolean;
-  isBoardDuplicateDialogHidden: boolean;
-  isBoardUpdateDialogHidden: boolean;
-  isArchiveBoardConfirmationDialogHidden: boolean;
   isMobileBoardActionsDialogHidden: boolean;
   isMobileTeamSelectorDialogHidden: boolean;
   isTeamBoardDeletedInfoDialogHidden: boolean;
   isTeamSelectorCalloutVisible: boolean;
   teamBoardDeletedDialogMessage: string;
   teamBoardDeletedDialogTitle: string;
-  isCarouselDialogHidden: boolean;
   focusModeModel: FocusModeModel | null;
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
-  isTeamAssessmentHistoryDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
   allowCrossColumnGroups: boolean;
@@ -201,19 +205,12 @@ const initialState: FeedbackBoardContainerState = {
   isAllTeamsLoaded: false,
   isAppInitialized: false,
   isBackendServiceConnected: false,
-  isBoardCreationDialogHidden: true,
-  isBoardDuplicateDialogHidden: true,
-  isBoardUpdateDialogHidden: true,
-  isCarouselDialogHidden: true,
   focusModeModel: null,
   isIncludeTeamEffectivenessMeasurementDialogHidden: true,
-  isTeamAssessmentHistoryDialogHidden: true,
-  isArchiveBoardConfirmationDialogHidden: true,
   isDropIssueInEdgeMessageBarVisible: true,
   isLiveSyncInTfsIssueMessageBarVisible: true,
   isMobileBoardActionsDialogHidden: true,
   isMobileTeamSelectorDialogHidden: true,
-  isRetroSummaryDialogHidden: true,
   isTeamBoardDeletedInfoDialogHidden: true,
   isTeamDataLoaded: false,
   isTeamSelectorCalloutVisible: false,
@@ -256,7 +253,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const prevCurrentTeamRef = React.useRef<WebApiTeam | undefined>(undefined);
   const prevCurrentBoardRef = React.useRef<IFeedbackBoardDocument | undefined>(undefined);
   const prevActiveTabRef = React.useRef<FeedbackBoardContainerState["activeTab"]>(initialState.activeTab);
-  const prevIsCarouselDialogHiddenRef = React.useRef<boolean>(initialState.isCarouselDialogHidden);
 
   const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -414,7 +410,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     const prevCurrentTeam = prevCurrentTeamRef.current;
     const prevCurrentBoard = prevCurrentBoardRef.current;
     const prevActiveTab = prevActiveTabRef.current;
-    const prevIsCarouselDialogHidden = prevIsCarouselDialogHiddenRef.current;
 
     if (prevCurrentTeam !== undefined && prevCurrentTeam !== state.currentTeam && state.currentTeam) {
       appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: state.currentTeam.id } });
@@ -438,19 +433,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       pauseBoardTimer();
     }
 
-    if (prevIsCarouselDialogHidden !== state.isCarouselDialogHidden && carouselDialogRef.current) {
-      const dialog = carouselDialogRef.current;
-      if (!state.isCarouselDialogHidden && !dialog.open) {
-        dialog.showModal();
-      } else if (state.isCarouselDialogHidden && dialog.open) {
-        dialog.close();
-      }
-    }
-
     prevCurrentTeamRef.current = state.currentTeam;
     prevCurrentBoardRef.current = state.currentBoard;
     prevActiveTabRef.current = state.activeTab;
-    prevIsCarouselDialogHiddenRef.current = state.isCarouselDialogHidden;
   });
 
   const clearBoardTimerInterval = React.useCallback(() => {
@@ -562,14 +547,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         pauseFn();
       }
 
-      if (prevState.isCarouselDialogHidden !== state.isCarouselDialogHidden && carouselDialogRef.current) {
-        const dialog = carouselDialogRef.current;
-        if (!state.isCarouselDialogHidden && !dialog.open) {
-          dialog.showModal();
-        } else if (state.isCarouselDialogHidden && dialog.open) {
-          dialog.close();
-        }
-      }
     },
     [pauseBoardTimer, resetBoardTimer],
   );
@@ -829,7 +806,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       }
 
       setState(
-        (prevState): Pick<FeedbackBoardContainerState, "boards" | "currentBoard" | "isBoardUpdateDialogHidden" | "isTeamBoardDeletedInfoDialogHidden" | "isCarouselDialogHidden" | "teamBoardDeletedDialogTitle" | "teamBoardDeletedDialogMessage"> => {
+        (prevState): Pick<FeedbackBoardContainerState, "boards" | "currentBoard" | "isTeamBoardDeletedInfoDialogHidden" | "teamBoardDeletedDialogTitle" | "teamBoardDeletedDialogMessage"> => {
           const currentBoards = prevState.boards;
           const boardsForTeam = currentBoards.filter(board => board.id !== deletedBoardId);
 
@@ -839,9 +816,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               return {
                 boards: [],
                 currentBoard: null,
-                isBoardUpdateDialogHidden: true,
                 isTeamBoardDeletedInfoDialogHidden: false,
-                isCarouselDialogHidden: true,
                 teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
                 teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user.",
               };
@@ -852,9 +827,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             return {
               boards: boardsForTeam,
               currentBoard: currentBoard,
-              isBoardUpdateDialogHidden: true,
               isTeamBoardDeletedInfoDialogHidden: false,
-              isCarouselDialogHidden: true,
               teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
               teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.",
             };
@@ -863,9 +836,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           return {
             boards: boardsForTeam,
             currentBoard: prevState.currentBoard,
-            isBoardUpdateDialogHidden: prevState.isBoardUpdateDialogHidden,
             isTeamBoardDeletedInfoDialogHidden: prevState.isTeamBoardDeletedInfoDialogHidden,
-            isCarouselDialogHidden: prevState.isCarouselDialogHidden,
             teamBoardDeletedDialogTitle: prevState.teamBoardDeletedDialogTitle,
             teamBoardDeletedDialogMessage: prevState.teamBoardDeletedDialogMessage,
           };
@@ -1327,11 +1298,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const showBoardCreationDialog = (): void => {
-    boardCreationDialogRef.current.showModal();
+    boardCreationDialogRef?.current?.showModal();
   };
 
   const hideBoardCreationDialog = (): void => {
-    boardCreationDialogRef.current.close();
+    boardCreationDialogRef?.current?.close();
   };
 
   const showRetroSummaryDialog = async () => {
@@ -1398,11 +1369,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       effectivenessMeasurementChartData: chartData,
       effectivenessMeasurementSummary: average,
     });
-    retroSummaryDialogRef.current.showModal();
+    retroSummaryDialogRef?.current?.showModal();
   };
 
   const hideRetroSummaryDialog = (): void => {
-    retroSummaryDialogRef.current.close();
+    retroSummaryDialogRef?.current?.close();
   };
 
   const showTeamAssessmentHistoryDialog = async () => {
@@ -1441,13 +1412,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       teamAssessmentHistoryData: historyData,
     });
 
-    teamAssessmentHistoryDialogRef.current.showModal();
+    teamAssessmentHistoryDialogRef?.current?.showModal();
 
     appInsights.trackEvent({ name: TelemetryEvents.TeamAssessmentHistoryViewed });
   };
 
   const hideTeamAssessmentHistoryDialog = (): void => {
-    teamAssessmentHistoryDialogRef.current.close();
+    teamAssessmentHistoryDialogRef?.current?.close();
   };
 
   const updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
@@ -1458,23 +1429,23 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const showBoardUpdateDialog = (): void => {
-    boardUpdateDialogRef.current.showModal();
+    boardUpdateDialogRef?.current?.showModal();
   };
 
   const hideBoardUpdateDialog = (): void => {
-    boardUpdateDialogRef.current.close();
+    boardUpdateDialogRef?.current?.close();
   };
 
   const showBoardDuplicateDialog = (): void => {
-    boardDuplicateDialogRef.current.showModal();
+    boardDuplicateDialogRef?.current?.showModal();
   };
 
   const hideBoardDuplicateDialog = (): void => {
-    boardDuplicateDialogRef.current.close();
+    boardDuplicateDialogRef?.current?.close();
   };
 
   const showArchiveBoardConfirmationDialog = () => {
-    archiveBoardDialogRef.current.showModal();
+    archiveBoardDialogRef?.current?.showModal();
   };
 
   const showBoardUrlCopiedToast = () => {
@@ -1516,7 +1487,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       currentBoard: { ...prevState.currentBoard, emailContent: emailContent },
     }));
 
-    previewEmailDialogRef.current.showModal();
+    previewEmailDialogRef?.current?.showModal();
   };
 
   const downloadEmailSummaryPdf = (): void => {
@@ -1620,11 +1591,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
   const showCarouselDialog = () => {
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemCarouselLaunched });
-    carouselDialogRef.current.showModal();
+    carouselDialogRef?.current?.showModal();
   };
 
   const hideCarouselDialog = () => {
-    carouselDialogRef.current.close();
+    carouselDialogRef?.current?.close();
   };
 
   const hideLiveSyncInTfsIssueMessageBar = () => {
@@ -1693,6 +1664,16 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       updateFeedbackItemsAndContributors,
       numberFormatter,
       percentageFormatter,
+      archiveBoardDialogRef,
+      previewEmailDialogRef,
+      boardCreationDialogRef,
+      boardDuplicateDialogRef,
+      boardUpdateDialogRef,
+      discussAndActDialogRef,
+      teamEffectivenessDialogRef,
+      retroSummaryDialogRef,
+      teamAssessmentHistoryDialogRef,
+      carouselDialogRef,
     };
 
     handleRef.current = handle;
@@ -1751,21 +1732,21 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const showTeamEffectivenessDialog = () => {
-    teamEffectivenessDialogRef.current.showModal();
+    teamEffectivenessDialogRef?.current?.showModal();
   };
 
   const hideTeamEffectivenessDialog = () => {
-    teamEffectivenessDialogRef.current.close();
+    teamEffectivenessDialogRef?.current?.close();
   };
 
   const showDiscussAndActDialog = (questionId: number) => {
     setState({ questionIdForDiscussAndActBoardUpdate: questionId });
-    discussAndActDialogRef.current.showModal();
+    discussAndActDialogRef?.current?.showModal();
   };
 
   const hideDiscussAndActDialog = () => {
     setState({ questionIdForDiscussAndActBoardUpdate: -1 });
-    discussAndActDialogRef.current.close();
+    discussAndActDialogRef?.current?.close();
   };
 
   const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
@@ -1783,12 +1764,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       });
     }
 
-    const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId).responses.find(e => e.questionId === questionId);
+    const currentVote = currentBoard.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId)?.responses.find(e => e.questionId === questionId);
 
     if (!currentVote) {
       currentBoard.teamEffectivenessMeasurementVoteCollection
         .find(e => e.userId === currentUserId)
-        .responses.push({
+        ?.responses.push({
           questionId: questionId,
           selection: selected,
         });
@@ -2051,7 +2032,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                             </button>
                           </div>
                           <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
-                          <div className="subText">{state.focusModeModel && <FeedbackCarousel focusModeModel={state.focusModeModel} isFocusModalHidden={state.isCarouselDialogHidden} />}</div>
+                          <div className="subText">{state.focusModeModel && <FeedbackCarousel focusModeModel={state.focusModeModel} isFocusModalHidden={false} />}</div>
                         </dialog>
                       </>
                     )}
