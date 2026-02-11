@@ -1,5 +1,4 @@
 import React from "react";
-import { DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
 
 import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
@@ -1794,7 +1793,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           </div>
           <div className="subText">Are you sure you want to change the template of this board?</div>
           <div className="inner">
-            <PrimaryButton
+            <button
+              type="button"
+              className="button"
               onClick={async () => {
                 if (!state.currentBoard || state.questionIdForDiscussAndActBoardUpdate === -1) {
                   hideDiscussAndActDialog();
@@ -1812,9 +1813,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                 hideDiscussAndActDialog();
                 hideRetroSummaryDialog();
               }}
-              text="Proceed"
-            />
-            <DefaultButton onClick={hideDiscussAndActDialog} text="Cancel" />
+            >
+              Proceed
+            </button>
+            <button type="button" className="button default" onClick={() => discussAndActDialogRef.current!.close()}>
+              Cancel
+            </button>
           </div>
         </dialog>
 
@@ -1906,7 +1910,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                             <div className="ms-Dialog-inner">
                               <div className="team-effectiveness-section-information">
                                 {getIconElement("info")}
-                                &nbsp;All answers will be saved anonymously
+                                All answers will be saved anonymously
                               </div>
                               <table className="team-effectiveness-measurement-table">
                                 <thead>
@@ -1971,14 +1975,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                             </div>
                           </div>
                           <div className="inner">
-                            <PrimaryButton
-                              className="team-effectiveness-submit-button"
-                              onClick={() => {
-                                saveTeamEffectivenessMeasurement();
-                              }}
-                              text="Submit"
-                            />
-                            <DefaultButton onClick={hideTeamEffectivenessDialog} text="Cancel" />
+                            <button type="button" className="button" onClick={saveTeamEffectivenessMeasurement}>
+                              Save
+                            </button>
+                            <button type="button" className="button default" onClick={() => teamEffectivenessDialogRef.current!.close()}>
+                              Cancel
+                            </button>
                           </div>
                         </dialog>
                         <button
