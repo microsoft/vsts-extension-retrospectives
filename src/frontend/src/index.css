@@ -455,7 +455,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board {
-  @apply w-full table table-fixed h-[calc(100vh-92px)];
+  @apply w-full h-[calc(100vh-92px)] grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
@@ -517,7 +518,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-item-group {
-  @apply mb-3 mr-3 break-inside-avoid inline-block align-top w-full max-w-80 min-w-65 box-border;
+  @apply break-inside-avoid box-border min-w-0;
 
   &:focus {
     @apply outline-none;
@@ -560,7 +561,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &.feedback-item-group-expanded .feedbackItemGroupGroupedItem .groupedItemCard {
-    @apply w-full max-w-80 mt-0 box-border bg-(--background-color) border border-border-gray;
+    @apply w-full mt-0 box-border bg-(--background-color) border border-border-gray;
   }
 
   &.feedback-item-group-expanded .feedbackItemGroupGroupedItem .groupedItemCard .card-integral-part {
@@ -1048,7 +1049,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column {
-  @apply border-r-2 border-l-2 border-(--nav-header-active-item-background) table-cell;
+  @apply border-r-2 border-l-2 border-(--nav-header-active-item-background) min-w-0 overflow-y-auto;
 
   &:focus {
     @apply outline-none;
@@ -1113,10 +1114,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-items-container {
-  @apply pt-2.5 flex flex-row flex-wrap gap-y-5 gap-x-7 w-full box-border overflow-visible;
+  @apply pt-2.5 w-full box-border overflow-visible grid gap-3;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 
   & > div {
-    @apply contents;
+    @apply min-w-0;
   }
 }
 
@@ -1872,7 +1874,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedbackItem {
-  @apply m-0 mr-3 mb-3 break-inside-avoid inline-block align-top w-full min-w-64 box-border;
+  @apply m-0 break-inside-avoid box-border min-w-0;
 
   &:focus {
     @apply outline-none;
@@ -1908,7 +1910,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedbackItem .mainItemCard {
-  @apply w-full max-w-80 bg-(--background-color) box-border border-t border-r border-b border-border-gray border-l-0;
+  @apply w-full bg-(--background-color) box-border border-t border-r border-b border-border-gray border-l-0;
 }
 
 .feedbackItem .mainItemCard .card-integral-part {
