@@ -1148,79 +1148,71 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.retrospectives-retro-summary-dialog {
-  @apply max-w-none w-2/3 flex items-center bg-(--background-color) text-(--text-primary-color);
-}
-
-.retrospectives-retro-summary-dialog .ms-Dialog-title {
-  @apply text-left text-(--text-primary-color);
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-section {
+.retro-summary-dialog .retro-summary-section {
   @apply p-2.5;
+
+  & #retro-summary-created-by {
+    @apply my-1 mx-0;
+  }
+
+  & .retro-summary-section-header {
+    @apply text-sm text-right bg-primary/50 mb-1 py-1.5 px-2 font-medium;
+  }
+
+  & .retro-summary-section-item .retro-summary-section-item-header {
+    @apply font-bold;
+  }
+
+  & .retro-summary-item-horizontal-group {
+    @apply flex-row flex items-center mt-2.5 border-t border-(--border-subtle-color) pt-2.5 w-full;
+
+    & .horizontal-group-item {
+      @apply m-auto;
+    }
+  }
+
+  & .retro-summary-contributors-section {
+    @apply flex flex-wrap p-1.5;
+
+    & .retro-summary-contributor {
+      @apply rounded-lg p-3 w-fit bg-(--border-subtle-color) mr-2.5 mb-2.5;
+
+      &:last-child {
+        @apply mr-0;
+      }
+    }
+  }
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-section #retro-summary-created-by {
-  @apply my-1 mx-0;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-section-header {
-  @apply text-base text-right bg-primary/50 mb-1.5 py-1.5 px-2.5 font-medium;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-section-item .retro-summary-section-item-header {
-  @apply font-bold;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-item-horizontal-group {
-  @apply flex-row flex items-center mt-2.5 border-t border-(--border-subtle-color) pt-2.5 w-full;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-item-horizontal-group .horizontal-group-item {
-  @apply m-auto;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-contributors-section {
-  @apply flex flex-wrap p-1.5;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-contributors-section .retro-summary-contributor {
-  @apply rounded-lg p-3 w-fit bg-(--border-subtle-color) mr-2.5 mb-2.5;
-}
-
-.retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-contributors-section .retro-summary-contributor:last-child {
-  @apply mr-0;
-}
-
-.retrospectives-retro-summary-dialog img.avatar {
+.retro-summary-dialog img.avatar {
   @apply h-6 rounded-full align-middle -mt-1.5 inline;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores {
+.retro-summary-dialog .retro-summary-effectiveness-scores {
   @apply clear-both relative min-w-25 min-h-25 p-0 flex flex-col items-center;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart {
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart {
   @apply flex-row p-0 my-2.5 mx-0 w-full list-none;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block {
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block {
   @apply flex flex-row my-0.5 mx-0 gap-1;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .chart-question {
-  @apply w-64;
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .chart-question {
+  @apply w-72;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .team-effectiveness-average-number {
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .team-effectiveness-average-number {
   @apply p-1 font-bold my-auto mx-0.5 w-7 text-center;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .assessment-chart-action {
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .assessment-chart-action {
   @apply whitespace-nowrap py-0 px-1.5 bg-primary;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response {
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response {
   & span {
     @apply grid justify-end p-2 pl-24 pointer-events-none rounded-4xl bg-black/50;
   }
@@ -1231,7 +1223,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &.yellow-chart-response {
-    @apply bg-task-yellow text-black;
+    @apply bg-task-yellow;
     background-image: repeating-linear-gradient(90deg, transparent, transparent 15px, #ceab02 15px, #ceab02 16px);
   }
 
@@ -1245,31 +1237,31 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li div {
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li div {
   @apply flex items-center justify-end min-h-2 p-2 box-border;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section {
+.retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section {
   @apply flex items-center justify-center flex-col rounded-sm border-2 border-(--border-subtle-color) p-2.5 w-fit mb-2.5;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section .favorability-header {
+.retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section .favorability-header {
   @apply font-bold;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section .chart-legend-group {
+.retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section .chart-legend-group {
   @apply flex;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section section {
+.retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section section {
   @apply flex mr-2.5;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section section:last-child {
+.retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section section:last-child {
   @apply mr-0;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section section div {
+.retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section section div {
   @apply w-5 h-5 rounded-full mr-1;
 }
 
@@ -1857,26 +1849,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .team-assessment-score-button-selected .team-assessment-score-circle {
   @apply bg-primary;
-}
-
-.team-effectiveness-dialog {
-  @apply bg-(--background-color) border-[3px] border-solid border-(--border-subtle-color) max-w-210 text-(--text-primary-color);
-
-  & .ms-Dialog-title {
-    @apply text-(--text-primary-color);
-  }
-
-  & .ms-Dialog-content .ms-Dialog-header {
-    @apply hidden;
-  }
-
-  & .ms-Dialog-content .ms-Dialog-inner {
-    @apply py-0 px-1 pb-1.5;
-  }
-
-  & .ms-Dialog-content i.accent3 {
-    @apply text-[rgba(var(--palette-accent3),0.5)];
-  }
 }
 
 .metadata-form-save-button,

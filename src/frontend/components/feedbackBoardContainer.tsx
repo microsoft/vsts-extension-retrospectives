@@ -545,7 +545,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         const pauseFn = handleRef.current?.pauseBoardTimer ?? pauseBoardTimer;
         pauseFn();
       }
-
     },
     [pauseBoardTimer, resetBoardTimer],
   );
@@ -1898,160 +1897,154 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                   <div className="flex items-center justify-start">
                     <div className="flex flex-row items-center workflow-stage-header 3">
                       {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                      <>
-                        <dialog ref={teamEffectivenessDialogRef} className="team-effectiveness-dialog" role="dialog" aria-label="Team Assessment">
-                          <div className="header">
-                            <h2 className="title">Team Assessment</h2>
-                            <button type="button" onClick={hideTeamEffectivenessDialog} aria-label="Close">
-                              {getIconElement("close")}
-                            </button>
-                          </div>
-                          <div className="ms-Dialog-content">
-                            <div className="ms-Dialog-inner">
-                              <div className="team-effectiveness-section-information">
-                                {getIconElement("info")}
-                                All answers will be saved anonymously
-                              </div>
-                              <table className="team-effectiveness-measurement-table">
-                                <thead>
-                                  <tr>
-                                    <th scope="col" className="text-left">
-                                      Question
-                                    </th>
-                                    <th scope="col" className="text-left min-w-13">
-                                      Details
-                                    </th>
-                                    <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
-                                      Unfavorable
-                                    </th>
-                                    <th scope="colgroup" colSpan={2} className="team-effectiveness-favorability-label">
-                                      Neutral
-                                    </th>
-                                    <th scope="colgroup" colSpan={2} className="team-effectiveness-favorability-label">
-                                      Favorable
-                                    </th>
-                                  </tr>
-                                  <tr>
-                                    <th scope="col" className="text-left"></th>
-                                    <th scope="col" className="text-left"></th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">
-                                      1
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">
-                                      2
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">
-                                      3
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">
-                                      4
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">
-                                      5
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">
-                                      6
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">
-                                      7
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">
-                                      8
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">
-                                      9
-                                    </th>
-                                    <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">
-                                      10
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {questions.map(question => {
-                                    return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
-                                  })}
-                                </tbody>
-                              </table>
+                        <>
+                          <dialog ref={teamEffectivenessDialogRef} className="team-effectiveness-dialog" role="dialog" aria-label="Team Assessment">
+                            <div className="header">
+                              <h2 className="title">Team Assessment</h2>
+                              <button type="button" onClick={hideTeamEffectivenessDialog} aria-label="Close">
+                                {getIconElement("close")}
+                              </button>
                             </div>
-                          </div>
-                          <div className="inner">
-                            <button type="button" className="button" onClick={saveTeamEffectivenessMeasurement}>
-                              Save
-                            </button>
-                            <button type="button" className="button default" onClick={() => teamEffectivenessDialogRef.current!.close()}>
-                              Cancel
-                            </button>
-                          </div>
-                        </dialog>
-                        <button
-                          className="team-assessment-button"
-                          onClick={showTeamEffectivenessDialog}
-                          title="Team Assessment"
-                          aria-label="Team Assessment"
-                          type="button"
-                        >
-                          {getIconElement("assessment")}
-                          <span className="hidden lg:inline">Team Assessment</span>
-                        </button>
-                      </>
-                    )}
-                    <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
-                      <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} />
-                      <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} />
-                      <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} />
-                      <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={clickWorkflowStateCallback} />
-                    </div>
-                    {state.currentBoard.activePhase === WorkflowPhase.Vote && (
-                      <div className="feedback-votes-count" role="status" aria-live="polite">
-                        <span className="entry" title={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
-                          {getIconElement("person")}
-                          <span className="hidden lg:inline">My Votes:</span> {state.currentVoteCount}/{state.currentBoard.maxVotesPerUser?.toString() || "0"}
-                        </span>
-                        {state.castedVoteCount > 0 && state.teamVoteCapacity > 0 && (
-                          <>
-                            <span className="separator" aria-hidden="true">
-                              |
-                            </span>
-                            <span className="entry" title={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`} aria-label={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`}>
-                              {getIconElement("people")}
-                              <span className="hidden lg:inline">Team Votes:</span> {state.castedVoteCount}/{state.teamVoteCapacity}
-                            </span>
-                          </>
-                        )}
+                            <div className="subText">
+                              <div className="ms-Dialog-inner">
+                                <div className="team-effectiveness-section-information">
+                                  {getIconElement("info")}
+                                  All answers will be saved anonymously
+                                </div>
+                                <table className="team-effectiveness-measurement-table">
+                                  <thead>
+                                    <tr>
+                                      <th scope="col" className="text-left">
+                                        Question
+                                      </th>
+                                      <th scope="col" className="text-left min-w-13">
+                                        Details
+                                      </th>
+                                      <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
+                                        Unfavorable
+                                      </th>
+                                      <th scope="colgroup" colSpan={2} className="team-effectiveness-favorability-label">
+                                        Neutral
+                                      </th>
+                                      <th scope="colgroup" colSpan={2} className="team-effectiveness-favorability-label">
+                                        Favorable
+                                      </th>
+                                    </tr>
+                                    <tr>
+                                      <th scope="col" className="text-left"></th>
+                                      <th scope="col" className="text-left"></th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-1">
+                                        1
+                                      </th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-2">
+                                        2
+                                      </th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-3">
+                                        3
+                                      </th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-4">
+                                        4
+                                      </th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-5">
+                                        5
+                                      </th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-unfavorable voting-index-6">
+                                        6
+                                      </th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-7">
+                                        7
+                                      </th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-neutral voting-index-8">
+                                        8
+                                      </th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-9">
+                                        9
+                                      </th>
+                                      <th scope="col" className="voting-measurement-index voting-measurement-index-favorable voting-index-10">
+                                        10
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {questions.map(question => {
+                                      return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                            <div className="inner">
+                              <button type="button" className="button" onClick={saveTeamEffectivenessMeasurement}>
+                                Save
+                              </button>
+                              <button type="button" className="button default" onClick={() => teamEffectivenessDialogRef.current!.close()}>
+                                Cancel
+                              </button>
+                            </div>
+                          </dialog>
+                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} title="Team Assessment" aria-label="Team Assessment" type="button">
+                            {getIconElement("assessment")}
+                            <span className="hidden lg:inline">Team Assessment</span>
+                          </button>
+                        </>
+                      )}
+                      <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
+                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} />
+                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} />
+                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} />
+                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={clickWorkflowStateCallback} />
                       </div>
-                    )}
-                    {state.currentBoard.activePhase === WorkflowPhase.Act && (
-                      <>
-                        <button className="focus-mode-button" onClick={showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
-                          {getIconElement("adjust")}
-                          <span>Focus Mode</span>
-                        </button>
-                        <dialog ref={carouselDialogRef} className="carousel-dialog" role="dialog" aria-label="Focus Mode">
-                          <div className="header">
-                            <h2 className="title">Focus Mode</h2>
-                            <button onClick={hideCarouselDialog} aria-label="Close">
-                              {getIconElement("close")}
-                            </button>
-                          </div>
-                          <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
-                          <div className="subText">{state.focusModeModel && <FeedbackCarousel focusModeModel={state.focusModeModel} isFocusModalHidden={false} />}</div>
-                        </dialog>
-                      </>
-                    )}
+                      {state.currentBoard.activePhase === WorkflowPhase.Vote && (
+                        <div className="feedback-votes-count" role="status" aria-live="polite">
+                          <span className="entry" title={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`} aria-label={`You have used ${state.currentVoteCount} of ${state.currentBoard.maxVotesPerUser?.toString() || "0"} votes`}>
+                            {getIconElement("person")}
+                            <span className="hidden lg:inline">My Votes:</span> {state.currentVoteCount}/{state.currentBoard.maxVotesPerUser?.toString() || "0"}
+                          </span>
+                          {state.castedVoteCount > 0 && state.teamVoteCapacity > 0 && (
+                            <>
+                              <span className="separator" aria-hidden="true">
+                                |
+                              </span>
+                              <span className="entry" title={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`} aria-label={`The team has used ${state.castedVoteCount} of ${state.teamVoteCapacity} votes`}>
+                                {getIconElement("people")}
+                                <span className="hidden lg:inline">Team Votes:</span> {state.castedVoteCount}/{state.teamVoteCapacity}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                      {state.currentBoard.activePhase === WorkflowPhase.Act && (
+                        <>
+                          <button className="focus-mode-button" onClick={showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
+                            {getIconElement("adjust")}
+                            <span>Focus Mode</span>
+                          </button>
+                          <dialog ref={carouselDialogRef} className="carousel-dialog" role="dialog" aria-label="Focus Mode">
+                            <div className="header">
+                              <h2 className="title">Focus Mode</h2>
+                              <button onClick={hideCarouselDialog} aria-label="Close">
+                                {getIconElement("close")}
+                              </button>
+                            </div>
+                            <div className="subText">Now is the time to focus! Discuss one feedback item at a time and create actionable work items.</div>
+                            <div className="subText">{state.focusModeModel && <FeedbackCarousel focusModeModel={state.focusModeModel} isFocusModalHidden={false} />}</div>
+                          </dialog>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
-            {state.activeTab === "History" && (
-              <>
-                <div className="mx-4 vertical-tab-separator" />
-                <button className="team-assessment-history-button" onClick={showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
-                  {getIconElement("insights")}
-                  <span className="hidden lg:inline">Team Assessment History</span>
-                </button>
-              </>
-            )}
-          </div>
+                </>
+              )}
+              {state.activeTab === "History" && (
+                <>
+                  <div className="mx-4 vertical-tab-separator" />
+                  <button className="team-assessment-history-button" onClick={showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
+                    {getIconElement("insights")}
+                    <span className="hidden lg:inline">Team Assessment History</span>
+                  </button>
+                </>
+              )}
+            </div>
           )}
           {state.currentBoard && state.activeTab === "History" && (
             <div className="flex-1 min-h-0 overflow-auto border-t-4 border-(--nav-header-active-item-background)">
@@ -2185,131 +2178,129 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         </dialog>
       )}
       <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label="Retrospective Board Summary" role="dialog">
-          <div className="header">
-            <h2 className="ms-Dialog-title">Retrospective Board Summary</h2>
-            <button type="button" onClick={hideRetroSummaryDialog} aria-label="Close">
-              {getIconElement("close")}
-            </button>
-          </div>
-          {state.currentBoard && (
-            <>
-              <section className="retro-summary-section">
-                <div className="retro-summary-section-header">Basic Settings</div>
-                <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(state.currentBoard.createdDate))}</div>
-                <div id="retro-summary-created-by">
-                  Created by <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
-                </div>
-              </section>
-              <section className="retro-summary-section">
-                <div className="retro-summary-section-header">Participant Summary</div>
-                <div className="retro-summary-section-item">Contributors: {state.contributors.length} participant(s)</div>
+        <div className="header">
+          <h2>Retrospective Board Summary</h2>
+          <button type="button" onClick={hideRetroSummaryDialog} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">
+          <section className="retro-summary-section">
+            <div className="retro-summary-section-header">Basic Settings</div>
+            <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(state.currentBoard.createdDate))}</div>
+            <div id="retro-summary-created-by">
+              Created by <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
+            </div>
+          </section>
+          <section className="retro-summary-section">
+            <div className="retro-summary-section-header">Participant Summary</div>
+            <div className="retro-summary-section-item">Contributors: {state.contributors.length} participant(s)</div>
 
-                {!state.currentBoard.isAnonymous && state.contributors.length > 0 && (
-                  <div className="retro-summary-contributors-section">
-                    {state.contributors.map(contributor => (
-                      <div key={contributor.id} className="retro-summary-contributor">
-                        <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
-                      </div>
-                    ))}
+            {!state.currentBoard.isAnonymous && state.contributors.length > 0 && (
+              <div className="retro-summary-contributors-section">
+                {state.contributors.map(contributor => (
+                  <div key={contributor.id} className="retro-summary-contributor">
+                    <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
                   </div>
-                )}
-                <div className="retro-summary-item-horizontal-group">
-                  <div className="retro-summary-section-item horizontal-group-item">
-                    {Object.keys(state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {state.castedVoteCount} vote(s)
-                  </div>
-                  <div className="retro-summary-section-item horizontal-group-item">{state.feedbackItems.length} feedback item(s) created</div>
-                  <div className="retro-summary-section-item horizontal-group-item">{state.actionItemIds.length} action item(s) created</div>
-                </div>
-              </section>
-              {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
-                <section className="retro-summary-section">
-                  <div className="retro-summary-section-header">Team Assessment</div>
-                  <div>
-                    Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
-                    <div className="retro-summary-effectiveness-scores">
-                      <ul className="chart">
-                        {state.effectivenessMeasurementChartData.map(data => {
-                          const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
-                          const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
-                          const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
-                          const redScore = (data.red * 100) / teamEffectivenessResponseCount;
-                          return (
-                            <li className="chart-question-block" key={data.questionId}>
-                              <div className="chart-question">
-                                <i className={getQuestionIconClassName(data.questionId)} /> &nbsp;
-                                {getQuestionShortName(data.questionId)}
-                              </div>
-                              {data.red > 0 && (
-                                <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
-                                  <span>{percentageFormatter(redScore)}</span>
-                                </div>
-                              )}
-                              {data.yellow > 0 && (
-                                <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
-                                  <span>{percentageFormatter(yellowScore)}</span>
-                                </div>
-                              )}
-                              {data.green > 0 && (
-                                <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
-                                  <span>{percentageFormatter(greenScore)}</span>
-                                </div>
-                              )}
-                              {averageScore > 0 && (
-                                <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${numberFormatter(averageScore)}`}>
-                                  {numberFormatter(averageScore)}
-                                </div>
-                              )}
-                              <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
-                                Discuss and Act
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      <div className="chart-legend-section">
-                        <div className="chart-legend-group">
-                          <section>
-                            <div className="chart-legend-color-unfavorable"></div>
-                            <span>Unfavorable</span>
-                          </section>
-                          <section>
-                            <div className="chart-legend-color-neutral"></div>
-                            <span>Neutral</span>
-                          </section>
-                          <section>
-                            <div className="chart-legend-color-favorable"></div>
-                            <span>Favorable</span>
-                          </section>
-                        </div>
-                      </div>
+                ))}
+              </div>
+            )}
+            <div className="retro-summary-item-horizontal-group">
+              <div className="retro-summary-section-item horizontal-group-item">
+                {Object.keys(state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {state.castedVoteCount} vote(s)
+              </div>
+              <div className="retro-summary-section-item horizontal-group-item">{state.feedbackItems.length} feedback item(s) created</div>
+              <div className="retro-summary-section-item horizontal-group-item">{state.actionItemIds.length} action item(s) created</div>
+            </div>
+          </section>
+          {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+            <section className="retro-summary-section">
+              <div className="retro-summary-section-header">Team Assessment</div>
+              <div>
+                Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
+                <div className="retro-summary-effectiveness-scores">
+                  <ul className="chart">
+                    {state.effectivenessMeasurementChartData.map(data => {
+                      const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
+                      const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
+                      const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
+                      const redScore = (data.red * 100) / teamEffectivenessResponseCount;
+                      return (
+                        <li className="chart-question-block" key={data.questionId}>
+                          <div className="chart-question">
+                            <i className={getQuestionIconClassName(data.questionId)} /> &nbsp;
+                            {getQuestionShortName(data.questionId)}
+                          </div>
+                          {data.red > 0 && (
+                            <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
+                              <span>{percentageFormatter(redScore)}</span>
+                            </div>
+                          )}
+                          {data.yellow > 0 && (
+                            <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
+                              <span>{percentageFormatter(yellowScore)}</span>
+                            </div>
+                          )}
+                          {data.green > 0 && (
+                            <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
+                              <span>{percentageFormatter(greenScore)}</span>
+                            </div>
+                          )}
+                          {averageScore > 0 && (
+                            <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${numberFormatter(averageScore)}`}>
+                              {numberFormatter(averageScore)}
+                            </div>
+                          )}
+                          <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
+                            Discuss and Act
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <div className="chart-legend-section">
+                    <div className="chart-legend-group">
+                      <section>
+                        <div className="chart-legend-color-unfavorable"></div>
+                        <span>Unfavorable</span>
+                      </section>
+                      <section>
+                        <div className="chart-legend-color-neutral"></div>
+                        <span>Neutral</span>
+                      </section>
+                      <section>
+                        <div className="chart-legend-color-favorable"></div>
+                        <span>Favorable</span>
+                      </section>
                     </div>
                   </div>
-                </section>
-              )}
-            </>
+                </div>
+              </div>
+            </section>
           )}
-        </dialog>
+        </div>
+      </dialog>
       <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog" aria-label="Team Assessment History" role="dialog">
-          <div className="header">
-            <h2 className="ms-Dialog-title">Team Assessment History</h2>
-            <button type="button" onClick={hideTeamAssessmentHistoryDialog} aria-label="Close">
-              {getIconElement("close")}
-            </button>
+        <div className="header">
+          <h2>Team Assessment History</h2>
+          <button type="button" onClick={hideTeamAssessmentHistoryDialog} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
+          <div className="team-assessment-no-data">
+            <p>No team assessment history available.</p>
+            <p>Create retrospectives with team assessments to see historical trends.</p>
           </div>
-          {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
-            <div className="team-assessment-no-data">
-              <p>No team assessment history available.</p>
-              <p>Create retrospectives with team assessments to see historical trends.</p>
-            </div>
-          ) : (
-            <>
-              <p className="team-assessment-info-text">
-                Showing average scores over time across {state.teamAssessmentHistoryData.slice(-13).length} retrospective{state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
-              </p>
-              <TeamAssessmentHistoryChart historyData={state.teamAssessmentHistoryData.slice(-13)} numberFormatter={numberFormatter} />
-            </>
-          )}
-        </dialog>
+        ) : (
+          <>
+            <p className="team-assessment-info-text">
+              Showing average scores over time across {state.teamAssessmentHistoryData.slice(-13).length} retrospective{state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
+            </p>
+            <TeamAssessmentHistoryChart historyData={state.teamAssessmentHistoryData.slice(-13)} numberFormatter={numberFormatter} />
+          </>
+        )}
+      </dialog>
       <ToastContainer className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
     </div>
   );
