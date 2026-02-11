@@ -1851,68 +1851,69 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       </div>
       <div className="flex items-center justify-start shrink-0">
         <div className="w-full">
-          <div className="flex items-center justify-start mt-2 ml-4 h-10">
-            <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
-              Board
-            </div>
-            <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
-              History
-            </div>
-            {state.activeTab === "Board" && state.currentBoard && (
-              <>
-                <div className="mx-4 vertical-tab-separator" />
-                <div className="flex items-center justify-start">
-                  <div className="board-selector">
-                    <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={changeSelectedBoard} title={"Retrospective Board"} />
+          {state.currentBoard && (
+            <div className="flex items-center justify-start mt-2 ml-4 h-10">
+              <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
+                Board
+              </div>
+              <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
+                History
+              </div>
+              {state.activeTab === "Board" && (
+                <>
+                  <div className="mx-4 vertical-tab-separator" />
+                  <div className="flex items-center justify-start">
+                    <div className="board-selector">
+                      <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={changeSelectedBoard} title={"Retrospective Board"} />
+                    </div>
+                    <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
+                      <details className="flex items-center relative">
+                        <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
+                          {getIconElement("more-horizontal")}
+                        </summary>
+                        <div className="callout-menu left" role="menu" aria-label="Board Actions">
+                          <button key="createBoard" type="button" title="Create new retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
+                            {getIconElement("add")}
+                            Create new retrospective
+                          </button>
+                          <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
+                            {getIconElement("content-copy")}
+                            Create copy of retrospective
+                          </button>
+                          <button key="editBoard" type="button" title="Edit retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
+                            {getIconElement("edit")}
+                            Edit retrospective
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
+                            {getIconElement("link")}
+                            {`Copy link to ${state.currentBoard.activePhase} phase`}
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="exportCSV" type="button" title="Export CSV content" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
+                            {getIconElement("sim-card-download")}
+                            Export CSV content
+                          </button>
+                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
+                            {getIconElement("forward-to-inbox")}
+                            Create email summary
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
+                            {getIconElement("source")}
+                            Show retrospective summary
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
+                            {getIconElement("inventory")}
+                            Archive retrospective
+                          </button>
+                        </div>
+                      </details>
+                    </div>
                   </div>
-                  <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
-                    <details className="flex items-center relative">
-                      <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
-                        {getIconElement("more-horizontal")}
-                      </summary>
-                      <div className="callout-menu left" role="menu" aria-label="Board Actions">
-                        <button key="createBoard" type="button" title="Create new retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
-                          {getIconElement("add")}
-                          Create new retrospective
-                        </button>
-                        <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
-                          {getIconElement("content-copy")}
-                          Create copy of retrospective
-                        </button>
-                        <button key="editBoard" type="button" title="Edit retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
-                          {getIconElement("edit")}
-                          Edit retrospective
-                        </button>
-                        <div key="seperator" className="divider" role="separator" />
-                        <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
-                          {getIconElement("link")}
-                          {`Copy link to ${state.currentBoard.activePhase} phase`}
-                        </button>
-                        <div key="seperator" className="divider" role="separator" />
-                        <button key="exportCSV" type="button" title="Export CSV content" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
-                          {getIconElement("sim-card-download")}
-                          Export CSV content
-                        </button>
-                        <button key="emailPreview" type="button" title="Create email summary" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
-                          {getIconElement("forward-to-inbox")}
-                          Create email summary
-                        </button>
-                        <div key="seperator" className="divider" role="separator" />
-                        <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
-                          {getIconElement("source")}
-                          Show retrospective summary
-                        </button>
-                        <div key="seperator" className="divider" role="separator" />
-                        <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
-                          {getIconElement("inventory")}
-                          Archive retrospective
-                        </button>
-                      </div>
-                    </details>
-                  </div>
-                </div>
-                <div className="flex items-center justify-start">
-                  <div className="flex flex-row items-center workflow-stage-header 3">
+                  <div className="flex items-center justify-start">
+                    <div className="flex flex-row items-center workflow-stage-header 3">
                     {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                       <>
                         <Dialog
@@ -2083,21 +2084,20 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               </>
             )}
           </div>
-          {state.activeTab === "History" && (
+          )}
+          {state.currentBoard && state.activeTab === "History" && (
             <div className="flex-1 min-h-0 overflow-auto border-t-4 border-(--nav-header-active-item-background)">
               <BoardSummaryTable teamId={state.currentTeam.id} currentUserId={state.currentUserId} currentUserIsTeamAdmin={isCurrentUserTeamAdmin()} supportedWorkItemTypes={state.allWorkItemTypes} onArchiveToggle={handleArchiveToggle} />
             </div>
           )}
-          {state.activeTab === "Board" && !state.currentBoard && (
-            <>
-              <div className="no-boards-container">
-                <div className="no-boards-text">Get started with your first Retrospective</div>
-                <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
-                <button title="Create Board" onClick={showBoardCreationDialog} className="create-new-board-button">
-                  Create Board
-                </button>
-              </div>
-            </>
+          {!state.currentBoard && (
+            <div className="no-boards-container">
+              <div className="no-boards-text">Get started with your first Retrospective</div>
+              <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
+              <button title="Create Board" onClick={showBoardCreationDialog} className="create-new-board-button">
+                Create Board
+              </button>
+            </div>
           )}
           {state.activeTab === "Board" && state.currentBoard && (
             <div className="feedback-board-container">
