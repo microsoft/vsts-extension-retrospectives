@@ -168,7 +168,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));
     fireEvent.click(screen.getByText("Open Retrospective Wiki"));
-    expect(windowOpenSpy).toHaveBeenCalledWith("https://retrospectivewiki.com", "_blank");
+    expect(windowOpenSpy).toHaveBeenCalledWith("https://retrospectivewiki.org", "_blank");
   });
 
   it("opens What's New dialog", async () => {

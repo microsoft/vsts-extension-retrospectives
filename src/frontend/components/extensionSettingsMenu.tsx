@@ -268,7 +268,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         <strong className="subText">&apos;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&apos;</strong>
         <em className="subText">--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
         <div className="inner">
-          <button className="button" onClick={() => window.open("https://retrospectivewiki.com", "_blank")}>
+          <button className="button" onClick={() => window.open("https://retrospectivewiki.org", "_blank")}>
             Open Retrospective Wiki
           </button>
           <button className="default button" onClick={() => primeDirectiveDialogRef.current!.close()}>
