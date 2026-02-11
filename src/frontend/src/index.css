@@ -1179,7 +1179,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-contributors-section .retro-summary-contributor {
-  @apply rounded-[10px] p-3 w-fit bg-(--border-subtle-color) mr-2.5 mb-2.5;
+  @apply rounded-lg p-3 w-fit bg-(--border-subtle-color) mr-2.5 mb-2.5;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-section .retro-summary-contributors-section .retro-summary-contributor:last-child {
@@ -1187,7 +1187,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-retro-summary-dialog img.avatar {
-  @apply h-[1.8em] rounded-full align-middle -mt-1.5 inline;
+  @apply h-6 rounded-full align-middle -mt-1.5 inline;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores {
@@ -1246,7 +1246,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section {
-  @apply flex items-center justify-center flex-col rounded-[3px] border-2 border-(--border-subtle-color) p-2.5 w-fit mb-2.5;
+  @apply flex items-center justify-center flex-col rounded-sm border-2 border-(--border-subtle-color) p-2.5 w-fit mb-2.5;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section .favorability-header {
@@ -1317,7 +1317,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-form-section-header {
-    @apply py-1 px-2.5 text-[1.1em] font-medium m-0 bg-primary text-right text-(--text-primary-color);
+    @apply py-1 px-2.5 font-medium m-0 bg-primary text-right text-(--text-primary-color);
 
     &.bottom-padding-zero {
       @apply pb-0;
@@ -1329,7 +1329,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-form-section-subheader {
-    @apply text-[1em] font-semibold w-full flex items-center m-[0.2em] text-(--text-primary-color);
+    @apply font-semibold w-full flex items-center m-1 text-(--text-primary-color);
 
     & label {
       @apply flex-1 text-start;
