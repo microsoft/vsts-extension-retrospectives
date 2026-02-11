@@ -1732,21 +1732,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>;
   }
 
-  if (!state.currentBoard) {
-    return (
-      <>
-        <div className="no-boards-container">
-          <div className="no-boards-text">Get started with your first Retrospective</div>
-          <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
-          <button title="Create Board" onClick={showBoardCreationDialog} className="create-new-board-button">
-            Create Board
-          </button>
-        </div>
-        {renderBoardUpdateMetadataFormDialog(true, false, state.isBoardCreationDialogHidden, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
-      </>
-    );
-  }
-
   const teamSelectorList: ISelectorList<WebApiTeam> = {
     selectorListItems: [
       {
@@ -1754,9 +1739,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         header: { id: "My Teams", title: "My Teams" },
         items: state.userTeams,
       },
-      // Removed All Teams
-      // Retrospectives should be safe space for team members to share feedback.
-      // Therefore, should not have access to other teams's retrospective boards.
     ],
   };
 
@@ -1822,38 +1804,40 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   return (
     <div className="flex flex-col h-screen" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <div className="flex items-center shrink-0 mt-2 ml-4">
-        <Dialog
-          hidden={state.questionIdForDiscussAndActBoardUpdate === -1}
-          onDismiss={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
-          dialogContentProps={{
-            type: DialogType.close,
-            title: "Discuss and Act",
-            subText: `Are you sure you want to change the template of this board?`,
-          }}
-          modalProps={{
-            isBlocking: true,
-            containerClassName: "retrospectives-delete-feedback-item-dialog",
-            className: "retrospectives-dialog-modal",
-          }}
-        >
-          <DialogFooter>
-            <PrimaryButton
-              onClick={async () => {
-                const question = questions.filter(question => question.id === state.questionIdForDiscussAndActBoardUpdate)[0];
-                const templateName = question.discussActTemplate;
-                const columns = getColumnsByTemplateId(templateName);
+        {state.currentBoard && (
+          <Dialog
+            hidden={state.questionIdForDiscussAndActBoardUpdate === -1}
+            onDismiss={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })}
+            dialogContentProps={{
+              type: DialogType.close,
+              title: "Discuss and Act",
+              subText: `Are you sure you want to change the template of this board?`,
+            }}
+            modalProps={{
+              isBlocking: true,
+              containerClassName: "retrospectives-delete-feedback-item-dialog",
+              className: "retrospectives-dialog-modal",
+            }}
+          >
+            <DialogFooter>
+              <PrimaryButton
+                onClick={async () => {
+                  const question = questions.filter(question => question.id === state.questionIdForDiscussAndActBoardUpdate)[0];
+                  const templateName = question.discussActTemplate;
+                  const columns = getColumnsByTemplateId(templateName);
 
-                const board = state.currentBoard;
+                  const board = state.currentBoard;
 
-                await updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
+                  await updateBoardMetadata(board.title, board.maxVotesPerUser, columns, board.isIncludeTeamEffectivenessMeasurement, board.shouldShowFeedbackAfterCollect, board.isAnonymous, board.permissions);
 
-                setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
-              }}
-              text="Proceed"
-            />
-            <DefaultButton onClick={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
-          </DialogFooter>
-        </Dialog>
+                  setState({ questionIdForDiscussAndActBoardUpdate: -1, isRetroSummaryDialogHidden: true });
+                }}
+                text="Proceed"
+              />
+              <DefaultButton onClick={() => setState({ questionIdForDiscussAndActBoardUpdate: -1 })} text="Cancel" />
+            </DialogFooter>
+          </Dialog>
+        )}
 
         <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
           Retrospectives
@@ -1867,68 +1851,69 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       </div>
       <div className="flex items-center justify-start shrink-0">
         <div className="w-full">
-          <div className="flex items-center justify-start mt-2 ml-4 h-10">
-            <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
-              Board
-            </div>
-            <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
-              History
-            </div>
-            {state.activeTab === "Board" && (
-              <>
-                <div className="mx-4 vertical-tab-separator" />
-                <div className="flex items-center justify-start">
-                  <div className="board-selector">
-                    <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={changeSelectedBoard} title={"Retrospective Board"} />
+          {state.currentBoard && (
+            <div className="flex items-center justify-start mt-2 ml-4 h-10">
+              <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
+                Board
+              </div>
+              <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
+                History
+              </div>
+              {state.activeTab === "Board" && (
+                <>
+                  <div className="mx-4 vertical-tab-separator" />
+                  <div className="flex items-center justify-start">
+                    <div className="board-selector">
+                      <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={changeSelectedBoard} title={"Retrospective Board"} />
+                    </div>
+                    <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
+                      <details className="flex items-center relative">
+                        <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
+                          {getIconElement("more-horizontal")}
+                        </summary>
+                        <div className="callout-menu left" role="menu" aria-label="Board Actions">
+                          <button key="createBoard" type="button" title="Create new retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
+                            {getIconElement("add")}
+                            Create new retrospective
+                          </button>
+                          <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
+                            {getIconElement("content-copy")}
+                            Create copy of retrospective
+                          </button>
+                          <button key="editBoard" type="button" title="Edit retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
+                            {getIconElement("edit")}
+                            Edit retrospective
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
+                            {getIconElement("link")}
+                            {`Copy link to ${state.currentBoard.activePhase} phase`}
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="exportCSV" type="button" title="Export CSV content" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
+                            {getIconElement("sim-card-download")}
+                            Export CSV content
+                          </button>
+                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
+                            {getIconElement("forward-to-inbox")}
+                            Create email summary
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
+                            {getIconElement("source")}
+                            Show retrospective summary
+                          </button>
+                          <div key="seperator" className="divider" role="separator" />
+                          <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
+                            {getIconElement("inventory")}
+                            Archive retrospective
+                          </button>
+                        </div>
+                      </details>
+                    </div>
                   </div>
-                  <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
-                    <details className="flex items-center relative">
-                      <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
-                        {getIconElement("more-horizontal")}
-                      </summary>
-                      <div className="callout-menu left" role="menu" aria-label="Board Actions">
-                        <button key="createBoard" type="button" title="Create new retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
-                          {getIconElement("add")}
-                          Create new retrospective
-                        </button>
-                        <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
-                          {getIconElement("content-copy")}
-                          Create copy of retrospective
-                        </button>
-                        <button key="editBoard" type="button" title="Edit retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
-                          {getIconElement("edit")}
-                          Edit retrospective
-                        </button>
-                        <div key="seperator" className="divider" role="separator" />
-                        <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
-                          {getIconElement("link")}
-                          {`Copy link to ${state.currentBoard.activePhase} phase`}
-                        </button>
-                        <div key="seperator" className="divider" role="separator" />
-                        <button key="exportCSV" type="button" title="Export CSV content" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
-                          {getIconElement("sim-card-download")}
-                          Export CSV content
-                        </button>
-                        <button key="emailPreview" type="button" title="Create email summary" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
-                          {getIconElement("forward-to-inbox")}
-                          Create email summary
-                        </button>
-                        <div key="seperator" className="divider" role="separator" />
-                        <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
-                          {getIconElement("source")}
-                          Show retrospective summary
-                        </button>
-                        <div key="seperator" className="divider" role="separator" />
-                        <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
-                          {getIconElement("inventory")}
-                          Archive retrospective
-                        </button>
-                      </div>
-                    </details>
-                  </div>
-                </div>
-                <div className="flex items-center justify-start">
-                  <div className="flex flex-row items-center workflow-stage-header 3">
+                  <div className="flex items-center justify-start">
+                    <div className="flex flex-row items-center workflow-stage-header 3">
                     {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                       <>
                         <Dialog
@@ -2099,12 +2084,22 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               </>
             )}
           </div>
-          {state.activeTab === "History" && (
+          )}
+          {state.currentBoard && state.activeTab === "History" && (
             <div className="flex-1 min-h-0 overflow-auto border-t-4 border-(--nav-header-active-item-background)">
               <BoardSummaryTable teamId={state.currentTeam.id} currentUserId={state.currentUserId} currentUserIsTeamAdmin={isCurrentUserTeamAdmin()} supportedWorkItemTypes={state.allWorkItemTypes} onArchiveToggle={handleArchiveToggle} />
             </div>
           )}
-          {state.activeTab === "Board" && (
+          {!state.currentBoard && (
+            <div className="no-boards-container">
+              <div className="no-boards-text">Get started with your first Retrospective</div>
+              <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
+              <button title="Create Board" onClick={showBoardCreationDialog} className="create-new-board-button">
+                Create Board
+              </button>
+            </div>
+          )}
+          {state.activeTab === "Board" && state.currentBoard && (
             <div className="feedback-board-container">
               {state.currentTeam && state.currentBoard && (
                 <>
@@ -2171,52 +2166,56 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           )}
         </div>
       </div>
-      <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={archiveBoardDialogRef} onClose={() => archiveBoardDialogRef.current?.close()}>
-        <div className="header">
-          <h2 className="title">Archive Retrospective</h2>
-          <button onClick={() => archiveBoardDialogRef.current?.close()} aria-label="Close">
-            {getIconElement("close")}
-          </button>
-        </div>
-        <div className="subText">
-          The retrospective board <strong>{state.currentBoard.title}</strong> with its feedback will be archived.
-        </div>
-        <div className="subText">
-          <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-        </div>
-        <div className="inner">
-          <button className="button" onClick={() => archiveCurrentBoard()}>
-            Archive
-          </button>
-          <button className="default button" onClick={() => archiveBoardDialogRef.current?.close()}>
-            Cancel
-          </button>
-        </div>
-      </dialog>
+      {state.currentBoard && (
+        <dialog className="archive-board-dialog" aria-label="Archive Retrospective" ref={archiveBoardDialogRef} onClose={() => archiveBoardDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Archive Retrospective</h2>
+            <button onClick={() => archiveBoardDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">
+            The retrospective board <strong>{state.currentBoard.title}</strong> with its feedback will be archived.
+          </div>
+          <div className="subText">
+            <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
+          </div>
+          <div className="inner">
+            <button className="button" onClick={() => archiveCurrentBoard()}>
+              Archive
+            </button>
+            <button className="default button" onClick={() => archiveBoardDialogRef.current?.close()}>
+              Cancel
+            </button>
+          </div>
+        </dialog>
+      )}
       {renderBoardUpdateMetadataFormDialog(true, false, state.isBoardCreationDialogHidden, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
       {renderBoardUpdateMetadataFormDialog(true, true, state.isBoardDuplicateDialogHidden, hideBoardDuplicateDialog, "Create copy of retrospective", "", createBoard, hideBoardDuplicateDialog)}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(false, false, state.isBoardUpdateDialogHidden, hideBoardUpdateDialog, "Edit retrospective", "", updateBoardMetadata, hideBoardUpdateDialog)}
-      <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" onClose={() => previewEmailDialogRef.current?.close()}>
-        <div className="header">
-          <h2 className="title">Email summary</h2>
-          <button onClick={() => previewEmailDialogRef.current?.close()} aria-label="Close">
-            {getIconElement("close")}
-          </button>
-        </div>
-        <div className="subText">
-          <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={state.currentBoard.emailContent}></textarea>
-        </div>
-        <div className="inner">
-          <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={showEmailCopiedToast}>
-            {getIconElement("content-copy")}
-            Copy to clipboard
-          </button>
-          <button title="Download PDF" aria-label="Download email summary as PDF" onClick={downloadEmailSummaryPdf} className="default button">
-            {getIconElement("sim-card-download")}
-            Download PDF
-          </button>
-        </div>
-      </dialog>
+      {state.currentBoard && (
+        <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" onClose={() => previewEmailDialogRef.current?.close()}>
+          <div className="header">
+            <h2 className="title">Email summary</h2>
+            <button onClick={() => previewEmailDialogRef.current?.close()} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">
+            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={state.currentBoard.emailContent}></textarea>
+          </div>
+          <div className="inner">
+            <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={showEmailCopiedToast}>
+              {getIconElement("content-copy")}
+              Copy to clipboard
+            </button>
+            <button title="Download PDF" aria-label="Download email summary as PDF" onClick={downloadEmailSummaryPdf} className="default button">
+              {getIconElement("sim-card-download")}
+              Download PDF
+            </button>
+          </div>
+        </dialog>
+      )}
       <Dialog
         hidden={state.isRetroSummaryDialogHidden}
         onDismiss={hideRetroSummaryDialog}
