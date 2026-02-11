@@ -2278,17 +2278,17 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                             </div>
                             {data.red > 0 && (
                               <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
-                                {percentageFormatter(redScore)}
+                                <span>{percentageFormatter(redScore)}</span>
                               </div>
                             )}
                             {data.yellow > 0 && (
                               <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
-                                {percentageFormatter(yellowScore)}
+                                <span>{percentageFormatter(yellowScore)}</span>
                               </div>
                             )}
                             {data.green > 0 && (
                               <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
-                                {percentageFormatter(greenScore)}
+                                <span>{percentageFormatter(greenScore)}</span>
                               </div>
                             )}
                             {averageScore > 0 && (

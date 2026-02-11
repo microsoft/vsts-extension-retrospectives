@@ -1207,7 +1207,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .team-effectiveness-average-number {
-  @apply p-3 font-bold my-auto mx-0.5 w-7 text-center;
+  @apply p-1 font-bold my-auto mx-0.5 w-7 text-center;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .assessment-chart-action {
