@@ -133,21 +133,17 @@ describe("FeedbackItemGroup", () => {
 
     const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
 
-    const groupDiv = container.querySelector(".feedback-item-group");
-    const dropEvent = new Event("drop", { bubbles: true });
+    const groupDiv = container.querySelector(".feedback-item-group") as Element;
     const mockDataTransfer = { getData: jest.fn() };
-    Object.defineProperty(dropEvent, "dataTransfer", {
-      value: mockDataTransfer,
-      writable: true,
-    });
 
-    const stopPropagationSpy = jest.spyOn(dropEvent, "stopPropagation");
+    const stopPropagationSpy = jest.spyOn(Event.prototype, "stopPropagation");
 
-    groupDiv?.dispatchEvent(dropEvent);
+    fireEvent.drop(groupDiv, { dataTransfer: mockDataTransfer });
 
     expect(mockGetIdValue).toHaveBeenCalled();
     expect(mockHandleDrop).toHaveBeenCalledWith(mockMainItem, "dragged-item-id", "main-item-1");
     expect(stopPropagationSpy).toHaveBeenCalled();
+    stopPropagationSpy.mockRestore();
   });
 
   it("should use dataTransfer id when dropping", () => {
@@ -159,17 +155,47 @@ describe("FeedbackItemGroup", () => {
 
     const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
 
-    const groupDiv = container.querySelector(".feedback-item-group");
-    const dropEvent = new Event("drop", { bubbles: true });
+    const groupDiv = container.querySelector(".feedback-item-group") as Element;
     const mockDataTransfer = { getData: jest.fn().mockReturnValue("dropped-from-data-transfer") };
-    Object.defineProperty(dropEvent, "dataTransfer", {
-      value: mockDataTransfer,
-      writable: true,
-    });
 
-    groupDiv?.dispatchEvent(dropEvent);
+    fireEvent.drop(groupDiv, { dataTransfer: mockDataTransfer });
 
     expect(mockHandleDrop).toHaveBeenCalledWith(mockMainItem, "dropped-from-data-transfer", "main-item-1");
+  });
+
+  it("should fall back to dataTransfer text when text/plain is empty", () => {
+    const mockGetIdValue = localStorageHelper.getIdValue as jest.Mock;
+    mockGetIdValue.mockReturnValue("fallback-id");
+
+    const FeedbackItemHelper = jest.requireMock("../feedbackItem").FeedbackItemHelper;
+    const mockHandleDrop = FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem;
+
+    const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group") as Element;
+    const mockDataTransfer = {
+      getData: jest.fn((type: string) => (type === "text/plain" ? "" : "dropped-from-text")),
+    };
+
+    fireEvent.drop(groupDiv, { dataTransfer: mockDataTransfer });
+
+    expect(mockHandleDrop).toHaveBeenCalledWith(mockMainItem, "dropped-from-text", "main-item-1");
+  });
+
+  it("should fall back to localStorage when dataTransfer is missing", () => {
+    const mockGetIdValue = localStorageHelper.getIdValue as jest.Mock;
+    mockGetIdValue.mockReturnValue("storage-id");
+
+    const FeedbackItemHelper = jest.requireMock("../feedbackItem").FeedbackItemHelper;
+    const mockHandleDrop = FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem;
+
+    const { container } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+
+    const groupDiv = container.querySelector(".feedback-item-group") as Element;
+
+    fireEvent.drop(groupDiv);
+
+    expect(mockHandleDrop).toHaveBeenCalledWith(mockMainItem, "storage-id", "main-item-1");
   });
 
   it("should handle Space key press without crashing", () => {
