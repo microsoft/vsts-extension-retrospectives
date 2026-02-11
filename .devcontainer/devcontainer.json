@@ -14,12 +14,13 @@
     "vscode": {
       "extensions": [
         "bradlc.vscode-tailwindcss",
-        "ms-dotnettools.csharp",
-        "ms-dotnettools.csdevkit",
-        "ms-azuretools.vscode-docker",
-        "vscode-icons-team.vscode-icons",
+        "davidanson.vscode-markdownlint",
         "editorconfig.editorconfig",
-        "davidanson.vscode-markdownlint"
+        "GitHub.copilot-chat",
+        "ms-azuretools.vscode-docker",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "vscode-icons-team.vscode-icons"
       ]
     }
   }
