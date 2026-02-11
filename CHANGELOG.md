@@ -2,6 +2,11 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.50
+
+* Responsive board layout to view multiple cards per column. From [GitHub PR #1548](https://github.com/microsoft/vsts-extension-retrospectives/pull/1548)
+* Boards do not display team dropdown when default team in list never had retrospective. From [GitHub PR #1550](https://github.com/microsoft/vsts-extension-retrospectives/pull/1550)
+
 ## v1.92.49
 
 * Fixing regression issues. From [GitHub PR #1545](https://github.com/microsoft/vsts-extension-retrospectives/pull/1545)

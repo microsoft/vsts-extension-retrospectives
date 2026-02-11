@@ -421,12 +421,6 @@ describe("FeedbackBoardContainer additional coverage", () => {
         isLiveSyncInTfsIssueMessageBarVisible: true,
         isDropIssueInEdgeMessageBarVisible: true,
         isIncludeTeamEffectivenessMeasurementDialogHidden: false,
-        isArchiveBoardConfirmationDialogHidden: false,
-        isBoardCreationDialogHidden: false,
-        isBoardDuplicateDialogHidden: false,
-        isBoardUpdateDialogHidden: false,
-        isRetroSummaryDialogHidden: false,
-        isTeamAssessmentHistoryDialogHidden: false,
         effectivenessMeasurementChartData: [{ questionId: 1, red: 1, yellow: 0, green: 0 }],
         effectivenessMeasurementSummary: [{ questionId: 1, question: "Q1", average: 10 }],
         contributors: [{ id: "u1", name: "User 1", imageUrl: "" }],
@@ -2179,39 +2173,48 @@ describe("FeedbackBoardContainer - Board operations", () => {
 
   it("should show and hide board creation dialog", () => {
     const instance = createStandaloneTimerInstance();
+    const showModal = jest.fn();
+    const close = jest.fn();
+    (instance as any).boardCreationDialogRef.current = { showModal, close } as any;
 
     (instance as any).showBoardCreationDialog();
-    expect(instance.state.isBoardCreationDialogHidden).toBe(false);
+    expect(showModal).toHaveBeenCalled();
 
     (instance as any).hideBoardCreationDialog();
-    expect(instance.state.isBoardCreationDialogHidden).toBe(true);
+    expect(close).toHaveBeenCalled();
   });
 
   it("should show and hide board update dialog", () => {
     const instance = createStandaloneTimerInstance();
+    const showModal = jest.fn();
+    const close = jest.fn();
+    (instance as any).boardUpdateDialogRef.current = { showModal, close } as any;
 
     (instance as any).showBoardUpdateDialog();
-    expect(instance.state.isBoardUpdateDialogHidden).toBe(false);
+    expect(showModal).toHaveBeenCalled();
 
     (instance as any).hideBoardUpdateDialog();
-    expect(instance.state.isBoardUpdateDialogHidden).toBe(true);
+    expect(close).toHaveBeenCalled();
   });
 
   it("should show and hide board duplicate dialog", () => {
     const instance = createStandaloneTimerInstance();
+    const showModal = jest.fn();
+    const close = jest.fn();
+    (instance as any).boardDuplicateDialogRef.current = { showModal, close } as any;
 
     (instance as any).showBoardDuplicateDialog();
-    expect(instance.state.isBoardDuplicateDialogHidden).toBe(false);
+    expect(showModal).toHaveBeenCalled();
 
     (instance as any).hideBoardDuplicateDialog();
-    expect(instance.state.isBoardDuplicateDialogHidden).toBe(true);
+    expect(close).toHaveBeenCalled();
   });
 
   it("should show and hide archive confirmation dialog", () => {
     const instance = createStandaloneTimerInstance();
 
     const showModal = jest.fn();
-    (instance as any).archiveBoardDialogRef = { current: { showModal } };
+    (instance as any).archiveBoardDialogRef.current = { showModal } as any;
 
     (instance as any).showArchiveBoardConfirmationDialog();
     expect(showModal).toHaveBeenCalledTimes(1);
@@ -2291,11 +2294,11 @@ describe("FeedbackBoardContainer - Team and Board selection", () => {
 describe("FeedbackBoardContainer - Team Assessment History", () => {
   it("should show and hide team assessment history dialog", () => {
     const instance = createStandaloneTimerInstance();
-
-    expect(instance.state.isTeamAssessmentHistoryDialogHidden).toBe(true);
+    const close = jest.fn();
+    (instance as any).teamAssessmentHistoryDialogRef.current = { close } as any;
 
     (instance as any).hideTeamAssessmentHistoryDialog();
-    expect(instance.state.isTeamAssessmentHistoryDialogHidden).toBe(true);
+    expect(close).toHaveBeenCalled();
   });
 
   it("should fetch and process team assessment history data", async () => {
@@ -2360,7 +2363,6 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 
     await (instance as any).showTeamAssessmentHistoryDialog();
 
-    expect(instance.state.isTeamAssessmentHistoryDialogHidden).toBe(false);
     expect(instance.state.teamAssessmentHistoryData).toHaveLength(2);
     expect(instance.state.teamAssessmentHistoryData[0].boardTitle).toBe("Retro 1");
     expect(instance.state.teamAssessmentHistoryData[1].boardTitle).toBe("Retro 2");
@@ -2513,7 +2515,6 @@ describe("FeedbackBoardContainer - Team Assessment History", () => {
 
     await (instance as any).showTeamAssessmentHistoryDialog();
 
-    expect(instance.state.isTeamAssessmentHistoryDialogHidden).toBe(false);
     expect(instance.state.teamAssessmentHistoryData).toHaveLength(0);
   });
 
@@ -2655,7 +2656,6 @@ describe("FeedbackBoardContainer - Retro Summary Dialog", () => {
 
     await (instance as any).showRetroSummaryDialog();
 
-    expect(instance.state.isRetroSummaryDialogHidden).toBe(false);
     expect(instance.state.effectivenessMeasurementSummary.length).toBeGreaterThan(0);
     expect(instance.state.effectivenessMeasurementChartData.length).toBeGreaterThan(0);
 
@@ -2702,16 +2702,16 @@ describe("FeedbackBoardContainer - Retro Summary Dialog", () => {
 
     await (instance as any).showRetroSummaryDialog();
 
-    expect(instance.state.isRetroSummaryDialogHidden).toBe(false);
     expect(instance.state.effectivenessMeasurementSummary).toEqual([]);
   });
 
   it("should hide retro summary dialog", () => {
     const instance = createStandaloneTimerInstance();
+    const close = jest.fn();
+    (instance as any).retroSummaryDialogRef.current = { close } as any;
 
-    instance.setState({ isRetroSummaryDialogHidden: false });
     (instance as any).hideRetroSummaryDialog();
-    expect(instance.state.isRetroSummaryDialogHidden).toBe(true);
+    expect(close).toHaveBeenCalled();
   });
 });
 
@@ -2734,13 +2734,16 @@ describe("FeedbackBoardContainer - Utility Methods", () => {
 
   it("should show and hide carousel dialog", () => {
     const instance = createStandaloneTimerInstance();
+    const showModal = jest.fn();
+    const close = jest.fn();
+    (instance as any).carouselDialogRef.current = { showModal, close } as any;
 
     (instance as any).showCarouselDialog();
-    expect(instance.state.isCarouselDialogHidden).toBe(false);
+    expect(showModal).toHaveBeenCalled();
     expect(appInsights.trackEvent).toHaveBeenCalledWith({ name: TelemetryEvents.FeedbackItemCarouselLaunched });
 
     (instance as any).hideCarouselDialog();
-    expect(instance.state.isCarouselDialogHidden).toBe(true);
+    expect(close).toHaveBeenCalled();
   });
 
   it("should hide live sync issue message bar", () => {
@@ -2857,11 +2860,10 @@ describe("FeedbackBoardContainer - Board Management", () => {
       currentTeam: team,
       currentBoard: board,
       boards: [board],
-      isArchiveBoardConfirmationDialogHidden: false,
     });
 
     const close = jest.fn();
-    (instance as any).archiveBoardDialogRef = { current: { close } };
+    (instance as any).archiveBoardDialogRef.current = { close } as any;
 
     const BoardDataService = require("../../dal/boardDataService").default;
     jest.spyOn(BoardDataService, "archiveFeedbackBoard").mockResolvedValue(undefined);

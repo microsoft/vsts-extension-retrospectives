@@ -1226,7 +1226,7 @@ describe("FeedbackBoardMetadataForm - Targeted Coverage (uncovered lines)", () =
     const changeIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
     await user.click(changeIconButtons[0]);
 
-    const dialog = container.querySelector("dialog.retrospectives-choose-column-icon-dialog") as HTMLDialogElement | null;
+    const dialog = container.querySelector("dialog.choose-column-icon-dialog") as HTMLDialogElement | null;
     expect(dialog).toBeInTheDocument();
 
     const innerCloseButton = dialog?.querySelector(".inner button") as HTMLButtonElement | null;
@@ -1237,7 +1237,7 @@ describe("FeedbackBoardMetadataForm - Targeted Coverage (uncovered lines)", () =
     }
 
     await waitFor(() => {
-      expect(container.querySelector("dialog.retrospectives-choose-column-icon-dialog")).not.toBeInTheDocument();
+      expect(container.querySelector("dialog.choose-column-icon-dialog")).not.toBeInTheDocument();
     });
   });
 });
