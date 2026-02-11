@@ -261,10 +261,18 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const prevActiveTabRef = React.useRef<FeedbackBoardContainerState["activeTab"]>(initialState.activeTab);
   const prevIsCarouselDialogHiddenRef = React.useRef<boolean>(initialState.isCarouselDialogHidden);
 
+  const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
+
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const boardMetaDataDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const discussAndActDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const teamEffectivenessDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const retroSummaryDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const teamAssessmentHistoryDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const boardCreationDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const boardDuplicateDialogRef = React.useRef<HTMLDialogElement | null>(null);
 
   const setState: FeedbackBoardContainerHandle["setState"] = React.useCallback((updater, callback) => {
     const currentState = stateRef.current;
@@ -1565,15 +1573,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       });
     }
 
-    if (hidden) {
-      return null;
-    }
-
     return (
-      <dialog className="board-metadata-dialog" aria-label={dialogTitle} open onCancel={event => {
-        event.preventDefault();
-        onDismiss();
-      }}>
+      <dialog className="board-metadata-dialog" ref={boardMetaDataDialogRef} role="dialog" aria-label={dialogTitle}>
         <div className="header">
           <h2 className="ms-Dialog-title">{dialogTitle}</h2>
           <button type="button" onClick={onDismiss} aria-label="Close">
