@@ -283,12 +283,11 @@ describe("FeedbackItemGroup", () => {
   it("should not prevent dragover when item is being dragged from this group", () => {
     const { container, getByTestId } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
 
-    // Simulate that the group is being dragged
     const groupDiv = container.querySelector(".feedback-item-group");
 
-    // First we need to set isBeingDragged to true somehow
-    // This would normally happen through setIsGroupBeingDragged callback
-    // Let's trigger a drag event to set the state
+    // Mark group as being dragged via captured callback
+    const setDraggingButton = getByTestId("set-dragging-true");
+    fireEvent.click(setDraggingButton);
 
     const dragEvent = new Event("dragover", { bubbles: true, cancelable: true });
     const mockDataTransfer = { dropEffect: "" };
@@ -301,8 +300,8 @@ describe("FeedbackItemGroup", () => {
 
     groupDiv?.dispatchEvent(dragEvent);
 
-    // When not being dragged, preventDefault should be called
-    expect(preventDefaultSpy).toHaveBeenCalled();
+    // When being dragged, preventDefault should not be called
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
   });
 
   it("should have correct aria-label based on expansion state", () => {
