@@ -1216,7 +1216,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response {
   & span {
-    @apply grid px-2 py-4 pointer-events-none blur-xl rounded-6xl;
+    @apply grid px-2 py-4 pointer-events-none blur-xl rounded-4xl;
 
     background: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0) 100%);
   }
