@@ -289,6 +289,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .delete-feedback-item-dialog,
 .move-feedback-item-dialog,
 .remove-feedback-item-from-group-dialog,
+.board-metadata-dialog,
+.delete-feedback-item-dialog,
+.team-effectiveness-dialog,
+.choose-column-accent-color-dialog,
+.retro-summary-dialog,
+.team-assessment-history-dialog,
 .whats-new-dialog,
 .prime-directive-dialog,
 .user-guide-dialog,
@@ -297,11 +303,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .archive-board-dialog,
 .edit-column-notes-dialog,
 .delete-board-dialog,
-.retrospectives-choose-column-icon-dialog,
+.choose-column-icon-dialog,
 .link-existing-work-item-dialog,
 .unlink-work-item-confirmation-dialog,
 .preview-email-dialog,
-.retrospectives-carousel-dialog {
+.carousel-dialog {
   @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
 
   & table {
@@ -1505,7 +1511,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-3xl h-12 m-1;
 }
 
-.retrospectives-choose-column-icon-dialog .choose-feedback-column-icon-button {
+.choose-column-icon-dialog .choose-feedback-column-icon-button {
   @apply text-3xl h-12 m-1;
 }
 

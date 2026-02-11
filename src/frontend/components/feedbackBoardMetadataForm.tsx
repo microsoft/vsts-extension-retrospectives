@@ -510,7 +510,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               </Dialog>
             )}
             {columnCardBeingEdited && isChooseColumnIconDialogOpen && (
-              <dialog className="retrospectives-choose-column-icon-dialog" aria-label="Choose Column Icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
+              <dialog className="choose-column-icon-dialog" aria-label="Choose Column Icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
                 <div className="header">
                   <h2 className="title">Choose Column Icon</h2>
                   <button onClick={() => chooseColumnIconDialogRef.current!.close()} aria-label="Close">
@@ -556,7 +556,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 }}
                 modalProps={{
                   isBlocking: false,
-                  containerClassName: "retrospectives-choose-column-accent-color-dialog",
+                  containerClassName: "choose-column-accent-color-dialog",
                   className: "retrospectives-dialog-modal",
                 }}
                 onDismiss={() => {
