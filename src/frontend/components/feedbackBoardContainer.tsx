@@ -57,9 +57,6 @@ export type FeedbackBoardContainerHandle = {
   get boardTimerIntervalId(): number | undefined;
   set boardTimerIntervalId(value: number | undefined);
 
-  previewEmailDialogRef: React.RefObject<HTMLDialogElement>;
-  archiveBoardDialogRef: React.RefObject<HTMLDialogElement>;
-
   handleBoardCreated: (teamId: string, boardId: string) => Promise<void>;
   handleBoardUpdated: (teamId: string, updatedBoardId: string) => Promise<void>;
   handleBoardDeleted: (teamId: string, deletedBoardId: string) => Promise<void>;
@@ -267,12 +264,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const boardMetaDataDialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const discussAndActDialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const teamEffectivenessDialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const retroSummaryDialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const teamAssessmentHistoryDialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const boardCreationDialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const boardDuplicateDialogRef = React.useRef<HTMLDialogElement | null>(null);
 
   const setState: FeedbackBoardContainerHandle["setState"] = React.useCallback((updater, callback) => {
     const currentState = stateRef.current;
@@ -1492,7 +1483,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const showArchiveBoardConfirmationDialog = () => {
-    (handleRef.current?.archiveBoardDialogRef ?? archiveBoardDialogRef)?.current?.showModal();
+    archiveBoardDialogRef.current?.showModal();
   };
 
   const showBoardUrlCopiedToast = () => {
@@ -1510,7 +1501,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     const state = stateRef.current;
     await BoardDataService.archiveFeedbackBoard(state.currentTeam.id, state.currentBoard.id);
     reflectBackendService.broadcastDeletedBoard(state.currentTeam.id, state.currentBoard.id);
-    (handleRef.current?.archiveBoardDialogRef ?? archiveBoardDialogRef)?.current?.close();
+    archiveBoardDialogRef.current?.close();
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: state.currentBoard.id } });
     await reloadBoardsForCurrentTeam();
   };
@@ -1668,8 +1659,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       set boardTimerIntervalId(value: number | undefined) {
         boardTimerIntervalIdRef.current = value;
       },
-      previewEmailDialogRef,
-      archiveBoardDialogRef,
       handleBoardCreated,
       handleBoardUpdated,
       handleBoardDeleted,
