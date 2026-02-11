@@ -1199,11 +1199,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block {
-  @apply flex flex-row my-0.5 mx-0;
+  @apply flex flex-row my-0.5 mx-0 gap-1;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .chart-question {
-  @apply w-64 text-right m-0.5;
+  @apply w-64;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .team-effectiveness-average-number {
@@ -1214,27 +1214,35 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply whitespace-nowrap py-0 px-1.5 bg-primary;
 }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response.red-chart-response {
-  @apply bg-error;
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
-}
+.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response {
+  & span {
+    @apply grid px-2 py-4 pointer-events-none blur-xl rounded-6xl;
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response.yellow-chart-response {
-  @apply bg-task-yellow text-black;
-  background-image: repeating-linear-gradient(90deg, transparent, transparent 15px, #ceab02 15px, #ceab02 16px);
-}
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0) 100%);
+  }
 
-.retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response.green-chart-response {
-  @apply bg-success;
-  background-image: radial-gradient(#006238 20%, transparent 20%), radial-gradient(#006238 20%, transparent 20%);
-  background-size: 12px 12px;
-  background-position:
-    top left,
-    6px 6px;
+  &.red-chart-response {
+    @apply bg-error;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
+  }
+
+  &.yellow-chart-response {
+    @apply bg-task-yellow text-black;
+    background-image: repeating-linear-gradient(90deg, transparent, transparent 15px, #ceab02 15px, #ceab02 16px);
+  }
+
+  &.green-chart-response {
+    @apply bg-success;
+    background-image: radial-gradient(#006238 20%, transparent 20%), radial-gradient(#006238 20%, transparent 20%);
+    background-size: 12px 12px;
+    background-position:
+      top left,
+      6px 6px;
+  }
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li div {
-  @apply inline-block min-h-2 p-2 box-border;
+  @apply flex items-center justify-end min-h-2 p-2 box-border;
 }
 
 .retrospectives-retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section {
