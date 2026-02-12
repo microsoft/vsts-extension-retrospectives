@@ -826,7 +826,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       },
       {
         key: "removeFeedbackFromGroup",
-        iconName: "delete",
+        iconName: "logout",
         onClick: showRemoveFeedbackItemFromGroupConfirmationDialog,
         text: "Remove feedback from group",
         title: "Remove feedback from group",
