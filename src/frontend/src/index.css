@@ -316,10 +316,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     & tr {
       @apply border-b border-(--border-subtle-color);
 
-      &:hover {
-        @apply bg-(--border-subtle-color);
-      }
-
       & td:first-child,
       & th:first-child {
         @apply py-2 px-3 w-2/5;
