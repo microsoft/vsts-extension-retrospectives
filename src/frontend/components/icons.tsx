@@ -878,7 +878,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "search", tags: ["search", "fa-solid fa-magnifying-glass"], name: "Search", icon: <SearchIcon /> },
   { id: "electric-bolt", tags: ["electric-bolt", "fa-solid fa-bolt"], name: "Electric Bolt", icon: <ElectricBoltIcon /> },
   { id: "psychological-safety", tags: ["psychological-safety", "fa-regular fa-handshake"], name: "Psychological Safety", icon: <PsychologicalSafetyIcon /> },
-  { id: "balance", tags: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip"], name: "Balance", icon: <BalanceIcon /> },
+  { id: "balance", tags: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
   { id: "gears", tags: ["gears", "fa-solid fa-gears"], name: "Gears", icon: <GearsIcon /> },
   { id: "eye", tags: ["eye", "far fa-eye"], name: "Eye", icon: <EyeIcon /> },
   { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
