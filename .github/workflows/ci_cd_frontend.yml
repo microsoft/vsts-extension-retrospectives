@@ -136,6 +136,7 @@ jobs:
           echo "camelCase" >> base.txt
           echo "useCallback" >> base.txt
           echo "useState" >> base.txt
+          echo "AdjustIcon" >> base.txt
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'
