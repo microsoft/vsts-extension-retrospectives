@@ -8245,7 +8245,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
       expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
     });
 
-    test("Escape closes the mobile actions menu when it is open", async () => {
+    test("Escape does not close the mobile actions menu", async () => {
       jest.spyOn(dialogHelper, "isAnyModalDialogOpen").mockReturnValue(false);
 
       const props = makeProps();
@@ -8261,12 +8261,12 @@ describe("FeedbackItem additional coverage (merged)", () => {
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       fireEvent.keyDown(card, { key: "Escape" });
 
-      expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+      expect((ref.current as any).state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
     });
   });
 
-  describe("Escape closes remove-from-group dialog", () => {
-    test("Escape hides the remove feedback from group dialog", async () => {
+  describe("Escape does not close remove-from-group dialog", () => {
+    test("Escape keeps the remove feedback from group dialog open", async () => {
       const props = makeProps({ workflowPhase: "Group" });
       const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
 
@@ -8284,9 +8284,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       fireEvent.keyDown(card, { key: "Escape" });
 
-      await waitFor(() => {
-        expect(dialog?.open).toBe(false);
-      });
+      expect(dialog?.open).toBe(true);
     });
   });
 
@@ -8411,7 +8409,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     expect(document.activeElement).toBe(editor);
   });
 
-  test("Space toggles group expand; Escape closes visible dialogs", async () => {
+  test("Space toggles group expand; Escape keeps visible dialogs open", async () => {
     const groupedItemProps = {
       groupedCount: 1,
       isGroupExpanded: false,
@@ -8432,10 +8430,8 @@ describe("FeedbackItem additional coverage (merged)", () => {
     expect(await screen.findByText("Delete Feedback")).toBeInTheDocument();
 
     fireEvent.keyDown(root, { key: "Escape" });
-    await waitFor(() => {
-      const dialog = document.querySelector('dialog[aria-label="Delete Feedback"]') as HTMLDialogElement | null;
-      expect(dialog?.open).toBe(false);
-    });
+    const dialog = document.querySelector('dialog[aria-label="Delete Feedback"]') as HTMLDialogElement | null;
+    expect(dialog?.open).toBe(true);
   });
 
   test("Act phase: key 'a' clicks Add action item; timer button triggers timer flow", async () => {
@@ -10463,7 +10459,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     expect(props.refreshFeedbackItems).toHaveBeenCalledWith([child1], true);
   });
 
-  test("Escape closes the group dialog when it is open", async () => {
+  test("Escape does not close the group dialog", async () => {
     jest.spyOn(dialogHelper, "isAnyModalDialogOpen").mockReturnValue(false);
 
     const props = makeProps({ workflowPhase: "Group" });
@@ -10488,10 +10484,10 @@ describe("FeedbackItem additional coverage (merged)", () => {
       fireEvent.keyDown(card, { key: "Escape" });
     });
 
-    expect((ref.current as any).state.isGroupFeedbackItemDialogHidden).toBe(true);
+    expect((ref.current as any).state.isGroupFeedbackItemDialogHidden).toBe(false);
   });
 
-  test("Escape closes the remove-from-group confirmation dialog when it is open", async () => {
+  test("Escape does not close the remove-from-group confirmation dialog", async () => {
     jest.spyOn(dialogHelper, "isAnyModalDialogOpen").mockReturnValue(false);
 
     const props = makeProps({ workflowPhase: "Group" });
@@ -10516,10 +10512,10 @@ describe("FeedbackItem additional coverage (merged)", () => {
       fireEvent.keyDown(card, { key: "Escape" });
     });
 
-    expect((ref.current as any).state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden).toBe(true);
+    expect((ref.current as any).state.isRemoveFeedbackItemFromGroupConfirmationDialogHidden).toBe(false);
   });
 
-  test("Escape closes the move dialog when it is open", async () => {
+  test("Escape does not close the move dialog", async () => {
     jest.spyOn(dialogHelper, "isAnyModalDialogOpen").mockReturnValue(false);
 
     const props = makeProps({ workflowPhase: "Group" });
@@ -10544,6 +10540,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
       fireEvent.keyDown(card, { key: "Escape" });
     });
 
-    expect((ref.current as any).state.isMoveFeedbackItemDialogHidden).toBe(true);
+    expect((ref.current as any).state.isMoveFeedbackItemDialogHidden).toBe(false);
   });
 });

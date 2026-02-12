@@ -30,6 +30,7 @@ import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionI
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { copyToClipboard } from "../utilities/clipboardHelper";
+import { closeTopMostDialog } from "../utilities/dialogHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
@@ -258,6 +259,24 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
+
+  React.useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      if (closeTopMostDialog()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscapeKey, true);
+    return () => {
+      document.removeEventListener("keydown", handleEscapeKey, true);
+    };
+  }, []);
   const boardCreationDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const boardDuplicateDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const boardUpdateDialogRef = React.useRef<HTMLDialogElement | null>(null);

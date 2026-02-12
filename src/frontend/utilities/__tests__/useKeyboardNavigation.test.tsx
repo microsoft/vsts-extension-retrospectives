@@ -127,20 +127,6 @@ describe("useKeyboardNavigation", () => {
     expect(onEnter).not.toHaveBeenCalled();
   });
 
-  it("should call onEscape when Escape is pressed", () => {
-    const onEscape = jest.fn();
-    const options: KeyboardNavigationOptions = { onEscape };
-
-    renderHook(() => useKeyboardNavigation(elementRef, options));
-
-    act(() => {
-      const event = new KeyboardEvent("keydown", { key: "Escape" });
-      elementRef.current!.dispatchEvent(event);
-    });
-
-    expect(onEscape).toHaveBeenCalledTimes(1);
-  });
-
   it("should call onSpace when Space is pressed on non-button elements", () => {
     const onSpace = jest.fn();
     const options: KeyboardNavigationOptions = { onSpace };

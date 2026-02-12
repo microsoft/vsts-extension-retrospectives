@@ -525,9 +525,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(feedbackItemProps, props.id, feedbackItemProps.id);
         hideGroupFeedbackItemDialog();
       }
-      if (event.key === "Escape") {
-        hideGroupFeedbackItemDialog();
-      }
     },
     [props.id, hideGroupFeedbackItemDialog],
   );
@@ -760,24 +757,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           if (props.workflowPhase === WorkflowPhase.Act) {
             e.preventDefault();
             timerSwitch(props.id);
-          }
-          break;
-        case "escape":
-          if (!stateRef.current.isDeleteItemConfirmationDialogHidden) {
-            e.preventDefault();
-            hideDeleteItemConfirmationDialog();
-          } else if (!stateRef.current.isMobileFeedbackItemActionsDialogHidden) {
-            e.preventDefault();
-            hideMobileFeedbackItemActionsDialog();
-          } else if (!stateRef.current.isMoveFeedbackItemDialogHidden) {
-            e.preventDefault();
-            hideMoveFeedbackItemDialog();
-          } else if (!stateRef.current.isGroupFeedbackItemDialogHidden) {
-            e.preventDefault();
-            hideGroupFeedbackItemDialog();
-          } else if (!stateRef.current.isRemoveFeedbackItemFromGroupConfirmationDialogHidden) {
-            e.preventDefault();
-            hideRemoveFeedbackItemFromGroupConfirmationDialog();
           }
           break;
       }
