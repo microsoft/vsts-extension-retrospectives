@@ -1263,7 +1263,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
   const changeSelectedTeam = async (team: WebApiTeam) => {
     if (team) {
-      if (stateRef.current.currentTeam.id === team.id) {
+      if (stateRef.current.currentTeam?.id === team.id) {
         return;
       }
 
@@ -2179,7 +2179,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         </dialog>
       )}
       {renderBoardUpdateMetadataFormDialog(boardCreationDialogRef, true, false, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
-      {renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, "Create copy of retrospective", "", createBoard, hideBoardDuplicateDialog)}
+      {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, "Create copy of retrospective", "", createBoard, hideBoardDuplicateDialog)}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, "Edit retrospective", "", updateBoardMetadata, hideBoardUpdateDialog)}
       {state.currentBoard && (
         <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" role="dialog">
@@ -2204,7 +2204,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           </div>
         </dialog>
       )}
-      <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label="Retrospective Board Summary" role="dialog">
+      {state.currentBoard && (
+        <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label="Retrospective Board Summary" role="dialog">
         <div className="header">
           <h2 className="title">Retrospective Board Summary</h2>
           <button type="button" onClick={hideRetroSummaryDialog} aria-label="Close">
@@ -2306,7 +2307,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             </section>
           )}
         </div>
-      </dialog>
+        </dialog>
+      )}
       <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog" aria-label="Team Assessment History" role="dialog">
         <div className="header">
           <h2>Team Assessment History</h2>
