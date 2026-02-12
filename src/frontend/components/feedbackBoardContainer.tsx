@@ -2179,7 +2179,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       )}
       <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label="Retrospective Board Summary" role="dialog">
         <div className="header">
-          <h2>Retrospective Board Summary</h2>
+          <h2 className="title">Retrospective Board Summary</h2>
           <button type="button" onClick={hideRetroSummaryDialog} aria-label="Close">
             {getIconElement("close")}
           </button>
