@@ -7,7 +7,6 @@ export interface KeyboardNavigationOptions {
   onArrowLeft?: () => void;
   onArrowRight?: () => void;
   onEnter?: () => void;
-  onEscape?: () => void;
   onSpace?: () => void;
   onDelete?: () => void;
   onPageUp?: () => void;
@@ -22,7 +21,7 @@ export interface KeyboardNavigationOptions {
  * Provides consistent keyboard event handling across components
  */
 export function useKeyboardNavigation(elementRef: React.RefObject<HTMLElement>, options: KeyboardNavigationOptions) {
-  const { onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onEnter, onEscape, onSpace, onDelete, onPageUp, onPageDown, enabled = true, preventDefault = true } = options;
+  const { onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onEnter, onSpace, onDelete, onPageUp, onPageDown, enabled = true, preventDefault = true } = options;
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -67,12 +66,6 @@ export function useKeyboardNavigation(elementRef: React.RefObject<HTMLElement>, 
             handled = true;
           }
           break;
-        case "Escape":
-          if (onEscape) {
-            onEscape();
-            handled = true;
-          }
-          break;
         case " ":
           if (onSpace && target.tagName !== "BUTTON") {
             onSpace();
@@ -105,7 +98,7 @@ export function useKeyboardNavigation(elementRef: React.RefObject<HTMLElement>, 
         event.stopPropagation();
       }
     },
-    [enabled, onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onEnter, onEscape, onSpace, onDelete, onPageUp, onPageDown, preventDefault],
+    [enabled, onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onEnter, onSpace, onDelete, onPageUp, onPageDown, preventDefault],
   );
 
   useEffect(() => {

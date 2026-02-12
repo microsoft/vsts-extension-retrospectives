@@ -30,6 +30,7 @@ import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionI
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { copyToClipboard } from "../utilities/clipboardHelper";
+import { closeTopMostDialog } from "../utilities/dialogHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
@@ -258,6 +259,24 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
+
+  React.useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      if (closeTopMostDialog()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscapeKey, true);
+    return () => {
+      document.removeEventListener("keydown", handleEscapeKey, true);
+    };
+  }, []);
   const boardCreationDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const boardDuplicateDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const boardUpdateDialogRef = React.useRef<HTMLDialogElement | null>(null);
@@ -1244,7 +1263,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
   const changeSelectedTeam = async (team: WebApiTeam) => {
     if (team) {
-      if (stateRef.current.currentTeam.id === team.id) {
+      if (stateRef.current.currentTeam?.id === team.id) {
         return;
       }
 
@@ -1714,7 +1733,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const saveTeamEffectivenessMeasurement = () => {
-    const teamEffectivenessMeasurementVoteCollection = state.currentBoard.teamEffectivenessMeasurementVoteCollection;
+    const currentBoard = state.currentBoard;
+    if (!currentBoard) {
+      return;
+    }
+
+    const teamEffectivenessMeasurementVoteCollection = currentBoard.teamEffectivenessMeasurementVoteCollection || [];
     const currentUserId = obfuscateUserId(state.currentUserId);
     const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
     const responseCount = currentUserVote?.responses?.length || 0;
@@ -1724,9 +1748,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       return;
     }
 
-    itemDataService.updateTeamEffectivenessMeasurement(state.currentBoard.id, state.currentTeam.id, currentUserId, state.currentBoard.teamEffectivenessMeasurementVoteCollection);
+    itemDataService.updateTeamEffectivenessMeasurement(currentBoard.id, state.currentTeam.id, currentUserId, teamEffectivenessMeasurementVoteCollection);
 
-    teamEffectivenessDialogRef.current.close();
+    teamEffectivenessDialogRef.current?.close();
   };
 
   const showTeamEffectivenessDialog = () => {
@@ -1749,6 +1773,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
   const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
     const currentBoard = stateRef.current.currentBoard;
+    if (!currentBoard) {
+      return;
+    }
 
     if (currentBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
       currentBoard.teamEffectivenessMeasurementVoteCollection = [];
@@ -2152,7 +2179,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         </dialog>
       )}
       {renderBoardUpdateMetadataFormDialog(boardCreationDialogRef, true, false, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
-      {renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, "Create copy of retrospective", "", createBoard, hideBoardDuplicateDialog)}
+      {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, "Create copy of retrospective", "", createBoard, hideBoardDuplicateDialog)}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, "Edit retrospective", "", updateBoardMetadata, hideBoardUpdateDialog)}
       {state.currentBoard && (
         <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" role="dialog">
@@ -2177,9 +2204,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           </div>
         </dialog>
       )}
-      <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label="Retrospective Board Summary" role="dialog">
+      {state.currentBoard && (
+        <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label="Retrospective Board Summary" role="dialog">
         <div className="header">
-          <h2>Retrospective Board Summary</h2>
+          <h2 className="title">Retrospective Board Summary</h2>
           <button type="button" onClick={hideRetroSummaryDialog} aria-label="Close">
             {getIconElement("close")}
           </button>
@@ -2279,7 +2307,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             </section>
           )}
         </div>
-      </dialog>
+        </dialog>
+      )}
       <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog" aria-label="Team Assessment History" role="dialog">
         <div className="header">
           <h2>Team Assessment History</h2>

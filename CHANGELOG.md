@@ -2,6 +2,12 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.51
+
+* Fix: improve readability of retrospective summary percentages by adjusting background styling. From [GitHub PR #1552](https://github.com/microsoft/vsts-extension-retrospectives/pull/1552)
+* Feat: update AdjustIcon SVG for improved design and functionality. From [GitHub PR #1554](https://github.com/microsoft/vsts-extension-retrospectives/pull/1554)
+* Fix: update Retrospective Wiki URL to the correct domain. From [GitHub PR #1556](https://github.com/microsoft/vsts-extension-retrospectives/pull/1556)
+
 ## v1.92.50
 
 * Responsive board layout to view multiple cards per column. From [GitHub PR #1548](https://github.com/microsoft/vsts-extension-retrospectives/pull/1548)

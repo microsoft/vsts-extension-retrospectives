@@ -837,6 +837,19 @@ export const UndoIcon = () => {
   );
 };
 
+export const LogoutIcon = () => {
+  return (
+    <svg className="icon-logout" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <g>
+        <path d="M0,0h24v24H0V0z" fill="none" />
+      </g>
+      <g>
+        <path d="M17,8l-1.41,1.41L17.17,11H9v2h8.17l-1.58,1.58L17,16l4-4L17,8z M5,5h7V3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h7v-2H5V5z" />
+      </g>
+    </svg>
+  );
+};
+
 export const availableIcons: { id: string; tags: string[]; name: string; icon: React.ReactElement }[] = [
   { id: "happy-face", tags: ["fas fa-cart-plus", "far fa-smile"], name: "Smile", icon: <HappyFaceIcon /> },
   { id: "sad-face", tags: ["far fa-frown"], name: "Frown", icon: <SadFaceIcon /> },
@@ -870,9 +883,10 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "search", tags: ["search", "fa-solid fa-magnifying-glass"], name: "Search", icon: <SearchIcon /> },
   { id: "electric-bolt", tags: ["electric-bolt", "fa-solid fa-bolt"], name: "Electric Bolt", icon: <ElectricBoltIcon /> },
   { id: "psychological-safety", tags: ["psychological-safety", "fa-regular fa-handshake"], name: "Psychological Safety", icon: <PsychologicalSafetyIcon /> },
-  { id: "balance", tags: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip"], name: "Balance", icon: <BalanceIcon /> },
+  { id: "balance", tags: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
   { id: "gears", tags: ["gears", "fa-solid fa-gears"], name: "Gears", icon: <GearsIcon /> },
   { id: "eye", tags: ["eye", "far fa-eye"], name: "Eye", icon: <EyeIcon /> },
+  { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
   { id: "add", tags: [], name: "Add", icon: <AddIcon /> },
   { id: "edit", tags: [], name: "Edit", icon: <EditIcon /> },
   { id: "link", tags: [], name: "Link", icon: <LinkIcon /> },
@@ -911,12 +925,12 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "source", tags: [], name: "Source", icon: <SourceIcon /> },
   { id: "inventory", tags: [], name: "Inventory", icon: <InventoryIcon /> },
   { id: "more-horizontal", tags: [], name: "More Horizontal", icon: <MoreHorizontalIcon /> },
+  { id: "more-vertical", tags: [], name: "More Vertical", icon: <MoreVerticalIcon /> },
   { id: "report-problem", tags: [], name: "Report Problem", icon: <ReportProblemIcon /> },
-  { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
-  { id: "more-vertical", tags: ["fa-solid fa-ellipsis-v"], name: "More Vertical", icon: <MoreVerticalIcon /> },
-  { id: "open-with", tags: ["fa-solid fa-open-with"], name: "Open With", icon: <OpenWithIcon /> },
-  { id: "group-work", tags: ["fa-solid fa-group-work"], name: "Group Work", icon: <GroupWorkIcon /> },
-  { id: "undo", tags: ["fa-solid fa-undo"], name: "Undo", icon: <UndoIcon /> },
+  { id: "open-with", tags: [], name: "Open With", icon: <OpenWithIcon /> },
+  { id: "group-work", tags: [], name: "Group Work", icon: <GroupWorkIcon /> },
+  { id: "undo", tags: [], name: "Undo", icon: <UndoIcon /> },
+  { id: "logout", tags: [], name: "Logout", icon: <LogoutIcon /> },
 ];
 
 export function getIconElement(iconId: string | undefined | null): React.ReactElement {

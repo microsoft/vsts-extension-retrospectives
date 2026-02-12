@@ -180,11 +180,11 @@ function SelectorCombo<T>({ className, currentValue, iconName, selectorList, tit
     });
   }, []);
 
-  const selectorButtonText: string = nameGetter(currentValue);
+  const selectorButtonText: string = currentValue ? nameGetter(currentValue) : "";
 
   return (
     <div className={className}>
-      <div className="selector-button" aria-label={"Click to search and select " + title + ". Current selection is " + selectorButtonText} aria-expanded={isSelectorCalloutVisible} aria-haspopup="true" role="button" data-testid="selector-button" ref={selectorButton} onClick={toggleSelectorCallout} tabIndex={0} onKeyDown={handleKeyPressSelectorButton}>
+      <div className="selector-button" aria-label={"Click to search and select " + title + ". Current selection is " + (selectorButtonText || "none")} aria-expanded={isSelectorCalloutVisible} aria-haspopup="true" role="button" data-testid="selector-button" ref={selectorButton} onClick={toggleSelectorCallout} tabIndex={0} onKeyDown={handleKeyPressSelectorButton}>
         {getIconElement(iconName)}
         <div>
           <span>{selectorButtonText}</span>
