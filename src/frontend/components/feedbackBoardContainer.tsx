@@ -1733,7 +1733,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const saveTeamEffectivenessMeasurement = () => {
-    const teamEffectivenessMeasurementVoteCollection = state.currentBoard.teamEffectivenessMeasurementVoteCollection;
+    const currentBoard = state.currentBoard;
+    if (!currentBoard) {
+      return;
+    }
+
+    const teamEffectivenessMeasurementVoteCollection = currentBoard.teamEffectivenessMeasurementVoteCollection || [];
     const currentUserId = obfuscateUserId(state.currentUserId);
     const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
     const responseCount = currentUserVote?.responses?.length || 0;
@@ -1743,9 +1748,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       return;
     }
 
-    itemDataService.updateTeamEffectivenessMeasurement(state.currentBoard.id, state.currentTeam.id, currentUserId, state.currentBoard.teamEffectivenessMeasurementVoteCollection);
+    itemDataService.updateTeamEffectivenessMeasurement(currentBoard.id, state.currentTeam.id, currentUserId, teamEffectivenessMeasurementVoteCollection);
 
-    teamEffectivenessDialogRef.current.close();
+    teamEffectivenessDialogRef.current?.close();
   };
 
   const showTeamEffectivenessDialog = () => {
@@ -1768,6 +1773,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
   const effectivenessMeasurementSelectionChanged = (questionId: number, selected: number) => {
     const currentBoard = stateRef.current.currentBoard;
+    if (!currentBoard) {
+      return;
+    }
 
     if (currentBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
       currentBoard.teamEffectivenessMeasurementVoteCollection = [];
