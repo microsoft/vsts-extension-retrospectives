@@ -92,17 +92,41 @@ export async function handleArchiveToggle(teamId: string, boardId: string, toggl
 
 const ARCHIVE_DELETE_DELAY = 2 * 60 * 1000; // 2 minutes
 
+function getValidArchivedTimestamp(archivedDate: Date | null | undefined): number | null {
+  if (!archivedDate) return null;
+  const archivedAt = new Date(archivedDate).getTime();
+  return Number.isFinite(archivedAt) ? archivedAt : null;
+}
+
+export function isArchivedWithoutValidDate(board: IBoardSummaryTableItem): boolean {
+  return !!board.isArchived && !getValidArchivedTimestamp(board.archivedDate);
+}
+
 export function isTrashEnabled(board: IBoardSummaryTableItem): boolean {
-  if (!board.isArchived || !board.archivedDate) return false;
+  if (!board.isArchived) return false;
+  const archivedAt = getValidArchivedTimestamp(board.archivedDate);
+  if (archivedAt === null) return false;
   const now = new Date().getTime();
-  const archivedAt = new Date(board.archivedDate).getTime();
   return now >= archivedAt + ARCHIVE_DELETE_DELAY;
 }
 
 export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClick }: { board: IBoardSummaryTableItem; currentUserId: string; currentUserIsTeamAdmin: boolean; onClick: (event: React.MouseEvent) => void }) {
-  if (!board.isArchived || !board.archivedDate || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
+  if (!board.isArchived || !(currentUserIsTeamAdmin || board.ownerId === currentUserId)) {
     return <></>;
   }
+
+  if (isArchivedWithoutValidDate(board)) {
+    return (
+      <div
+        className="centered-cell trash-icon-disabled"
+        title="Legacy archived board. Toggle archive off and on to enable delete."
+        aria-label="Legacy archived board. Toggle archive off and on to enable delete."
+      >
+        {getIconElement("delete")}
+      </div>
+    );
+  }
+
   return isTrashEnabled(board) ? (
     <div className="centered-cell trash-icon" title="Delete board" aria-label="Delete board" onClick={onClick}>
       {getIconElement("delete")}
@@ -146,11 +170,14 @@ export function buildBoardSummaryState(boardDocuments: IFeedbackBoardDocument[])
   const actionItems: IActionItemsTableItems = {};
 
   boardDocuments.forEach(board => {
+    const archivedDate = board.archivedDate ? new Date(board.archivedDate) : null;
+    const normalizedArchivedDate = getValidArchivedTimestamp(archivedDate) === null ? null : archivedDate;
+
     boardsTableItems.push({
       boardName: board.title,
       createdDate: new Date(board.createdDate),
       isArchived: board.isArchived ?? false,
-      archivedDate: board.archivedDate ? new Date(board.archivedDate) : null,
+      archivedDate: normalizedArchivedDate,
       pendingWorkItemsCount: 0,
       totalWorkItemsCount: 0,
       feedbackItemsCount: 0,
@@ -315,72 +342,79 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     const updatedBoardsTableItems = [...state.boardsTableItems];
     const updatedActionItemsByBoard = { ...state.actionItemsByBoard };
 
-    const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
-    await Promise.all(
-      props.supportedWorkItemTypes.map(async workItemType => {
-        const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
-        workItemTypeToStatesMap[workItemType.name] = workItemTypeStates;
-      }),
-    );
+    try {
+      const workItemTypeToStatesMap: { [key: string]: WorkItemStateColor[] } = {};
+      await Promise.all(
+        props.supportedWorkItemTypes.map(async workItemType => {
+          const workItemTypeStates = await workItemService.getWorkItemStates(workItemType.name);
+          workItemTypeToStatesMap[workItemType.name] = workItemTypeStates;
+        }),
+      );
 
-    const boardIdToIndex: { [key: string]: number } = {};
-    updatedBoardsTableItems.forEach((item, index) => {
-      boardIdToIndex[item.id] = index;
-    });
+      const boardIdToIndex: { [key: string]: number } = {};
+      updatedBoardsTableItems.forEach((item, index) => {
+        boardIdToIndex[item.id] = index;
+      });
 
-    await Promise.all(
-      state.feedbackBoards.map(async feedbackBoard => {
-        const feedbackBoardId: string = feedbackBoard.id;
-        const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
+      await Promise.all(
+        state.feedbackBoards.map(async feedbackBoard => {
+          const feedbackBoardId: string = feedbackBoard.id;
+          const feedbackItems = await itemDataService.getFeedbackItemsForBoard(feedbackBoardId);
 
-        const boardIndex = boardIdToIndex[feedbackBoardId];
-        updatedBoardsTableItems[boardIndex] = {
-          ...updatedBoardsTableItems[boardIndex],
-          feedbackItemsCount: feedbackItems.length,
-        };
+          const boardIndex = boardIdToIndex[feedbackBoardId];
+          updatedBoardsTableItems[boardIndex] = {
+            ...updatedBoardsTableItems[boardIndex],
+            feedbackItemsCount: feedbackItems.length,
+          };
 
-        if (!feedbackItems.length) return;
+          if (!feedbackItems.length) return;
 
-        const actionableFeedbackItems = feedbackItems.filter(item => item.associatedActionItemIds && item.associatedActionItemIds.length > 0);
+          const actionableFeedbackItems = feedbackItems.filter(item => item.associatedActionItemIds && item.associatedActionItemIds.length > 0);
 
-        if (!actionableFeedbackItems.length) {
-          return;
-        }
+          if (!actionableFeedbackItems.length) {
+            return;
+          }
 
-        const aggregatedWorkItems: WorkItem[] = [];
-        await Promise.all(
-          actionableFeedbackItems.map(async item => {
-            const workItems = await workItemService.getWorkItemsByIds(item.associatedActionItemIds);
-            if (workItems?.length) {
-              aggregatedWorkItems.push(...workItems);
-            }
-          }),
-        );
+          const aggregatedWorkItems: WorkItem[] = [];
+          await Promise.all(
+            actionableFeedbackItems.map(async item => {
+              const workItems = await workItemService.getWorkItemsByIds(item.associatedActionItemIds);
+              if (workItems?.length) {
+                aggregatedWorkItems.push(...workItems);
+              }
+            }),
+          );
 
-        updatedActionItemsByBoard[feedbackBoardId] = {
-          isDataLoaded: true,
-          actionItems: aggregatedWorkItems,
-        };
+          updatedActionItemsByBoard[feedbackBoardId] = {
+            isDataLoaded: true,
+            actionItems: aggregatedWorkItems,
+          };
 
-        const pendingWorkItems = aggregatedWorkItems.filter(workItem => {
-          const states = workItemTypeToStatesMap[workItem.fields["System.WorkItemType"]].filter(state => state.name === workItem.fields["System.State"]);
-          return !states.length || (states[0].category !== "Completed" && states[0].category !== "Removed");
-        });
+          const pendingWorkItems = aggregatedWorkItems.filter(workItem => {
+            const states = workItemTypeToStatesMap[workItem.fields["System.WorkItemType"]].filter(state => state.name === workItem.fields["System.State"]);
+            return !states.length || (states[0].category !== "Completed" && states[0].category !== "Removed");
+          });
 
-        updatedBoardsTableItems[boardIndex] = {
-          ...updatedBoardsTableItems[boardIndex],
-          pendingWorkItemsCount: pendingWorkItems.length,
-          totalWorkItemsCount: aggregatedWorkItems.length,
-        };
-      }),
-    );
-
-    setBoardSummaryState({
-      ...state,
-      boardsTableItems: updatedBoardsTableItems,
-      actionItemsByBoard: updatedActionItemsByBoard,
-      allDataLoaded: true,
-    });
+          updatedBoardsTableItems[boardIndex] = {
+            ...updatedBoardsTableItems[boardIndex],
+            pendingWorkItemsCount: pendingWorkItems.length,
+            totalWorkItemsCount: aggregatedWorkItems.length,
+          };
+        }),
+      );
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "loadBoardHistoryActionItems",
+        teamId: props.teamId,
+      });
+    } finally {
+      setBoardSummaryState({
+        ...state,
+        boardsTableItems: updatedBoardsTableItems,
+        actionItemsByBoard: updatedActionItemsByBoard,
+        allDataLoaded: true,
+      });
+    }
   };
 
   const boardRowSummary = (item: IBoardSummaryTableItem) => {

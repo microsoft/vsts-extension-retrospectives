@@ -359,6 +359,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       appInsights.trackException(error, {
         action: "initializeTeamAndBoardState",
       });
+      setState({ isTeamDataLoaded: true });
     }
 
     try {
@@ -1147,36 +1148,44 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
    */
   const setCurrentTeam = async (teamId: string) => {
     setState({ isTeamDataLoaded: false });
-    const state = stateRef.current;
-    const matchedTeam = state.projectTeams.find(team => team.id === teamId) || state.userTeams.find(team => team.id === teamId);
+    try {
+      const state = stateRef.current;
+      const matchedTeam = state.projectTeams.find(team => team.id === teamId) || state.userTeams.find(team => team.id === teamId);
 
-    if (matchedTeam) {
-      let boardsForTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
-      if (boardsForTeam?.length) {
-        boardsForTeam = boardsForTeam
-          .filter((board: IFeedbackBoardDocument) =>
-            FeedbackBoardDocumentHelper.filter(
-              board,
-              stateRef.current.userTeams.map(t => t.id),
-              stateRef.current.currentUserId,
-            ),
-          )
-          .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-      }
-
-      setState(prevState => {
-        // Ensure that we are actually changing teams to prevent needless rerenders.
-        if (!prevState.currentTeam || prevState.currentTeam.id !== matchedTeam.id) {
-          return {
-            boards: boardsForTeam?.length ? boardsForTeam : [],
-            currentBoard: boardsForTeam?.length ? boardsForTeam[0] : null,
-            currentTeam: matchedTeam,
-            isTeamDataLoaded: true,
-          };
+      if (matchedTeam) {
+        let boardsForTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
+        if (boardsForTeam?.length) {
+          boardsForTeam = boardsForTeam
+            .filter((board: IFeedbackBoardDocument) =>
+              FeedbackBoardDocumentHelper.filter(
+                board,
+                stateRef.current.userTeams.map(t => t.id),
+                stateRef.current.currentUserId,
+              ),
+            )
+            .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
         }
 
-        return null;
+        setState(prevState => {
+          if (!prevState.currentTeam || prevState.currentTeam.id !== matchedTeam.id) {
+            return {
+              boards: boardsForTeam?.length ? boardsForTeam : [],
+              currentBoard: boardsForTeam?.length ? boardsForTeam[0] : null,
+              currentTeam: matchedTeam,
+              isTeamDataLoaded: true,
+            };
+          }
+
+          return null;
+        });
+      } else {
+        setState({ isTeamDataLoaded: true });
+      }
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "setCurrentTeam",
       });
+      setState({ isTeamDataLoaded: true });
     }
   };
 
@@ -1206,33 +1215,40 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const reloadBoardsForCurrentTeam = async () => {
     setState({ isTeamDataLoaded: false });
 
-    let boardsForTeam = await BoardDataService.getBoardsForTeam(stateRef.current.currentTeam.id);
+    try {
+      let boardsForTeam = await BoardDataService.getBoardsForTeam(stateRef.current.currentTeam.id);
 
-    if (!boardsForTeam.length) {
+      if (!boardsForTeam.length) {
+        setState({
+          isTeamDataLoaded: true,
+          boards: [],
+          currentBoard: null,
+        });
+
+        return;
+      }
+
+      boardsForTeam = boardsForTeam
+        .filter((board: IFeedbackBoardDocument) =>
+          FeedbackBoardDocumentHelper.filter(
+            board,
+            stateRef.current.userTeams.map(t => t.id),
+            stateRef.current.currentUserId,
+          ),
+        )
+        .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+
       setState({
         isTeamDataLoaded: true,
-        boards: [],
-        currentBoard: null,
+        boards: boardsForTeam,
+        currentBoard: boardsForTeam[0],
       });
-
-      return;
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "reloadBoardsForCurrentTeam",
+      });
+      setState({ isTeamDataLoaded: true });
     }
-
-    boardsForTeam = boardsForTeam
-      .filter((board: IFeedbackBoardDocument) =>
-        FeedbackBoardDocumentHelper.filter(
-          board,
-          stateRef.current.userTeams.map(t => t.id),
-          stateRef.current.currentUserId,
-        ),
-      )
-      .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-
-    setState({
-      isTeamDataLoaded: true,
-      boards: boardsForTeam,
-      currentBoard: boardsForTeam[0],
-    });
   };
 
   /**
