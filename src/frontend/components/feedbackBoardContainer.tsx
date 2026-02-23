@@ -2182,6 +2182,14 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                         >
                           <span>{state.isBackendServiceReconnecting ? "Retrying..." : "Retry"}</span>
                         </button>
+                        <button
+                          type="button"
+                          onClick={hideLiveSyncInTfsIssueMessageBar}
+                          aria-label="Dismiss notification"
+                          title="Dismiss notification"
+                        >
+                          <span>{!state.isBackendServiceConnected && "Dismiss"}</span>
+                        </button>
                       </div>
                     </div>
                   )}
