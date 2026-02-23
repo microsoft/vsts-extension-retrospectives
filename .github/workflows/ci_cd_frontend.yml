@@ -132,6 +132,12 @@ jobs:
           echo "useCallback" >> base.txt
           echo "useState" >> base.txt
           echo "AdjustIcon" >> base.txt
+          echo "reconnection" >> base.txt
+          echo "ZTNA" >> base.txt
+          echo "WebSocket" >> base.txt
+          echo "hostname" >> base.txt
+          echo "on-prem" >> base.txt
+          echo "allowlist" >> base.txt
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'

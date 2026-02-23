@@ -130,6 +130,7 @@ export interface FeedbackBoardContainerState {
   hasToggledArchive: boolean;
   isAppInitialized: boolean;
   isBackendServiceConnected: boolean;
+  isBackendServiceReconnecting: boolean;
   isTeamDataLoaded: boolean;
   isAllTeamsLoaded: boolean;
   maxVotesPerUser: number;
@@ -205,6 +206,7 @@ const initialState: FeedbackBoardContainerState = {
   isAllTeamsLoaded: false,
   isAppInitialized: false,
   isBackendServiceConnected: false,
+  isBackendServiceReconnecting: false,
   focusModeModel: null,
   isIncludeTeamEffectivenessMeasurementDialogHidden: true,
   isDropIssueInEdgeMessageBarVisible: true,
@@ -297,6 +299,21 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     }
   }, []);
 
+  const handleBackendConnectionClosed = React.useCallback(() => {
+    appInsights.trackEvent({ name: TelemetryEvents.LiveSyncConnectionClosed });
+    setState({ isBackendServiceConnected: false, isBackendServiceReconnecting: false });
+  }, [setState]);
+
+  const handleBackendConnectionReconnecting = React.useCallback(() => {
+    appInsights.trackEvent({ name: TelemetryEvents.LiveSyncReconnecting });
+    setState({ isBackendServiceConnected: false, isBackendServiceReconnecting: true });
+  }, [setState]);
+
+  const handleBackendConnectionReconnected = React.useCallback(() => {
+    appInsights.trackEvent({ name: TelemetryEvents.LiveSyncReconnected });
+    setState({ isBackendServiceConnected: true, isBackendServiceReconnecting: false });
+  }, [setState]);
+
   const handleBoardActionsDocumentPointerDown = React.useCallback((event: PointerEvent) => {
     const root = boardActionsMenuRootRef.current;
     if (!root) {
@@ -337,14 +354,14 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     if (props.isHostedAzureDevOps) {
       try {
         const isBackendServiceConnected = await reflectBackendService.startConnection();
-        setState({ isBackendServiceConnected });
+        setState({ isBackendServiceConnected, isBackendServiceReconnecting: false });
       } catch (error) {
         appInsights.trackException(error, {
           action: "connect",
         });
       }
     } else {
-      setState({ isBackendServiceConnected: false });
+      setState({ isBackendServiceConnected: false, isBackendServiceReconnecting: false });
     }
 
     try {
@@ -387,9 +404,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     }
 
     try {
-      reflectBackendService.onConnectionClose(() => {
-        setState({ isBackendServiceConnected: false });
-      });
+      reflectBackendService.onConnectionClose(handleBackendConnectionClosed);
+      reflectBackendService.onConnectionReconnecting(handleBackendConnectionReconnecting);
+      reflectBackendService.onConnectionReconnected(handleBackendConnectionReconnected);
 
       reflectBackendService.onReceiveNewBoard(handleBoardCreated);
       reflectBackendService.onReceiveDeletedBoard(handleBoardDeleted);
@@ -403,16 +420,22 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     setState({ isAppInitialized: true });
 
     document.addEventListener("pointerdown", handleBoardActionsDocumentPointerDown);
-  }, [handleBoardActionsDocumentPointerDown, setState]);
+  }, [handleBackendConnectionClosed, handleBackendConnectionReconnected, handleBackendConnectionReconnecting, handleBoardActionsDocumentPointerDown, setState]);
 
   const componentWillUnmount = React.useCallback(() => {
+    reflectBackendService.removeOnConnectionClose(handleBackendConnectionClosed);
+    reflectBackendService.removeOnConnectionReconnecting(handleBackendConnectionReconnecting);
+    reflectBackendService.removeOnConnectionReconnected(handleBackendConnectionReconnected);
     reflectBackendService.removeOnReceiveNewBoard(handleBoardCreated);
     reflectBackendService.removeOnReceiveDeletedBoard(handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(handleBoardUpdated);
-    clearBoardTimerInterval();
+    if (boardTimerIntervalIdRef.current !== undefined) {
+      window.clearInterval(boardTimerIntervalIdRef.current);
+      boardTimerIntervalIdRef.current = undefined;
+    }
 
     document.removeEventListener("pointerdown", handleBoardActionsDocumentPointerDown);
-  }, [handleBoardActionsDocumentPointerDown]);
+  }, [handleBackendConnectionClosed, handleBackendConnectionReconnected, handleBackendConnectionReconnecting, handleBoardActionsDocumentPointerDown]);
 
   React.useEffect(() => {
     if (!props.deferInitialization) {
@@ -1639,6 +1662,16 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     setState({ isDropIssueInEdgeMessageBarVisible: false });
   };
 
+  const retryBackendConnection = async () => {
+    appInsights.trackEvent({ name: TelemetryEvents.LiveSyncManualRetry });
+    setState({ isBackendServiceReconnecting: true });
+    const isBackendServiceConnected = await reflectBackendService.retryConnection();
+    if (!isBackendServiceConnected) {
+      appInsights.trackEvent({ name: TelemetryEvents.LiveSyncManualRetryFailed });
+    }
+    setState({ isBackendServiceConnected, isBackendServiceReconnecting: false });
+  };
+
   React.useImperativeHandle(ref, () => {
     const handle: FeedbackBoardContainerHandle = {
       get state() {
@@ -2133,17 +2166,21 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                   )}
                   {props.isHostedAzureDevOps && !state.isBackendServiceConnected && (
                     <div className="retro-message-bar" role="alert" aria-live="assertive">
-                      <span>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users.</span>
+                      <span>
+                        {state.isBackendServiceReconnecting
+                          ? "We are reconnecting to the live syncing service."
+                          : <>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users. <a href="https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#live-sync-troubleshooting" target="_blank" rel="noopener noreferrer">Troubleshooting steps</a></>
+                        }
+                      </span>
                       <div className="actions">
                         <button
                           type="button"
-                          onClick={() => {
-                            setState({ isBackendServiceConnected: true });
-                          }}
-                          aria-label="Hide"
-                          title="Hide"
+                          onClick={retryBackendConnection}
+                          aria-label="Retry live sync"
+                          title="Retry live sync"
+                          disabled={state.isBackendServiceReconnecting}
                         >
-                          <span aria-hidden="true">×</span>
+                          <span>{state.isBackendServiceReconnecting ? "Retrying..." : "Retry"}</span>
                         </button>
                       </div>
                     </div>

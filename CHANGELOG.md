@@ -4,7 +4,8 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.52
 
-* Fix: improve archived board delete messaging in History and harden loading-state recovery to avoid indefinite spinner states after data-load failures.
+* Fix: improve archived board delete messaging in History and harden loading-state recovery to avoid indefinite spinner states after data-load failures. From [GitHub PR #1578](https://github.com/microsoft/vsts-extension-retrospectives/pull/1578)
+* Fix: improve live-sync reliability with automatic reconnect, manual retry, and connection telemetry for better diagnostics. From [GitHub PR #1580](https://github.com/microsoft/vsts-extension-retrospectives/pull/1580)
 
 ## v1.92.51
 

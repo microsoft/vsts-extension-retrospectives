@@ -22,6 +22,7 @@ The [Retrospectives extension](https://marketplace.visualstudio.com/items?itemNa
   - [Retrospective Features](#retrospective-features)
   - [Install](#install)
   - [Use](#use)
+  - [Live Sync Troubleshooting](#live-sync-troubleshooting)
   - [Best Practices](#best-practices)
   - [Contribute](#contribute)
   - [License](#license)
@@ -309,6 +310,28 @@ To _archive_ a retrospective, check the box in the Archived column. The retrospe
 To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective will reappear in the Board selection dropdown. Restoring will take effect immediately for the user performing the action, while other users will see the change only after reloading the Retrospective boards.
 
 To _delete_ an archived retrospective, wait for two minutes after archiving, then click the trash icon to _permanently_ delete the retrospective.  The delay between archiving and deleting was added to encourage users to try the archive functionality before deleting, since the delete action cannot be undone and, in most cases, archiving will be sufficient.  Deleting will take effect immediately for all users.
+
+## Live Sync Troubleshooting
+
+If you see the in-app message that live syncing is unavailable, the board still works, but updates from other users may not appear until the connection is restored.
+
+### Quick checks
+
+- Select **Retry** in the warning banner and wait for reconnection.
+- Refresh the browser tab if the warning persists.
+- Verify system clock/timezone are accurate on the client machine (token validation depends on local time).
+
+### Network / proxy checks (including enterprise ZTNA, ZScaler, etc.)
+
+Live sync uses a SignalR connection to the backend service URL `https://app-retrospective-extension-prod.azurewebsites.net`.
+
+- Ensure outbound HTTPS/WebSocket traffic to that hostname is allowed by your firewall/proxy.
+- If your organization uses network security tooling (for example, SSL interception, private access, or zero-trust gateways), add an allow rule for the collaboration service hostname.
+- Confirm that proxy policy permits long-lived connections (WebSocket or SignalR fallback transports).
+
+### On-premise note
+
+For Azure DevOps Server/on-prem deployments, behavior depends on your environment and backend setup. If live sync does not connect reliably, use page refresh as a fallback while validating proxy/allowlist configuration for your collaboration service endpoint.
 
 ## Best Practices
 

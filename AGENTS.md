@@ -31,8 +31,6 @@ src/
 ```bash
 npm ci                     # Install dependencies
 npm run build              # Build for production
-npm run lint               # Lint TypeScript/React
-npm run lint:fix           # Auto-fix lint issues
 npm run format             # Format with Prettier
 npm test                   # Run all tests with coverage
 
@@ -164,4 +162,4 @@ PRs trigger:
 2. Backend: restore, build, test
 3. Pre-commit: gitleaks (secrets), shellcheck, formatting
 
-Always run `npm run lint` and `npm test` before committing frontend changes.
+Always run `npm test` before committing frontend changes.

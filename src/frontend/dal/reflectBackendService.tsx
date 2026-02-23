@@ -1,4 +1,4 @@
-import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
 import { getAppToken } from "azure-devops-extension-sdk";
 
 import { config } from "../config/config";
@@ -31,15 +31,38 @@ class ReflectBackendService {
   private _appToken: string;
   private _tokenExpiry: Date;
   private _connectionAvailable: boolean;
+  private _connectionCloseCallbacks = new Set<(error?: Error) => void>();
+  private _connectionReconnectingCallbacks = new Set<(error?: Error) => void>();
+  private _connectionReconnectedCallbacks = new Set<(connectionId?: string) => void>();
 
   constructor() {
-    this._signalRConnection = new HubConnectionBuilder().withUrl(ReflectBackendService.signalRHubUrl.href, { accessTokenFactory: this.retrieveValidToken }).configureLogging(LogLevel.Error).build();
+    this._signalRConnection = new HubConnectionBuilder()
+      .withUrl(ReflectBackendService.signalRHubUrl.href, { accessTokenFactory: this.retrieveValidToken })
+      .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+      .configureLogging(LogLevel.Error)
+      .build();
     this._connectionAvailable = false;
 
-    this._signalRConnection.onclose(() => {
+    this._signalRConnection.onclose((error?: Error) => {
       this._connectionAvailable = false;
+      this._connectionCloseCallbacks.forEach(callback => callback(error));
+    });
+
+    this._signalRConnection.onreconnecting((error?: Error) => {
+      this._connectionAvailable = false;
+      this._connectionReconnectingCallbacks.forEach(callback => callback(error));
+    });
+
+    this._signalRConnection.onreconnected((connectionId?: string) => {
+      this._connectionAvailable = true;
+      if (this._currentBoardId) {
+        this.joinBoardGroup(this._currentBoardId);
+      }
+      this._connectionReconnectedCallbacks.forEach(callback => callback(connectionId));
     });
   }
+
+  private isConnected = () => this._signalRConnection && this._signalRConnection.state === HubConnectionState.Connected;
 
   /**
    * Starts the connection to the signalR hub.
@@ -49,15 +72,53 @@ class ReflectBackendService {
       return false;
     }
 
+    if (this.isConnected()) {
+      this._connectionAvailable = true;
+      return true;
+    }
+
+    if (this._signalRConnection.state === HubConnectionState.Connecting || this._signalRConnection.state === HubConnectionState.Reconnecting) {
+      return this._connectionAvailable;
+    }
+
     try {
       await this._signalRConnection.start();
       this._connectionAvailable = true;
+      if (this._currentBoardId) {
+        this.joinBoardGroup(this._currentBoardId);
+      }
     } catch (error) {
       console.debug(`Error when trying to start signalR connection: ${error}. Unable to establish signalR connection, live syncing will be affected.`);
       this._connectionAvailable = false;
+      appInsights.trackException(error, {
+        action: "startSignalRConnection",
+      });
     }
 
     return this._connectionAvailable;
+  };
+
+  public retryConnection = async () => {
+    if (!this._signalRConnection) {
+      return false;
+    }
+
+    if (this.isConnected()) {
+      this._connectionAvailable = true;
+      return true;
+    }
+
+    if (this._signalRConnection.state === HubConnectionState.Connecting || this._signalRConnection.state === HubConnectionState.Reconnecting) {
+      return this._connectionAvailable;
+    }
+
+    try {
+      await this._signalRConnection.stop();
+    } catch {
+      this._connectionAvailable = false;
+    }
+
+    return this.startConnection();
   };
 
   private retrieveValidToken = () => {
@@ -88,7 +149,7 @@ class ReflectBackendService {
   };
 
   private joinBoardGroup = (boardId: string) => {
-    if (!this._connectionAvailable) {
+    if (!this.isConnected()) {
       return;
     }
 
@@ -96,10 +157,6 @@ class ReflectBackendService {
   };
 
   private removeSignalCallback = (signal: string, callback: (columnId: string, feedbackItemId: string) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
     this._signalRConnection.off(signal, callback);
   };
 
@@ -110,15 +167,11 @@ class ReflectBackendService {
    * @param newBoardId The id of the board to join.
    */
   public switchToBoard = (newBoardId: string) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
-    if (this._currentBoardId !== undefined && this._currentBoardId !== null) {
+    if (this._currentBoardId !== undefined && this._currentBoardId !== null && this.isConnected()) {
       this._signalRConnection.send(ReflectBackendSignals.LeaveReflectBoardGroup, this._currentBoardId);
     }
 
-    if (newBoardId) {
+    if (newBoardId && this.isConnected()) {
       this.joinBoardGroup(newBoardId);
     }
     this._currentBoardId = newBoardId;
@@ -208,11 +261,27 @@ class ReflectBackendService {
    * @param callback The callback function: (errror?: Error) => void
    */
   public onConnectionClose = (callback: (error?: Error) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
+    this._connectionCloseCallbacks.add(callback);
+  };
 
-    this._signalRConnection.onclose(callback);
+  public removeOnConnectionClose = (callback: (error?: Error) => void) => {
+    this._connectionCloseCallbacks.delete(callback);
+  };
+
+  public onConnectionReconnecting = (callback: (error?: Error) => void) => {
+    this._connectionReconnectingCallbacks.add(callback);
+  };
+
+  public removeOnConnectionReconnecting = (callback: (error?: Error) => void) => {
+    this._connectionReconnectingCallbacks.delete(callback);
+  };
+
+  public onConnectionReconnected = (callback: (connectionId?: string) => void) => {
+    this._connectionReconnectedCallbacks.add(callback);
+  };
+
+  public removeOnConnectionReconnected = (callback: (connectionId?: string) => void) => {
+    this._connectionReconnectedCallbacks.delete(callback);
   };
 
   /**
@@ -220,10 +289,6 @@ class ReflectBackendService {
    * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
    */
   public onReceiveNewItem = (callback: (columnId: string, feedbackItemId: string) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
     this._signalRConnection.on(ReflectBackendSignals.ReceiveNewItem, callback);
   };
 
@@ -242,10 +307,6 @@ class ReflectBackendService {
    * @param callback The callback function: (teamId: string, boardId: string) => void
    */
   public onReceiveNewBoard = (callback: (teamId: string, boardId: string) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
     this._signalRConnection.on(ReflectBackendSignals.ReceiveNewBoard, callback);
   };
 
@@ -264,10 +325,6 @@ class ReflectBackendService {
    * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
    */
   public onReceiveUpdatedItem = (callback: (columnId: string, feedbackItemId: string) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
     this._signalRConnection.on(ReflectBackendSignals.ReceiveUpdatedItem, callback);
   };
 
@@ -286,10 +343,6 @@ class ReflectBackendService {
    * @param callback The callback function: (columnId: string, feedbackItemId: string) => void
    */
   public onReceiveDeletedItem = (callback: (columnId: string, feedbackItemId: string) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
     this._signalRConnection.on(ReflectBackendSignals.ReceiveDeletedItem, callback);
   };
 
@@ -308,10 +361,6 @@ class ReflectBackendService {
    * @param callback The callback function: (teamId: string, boardId: string) => void
    */
   public onReceiveDeletedBoard = (callback: (teamId: string, boardId: string) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
     this._signalRConnection.on(ReflectBackendSignals.ReceiveDeletedBoard, callback);
   };
 
@@ -330,10 +379,6 @@ class ReflectBackendService {
    * @param callback The callback function: (teamId: string, boardId: string) => void
    */
   public onReceiveUpdatedBoard = (callback: (teamId: string, boardId: string) => void) => {
-    if (!this._connectionAvailable) {
-      return;
-    }
-
     this._signalRConnection.on(ReflectBackendSignals.ReceiveUpdatedBoard, callback);
   };
 
