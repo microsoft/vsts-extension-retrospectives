@@ -128,7 +128,7 @@ export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClic
       {getIconElement("delete")}
     </div>
   ) : (
-    <div className="centered-cell trash-icon-disabled" title="Try archive before delete" aria-label="Try archive before delete">
+    <div className="centered-cell trash-icon-disabled" title="To delete this board, you must wait for 2 minutes after archiving." aria-label="To delete this board, you must wait for 2 minutes after archiving.">
       {getIconElement("delete")}
     </div>
   );
