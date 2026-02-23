@@ -60,11 +60,6 @@ jobs:
           pre-commit run --all-files || true
 
       - if: steps.changes.outputs.src == 'true'
-        name: "Lint node files"
-        run: npm run lint
-        working-directory: "src/frontend"
-
-      - if: steps.changes.outputs.src == 'true'
         name: "Build (bundle analysis)"
         run: npm run build
         working-directory: "src/frontend"

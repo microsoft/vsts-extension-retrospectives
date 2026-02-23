@@ -359,6 +359,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       appInsights.trackException(error, {
         action: "initializeTeamAndBoardState",
       });
+      setState({ isTeamDataLoaded: true });
     }
 
     try {
@@ -1147,36 +1148,44 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
    */
   const setCurrentTeam = async (teamId: string) => {
     setState({ isTeamDataLoaded: false });
-    const state = stateRef.current;
-    const matchedTeam = state.projectTeams.find(team => team.id === teamId) || state.userTeams.find(team => team.id === teamId);
+    try {
+      const state = stateRef.current;
+      const matchedTeam = state.projectTeams.find(team => team.id === teamId) || state.userTeams.find(team => team.id === teamId);
 
-    if (matchedTeam) {
-      let boardsForTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
-      if (boardsForTeam?.length) {
-        boardsForTeam = boardsForTeam
-          .filter((board: IFeedbackBoardDocument) =>
-            FeedbackBoardDocumentHelper.filter(
-              board,
-              stateRef.current.userTeams.map(t => t.id),
-              stateRef.current.currentUserId,
-            ),
-          )
-          .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-      }
-
-      setState(prevState => {
-        // Ensure that we are actually changing teams to prevent needless rerenders.
-        if (!prevState.currentTeam || prevState.currentTeam.id !== matchedTeam.id) {
-          return {
-            boards: boardsForTeam?.length ? boardsForTeam : [],
-            currentBoard: boardsForTeam?.length ? boardsForTeam[0] : null,
-            currentTeam: matchedTeam,
-            isTeamDataLoaded: true,
-          };
+      if (matchedTeam) {
+        let boardsForTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
+        if (boardsForTeam?.length) {
+          boardsForTeam = boardsForTeam
+            .filter((board: IFeedbackBoardDocument) =>
+              FeedbackBoardDocumentHelper.filter(
+                board,
+                stateRef.current.userTeams.map(t => t.id),
+                stateRef.current.currentUserId,
+              ),
+            )
+            .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
         }
 
-        return null;
+        setState(prevState => {
+          if (!prevState.currentTeam || prevState.currentTeam.id !== matchedTeam.id) {
+            return {
+              boards: boardsForTeam?.length ? boardsForTeam : [],
+              currentBoard: boardsForTeam?.length ? boardsForTeam[0] : null,
+              currentTeam: matchedTeam,
+              isTeamDataLoaded: true,
+            };
+          }
+
+          return null;
+        });
+      } else {
+        setState({ isTeamDataLoaded: true });
+      }
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "setCurrentTeam",
       });
+      setState({ isTeamDataLoaded: true });
     }
   };
 
@@ -1206,33 +1215,40 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const reloadBoardsForCurrentTeam = async () => {
     setState({ isTeamDataLoaded: false });
 
-    let boardsForTeam = await BoardDataService.getBoardsForTeam(stateRef.current.currentTeam.id);
+    try {
+      let boardsForTeam = await BoardDataService.getBoardsForTeam(stateRef.current.currentTeam.id);
 
-    if (!boardsForTeam.length) {
+      if (!boardsForTeam.length) {
+        setState({
+          isTeamDataLoaded: true,
+          boards: [],
+          currentBoard: null,
+        });
+
+        return;
+      }
+
+      boardsForTeam = boardsForTeam
+        .filter((board: IFeedbackBoardDocument) =>
+          FeedbackBoardDocumentHelper.filter(
+            board,
+            stateRef.current.userTeams.map(t => t.id),
+            stateRef.current.currentUserId,
+          ),
+        )
+        .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+
       setState({
         isTeamDataLoaded: true,
-        boards: [],
-        currentBoard: null,
+        boards: boardsForTeam,
+        currentBoard: boardsForTeam[0],
       });
-
-      return;
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "reloadBoardsForCurrentTeam",
+      });
+      setState({ isTeamDataLoaded: true });
     }
-
-    boardsForTeam = boardsForTeam
-      .filter((board: IFeedbackBoardDocument) =>
-        FeedbackBoardDocumentHelper.filter(
-          board,
-          stateRef.current.userTeams.map(t => t.id),
-          stateRef.current.currentUserId,
-        ),
-      )
-      .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-
-    setState({
-      isTeamDataLoaded: true,
-      boards: boardsForTeam,
-      currentBoard: boardsForTeam[0],
-    });
   };
 
   /**
@@ -2206,107 +2222,107 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       )}
       {state.currentBoard && (
         <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label="Retrospective Board Summary" role="dialog">
-        <div className="header">
-          <h2 className="title">Retrospective Board Summary</h2>
-          <button type="button" onClick={hideRetroSummaryDialog} aria-label="Close">
-            {getIconElement("close")}
-          </button>
-        </div>
-        <div className="subText">
-          <section className="retro-summary-section">
-            <div className="retro-summary-section-header">Basic Settings</div>
-            <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(state.currentBoard.createdDate))}</div>
-            <div id="retro-summary-created-by">
-              Created by <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
-            </div>
-          </section>
-          <section className="retro-summary-section">
-            <div className="retro-summary-section-header">Participant Summary</div>
-            <div className="retro-summary-section-item">Contributors: {state.contributors.length} participant(s)</div>
-
-            {!state.currentBoard.isAnonymous && state.contributors.length > 0 && (
-              <div className="retro-summary-contributors-section">
-                {state.contributors.map(contributor => (
-                  <div key={contributor.id} className="retro-summary-contributor">
-                    <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="retro-summary-item-horizontal-group">
-              <div className="retro-summary-section-item horizontal-group-item">
-                {Object.keys(state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {state.castedVoteCount} vote(s)
-              </div>
-              <div className="retro-summary-section-item horizontal-group-item">{state.feedbackItems.length} feedback item(s) created</div>
-              <div className="retro-summary-section-item horizontal-group-item">{state.actionItemIds.length} action item(s) created</div>
-            </div>
-          </section>
-          {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+          <div className="header">
+            <h2 className="title">Retrospective Board Summary</h2>
+            <button type="button" onClick={hideRetroSummaryDialog} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <div className="subText">
             <section className="retro-summary-section">
-              <div className="retro-summary-section-header">Team Assessment</div>
-              <div>
-                Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
-                <div className="retro-summary-effectiveness-scores">
-                  <ul className="chart">
-                    {state.effectivenessMeasurementChartData.map(data => {
-                      const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
-                      const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
-                      const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
-                      const redScore = (data.red * 100) / teamEffectivenessResponseCount;
-                      return (
-                        <li className="chart-question-block" key={data.questionId}>
-                          <div className="chart-question">
-                            <i className={getQuestionIconClassName(data.questionId)} /> &nbsp;
-                            {getQuestionShortName(data.questionId)}
-                          </div>
-                          {data.red > 0 && (
-                            <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
-                              <span>{percentageFormatter(redScore)}</span>
+              <div className="retro-summary-section-header">Basic Settings</div>
+              <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(state.currentBoard.createdDate))}</div>
+              <div id="retro-summary-created-by">
+                Created by <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
+              </div>
+            </section>
+            <section className="retro-summary-section">
+              <div className="retro-summary-section-header">Participant Summary</div>
+              <div className="retro-summary-section-item">Contributors: {state.contributors.length} participant(s)</div>
+
+              {!state.currentBoard.isAnonymous && state.contributors.length > 0 && (
+                <div className="retro-summary-contributors-section">
+                  {state.contributors.map(contributor => (
+                    <div key={contributor.id} className="retro-summary-contributor">
+                      <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="retro-summary-item-horizontal-group">
+                <div className="retro-summary-section-item horizontal-group-item">
+                  {Object.keys(state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {state.castedVoteCount} vote(s)
+                </div>
+                <div className="retro-summary-section-item horizontal-group-item">{state.feedbackItems.length} feedback item(s) created</div>
+                <div className="retro-summary-section-item horizontal-group-item">{state.actionItemIds.length} action item(s) created</div>
+              </div>
+            </section>
+            {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
+              <section className="retro-summary-section">
+                <div className="retro-summary-section-header">Team Assessment</div>
+                <div>
+                  Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
+                  <div className="retro-summary-effectiveness-scores">
+                    <ul className="chart">
+                      {state.effectivenessMeasurementChartData.map(data => {
+                        const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
+                        const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
+                        const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
+                        const redScore = (data.red * 100) / teamEffectivenessResponseCount;
+                        return (
+                          <li className="chart-question-block" key={data.questionId}>
+                            <div className="chart-question">
+                              <i className={getQuestionIconClassName(data.questionId)} /> &nbsp;
+                              {getQuestionShortName(data.questionId)}
                             </div>
-                          )}
-                          {data.yellow > 0 && (
-                            <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
-                              <span>{percentageFormatter(yellowScore)}</span>
-                            </div>
-                          )}
-                          {data.green > 0 && (
-                            <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
-                              <span>{percentageFormatter(greenScore)}</span>
-                            </div>
-                          )}
-                          {averageScore > 0 && (
-                            <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${numberFormatter(averageScore)}`}>
-                              {numberFormatter(averageScore)}
-                            </div>
-                          )}
-                          <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
-                            Discuss and Act
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  <div className="chart-legend-section">
-                    <div className="chart-legend-group">
-                      <section>
-                        <div className="chart-legend-color-unfavorable"></div>
-                        <span>Unfavorable</span>
-                      </section>
-                      <section>
-                        <div className="chart-legend-color-neutral"></div>
-                        <span>Neutral</span>
-                      </section>
-                      <section>
-                        <div className="chart-legend-color-favorable"></div>
-                        <span>Favorable</span>
-                      </section>
+                            {data.red > 0 && (
+                              <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
+                                <span>{percentageFormatter(redScore)}</span>
+                              </div>
+                            )}
+                            {data.yellow > 0 && (
+                              <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
+                                <span>{percentageFormatter(yellowScore)}</span>
+                              </div>
+                            )}
+                            {data.green > 0 && (
+                              <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
+                                <span>{percentageFormatter(greenScore)}</span>
+                              </div>
+                            )}
+                            {averageScore > 0 && (
+                              <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${numberFormatter(averageScore)}`}>
+                                {numberFormatter(averageScore)}
+                              </div>
+                            )}
+                            <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
+                              Discuss and Act
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <div className="chart-legend-section">
+                      <div className="chart-legend-group">
+                        <section>
+                          <div className="chart-legend-color-unfavorable"></div>
+                          <span>Unfavorable</span>
+                        </section>
+                        <section>
+                          <div className="chart-legend-color-neutral"></div>
+                          <span>Neutral</span>
+                        </section>
+                        <section>
+                          <div className="chart-legend-color-favorable"></div>
+                          <span>Favorable</span>
+                        </section>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </section>
-          )}
-        </div>
+              </section>
+            )}
+          </div>
         </dialog>
       )}
       <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog" aria-label="Team Assessment History" role="dialog">

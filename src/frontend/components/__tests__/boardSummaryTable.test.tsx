@@ -7,7 +7,7 @@ import { IdentityRef } from "azure-devops-extension-api/WebApi";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 
 import BoardSummaryTable, { buildBoardSummaryState, IBoardSummaryTableProps, IBoardSummaryTableItem } from "../boardSummaryTable";
-import { TrashIcon, isTrashEnabled, handleArchiveToggle } from "../boardSummaryTable";
+import { TrashIcon, isTrashEnabled, handleArchiveToggle, isArchivedWithoutValidDate } from "../boardSummaryTable";
 import BoardDataService from "../../dal/boardDataService";
 import { itemDataService } from "../../dal/itemDataService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
@@ -183,6 +183,12 @@ describe("isTrashEnabled", () => {
     const recentlyArchivedBoard = { ...board, isArchived: true, archivedDate: new Date(Date.now() - 1 * 60 * 1000) };
     expect(isTrashEnabled(recentlyArchivedBoard)).toBe(false);
   });
+
+  it("should classify invalid archivedDate as legacy archived", () => {
+    const invalidArchivedBoard = { ...board, isArchived: true, archivedDate: new Date("invalid") };
+    expect(isTrashEnabled(invalidArchivedBoard)).toBe(false);
+    expect(isArchivedWithoutValidDate(invalidArchivedBoard)).toBe(true);
+  });
 });
 
 describe("TrashIcon tests", () => {
@@ -203,6 +209,16 @@ describe("TrashIcon tests", () => {
     const recentlyArchived = { ...baseBoard, archivedDate: new Date(Date.now() - 1 * 60 * 1000) };
     const { container } = render(<TrashIcon board={recentlyArchived} currentUserId="user-1" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
     expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
+  });
+
+  it("should render legacy disabled trash icon when archivedDate is missing", () => {
+    const legacyArchivedBoard: IBoardSummaryTableItem = {
+      ...baseBoard,
+      archivedDate: undefined,
+    };
+    const { container } = render(<TrashIcon board={legacyArchivedBoard} currentUserId="user-1" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
+    expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
+    expect(container.querySelector(".trash-icon-disabled")?.getAttribute("title")).toBe("Toggle archive off and on to enable delete.");
   });
 
   it("should not render trash icon when board is not archived", () => {
@@ -1109,6 +1125,25 @@ describe("BoardSummaryTable - Action Items Loading", () => {
       expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
     });
   });
+
+  it("handleActionItems sets loaded state when action item loading fails", async () => {
+    const error = new Error("feedback load failed");
+    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockRejectedValueOnce(error);
+
+    const { container } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.querySelector(".board-summary-table-container")).toBeTruthy();
+    });
+
+    expect(appInsights.trackException).toHaveBeenCalledWith(
+      error,
+      expect.objectContaining({
+        action: "loadBoardHistoryActionItems",
+        teamId: "team-1",
+      }),
+    );
+  });
 });
 
 describe("BoardSummaryTable - Delete Dialog", () => {
@@ -1749,7 +1784,7 @@ describe("BoardSummaryTable - TrashIcon rendering", () => {
     const { container } = render(<TrashIcon board={board} currentUserId="owner-1" currentUserIsTeamAdmin={false} onClick={jest.fn()} />);
 
     expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
-    expect(container.querySelector(".trash-icon-disabled")?.getAttribute("title")).toBe("Try archive before delete");
+    expect(container.querySelector(".trash-icon-disabled")?.getAttribute("title")).toBe("To delete this board, you must wait for 2 minutes after archiving.");
   });
 
   it("renders enabled trash icon when board is archived and past delay", () => {

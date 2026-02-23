@@ -2,6 +2,10 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.52
+
+* Fix: improve archived board delete messaging in History and harden loading-state recovery to avoid indefinite spinner states after data-load failures.
+
 ## v1.92.51
 
 * Fix: improve readability of retrospective summary percentages by adjusting background styling. From [GitHub PR #1552](https://github.com/microsoft/vsts-extension-retrospectives/pull/1552)

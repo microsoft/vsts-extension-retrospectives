@@ -1,12 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using CollaborationStateService.Configuration;
 using static ReflectBackend.ReflectBackendSignals;
 
 namespace ReflectBackend
@@ -27,10 +24,10 @@ namespace ReflectBackend
         private readonly TelemetryClient _insights;
         private ILogger<ReflectHub> _logger;
 
-        public ReflectHub(ILogger<ReflectHub> logger, IOptions<AppInsightsSettings> options)
+        public ReflectHub(ILogger<ReflectHub> logger, TelemetryClient insights)
         {
             this._logger = logger;
-            this._insights = new TelemetryClient(new TelemetryConfiguration(options.Value.InstrumentationKey));
+            this._insights = insights;
         }
 
         /// <summary>

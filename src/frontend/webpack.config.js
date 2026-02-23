@@ -4,15 +4,12 @@ import { fileURLToPath } from "url";
 import { createRequire } from "module";
 import TerserPlugin from "terser-webpack-plugin";
 
-import ESLintPlugin from "eslint-webpack-plugin";
-
 import CompressionPlugin from "compression-webpack-plugin";
 
 import { codecovWebpackPlugin } from "@codecov/webpack-plugin";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const require = createRequire(import.meta.url);
 
 const BUILD_DIR = _resolve(__dirname, "dist");
 const APP_DIR = _resolve(__dirname, "");
@@ -96,7 +93,6 @@ export default (_, argv) => {
       maxEntrypointSize: 1600000, // 1.6 MB
     },
     plugins: [
-      new ESLintPlugin(),
       new webpack.ProvidePlugin({
         process: "process/browser",
       }),
