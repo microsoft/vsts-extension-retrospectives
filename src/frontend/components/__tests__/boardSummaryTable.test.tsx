@@ -218,7 +218,7 @@ describe("TrashIcon tests", () => {
     };
     const { container } = render(<TrashIcon board={legacyArchivedBoard} currentUserId="user-1" currentUserIsTeamAdmin={true} onClick={jest.fn()} />);
     expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
-    expect(container.querySelector(".trash-icon-disabled")?.getAttribute("title")).toBe("Legacy archived board. Toggle archive off and on to enable delete.");
+    expect(container.querySelector(".trash-icon-disabled")?.getAttribute("title")).toBe("Toggle archive off and on to enable delete.");
   });
 
   it("should not render trash icon when board is not archived", () => {
@@ -1784,7 +1784,7 @@ describe("BoardSummaryTable - TrashIcon rendering", () => {
     const { container } = render(<TrashIcon board={board} currentUserId="owner-1" currentUserIsTeamAdmin={false} onClick={jest.fn()} />);
 
     expect(container.querySelector(".trash-icon-disabled")).toBeTruthy();
-    expect(container.querySelector(".trash-icon-disabled")?.getAttribute("title")).toBe("Try archive before delete");
+    expect(container.querySelector(".trash-icon-disabled")?.getAttribute("title")).toBe("To delete this board, you must wait for 2 minutes after archiving.");
   });
 
   it("renders enabled trash icon when board is archived and past delay", () => {
