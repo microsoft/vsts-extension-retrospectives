@@ -2169,7 +2169,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                       <span>
                         {state.isBackendServiceReconnecting
                           ? "We are reconnecting to the live syncing service."
-                          : "We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users. <a href='https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#live-sync-troubleshooting' target='_blank' rel='noopener noreferrer'>Troubleshooting steps</a>"}
+                          : <>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users. <a href="https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#live-sync-troubleshooting" target="_blank" rel="noopener noreferrer">Troubleshooting steps</a></>
+                        }
                       </span>
                       <div className="actions">
                         <button
