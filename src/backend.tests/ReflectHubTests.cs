@@ -14,7 +14,7 @@ namespace RetrospectiveExtension.Backend.Tests
     public class ReflectHubTests
     {
         private ILogger<ReflectHub> _logger = Mock.Of<ILogger<ReflectHub>>();
-        private TelemetryClient _insights = new TelemetryClient(new TelemetryConfiguration
+        private readonly TelemetryClient _insights = new TelemetryClient(new TelemetryConfiguration
         {
             DisableTelemetry = true,
             ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000"
