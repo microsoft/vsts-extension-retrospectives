@@ -109,16 +109,16 @@ namespace CollaborationStateService
 
       app.UseAuthentication();
 
-      app.UseAzureSignalR(routes => { routes.MapHub<ReflectBackend.ReflectHub>("/collaborationUpdates"); });
-
       app.Use(async (context, next) =>
       {
-        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
         await next();
       });
 
       app.UseEndpoints(endpoints =>
       {
+        endpoints.MapHub<ReflectBackend.ReflectHub>("/collaborationUpdates");
+
         endpoints.MapGet("/health", async context =>
         {
           logger.LogInformation("Received health request");
