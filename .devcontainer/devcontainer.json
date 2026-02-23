@@ -1,14 +1,16 @@
 {
   "name": "Retrospective Extension Development Environment",
   "image": "mcr.microsoft.com/devcontainers/base:bullseye",
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y shellcheck && sudo apt-get remove -y python3-virtualenv pre-commit || true && sudo pip3 install -U pre-commit virtualenv",
   "features": {
     "ghcr.io/devcontainers/features/azure-cli:1.2.9": {},
     "ghcr.io/devcontainers/features/common-utils:2.5.6": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:2.14.0": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2.16.0": {},
     "ghcr.io/devcontainers/features/dotnet:2.4.2": {},
     "ghcr.io/devcontainers/features/github-cli:1.1.0": {},
-    "ghcr.io/devcontainers/features/node:1.7.1": {}
+    "ghcr.io/devcontainers/features/node:1.7.1": {},
+    "ghcr.io/devcontainers-extra/features/apt-packages": {
+      "packages": "pre-commit,shellcheck"
+    }
   },
   "customizations": {
     "vscode": {
