@@ -1722,6 +1722,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & span {
     @apply flex-1;
+
+    & a {
+      @apply underline text-primary;
+    }
   }
 
   & .actions {
