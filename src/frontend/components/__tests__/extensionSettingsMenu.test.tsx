@@ -353,6 +353,44 @@ describe("ExtensionSettingsMenu", () => {
     });
   });
 
+  it("handles dialog cancel events for all help dialogs", async () => {
+    render(<ExtensionSettingsMenu />);
+
+    fireEvent.click(screen.getByTitle("Prime Directive"));
+    const primeDirectiveDialog = screen.getByRole("dialog", { name: "The Prime Directive" });
+    expect(primeDirectiveDialog).toHaveAttribute("open");
+    fireEvent(primeDirectiveDialog, new Event("cancel", { bubbles: false, cancelable: true }));
+    expect(primeDirectiveDialog).not.toHaveAttribute("open");
+
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(screen.getByText("What's new"));
+    const whatsNewDialog = screen.getByRole("dialog", { name: "What is New" });
+    expect(whatsNewDialog).toHaveAttribute("open");
+    fireEvent(whatsNewDialog, new Event("cancel", { bubbles: false, cancelable: true }));
+    expect(whatsNewDialog).not.toHaveAttribute("open");
+
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(screen.getByText("User guide"));
+    const userGuideDialog = screen.getByRole("dialog", { name: "Retrospectives User Guide" });
+    expect(userGuideDialog).toHaveAttribute("open");
+    fireEvent(userGuideDialog, new Event("cancel", { bubbles: false, cancelable: true }));
+    expect(userGuideDialog).not.toHaveAttribute("open");
+
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
+    const volunteerDialog = screen.getByRole("dialog", { name: "Volunteer" });
+    expect(volunteerDialog).toHaveAttribute("open");
+    fireEvent(volunteerDialog, new Event("cancel", { bubbles: false, cancelable: true }));
+    expect(volunteerDialog).not.toHaveAttribute("open");
+
+    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(screen.getByText("Keyboard shortcuts"));
+    const keyboardShortcutsDialog = screen.getByRole("dialog", { name: "Keyboard Shortcuts" });
+    expect(keyboardShortcutsDialog).toHaveAttribute("open");
+    fireEvent(keyboardShortcutsDialog, new Event("cancel", { bubbles: false, cancelable: true }));
+    expect(keyboardShortcutsDialog).not.toHaveAttribute("open");
+  });
+
   it("handles keyboard shortcuts", async () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));

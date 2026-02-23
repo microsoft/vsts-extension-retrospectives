@@ -47,9 +47,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const cleanPermissionOptions = props.permissionOptions.filter(option => !isGroupOption(option)); // removes groups
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
-  const handleSelectAllClicked = (event: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  const handleSelectAllClicked = (_event: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     if (!canEditPermissions) return;
-    const nextChecked = typeof checked === "boolean" ? checked : Boolean((event.target as HTMLInputElement | null)?.checked);
+    const nextChecked = checked as boolean;
 
     if (nextChecked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === "team" && !teamPermissions.includes(o.id)).map(o => o.id)]);
@@ -205,9 +205,8 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                         disabled={isBoardOwner}
                         checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
                         indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner}
-                        onChange={(event, isChecked) => {
-                          const nextChecked = typeof isChecked === "boolean" ? isChecked : Boolean((event.target as HTMLInputElement | null)?.checked);
-                          handlePermissionClicked(option, nextChecked);
+                        onChange={(_event, isChecked) => {
+                          handlePermissionClicked(option, isChecked as boolean);
                         }}
                       />
                     </td>

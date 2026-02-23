@@ -367,6 +367,7 @@ describe("Board Metadata Form Permissions", () => {
       expect(container.firstChild).toBeTruthy();
     });
 
+
     it("should handle removing member permissions", () => {
       const onPermissionChanged = jest.fn();
       const props = makeProps({
