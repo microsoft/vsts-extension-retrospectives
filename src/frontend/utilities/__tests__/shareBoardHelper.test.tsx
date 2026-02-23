@@ -403,6 +403,72 @@ describe("ShareBoardHelper", () => {
       expect(text).toContain('"What went well","Grouped child item 1",0');
       expect(text).toContain('"undefined"');
     });
+
+    it("should order parent and grouped child items by votes then newest created date", async () => {
+      const orderedFeedbackItems = [
+        {
+          ...mockFeedbackItems[0],
+          id: "parent-old",
+          title: "Parent tie older",
+          columnId: "col1",
+          upvotes: 3,
+          createdDate: new Date("2023-01-01T10:00:00Z"),
+          childFeedbackItemIds: undefined as string[] | undefined,
+        },
+        {
+          ...mockFeedbackItems[0],
+          id: "parent-new",
+          title: "Parent tie newer",
+          columnId: "col2",
+          upvotes: 3,
+          createdDate: new Date("2023-01-01T10:30:00Z"),
+          childFeedbackItemIds: undefined as string[] | undefined,
+        },
+        {
+          ...mockFeedbackItems[2],
+          id: "parent-with-children",
+          title: "Parent with children",
+          columnId: "col1",
+          upvotes: 2,
+          createdDate: new Date("2023-01-01T11:00:00Z"),
+          childFeedbackItemIds: ["child-high", "child-tie-older", "child-tie-newer"],
+        },
+        {
+          ...mockFeedbackItems[3],
+          id: "child-high",
+          title: "Child high votes",
+          upvotes: 2,
+          createdDate: new Date("2023-01-01T11:10:00Z"),
+          parentFeedbackItemId: "parent-with-children",
+        },
+        {
+          ...mockFeedbackItems[3],
+          id: "child-tie-older",
+          title: "Child tie older",
+          upvotes: 1,
+          createdDate: new Date("2023-01-01T11:05:00Z"),
+          parentFeedbackItemId: "parent-with-children",
+        },
+        {
+          ...mockFeedbackItems[3],
+          id: "child-tie-newer",
+          title: "Child tie newer",
+          upvotes: 1,
+          createdDate: new Date("2023-01-01T11:20:00Z"),
+          parentFeedbackItemId: "parent-with-children",
+        },
+      ] as IFeedbackItemDocument[];
+
+      mockItemDataService.getFeedbackItemsForBoard.mockResolvedValue(orderedFeedbackItems);
+
+      await shareBoardHelper.generateCSVContent(mockBoard);
+      const text = await capturedBlob!.text();
+
+      expect(text.indexOf('"What could be improved","Parent tie newer",3')).toBeLessThan(text.indexOf('"What went well","Parent tie older",3'));
+      expect(text.indexOf('"What went well","Parent tie older",3')).toBeLessThan(text.indexOf('"What went well","Parent with children",2'));
+      expect(text.indexOf('"What went well","Child high votes",2')).toBeLessThan(text.indexOf('"What went well","Child tie newer",1'));
+      expect(text.indexOf('"What went well","Child tie newer",1')).toBeLessThan(text.indexOf('"What went well","Child tie older",1'));
+    });
   });
 
   describe("generateEmailText", () => {
@@ -514,6 +580,69 @@ describe("ShareBoardHelper", () => {
 
       expect(result).toContain("\t\t- Grouped child item 1 [0 votes]");
       expect(result).toContain("\t\t- Grouped child item 2 [1 votes]");
+    });
+
+    it("should order items by votes and newest created date within each column", async () => {
+      const emailOrderFeedbackItems = [
+        {
+          ...mockFeedbackItems[0],
+          id: "column-tie-old",
+          title: "Column tie older",
+          columnId: "col1",
+          upvotes: 2,
+          createdDate: new Date("2023-01-01T10:00:00Z"),
+          childFeedbackItemIds: undefined as string[] | undefined,
+        },
+        {
+          ...mockFeedbackItems[0],
+          id: "column-tie-new",
+          title: "Column tie newer",
+          columnId: "col1",
+          upvotes: 2,
+          createdDate: new Date("2023-01-01T10:20:00Z"),
+          childFeedbackItemIds: undefined as string[] | undefined,
+        },
+        {
+          ...mockFeedbackItems[2],
+          id: "parent-grouped",
+          title: "Parent grouped",
+          columnId: "col1",
+          upvotes: 1,
+          childFeedbackItemIds: ["child-vote-high", "child-vote-tie-old", "child-vote-tie-new"],
+        },
+        {
+          ...mockFeedbackItems[3],
+          id: "child-vote-high",
+          title: "Child vote high",
+          upvotes: 3,
+          createdDate: new Date("2023-01-01T11:00:00Z"),
+          parentFeedbackItemId: "parent-grouped",
+        },
+        {
+          ...mockFeedbackItems[3],
+          id: "child-vote-tie-old",
+          title: "Child vote tie old",
+          upvotes: 1,
+          createdDate: new Date("2023-01-01T11:10:00Z"),
+          parentFeedbackItemId: "parent-grouped",
+        },
+        {
+          ...mockFeedbackItems[3],
+          id: "child-vote-tie-new",
+          title: "Child vote tie new",
+          upvotes: 1,
+          createdDate: new Date("2023-01-01T11:30:00Z"),
+          parentFeedbackItemId: "parent-grouped",
+        },
+      ] as IFeedbackItemDocument[];
+
+      mockItemDataService.getFeedbackItemsForBoard.mockResolvedValue(emailOrderFeedbackItems);
+
+      const result = await shareBoardHelper.generateEmailText(mockBoard, mockBoardUrl, false);
+
+      expect(result.indexOf(" - Column tie newer [2 votes]")).toBeLessThan(result.indexOf(" - Column tie older [2 votes]"));
+      expect(result.indexOf("\t\t- Child vote high [3 votes]")).toBeLessThan(result.indexOf("\t\t- Child vote tie new [1 votes]"));
+      expect(result.indexOf("\t\t- Child vote tie new [1 votes]")).toBeLessThan(result.indexOf("\t\t- Child vote tie old [1 votes]"));
     });
   });
 
