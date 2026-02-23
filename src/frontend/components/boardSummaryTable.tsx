@@ -19,7 +19,7 @@ export interface IBoardSummaryTableProps {
   currentUserId: string;
   currentUserIsTeamAdmin: boolean;
   supportedWorkItemTypes: WorkItemType[];
-  onArchiveToggle: () => void; // Notify the parent about archive toggles
+  onArchiveToggle: () => void;
 }
 
 export interface IBoardSummaryTableState {
@@ -117,7 +117,7 @@ export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClic
 
   if (isArchivedWithoutValidDate(board)) {
     return (
-      <div className="centered-cell trash-icon-disabled" title="Legacy archived board. Toggle archive off and on to enable delete." aria-label="Legacy archived board. Toggle archive off and on to enable delete.">
+      <div className="centered-cell trash-icon-disabled" title="Toggle archive off and on to enable delete." aria-label="Toggle archive off and on to enable delete.">
         {getIconElement("delete")}
       </div>
     );
