@@ -1,13 +1,23 @@
 // Create comprehensive mocks before any imports
 const mockStart = jest.fn();
+const mockStop = jest.fn();
 const mockSend = jest.fn();
 const mockOn = jest.fn();
 const mockOff = jest.fn();
 
 // Store the onclose callback so we can trigger it later
-let capturedOncloseCallback: (() => void) | null = null;
-const mockOnClose = jest.fn().mockImplementation((callback: () => void) => {
+let capturedOncloseCallback: ((error?: Error) => void) | null = null;
+let capturedOnReconnectingCallback: ((error?: Error) => void) | null = null;
+let capturedOnReconnectedCallback: ((connectionId?: string) => void) | null = null;
+
+const mockOnClose = jest.fn().mockImplementation((callback: (error?: Error) => void) => {
   capturedOncloseCallback = callback;
+});
+const mockOnReconnecting = jest.fn().mockImplementation((callback: (error?: Error) => void) => {
+  capturedOnReconnectingCallback = callback;
+});
+const mockOnReconnected = jest.fn().mockImplementation((callback: (connectionId?: string) => void) => {
+  capturedOnReconnectedCallback = callback;
 });
 
 // Store the accessTokenFactory so we can test it
@@ -15,23 +25,34 @@ let capturedAccessTokenFactory: (() => string | Promise<string>) | null = null;
 
 const mockConnection = {
   start: mockStart,
+  stop: mockStop,
   send: mockSend,
   on: mockOn,
   off: mockOff,
   onclose: mockOnClose,
+  onreconnecting: mockOnReconnecting,
+  onreconnected: mockOnReconnected,
+  state: "Disconnected",
 };
 
 const mockBuild = jest.fn().mockReturnValue(mockConnection);
 const mockConfigureLogging = jest.fn().mockReturnValue({ build: mockBuild });
+const mockWithAutomaticReconnect = jest.fn().mockReturnValue({ configureLogging: mockConfigureLogging });
 const mockWithUrl = jest.fn().mockImplementation((url: string, options: { accessTokenFactory: () => string | Promise<string> }) => {
   capturedAccessTokenFactory = options?.accessTokenFactory;
-  return { configureLogging: mockConfigureLogging };
+  return { withAutomaticReconnect: mockWithAutomaticReconnect };
 });
 
 jest.mock("@microsoft/signalr", () => ({
   HubConnectionBuilder: jest.fn().mockImplementation(() => ({
     withUrl: mockWithUrl,
   })),
+  HubConnectionState: {
+    Disconnected: "Disconnected",
+    Connecting: "Connecting",
+    Connected: "Connected",
+    Reconnecting: "Reconnecting",
+  },
   LogLevel: {
     Error: 4,
   },
@@ -66,12 +87,19 @@ describe("ReflectBackendService", () => {
   beforeEach(() => {
     // Don't clear mockOnClose and mockWithUrl as they were called during module import
     mockStart.mockClear();
+    mockStop.mockClear();
     mockSend.mockClear();
     mockOn.mockClear();
     mockOff.mockClear();
     mockTrackException.mockClear();
 
-    mockStart.mockResolvedValue(undefined);
+    mockConnection.state = "Disconnected";
+    mockStart.mockImplementation(async () => {
+      mockConnection.state = "Connected";
+    });
+    mockStop.mockImplementation(async () => {
+      mockConnection.state = "Disconnected";
+    });
     mockSend.mockResolvedValue(undefined);
     mockGetAppToken.mockResolvedValue("mock-token");
     mockDecodeJwt.mockReturnValue({ exp: Math.floor(Date.now() / 1000) + 3600 });
@@ -81,6 +109,7 @@ describe("ReflectBackendService", () => {
     it("should create service instance", () => {
       expect(reflectBackendService).toBeDefined();
       expect(typeof reflectBackendService.startConnection).toBe("function");
+      expect(typeof reflectBackendService.retryConnection).toBe("function");
       expect(typeof reflectBackendService.switchToBoard).toBe("function");
     });
   });
@@ -272,9 +301,12 @@ describe("ReflectBackendService", () => {
 
     it("onConnectionClose should register callback", () => {
       const callback = jest.fn();
-      mockOnClose.mockClear();
       reflectBackendService.onConnectionClose(callback);
-      expect(mockOnClose).toHaveBeenCalledWith(callback);
+      expect(capturedOncloseCallback).toBeDefined();
+
+      capturedOncloseCallback!(new Error("closed"));
+
+      expect(callback).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -311,6 +343,7 @@ describe("ReflectBackendService - Connection unavailable scenarios", () => {
 
       // Trigger the onclose callback to simulate connection close
       capturedOncloseCallback!();
+      mockConnection.state = "Disconnected";
 
       // After onclose, the connection should be marked as unavailable
       // Now calls should not send signals
@@ -326,6 +359,7 @@ describe("ReflectBackendService - Connection unavailable scenarios", () => {
 
       // Trigger onclose to make connection unavailable
       capturedOncloseCallback!();
+      mockConnection.state = "Disconnected";
 
       mockSend.mockClear();
 
@@ -340,14 +374,14 @@ describe("ReflectBackendService - Connection unavailable scenarios", () => {
       expect(mockSend).not.toHaveBeenCalled();
     });
 
-    it("should not register event handlers when connection is unavailable", async () => {
+    it("should still register event handlers when connection is unavailable", async () => {
       await reflectBackendService.startConnection();
 
       // Trigger onclose to make connection unavailable
       capturedOncloseCallback!();
+      mockConnection.state = "Disconnected";
 
       mockOn.mockClear();
-      mockOnClose.mockClear();
 
       const callback = jest.fn();
       reflectBackendService.onReceiveNewItem(callback);
@@ -358,16 +392,15 @@ describe("ReflectBackendService - Connection unavailable scenarios", () => {
       reflectBackendService.onReceiveDeletedBoard(callback);
       reflectBackendService.onConnectionClose(callback);
 
-      expect(mockOn).not.toHaveBeenCalled();
-      // onConnectionClose uses mockOnClose, not mockOn
-      expect(mockOnClose).not.toHaveBeenCalled();
+      expect(mockOn).toHaveBeenCalledTimes(6);
     });
 
-    it("should not call off when removeSignalCallback is called with unavailable connection", async () => {
+    it("should call off when removeSignalCallback is called with unavailable connection", async () => {
       await reflectBackendService.startConnection();
 
       // Trigger onclose to make connection unavailable
       capturedOncloseCallback!();
+      mockConnection.state = "Disconnected";
 
       mockOff.mockClear();
 
@@ -379,7 +412,7 @@ describe("ReflectBackendService - Connection unavailable scenarios", () => {
       reflectBackendService.removeOnReceiveUpdatedBoard(callback);
       reflectBackendService.removeOnReceiveDeletedBoard(callback);
 
-      expect(mockOff).not.toHaveBeenCalled();
+      expect(mockOff).toHaveBeenCalledTimes(6);
     });
 
     it("should not join board group when connection is unavailable", async () => {
@@ -387,6 +420,7 @@ describe("ReflectBackendService - Connection unavailable scenarios", () => {
 
       // Trigger onclose
       capturedOncloseCallback!();
+      mockConnection.state = "Disconnected";
 
       mockSend.mockClear();
 
@@ -420,6 +454,7 @@ describe("ReflectBackendService - Connection unavailable scenarios", () => {
 
     it("joinBoardGroup returns early when connection is unavailable", () => {
       (reflectBackendService as unknown as { _connectionAvailable: boolean })._connectionAvailable = false;
+      mockConnection.state = "Disconnected";
 
       mockSend.mockClear();
       (reflectBackendService as unknown as { joinBoardGroup: (id: string) => void }).joinBoardGroup("board-xyz");
