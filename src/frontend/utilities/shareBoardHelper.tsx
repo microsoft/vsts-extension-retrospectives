@@ -85,7 +85,6 @@ class ShareBoardHelper {
         for (const item of workItems) {
           content += `\"${feedbackItem.title}\",\"${item.fields["System.Title"]}\",${item.fields["System.WorkItemType"]},${item.id},${item._links["html"]["href"]}\n`;
         }
-        /* eslint-enable  no-useless-escape */
       }
     }
 
@@ -93,14 +92,13 @@ class ShareBoardHelper {
     downloadFile(blob, "retro.csv");
   };
 
-  // Builds an email message which lists the given board's feedback and work items
   public generateEmailText = async (board: IFeedbackBoardDocument, boardUrl: string, sendEmail: boolean): Promise<string> => {
     const feedbackItems: IFeedbackItemDocument[] = await itemDataService.getFeedbackItemsForBoard(board.id);
     let emailBody: string = `Retrospectives Summary\n\nRetrospective: ${board.title}\n`;
 
     emailBody += await this.getFeedbackBody(feedbackItems, board.columns);
     emailBody += "\n" + (await this.getActionItemsBody(feedbackItems));
-    emailBody += "\n\nLink to retrospective:\n" + boardUrl + " \n\n";
+    emailBody += "\n\nLink to retrospective:\n" + boardUrl;
 
     if (sendEmail) {
       window.open(`mailto:?subject=Retrospectives Summary for ${board.title}&body=${encodeURIComponent(emailBody)}`);
