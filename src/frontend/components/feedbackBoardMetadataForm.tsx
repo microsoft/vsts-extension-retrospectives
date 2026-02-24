@@ -516,10 +516,10 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 </div>
                 <div className="subText">{`Are you sure you want to remove columns from '${currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`}</div>
                 <div className="inner">
-                  <button className="metadata-form-save-button" onClick={handleDeleteColumnConfirm}>
+                  <button onClick={handleDeleteColumnConfirm}>
                     Confirm
                   </button>
-                  <button onClick={hideDeleteColumnConfirmationDialog}>Cancel</button>
+                  <button className="default button" onClick={hideDeleteColumnConfirmationDialog}>Cancel</button>
                 </div>
               </dialog>
             )}
