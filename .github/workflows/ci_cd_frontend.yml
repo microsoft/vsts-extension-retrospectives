@@ -138,6 +138,7 @@ jobs:
           echo "hostname" >> base.txt
           echo "on-prem" >> base.txt
           echo "allowlist" >> base.txt
+          echo "favorability-band" >> base.txt
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'
