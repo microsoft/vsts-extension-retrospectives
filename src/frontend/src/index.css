@@ -286,6 +286,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-(--callout-background-color);
 }
 
+.confirm-changes-dialog,
 .delete-feedback-item-dialog,
 .move-feedback-item-dialog,
 .remove-feedback-item-from-group-dialog,
@@ -1378,7 +1379,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-edit-column-settings {
-    @apply border border-solid border-gray-medium p-2;
+    @apply p-2;
   }
 
   & .board-metadata-form-section-subheader {

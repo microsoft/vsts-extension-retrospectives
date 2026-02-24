@@ -1,6 +1,4 @@
 import React, { ChangeEvent, useState, useEffect, useRef, useCallback } from "react";
-import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
-import Dialog, { DialogFooter, DialogType } from "@fluentui/react/lib/Dialog";
 import { List } from "@fluentui/react/lib/List";
 import { DocumentCardType, DocumentCard } from "@fluentui/react/lib/DocumentCard";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
@@ -149,12 +147,26 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   const [permissions, setPermissions] = useState<IFeedbackBoardDocumentPermissions>(initialState.permissions);
 
   const chooseColumnIconDialogRef = useRef<HTMLDialogElement>(null);
+  const deleteColumnConfirmDialogRef = useRef<HTMLDialogElement>(null);
+  const chooseColumnAccentColorDialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     if (columnCardBeingEdited && isChooseColumnIconDialogOpen) {
       chooseColumnIconDialogRef.current!.showModal();
     }
   }, [columnCardBeingEdited, isChooseColumnIconDialogOpen]);
+
+  useEffect(() => {
+    if (currentBoard && !isDeleteColumnConfirmationDialogHidden) {
+      deleteColumnConfirmDialogRef.current?.showModal();
+    }
+  }, [currentBoard, isDeleteColumnConfirmationDialogHidden]);
+
+  useEffect(() => {
+    if (columnCardBeingEdited && !isChooseColumnAccentColorDialogHidden) {
+      chooseColumnAccentColorDialogRef.current?.showModal();
+    }
+  }, [columnCardBeingEdited, isChooseColumnAccentColorDialogHidden]);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -244,6 +256,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
 
   const hideDeleteColumnConfirmationDialog = useCallback(() => {
     setIsDeleteColumnConfirmationDialogHidden(true);
+    deleteColumnConfirmDialogRef.current?.close();
   }, []);
 
   const openChooseColumnIconDialog = useCallback((columnCard: IFeedbackColumnCard) => {
@@ -488,26 +501,27 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 Add new column
               </button>
             </section>
-            {currentBoard && (
-              <Dialog
-                hidden={isDeleteColumnConfirmationDialogHidden}
-                onDismiss={hideDeleteColumnConfirmationDialog}
-                dialogContentProps={{
-                  type: DialogType.close,
-                  title: "Confirm Changes",
-                  subText: `Are you sure you want to remove columns from '${currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`,
-                }}
-                modalProps={{
-                  isBlocking: true,
-                  containerClassName: "retrospectives-confirm-changes-dialog",
-                  className: "retrospectives-dialog-modal",
-                }}
+            {currentBoard && !isDeleteColumnConfirmationDialogHidden && (
+              <dialog
+                ref={deleteColumnConfirmDialogRef}
+                className="confirm-changes-dialog"
+                aria-label="Confirm Changes"
+                onClose={() => setIsDeleteColumnConfirmationDialogHidden(true)}
               >
-                <DialogFooter>
-                  <PrimaryButton onClick={handleDeleteColumnConfirm} text="Confirm" />
-                  <DefaultButton onClick={hideDeleteColumnConfirmationDialog} text="Cancel" />
-                </DialogFooter>
-              </Dialog>
+                <div className="header">
+                  <h2 className="title">Confirm Changes</h2>
+                  <button onClick={hideDeleteColumnConfirmationDialog} aria-label="Close">
+                    {getIconElement("close")}
+                  </button>
+                </div>
+                <div className="subText">{`Are you sure you want to remove columns from '${currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`}</div>
+                <div className="inner">
+                  <button className="metadata-form-save-button" onClick={handleDeleteColumnConfirm}>
+                    Confirm
+                  </button>
+                  <button onClick={hideDeleteColumnConfirmationDialog}>Cancel</button>
+                </div>
+              </dialog>
             )}
             {columnCardBeingEdited && isChooseColumnIconDialogOpen && (
               <dialog className="choose-column-icon-dialog" aria-label="Choose Column Icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
@@ -546,47 +560,54 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 </div>
               </dialog>
             )}
-            {columnCardBeingEdited && (
-              <Dialog
-                hidden={isChooseColumnAccentColorDialogHidden}
-                dialogContentProps={{
-                  type: DialogType.normal,
-                  title: "Choose Column Color",
-                  subText: `Choose the column color for column '${columnCardBeingEdited.column.title}'`,
-                }}
-                modalProps={{
-                  isBlocking: false,
-                  containerClassName: "choose-column-accent-color-dialog",
-                  className: "retrospectives-dialog-modal",
-                }}
-                onDismiss={() => {
+            {columnCardBeingEdited && !isChooseColumnAccentColorDialogHidden && (
+              <dialog
+                ref={chooseColumnAccentColorDialogRef}
+                className="choose-column-accent-color-dialog"
+                aria-label="Choose Column Color"
+                onClose={() => {
                   setIsChooseColumnAccentColorDialogHidden(true);
                   setColumnCardBeingEdited(null);
                 }}
               >
-                {allAccentColors.map(accentColor => {
-                  return (
-                    <DefaultButton
-                      key={accentColor.friendlyName}
-                      ariaLabel={"Choose the color " + accentColor.friendlyName}
-                      className="choose-feedback-column-accent-color-button"
-                      onClick={() => {
-                        columnCardBeingEdited.column.accentColor = accentColor.colorCode;
-                        setIsChooseColumnAccentColorDialogHidden(true);
-                        setColumnCardBeingEdited(null);
-                        setColumnCards([...columnCards]);
-                      }}
-                    >
-                      <i
-                        className={"fas fa-square"}
-                        style={{
-                          color: accentColor.colorCode,
+                <div className="header">
+                  <h2 className="title">Choose Column Color</h2>
+                  <button
+                    onClick={() => {
+                      chooseColumnAccentColorDialogRef.current?.close();
+                    }}
+                    aria-label="Close"
+                  >
+                    {getIconElement("close")}
+                  </button>
+                </div>
+                <div className="subText">{`Choose the column color for column '${columnCardBeingEdited.column.title}'`}</div>
+                <div className="subText">
+                  {allAccentColors.map(accentColor => {
+                    return (
+                      <button
+                        key={accentColor.friendlyName}
+                        aria-label={"Choose the color " + accentColor.friendlyName}
+                        className="choose-feedback-column-accent-color-button"
+                        onClick={() => {
+                          columnCardBeingEdited.column.accentColor = accentColor.colorCode;
+                          setIsChooseColumnAccentColorDialogHidden(true);
+                          setColumnCardBeingEdited(null);
+                          setColumnCards([...columnCards]);
+                          chooseColumnAccentColorDialogRef.current?.close();
                         }}
-                      />
-                    </DefaultButton>
-                  );
-                })}
-              </Dialog>
+                      >
+                        <i
+                          className={"fas fa-square"}
+                          style={{
+                            color: accentColor.colorCode,
+                          }}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              </dialog>
             )}
           </div>
         </PivotItem>
@@ -594,8 +615,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
           <FeedbackBoardMetadataFormPermissions board={currentBoard} permissions={permissions} permissionOptions={availablePermissionOptions} currentUserId={currentUserId} isNewBoardCreation={isNewBoardCreation} onPermissionChanged={(s: FeedbackBoardPermissionState) => setPermissions(s.permissions)} />
         </PivotItem>
       </Pivot>
-      <DialogFooter>
-        <PrimaryButton
+      <div className="inner">
+        <button
           disabled={!isSaveButtonEnabled()}
           onClick={event => {
             if (isNewBoardCreation || columnCards.every(columnCard => !columnCard.markedForDeletion)) {
@@ -604,11 +625,14 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               showDeleteColumnConfirmationDialog();
             }
           }}
-          text="Save"
           className="metadata-form-save-button"
-        />
-        <DefaultButton onClick={onFormCancel} text="Cancel" />
-      </DialogFooter>
+        >
+          Save
+        </button>
+        <button className="default button" onClick={onFormCancel}>
+          Cancel
+        </button>
+      </div>
     </div>
   );
 };
