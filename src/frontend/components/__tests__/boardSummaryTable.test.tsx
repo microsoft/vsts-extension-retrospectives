@@ -461,6 +461,24 @@ describe("BoardSummaryTable, additional coverage", () => {
     });
   });
 
+  it("handles expanded row when team changes and board is no longer present", async () => {
+    (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValueOnce(mockBoards).mockResolvedValueOnce([]);
+
+    const { container, getAllByLabelText, rerender } = render(<BoardSummaryTable {...baseProps} />);
+
+    await waitFor(() => {
+      expect(container.textContent).toContain(mockBoards[0].title);
+    });
+
+    fireEvent.click(getAllByLabelText("Expand Row")[0]);
+
+    rerender(<BoardSummaryTable {...baseProps} teamId="team-2" />);
+
+    await waitFor(() => {
+      expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("team-2");
+    });
+  });
+
   describe("Additional Coverage Tests", () => {
     it("TrashIcon shows disabled icon before delete delay passes", () => {
       const recentlyArchivedBoard: IBoardSummaryTableItem = {

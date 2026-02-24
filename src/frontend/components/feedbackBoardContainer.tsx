@@ -2164,7 +2164,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                       </div>
                     </div>
                   )}
-                  {props.isHostedAzureDevOps && !state.isBackendServiceConnected && (
+                  {props.isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
                     <div className="retro-message-bar" role="alert" aria-live="assertive">
                       <span>
                         {state.isBackendServiceReconnecting
@@ -2181,6 +2181,14 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                           disabled={state.isBackendServiceReconnecting}
                         >
                           <span>{state.isBackendServiceReconnecting ? "Retrying..." : "Retry"}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={hideLiveSyncInTfsIssueMessageBar}
+                          aria-label="Dismiss notification"
+                          title="Dismiss notification"
+                        >
+                          <span>Dismiss</span>
                         </button>
                       </div>
                     </div>

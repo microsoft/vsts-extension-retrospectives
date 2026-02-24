@@ -393,7 +393,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .preview-email-content {
-  @apply w-full;
+  @apply w-full p-2;
 }
 
 .choose-feedback-column-icon-button {

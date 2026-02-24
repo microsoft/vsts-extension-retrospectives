@@ -133,6 +133,65 @@ describe("ReflectBackendService", () => {
 
       consoleDebugSpy.mockRestore();
     });
+
+    it("should return true immediately when already connected", async () => {
+      mockConnection.state = "Connected";
+      const result = await reflectBackendService.startConnection();
+
+      expect(result).toBe(true);
+      expect(mockStart).not.toHaveBeenCalled();
+    });
+
+    it("should return current availability while connection is in connecting state", async () => {
+      (reflectBackendService as unknown as { _connectionAvailable: boolean })._connectionAvailable = true;
+      mockConnection.state = "Connecting";
+
+      const result = await reflectBackendService.startConnection();
+      expect(result).toBe(true);
+      expect(mockStart).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("retryConnection", () => {
+    it("returns false when signalR connection is missing", async () => {
+      const originalConnection = (reflectBackendService as unknown as { _signalRConnection: unknown })._signalRConnection;
+      (reflectBackendService as unknown as { _signalRConnection: unknown })._signalRConnection = undefined;
+
+      const result = await reflectBackendService.retryConnection();
+      expect(result).toBe(false);
+
+      (reflectBackendService as unknown as { _signalRConnection: unknown })._signalRConnection = originalConnection;
+    });
+
+    it("returns true when already connected", async () => {
+      mockConnection.state = "Connected";
+
+      const result = await reflectBackendService.retryConnection();
+
+      expect(result).toBe(true);
+      expect(mockStop).not.toHaveBeenCalled();
+    });
+
+    it("returns current availability while reconnecting", async () => {
+      (reflectBackendService as unknown as { _connectionAvailable: boolean })._connectionAvailable = false;
+      mockConnection.state = "Reconnecting";
+
+      const result = await reflectBackendService.retryConnection();
+      expect(result).toBe(false);
+      expect(mockStop).not.toHaveBeenCalled();
+    });
+
+    it("continues to start connection even if stop throws", async () => {
+      mockConnection.state = "Disconnected";
+      mockStop.mockRejectedValueOnce(new Error("stop failed"));
+      mockStart.mockResolvedValueOnce(undefined);
+
+      const result = await reflectBackendService.retryConnection();
+
+      expect(mockStop).toHaveBeenCalled();
+      expect(mockStart).toHaveBeenCalled();
+      expect(result).toBe(true);
+    });
   });
 
   describe("token retrieval", () => {
@@ -318,6 +377,50 @@ describe("ReflectBackendService", () => {
       mockSend.mockClear();
       reflectBackendService.switchToBoard("board-1");
       expect(mockSend).toHaveBeenCalled();
+    });
+
+    it("should invoke reconnecting callbacks", () => {
+      const callback = jest.fn();
+      reflectBackendService.onConnectionReconnecting(callback);
+
+      capturedOnReconnectingCallback!(new Error("reconnecting"));
+
+      expect(callback).toHaveBeenCalledWith(expect.any(Error));
+    });
+
+    it("should rejoin board and invoke reconnected callbacks", () => {
+      const callback = jest.fn();
+      reflectBackendService.onConnectionReconnected(callback);
+      (reflectBackendService as unknown as { _currentBoardId: string })._currentBoardId = "board-rejoin";
+      mockConnection.state = "Connected";
+      mockSend.mockClear();
+
+      capturedOnReconnectedCallback!("conn-123");
+
+      expect(mockSend).toHaveBeenCalledWith("joinReflectBoardGroup", "board-rejoin");
+      expect(callback).toHaveBeenCalledWith("conn-123");
+    });
+
+    it("should remove registered connection callbacks", () => {
+      const closeCb = jest.fn();
+      const reconnectingCb = jest.fn();
+      const reconnectedCb = jest.fn();
+
+      reflectBackendService.onConnectionClose(closeCb);
+      reflectBackendService.onConnectionReconnecting(reconnectingCb);
+      reflectBackendService.onConnectionReconnected(reconnectedCb);
+
+      reflectBackendService.removeOnConnectionClose(closeCb);
+      reflectBackendService.removeOnConnectionReconnecting(reconnectingCb);
+      reflectBackendService.removeOnConnectionReconnected(reconnectedCb);
+
+      capturedOncloseCallback!(new Error("closed"));
+      capturedOnReconnectingCallback!(new Error("reconnecting"));
+      capturedOnReconnectedCallback!("conn-abc");
+
+      expect(closeCb).not.toHaveBeenCalled();
+      expect(reconnectingCb).not.toHaveBeenCalled();
+      expect(reconnectedCb).not.toHaveBeenCalled();
     });
   });
 });

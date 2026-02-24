@@ -3,8 +3,14 @@
   "version": "1.0.0",
   "description": "Azure DevOps Retrospective Extension",
   "main": "index.tsx",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/vsts-extension-retrospectives"
+  },
+  "author": "Microsoft",
+  "license": "MIT",
   "scripts": {
-    "test": "jest --env=jsdom --silent -ci --reporters=default --reporters=jest-junit --coverage",
+    "test": "node --no-deprecation ./node_modules/jest/bin/jest.js --env=jsdom --silent -ci --reporters=default --reporters=jest-junit --coverage",
     "test:fuzz": "jest --env=jsdom --testMatch='**/*.fuzz.test.{ts,tsx}' --verbose",
     "build": "npm run clean && npm run compile && npx webpack --mode=production",
     "check": "npm run ncu && npm run format && cd ../../ && pre-commit run --all-files && cd - && npm run test",
@@ -18,12 +24,6 @@
     "publish:p": "npm run pack:p && npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token ${AZURE_DEVOPS_TOKEN}",
     "stats": "CODECOV_TOKEN= npx webpack --mode=production --profile --json > stats.json && npx webpack-bundle-analyzer stats.json dist"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/microsoft/vsts-extension-retrospectives"
-  },
-  "author": "Microsoft",
-  "license": "MIT",
   "dependencies": {
     "@fluentui/react": "8.125.4",
     "@microsoft/applicationinsights-react-js": "19.3.8",
