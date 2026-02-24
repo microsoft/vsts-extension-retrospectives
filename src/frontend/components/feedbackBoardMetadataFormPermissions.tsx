@@ -1,6 +1,4 @@
 import React, { useEffect } from "react";
-import { TextField } from "@fluentui/react/lib/TextField";
-import { Checkbox } from "@fluentui/react/lib/Checkbox";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../interfaces/feedback";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
@@ -47,9 +45,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const cleanPermissionOptions = props.permissionOptions.filter(option => !isGroupOption(option)); // removes groups
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
-  const handleSelectAllClicked = (_event: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  const handleSelectAllClicked = (checked: boolean) => {
     if (!canEditPermissions) return;
-    const nextChecked = checked as boolean;
+    const nextChecked = checked;
 
     if (nextChecked) {
       setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === "team" && !teamPermissions.includes(o.id)).map(o => o.id)]);
@@ -176,7 +174,16 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         <PublicWarningBanner />
 
         <div className="search-bar">
-          <TextField ariaLabel="Search for a team or a member to add permissions" aria-required={true} placeholder={"Search teams or users"} id="retrospective-permission-search-input" value={searchTerm} onChange={(_, newValue) => handleSearchTermChanged(newValue)} />
+          <input
+            aria-label="Search for a team or a member to add permissions"
+            aria-required={true}
+            placeholder="Search teams or users"
+            id="retrospective-permission-search-input"
+            value={searchTerm}
+            onChange={event => handleSearchTermChanged(event.target.value)}
+            type="text"
+            className="permission-search-input"
+          />
         </div>
 
         <div className="board-metadata-table-container">
@@ -184,7 +191,15 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
             <thead>
               <tr>
                 <th className="cell-checkbox" scope="col">
-                  <Checkbox className="my-2" id="select-all-permission-options-visible" ariaLabel="Add permission to every team or member in the table." boxSide="start" disabled={!canEditPermissions} checked={selectAllChecked} onChange={(event, checked) => handleSelectAllClicked(event, checked)} />
+                  <input
+                    className="my-2"
+                    id="select-all-permission-options-visible"
+                    aria-label="Add permission to every team or member in the table."
+                    disabled={!canEditPermissions}
+                    checked={selectAllChecked}
+                    onChange={event => handleSelectAllClicked(event.target.checked)}
+                    type="checkbox"
+                  />
                 </th>
                 <th className={"text-left"} scope="col">
                   <span aria-label="Permission option name table header">{"Name"}</span>
@@ -197,16 +212,20 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                 return (
                   <tr key={option.id} className="option-row">
                     <td>
-                      <Checkbox
+                      <input
                         className="my-2"
                         id={`permission-option-${option.id}`}
-                        ariaLabel="Add permission to every team or member in the table"
-                        boxSide="start"
+                        aria-label="Add permission to every team or member in the table"
                         disabled={isBoardOwner}
                         checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
-                        indeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner}
-                        onChange={(_event, isChecked) => {
-                          handlePermissionClicked(option, isChecked as boolean);
+                        onChange={event => {
+                          handlePermissionClicked(option, event.target.checked);
+                        }}
+                        type="checkbox"
+                        ref={input => {
+                          if (input) {
+                            input.indeterminate = teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner;
+                          }
                         }}
                       />
                     </td>

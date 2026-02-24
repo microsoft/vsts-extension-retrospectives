@@ -472,6 +472,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .search-bar {
     @apply pt-0 px-2.5 pb-2.5;
+
+    & .permission-search-input {
+      @apply w-full p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
+    }
   }
 
   & .board-metadata-table-container {

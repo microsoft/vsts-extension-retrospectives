@@ -613,6 +613,20 @@ describe("Board Metadata Form Permissions", () => {
   });
 
   describe("Search functionality", () => {
+    it("renders native search input", () => {
+      const props = makeProps({
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [{ id: "user1", name: "Alice Smith", uniqueName: "alice@example.com", type: "member" }],
+      });
+
+      const { container, getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const searchInput = getByLabelText("Search for a team or a member to add permissions") as HTMLInputElement;
+
+      expect(searchInput.tagName).toBe("INPUT");
+      expect(searchInput.type).toBe("text");
+      expect(container.querySelector("#retrospective-permission-search-input")).toBeInTheDocument();
+    });
+
     it("should filter options when search term changes", async () => {
       const props = makeProps({
         board: {
@@ -841,6 +855,29 @@ describe("Board Metadata Form Permissions", () => {
   });
 
   describe("Coverage gaps", () => {
+    it("renders native checkbox elements for permissions", () => {
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef(testUserId, "Owner User"),
+        },
+        currentUserId: testUserId,
+        isNewBoardCreation: false,
+        permissions: { Teams: [], Members: [] },
+        permissionOptions: [{ id: "team1", name: "Team One", uniqueName: "team-one", type: "team" }],
+      });
+
+      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const selectAllCheckbox = container.querySelector("#select-all-permission-options-visible") as HTMLInputElement | null;
+      const permissionCheckbox = container.querySelector("#permission-option-team1") as HTMLInputElement | null;
+
+      expect(selectAllCheckbox).toBeInTheDocument();
+      expect(selectAllCheckbox?.tagName).toBe("INPUT");
+      expect(selectAllCheckbox?.type).toBe("checkbox");
+      expect(permissionCheckbox).toBeInTheDocument();
+      expect(permissionCheckbox?.type).toBe("checkbox");
+    });
+
     it("should default to empty permissions when props.permissions is missing", () => {
       const props = makeProps({
         // Intentionally violate the type to exercise nullish-coalescing branches.
