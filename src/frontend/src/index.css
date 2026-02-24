@@ -624,23 +624,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.selector-button {
-  @apply text-lg leading-8 mr-1 bg-black/5 flex h-8 items-center pl-2 pr-2 cursor-pointer hover:text-(--text-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+.selector-option {
+  @apply text-sm leading-8 mr-1 bg-black/5 flex h-8 items-center px-2 cursor-pointer hover:text-(--text-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
 
-  & svg {
-    @apply w-5 h-5;
-  }
-
-  & div {
-    @apply max-w-80 overflow-hidden text-ellipsis px-2;
-
-    & span {
-      @apply text-sm leading-8 inline whitespace-nowrap;
-
-      &:hover {
-        @apply text-primary;
-      }
-    }
+  & option {
+    @apply text-sm bg-black/5 px-2;
   }
 }
 
