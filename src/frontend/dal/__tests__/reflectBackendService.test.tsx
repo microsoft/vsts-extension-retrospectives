@@ -422,6 +422,19 @@ describe("ReflectBackendService", () => {
       expect(reconnectingCb).not.toHaveBeenCalled();
       expect(reconnectedCb).not.toHaveBeenCalled();
     });
+
+    it("should invoke reconnected callbacks without rejoining when no current board", () => {
+      const callback = jest.fn();
+      reflectBackendService.onConnectionReconnected(callback);
+      (reflectBackendService as unknown as { _currentBoardId?: string })._currentBoardId = undefined;
+      mockConnection.state = "Connected";
+      mockSend.mockClear();
+
+      capturedOnReconnectedCallback!("conn-no-board");
+
+      expect(mockSend).not.toHaveBeenCalled();
+      expect(callback).toHaveBeenCalledWith("conn-no-board");
+    });
   });
 });
 
