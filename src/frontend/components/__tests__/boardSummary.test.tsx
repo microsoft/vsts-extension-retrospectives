@@ -4,35 +4,6 @@ import "@testing-library/jest-dom";
 import { getService } from "azure-devops-extension-sdk";
 import { mockWorkItem, mockWorkItemType } from "../__mocks__/mocked_components/mockedWorkItemTracking";
 import BoardSummary, { IBoardSummaryProps, sortActionItemsByColumn } from "../boardSummary";
-import { IColumn } from "@fluentui/react/lib/DetailsList";
-
-// Store the onColumnClick callback for testing
-let capturedOnColumnClick: ((ev: React.MouseEvent<HTMLElement>, column: IColumn) => void) | undefined;
-let capturedOnItemInvoked: ((item: { id: number }) => void) | undefined;
-
-// Mock DetailsList to capture callbacks
-jest.mock("@fluentui/react/lib/DetailsList", () => {
-  const actual = jest.requireActual("@fluentui/react/lib/DetailsList");
-  return {
-    ...actual,
-    DetailsList: (props: any) => {
-      // Capture the onItemInvoked callback
-      if (props.onItemInvoked) {
-        capturedOnItemInvoked = props.onItemInvoked;
-      }
-      // Capture onColumnClick from columns
-      if (props.columns) {
-        props.columns.forEach((col: any) => {
-          if (col.onColumnClick) {
-            capturedOnColumnClick = col.onColumnClick;
-          }
-        });
-      }
-      // Render actual DetailsList
-      return <actual.DetailsList {...props} />;
-    },
-  };
-});
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
@@ -141,8 +112,6 @@ const createActionItem = (overrides: Partial<Record<string, unknown>> = {}) => (
 describe("Board Summary", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    capturedOnColumnClick = undefined;
-    capturedOnItemInvoked = undefined;
   });
 
   it("should render without errors", () => {
@@ -574,7 +543,7 @@ describe("Board Summary", () => {
     }
   });
 
-  it("should open work item when row is double-clicked", async () => {
+  it("should open work item when row is clicked", async () => {
     const mockOpenWorkItem = jest.fn().mockResolvedValue(undefined);
     (getService as jest.MockedFunction<typeof getService>).mockResolvedValue({
       openWorkItem: mockOpenWorkItem,
@@ -586,9 +555,9 @@ describe("Board Summary", () => {
     const rows = container.querySelectorAll('[role="row"]');
 
     if (rows.length > 1) {
-      // Skip header row, double-click the first data row
+      // Skip header row, click the first data row
       const firstDataRow = rows[1];
-      fireEvent.doubleClick(firstDataRow);
+      fireEvent.click(firstDataRow);
 
       await waitFor(
         () => {
@@ -1470,8 +1439,8 @@ describe("Board Summary", () => {
       const rows = container.querySelectorAll('[data-automationid="DetailsRow"]');
 
       if (rows.length > 0) {
-        // Double-click to invoke
-        fireEvent.doubleClick(rows[0]);
+        // Click to invoke
+        fireEvent.click(rows[0]);
         await waitFor(
           () => {
             expect(mockOpenWorkItem).toHaveBeenCalled();
@@ -1776,421 +1745,37 @@ describe("Board Summary", () => {
     });
   });
 
-  describe("Direct onColumnClick callback testing", () => {
-    it("directly invokes captured onColumnClick with title column", async () => {
-      const item1 = {
-        ...mockWorkItem,
-        id: 100,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Zebra",
-          ["System.State"]: "Active",
-          ["System.WorkItemType"]: "Bug",
-        },
-      };
+  describe("Native table interactions", () => {
+    it("sorts when clicking native column header button", async () => {
+      const { container, getByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+      const titleHeaderButton = getByRole("button", { name: "Work item title" });
 
-      const item2 = {
-        ...mockWorkItem,
-        id: 200,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Apple",
-          ["System.State"]: "New",
-          ["System.WorkItemType"]: "Bug",
-        },
-      };
+      await act(async () => {
+        fireEvent.click(titleHeaderButton);
+      });
 
-      const propsForSort: IBoardSummaryProps = {
-        ...mockedPropsWithActionItems,
-        actionItems: [item1, item2],
-      };
-
-      const { container } = render(<BoardSummary {...propsForSort} />);
-
-      // The mock should have captured the onColumnClick callback
-      expect(capturedOnColumnClick).toBeDefined();
-
-      if (capturedOnColumnClick) {
-        const mockEvent = { preventDefault: jest.fn() } as unknown as React.MouseEvent<HTMLElement>;
-        const mockColumn: IColumn = {
-          key: "title",
-          name: "Title",
-          fieldName: "title",
-          minWidth: 100,
-          isSorted: false,
-          isSortedDescending: false,
-        };
-
-        // First click - should sort ascending
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, mockColumn);
-        });
-
-        expect(container.querySelector('[role="grid"]')).toBeTruthy();
-      }
+      expect(container.querySelector('[role="grid"]')).toBeTruthy();
+      const titleHeaderCell = container.querySelector('[role="columnheader"][aria-colindex="2"]');
+      expect(titleHeaderCell?.getAttribute("aria-sort")).toBe("ascending");
     });
 
-    it("directly invokes onColumnClick with undefined fieldName (line 125 fallback)", async () => {
-      const item1 = {
-        ...mockWorkItem,
-        id: 100,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Item 1",
-          ["System.WorkItemType"]: "Bug",
-        },
-      };
-
-      const item2 = {
-        ...mockWorkItem,
-        id: 200,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Item 2",
-          ["System.WorkItemType"]: "Bug",
-        },
-      };
-
-      const propsForSort: IBoardSummaryProps = {
-        ...mockedPropsWithActionItems,
-        actionItems: [item1, item2],
-      };
-
-      const { container } = render(<BoardSummary {...propsForSort} />);
-
-      expect(capturedOnColumnClick).toBeDefined();
-
-      if (capturedOnColumnClick) {
-        const mockEvent = { preventDefault: jest.fn() } as unknown as React.MouseEvent<HTMLElement>;
-
-        // Column with undefined fieldName - should trigger the || "" fallback on line 125
-        const mockColumnWithNoFieldName: IColumn = {
-          key: "icon",
-          name: "Work Item Icon",
-          fieldName: undefined, // No fieldName
-          minWidth: 16,
-          isSorted: false,
-          isSortedDescending: false,
-        };
-
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, mockColumnWithNoFieldName);
-        });
-
-        expect(container.querySelector('[role="grid"]')).toBeTruthy();
-      }
-    });
-
-    it("directly invokes onColumnClick multiple times to toggle sort", async () => {
-      const item1 = {
-        ...mockWorkItem,
-        id: 100,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Beta",
-          ["System.State"]: "Active",
-          ["System.WorkItemType"]: "Bug",
-        },
-      };
-
-      const item2 = {
-        ...mockWorkItem,
-        id: 200,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Alpha",
-          ["System.State"]: "New",
-          ["System.WorkItemType"]: "Bug",
-        },
-      };
-
-      const propsForSort: IBoardSummaryProps = {
-        ...mockedPropsWithActionItems,
-        actionItems: [item1, item2],
-      };
-
-      const { container } = render(<BoardSummary {...propsForSort} />);
-
-      expect(capturedOnColumnClick).toBeDefined();
-
-      if (capturedOnColumnClick) {
-        const mockEvent = { preventDefault: jest.fn() } as unknown as React.MouseEvent<HTMLElement>;
-        const stateColumn: IColumn = {
-          key: "state",
-          name: "State",
-          fieldName: "state",
-          minWidth: 50,
-          isSorted: false,
-          isSortedDescending: false,
-        };
-
-        // First click - ascending
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, stateColumn);
-        });
-
-        // Second click - descending (isSorted will be true now)
-        stateColumn.isSorted = true;
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, stateColumn);
-        });
-
-        // Third click - back to ascending
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, stateColumn);
-        });
-
-        expect(container.querySelector('[role="grid"]')).toBeTruthy();
-      }
-    });
-
-    it("directly invokes onColumnClick with different columns to reset sort", async () => {
-      const item1 = {
-        ...mockWorkItem,
-        id: 100,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Item A",
-          ["System.State"]: "Active",
-          ["System.WorkItemType"]: "Bug",
-          ["Microsoft.VSTS.Common.Priority"]: "2",
-        },
-      };
-
-      const item2 = {
-        ...mockWorkItem,
-        id: 200,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Item B",
-          ["System.State"]: "New",
-          ["System.WorkItemType"]: "Bug",
-          ["Microsoft.VSTS.Common.Priority"]: "1",
-        },
-      };
-
-      const propsForSort: IBoardSummaryProps = {
-        ...mockedPropsWithActionItems,
-        actionItems: [item1, item2],
-      };
-
-      const { container } = render(<BoardSummary {...propsForSort} />);
-
-      expect(capturedOnColumnClick).toBeDefined();
-
-      if (capturedOnColumnClick) {
-        const mockEvent = { preventDefault: jest.fn() } as unknown as React.MouseEvent<HTMLElement>;
-
-        const titleColumn: IColumn = {
-          key: "title",
-          name: "Title",
-          fieldName: "title",
-          minWidth: 100,
-          isSorted: false,
-          isSortedDescending: false,
-        };
-
-        const priorityColumn: IColumn = {
-          key: "priority",
-          name: "Priority",
-          fieldName: "priority",
-          minWidth: 50,
-          isSorted: false,
-          isSortedDescending: false,
-        };
-
-        // Click title column
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, titleColumn);
-        });
-
-        // Click priority column - should reset title sort
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, priorityColumn);
-        });
-
-        expect(container.querySelector('[role="grid"]')).toBeTruthy();
-      }
-    });
-
-    it("directly invokes onColumnClick on type column", async () => {
-      const item1 = {
-        ...mockWorkItem,
-        id: 100,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Bug Item",
-          ["System.WorkItemType"]: "Bug",
-        },
-      };
-
-      const item2 = {
-        ...mockWorkItem,
-        id: 200,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Task Item",
-          ["System.WorkItemType"]: "Task",
-        },
-      };
-
-      const propsForSort: IBoardSummaryProps = {
-        ...mockedPropsWithActionItems,
-        actionItems: [item1, item2],
-      };
-
-      const { container } = render(<BoardSummary {...propsForSort} />);
-
-      expect(capturedOnColumnClick).toBeDefined();
-
-      if (capturedOnColumnClick) {
-        const mockEvent = { preventDefault: jest.fn() } as unknown as React.MouseEvent<HTMLElement>;
-        const typeColumn: IColumn = {
-          key: "type",
-          name: "Type",
-          fieldName: "type",
-          minWidth: 50,
-          isSorted: false,
-          isSortedDescending: false,
-        };
-
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, typeColumn);
-        });
-
-        expect(container.querySelector('[role="grid"]')).toBeTruthy();
-      }
-    });
-
-    it("directly invokes onColumnClick on changedDate column", async () => {
-      const item1 = {
-        ...mockWorkItem,
-        id: 100,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Old Item",
-          ["System.WorkItemType"]: "Bug",
-          ["System.ChangedDate"]: "2023-01-01T00:00:00Z",
-        },
-      };
-
-      const item2 = {
-        ...mockWorkItem,
-        id: 200,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "New Item",
-          ["System.WorkItemType"]: "Bug",
-          ["System.ChangedDate"]: "2024-01-01T00:00:00Z",
-        },
-      };
-
-      const propsForSort: IBoardSummaryProps = {
-        ...mockedPropsWithActionItems,
-        actionItems: [item1, item2],
-      };
-
-      const { container } = render(<BoardSummary {...propsForSort} />);
-
-      expect(capturedOnColumnClick).toBeDefined();
-
-      if (capturedOnColumnClick) {
-        const mockEvent = { preventDefault: jest.fn() } as unknown as React.MouseEvent<HTMLElement>;
-        const dateColumn: IColumn = {
-          key: "changedDate",
-          name: "Last Updated",
-          fieldName: "changedDate",
-          minWidth: 100,
-          isSorted: false,
-          isSortedDescending: false,
-        };
-
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, dateColumn);
-        });
-
-        // Toggle to descending
-        dateColumn.isSorted = true;
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, dateColumn);
-        });
-
-        expect(container.querySelector('[role="grid"]')).toBeTruthy();
-      }
-    });
-
-    it("directly invokes onColumnClick on assignedTo column", async () => {
-      const item1 = {
-        ...mockWorkItem,
-        id: 100,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Assigned to Zelda",
-          ["System.WorkItemType"]: "Bug",
-          ["System.AssignedTo"]: { displayName: "Zelda" },
-        },
-      };
-
-      const item2 = {
-        ...mockWorkItem,
-        id: 200,
-        fields: {
-          ...mockWorkItem.fields,
-          ["System.Title"]: "Assigned to Amy",
-          ["System.WorkItemType"]: "Bug",
-          ["System.AssignedTo"]: { displayName: "Amy" },
-        },
-      };
-
-      const propsForSort: IBoardSummaryProps = {
-        ...mockedPropsWithActionItems,
-        actionItems: [item1, item2],
-      };
-
-      const { container } = render(<BoardSummary {...propsForSort} />);
-
-      expect(capturedOnColumnClick).toBeDefined();
-
-      if (capturedOnColumnClick) {
-        const mockEvent = { preventDefault: jest.fn() } as unknown as React.MouseEvent<HTMLElement>;
-        const assignedColumn: IColumn = {
-          key: "assignedTo",
-          name: "Assigned To",
-          fieldName: "assignedTo",
-          minWidth: 100,
-          isSorted: false,
-          isSortedDescending: false,
-        };
-
-        await act(async () => {
-          capturedOnColumnClick!(mockEvent, assignedColumn);
-        });
-
-        expect(container.querySelector('[role="grid"]')).toBeTruthy();
-      }
-    });
-  });
-
-  describe("Direct onItemInvoked callback testing", () => {
-    it("directly invokes captured onItemInvoked callback", async () => {
+    it("invokes openWorkItem when row is clicked", async () => {
       const mockOpenWorkItem = jest.fn().mockResolvedValue(undefined);
       (getService as jest.MockedFunction<typeof getService>).mockResolvedValue({
         openWorkItem: mockOpenWorkItem,
       } as any);
 
-      render(<BoardSummary {...mockedPropsWithActionItems} />);
+      const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+      const rows = container.querySelectorAll('tbody tr[role="row"]');
+      expect(rows.length).toBeGreaterThan(0);
 
-      expect(capturedOnItemInvoked).toBeDefined();
+      await act(async () => {
+        fireEvent.click(rows[0]);
+      });
 
-      if (capturedOnItemInvoked) {
-        await act(async () => {
-          capturedOnItemInvoked!({ id: 123 });
-        });
-
-        await waitFor(() => {
-          expect(mockOpenWorkItem).toHaveBeenCalledWith(123);
-        });
-      }
+      await waitFor(() => {
+        expect(mockOpenWorkItem).toHaveBeenCalled();
+      });
     });
   });
 });

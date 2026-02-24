@@ -899,6 +899,61 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply border-b-3 border-(--border-subtle-color);
       }
 
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table {
+        @apply w-full h-full border-collapse table-fixed;
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table th {
+        @apply bg-(--background-color) text-(--text-primary-color) text-left px-2 overflow-hidden text-ellipsis whitespace-nowrap;
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table th.sortable button {
+        @apply bg-transparent border-0 text-inherit cursor-pointer text-left p-0 w-full;
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table td {
+        @apply bg-(--background-color) text-(--text-primary-color) border-0 px-2 text-sm overflow-hidden text-ellipsis whitespace-nowrap;
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table th:nth-child(1),
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table td:nth-child(1) {
+        @apply px-1 w-[3%];
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table th:nth-child(2),
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table td:nth-child(2) {
+        @apply w-[39%];
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table th:nth-child(3),
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table td:nth-child(3) {
+        @apply w-[9%];
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table th:nth-child(4),
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table td:nth-child(4) {
+        @apply w-[9%];
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table th:nth-child(5),
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table td:nth-child(5) {
+        @apply w-[14%];
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table th:nth-child(6),
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table td:nth-child(6) {
+        @apply w-[20%];
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table th:nth-child(7),
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table td:nth-child(7) {
+        @apply w-[6%];
+      }
+
+      & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table tbody tr:nth-child(even) td {
+        @apply bg-(--border-subtle-color);
+      }
+
       & tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"] {
         @apply bg-(--background-color) text-(--text-primary-color) border-b border-white;
       }
@@ -928,7 +983,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
 
       & tr .board-summary-container .action-items-summary-card .work-item-title {
-        @apply cursor-pointer text-start;
+        @apply cursor-pointer text-start max-w-full overflow-hidden text-ellipsis whitespace-nowrap block;
       }
 
       & tr .board-summary-container .action-items-summary-card .no-action-items {

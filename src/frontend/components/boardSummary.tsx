@@ -2,7 +2,6 @@
 import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
-import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn } from "@fluentui/react/lib/DetailsList";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getIconElement } from "./icons";
@@ -33,6 +32,19 @@ interface IActionItemsTableProps {
   priority: string;
   id: number;
   onActionItemClick: (id: number) => void;
+}
+
+interface IActionItemsColumn {
+  ariaLabel: string;
+  key: string;
+  name: string;
+  fieldName?: string;
+  isIconOnly?: boolean;
+  isResizable?: boolean;
+  minWidth?: number;
+  maxWidth?: number;
+  isSortable?: boolean;
+  onRender?: (item: IActionItemsTableProps) => React.ReactNode;
 }
 
 const getIconForWorkItemType = (type: string, supportedWorkItemTypes: WorkItemType[]): IIconProps => {
@@ -99,31 +111,38 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
 
   const [actionItemTableItems, setActionItemTableItems] = useState<IActionItemsTableProps[]>(() => buildActionItemsList());
 
-  const onColumnClick = useCallback((_: React.MouseEvent<HTMLElement>, column: IColumn): void => {
+  const onColumnClick = useCallback((column: IActionItemsColumn): void => {
+    if (!column.fieldName || !column.isSortable) {
+      return;
+    }
+
     setActionItemTableItems(prevItems => {
       let newActionItems = prevItems.slice();
 
       setActionItemTableColumns(prevColumns => {
-        const newTableColumns: IColumn[] = prevColumns.slice();
-        const currColumn: IColumn = newTableColumns.filter((currCol: IColumn) => {
+        const newTableColumns: IActionItemsColumn[] = prevColumns.slice();
+        const currColumn = newTableColumns.filter(currCol => {
           return column.key === currCol.key;
         })[0];
 
-        newTableColumns.forEach((newCol: IColumn) => {
+        if (!currColumn?.fieldName || !currColumn.isSortable) {
+          return newTableColumns;
+        }
+
+        newTableColumns.forEach(newCol => {
           if (newCol === currColumn) {
-            if (currColumn.isSorted) {
-              currColumn.isSortedDescending = !currColumn.isSortedDescending;
-            } else {
-              currColumn.isSortedDescending = false;
-            }
-            currColumn.isSorted = true;
+            const currentDescending = (currColumn as IActionItemsColumn & { isSortedDescending?: boolean; isSorted?: boolean }).isSortedDescending ?? false;
+            const isSorted = (currColumn as IActionItemsColumn & { isSorted?: boolean }).isSorted ?? false;
+            (currColumn as IActionItemsColumn & { isSortedDescending: boolean; isSorted: boolean }).isSortedDescending = isSorted ? !currentDescending : false;
+            (currColumn as IActionItemsColumn & { isSorted: boolean }).isSorted = true;
           } else {
-            newCol.isSorted = false;
-            newCol.isSortedDescending = false;
+            (newCol as IActionItemsColumn & { isSorted: boolean; isSortedDescending: boolean }).isSorted = false;
+            (newCol as IActionItemsColumn & { isSortedDescending: boolean }).isSortedDescending = false;
           }
         });
 
-        newActionItems = sortActionItemsByColumn(newActionItems, currColumn.fieldName!, currColumn.isSortedDescending);
+        const isSortedDescending = (currColumn as IActionItemsColumn & { isSortedDescending?: boolean }).isSortedDescending ?? false;
+        newActionItems = sortActionItemsByColumn(newActionItems, currColumn.fieldName, isSortedDescending);
         return newTableColumns;
       });
 
@@ -132,7 +151,7 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
   }, []);
 
   const initialColumns = useMemo(
-    (): IColumn[] => [
+    (): (IActionItemsColumn & { isSorted?: boolean; isSortedDescending?: boolean })[] => [
       {
         ariaLabel: "Work item type icon",
         key: "icon",
@@ -154,9 +173,9 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
+        isSortable: true,
         maxWidth: 350,
         minWidth: 100,
-        onColumnClick: onColumnClick,
         onRender: ({ id, title, onActionItemClick }: IActionItemsTableProps) => {
           return (
             <button
@@ -178,9 +197,9 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
+        isSortable: true,
         minWidth: 50,
         maxWidth: 100,
-        onColumnClick: onColumnClick,
       },
       {
         ariaLabel: "Work item type",
@@ -190,9 +209,9 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
+        isSortable: true,
         minWidth: 50,
         maxWidth: 100,
-        onColumnClick: onColumnClick,
       },
       {
         ariaLabel: "Work item changed date",
@@ -202,13 +221,13 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
+        isSortable: true,
         minWidth: 100,
         maxWidth: 150,
         onRender: ({ changedDate }: IActionItemsTableProps) => {
           const changedDateAsDate = new Date(changedDate);
           return <div className="overflow-ellipsis">{new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(changedDateAsDate)}</div>;
         },
-        onColumnClick: onColumnClick,
       },
       {
         ariaLabel: "Work item assigned to",
@@ -218,9 +237,9 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
+        isSortable: true,
         minWidth: 100,
         maxWidth: 400,
-        onColumnClick: onColumnClick,
       },
       {
         ariaLabel: "Work item priority",
@@ -230,15 +249,15 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         isResizable: true,
         isSorted: false,
         isSortedDescending: false,
+        isSortable: true,
         minWidth: 50,
         maxWidth: 50,
-        onColumnClick: onColumnClick,
       },
     ],
-    [onColumnClick],
+    [],
   );
 
-  const [actionItemTableColumns, setActionItemTableColumns] = useState<IColumn[]>(initialColumns);
+  const [actionItemTableColumns, setActionItemTableColumns] = useState<(IActionItemsColumn & { isSorted?: boolean; isSortedDescending?: boolean })[]>(initialColumns);
 
   const onItemInvoked = useCallback(async (item: { id: number }) => {
     const workItemNavSvc = await getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
@@ -289,7 +308,52 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         </div>
       </div>
       <div className="action-items-summary-card">
-        {actionItems.length > 0 && <DetailsList items={actionItemTableItems} compact={false} columns={actionItemTableColumns} selectionMode={SelectionMode.none} setKey="set" layoutMode={DetailsListLayoutMode.justified} isHeaderVisible={true} selectionPreservedOnEmptyClick={true} onItemInvoked={onItemInvoked} />}
+        {actionItems.length > 0 && (
+          <table className="board-summary-action-items-table" role="grid" aria-label="Work items summary table">
+            <thead>
+              <tr role="row">
+                {actionItemTableColumns.map((column, index) => {
+                  const isSorted = (column as IActionItemsColumn & { isSorted?: boolean }).isSorted ?? false;
+                  const isSortedDescending = (column as IActionItemsColumn & { isSortedDescending?: boolean }).isSortedDescending ?? false;
+                  const ariaSort = isSorted ? (isSortedDescending ? "descending" : "ascending") : "none";
+
+                  return (
+                    <th key={column.key} role="columnheader" aria-colindex={index + 1} aria-sort={ariaSort} data-automationid="ColumnsHeaderColumn" className={column.isSortable ? "sortable" : ""}>
+                      {column.isSortable ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onColumnClick(column);
+                          }}
+                          aria-label={column.ariaLabel}
+                        >
+                          {column.name}
+                        </button>
+                      ) : (
+                        <span aria-label={column.ariaLabel}>{column.isIconOnly ? "" : column.name}</span>
+                      )}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {actionItemTableItems.map(item => (
+                <tr
+                  key={item.id}
+                  role="row"
+                  onClick={() => {
+                    onItemInvoked({ id: item.id });
+                  }}
+                >
+                  {actionItemTableColumns.map(column => (
+                    <td key={`${item.id}-${column.key}`}>{column.onRender ? column.onRender(item) : String(item[column.fieldName ?? ""] ?? "")}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         {actionItems.length === 0 && <div className="no-action-items">Looks like no work items were created for this board.</div>}
       </div>
     </div>
