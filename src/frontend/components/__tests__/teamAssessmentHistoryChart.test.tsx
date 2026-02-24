@@ -210,7 +210,7 @@ describe("TeamAssessmentHistoryChart", () => {
       const svg = container.querySelector("svg");
       expect(svg).toBeInTheDocument();
       expect(svg).toHaveAttribute("width", "1100");
-      expect(svg).toHaveAttribute("height", "500");
+      expect(svg).toHaveAttribute("height", "600");
     });
 
     it("should render with custom dimensions", () => {
