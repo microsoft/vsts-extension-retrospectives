@@ -3,7 +3,7 @@
  */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from "react";
-import { render, screen, waitFor, act, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mockUuid } from "../__mocks__/uuid/v4";
