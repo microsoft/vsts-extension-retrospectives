@@ -419,7 +419,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply inline-block min-w-3/4 w-full resize-none align-middle;
 
     & .editable-text-input {
-      @apply text-base leading-5 border rounded-sm bg-white min-h-15;
+      @apply text-base leading-5 border rounded-sm bg-white text-black min-h-15 w-full;
 
       &.error-border {
         @apply border border-error -m-px;
