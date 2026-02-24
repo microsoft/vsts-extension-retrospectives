@@ -3,7 +3,7 @@
  */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from "react";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mockUuid } from "../__mocks__/uuid/v4";
@@ -1599,7 +1599,10 @@ describe("FeedbackBoardMetadataForm - Delete Confirmation Dialog", () => {
       expect(screen.getByText(/confirm changes/i)).toBeInTheDocument();
     });
 
-    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    const confirmDialogTitle = screen.getByText(/confirm changes/i);
+    const deleteConfirmationDialog = confirmDialogTitle.closest("dialog");
+    expect(deleteConfirmationDialog).not.toBeNull();
+    const cancelButton = within(deleteConfirmationDialog as HTMLElement).getByRole("button", { name: /cancel/i });
     await user.click(cancelButton);
 
     await waitFor(() => {
@@ -1704,14 +1707,11 @@ describe("FeedbackBoardMetadataForm - Dialog Dismissal", () => {
 
     expect(screen.getByText(/choose column color/i)).toBeInTheDocument();
 
-    // The Fluent Dialog is rendered in a portal and doesn't include an explicit close button.
-    // Dismiss via overlay click (or Escape as a fallback).
-    const overlay = document.body.querySelector(".retrospectives-dialog-modal .ms-Overlay") ?? document.body.querySelector(".retrospectives-choose-column-accent-color-dialog")?.closest(".ms-Modal")?.querySelector(".ms-Overlay") ?? document.body.querySelector(".ms-Overlay");
-    if (overlay) {
-      await user.click(overlay as HTMLElement);
-    } else {
-      await user.keyboard("{Escape}");
-    }
+    const colorDialogTitle = screen.getByText(/choose column color/i);
+    const colorDialog = colorDialogTitle.closest("dialog");
+    expect(colorDialog).not.toBeNull();
+    const closeButton = within(colorDialog as HTMLElement).getByRole("button", { name: /close/i });
+    await user.click(closeButton);
     await waitFor(() => {
       expect(screen.queryByText(/choose column color/i)).not.toBeInTheDocument();
     });

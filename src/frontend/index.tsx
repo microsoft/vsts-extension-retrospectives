@@ -1,4 +1,3 @@
-import { registerIcons } from "@fluentui/react/lib/Styling";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { init as sdkInit } from "azure-devops-extension-sdk";
@@ -7,9 +6,6 @@ import { getProjectId } from "./utilities/servicesHelper";
 import { reactPlugin } from "./utilities/telemetryClient";
 import { AppInsightsErrorBoundary } from "@microsoft/applicationinsights-react-js";
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from "./components/feedbackBoardContainer";
-import { fluentUiIcons } from "./components/icons";
-
-registerIcons({ icons: fluentUiIcons });
 
 sdkInit({ applyTheme: true }).then(() => {
   Promise.all([isHostedAzureDevOps(), getProjectId()]).then(res => {

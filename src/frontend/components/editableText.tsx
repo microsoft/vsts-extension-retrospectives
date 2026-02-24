@@ -1,5 +1,4 @@
 ﻿import React, { useState, useEffect, useRef, useCallback } from "react";
-import { TextField } from "@fluentui/react/lib/TextField";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { parseMarkdown, hasMarkdownFormatting } from "../utilities/markdownUtils";
@@ -54,7 +53,9 @@ export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultil
   }, [handleClickOutside]);
 
   const handleTextChange = useCallback(
-    (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string) => {
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const newValue = event.target.value;
+
       if (!newValue.trim()) {
         setNewText("");
         setHasErrors(true);
@@ -87,7 +88,7 @@ export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultil
   }, []);
 
   const handleKeyPress = useCallback(
-    (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       event.stopPropagation();
 
       if (event.key === "Escape") {
@@ -124,23 +125,38 @@ export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultil
   if (isEditing) {
     return (
       <div className="editable-text-container" ref={editableTextRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
-        <TextField
-          autoFocus
-          ariaLabel="Please enter feedback title"
-          aria-required={true}
-          inputClassName={`editable-text-input${hasErrors ? " error-border" : ""}`}
-          value={newText}
-          onChange={handleTextChange}
-          className="editable-text-input-container"
-          autoAdjustHeight
-          multiline={isMultiline}
-          maxLength={maxLength}
-          resizable={false}
-          onKeyDown={handleKeyPress}
-          onClick={(e: React.MouseEvent<HTMLTextAreaElement | HTMLInputElement, MouseEvent>) => {
-            e.stopPropagation();
-          }}
-        />
+        <div className="editable-text-input-container">
+          {isMultiline ? (
+            <textarea
+              autoFocus
+              aria-label="Please enter feedback title"
+              aria-required={true}
+              className={`editable-text-input${hasErrors ? " error-border" : ""}`}
+              value={newText}
+              onChange={handleTextChange}
+              maxLength={maxLength}
+              onKeyDown={handleKeyPress}
+              onClick={(e: React.MouseEvent<HTMLTextAreaElement>) => {
+                e.stopPropagation();
+              }}
+            />
+          ) : (
+            <input
+              autoFocus
+              aria-label="Please enter feedback title"
+              aria-required={true}
+              className={`editable-text-input${hasErrors ? " error-border" : ""}`}
+              type="text"
+              value={newText}
+              onChange={handleTextChange}
+              maxLength={maxLength}
+              onKeyDown={handleKeyPress}
+              onClick={(e: React.MouseEvent<HTMLInputElement>) => {
+                e.stopPropagation();
+              }}
+            />
+          )}
+        </div>
         {hasErrors && (
           <span className="input-validation-message" role="alert" aria-live="assertive">
             This cannot be empty.

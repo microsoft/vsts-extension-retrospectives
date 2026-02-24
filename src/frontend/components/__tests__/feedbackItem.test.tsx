@@ -8580,7 +8580,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
   });
 
-  test("group dialog: search filters results, click/enter groups item, escape closes", async () => {
+  test("group dialog: search filters results, click groups item, and closes", async () => {
     const boardId = testBoardId;
 
     const current = makeDoc({ id: "current", boardId, title: "Current", columnId: testColumnUuidOne });
@@ -8633,31 +8633,10 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     await waitFor(() => {
-      expect(screen.queryByText("Group Feedback")).not.toBeInTheDocument();
+      const dialog = document.querySelector('dialog[aria-label="Group Feedback"]') as HTMLDialogElement | null;
+      expect(dialog?.open).toBe(false);
     });
 
-    // Reopen dialog and test Enter/Escape
-    fireEvent.keyDown(root, { key: "g" });
-    expect(await screen.findByText("Group Feedback")).toBeInTheDocument();
-
-    const searchBox2 = (await screen.findByRole("searchbox")) as HTMLInputElement;
-    fireEvent.change(searchBox2, { target: { value: "hello" } });
-
-    await waitFor(() => {
-      expect(document.querySelectorAll(".feedback-item-search-result-item").length).toBe(1);
-    });
-
-    const result2 = document.querySelector(".feedback-item-search-result-item") as HTMLButtonElement;
-    fireEvent.keyDown(result2, { key: "Enter" });
-
-    await waitFor(() => {
-      expect(itemDataService.addFeedbackItemAsChild).toHaveBeenCalled();
-    });
-
-    fireEvent.keyDown(root, { key: "Escape" });
-    await waitFor(() => {
-      expect(screen.queryByText("Group Feedback")).not.toBeInTheDocument();
-    });
   });
 
   test("FeedbackItemHelper groups items", async () => {

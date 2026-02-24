@@ -16,7 +16,6 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
 import { userDataService } from "../dal/userDataService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
-import SelectorCombo, { ISelectorList } from "./selectorCombo";
 import { ToastContainer, toast } from "./toastNotifications";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { shareBoardHelper } from "../utilities/shareBoardHelper";
@@ -1761,24 +1760,20 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>;
   }
 
-  const teamSelectorList: ISelectorList<WebApiTeam> = {
-    selectorListItems: [
-      {
-        finishedLoading: state.isAppInitialized,
-        header: { id: "My Teams", title: "My Teams" },
-        items: state.userTeams,
-      },
-    ],
+  const handleTeamSelectionChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedTeamId = event.target.value;
+    const selectedTeam = state.userTeams.find(team => team.id === selectedTeamId);
+    if (selectedTeam) {
+      await changeSelectedTeam(selectedTeam);
+    }
   };
 
-  const boardSelectorList: ISelectorList<IFeedbackBoardDocument> = {
-    selectorListItems: [
-      {
-        finishedLoading: true,
-        header: { id: "All Retrospectives", isHidden: true, title: "All Retrospectives" },
-        items: state.boards,
-      },
-    ],
+  const handleBoardSelectionChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedBoardId = event.target.value;
+    const selectedBoard = state.boards.find(board => board.id === selectedBoardId);
+    if (selectedBoard) {
+      await changeSelectedBoard(selectedBoard);
+    }
   };
 
   const saveTeamEffectivenessMeasurement = () => {
@@ -1900,7 +1895,18 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
           Retrospectives
         </h1>
-        <SelectorCombo<WebApiTeam> className="flex items-center mx-6" currentValue={state.currentTeam} iconName="people" nameGetter={team => team.name} selectorList={teamSelectorList} selectorListItemOnClick={changeSelectedTeam} title={"Team"} />
+        <div className="flex items-center mx-6" role="group" aria-label="Team selector">
+          <label htmlFor="team-selector" className="sr-only">
+            Team
+          </label>
+          <select id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} aria-label="Team">
+            {state.userTeams.map(team => (
+              <option key={team.id} value={team.id}>
+                {team.name}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">
           {renderWorkflowTimerControls()}
@@ -1922,7 +1928,16 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                   <div className="mx-4 vertical-tab-separator" />
                   <div className="flex items-center justify-start">
                     <div className="board-selector">
-                      <SelectorCombo<IFeedbackBoardDocument> className="board-selector" currentValue={state.currentBoard} iconName="table-chart" nameGetter={feedbackBoard => feedbackBoard.title} selectorList={boardSelectorList} selectorListItemOnClick={changeSelectedBoard} title={"Retrospective Board"} />
+                      <label htmlFor="board-selector" className="sr-only">
+                        Retrospective Board
+                      </label>
+                      <select id="board-selector" className="selector-option" value={state.currentBoard?.id || ""} onChange={handleBoardSelectionChange} aria-label="Retrospective Board">
+                        {state.boards.map(board => (
+                          <option key={board.id} value={board.id}>
+                            {board.title}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
                       <details className="flex items-center relative">
