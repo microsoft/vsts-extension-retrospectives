@@ -54,7 +54,7 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
         const isSelected = selected === value;
         return (
           <td key={value}>
-            <button type="button" className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`} aria-label={`${value}`} aria-pressed={isSelected} onClick={() => handleSelect(value)}>
+            <button type="button" className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`} aria-label={`${title}, score ${value}, ${value <= 6 ? "Unfavorable" : value <= 8 ? "Neutral" : "Favorable"}`} aria-pressed={isSelected} onClick={() => handleSelect(value)}>
               <span className="team-assessment-score-circle" />
             </button>
           </td>

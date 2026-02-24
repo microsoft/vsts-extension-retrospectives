@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import EffectivenessMeasurementRow, { EffectivenessMeasurementRowProps } from "../effectivenessMeasurementRow";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../../interfaces/feedback";
@@ -32,6 +32,18 @@ const mockVotes: ITeamEffectivenessMeasurementVoteCollection[] = [
     ],
   },
 ];
+
+const getFavorabilityBand = (value: number): string => {
+  if (value <= 6) {
+    return "Unfavorable";
+  }
+  if (value <= 8) {
+    return "Neutral";
+  }
+  return "Favorable";
+};
+
+const getScoreAriaLabel = (title: string, value: number): string => `${title}, score ${value}, ${getFavorabilityBand(value)}`;
 
 describe("EffectivenessMeasurementRow", () => {
   beforeEach(() => {
@@ -82,20 +94,29 @@ describe("EffectivenessMeasurementRow", () => {
       const { container } = render(<EffectivenessMeasurementRow {...defaultProps} />);
 
       for (let i = 1; i <= 10; i++) {
-        const button = container.querySelector(`button[aria-label="${i}"]`);
+        const button = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, i)}"]`);
         expect(button).toBeInTheDocument();
       }
     });
   });
 
   describe("Accessibility", () => {
-    it("provides proper aria-labels for screen readers", () => {
+    it("provides question and favorability context in aria-labels for screen readers", () => {
       const { container } = render(<EffectivenessMeasurementRow {...defaultProps} />);
 
       for (let i = 1; i <= 10; i++) {
-        const button = container.querySelector(`button[aria-label="${i}"]`);
+        const button = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, i)}"]`);
         expect(button).toBeInTheDocument();
       }
+    });
+
+    it("maps score boundaries to correct favorability bands", () => {
+      render(<EffectivenessMeasurementRow {...defaultProps} />);
+
+      expect(screen.getByRole("button", { name: getScoreAriaLabel(defaultProps.title, 6) })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: getScoreAriaLabel(defaultProps.title, 7) })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: getScoreAriaLabel(defaultProps.title, 8) })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: getScoreAriaLabel(defaultProps.title, 9) })).toBeInTheDocument();
     });
 
     it("renders buttons with appropriate accessibility attributes", () => {
@@ -116,7 +137,7 @@ describe("EffectivenessMeasurementRow", () => {
       const props = { ...defaultProps, onSelectedChange: mockOnSelectedChange };
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
-      const button5 = container.querySelector('button[aria-label="5"]') as HTMLButtonElement;
+      const button5 = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, 5)}"]`) as HTMLButtonElement;
       button5.click();
 
       expect(mockOnSelectedChange).toHaveBeenCalledWith(5);
@@ -129,7 +150,7 @@ describe("EffectivenessMeasurementRow", () => {
 
       const testValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
       testValues.forEach(value => {
-        const button = container.querySelector(`button[aria-label="${value}"]`) as HTMLButtonElement;
+        const button = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, value)}"]`) as HTMLButtonElement;
         button.click();
         expect(mockOnSelectedChange).toHaveBeenCalledWith(value);
       });
@@ -140,11 +161,11 @@ describe("EffectivenessMeasurementRow", () => {
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
       // Button 5 should be selected (from mockVotes)
-      const button5 = container.querySelector('button[aria-label="5"]');
+      const button5 = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, 5)}"]`);
       expect(button5).toHaveClass("team-assessment-score-button-selected");
 
       // Other buttons should have CircleRing
-      const button1 = container.querySelector('button[aria-label="1"]');
+      const button1 = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, 1)}"]`);
       expect(button1).not.toHaveClass("team-assessment-score-button-selected");
     });
 
@@ -153,7 +174,7 @@ describe("EffectivenessMeasurementRow", () => {
       const props = { ...defaultProps, onSelectedChange: mockOnSelectedChange };
       const { getByLabelText } = render(<EffectivenessMeasurementRow {...props} />);
 
-      const button1 = getByLabelText("1");
+      const button1 = getByLabelText(getScoreAriaLabel(defaultProps.title, 1));
       expect(button1).not.toHaveClass("team-assessment-score-button-selected");
 
       fireEvent.click(button1);
@@ -161,7 +182,7 @@ describe("EffectivenessMeasurementRow", () => {
       expect(mockOnSelectedChange).toHaveBeenCalledWith(1);
 
       await waitFor(() => {
-        expect(getByLabelText("1")).toHaveClass("team-assessment-score-button-selected");
+        expect(getByLabelText(getScoreAriaLabel(defaultProps.title, 1))).toHaveClass("team-assessment-score-button-selected");
       });
     });
   });
@@ -172,7 +193,7 @@ describe("EffectivenessMeasurementRow", () => {
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
       // User's vote for question 1 is 5, so button 5 should show CircleFill
-      const button5 = container.querySelector('button[aria-label="5"]');
+      const button5 = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, 5)}"]`);
       expect(button5).toHaveClass("team-assessment-score-button-selected");
     });
 
@@ -181,7 +202,7 @@ describe("EffectivenessMeasurementRow", () => {
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
       // User's vote for question 2 is 8, so button 8 should show CircleFill
-      const button8 = container.querySelector('button[aria-label="8"]');
+      const button8 = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, 8)}"]`);
       expect(button8).toHaveClass("team-assessment-score-button-selected");
     });
 
@@ -191,7 +212,7 @@ describe("EffectivenessMeasurementRow", () => {
 
       // All buttons should have CircleRing when no vote exists
       for (let i = 1; i <= 10; i++) {
-        const button = container.querySelector(`button[aria-label="${i}"]`);
+        const button = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, i)}"]`);
         expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
@@ -202,7 +223,7 @@ describe("EffectivenessMeasurementRow", () => {
 
       // All buttons should have CircleRing when user hasn't voted on this question
       for (let i = 1; i <= 10; i++) {
-        const button = container.querySelector(`button[aria-label="${i}"]`);
+        const button = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, i)}"]`);
         expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
@@ -219,7 +240,7 @@ describe("EffectivenessMeasurementRow", () => {
 
       // Should default to no selection (0)
       for (let i = 1; i <= 10; i++) {
-        const button = container.querySelector(`button[aria-label="${i}"]`);
+        const button = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, i)}"]`);
         expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
@@ -236,7 +257,7 @@ describe("EffectivenessMeasurementRow", () => {
 
       // Should default to no selection (0)
       for (let i = 1; i <= 10; i++) {
-        const button = container.querySelector(`button[aria-label="${i}"]`);
+        const button = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, i)}"]`);
         expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
@@ -274,7 +295,7 @@ describe("EffectivenessMeasurementRow", () => {
 
       // No button should be selected since questionId doesn't match
       for (let i = 1; i <= 10; i++) {
-        const button = container.querySelector(`button[aria-label="${i}"]`);
+        const button = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, i)}"]`);
         expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
@@ -286,7 +307,7 @@ describe("EffectivenessMeasurementRow", () => {
 
       // All buttons should have no selection since votes defaults to []
       for (let i = 1; i <= 10; i++) {
-        const button = container.querySelector(`button[aria-label="${i}"]`);
+        const button = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, i)}"]`);
         expect(button).not.toHaveClass("team-assessment-score-button-selected");
       }
     });
@@ -305,7 +326,7 @@ describe("EffectivenessMeasurementRow", () => {
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
       // Button 7 should be selected since the questionId matches and selection is 7
-      const selectedButton = container.querySelector('button[aria-label="7"]');
+      const selectedButton = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, 7)}"]`);
       expect(selectedButton).toHaveClass("team-assessment-score-button-selected");
     });
 
@@ -324,11 +345,11 @@ describe("EffectivenessMeasurementRow", () => {
       const { container } = render(<EffectivenessMeasurementRow {...props} />);
 
       // Button 3 should be selected (matches questionId 1)
-      const button3 = container.querySelector('button[aria-label="3"]');
+      const button3 = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, 3)}"]`);
       expect(button3).toHaveClass("team-assessment-score-button-selected");
 
       // Button 8 should NOT be selected (matches questionId 2, not 1)
-      const button8 = container.querySelector('button[aria-label="8"]');
+      const button8 = container.querySelector(`button[aria-label="${getScoreAriaLabel(defaultProps.title, 8)}"]`);
       expect(button8).not.toHaveClass("team-assessment-score-button-selected");
     });
   });
