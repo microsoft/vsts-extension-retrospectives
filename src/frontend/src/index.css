@@ -625,10 +625,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .selector-option {
-  @apply text-sm leading-8 mr-1 bg-black/5 flex h-8 items-center px-2 cursor-pointer hover:text-(--text-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+  @apply text-sm h-8 px-2 cursor-pointer bg-(--callout-background-color) text-(--text-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
 
   & option {
-    @apply text-sm bg-black/5 px-2;
+    @apply text-sm px-2 bg-(--callout-background-color) text-(--text-primary-color);
   }
 }
 
