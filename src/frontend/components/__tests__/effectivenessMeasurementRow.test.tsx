@@ -44,6 +44,7 @@ const getFavorabilityBand = (value: number): string => {
 };
 
 const getScoreAriaLabel = (title: string, value: number): string => `${title}, score ${value}, ${getFavorabilityBand(value)}`;
+const getInfoAriaLabel = (title: string): string => `More information about ${title}`;
 
 describe("EffectivenessMeasurementRow", () => {
   beforeEach(() => {
@@ -77,10 +78,11 @@ describe("EffectivenessMeasurementRow", () => {
     });
 
     it("renders tooltip with correct content", () => {
-      const { getByLabelText } = render(<EffectivenessMeasurementRow {...defaultProps} />);
+      const { getByRole } = render(<EffectivenessMeasurementRow {...defaultProps} />);
 
-      const tooltipHost = getByLabelText("This is a test tooltip");
+      const tooltipHost = getByRole("button", { name: getInfoAriaLabel(defaultProps.title) });
       expect(tooltipHost).toBeInTheDocument();
+      expect(tooltipHost).toHaveAttribute("title", defaultProps.tooltip);
     });
 
     it("renders all 10 voting buttons", () => {
