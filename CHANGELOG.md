@@ -10,6 +10,7 @@ You can find the changelog of the Retrospective Extension below.
 * Refactor: inline favorability-band helper logic in team assessment score aria-label generation. From [GitHub PR #1582](https://github.com/microsoft/vsts-extension-retrospectives/pull/1582)
 * Refactor: remove remaining Fluent UI dependencies by replacing selector-combo, dialogs, buttons, editable inputs, and board summary list/table implementations with native HTML elements, with associated style and test updates. From [GitHub PR #1583](https://github.com/microsoft/vsts-extension-retrospectives/pull/1583)
 * Fix: improve Team Assessment info button accessibility by providing explicit accessible names and descriptions for screen readers. From [GitHub PR #1584](https://github.com/microsoft/vsts-extension-retrospectives/pull/1584)
+* Feat: improve runtime performance by memoizing heavy frontend computations, optimizing team assessment history chart rendering, and updating TypeScript target settings. From [GitHub PR #1585](https://github.com/microsoft/vsts-extension-retrospectives/pull/1585)
 
 ## v1.92.51
 

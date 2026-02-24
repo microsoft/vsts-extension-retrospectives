@@ -943,25 +943,38 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const hideFeedbackItems = props.workflowPhase === "Collect" && props.hideFeedbackItems && props.userIdRef !== getUserIdentity().id;
   const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : props.title;
-
-  let ariaLabel = `Feedback item ${itemPosition} of ${totalItemsInColumn}. `;
-  if (!isNotGroupedItem) {
-    ariaLabel = isMainItem ? `Feedback group main item ${itemPosition} of ${totalItemsInColumn}. Group has ${groupItemsCount} items. ` : `Grouped feedback item. `;
-  }
-  ariaLabel += `Title: ${displayTitle}. `;
-  if (props.createdBy && !hideFeedbackItems) {
-    ariaLabel += `Created by ${props.createdBy}. `;
-  }
-  if (props.createdDate) {
-    const creationDate = new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric" }).format(new Date(props.createdDate));
-    ariaLabel += `Created on ${creationDate}. `;
-  }
-  if (showVotes) {
-    ariaLabel += `${totalVotes} total votes.`;
-    if (showVoteButton) {
-      ariaLabel += ` You have ${votesByUser} votes on this item.`;
+  const creationDateFormatter = useMemo(() => new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric" }), []);
+  const creationDateLabel = useMemo(() => {
+    if (!props.createdDate) {
+      return null;
     }
-  }
+
+    return creationDateFormatter.format(new Date(props.createdDate));
+  }, [creationDateFormatter, props.createdDate]);
+  const ariaLabel = useMemo(() => {
+    let label = `Feedback item ${itemPosition} of ${totalItemsInColumn}. `;
+    if (!isNotGroupedItem) {
+      label = isMainItem ? `Feedback group main item ${itemPosition} of ${totalItemsInColumn}. Group has ${groupItemsCount} items. ` : `Grouped feedback item. `;
+    }
+
+    label += `Title: ${displayTitle}. `;
+    if (props.createdBy && !hideFeedbackItems) {
+      label += `Created by ${props.createdBy}. `;
+    }
+
+    if (creationDateLabel) {
+      label += `Created on ${creationDateLabel}. `;
+    }
+
+    if (showVotes) {
+      label += `${totalVotes} total votes.`;
+      if (showVoteButton) {
+        label += ` You have ${votesByUser} votes on this item.`;
+      }
+    }
+
+    return label;
+  }, [itemPosition, totalItemsInColumn, isNotGroupedItem, isMainItem, groupItemsCount, displayTitle, props.createdBy, hideFeedbackItems, creationDateLabel, showVotes, totalVotes, showVoteButton, votesByUser]);
 
   const curTimerState = props.timerState;
 
