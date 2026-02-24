@@ -344,6 +344,45 @@ describe("ShareBoardHelper", () => {
       expect(text).not.toContain("item6");
     });
 
+    it("should sort equal-vote parent items when createdDate is missing", async () => {
+      const feedbackItemsWithMissingDates = [
+        {
+          ...mockFeedbackItems[0],
+          id: "missing-date-parent",
+          title: "Missing date parent",
+          upvotes: 5,
+          createdDate: undefined,
+          parentFeedbackItemId: undefined,
+        },
+        {
+          ...mockFeedbackItems[1],
+          id: "dated-parent",
+          title: "Dated parent",
+          upvotes: 5,
+          createdDate: new Date("2023-01-01T12:00:00Z"),
+          parentFeedbackItemId: undefined,
+        },
+        {
+          ...mockFeedbackItems[2],
+          id: "second-missing-date-parent",
+          title: "Second missing date parent",
+          upvotes: 5,
+          createdDate: undefined,
+          parentFeedbackItemId: undefined,
+          childFeedbackItemIds: undefined,
+        },
+      ] as IFeedbackItemDocument[];
+
+      mockItemDataService.getFeedbackItemsForBoard.mockResolvedValue(feedbackItemsWithMissingDates);
+      mockWorkItemService.getWorkItemsByIds.mockResolvedValue([] as never);
+
+      await shareBoardHelper.generateCSVContent(mockBoard);
+
+      const text = await capturedBlob!.text();
+      expect(text.indexOf("\"What could be improved\",\"Dated parent\",5")).toBeLessThan(text.indexOf("\"What went well\",\"Missing date parent\",5"));
+      expect(text).toContain('"What went well","Second missing date parent",5');
+    });
+
     it("should handle items with undefined createdBy", async () => {
       const feedbackItemsWithUndefinedCreatedBy = [
         {

@@ -1802,7 +1802,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply text-center;
 
     & .team-effectiveness-favorability-label {
-      @apply border-b border-solid border-(--text-primary-color) outline-4 outline-(--background-color) font-light;
+      @apply border-b border-solid border-(--text-primary-color) font-light;
     }
 
     & .voting-measurement-index {
@@ -1889,7 +1889,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
-    @apply border-r-2 border-solid border-primary text-center;
+    @apply w-10 border-r-2 border-solid border-primary text-center;
   }
 }
 

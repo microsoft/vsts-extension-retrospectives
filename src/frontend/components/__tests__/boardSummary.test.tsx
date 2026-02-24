@@ -263,6 +263,138 @@ describe("Board Summary", () => {
     }
   });
 
+  it("should return early when clicked column has no sortable field", () => {
+    const useMemoSpy = jest.spyOn(React, "useMemo").mockImplementationOnce(() => {
+      return [
+        {
+          ariaLabel: "bad-sort-column",
+          key: "bad-sort-column",
+          name: "Bad Sort",
+          isSortable: true,
+          isSorted: false,
+          isSortedDescending: false,
+          minWidth: 100,
+          maxWidth: 150,
+        },
+      ] as any;
+    });
+
+    const { getByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+
+    expect(() => {
+      fireEvent.click(getByRole("button", { name: "bad-sort-column" }));
+    }).not.toThrow();
+
+    useMemoSpy.mockRestore();
+  });
+
+  it("should return existing columns when clicked column key is missing", () => {
+    const realUseState = React.useState;
+
+    const useStateSpy = jest.spyOn(React, "useState");
+    (useStateSpy as unknown as jest.Mock).mockImplementation((initialState: unknown) => {
+      const [state, setState] = (realUseState as unknown as (value: unknown) => [unknown, React.Dispatch<React.SetStateAction<unknown>>])(initialState);
+
+      const isColumnsState = Array.isArray(state) && state.length > 0 && typeof (state as Array<{ key?: unknown }>)[0]?.key === "string";
+
+      if (isColumnsState) {
+        const setColumnsWithMissingKey: React.Dispatch<React.SetStateAction<unknown>> = updater => {
+          if (typeof updater === "function") {
+            const missingColumn = [
+              {
+                ariaLabel: "missing",
+                key: "missing",
+                name: "Missing",
+                fieldName: "title",
+                isSortable: true,
+              },
+            ];
+
+            (updater as (prevState: unknown) => unknown)(missingColumn);
+          }
+        };
+
+        return [state, setColumnsWithMissingKey] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+      }
+
+      return [state, setState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+    });
+
+    const { getByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+
+    expect(() => {
+      fireEvent.click(getByRole("button", { name: "Work item title" }));
+    }).not.toThrow();
+
+    useStateSpy.mockRestore();
+  });
+
+  it("should use default sort flags when sortable column has undefined sort state", () => {
+    const realUseState = React.useState;
+
+    const useStateSpy = jest.spyOn(React, "useState");
+    (useStateSpy as unknown as jest.Mock).mockImplementation((initialState: unknown) => {
+      const [state, setState] = (realUseState as unknown as (value: unknown) => [unknown, React.Dispatch<React.SetStateAction<unknown>>])(initialState);
+
+      const isColumnsState = Array.isArray(state) && state.length > 0 && typeof (state as Array<{ key?: unknown }>)[0]?.key === "string";
+
+      if (isColumnsState) {
+        const customColumns = [
+          {
+            ariaLabel: "custom-sortable",
+            key: "custom-sortable",
+            name: "Custom Sortable",
+            fieldName: "title",
+            isSortable: true,
+            minWidth: 100,
+            maxWidth: 150,
+          },
+        ];
+
+        const setColumnsWithUndefinedSortState: React.Dispatch<React.SetStateAction<unknown>> = updater => {
+          if (typeof updater === "function") {
+            (updater as (prevState: unknown) => unknown)(customColumns);
+          }
+        };
+
+        return [customColumns, setColumnsWithUndefinedSortState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+      }
+
+      return [state, setState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+    });
+
+    const { getByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+
+    expect(() => {
+      fireEvent.click(getByRole("button", { name: "custom-sortable" }));
+    }).not.toThrow();
+
+    useStateSpy.mockRestore();
+  });
+
+  it("should render non-sortable text column header as span", () => {
+    const useMemoSpy = jest.spyOn(React, "useMemo").mockImplementationOnce(() => {
+      return [
+        {
+          ariaLabel: "plain-header",
+          key: "plain-header",
+          name: "Plain Header",
+          isSortable: false,
+          isIconOnly: false,
+          minWidth: 100,
+          maxWidth: 150,
+        },
+      ] as any;
+    });
+
+    const { getByLabelText, queryByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+
+    expect(getByLabelText("plain-header").textContent).toBe("Plain Header");
+    expect(queryByRole("button", { name: "plain-header" })).toBeNull();
+
+    useMemoSpy.mockRestore();
+  });
+
   it("should sort items descending when column is clicked twice", async () => {
     const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
 

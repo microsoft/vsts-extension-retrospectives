@@ -9,5 +9,11 @@ describe("icons", () => {
       const { container } = render(icon);
       expect(container.querySelector(".icon-plumbing")).toBeTruthy();
     });
+
+    it("returns TableChartIcon for table-chart id", () => {
+      const icon = getIconElement("table-chart");
+      const { container } = render(icon);
+      expect(container.querySelector(".icon-table-chart")).toBeTruthy();
+    });
   });
 });

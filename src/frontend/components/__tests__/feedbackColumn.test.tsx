@@ -4607,4 +4607,63 @@ describe("Feedback Column ", () => {
       expect(container).toBeTruthy();
     });
   });
+  describe("Branch coverage regressions", () => {
+    test("uses empty source items when sort helper returns undefined in Act phase", () => {
+      (itemDataService.sortItemsByVotesAndDate as jest.Mock).mockReturnValueOnce(undefined);
+
+      const props = {
+        ...testColumnProps,
+        workflowPhase: WorkflowPhase.Act,
+        columnItems: [] as IColumnItem[],
+      };
+
+      const { container } = render(<FeedbackColumn {...props} />);
+      expect(container.querySelector(".feedback-column")).toBeTruthy();
+    });
+
+    test("createEmptyFeedbackItem returns early outside Collect phase", () => {
+      const addFeedbackItems = jest.fn();
+      const ref = React.createRef<FeedbackColumnHandle>();
+      const props = {
+        ...testColumnProps,
+        workflowPhase: WorkflowPhase.Group,
+        addFeedbackItems,
+      };
+
+      render(<FeedbackColumn {...props} ref={ref} />);
+
+      act(() => {
+        ref.current?.createEmptyFeedbackItem();
+      });
+
+      expect(addFeedbackItems).not.toHaveBeenCalled();
+    });
+
+    test("createEmptyFeedbackItem returns early when empty placeholder already exists", () => {
+      const addFeedbackItems = jest.fn();
+      const ref = React.createRef<FeedbackColumnHandle>();
+      const props = {
+        ...testColumnProps,
+        workflowPhase: WorkflowPhase.Collect,
+        addFeedbackItems,
+        columnItems: [
+          {
+            ...testColumnProps.columnItems[0],
+            feedbackItem: {
+              ...testColumnProps.columnItems[0].feedbackItem,
+              id: "emptyFeedbackItem",
+            },
+          },
+        ],
+      };
+
+      render(<FeedbackColumn {...props} ref={ref} />);
+
+      act(() => {
+        ref.current?.createEmptyFeedbackItem();
+      });
+
+      expect(addFeedbackItems).not.toHaveBeenCalled();
+    });
+  });
 });

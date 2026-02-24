@@ -2964,4 +2964,49 @@ describe("FeedbackBoard Component", () => {
       expect(mockFocusColumn).toHaveBeenCalled();
     });
   });
+
+  describe("Branch coverage regressions", () => {
+    it("falls back to non-current iterations when current iterations are empty", async () => {
+      (workService.getIterations as jest.Mock)
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{ path: "Iteration\\Fallback", id: "iter-fallback" }]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(workService.getIterations).toHaveBeenNthCalledWith(1, testColumnProps.team.id, "current");
+        expect(workService.getIterations).toHaveBeenNthCalledWith(2, testColumnProps.team.id);
+      });
+    });
+
+    it("handles null feedback item list from data service", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(null);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const firstColumnProps = getLatestColumnProps(testColumnProps.columnIds[0]);
+        expect(firstColumnProps?.isDataLoaded).toBe(true);
+        expect(firstColumnProps?.columnItems).toEqual([]);
+      });
+    });
+
+    it("does not show column edit button when current user is not board owner", async () => {
+      const props = {
+        ...mockedProps,
+        userId: "different-user",
+        board: {
+          ...mockedBoard,
+          createdBy: { ...mockedIdentity, id: "owner-user" },
+        },
+      };
+
+      render(<FeedbackBoard {...props} />);
+
+      await waitFor(() => {
+        const firstColumnProps = getLatestColumnProps(testColumnProps.columnIds[0]);
+        expect(firstColumnProps?.showColumnEditButton).toBe(false);
+      });
+    });
+  });
 });
