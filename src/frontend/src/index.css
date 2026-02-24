@@ -418,12 +418,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .editable-text-input-container {
     @apply inline-block min-w-3/4 w-full resize-none align-middle;
 
-    & .editable-text-input.error-border {
-      @apply border border-error -m-px;
-    }
-
     & .editable-text-input {
       @apply text-base leading-5 border rounded-sm bg-white min-h-15;
+
+      &.error-border {
+        @apply border border-error -m-px;
+      }
 
       &:focus {
         outline: none;
