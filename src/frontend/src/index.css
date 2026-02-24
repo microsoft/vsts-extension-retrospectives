@@ -1290,8 +1290,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-metadata-form {
-  @apply text-center;
-
   & hr {
     @apply border border-primary;
   }
