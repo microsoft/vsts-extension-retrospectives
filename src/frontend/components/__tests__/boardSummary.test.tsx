@@ -263,6 +263,72 @@ describe("Board Summary", () => {
     }
   });
 
+  it("should return early when clicked column has no sortable field", () => {
+    const useMemoSpy = jest.spyOn(React, "useMemo").mockImplementationOnce(() => {
+      return [
+        {
+          ariaLabel: "bad-sort-column",
+          key: "bad-sort-column",
+          name: "Bad Sort",
+          isSortable: true,
+          isSorted: false,
+          isSortedDescending: false,
+          minWidth: 100,
+          maxWidth: 150,
+        },
+      ] as any;
+    });
+
+    const { getByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+
+    expect(() => {
+      fireEvent.click(getByRole("button", { name: "bad-sort-column" }));
+    }).not.toThrow();
+
+    useMemoSpy.mockRestore();
+  });
+
+  it("should return existing columns when clicked column key is missing", () => {
+    const realUseState = React.useState;
+    let useStateCallCount = 0;
+
+    const useStateSpy = jest.spyOn(React, "useState");
+    (useStateSpy as unknown as jest.Mock).mockImplementation((initialState: unknown) => {
+      useStateCallCount += 1;
+      const [state, setState] = (realUseState as unknown as (value: unknown) => [unknown, React.Dispatch<React.SetStateAction<unknown>>])(initialState);
+
+      if (useStateCallCount === 2) {
+        const setColumnsWithMissingKey: React.Dispatch<React.SetStateAction<unknown>> = updater => {
+          if (typeof updater === "function") {
+            const missingColumn = [
+              {
+                ariaLabel: "missing",
+                key: "missing",
+                name: "Missing",
+                fieldName: "title",
+                isSortable: true,
+              },
+            ];
+
+            (updater as (prevState: unknown) => unknown)(missingColumn);
+          }
+        };
+
+        return [state, setColumnsWithMissingKey] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+      }
+
+      return [state, setState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+    });
+
+    const { getByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+
+    expect(() => {
+      fireEvent.click(getByRole("button", { name: "Work item title" }));
+    }).not.toThrow();
+
+    useStateSpy.mockRestore();
+  });
+
   it("should sort items descending when column is clicked twice", async () => {
     const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
 
