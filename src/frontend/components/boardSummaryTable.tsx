@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { WorkItem, WorkItemType, WorkItemStateColor } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
@@ -218,7 +218,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     setTableData(boardSummaryState.boardsTableItems);
   }, [boardSummaryState.boardsTableItems]);
 
-  const dateFormatter = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" });
+  const dateFormatter = useMemo(() => new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }), []);
   const deleteBoardDialogRef = useRef<HTMLDialogElement>(null);
 
   const toggleSort = (columnId: string) => {
@@ -248,7 +248,8 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     });
   };
 
-  const columnList: ISimpleColumn[] = [
+  const columnList: ISimpleColumn[] = useMemo(
+    () => [
     {
       id: "expand",
       header: null,
@@ -332,7 +333,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       ),
       sortable: false,
     },
-  ];
+    ],
+    [dateFormatter, expandedRows, props.currentUserId, props.currentUserIsTeamAdmin, props.onArchiveToggle],
+  );
 
   const handleActionItems = async (state: IBoardSummaryTableState) => {
     const updatedBoardsTableItems = [...state.boardsTableItems];
@@ -413,8 +416,12 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     }
   };
 
+  const boardsById = useMemo(() => {
+    return new Map(boardSummaryState.boardsTableItems.map(board => [board.id, board] as const));
+  }, [boardSummaryState.boardsTableItems]);
+
   const boardRowSummary = (item: IBoardSummaryTableItem) => {
-    const currentBoard = boardSummaryState.boardsTableItems.find(board => board.id === item.id);
+    const currentBoard = boardsById.get(item.id);
     if (!currentBoard) return null;
     const actionItems = boardSummaryState.actionItemsByBoard[currentBoard.id];
     return <BoardSummary actionItems={actionItems.actionItems} pendingWorkItemsCount={currentBoard.pendingWorkItemsCount} resolvedActionItemsCount={currentBoard.totalWorkItemsCount - currentBoard.pendingWorkItemsCount} boardName={currentBoard.boardName} feedbackItemsCount={currentBoard.feedbackItemsCount} supportedWorkItemTypes={props.supportedWorkItemTypes} />;
@@ -464,6 +471,33 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     }
   }, [props.teamId]);
 
+  const selectedBoardForDelete = useMemo(() => tableData.find(board => board.id === openDialogBoardId), [tableData, openDialogBoardId]);
+  const sortedData = useMemo(() => {
+    return [...tableData].sort((a, b) => {
+      let aVal: Date | string | number | boolean | null | undefined;
+      let bVal: Date | string | number | boolean | null | undefined;
+
+      if (sortColumn === "createdDate" || sortColumn === "archivedDate") {
+        aVal = a[sortColumn as keyof IBoardSummaryTableItem];
+        bVal = b[sortColumn as keyof IBoardSummaryTableItem];
+        if (!aVal) return 1;
+        if (!bVal) return -1;
+        const aTime = new Date(aVal as Date).getTime();
+        const bTime = new Date(bVal as Date).getTime();
+        return sortDirection === "asc" ? (aTime < bTime ? -1 : 1) : aTime < bTime ? 1 : -1;
+      } else {
+        aVal = a[sortColumn as keyof IBoardSummaryTableItem];
+        bVal = b[sortColumn as keyof IBoardSummaryTableItem];
+      }
+
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [tableData, sortColumn, sortDirection]);
+
   if (boardSummaryState.allDataLoaded !== true) {
     return (
       <div className="spinner" aria-live="assertive">
@@ -472,31 +506,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       </div>
     );
   }
-
-  const selectedBoardForDelete = tableData.find(board => board.id === openDialogBoardId);
-  const sortedData = [...tableData].sort((a, b) => {
-    let aVal: Date | string | number | boolean | null | undefined;
-    let bVal: Date | string | number | boolean | null | undefined;
-
-    if (sortColumn === "createdDate" || sortColumn === "archivedDate") {
-      aVal = a[sortColumn as keyof IBoardSummaryTableItem];
-      bVal = b[sortColumn as keyof IBoardSummaryTableItem];
-      if (!aVal) return 1;
-      if (!bVal) return -1;
-      const aTime = new Date(aVal as Date).getTime();
-      const bTime = new Date(bVal as Date).getTime();
-      return sortDirection === "asc" ? (aTime < bTime ? -1 : 1) : aTime < bTime ? 1 : -1;
-    } else {
-      aVal = a[sortColumn as keyof IBoardSummaryTableItem];
-      bVal = b[sortColumn as keyof IBoardSummaryTableItem];
-    }
-
-    if (aVal == null) return 1;
-    if (bVal == null) return -1;
-    if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
-    if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
-    return 0;
-  });
 
   return (
     <div className="board-summary-table-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>

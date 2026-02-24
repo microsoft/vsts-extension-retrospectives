@@ -2398,12 +2398,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             <p>Create retrospectives with team assessments to see historical trends.</p>
           </div>
         ) : (
-          <>
+          <div className="subText">
             <p className="team-assessment-info-text">
               Showing average scores over time across {state.teamAssessmentHistoryData.slice(-13).length} retrospective{state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
             </p>
             <TeamAssessmentHistoryChart historyData={state.teamAssessmentHistoryData.slice(-13)} numberFormatter={numberFormatter} />
-          </>
+          </div>
         )}
       </dialog>
       <ToastContainer className="retrospective-notification-toast-container" toastClassName="retrospective-notification-toast" progressClassName="retrospective-notification-toast-progress-bar" />
