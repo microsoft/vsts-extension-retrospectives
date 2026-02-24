@@ -10618,4 +10618,125 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     expect((ref.current as any).state.isMoveFeedbackItemDialogHidden).toBe(false);
   });
+
+  test("renders original column fallback label when original column is missing", async () => {
+    const props = makeProps({
+      workflowPhase: "Vote",
+      isFocusModalHidden: true,
+      columnId: "current-col",
+      columnIds: ["current-col"],
+      originalColumnId: "missing-original-col",
+      columns: {
+        "current-col": {
+          columnProperties: {
+            id: "current-col",
+            title: "Current",
+            iconClass: "far fa-smile",
+            accentColor: "#008000",
+            notes: "",
+          },
+          columnItems: [
+            {
+              feedbackItem: makeDoc({ id: "orig-fallback-item", columnId: "current-col", originalColumnId: "missing-original-col" }),
+              actionItems: [],
+            },
+          ],
+        },
+      },
+    });
+
+    render(<FeedbackItem {...props} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Original Column: n/a")).toBeInTheDocument();
+    });
+  });
+
+  test("renders bold grouped vote summary for collapsed main grouped item", async () => {
+    jest.spyOn(itemDataService, "getVotesForGroupedItemsByUser").mockReturnValue("3" as any);
+
+    const groupedMain = makeDoc({
+      id: "group-main",
+      columnId: testColumnUuidOne,
+      childFeedbackItemIds: ["group-child"],
+      upvotes: 1,
+    });
+
+    const groupedChild = makeDoc({
+      id: "group-child",
+      columnId: testColumnUuidOne,
+      parentFeedbackItemId: "group-main",
+      upvotes: 2,
+    });
+
+    const props = makeProps({
+      id: "group-main",
+      title: groupedMain.title,
+      workflowPhase: "Vote",
+      groupCount: 1,
+      groupIds: ["group-child"],
+      groupedItemProps: {
+        isMainItem: true,
+        isGroupExpanded: false,
+        groupedCount: 1,
+        parentItemId: "",
+        setIsGroupBeingDragged: jest.fn(),
+        toggleGroupExpand: jest.fn(),
+      },
+      columns: {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            { feedbackItem: groupedMain, actionItems: [] },
+            { feedbackItem: groupedChild, actionItems: [] },
+          ],
+        },
+      },
+    });
+
+    const { container } = render(<FeedbackItem {...props} />);
+
+    await waitFor(() => {
+      const groupedVotes = container.querySelector(".feedback-yourvote-count.bold");
+      expect(groupedVotes).toBeInTheDocument();
+      expect(groupedVotes?.textContent).toContain("3");
+    });
+  });
+
+  test("renders grouped search result when searched item column is missing", async () => {
+    const props = makeProps({
+      workflowPhase: "Group",
+      accentColor: "#123456",
+      columns: {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [{ feedbackItem: makeDoc({ id: "search-host", columnId: testColumnUuidOne }), actionItems: [] }],
+        },
+      },
+    });
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await act(async () => {
+      (ref.current as any).setState({
+        isGroupFeedbackItemDialogHidden: false,
+        searchTerm: "missing",
+        searchedFeedbackItems: [
+          makeDoc({
+            id: "search-missing-column",
+            title: "Search Missing Column",
+            columnId: "column-not-present",
+            originalColumnId: "column-not-present",
+          }),
+        ],
+      });
+    });
+
+    expect(screen.getByText("Search Missing Column")).toBeInTheDocument();
+  });
 });
