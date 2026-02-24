@@ -2098,8 +2098,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply my-4;
 }
 
-.retrospectives-group-feedback-item-dialog .ms-Dialog-title,
-.retrospectives-group-feedback-item-dialog .ms-Dialog-subText {
+.retrospectives-group-feedback-item-dialog .title,
+.retrospectives-group-feedback-item-dialog .subText {
   @apply text-(--text-primary-color);
 }
 

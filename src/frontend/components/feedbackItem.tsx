@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
 import { cn } from "../utilities/classNameHelper";
-import { Dialog, DialogType } from "@fluentui/react/lib/Dialog";
 import { DocumentCard, DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
 import { SearchBox } from "@fluentui/react/lib/SearchBox";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
@@ -184,6 +183,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const mobileActionsMenuRef = useRef<HTMLDivElement>(null);
   const deleteFeedbackDialogRef = useRef<HTMLDialogElement>(null);
   const moveFeedbackDialogRef = useRef<HTMLDialogElement>(null);
+  const groupFeedbackDialogRef = useRef<HTMLDialogElement>(null);
   const removeFeedbackFromGroupDialogRef = useRef<HTMLDialogElement>(null);
 
   const setStateMerge = useCallback((stateUpdate: Partial<IFeedbackItemState> | ((prev: IFeedbackItemState) => Partial<IFeedbackItemState>)) => {
@@ -373,10 +373,17 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const showGroupFeedbackItemDialog = useCallback(() => {
     setStateMerge({ isGroupFeedbackItemDialogHidden: false });
+    const dialog = groupFeedbackDialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+      const searchInput = dialog.querySelector('input[id="feedback-item-search-input"]') as HTMLInputElement | null;
+      searchInput?.focus();
+    }
   }, [setStateMerge]);
 
   const hideGroupFeedbackItemDialog = useCallback(() => {
     setStateMerge({ isGroupFeedbackItemDialogHidden: true, searchedFeedbackItems: [], searchTerm: "" });
+    groupFeedbackDialogRef.current?.close();
   }, [setStateMerge]);
 
   const toggleShowGroupedChildrenTitles = useCallback(() => {
@@ -1158,11 +1165,22 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           </button>
         </div>
       </dialog>
-      <Dialog hidden={state.isGroupFeedbackItemDialogHidden} maxWidth={600} minWidth={600} onDismiss={hideGroupFeedbackItemDialog} dialogContentProps={{ type: DialogType.close, title: "Group Feedback" }} modalProps={{ isBlocking: false, containerClassName: "retrospectives-group-feedback-item-dialog", className: "retrospectives-dialog-modal" }}>
-        <label className="ms-Dialog-subText" htmlFor="feedback-item-search-input">
+      <dialog
+        ref={groupFeedbackDialogRef}
+        className="retrospectives-group-feedback-item-dialog"
+        aria-label="Group Feedback"
+        onClose={() => setStateMerge({ isGroupFeedbackItemDialogHidden: true, searchedFeedbackItems: [], searchTerm: "" })}
+      >
+        <div className="header">
+          <h2 className="title">Group Feedback</h2>
+          <button onClick={hideGroupFeedbackItemDialog} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <label className="subText" htmlFor="feedback-item-search-input">
           Search and select the feedback under which to group the current feedback.
         </label>
-        <SearchBox id="feedback-item-search-input" autoFocus={true} placeholder="Enter the feedback title" aria-label="Enter the feedback title" onChange={handleFeedbackItemSearchInputChange} />
+        <SearchBox id="feedback-item-search-input" placeholder="Enter the feedback title" aria-label="Enter the feedback title" onChange={handleFeedbackItemSearchInputChange} />
         <div className="output-container">
           {!state.searchedFeedbackItems.length && state.searchTerm && <p className="no-matching-feedback-message">No feedback with title containing your input.</p>}
           {state.searchedFeedbackItems.map((searchItem, index) => {
@@ -1219,7 +1237,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
             );
           })}
         </div>
-      </Dialog>
+      </dialog>
       <dialog ref={removeFeedbackFromGroupDialogRef} className="remove-feedback-item-from-group-dialog" aria-label="Remove Feedback from Group" onClose={() => setStateMerge({ isRemoveFeedbackItemFromGroupConfirmationDialogHidden: true })}>
         <div className="header">
           <h2 className="title">Remove Feedback from Group</h2>
