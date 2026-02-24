@@ -422,8 +422,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply border border-error -m-px;
     }
 
-    & .ms-TextField-wrapper .ms-TextField-fieldGroup .editable-text-input {
+    & .editable-text-input {
       @apply text-base leading-5;
+
+      &:focus {
+        outline: none;
+      }
     }
   }
 

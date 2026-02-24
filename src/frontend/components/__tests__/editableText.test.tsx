@@ -37,6 +37,28 @@ describe("Editable Text Component", () => {
     expect(document.querySelector("textarea, input")).toBeTruthy();
   });
 
+  it("renders native input in single-line mode", async () => {
+    render(<EditableText {...mockedTestProps} text="Single line" isMultiline={false} />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const input = document.querySelector('input[aria-label="Please enter feedback title"]') as HTMLInputElement | null;
+    expect(input).toBeTruthy();
+    expect(document.querySelector("textarea")).toBeNull();
+  });
+
+  it("renders native textarea in multiline mode", async () => {
+    render(<EditableText {...mockedTestProps} text="Multi line" isMultiline={true} />);
+
+    const clickableElement = document.querySelector('[title="Click to edit"]') as HTMLElement;
+    await userEvent.click(clickableElement);
+
+    const textarea = document.querySelector('textarea[aria-label="Please enter feedback title"]') as HTMLTextAreaElement | null;
+    expect(textarea).toBeTruthy();
+    expect(document.querySelector("input")).toBeNull();
+  });
+
   it("renders in display mode when text is provided", () => {
     const propsWithText = { ...mockedTestProps, text: "Test Text" };
     render(<EditableText {...propsWithText} />);
