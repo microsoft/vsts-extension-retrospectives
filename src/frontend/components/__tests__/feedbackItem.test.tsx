@@ -8,6 +8,7 @@ import { reflectBackendService } from "../../dal/reflectBackendService";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
 import localStorageHelper from "../../utilities/localStorageHelper";
 import * as dialogHelper from "../../utilities/dialogHelper";
+import * as Icons from "../icons";
 
 // Mock HTMLDialogElement for JSDOM
 beforeAll(() => {
@@ -11077,5 +11078,120 @@ describe("FeedbackItem additional coverage (merged)", () => {
       const root = container.querySelector(`[data-feedback-item-id="${orphanGroupProps.id}"]`);
       expect(root).toBeInTheDocument();
     });
+  });
+
+  test("keyboard shortcuts g/m/t are ignored outside expected workflow phases", async () => {
+    const props = makeProps({ workflowPhase: "Vote", newlyCreated: false });
+    const { container } = render(<FeedbackItem {...props} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    await act(async () => {
+      fireEvent.keyDown(root, { key: "g" });
+      fireEvent.keyDown(root, { key: "m" });
+      fireEvent.keyDown(root, { key: "t" });
+    });
+
+    const groupDialog = document.querySelector('dialog[aria-label="Group Feedback"]') as HTMLDialogElement | null;
+    const moveDialog = document.querySelector('dialog[aria-label="Move Feedback to Different Column"]') as HTMLDialogElement | null;
+    expect(groupDialog?.open).toBe(false);
+    expect(moveDialog?.open).toBe(false);
+  });
+
+  test("keyboard shortcut a is ignored for non-main grouped items", async () => {
+    const props = makeProps({
+      workflowPhase: "Act",
+      groupedItemProps: {
+        isMainItem: false,
+        isGroupExpanded: true,
+        groupedCount: 1,
+        parentItemId: "parent-item",
+        setIsGroupBeingDragged: jest.fn(),
+        toggleGroupExpand: jest.fn(),
+      },
+      newlyCreated: false,
+    });
+    const { container } = render(<FeedbackItem {...props} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    await act(async () => {
+      fireEvent.keyDown(root, { key: "a" });
+    });
+
+    expect(screen.queryByText("Add action item")).not.toBeInTheDocument();
+  });
+
+  test("skips keydown listener registration when root element ref is null", () => {
+    const realUseRef = React.useRef;
+    let useRefCallCount = 0;
+
+    const useRefSpy = jest.spyOn(React, "useRef").mockImplementation((initialValue: unknown) => {
+      useRefCallCount += 1;
+      if (useRefCallCount === 1) {
+        return { current: null } as React.MutableRefObject<any>;
+      }
+      return realUseRef(initialValue as any) as React.MutableRefObject<any>;
+    });
+
+    expect(() => {
+      const { unmount } = render(<FeedbackItem {...makeProps()} />);
+      unmount();
+    }).not.toThrow();
+
+    useRefSpy.mockRestore();
+  });
+
+  test("imperative itemElement getter falls back to internal ref when no override is set", async () => {
+    const props = makeProps({ newlyCreated: false });
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    const rootElement = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    expect(ref.current?.itemElement).toBe(rootElement);
+  });
+
+  test("search result icon falls back to item icon when icon resolver returns null", async () => {
+    const searchableItem = makeDoc({
+      id: "search-existing-column-fallback-icon",
+      title: "Search Existing Column Fallback Icon",
+      columnId: testColumnUuidOne,
+      originalColumnId: testColumnUuidOne,
+    });
+
+    const props = makeProps({
+      workflowPhase: "Group",
+      columns: {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [{ feedbackItem: searchableItem, actionItems: [] }],
+        },
+      },
+    });
+
+    const iconSpy = jest.spyOn(Icons, "getIconElement").mockReturnValue(null as any);
+
+    const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+    const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+    await act(async () => {
+      (ref.current as any).setState({
+        isGroupFeedbackItemDialogHidden: false,
+        searchTerm: "existing",
+        searchedFeedbackItems: [searchableItem],
+      });
+    });
+
+    expect(screen.getByText("Search Existing Column Fallback Icon")).toBeInTheDocument();
+    expect(container.querySelector(".feedback-item-search-result-item svg, .feedback-item-search-result-item i, .feedback-item-search-result-item .ms-Icon")).toBeTruthy();
+
+    iconSpy.mockRestore();
   });
 });
