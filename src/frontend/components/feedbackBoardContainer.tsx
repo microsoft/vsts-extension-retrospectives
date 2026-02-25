@@ -249,6 +249,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const [, forceRender] = React.useReducer((x: number) => x + 1, 0);
 
   const boardTimerIntervalIdRef = React.useRef<number | undefined>(undefined);
+  const connectionWatchdogIntervalIdRef = React.useRef<number | undefined>(undefined);
   const didMountRef = React.useRef(false);
 
   const prevCurrentTeamRef = React.useRef<WebApiTeam | undefined>(undefined);
@@ -431,6 +432,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     if (boardTimerIntervalIdRef.current !== undefined) {
       window.clearInterval(boardTimerIntervalIdRef.current);
       boardTimerIntervalIdRef.current = undefined;
+    }
+
+    if (connectionWatchdogIntervalIdRef.current !== undefined) {
+      window.clearInterval(connectionWatchdogIntervalIdRef.current);
+      connectionWatchdogIntervalIdRef.current = undefined;
     }
 
     document.removeEventListener("pointerdown", handleBoardActionsDocumentPointerDown);
@@ -1661,15 +1667,56 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     setState({ isDropIssueInEdgeMessageBarVisible: false });
   };
 
+  const attemptBackendReconnect = React.useCallback(
+    async (isManualRetry: boolean): Promise<void> => {
+      const state = stateRef.current;
+      if (state.isBackendServiceReconnecting) {
+        return;
+      }
+
+      if (isManualRetry) {
+        appInsights.trackEvent({ name: TelemetryEvents.LiveSyncManualRetry });
+      }
+
+      setState({ isBackendServiceReconnecting: true });
+
+      const isBackendServiceConnected = await reflectBackendService.retryConnection();
+      if (!isBackendServiceConnected && isManualRetry) {
+        appInsights.trackEvent({ name: TelemetryEvents.LiveSyncManualRetryFailed });
+      }
+
+      setState({ isBackendServiceConnected, isBackendServiceReconnecting: false });
+
+      if (isBackendServiceConnected && state.currentTeam && state.currentBoard) {
+        await updateFeedbackItemsAndContributors(state.currentTeam, state.currentBoard);
+      }
+    },
+    [setState, updateFeedbackItemsAndContributors],
+  );
+
   const retryBackendConnection = async () => {
-    appInsights.trackEvent({ name: TelemetryEvents.LiveSyncManualRetry });
-    setState({ isBackendServiceReconnecting: true });
-    const isBackendServiceConnected = await reflectBackendService.retryConnection();
-    if (!isBackendServiceConnected) {
-      appInsights.trackEvent({ name: TelemetryEvents.LiveSyncManualRetryFailed });
-    }
-    setState({ isBackendServiceConnected, isBackendServiceReconnecting: false });
+    await attemptBackendReconnect(true);
   };
+
+  React.useEffect(() => {
+    if (props.isHostedAzureDevOps) {
+      connectionWatchdogIntervalIdRef.current = window.setInterval(() => {
+        const state = stateRef.current;
+        if (state.isBackendServiceConnected || state.isBackendServiceReconnecting) {
+          return;
+        }
+
+        void attemptBackendReconnect(false);
+      }, 5000);
+    }
+
+    return () => {
+      if (connectionWatchdogIntervalIdRef.current !== undefined) {
+        window.clearInterval(connectionWatchdogIntervalIdRef.current);
+        connectionWatchdogIntervalIdRef.current = undefined;
+      }
+    };
+  }, [attemptBackendReconnect, props.isHostedAzureDevOps]);
 
   React.useImperativeHandle(ref, () => {
     const handle: FeedbackBoardContainerHandle = {
