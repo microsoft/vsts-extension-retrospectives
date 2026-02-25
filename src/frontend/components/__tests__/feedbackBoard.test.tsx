@@ -3008,5 +3008,237 @@ describe("FeedbackBoard Component", () => {
         expect(firstColumnProps?.showColumnEditButton).toBe(false);
       });
     });
+
+    it("polls in Collect phase and clears the interval on unmount", async () => {
+      jest.useFakeTimers();
+      const setIntervalSpy = jest.spyOn(window, "setInterval");
+      const clearIntervalSpy = jest.spyOn(window, "clearInterval");
+
+      const collectProps: FeedbackBoardProps = {
+        ...mockedProps,
+        workflowPhase: "Collect",
+      };
+
+      const { unmount } = render(<FeedbackBoard {...collectProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      });
+
+      const initialCalls = (itemDataService.getFeedbackItemsForBoard as jest.Mock).mock.calls.length;
+
+      await act(async () => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      await waitFor(() => {
+        expect((itemDataService.getFeedbackItemsForBoard as jest.Mock).mock.calls.length).toBeGreaterThan(initialCalls);
+      });
+
+      unmount();
+
+      expect(setIntervalSpy).toHaveBeenCalled();
+      expect(clearIntervalSpy).toHaveBeenCalled();
+
+      setIntervalSpy.mockRestore();
+      clearIntervalSpy.mockRestore();
+      jest.useRealTimers();
+    });
+
+    it("ignores server feedback items that belong to unknown columns", async () => {
+      const unknownColumnItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: "unknown-column-item",
+        columnId: "column-not-in-board",
+        originalColumnId: "column-not-in-board",
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([unknownColumnItem]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const firstColumnProps = getLatestColumnProps(testColumnProps.columnIds[0]);
+        expect(firstColumnProps).toBeDefined();
+        expect(firstColumnProps?.columnItems.some((item: any) => item.feedbackItem.id === "unknown-column-item")).toBe(false);
+      });
+    });
+
+    it("preserves locally newly-created items when server returns no items on polling", async () => {
+      jest.useFakeTimers();
+
+      const collectProps: FeedbackBoardProps = {
+        ...mockedProps,
+        workflowPhase: "Collect",
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...collectProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+      const localNewItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: "local-new-item",
+        columnId,
+        originalColumnId: columnId,
+      };
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.addFeedbackItems(columnId, [localNewItem], false, true, false, false, false);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.columnItems.some((item: any) => item.feedbackItem.id === localNewItem.id)).toBe(true);
+      });
+
+      await act(async () => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.columnItems.some((item: any) => item.feedbackItem.id === localNewItem.id)).toBe(true);
+      });
+
+      jest.useRealTimers();
+    });
+
+    it("preserves local empty placeholder item when server returns no items on polling", async () => {
+      jest.useFakeTimers();
+
+      const collectProps: FeedbackBoardProps = {
+        ...mockedProps,
+        workflowPhase: "Collect",
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...collectProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+      const emptyPlaceholderItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: "emptyFeedbackItem",
+        title: "",
+        columnId,
+        originalColumnId: columnId,
+      };
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.addFeedbackItems(columnId, [emptyPlaceholderItem], false, false, false, false, false);
+      });
+
+      await act(async () => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        expect(columnProps?.columnItems.some((item: any) => item.feedbackItem.id === "emptyFeedbackItem")).toBe(true);
+      });
+
+      jest.useRealTimers();
+    });
+
+    it("skips merging for a board column id that does not yet exist in local column state", async () => {
+      const extraColumnId = "new-column-id";
+      const boardWithAdditionalColumn: IFeedbackBoardDocument = {
+        ...mockedBoard,
+        columns: [
+          ...mockedBoard.columns,
+          {
+            ...mockedBoard.columns[0],
+            id: extraColumnId,
+            title: "New Column",
+          },
+        ],
+      };
+
+      const itemForNewColumn: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: "server-new-column-item",
+        columnId: extraColumnId,
+        originalColumnId: extraColumnId,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([itemForNewColumn]);
+
+      const { rerender } = render(<FeedbackBoard {...mockedProps} />);
+
+      rerender(<FeedbackBoard {...mockedProps} board={boardWithAdditionalColumn} />);
+
+      await waitFor(() => {
+        const firstColumnProps = getLatestColumnProps(testColumnProps.columnIds[0]);
+        expect(firstColumnProps).toBeDefined();
+      });
+    });
+
+    it("replaces local item with server item when ids match during merge", async () => {
+      jest.useFakeTimers();
+
+      const collectProps: FeedbackBoardProps = {
+        ...mockedProps,
+        workflowPhase: "Collect",
+      };
+
+      const columnId = testColumnProps.columnIds[0];
+      const localItemId = "duplicate-item-id";
+
+      const localItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: localItemId,
+        title: "Local Item Title",
+        columnId,
+        originalColumnId: columnId,
+      };
+
+      const serverItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: localItemId,
+        title: "Server Item Title",
+        columnId,
+        originalColumnId: columnId,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock)
+        .mockResolvedValueOnce([])
+        .mockResolvedValue([serverItem]);
+
+      render(<FeedbackBoard {...collectProps} />);
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.addFeedbackItems(columnId, [localItem], false, true, false, false, false);
+      });
+
+      await act(async () => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        const mergedItem = columnProps?.columnItems.find((item: any) => item.feedbackItem.id === localItemId);
+        expect(mergedItem?.feedbackItem.title).toBe("Server Item Title");
+      });
+
+      jest.useRealTimers();
+    });
+
   });
 });

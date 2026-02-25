@@ -10739,4 +10739,45 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     expect(screen.getByText("Search Missing Column")).toBeInTheDocument();
   });
+
+  test("aria-label omits creation date text when createdDate is not provided", () => {
+    const props: any = {
+      id: "test-aria-no-date",
+      title: "No Date Item",
+      columnId: testColumnUuidOne,
+      columns: testColumns,
+      columnIds: testColumnIds,
+      boardId: testBoardId,
+      createdDate: null,
+      createdBy: "Jane Doe",
+      upvotes: 2,
+      voteCount: 2,
+      groupIds: [],
+      userIdRef: "",
+      actionItems: [] as any[],
+      newlyCreated: false,
+      showAddedAnimation: false,
+      shouldHaveFocus: false,
+      hideFeedbackItems: false,
+      nonHiddenWorkItemTypes: [],
+      allWorkItemTypes: [],
+      originalColumnId: testColumnUuidOne,
+      timerSecs: 0,
+      timerState: false,
+      timerId: "",
+      isGroupedCarouselItem: false,
+      workflowPhase: "Vote",
+      currentUserId: "user-1",
+      currentTeamId: "team-1",
+      voteCollection: {},
+      isIncluded: true,
+    };
+
+    const { container } = render(<FeedbackItem {...props} />);
+    const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-aria-no-date"]');
+    const ariaLabel = feedbackItemElement?.getAttribute("aria-label") ?? "";
+
+    expect(ariaLabel).toContain("No Date Item");
+    expect(ariaLabel).not.toContain("Created on");
+  });
 });

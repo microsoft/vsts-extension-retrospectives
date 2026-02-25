@@ -372,6 +372,49 @@ describe("Board Summary", () => {
     useStateSpy.mockRestore();
   });
 
+  it("should return early when matched column is not sortable", () => {
+    const realUseState = React.useState;
+
+    const useStateSpy = jest.spyOn(React, "useState");
+    (useStateSpy as unknown as jest.Mock).mockImplementation((initialState: unknown) => {
+      const [state, setState] = (realUseState as unknown as (value: unknown) => [unknown, React.Dispatch<React.SetStateAction<unknown>>])(initialState);
+
+      const isColumnsState = Array.isArray(state) && state.length > 0 && typeof (state as Array<{ key?: unknown }>)[0]?.key === "string";
+
+      if (isColumnsState) {
+        const nonSortableColumns = [
+          {
+            ariaLabel: "Work item title",
+            key: "title",
+            name: "Title",
+            fieldName: "title",
+            isSortable: false,
+            minWidth: 100,
+            maxWidth: 150,
+          },
+        ];
+
+        const setColumnsWithNonSortableMatch: React.Dispatch<React.SetStateAction<unknown>> = updater => {
+          if (typeof updater === "function") {
+            (updater as (prevState: unknown) => unknown)(nonSortableColumns);
+          }
+        };
+
+        return [state, setColumnsWithNonSortableMatch] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+      }
+
+      return [state, setState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+    });
+
+    const { getByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+
+    expect(() => {
+      fireEvent.click(getByRole("button", { name: "Work item title" }));
+    }).not.toThrow();
+
+    useStateSpy.mockRestore();
+  });
+
   it("should render non-sortable text column header as span", () => {
     const useMemoSpy = jest.spyOn(React, "useMemo").mockImplementationOnce(() => {
       return [
