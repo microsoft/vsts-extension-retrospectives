@@ -10991,7 +10991,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
-    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
     const menuButton = container.querySelector(".contextual-menu-button") as HTMLElement;
 
     await act(async () => {
