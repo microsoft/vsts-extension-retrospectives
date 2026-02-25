@@ -38,9 +38,11 @@ const mockConnection = {
 const mockBuild = jest.fn().mockReturnValue(mockConnection);
 const mockConfigureLogging = jest.fn().mockReturnValue({ build: mockBuild });
 const mockWithAutomaticReconnect = jest.fn().mockReturnValue({ configureLogging: mockConfigureLogging });
+const mockWithServerTimeout = jest.fn().mockReturnValue({ withAutomaticReconnect: mockWithAutomaticReconnect });
+const mockWithKeepAliveInterval = jest.fn().mockReturnValue({ withServerTimeout: mockWithServerTimeout });
 const mockWithUrl = jest.fn().mockImplementation((url: string, options: { accessTokenFactory: () => string | Promise<string> }) => {
   capturedAccessTokenFactory = options?.accessTokenFactory;
-  return { withAutomaticReconnect: mockWithAutomaticReconnect };
+  return { withKeepAliveInterval: mockWithKeepAliveInterval };
 });
 
 jest.mock("@microsoft/signalr", () => ({
