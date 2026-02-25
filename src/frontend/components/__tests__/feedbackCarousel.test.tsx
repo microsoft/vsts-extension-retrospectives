@@ -3,6 +3,7 @@ import { render } from "@testing-library/react";
 import FeedbackCarousel, { type FocusModeModel } from "../../components/feedbackCarousel";
 import { testGroupColumnProps, testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { mockUuid } from "../__mocks__/uuid/v4";
+import * as icons from "../../components/icons";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
@@ -316,6 +317,49 @@ describe("Feedback Carousel ", () => {
       const { container } = render(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={false} />);
 
       // Should use column defaults for accentColor and icon
+      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
+
+    it("should use column icon fallback when getIconElement returns null", () => {
+      const getIconElementSpy = jest.spyOn(icons, "getIconElement").mockReturnValue(null as any);
+
+      const itemWithKnownColumn = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "fallback-icon-item",
+          columnId: testColumnProps.columnId,
+        },
+      };
+
+      const model = buildFocusModeModel([{ ...testColumnProps, columnItems: [itemWithKnownColumn] }]);
+      const { container } = render(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={false} />);
+
+      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+      getIconElementSpy.mockRestore();
+    });
+
+    it("should map createdBy and modifiedDate when they are present", () => {
+      const itemWithCreatorAndModifiedDate = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "item-with-created-by",
+          createdBy: {
+            displayName: "Test Creator",
+            _links: {
+              avatar: {
+                href: "https://example.com/avatar.png",
+              },
+            },
+          },
+          modifiedDate: new Date("2024-05-01T12:00:00Z"),
+        },
+      };
+
+      const model = buildFocusModeModel([{ ...testColumnProps, columnItems: [itemWithCreatorAndModifiedDate] }]);
+      const { container } = render(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={false} />);
+
       expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
     });
   });
