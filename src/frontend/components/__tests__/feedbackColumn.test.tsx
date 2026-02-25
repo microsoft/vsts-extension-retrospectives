@@ -4665,5 +4665,142 @@ describe("Feedback Column ", () => {
 
       expect(addFeedbackItems).not.toHaveBeenCalled();
     });
+
+    test("focusColumn is a no-op after unmount when column ref is null", () => {
+      const ref = React.createRef<FeedbackColumnHandle>();
+      const { unmount } = render(<FeedbackColumn {...testColumnProps} ref={ref} />);
+
+      const handle = ref.current;
+      unmount();
+
+      expect(() => {
+        act(() => {
+          handle?.focusColumn();
+        });
+      }).not.toThrow();
+    });
+
+    test("restoreFocus handles missing preserved feedback card gracefully", async () => {
+      const firstId = "focus-preserve-item-1";
+      const secondId = "focus-preserve-item-2";
+
+      const props = {
+        ...testColumnProps,
+        columnItems: [
+          {
+            ...testColumnProps.columnItems[0],
+            feedbackItem: {
+              ...testColumnProps.columnItems[0].feedbackItem,
+              id: firstId,
+              parentFeedbackItemId: undefined,
+            },
+          },
+        ],
+      };
+
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+      const firstCard = container.querySelector(`[data-feedback-item-id="${firstId}"]`) as HTMLElement | null;
+      firstCard?.focus();
+
+      rerender(
+        <FeedbackColumn
+          {...props}
+          columnItems={[
+            {
+              ...testColumnProps.columnItems[0],
+              feedbackItem: {
+                ...testColumnProps.columnItems[0].feedbackItem,
+                id: secondId,
+                parentFeedbackItemId: undefined,
+              },
+            },
+            {
+              ...testColumnProps.columnItems[0],
+              feedbackItem: {
+                ...testColumnProps.columnItems[0].feedbackItem,
+                id: `${secondId}-extra`,
+                parentFeedbackItemId: undefined,
+              },
+            },
+          ]}
+        />,
+      );
+
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+
+      expect(container.querySelector(".feedback-column")).toBeTruthy();
+    });
+
+    test("preserveFocus handles contenteditable when selection is unavailable", async () => {
+      const getSelectionSpy = jest.spyOn(window, "getSelection").mockReturnValue(null as unknown as Selection);
+
+      const props = {
+        ...testColumnProps,
+        columnItems: [
+          {
+            ...testColumnProps.columnItems[0],
+            feedbackItem: {
+              ...testColumnProps.columnItems[0].feedbackItem,
+              id: "contenteditable-selection-null",
+              parentFeedbackItemId: undefined,
+            },
+          },
+        ],
+      };
+
+      const { container, rerender } = render(<FeedbackColumn {...props} />);
+
+      const feedbackCard = container.querySelector('[data-feedback-item-id="contenteditable-selection-null"]') as HTMLElement | null;
+      const contentEditable = document.createElement("div");
+      contentEditable.contentEditable = "true";
+      contentEditable.textContent = "Editable";
+      feedbackCard?.appendChild(contentEditable);
+      contentEditable.focus();
+
+      rerender(
+        <FeedbackColumn
+          {...props}
+          columnItems={[
+            ...props.columnItems,
+            {
+              ...testColumnProps.columnItems[0],
+              feedbackItem: {
+                ...testColumnProps.columnItems[0].feedbackItem,
+                id: "contenteditable-selection-null-extra",
+                parentFeedbackItemId: undefined,
+              },
+            },
+          ]}
+        />,
+      );
+
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+
+      getSelectionSpy.mockRestore();
+      expect(container.querySelector(".feedback-column")).toBeTruthy();
+    });
+
+    test("column notes draft change falls back to empty string when no value provided", () => {
+      const onColumnNotesChange = jest.fn();
+      const props = {
+        ...testColumnProps,
+        showColumnEditButton: true,
+        columnNotes: "Initial notes",
+        onColumnNotesChange,
+      };
+
+      const { getByRole, getByLabelText } = render(<FeedbackColumn {...props} />);
+
+      fireEvent.click(getByRole("button", { name: `Edit column ${props.columnName}` }));
+      const textarea = getByLabelText("Column notes") as HTMLTextAreaElement;
+      fireEvent.change(textarea, { target: { value: "" } });
+      fireEvent.click(getByRole("button", { name: "Save" }));
+
+      expect(onColumnNotesChange).toHaveBeenCalledWith("");
+    });
   });
 });
