@@ -3240,5 +3240,57 @@ describe("FeedbackBoard Component", () => {
       jest.useRealTimers();
     });
 
+    it("handles merge when local columns map is missing a board column key", async () => {
+      const realUseState = React.useState;
+      const useStateSpy = jest.spyOn(React, "useState");
+
+      (useStateSpy as unknown as jest.Mock).mockImplementation((initialState: unknown) => {
+        const [state, setState] = (realUseState as unknown as (value: unknown) => [unknown, React.Dispatch<React.SetStateAction<unknown>>])(initialState);
+
+        const isColumnsState =
+          !!state &&
+          typeof state === "object" &&
+          !Array.isArray(state) &&
+          Object.values(state as Record<string, unknown>).some(value => !!value && typeof value === "object" && "columnItems" in (value as object) && "columnProperties" in (value as object));
+
+        if (!isColumnsState) {
+          return [state, setState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+        }
+
+        const wrappedSetState: React.Dispatch<React.SetStateAction<unknown>> = update => {
+          if (typeof update === "function") {
+            const currentColumns = state as Record<string, unknown>;
+            const keys = Object.keys(currentColumns);
+
+            if (keys.length > 1) {
+              const [, ...remainingKeys] = keys;
+              const columnsMissingFirstKey = remainingKeys.reduce((acc, key) => {
+                acc[key] = currentColumns[key];
+                return acc;
+              }, {} as Record<string, unknown>);
+
+              (update as (prevState: unknown) => unknown)(columnsMissingFirstKey);
+              return;
+            }
+          }
+
+          setState(update);
+        };
+
+        return [state, wrappedSetState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+      });
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(mockFeedbackItems);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      useStateSpy.mockRestore();
+    });
+
   });
 });
