@@ -141,7 +141,7 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
           }
         });
 
-        const isSortedDescending = (currColumn as IActionItemsColumn & { isSortedDescending?: boolean }).isSortedDescending ?? false;
+        const isSortedDescending = (currColumn as IActionItemsColumn & { isSortedDescending: boolean }).isSortedDescending;
         newActionItems = sortActionItemsByColumn(newActionItems, currColumn.fieldName, isSortedDescending);
         return newTableColumns;
       });

@@ -327,6 +327,7 @@ describe("FeedbackBoardContainer additional coverage", () => {
     itemDataServiceMock.updateTeamEffectivenessMeasurement?.mockResolvedValue(undefined as any);
 
     reflectMock.startConnection?.mockResolvedValue(true as any);
+    reflectMock.retryConnection?.mockResolvedValue(true as any);
     reflectMock.switchToBoard?.mockImplementation(() => undefined);
     reflectMock.broadcastUpdatedBoard?.mockImplementation(() => undefined);
     reflectMock.broadcastDeletedBoard?.mockImplementation(() => undefined);

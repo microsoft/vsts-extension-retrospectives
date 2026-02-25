@@ -373,15 +373,45 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
 
     const columnItems = await Promise.all(columnItemPromises);
 
+    const activeEditorElement = document.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
+    const activeEditingItemId = activeEditorElement?.closest("[data-feedback-item-id]")?.getAttribute("data-feedback-item-id");
+
     setColumns(prevColumns => {
       const newColumns = { ...prevColumns };
+
+      const serverItemsByColumn = new Map<string, IColumnItem[]>();
       columnItems.forEach(columnItem => {
-        if (columnIds.indexOf(columnItem.feedbackItem.columnId) >= 0) {
-          newColumns[columnItem.feedbackItem.columnId] = {
-            ...newColumns[columnItem.feedbackItem.columnId],
-            columnItems: [...newColumns[columnItem.feedbackItem.columnId].columnItems, columnItem],
-          };
+        const columnId = columnItem.feedbackItem.columnId;
+        if (columnIds.indexOf(columnId) < 0) {
+          return;
         }
+
+        const existingItems = serverItemsByColumn.get(columnId) ?? [];
+        existingItems.push(columnItem);
+        serverItemsByColumn.set(columnId, existingItems);
+      });
+
+      columnIds.forEach(columnId => {
+        if (!newColumns[columnId]) {
+          return;
+        }
+
+        const serverItems = serverItemsByColumn.get(columnId) ?? [];
+        const serverIds = new Set(serverItems.map(item => item.feedbackItem.id));
+
+        const localItemsToPreserve = newColumns[columnId].columnItems.filter(columnItem => {
+          const itemId = columnItem.feedbackItem.id;
+          if (serverIds.has(itemId)) {
+            return false;
+          }
+
+          return columnItem.newlyCreated || itemId === "emptyFeedbackItem" || (activeEditingItemId !== null && itemId === activeEditingItemId);
+        });
+
+        newColumns[columnId] = {
+          ...newColumns[columnId],
+          columnItems: [...localItemsToPreserve, ...serverItems],
+        };
       });
 
       setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
@@ -390,6 +420,22 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
 
     setIsDataLoaded(true);
   }, [board.id, columnIds]);
+
+  useEffect(() => {
+    let fallbackPollingIntervalId: number | undefined;
+
+    if (workflowPhase === WorkflowPhase.Collect) {
+      fallbackPollingIntervalId = window.setInterval(() => {
+        void getAllBoardFeedbackItems();
+      }, 5000);
+    }
+
+    return () => {
+      if (fallbackPollingIntervalId !== undefined) {
+        window.clearInterval(fallbackPollingIntervalId);
+      }
+    };
+  }, [getAllBoardFeedbackItems, workflowPhase]);
 
   const setDefaultIterationAndAreaPath = useCallback(async (teamId: string): Promise<void> => {
     let currentIterations = await workService.getIterations(teamId, "current");
