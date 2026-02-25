@@ -38,8 +38,8 @@ class ReflectBackendService {
   constructor() {
     this._signalRConnection = new HubConnectionBuilder()
       .withUrl(ReflectBackendService.signalRHubUrl.href, { accessTokenFactory: this.retrieveValidToken })
-      .withKeepAliveInterval(30000)
-      .withServerTimeout(60000)
+      .withKeepAliveInterval(10000)
+      .withServerTimeout(20000)
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .configureLogging(LogLevel.Error)
       .build();
