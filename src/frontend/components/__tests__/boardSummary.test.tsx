@@ -372,6 +372,139 @@ describe("Board Summary", () => {
     useStateSpy.mockRestore();
   });
 
+  it("should toggle descending when clicked column is already sorted", () => {
+    const realUseState = React.useState;
+    const setColumnsWithSortedState = jest.fn();
+
+    const useStateSpy = jest.spyOn(React, "useState");
+    (useStateSpy as unknown as jest.Mock).mockImplementation((initialState: unknown) => {
+      const [state, setState] = (realUseState as unknown as (value: unknown) => [unknown, React.Dispatch<React.SetStateAction<unknown>>])(initialState);
+
+      const isColumnsState = Array.isArray(state) && state.length > 0 && typeof (state as Array<{ key?: unknown }>)[0]?.key === "string";
+
+      if (isColumnsState) {
+        const sortedColumns = [
+          {
+            ariaLabel: "already-sorted-title",
+            key: "title",
+            name: "Title",
+            fieldName: "title",
+            isSortable: true,
+            isSorted: true,
+            isSortedDescending: false,
+            minWidth: 100,
+            maxWidth: 150,
+          },
+        ];
+
+        const setColumnsAndValidate: React.Dispatch<React.SetStateAction<unknown>> = updater => {
+          if (typeof updater === "function") {
+            const updatedColumns = (updater as (prevState: unknown) => unknown)(sortedColumns) as Array<{ isSorted?: boolean; isSortedDescending?: boolean }>;
+            expect(updatedColumns[0].isSorted).toBe(true);
+            expect(updatedColumns[0].isSortedDescending).toBe(true);
+          }
+          setColumnsWithSortedState(updater);
+        };
+
+        return [sortedColumns, setColumnsAndValidate] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+      }
+
+      return [state, setState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+    });
+
+    const { getByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+
+    fireEvent.click(getByRole("button", { name: "already-sorted-title" }));
+    expect(setColumnsWithSortedState).toHaveBeenCalled();
+
+    useStateSpy.mockRestore();
+  });
+
+  it("should set ascending sort when clicking unsorted title column for the first time", async () => {
+    const unsortedProps: IBoardSummaryProps = {
+      ...mockedPropsWithActionItems,
+      actionItems: [
+        {
+          ...testWorkItem1,
+          id: 901,
+          fields: {
+            ...testWorkItem1.fields,
+            ["System.Title"]: "Zulu Item",
+            ["System.WorkItemType"]: "Bug",
+          },
+        },
+        {
+          ...testWorkItem2,
+          id: 902,
+          fields: {
+            ...testWorkItem2.fields,
+            ["System.Title"]: "Alpha Item",
+            ["System.WorkItemType"]: "Task",
+          },
+        },
+      ],
+    };
+
+    const { getByRole, container } = render(<BoardSummary {...unsortedProps} />);
+
+    const initialTitles = Array.from(container.querySelectorAll(".work-item-title")).map(node => node.textContent);
+    expect(initialTitles[0]).toBe("Zulu Item");
+
+    fireEvent.click(getByRole("button", { name: "Work item title" }));
+
+    await waitFor(() => {
+      const sortedTitles = Array.from(container.querySelectorAll(".work-item-title")).map(node => node.textContent);
+      expect(sortedTitles[0]).toBe("Alpha Item");
+    });
+  });
+
+  it("should switch from descending to ascending when already sorted descending", () => {
+    const realUseState = React.useState;
+    const setColumnsWithDescendingState = jest.fn();
+
+    const useStateSpy = jest.spyOn(React, "useState");
+    (useStateSpy as unknown as jest.Mock).mockImplementation((initialState: unknown) => {
+      const [state, setState] = (realUseState as unknown as (value: unknown) => [unknown, React.Dispatch<React.SetStateAction<unknown>>])(initialState);
+
+      const isColumnsState = Array.isArray(state) && state.length > 0 && typeof (state as Array<{ key?: unknown }>)[0]?.key === "string";
+
+      if (isColumnsState) {
+        const descendingColumns = [
+          {
+            ariaLabel: "descending-title",
+            key: "title",
+            name: "Title",
+            fieldName: "title",
+            isSortable: true,
+            isSorted: true,
+            isSortedDescending: true,
+            minWidth: 100,
+            maxWidth: 150,
+          },
+        ];
+
+        const setColumnsAndValidate: React.Dispatch<React.SetStateAction<unknown>> = updater => {
+          if (typeof updater === "function") {
+            const updatedColumns = (updater as (prevState: unknown) => unknown)(descendingColumns) as Array<{ isSorted?: boolean; isSortedDescending?: boolean }>;
+            expect(updatedColumns[0].isSorted).toBe(true);
+            expect(updatedColumns[0].isSortedDescending).toBe(false);
+          }
+          setColumnsWithDescendingState(updater);
+        };
+
+        return [descendingColumns, setColumnsAndValidate] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+      }
+
+      return [state, setState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
+    });
+
+    const { getByRole } = render(<BoardSummary {...mockedPropsWithActionItems} />);
+    fireEvent.click(getByRole("button", { name: "descending-title" }));
+
+    expect(setColumnsWithDescendingState).toHaveBeenCalled();
+    useStateSpy.mockRestore();
+  });
+
   it("should return early when matched column is not sortable", () => {
     const realUseState = React.useState;
 
