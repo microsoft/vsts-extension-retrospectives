@@ -191,6 +191,32 @@ describe("EffectivenessMeasurementRow", () => {
   });
 
   describe("Vote Initialization", () => {
+    it("updates selected score when votes prop changes (board switch scenario)", async () => {
+      const firstBoardVotes: ITeamEffectivenessMeasurementVoteCollection[] = [
+        {
+          userId: "encrypted-test-user-id",
+          responses: [{ questionId: 1, selection: 9 }],
+        },
+      ];
+      const secondBoardVotes: ITeamEffectivenessMeasurementVoteCollection[] = [
+        {
+          userId: "encrypted-test-user-id",
+          responses: [{ questionId: 1, selection: 3 }],
+        },
+      ];
+
+      const { rerender } = render(<EffectivenessMeasurementRow {...defaultProps} votes={firstBoardVotes} />);
+
+      expect(screen.getByLabelText(getScoreAriaLabel(defaultProps.title, 9, true))).toHaveClass("team-assessment-score-button-selected");
+
+      rerender(<EffectivenessMeasurementRow {...defaultProps} votes={secondBoardVotes} />);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(getScoreAriaLabel(defaultProps.title, 3, true))).toHaveClass("team-assessment-score-button-selected");
+        expect(screen.getByLabelText(getScoreAriaLabel(defaultProps.title, 9, false))).not.toHaveClass("team-assessment-score-button-selected");
+      });
+    });
+
     it("initializes with existing vote for the current user and question", () => {
       const props = { ...defaultProps, questionId: 1, votes: mockVotes };
       const { container } = render(<EffectivenessMeasurementRow {...props} />);

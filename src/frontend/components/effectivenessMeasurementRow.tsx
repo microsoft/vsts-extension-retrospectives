@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
@@ -39,6 +39,10 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
   }, [votes, questionId]);
 
   const [selected, setSelected] = useState(initialSelection);
+
+  useEffect(() => {
+    setSelected(initialSelection);
+  }, [initialSelection]);
 
   const handleSelect = useCallback(
     (value: number) => {
