@@ -1799,8 +1799,12 @@ describe("Feedback Column ", () => {
       };
 
       const { container } = render(<FeedbackColumn {...props} />);
+      const feedbackList = container.querySelector(".feedback-items-container") as HTMLUListElement;
 
-      expect(container.querySelector(".feedback-items-container")).toBeTruthy();
+      expect(feedbackList).toBeTruthy();
+      expect(feedbackList.tagName).toBe("UL");
+      expect(feedbackList.children.length).toBeGreaterThan(0);
+      expect(Array.from(feedbackList.children).every(child => child.tagName === "LI")).toBe(true);
     });
 
     test("renders grouped items in Act workflow phase sorted by votes", () => {

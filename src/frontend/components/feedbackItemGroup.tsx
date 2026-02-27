@@ -77,34 +77,37 @@ const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({ groupedWorkItems
 
   return (
     <div ref={groupRef} className={`feedback-item-group ${isGroupExpanded ? "feedback-item-group-expanded" : ""}`} onDragOver={handleDragOver} onDrop={handleDrop} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity} role="group" aria-label={`${groupTitle}. Feedback group with ${groupedWorkItems.length + 1} items${isGroupExpanded ? ", expanded" : ", collapsed"}`}>
-      <div className="item-cards" aria-label="Group Feedback Items">
-        <FeedbackItem
-          {...mainFeedbackItem}
-          groupedItemProps={{
-            groupedCount: groupedWorkItems.length,
-            isGroupExpanded: isGroupExpanded,
-            isMainItem: true,
-            parentItemId: undefined,
-            setIsGroupBeingDragged: setIsGroupBeingDragged,
-            toggleGroupExpand: toggleGroupExpand,
-          }}
-        />
+      <ul className="item-cards" aria-label="Group Feedback Items">
+        <li className="feedback-item-group-entry">
+          <FeedbackItem
+            {...mainFeedbackItem}
+            groupedItemProps={{
+              groupedCount: groupedWorkItems.length,
+              isGroupExpanded: isGroupExpanded,
+              isMainItem: true,
+              parentItemId: undefined,
+              setIsGroupBeingDragged: setIsGroupBeingDragged,
+              toggleGroupExpand: toggleGroupExpand,
+            }}
+          />
+        </li>
         {isGroupExpanded &&
           groupedWorkItems.map(itemProps => (
-            <FeedbackItem
-              key={itemProps.id}
-              {...itemProps}
-              groupedItemProps={{
-                groupedCount: undefined,
-                isGroupExpanded: undefined,
-                isMainItem: false,
-                parentItemId: mainFeedbackItem.id,
-                setIsGroupBeingDragged: setIsGroupBeingDragged,
-                toggleGroupExpand: undefined,
-              }}
-            />
+            <li key={itemProps.id} className="feedback-item-group-entry">
+              <FeedbackItem
+                {...itemProps}
+                groupedItemProps={{
+                  groupedCount: undefined,
+                  isGroupExpanded: undefined,
+                  isMainItem: false,
+                  parentItemId: mainFeedbackItem.id,
+                  setIsGroupBeingDragged: setIsGroupBeingDragged,
+                  toggleGroupExpand: undefined,
+                }}
+              />
+            </li>
           ))}
-      </div>
+      </ul>
     </div>
   );
 };

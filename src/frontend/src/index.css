@@ -540,7 +540,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .item-cards {
-    @apply flex flex-col w-full;
+    @apply flex flex-col w-full list-none m-0 p-0;
+
+    & > li {
+      @apply min-w-0;
+    }
 
     & .feedbackItemGroupItem.removeFeedbackItem .ms-DocumentCard {
       @apply animate-[fadeOutToRed_1000ms_ease-in_1_forwards];
@@ -1172,10 +1176,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-items-container {
-  @apply pt-2.5 w-full box-border overflow-visible grid gap-3;
+  @apply pt-2.5 w-full box-border overflow-visible grid gap-3 list-none m-0 p-0;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 
-  & > div {
+  & > li {
     @apply min-w-0;
   }
 }

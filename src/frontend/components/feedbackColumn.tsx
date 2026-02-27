@@ -420,14 +420,20 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
     return navigableItems.map(columnItem => {
       const feedbackItemProps = createFeedbackItemProps(props, columnItem);
+      let itemContent: React.JSX.Element;
 
       if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
         const childItemsToGroup = sourceColumnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => createFeedbackItemProps(props, childColumnItem));
-
-        return <FeedbackItemGroup key={feedbackItemProps.id} mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={workflowPhase} />;
+        itemContent = <FeedbackItemGroup mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={workflowPhase} />;
       } else {
-        return <FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />;
+        itemContent = <FeedbackItem {...feedbackItemProps} />;
       }
+
+      return (
+        <li key={feedbackItemProps.id} className="feedback-item-list-entry">
+          {itemContent}
+        </li>
+      );
     });
   }, [columnItems, getNavigableColumnItems, props, workflowPhase]);
 
@@ -460,7 +466,11 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
             Add new feedback
           </button>
         )}
-        {isDataLoaded && <div className="feedback-items-container">{renderFeedbackItems()}</div>}
+        {isDataLoaded && (
+          <ul className="feedback-items-container" aria-label={`${columnName} feedback list`}>
+            {renderFeedbackItems()}
+          </ul>
+        )}
       </div>
       <dialog ref={editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label="Edit column notes">
         <div className="header">
