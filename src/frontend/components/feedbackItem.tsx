@@ -983,7 +983,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       ref={itemElementRef}
       data-feedback-item-id={props.id}
       tabIndex={0}
-      aria-live="polite"
       aria-label={ariaLabel}
       aria-hidden={hideFeedbackItems || undefined}
       role="article"
