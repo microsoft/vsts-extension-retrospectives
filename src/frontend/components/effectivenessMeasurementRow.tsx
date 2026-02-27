@@ -18,6 +18,18 @@ export interface EffectivenessMeasurementRowProps {
 
 const VOTING_SCALE = Array.from({ length: 10 }, (_, index) => index + 1);
 
+const getFavorabilityBand = (value: number): string => {
+  if (value <= 6) {
+    return "Unfavorable";
+  }
+
+  if (value <= 8) {
+    return "Neutral";
+  }
+
+  return "Favorable";
+};
+
 const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = ({ title, subtitle, iconClassName, tooltip, questionId, votes = [], onSelectedChange }) => {
   const initialSelection = useMemo(() => {
     const currentUserId = obfuscateUserId(getUserIdentity().id);
@@ -52,9 +64,16 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
       </td>
       {VOTING_SCALE.map((value: number) => {
         const isSelected = selected === value;
+        const selectedState = isSelected ? "Selected" : "Not selected";
         return (
           <td key={value}>
-            <button type="button" className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`} aria-label={`${title}, score ${value}, ${value <= 6 ? "Unfavorable" : value <= 8 ? "Neutral" : "Favorable"}`} aria-pressed={isSelected} onClick={() => handleSelect(value)}>
+            <button
+              type="button"
+              className={`team-assessment-score-button ${isSelected ? "team-assessment-score-button-selected" : ""}`}
+              aria-label={`${title}, score ${value}, ${getFavorabilityBand(value)}, ${selectedState}`}
+              aria-pressed={isSelected}
+              onClick={() => handleSelect(value)}
+            >
               <span className="team-assessment-score-circle" />
             </button>
           </td>
