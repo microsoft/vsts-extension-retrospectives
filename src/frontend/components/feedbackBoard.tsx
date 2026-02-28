@@ -48,6 +48,20 @@ export interface IColumnItem {
   hideFeedbackItems?: boolean;
 }
 
+const deduplicateColumnItemsByFeedbackId = (columnItems: IColumnItem[]): IColumnItem[] => {
+  const seenFeedbackItemIds = new Set<string>();
+
+  return columnItems.filter(columnItem => {
+    const feedbackItemId = columnItem.feedbackItem.id;
+    if (seenFeedbackItemIds.has(feedbackItemId)) {
+      return false;
+    }
+
+    seenFeedbackItemIds.add(feedbackItemId);
+    return true;
+  });
+};
+
 const findActiveTimerFeedbackItemId = (columns: { [id: string]: IColumn }): string | null => {
   for (const columnId of Object.keys(columns)) {
     const activeItem = columns[columnId]?.columnItems.find(columnItem => columnItem.feedbackItem.timerState);
@@ -243,7 +257,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         .concat(resetFocusForStateColumns[columnId].columnItems);
 
       const newColumns = { ...resetFocusForStateColumns };
-      newColumns[columnId].columnItems = updatedColumnItems;
+      newColumns[columnId].columnItems = deduplicateColumnItemsByFeedbackId(updatedColumnItems);
       setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
       setIsDataLoaded(true);
 
@@ -387,7 +401,12 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         }
 
         const existingItems = serverItemsByColumn.get(columnId) ?? [];
-        existingItems.push(columnItem);
+        const existingItemIndex = existingItems.findIndex(item => item.feedbackItem.id === columnItem.feedbackItem.id);
+        if (existingItemIndex >= 0) {
+          existingItems[existingItemIndex] = columnItem;
+        } else {
+          existingItems.push(columnItem);
+        }
         serverItemsByColumn.set(columnId, existingItems);
       });
 
@@ -410,7 +429,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
 
         newColumns[columnId] = {
           ...newColumns[columnId],
-          columnItems: [...localItemsToPreserve, ...serverItems],
+          columnItems: deduplicateColumnItemsByFeedbackId([...localItemsToPreserve, ...serverItems]),
         };
       });
 
