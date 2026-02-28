@@ -1441,6 +1441,37 @@ describe("FeedbackBoard Component", () => {
       expect(reflectBackendService.broadcastNewItem).toHaveBeenCalledWith(columnId, "new-1");
       expect(reflectBackendService.broadcastNewItem).toHaveBeenCalledWith(columnId, "new-2");
     });
+
+    it("does not add duplicate feedback item when the same item is added multiple times", async () => {
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      const columnId = testColumnProps.columnIds[0];
+      const duplicateItemId = "duplicate-live-item";
+      const duplicateItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: duplicateItemId,
+        columnId,
+        originalColumnId: columnId,
+      };
+
+      await waitFor(() => {
+        expect(getLatestColumnProps(columnId)).toBeDefined();
+      });
+
+      await act(async () => {
+        const columnProps = getLatestColumnProps(columnId);
+        columnProps.addFeedbackItems(columnId, [duplicateItem], false, false, false, false, false);
+        columnProps.addFeedbackItems(columnId, [duplicateItem], false, false, false, false, false);
+      });
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        const duplicateItems = columnProps?.columnItems.filter((item: any) => item.feedbackItem.id === duplicateItemId) ?? [];
+        expect(duplicateItems).toHaveLength(1);
+      });
+    });
   });
 
   describe("Timer Operations - Error Handling", () => {
@@ -3238,6 +3269,37 @@ describe("FeedbackBoard Component", () => {
       });
 
       jest.useRealTimers();
+    });
+
+    it("deduplicates feedback items when server polling returns the same id multiple times", async () => {
+      const columnId = testColumnProps.columnIds[0];
+      const duplicateId = "server-duplicate-item";
+      const olderItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: duplicateId,
+        title: "Older",
+        columnId,
+        originalColumnId: columnId,
+      };
+      const newerItem: IFeedbackItemDocument = {
+        ...mockFeedbackItems[0],
+        id: duplicateId,
+        title: "Newer",
+        columnId,
+        originalColumnId: columnId,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([olderItem, newerItem]);
+
+      render(<FeedbackBoard {...mockedProps} />);
+
+      await waitFor(() => {
+        const columnProps = getLatestColumnProps(columnId);
+        const duplicateItems = columnProps?.columnItems.filter((item: any) => item.feedbackItem.id === duplicateId) ?? [];
+
+        expect(duplicateItems).toHaveLength(1);
+        expect(duplicateItems[0].feedbackItem.title).toBe("Newer");
+      });
     });
 
     it("handles merge when local columns map is missing a board column key", async () => {
