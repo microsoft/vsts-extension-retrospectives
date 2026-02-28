@@ -8403,11 +8403,13 @@ describe("FeedbackItem additional coverage (merged)", () => {
     const props = makeProps();
     const { container } = render(<FeedbackItem {...props} />);
     const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+    expect(root).not.toHaveAttribute("aria-live");
 
     fireEvent.keyDown(root, { key: "Enter" });
 
     const editor = (await screen.findByLabelText("Please enter feedback title")) as HTMLElement;
     expect(document.activeElement).toBe(editor);
+    expect(root).not.toHaveAttribute("aria-live");
   });
 
   test("Space toggles group expand; Escape keeps visible dialogs open", async () => {

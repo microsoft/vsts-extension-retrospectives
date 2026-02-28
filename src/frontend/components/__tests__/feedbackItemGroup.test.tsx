@@ -76,6 +76,19 @@ describe("FeedbackItemGroup", () => {
     expect(getByTestId("feedback-item-main-item-1")).toBeInTheDocument();
   });
 
+  it("should render grouped cards in semantic list markup", () => {
+    const { container, getByTestId } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
+    const itemCards = container.querySelector(".item-cards") as HTMLUListElement;
+
+    expect(itemCards).toBeInTheDocument();
+    expect(itemCards.tagName).toBe("UL");
+    expect(itemCards.children.length).toBe(1);
+    expect(Array.from(itemCards.children).every(child => child.tagName === "LI")).toBe(true);
+
+    fireEvent.click(getByTestId("toggle-expand"));
+    expect(itemCards.children.length).toBe(2);
+  });
+
   it("should not render grouped items initially", () => {
     const { queryByTestId } = render(<FeedbackItemGroup mainFeedbackItem={mockMainItem} groupedWorkItems={[mockGroupedItem]} workflowState={WorkflowPhase.Collect} />);
 

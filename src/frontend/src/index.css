@@ -540,7 +540,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .item-cards {
-    @apply flex flex-col w-full;
+    @apply flex flex-col w-full list-none m-0 p-0;
+
+    & > li {
+      @apply min-w-0;
+    }
 
     & .feedbackItemGroupItem.removeFeedbackItem .ms-DocumentCard {
       @apply animate-[fadeOutToRed_1000ms_ease-in_1_forwards];
@@ -625,7 +629,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .selector-option {
-  @apply text-sm h-8 px-2 cursor-pointer bg-(--callout-background-color) text-(--text-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+  @apply w-60 text-ellipsis whitespace-nowrap text-sm h-8 px-2 cursor-pointer bg-(--callout-background-color) text-(--text-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
 
   & option {
     @apply text-sm px-2 bg-(--callout-background-color) text-(--text-primary-color);
@@ -1172,10 +1176,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-items-container {
-  @apply pt-2.5 w-full box-border overflow-visible grid gap-3;
+  @apply pt-2.5 w-full box-border overflow-visible grid gap-3 list-none m-0 p-0;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 
-  & > div {
+  & > li {
     @apply min-w-0;
   }
 }

@@ -2083,3 +2083,115 @@ describe("FeedbackBoardMetadataForm - Comprehensive Coverage Tests", () => {
     });
   });
 });
+
+describe("FeedbackBoardMetadataForm - Null ref branch coverage", () => {
+  it("covers delete confirmation dialog show/close when delete dialog ref is null", async () => {
+    const user = userEvent.setup();
+    const onFormSubmit = jest.fn();
+
+    const originalUseRef = React.useRef;
+    const useRefSpy = jest.spyOn(React, "useRef");
+    let useRefCallCount = 0;
+
+    useRefSpy.mockImplementation((initialValue: unknown) => {
+      useRefCallCount += 1;
+      const refObject = originalUseRef(initialValue);
+      if (useRefCallCount === 2) {
+        Object.defineProperty(refObject, "current", {
+          get: () => null,
+          set: () => {},
+          configurable: true,
+        });
+      }
+      return refObject;
+    });
+
+    const props: IFeedbackBoardMetadataFormProps = {
+      ...mockedProps,
+      isNewBoardCreation: false,
+      currentBoard: testExistingBoard,
+      onFormSubmit,
+    };
+
+    try {
+      const { container } = render(<FeedbackBoardMetadataForm {...props} />);
+
+      const deleteButtons = container.querySelectorAll(".feedback-column-card-delete-button");
+      expect(deleteButtons.length).toBeGreaterThan(0);
+      await user.click(deleteButtons[0] as HTMLButtonElement);
+
+      const saveButton = screen.getByRole("button", { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(screen.getByText(/confirm changes/i)).toBeInTheDocument();
+      });
+
+      const closeButton = container.querySelector('.confirm-changes-dialog button[aria-label="Close"]') as HTMLButtonElement | null;
+      expect(closeButton).toBeInTheDocument();
+      if (closeButton) {
+        await user.click(closeButton);
+      }
+    } finally {
+      useRefSpy.mockRestore();
+    }
+  });
+
+  it("covers color dialog show/close/select when color dialog ref is null", async () => {
+    const user = userEvent.setup();
+
+    const originalUseRef = React.useRef;
+    const useRefSpy = jest.spyOn(React, "useRef");
+    let useRefCallCount = 0;
+
+    useRefSpy.mockImplementation((initialValue: unknown) => {
+      useRefCallCount += 1;
+      const refObject = originalUseRef(initialValue);
+      if (useRefCallCount === 3) {
+        Object.defineProperty(refObject, "current", {
+          get: () => null,
+          set: () => {},
+          configurable: true,
+        });
+      }
+      return refObject;
+    });
+
+    const props: IFeedbackBoardMetadataFormProps = {
+      ...mockedProps,
+      isNewBoardCreation: false,
+      currentBoard: testExistingBoard,
+    };
+
+    try {
+      const { container } = render(<FeedbackBoardMetadataForm {...props} />);
+
+      const colorButtons = container.querySelectorAll(".feedback-column-card-accent-color-button");
+      expect(colorButtons.length).toBeGreaterThan(0);
+
+      await user.click(colorButtons[0] as HTMLButtonElement);
+
+      await waitFor(() => {
+        expect(screen.getByText(/choose column color/i)).toBeInTheDocument();
+      });
+
+      const closeButton = container.querySelector('.choose-column-accent-color-dialog button[aria-label="Close"]') as HTMLButtonElement | null;
+      expect(closeButton).toBeInTheDocument();
+      if (closeButton) {
+        await user.click(closeButton);
+      }
+
+      const colorChoiceButton = container.querySelector(".choose-feedback-column-accent-color-button") as HTMLButtonElement | null;
+      expect(colorChoiceButton).toBeInTheDocument();
+      if (colorChoiceButton) {
+        await user.click(colorChoiceButton);
+      }
+
+      await waitFor(() => {
+        expect(screen.queryByText(/choose column color/i)).not.toBeInTheDocument();
+      });
+    } finally {
+      useRefSpy.mockRestore();
+    }
+  });
+});

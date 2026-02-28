@@ -133,6 +133,7 @@ export const createFeedbackItemProps = (columnProps: FeedbackColumnProps, column
 
 const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((props, ref) => {
   const { columnName, columnId, icon, workflowPhase, isDataLoaded, columnItems, boardId, isBoardAnonymous, showColumnEditButton, columnNotes, onColumnNotesChange, addFeedbackItems, refreshFeedbackItems } = props;
+  const currentColumnItems = columnItems ?? [];
 
   const [isCollapsed] = useState(false);
   const [columnNotesDraft, setColumnNotesDraft] = useState("");
@@ -141,10 +142,10 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   const columnRef = useRef<HTMLDivElement>(null);
   const editColumnNotesDialogRef = useRef<HTMLDialogElement>(null);
   const focusPreservation = useRef<FocusPreservation | null>(null);
-  const prevColumnItemsLength = useRef<number>(columnItems.length);
+  const prevColumnItemsLength = useRef<number>(currentColumnItems.length);
 
   const getNavigableColumnItems = useCallback((): IColumnItem[] => {
-    const sourceColumnItems: IColumnItem[] = columnItems || [];
+    const sourceColumnItems: IColumnItem[] = currentColumnItems;
 
     let sortedItems: IColumnItem[] = sourceColumnItems;
 
@@ -155,7 +156,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
     }
 
     return (sortedItems || []).filter(item => !item.feedbackItem.parentFeedbackItemId);
-  }, [columnItems, workflowPhase]);
+  }, [currentColumnItems, workflowPhase]);
 
   const focusFeedbackItemById = useCallback((feedbackItemId: string) => {
     const elementToFocus = columnRef.current?.querySelector(`[data-feedback-item-id="${feedbackItemId}"]`) as HTMLElement | null;
@@ -166,7 +167,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   const focusFeedbackItemAtIndex = useCallback(
     (index: number) => {
       const navigableItems = getNavigableColumnItems();
-      const feedbackItemId = navigableItems[index]?.feedbackItem?.id;
+      const feedbackItemId = navigableItems[index].feedbackItem.id;
       focusFeedbackItemById(feedbackItemId);
     },
     [focusFeedbackItemById, getNavigableColumnItems],
@@ -180,8 +181,8 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
       }
 
       const activeElement = document.activeElement as HTMLElement | null;
-      const activeCard = activeElement?.closest?.("[data-feedback-item-id]") as HTMLElement | null;
-      const activeId = activeCard?.getAttribute?.("data-feedback-item-id") ?? null;
+      const activeCard = activeElement?.closest("[data-feedback-item-id]") as HTMLElement | null;
+      const activeId = activeCard?.getAttribute("data-feedback-item-id") ?? null;
 
       const currentIndex = activeId ? navigableItems.findIndex(item => item.feedbackItem.id === activeId) : -1;
 
@@ -232,8 +233,8 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
     setTimeout(() => {
       let elementToFocus: HTMLElement | null = null;
 
-      if (preserved.elementId) {
-        const feedbackCard = columnRef.current?.querySelector(`[data-feedback-item-id="${preserved.elementId}"]`) as HTMLElement;
+      if (preserved.elementId && columnRef.current) {
+        const feedbackCard = columnRef.current.querySelector(`[data-feedback-item-id="${preserved.elementId}"]`) as HTMLElement;
         if (feedbackCard) {
           elementToFocus = feedbackCard.querySelector('input, textarea, [contenteditable="true"]') as HTMLElement;
           if (!elementToFocus) {
@@ -247,13 +248,15 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
         if ((elementToFocus.tagName === "INPUT" || elementToFocus.tagName === "TEXTAREA") && preserved.selectionStart !== null) {
           const inputElement = elementToFocus as HTMLInputElement | HTMLTextAreaElement;
-          inputElement.setSelectionRange(preserved.selectionStart, preserved.selectionEnd || preserved.selectionStart);
+          inputElement.setSelectionRange(preserved.selectionStart, preserved.selectionEnd ?? preserved.selectionStart);
         } else if (elementToFocus.isContentEditable && preserved.cursorPosition !== null) {
           try {
             const range = document.createRange();
             const selection = window.getSelection();
             if (elementToFocus.firstChild && selection) {
-              range.setStart(elementToFocus.firstChild, Math.min(preserved.cursorPosition, elementToFocus.firstChild.textContent?.length || 0));
+              const firstChildText = elementToFocus.firstChild.textContent;
+              const maxOffset = firstChildText === null ? 0 : firstChildText.length;
+              range.setStart(elementToFocus.firstChild, Math.min(preserved.cursorPosition, maxOffset));
               range.collapse(true);
               selection.removeAllRanges();
               selection.addRange(range);
@@ -269,7 +272,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   const createEmptyFeedbackItem = useCallback(() => {
     if (workflowPhase !== WorkflowPhase.Collect) return;
 
-    const item = columnItems.find(x => x.feedbackItem.id === "emptyFeedbackItem");
+    const item = currentColumnItems.find(x => x.feedbackItem.id === "emptyFeedbackItem");
     if (item) {
       return;
     }
@@ -294,7 +297,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
     };
 
     addFeedbackItems(columnId, [feedbackItem], /*shouldBroadcast*/ false, /*newlyCreated*/ true, /*showAddedAnimation*/ false, /*shouldHaveFocus*/ false, /*hideFeedbackItems*/ false);
-  }, [workflowPhase, columnItems, boardId, columnId, isBoardAnonymous, addFeedbackItems]);
+  }, [workflowPhase, currentColumnItems, boardId, columnId, isBoardAnonymous, addFeedbackItems]);
 
   const openEditDialog = useCallback(() => {
     setColumnNotesDraft(columnNotes);
@@ -378,19 +381,19 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   }, [handleColumnKeyDown]);
 
   useEffect(() => {
-    const itemCountChanged = prevColumnItemsLength.current !== columnItems.length;
+    const itemCountChanged = prevColumnItemsLength.current !== currentColumnItems.length;
 
     if (itemCountChanged) {
       preserveFocus();
     }
 
-    prevColumnItemsLength.current = columnItems.length;
+    prevColumnItemsLength.current = currentColumnItems.length;
 
     if (itemCountChanged && focusPreservation.current) {
       restoreFocus();
       focusPreservation.current = null;
     }
-  }, [columnItems.length, preserveFocus, restoreFocus]);
+  }, [currentColumnItems.length, preserveFocus, restoreFocus]);
 
   const dragFeedbackItemOverColumn = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -405,7 +408,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
   const handleColumnNotesDraftChange = useCallback((event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
     const target = event.target as HTMLInputElement | HTMLTextAreaElement | null;
-    const value = newValue ?? target?.value ?? "";
+    const value = target ? target.value : "";
     setColumnNotesDraft(value);
   }, []);
 
@@ -415,23 +418,27 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   }, [onColumnNotesChange, columnNotesDraft]);
 
   const renderFeedbackItems = useCallback(() => {
-    const sourceColumnItems: IColumnItem[] = columnItems || [];
+    const sourceColumnItems: IColumnItem[] = currentColumnItems;
     const navigableItems = getNavigableColumnItems();
 
     return navigableItems.map(columnItem => {
       const feedbackItemProps = createFeedbackItemProps(props, columnItem);
+      let itemContent: React.JSX.Element;
 
       if (columnItem.feedbackItem.childFeedbackItemIds?.length) {
         const childItemsToGroup = sourceColumnItems.filter(childColumnItem => columnItem.feedbackItem.childFeedbackItemIds.some(childId => childId === childColumnItem.feedbackItem.id)).map(childColumnItem => createFeedbackItemProps(props, childColumnItem));
-
-        return <FeedbackItemGroup key={feedbackItemProps.id} mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={workflowPhase} />;
+        itemContent = <FeedbackItemGroup mainFeedbackItem={feedbackItemProps} groupedWorkItems={childItemsToGroup} workflowState={workflowPhase} />;
       } else {
-        return <FeedbackItem key={feedbackItemProps.id} {...feedbackItemProps} />;
+        itemContent = <FeedbackItem {...feedbackItemProps} />;
       }
-    });
-  }, [columnItems, getNavigableColumnItems, props, workflowPhase]);
 
-  const currentColumnItems = columnItems || [];
+      return (
+        <li key={feedbackItemProps.id} className="feedback-item-list-entry">
+          {itemContent}
+        </li>
+      );
+    });
+  }, [currentColumnItems, getNavigableColumnItems, props, workflowPhase]);
 
   return (
     <div ref={columnRef} className="feedback-column" role="region" aria-label={`${columnName} column with ${currentColumnItems.length} feedback items`} tabIndex={0} onDoubleClick={createEmptyFeedbackItem} onDrop={handleDropFeedbackItemOnColumnSpace} onDragOver={dragFeedbackItemOverColumn}>
@@ -460,7 +467,11 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
             Add new feedback
           </button>
         )}
-        {isDataLoaded && <div className="feedback-items-container">{renderFeedbackItems()}</div>}
+        {isDataLoaded && (
+          <ul className="feedback-items-container" aria-label={`${columnName} feedback list`}>
+            {renderFeedbackItems()}
+          </ul>
+        )}
       </div>
       <dialog ref={editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label="Edit column notes">
         <div className="header">
