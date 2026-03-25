@@ -243,7 +243,7 @@ Once the team has decided which dimension to focus on, the facilitator will clic
 and Act" which aligns to the dimension the team wants to focus on. This will create retrospective
 with a template that aligns to the dimension.
 
-##### Collect
+##### Collect Feedback for Improvement
 
 In this phase team members will provide feedback to help improve the dimension they've chosen to focus
 on. Ask team members to input feedback cards on the left 2 columns.
@@ -256,14 +256,14 @@ feedback we've collected, if you could take only one action in the next sprint t
 biggest improvement on [dimension team is focused on improving from Team Assessment] what would it be?
 Capture this in a feedback card in the third column for one action to try next sprint."
 
-#### Group
+##### Group Feedback Items
 
 In this phase the team will group similar items together. To expedite the process we recommend only
 grouping the action items together in the last column.
 After the majority of the team has added feedback cards to the third column, the facilitator switches
 to the "group" tab and collectively groups like ideas together with the team (see above).
 
-#### Vote
+#### Vote on Actions
 
 In this phase the facilitator asks participants to vote only on the third column and the top items
 for improvement are identified.
@@ -272,7 +272,7 @@ facilitator can view the retrospective summary to quickly determine how many vot
 the facilitator clicks on the "Act" tab which automatically sorts the cards from the most to the
 least voted upon.
 
-#### Act
+#### Act on Improvements
 
 Follow the steps above to assign actions as work items in Azure DevOps. Note: We recommend only selecting 1-2 actions per sprint to ensure completion prior to the next sprint.
 

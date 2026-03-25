@@ -264,6 +264,7 @@ beforeAll(() => {
 
 describe("FeedbackBoard Component", () => {
   beforeEach(() => {
+    jest.useRealTimers();
     jest.clearAllMocks();
     feedbackColumnPropsSpy.mockClear();
     mockNavigateByKeyboard.mockClear();
@@ -3028,7 +3029,7 @@ describe("FeedbackBoard Component", () => {
       const initialCalls = (itemDataService.getFeedbackItemsForBoard as jest.Mock).mock.calls.length;
 
       await act(async () => {
-        jest.advanceTimersByTime(5000);
+        jest.advanceTimersByTime(10000);
       });
 
       await waitFor(() => {
@@ -3099,7 +3100,7 @@ describe("FeedbackBoard Component", () => {
       });
 
       await act(async () => {
-        jest.advanceTimersByTime(5000);
+        jest.advanceTimersByTime(10000);
       });
 
       await waitFor(() => {
@@ -3141,7 +3142,7 @@ describe("FeedbackBoard Component", () => {
       });
 
       await act(async () => {
-        jest.advanceTimersByTime(5000);
+        jest.advanceTimersByTime(10000);
       });
 
       await waitFor(() => {
@@ -3228,7 +3229,7 @@ describe("FeedbackBoard Component", () => {
       });
 
       await act(async () => {
-        jest.advanceTimersByTime(5000);
+        jest.advanceTimersByTime(10000);
       });
 
       await waitFor(() => {

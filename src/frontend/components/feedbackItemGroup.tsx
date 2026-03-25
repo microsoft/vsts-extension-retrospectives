@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { WorkflowPhase } from "../interfaces/workItem";
 import localStorageHelper from "../utilities/localStorageHelper";
 import { reactPlugin } from "../utilities/telemetryClient";
-import FeedbackItem, { FeedbackItemHelper, IFeedbackItemProps } from "./feedbackItem";
+import FeedbackItem, { FeedbackItemHelper, IFeedbackItemProps, IGroupedFeedbackItemProps } from "./feedbackItem";
 
 export interface IFeedbackItemGroupProps {
   groupedWorkItems: IFeedbackItemProps[];
@@ -73,6 +73,24 @@ const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({ groupedWorkItems
     [mainFeedbackItem],
   );
 
+  const mainGroupedItemProps: IGroupedFeedbackItemProps = useMemo((): IGroupedFeedbackItemProps => ({
+    groupedCount: groupedWorkItems.length,
+    isGroupExpanded: isGroupExpanded,
+    isMainItem: true,
+    parentItemId: undefined as unknown as string,
+    setIsGroupBeingDragged: setIsGroupBeingDragged,
+    toggleGroupExpand: toggleGroupExpand,
+  }), [groupedWorkItems.length, isGroupExpanded, setIsGroupBeingDragged, toggleGroupExpand]);
+
+  const childGroupedItemProps: IGroupedFeedbackItemProps = useMemo((): IGroupedFeedbackItemProps => ({
+    groupedCount: undefined as unknown as number,
+    isGroupExpanded: undefined as unknown as boolean,
+    isMainItem: false,
+    parentItemId: mainFeedbackItem.id,
+    setIsGroupBeingDragged: setIsGroupBeingDragged,
+    toggleGroupExpand: undefined as unknown as () => void,
+  }), [mainFeedbackItem.id, setIsGroupBeingDragged]);
+
   const groupTitle = mainFeedbackItem.title || "Untitled feedback";
 
   return (
@@ -81,14 +99,7 @@ const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({ groupedWorkItems
         <li className="feedback-item-group-entry">
           <FeedbackItem
             {...mainFeedbackItem}
-            groupedItemProps={{
-              groupedCount: groupedWorkItems.length,
-              isGroupExpanded: isGroupExpanded,
-              isMainItem: true,
-              parentItemId: undefined,
-              setIsGroupBeingDragged: setIsGroupBeingDragged,
-              toggleGroupExpand: toggleGroupExpand,
-            }}
+            groupedItemProps={mainGroupedItemProps}
           />
         </li>
         {isGroupExpanded &&
@@ -96,14 +107,7 @@ const FeedbackItemGroup: React.FC<IFeedbackItemGroupProps> = ({ groupedWorkItems
             <li key={itemProps.id} className="feedback-item-group-entry">
               <FeedbackItem
                 {...itemProps}
-                groupedItemProps={{
-                  groupedCount: undefined,
-                  isGroupExpanded: undefined,
-                  isMainItem: false,
-                  parentItemId: mainFeedbackItem.id,
-                  setIsGroupBeingDragged: setIsGroupBeingDragged,
-                  toggleGroupExpand: undefined,
-                }}
+                groupedItemProps={childGroupedItemProps}
               />
             </li>
           ))}

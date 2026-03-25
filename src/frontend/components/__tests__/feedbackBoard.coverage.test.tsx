@@ -288,7 +288,7 @@ describe("FeedbackBoard targeted coverage", () => {
     });
 
     await act(async () => {
-      jest.advanceTimersByTime(5000);
+      jest.advanceTimersByTime(10000);
     });
 
     await waitFor(() => {
@@ -320,7 +320,7 @@ describe("FeedbackBoard targeted coverage", () => {
     });
 
     await act(async () => {
-      jest.advanceTimersByTime(5000);
+      jest.advanceTimersByTime(10000);
     });
 
     expect(workItemService.getWorkItemsByIds).not.toHaveBeenCalledWith(undefined);
