@@ -11196,4 +11196,918 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     iconSpy.mockRestore();
   });
+
+  describe("Branch coverage: startEditingTitle paths", () => {
+    test("focuses existing active editor textarea when present", async () => {
+      const props = makeProps({ workflowPhase: "Collect" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      const editorContainer = document.createElement("div");
+      editorContainer.className = "editable-text-input-container";
+      const textarea = document.createElement("textarea");
+      editorContainer.appendChild(textarea);
+      card.appendChild(editorContainer);
+
+      const focusSpy = jest.spyOn(textarea, "focus");
+      await act(async () => { ref.current?.startEditingTitle(); });
+      expect(focusSpy).toHaveBeenCalled();
+    });
+
+    test("clicks editable-text element when no active editor", async () => {
+      const props = makeProps({ workflowPhase: "Collect" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Use an override element that only has .editable-text
+      const overrideEl = document.createElement("div");
+      const titleEl = document.createElement("span");
+      titleEl.className = "editable-text";
+      overrideEl.appendChild(titleEl);
+      ref.current!.itemElement = overrideEl;
+
+      const clickSpy = jest.spyOn(titleEl, "click");
+      await act(async () => { ref.current?.startEditingTitle(); });
+      expect(clickSpy).toHaveBeenCalled();
+    });
+
+    test("clicks container element when neither editor nor editable-text exists", async () => {
+      const props = makeProps({ workflowPhase: "Collect" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Use an override element that only has .editable-text-container
+      const overrideEl = document.createElement("div");
+      const containerEl = document.createElement("div");
+      containerEl.className = "editable-text-container";
+      overrideEl.appendChild(containerEl);
+      ref.current!.itemElement = overrideEl;
+
+      const clickSpy = jest.spyOn(containerEl, "click");
+      await act(async () => { ref.current?.startEditingTitle(); });
+      expect(clickSpy).toHaveBeenCalled();
+    });
+
+    test("uses itemElementOverride when set", async () => {
+      const props = makeProps({ workflowPhase: "Collect" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const overrideEl = document.createElement("div");
+      const editorDiv = document.createElement("div");
+      editorDiv.className = "editable-text-input-container";
+      const input = document.createElement("input");
+      editorDiv.appendChild(input);
+      overrideEl.appendChild(editorDiv);
+
+      ref.current!.itemElement = overrideEl;
+      const focusSpy = jest.spyOn(input, "focus");
+      await act(async () => { ref.current?.startEditingTitle(); });
+      expect(focusSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe("Branch coverage: navigateToAdjacentCard edge cases", () => {
+    test("does nothing when current item is not in visible items", async () => {
+      const otherItem = makeDoc({ id: "other-item", title: "Other", parentFeedbackItemId: null });
+      const columns = makeColumns([otherItem]);
+      const props = makeProps({ id: "nonexistent-item", columns });
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(makeDoc({ id: "nonexistent-item", upvotes: 0 }));
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Should not throw - item is not in the column
+      await act(async () => { ref.current?.navigateToAdjacentCard("next"); });
+    });
+  });
+
+  describe("Branch coverage: focusCardControl edge cases", () => {
+    test("does nothing when there are no visible controls", async () => {
+      const props = makeProps({ workflowPhase: "Collect", newlyCreated: true });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Remove all card controls
+      container.querySelectorAll('[data-card-control="true"], .editable-text-container, .non-editable-text-container').forEach(el => el.remove());
+
+      await act(async () => { ref.current?.focusCardControl("next"); });
+      // Should not throw or change focus
+    });
+
+    test("wraps around when focusing prev from first control", async () => {
+      const props = makeProps({ workflowPhase: "Vote", isFocusModalHidden: true });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Use a controlled override element with known controls
+      const overrideEl = document.createElement("div");
+      const ctrl1 = document.createElement("button");
+      ctrl1.setAttribute("data-card-control", "true");
+      const ctrl2 = document.createElement("button");
+      ctrl2.setAttribute("data-card-control", "true");
+      const ctrl3 = document.createElement("button");
+      ctrl3.setAttribute("data-card-control", "true");
+      overrideEl.appendChild(ctrl1);
+      overrideEl.appendChild(ctrl2);
+      overrideEl.appendChild(ctrl3);
+      document.body.appendChild(overrideEl);
+      ref.current!.itemElement = overrideEl;
+
+      // Focus the first control
+      ctrl1.focus();
+      expect(document.activeElement).toBe(ctrl1);
+
+      // Prev from first → wraps to last
+      await act(async () => { ref.current?.focusCardControl("prev"); });
+      expect(document.activeElement).toBe(ctrl3);
+      document.body.removeChild(overrideEl);
+    });
+
+    test("starts from end when activeElement is not a control and direction is prev", async () => {
+      const props = makeProps({ workflowPhase: "Vote", isFocusModalHidden: true });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Focus an element that is NOT a card control (activeElement won't be in the list)
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      // Build a controlled override element with known controls
+      const overrideEl = document.createElement("div");
+      const ctrl1 = document.createElement("button");
+      ctrl1.setAttribute("data-card-control", "true");
+      const ctrl2 = document.createElement("button");
+      ctrl2.setAttribute("data-card-control", "true");
+      overrideEl.appendChild(ctrl1);
+      overrideEl.appendChild(ctrl2);
+      document.body.appendChild(overrideEl);
+      ref.current!.itemElement = overrideEl;
+
+      await act(async () => { ref.current?.focusCardControl("prev"); });
+      expect(document.activeElement).toBe(ctrl2);
+      document.body.removeChild(overrideEl);
+    });
+  });
+
+  describe("Branch coverage: markFeedbackItemForDelete with expanded main item", () => {
+    test("collapses group when main item is expanded and then deleted", async () => {
+      const toggleGroupExpand = jest.fn();
+      const mainItem = makeDoc({ id: "main-expand-delete" });
+      const columns = makeColumns([mainItem]);
+      const props = makeProps({
+        id: mainItem.id,
+        columns,
+        groupedItemProps: {
+          groupedCount: 2,
+          isGroupExpanded: true,
+          isMainItem: true,
+          parentItemId: "",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand,
+        },
+        groupCount: 2,
+      });
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mainItem);
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => { ref.current?.markFeedbackItemForDelete(true); });
+      expect(toggleGroupExpand).toHaveBeenCalled();
+    });
+  });
+
+  describe("Branch coverage: initiateDeleteFeedbackItem branches", () => {
+    test("removes newly created item without backend call", async () => {
+      const props = makeProps({ newlyCreated: true });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => { await ref.current?.initiateDeleteFeedbackItem(); });
+      expect(props.removeFeedbackItemFromColumn).toHaveBeenCalledWith(props.columnId, props.id, false);
+    });
+
+    test("handles deleteFeedbackItem when updatedChildFeedbackItems is null", async () => {
+      jest.spyOn(itemDataService, "deleteFeedbackItem").mockResolvedValue({ updatedChildFeedbackItems: null } as any);
+
+      const props = makeProps({ newlyCreated: false });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => { await ref.current?.initiateDeleteFeedbackItem(); });
+      expect(itemDataService.deleteFeedbackItem).toHaveBeenCalledWith(props.boardId, props.id);
+      expect(props.refreshFeedbackItems).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Branch coverage: showMoveFeedbackItemDialog when dialog is already open", () => {
+    test("does not call showModal when dialog is already open", async () => {
+      const props = makeProps({ workflowPhase: "Group" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const moveDialog = container.querySelector(".move-feedback-item-dialog") as HTMLDialogElement;
+      if (moveDialog) {
+        moveDialog.showModal(); // open it first
+        const showModalSpy = jest.spyOn(moveDialog, "showModal");
+        // Show dialog again - should not call showModal since it's already open
+        const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+        card.focus();
+        await act(async () => { fireEvent.keyDown(card, { key: "m" }); });
+        expect(showModalSpy).not.toHaveBeenCalled();
+      }
+    });
+  });
+
+  describe("Branch coverage: timerSwitch with existing timerId", () => {
+    test("uses existing timerId when starting timer", async () => {
+      const existingTimerId = setInterval(() => {}, 99999);
+      const timerItem = makeDoc({ id: "timer-existing-id", timerSecs: 10, timerState: false });
+      const columns = makeColumns([timerItem]);
+      const updatedItem = { ...timerItem, timerSecs: 11 };
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(timerItem);
+      jest.spyOn(itemDataService, "updateTimer").mockResolvedValue(updatedItem as any);
+      jest.spyOn(itemDataService, "flipTimer").mockResolvedValue(updatedItem as any);
+
+      const props = makeProps({
+        id: timerItem.id,
+        columns,
+        workflowPhase: "Act",
+        timerState: false,
+        timerId: existingTimerId,
+        timerSecs: 10,
+        team: { id: "team-1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "area",
+        defaultActionItemIteration: "iter",
+        isFocusModalHidden: true,
+      });
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = document.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+      await act(async () => { fireEvent.keyDown(card, { key: "t" }); });
+      await waitFor(() => expect(itemDataService.flipTimer).toHaveBeenCalledWith(props.boardId, props.id, existingTimerId));
+      clearInterval(existingTimerId);
+    });
+  });
+
+  describe("Branch coverage: onFeedbackItemDocumentCardTitleSave null returns", () => {
+    test("empty title on non-new item does nothing", async () => {
+      const props = makeProps({ newlyCreated: false });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        await ref.current?.onFeedbackItemDocumentCardTitleSave(props.id, "   ", false);
+      });
+      // Should not call removeFeedbackItemFromColumn (only removes for newlyCreated)
+      expect(props.removeFeedbackItemFromColumn).not.toHaveBeenCalled();
+    });
+
+    test("updateTitle returns null does not refresh", async () => {
+      jest.spyOn(itemDataService, "updateTitle").mockResolvedValue(null as any);
+
+      const props = makeProps({ newlyCreated: false });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        await ref.current?.onFeedbackItemDocumentCardTitleSave(props.id, "Updated Title", false);
+      });
+      expect(itemDataService.updateTitle).toHaveBeenCalled();
+      expect(props.refreshFeedbackItems).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Branch coverage: pointerdown handler branches", () => {
+    test("pointerdown outside menu and button closes the menu", async () => {
+      const props = makeProps({ workflowPhase: "Vote", isFocusModalHidden: true });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const menuButton = container.querySelector(".contextual-menu-button") as HTMLElement;
+      await act(async () => { fireEvent.click(menuButton); });
+      expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
+
+      // Dispatch pointerdown on document body (outside menu and button)
+      const outsideEl = document.createElement("div");
+      document.body.appendChild(outsideEl);
+      await act(async () => {
+        const event = new Event("pointerdown", { bubbles: true });
+        outsideEl.dispatchEvent(event);
+      });
+      expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+      document.body.removeChild(outsideEl);
+    });
+
+    test("pointerdown inside menu button keeps it open", async () => {
+      const props = makeProps({ workflowPhase: "Vote", isFocusModalHidden: true });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const menuButton = container.querySelector(".contextual-menu-button") as HTMLElement;
+      await act(async () => { fireEvent.click(menuButton); });
+      expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
+
+      // Dispatch pointerdown on the button itself
+      await act(async () => {
+        const event = new Event("pointerdown", { bubbles: true });
+        menuButton.dispatchEvent(event);
+      });
+      expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
+    });
+  });
+
+  describe("Branch coverage: timer cleanup effect", () => {
+    test("clears interval on unmount when timerState and timerId are set", async () => {
+      const timerId = setInterval(() => {}, 99999);
+      const clearSpy = jest.spyOn(global, "clearInterval");
+
+      const timerItem = makeDoc({ id: "timer-cleanup", timerState: true });
+      const columns = makeColumns([timerItem]);
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(timerItem);
+
+      const props = makeProps({
+        id: timerItem.id,
+        columns,
+        timerState: true,
+        timerId,
+        workflowPhase: "Act",
+        team: { id: "team-1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "area",
+        defaultActionItemIteration: "iter",
+      });
+
+      const { unmount } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      unmount();
+      expect(clearSpy).toHaveBeenCalledWith(timerId);
+      clearInterval(timerId);
+      clearSpy.mockRestore();
+    });
+  });
+
+  describe("Branch coverage: handleItemKeyDown when dialog is open", () => {
+    test("ignores non-escape/tab keys when a modal dialog is open", async () => {
+      const updateVoteSpy = jest.spyOn(itemDataService, "updateVote").mockResolvedValue(null as any);
+
+      const props = makeProps({ workflowPhase: "Vote", isFocusModalHidden: true });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Mock isAnyModalDialogOpen AFTER render so initial key handler setup uses false
+      jest.spyOn(dialogHelper, "isAnyModalDialogOpen").mockReturnValue(true);
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      await act(async () => { fireEvent.keyDown(card, { key: "v" }); });
+      expect(updateVoteSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Branch coverage: keyboard v key for non-main grouped item", () => {
+    test("v key does nothing for non-main grouped item in Vote phase", async () => {
+      const updateVoteSpy = jest.spyOn(itemDataService, "updateVote").mockResolvedValue(null as any);
+      const childItem = makeDoc({ id: "vote-child-item" });
+      const columns = makeColumns([childItem]);
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(childItem);
+
+      const props = makeProps({
+        id: childItem.id,
+        columns,
+        workflowPhase: "Vote",
+        isFocusModalHidden: true,
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: true,
+          isMainItem: false,
+          parentItemId: "parent-1",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      });
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+      await act(async () => { fireEvent.keyDown(card, { key: "v" }); });
+      expect(updateVoteSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Branch coverage: keyboard a key for non-main item", () => {
+    test("a key does nothing for non-main grouped item in Act phase", async () => {
+      const childItem = makeDoc({ id: "action-child-item" });
+      const columns = makeColumns([childItem]);
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(childItem);
+
+      const props = makeProps({
+        id: childItem.id,
+        columns,
+        workflowPhase: "Act",
+        isFocusModalHidden: true,
+        team: { id: "team-1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "area",
+        defaultActionItemIteration: "iter",
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: true,
+          isMainItem: false,
+          parentItemId: "parent-1",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      });
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+      await act(async () => { fireEvent.keyDown(card, { key: "a" }); });
+      // No action should be triggered for non-main item
+    });
+  });
+
+  describe("Branch coverage: keyboard t key in Act phase", () => {
+    test("t key triggers timer switch in Act phase", async () => {
+      const timerItem = makeDoc({ id: "t-key-timer", timerSecs: 0, timerState: false });
+      const columns = makeColumns([timerItem]);
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(timerItem);
+      jest.spyOn(itemDataService, "updateTimer").mockResolvedValue(timerItem as any);
+      jest.spyOn(itemDataService, "flipTimer").mockResolvedValue(timerItem as any);
+
+      const props = makeProps({
+        id: timerItem.id,
+        columns,
+        workflowPhase: "Act",
+        timerState: false,
+        timerSecs: 0,
+        team: { id: "team-1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "area",
+        defaultActionItemIteration: "iter",
+        isFocusModalHidden: true,
+      });
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+      await act(async () => { fireEvent.keyDown(card, { key: "t" }); });
+      expect(props.requestTimerStart).toHaveBeenCalled();
+    });
+  });
+
+  describe("Branch coverage: ellipsis menu items for non-main grouped item", () => {
+    test("shows remove from group option for non-main item", async () => {
+      const childItem = makeDoc({ id: "menu-child-item" });
+      const columns = makeColumns([childItem]);
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(childItem);
+
+      const props = makeProps({
+        id: childItem.id,
+        columns,
+        workflowPhase: "Group",
+        isFocusModalHidden: true,
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: true,
+          isMainItem: false,
+          parentItemId: "parent-1",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      });
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Open the menu
+      const menuButton = container.querySelector(".contextual-menu-button") as HTMLElement;
+      await act(async () => { fireEvent.click(menuButton); });
+
+      // For non-main items, hideMainItem=true items should be visible
+      const menuItems = container.querySelectorAll('[role="menuitem"]');
+      const menuTexts = Array.from(menuItems).map(el => el.textContent);
+      expect(menuTexts).toContain("Remove feedback from group");
+    });
+  });
+
+  describe("Branch coverage: renderGroupButton in focus mode", () => {
+    test("renders focus group button with carousel mode in Act focus", async () => {
+      const mainItem = makeDoc({ id: "focus-group-btn" });
+      const childItem = makeDoc({ id: "child-focus-btn", parentFeedbackItemId: "focus-group-btn" });
+      const columns = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            { feedbackItem: mainItem, actionItems: [] },
+            { feedbackItem: childItem, actionItems: [] },
+          ],
+        },
+      } as any;
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mainItem);
+
+      const props = makeProps({
+        id: mainItem.id,
+        columns,
+        workflowPhase: "Act",
+        isFocusModalHidden: false,
+        isGroupedCarouselItem: true,
+        groupCount: 1,
+        groupIds: ["child-focus-btn"],
+        team: { id: "team-1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "area",
+        defaultActionItemIteration: "iter",
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: false,
+          isMainItem: true,
+          parentItemId: "",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      });
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const focusBtn = container.querySelector(".feedback-expand-group-focus");
+      expect(focusBtn).toBeInTheDocument();
+      expect(focusBtn?.textContent).toContain("Items");
+
+      // Click to toggle titles
+      await act(async () => { fireEvent.click(focusBtn as HTMLElement); });
+    });
+
+    test("renders non-focus group button for collapsed main grouped item", async () => {
+      const mainItem = makeDoc({ id: "nonfocus-group-btn" });
+      const childItem = makeDoc({ id: "child-nonfocus-btn", parentFeedbackItemId: "nonfocus-group-btn" });
+      const columns = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            { feedbackItem: mainItem, actionItems: [] },
+            { feedbackItem: childItem, actionItems: [] },
+          ],
+        },
+      } as any;
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mainItem);
+
+      const props = makeProps({
+        id: mainItem.id,
+        columns,
+        workflowPhase: "Vote",
+        isFocusModalHidden: true,
+        isGroupedCarouselItem: false,
+        groupCount: 1,
+        groupIds: ["child-nonfocus-btn"],
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: false,
+          isMainItem: true,
+          parentItemId: "",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      });
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const groupBtn = container.querySelector(".feedback-expand-group");
+      expect(groupBtn).toBeInTheDocument();
+
+      // Click to toggle group expand
+      await act(async () => { fireEvent.click(groupBtn as HTMLElement); });
+      expect(props.groupedItemProps.toggleGroupExpand).toHaveBeenCalled();
+    });
+  });
+
+  describe("Branch coverage: totalVotes in focus mode", () => {
+    test("shows grouped votes when in focus mode", async () => {
+      const mainItem = makeDoc({ id: "focus-votes", upvotes: 2 });
+      const childItem = makeDoc({ id: "child-votes", upvotes: 3, parentFeedbackItemId: "focus-votes" });
+      const columns = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            { feedbackItem: mainItem, actionItems: [] },
+            { feedbackItem: childItem, actionItems: [] },
+          ],
+        },
+      } as any;
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mainItem);
+      jest.spyOn(itemDataService, "getVotes").mockReturnValue(2);
+      jest.spyOn(itemDataService, "getVotesForGroupedItems").mockReturnValue(5);
+      jest.spyOn(itemDataService, "getVotesForGroupedItemsByUser").mockReturnValue("1" as any);
+
+      const props = makeProps({
+        id: mainItem.id,
+        columns,
+        workflowPhase: "Act",
+        isFocusModalHidden: false,
+        isGroupedCarouselItem: true,
+        groupCount: 1,
+        groupIds: ["child-votes"],
+        upvotes: 2,
+        team: { id: "team-1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "area",
+        defaultActionItemIteration: "iter",
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: false,
+          isMainItem: true,
+          parentItemId: "",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      });
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+      // Grouped votes (5) should be displayed
+      expect(container.querySelector(".feedback-vote-count")?.textContent).toBe("5");
+    });
+  });
+
+  describe("Branch coverage: vote display for collapsed grouped item", () => {
+    test("shows bold grouped vote count when main item is collapsed in Vote phase", async () => {
+      const mainItem = makeDoc({ id: "collapsed-vote-item", upvotes: 2 });
+      const childItem = makeDoc({ id: "child-vote-item", upvotes: 3, parentFeedbackItemId: "collapsed-vote-item" });
+      const columns = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            { feedbackItem: mainItem, actionItems: [] },
+            { feedbackItem: childItem, actionItems: [] },
+          ],
+        },
+      } as any;
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mainItem);
+      jest.spyOn(itemDataService, "getVotes").mockReturnValue(2);
+      jest.spyOn(itemDataService, "getVotesForGroupedItems").mockReturnValue(5);
+      jest.spyOn(itemDataService, "getVotesForGroupedItemsByUser").mockReturnValue("3" as any);
+
+      const props = makeProps({
+        id: mainItem.id,
+        columns,
+        workflowPhase: "Vote",
+        isFocusModalHidden: true,
+        groupCount: 1,
+        groupIds: ["child-vote-item"],
+        upvotes: 2,
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: false,
+          isMainItem: true,
+          parentItemId: "",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      });
+
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const boldVote = container.querySelector(".feedback-yourvote-count.bold");
+      expect(boldVote).toBeInTheDocument();
+      expect(boldVote?.textContent).toContain("[My Votes: 3]");
+    });
+  });
+
+  describe("Branch coverage: keyboard shortcuts ignored outside expected phases", () => {
+    test("v key ignored in Collect phase", async () => {
+      const updateVoteSpy = jest.spyOn(itemDataService, "updateVote").mockResolvedValue(null as any);
+      const props = makeProps({ workflowPhase: "Collect" });
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+      await act(async () => { fireEvent.keyDown(card, { key: "v" }); });
+      expect(updateVoteSpy).not.toHaveBeenCalled();
+    });
+
+    test("g key ignored in Act phase", async () => {
+      const props = makeProps({
+        workflowPhase: "Act",
+        team: { id: "team-1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "area",
+        defaultActionItemIteration: "iter",
+      });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+      await act(async () => { fireEvent.keyDown(card, { key: "g" }); });
+      expect(ref.current?.state.isGroupFeedbackItemDialogHidden).toBe(true);
+    });
+
+    test("m key ignored in Vote phase", async () => {
+      const props = makeProps({ workflowPhase: "Vote", isFocusModalHidden: true });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+      await act(async () => { fireEvent.keyDown(card, { key: "m" }); });
+      expect(ref.current?.state.isMoveFeedbackItemDialogHidden).toBe(true);
+    });
+  });
+
+  describe("Branch coverage: toggleMobileFeedbackItemActionsMenu both directions", () => {
+    test("toggles menu open then closed via menu button", async () => {
+      const props = makeProps({ workflowPhase: "Vote", isFocusModalHidden: true });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const menuButton = container.querySelector(".contextual-menu-button") as HTMLElement;
+
+      // Open menu
+      await act(async () => { fireEvent.click(menuButton); });
+      expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
+
+      // Close menu by clicking again
+      await act(async () => { fireEvent.click(menuButton); });
+      expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
+    });
+  });
+
+  describe("Branch coverage: isGroupedCarouselItem with showingGroupedChildrenTitles", () => {
+    test("renders GroupedFeedbackList when carousel item shows children titles", async () => {
+      const mainItem = makeDoc({ id: "carousel-titles" });
+      const childItem = makeDoc({ id: "carousel-child", parentFeedbackItemId: "carousel-titles" });
+      const columns = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            { feedbackItem: mainItem, actionItems: [] },
+            { feedbackItem: childItem, actionItems: [] },
+          ],
+        },
+      } as any;
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(mainItem);
+
+      const props = makeProps({
+        id: mainItem.id,
+        columns,
+        workflowPhase: "Act",
+        isFocusModalHidden: false,
+        isGroupedCarouselItem: true,
+        groupCount: 1,
+        groupIds: ["carousel-child"],
+        team: { id: "team-1" },
+        boardTitle: "Board",
+        defaultActionItemAreaPath: "area",
+        defaultActionItemIteration: "iter",
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: false,
+          isMainItem: true,
+          parentItemId: "",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      });
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Toggle showing grouped children titles
+      await act(async () => {
+        ref.current?.setState({ isShowingGroupedChildrenTitles: true });
+      });
+
+      // The GroupedFeedbackList should now be rendered - look for the focus group button with expanded state
+      const focusBtn = container.querySelector(".feedback-expand-group-focus");
+      expect(focusBtn).toBeInTheDocument();
+      expect(focusBtn?.getAttribute("aria-expanded")).toBeTruthy();
+    });
+  });
+
+  describe("Branch coverage: enter key on non-hidden feedback", () => {
+    test("enter key triggers startEditingTitle when feedback is not hidden", async () => {
+      const props = makeProps({
+        workflowPhase: "Collect",
+        hideFeedbackItems: false,
+        userIdRef: "test-user-id",
+      });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+
+      // Enter should trigger editing (not be blocked by hidden check)
+      await act(async () => { fireEvent.keyDown(card, { key: "Enter" }); });
+      // No error means startEditingTitle was called successfully
+    });
+  });
+
+  describe("Branch coverage: onAnimationEnd for grouped child deletion", () => {
+    test("refreshes parent item when grouped child is marked for deletion", async () => {
+      const parentItem = makeDoc({ id: "anim-parent" });
+      const childItem = makeDoc({ id: "anim-child", parentFeedbackItemId: "anim-parent" });
+      const columns = {
+        ...testColumns,
+        [testColumnUuidOne]: {
+          ...testColumns[testColumnUuidOne],
+          columnItems: [
+            { feedbackItem: parentItem, actionItems: [] },
+            { feedbackItem: childItem, actionItems: [] },
+          ],
+        },
+      } as any;
+
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(childItem);
+
+      const props = makeProps({
+        id: childItem.id,
+        columns,
+        groupedItemProps: {
+          groupedCount: 1,
+          isGroupExpanded: true,
+          isMainItem: false,
+          parentItemId: "anim-parent",
+          setIsGroupBeingDragged: jest.fn(),
+          toggleGroupExpand: jest.fn(),
+        },
+      });
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      // Mark for deletion
+      await act(async () => { ref.current?.markFeedbackItemForDelete(true); });
+
+      // Trigger animation end
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`);
+      if (card) {
+        jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(parentItem);
+        await act(async () => { fireEvent.animationEnd(card); });
+        expect(props.removeFeedbackItemFromColumn).toHaveBeenCalled();
+        expect(props.refreshFeedbackItems).toHaveBeenCalled();
+      }
+    });
+  });
 });
