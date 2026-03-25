@@ -437,7 +437,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     if (workflowPhase === WorkflowPhase.Collect) {
       fallbackPollingIntervalId = window.setInterval(() => {
         void getAllBoardFeedbackItems();
-      }, 5000);
+      }, 10000);
     }
 
     return () => {
