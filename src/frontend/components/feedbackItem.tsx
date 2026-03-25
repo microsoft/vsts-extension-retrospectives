@@ -312,10 +312,13 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     [setStateMerge],
   );
 
+  const groupedItemPropsRef = useRef(props.groupedItemProps);
+  groupedItemPropsRef.current = props.groupedItemProps;
+
   const markFeedbackItemForDelete = useCallback(
     (isLocalDelete: boolean = false) => {
-      if (props.groupedItemProps?.isMainItem && props.groupedItemProps?.isGroupExpanded) {
-        props.groupedItemProps.toggleGroupExpand();
+      if (groupedItemPropsRef.current?.isMainItem && groupedItemPropsRef.current?.isGroupExpanded) {
+        groupedItemPropsRef.current.toggleGroupExpand();
       }
 
       setStateMerge({
@@ -324,7 +327,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         isLocalDelete,
       });
     },
-    [props.groupedItemProps, setStateMerge],
+    [setStateMerge],
   );
 
   const initiateDeleteFeedbackItem = useCallback(async () => {
@@ -561,10 +564,10 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       e:
         | React.DragEvent<HTMLDivElement>
         | {
-            preventDefault: () => void;
-            stopPropagation: () => void;
-            dataTransfer?: { dropEffect?: string };
-          },
+          preventDefault: () => void;
+          stopPropagation: () => void;
+          dataTransfer?: { dropEffect?: string };
+        },
     ) => {
       if (!stateRef.current.isBeingDragged) {
         e.preventDefault();
@@ -582,11 +585,11 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       e:
         | React.DragEvent<HTMLDivElement>
         | {
-            dataTransfer: { effectAllowed: string; setData: (format: string, data: string) => void };
-          },
+          dataTransfer: { effectAllowed: string; setData: (format: string, data: string) => void };
+        },
     ) => {
-      if (props.groupedItemProps) {
-        props.groupedItemProps.setIsGroupBeingDragged(true);
+      if (groupedItemPropsRef.current) {
+        groupedItemPropsRef.current.setIsGroupBeingDragged(true);
       }
       e.dataTransfer.effectAllowed = "linkMove";
       e.dataTransfer.setData("text/plain", props.id);
@@ -594,15 +597,15 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       localStorageHelper.setIdValue(props.id);
       setStateMerge({ isBeingDragged: true });
     },
-    [props.groupedItemProps, props.id, setStateMerge],
+    [props.id, setStateMerge],
   );
 
   const dragFeedbackItemEnd = useCallback(() => {
-    if (props.groupedItemProps) {
-      props.groupedItemProps.setIsGroupBeingDragged(false);
+    if (groupedItemPropsRef.current) {
+      groupedItemPropsRef.current.setIsGroupBeingDragged(false);
     }
     setStateMerge({ isBeingDragged: false });
-  }, [props.groupedItemProps, setStateMerge]);
+  }, [setStateMerge]);
 
   const dropFeedbackItemOnFeedbackItem = useCallback(
     async (e: React.DragEvent<HTMLDivElement>) => {
@@ -615,13 +618,16 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     [props],
   );
 
+  const markFeedbackItemForDeleteRef = useRef(markFeedbackItemForDelete);
+  markFeedbackItemForDeleteRef.current = markFeedbackItemForDelete;
+
   const receiveDeletedItemHandler = useCallback(
     (_columnId: string, feedbackItemId: string) => {
       if (feedbackItemId === props.id && !stateRef.current.isMarkedForDeletion) {
-        markFeedbackItemForDelete(false);
+        markFeedbackItemForDeleteRef.current(false);
       }
     },
-    [props.id, markFeedbackItemForDelete],
+    [props.id],
   );
 
   useEffect(() => {
@@ -637,6 +643,9 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     };
   }, [props.columnProps, props.id]);
 
+  const hideMobileFeedbackItemActionsDialogRef = useRef(hideMobileFeedbackItemActionsDialog);
+  hideMobileFeedbackItemActionsDialogRef.current = hideMobileFeedbackItemActionsDialog;
+
   useEffect(() => {
     const handleDocumentPointerDown = (event: PointerEvent) => {
       const target = event.target as Node;
@@ -647,14 +656,14 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         return;
       }
 
-      hideMobileFeedbackItemActionsDialog();
+      hideMobileFeedbackItemActionsDialogRef.current();
     };
 
     document.addEventListener("pointerdown", handleDocumentPointerDown);
     return () => {
       document.removeEventListener("pointerdown", handleDocumentPointerDown);
     };
-  }, [state.isMobileFeedbackItemActionsDialogHidden, hideMobileFeedbackItemActionsDialog]);
+  }, []);
 
   useEffect(() => {
     reflectBackendService.onReceiveDeletedItem(receiveDeletedItemHandler);
@@ -662,6 +671,15 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       reflectBackendService.removeOnReceiveDeletedItem(receiveDeletedItemHandler);
     };
   }, [receiveDeletedItemHandler]);
+
+  useEffect(() => {
+    if (props.timerState && props.timerId) {
+      return () => {
+        clearInterval(props.timerId);
+      };
+    }
+    return undefined;
+  }, [props.timerState, props.timerId]);
 
   useEffect(() => {
     isVoted(props.id);

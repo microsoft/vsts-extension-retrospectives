@@ -353,72 +353,82 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     setActiveTimerFeedbackItemId(null);
   }, [board.columns]);
 
-  const getAllBoardFeedbackItems = useCallback(async () => {
-    const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board.id);
+  const isFetchingRef = useRef(false);
 
-    if (!feedbackItems) {
-      setIsDataLoaded(true);
-      setActiveTimerFeedbackItemId(null);
+  const getAllBoardFeedbackItems = useCallback(async () => {
+    if (isFetchingRef.current) {
       return;
     }
+    isFetchingRef.current = true;
+    try {
+      const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board.id);
 
-    const columnItemPromises: Promise<IColumnItem>[] = feedbackItems.map(async feedbackItem => {
-      const actionItems = feedbackItem.associatedActionItemIds?.length ? await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
+      if (!feedbackItems) {
+        setIsDataLoaded(true);
+        setActiveTimerFeedbackItemId(null);
+        return;
+      }
 
-      return {
-        actionItems,
-        feedbackItem,
-      };
-    });
+      const columnItemPromises: Promise<IColumnItem>[] = feedbackItems.map(async feedbackItem => {
+        const actionItems = feedbackItem.associatedActionItemIds?.length ? await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
 
-    const columnItems = await Promise.all(columnItemPromises);
-
-    const activeEditorElement = document.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
-    const activeEditingItemId = activeEditorElement?.closest("[data-feedback-item-id]")?.getAttribute("data-feedback-item-id");
-
-    setColumns(prevColumns => {
-      const newColumns = { ...prevColumns };
-
-      const serverItemsByColumn = new Map<string, IColumnItem[]>();
-      columnItems.forEach(columnItem => {
-        const columnId = columnItem.feedbackItem.columnId;
-        if (columnIds.indexOf(columnId) < 0) {
-          return;
-        }
-
-        const existingItems = serverItemsByColumn.get(columnId) ?? [];
-        existingItems.push(columnItem);
-        serverItemsByColumn.set(columnId, existingItems);
-      });
-
-      columnIds.forEach(columnId => {
-        if (!newColumns[columnId]) {
-          return;
-        }
-
-        const serverItems = serverItemsByColumn.get(columnId) ?? [];
-        const serverIds = new Set(serverItems.map(item => item.feedbackItem.id));
-
-        const localItemsToPreserve = newColumns[columnId].columnItems.filter(columnItem => {
-          const itemId = columnItem.feedbackItem.id;
-          if (serverIds.has(itemId)) {
-            return false;
-          }
-
-          return columnItem.newlyCreated || itemId === "emptyFeedbackItem" || (activeEditingItemId !== null && itemId === activeEditingItemId);
-        });
-
-        newColumns[columnId] = {
-          ...newColumns[columnId],
-          columnItems: [...localItemsToPreserve, ...serverItems],
+        return {
+          actionItems,
+          feedbackItem,
         };
       });
 
-      setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
-      return newColumns;
-    });
+      const columnItems = await Promise.all(columnItemPromises);
 
-    setIsDataLoaded(true);
+      const activeEditorElement = document.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
+      const activeEditingItemId = activeEditorElement?.closest("[data-feedback-item-id]")?.getAttribute("data-feedback-item-id");
+
+      setColumns(prevColumns => {
+        const newColumns = { ...prevColumns };
+
+        const serverItemsByColumn = new Map<string, IColumnItem[]>();
+        columnItems.forEach(columnItem => {
+          const columnId = columnItem.feedbackItem.columnId;
+          if (columnIds.indexOf(columnId) < 0) {
+            return;
+          }
+
+          const existingItems = serverItemsByColumn.get(columnId) ?? [];
+          existingItems.push(columnItem);
+          serverItemsByColumn.set(columnId, existingItems);
+        });
+
+        columnIds.forEach(columnId => {
+          if (!newColumns[columnId]) {
+            return;
+          }
+
+          const serverItems = serverItemsByColumn.get(columnId) ?? [];
+          const serverIds = new Set(serverItems.map(item => item.feedbackItem.id));
+
+          const localItemsToPreserve = newColumns[columnId].columnItems.filter(columnItem => {
+            const itemId = columnItem.feedbackItem.id;
+            if (serverIds.has(itemId)) {
+              return false;
+            }
+
+            return columnItem.newlyCreated || itemId === "emptyFeedbackItem" || (activeEditingItemId !== null && itemId === activeEditingItemId);
+          });
+
+          newColumns[columnId] = {
+            ...newColumns[columnId],
+            columnItems: [...localItemsToPreserve, ...serverItems],
+          };
+        });
+
+        setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
+        return newColumns;
+      });
+
+      setIsDataLoaded(true);
+    } finally {
+      isFetchingRef.current = false;
+    }
   }, [board.id, columnIds]);
 
   useEffect(() => {
