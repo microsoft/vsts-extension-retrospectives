@@ -431,12 +431,15 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     }
   }, [board.id, columnIds]);
 
+  const getAllBoardFeedbackItemsRef = useRef(getAllBoardFeedbackItems);
+  getAllBoardFeedbackItemsRef.current = getAllBoardFeedbackItems;
+
   useEffect(() => {
     let fallbackPollingIntervalId: number | undefined;
 
     if (workflowPhase === WorkflowPhase.Collect) {
       fallbackPollingIntervalId = window.setInterval(() => {
-        void getAllBoardFeedbackItems();
+        void getAllBoardFeedbackItemsRef.current();
       }, 10000);
     }
 
@@ -445,7 +448,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         window.clearInterval(fallbackPollingIntervalId);
       }
     };
-  }, [getAllBoardFeedbackItems, workflowPhase]);
+  }, [workflowPhase]);
 
   const setDefaultIterationAndAreaPath = useCallback(async (teamId: string): Promise<void> => {
     let currentIterations = await workService.getIterations(teamId, "current");

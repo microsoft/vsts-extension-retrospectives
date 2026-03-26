@@ -673,13 +673,14 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   }, [receiveDeletedItemHandler]);
 
   useEffect(() => {
-    if (props.timerState && props.timerId) {
+    const timerId = props.timerId;
+    if (timerId) {
       return () => {
-        clearInterval(props.timerId);
+        clearInterval(timerId);
       };
     }
     return undefined;
-  }, [props.timerState, props.timerId]);
+  }, [props.timerId]);
 
   useEffect(() => {
     isVoted(props.id);
@@ -789,18 +790,21 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     [navigateToAdjacentCard, focusCardControl, deleteFeedbackItem, startEditingTitle, onVote, props, showGroupFeedbackItemDialog, showMoveFeedbackItemDialog, timerSwitch, hideDeleteItemConfirmationDialog, hideMoveFeedbackItemDialog, hideGroupFeedbackItemDialog, hideRemoveFeedbackItemFromGroupConfirmationDialog],
   );
 
+  const handleItemKeyDownRef = useRef(handleItemKeyDown);
+  handleItemKeyDownRef.current = handleItemKeyDown;
+
   useEffect(() => {
     const element = itemElementRef.current;
 
     const listener = (event: KeyboardEvent) => {
-      handleItemKeyDown(event);
+      handleItemKeyDownRef.current(event);
     };
 
     element?.addEventListener("keydown", listener);
     return () => {
       element?.removeEventListener("keydown", listener);
     };
-  }, [handleItemKeyDown]);
+  }, []);
 
   const feedbackItemEllipsisMenuItems: FeedbackItemEllipsisMenuItem[] = useMemo(
     () => [
