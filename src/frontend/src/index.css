@@ -73,6 +73,14 @@ body {
   @apply overflow-hidden;
 }
 
+.header-title {
+  @apply text-2xl font-medium tracking-tight w-44;
+}
+
+.header-tabs {
+  @apply flex items-center w-44;
+}
+
 .work-item-task-color {
   @apply text-task-yellow;
 }

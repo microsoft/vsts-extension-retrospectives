@@ -1694,6 +1694,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     [setState, updateFeedbackItemsAndContributors],
   );
 
+  const attemptBackendReconnectRef = React.useRef(attemptBackendReconnect);
+  attemptBackendReconnectRef.current = attemptBackendReconnect;
+
   const retryBackendConnection = async () => {
     await attemptBackendReconnect(true);
   };
@@ -1706,7 +1709,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           return;
         }
 
-        void attemptBackendReconnect(false);
+        void attemptBackendReconnectRef.current(false);
       }, 5000);
     }
 
@@ -1716,7 +1719,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         connectionWatchdogIntervalIdRef.current = undefined;
       }
     };
-  }, [attemptBackendReconnect, props.isHostedAzureDevOps]);
+  }, [props.isHostedAzureDevOps]);
 
   React.useImperativeHandle(ref, () => {
     const handle: FeedbackBoardContainerHandle = {
@@ -1939,10 +1942,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           </div>
         </dialog>
 
-        <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
+        <h1 className="header-title" aria-label="Retrospectives">
           Retrospectives
         </h1>
-        <div className="flex items-center mx-6" role="group" aria-label="Team selector">
+        <div className="flex items-center" role="group" aria-label="Team selector">
           <label htmlFor="team-selector" className="sr-only">
             Team
           </label>
@@ -1964,15 +1967,16 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         <div className="w-full">
           {state.currentBoard && (
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
-                Board
-              </div>
-              <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
-                History
+              <div className="header-tabs">
+                <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
+                  Board
+                </div>
+                <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
+                  History
+                </div>
               </div>
               {state.activeTab === "Board" && (
                 <>
-                  <div className="mx-4 vertical-tab-separator" />
                   <div className="flex items-center justify-start">
                     <div className="board-selector">
                       <label htmlFor="board-selector" className="sr-only">
@@ -2203,18 +2207,16 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               {state.currentTeam && state.currentBoard && (
                 <>
                   {!props.isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
-                    <>
-                      <div className="retro-message-bar">
-                        <span>
-                          <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
-                        </span>
-                      </div>
+                    <div className="retro-message-bar">
+                      <span>
+                        <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
+                      </span>
                       <div className="actions">
                         <button type="button" className="dismiss" onClick={hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
                           <span aria-hidden="true">×</span>
                         </button>
                       </div>
-                    </>
+                    </div>
                   )}
                   {!props.isHostedAzureDevOps && state.isDropIssueInEdgeMessageBarVisible && !state.isBackendServiceConnected && (
                     <div className="retro-message-bar" role="alert" aria-live="assertive">
