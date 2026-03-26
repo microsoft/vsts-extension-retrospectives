@@ -1942,10 +1942,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           </div>
         </dialog>
 
-        <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
+        <h1 className="header-title" aria-label="Retrospectives">
           Retrospectives
         </h1>
-        <div className="flex items-center mx-6" role="group" aria-label="Team selector">
+        <div className="flex items-center" role="group" aria-label="Team selector">
           <label htmlFor="team-selector" className="sr-only">
             Team
           </label>
@@ -1967,15 +1967,16 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         <div className="w-full">
           {state.currentBoard && (
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
-                Board
-              </div>
-              <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
-                History
+              <div className="header-tabs">
+                <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
+                  Board
+                </div>
+                <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
+                  History
+                </div>
               </div>
               {state.activeTab === "Board" && (
                 <>
-                  <div className="mx-4 vertical-tab-separator" />
                   <div className="flex items-center justify-start">
                     <div className="board-selector">
                       <label htmlFor="board-selector" className="sr-only">
