@@ -367,18 +367,22 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
     [navigateByKeyboard, focusColumn, createEmptyFeedbackItem],
   );
 
+  const handleColumnKeyDownRef = useRef(handleColumnKeyDown);
+  handleColumnKeyDownRef.current = handleColumnKeyDown;
+
   useEffect(() => {
     const column = columnRef.current;
-    if (column) {
-      column.addEventListener("keydown", handleColumnKeyDown);
+    if (!column) {
+      return undefined;
     }
 
+    const listener = (e: Event) => handleColumnKeyDownRef.current(e as KeyboardEvent);
+    column.addEventListener("keydown", listener);
+
     return () => {
-      if (column) {
-        column.removeEventListener("keydown", handleColumnKeyDown);
-      }
+      column.removeEventListener("keydown", listener);
     };
-  }, [handleColumnKeyDown]);
+  }, []);
 
   useEffect(() => {
     const itemCountChanged = prevColumnItemsLength.current !== currentColumnItems.length;
