@@ -6,13 +6,14 @@ import { cn } from "../utilities/classNameHelper";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
 import BoardDataService from "../dal/boardDataService";
-import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn } from "../interfaces/feedback";
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, ITeamAssessmentQuestion } from "../interfaces/feedback";
 import EditableDocumentCardTitle from "./editableDocumentCardTitle";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from "./feedbackBoardMetadataFormPermissions";
 import { generateUUID } from "../utilities/random";
 import { availableIcons, getIconElement } from "./icons";
+import { questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 export interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
@@ -23,7 +24,7 @@ export interface IFeedbackBoardMetadataFormProps {
   maxVotesPerUser: number;
   availablePermissionOptions: FeedbackBoardPermissionOption[];
   currentUserId: string;
-  onFormSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => void;
+  onFormSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void;
   onFormCancel: () => void;
 }
 
@@ -123,6 +124,7 @@ const getInitialState = (props: IFeedbackBoardMetadataFormProps) => {
     permissions: defaultPermissions,
     initialTitle: defaultTitle,
     title: defaultTitle,
+    customTeamAssessmentQuestions: isCopyRetrospective || isEditRetrospective ? (props.currentBoard?.teamAssessmentQuestions || []).filter(question => question.isCustom).map(question => question.title) : [],
   };
 };
 
@@ -140,6 +142,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   const [isIncludeTeamEffectivenessMeasurement, setIsIncludeTeamEffectivenessMeasurement] = useState(initialState.isIncludeTeamEffectivenessMeasurement);
   const [shouldShowFeedbackAfterCollect, setShouldShowFeedbackAfterCollect] = useState(initialState.shouldShowFeedbackAfterCollect);
   const [isBoardAnonymous, setIsBoardAnonymous] = useState(initialState.isBoardAnonymous);
+  const [customTeamAssessmentQuestions, setCustomTeamAssessmentQuestions] = useState<string[]>(initialState.customTeamAssessmentQuestions);
   const [isDeleteColumnConfirmationDialogHidden, setIsDeleteColumnConfirmationDialogHidden] = useState(true);
   const [isChooseColumnAccentColorDialogHidden, setIsChooseColumnAccentColorDialogHidden] = useState(true);
   const [columnCardBeingEdited, setColumnCardBeingEdited] = useState<IFeedbackColumnCard | null>(null);
@@ -218,9 +221,24 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         shouldShowFeedbackAfterCollect,
         isBoardAnonymous,
         permissions,
+        isIncludeTeamEffectivenessMeasurement
+          ? questions.concat(
+              customTeamAssessmentQuestions
+                .map(question => question.trim())
+                .filter(Boolean)
+                .map((question, index) => ({
+                  id: questions.length + index + 1,
+                  shortTitle: question.length > 30 ? `${question.slice(0, 27)}...` : question,
+                  title: question,
+                  iconClassName: "assessment",
+                  tooltip: "",
+                  isCustom: true,
+                })),
+            )
+          : [],
       );
     },
-    [title, teamId, initialTitle, isNewBoardCreation, isDuplicatingBoard, maxVotesPerUser, isIncludeTeamEffectivenessMeasurement, shouldShowFeedbackAfterCollect, isBoardAnonymous, onFormSubmit, columnCards, permissions],
+    [title, teamId, initialTitle, isNewBoardCreation, isDuplicatingBoard, maxVotesPerUser, isIncludeTeamEffectivenessMeasurement, shouldShowFeedbackAfterCollect, isBoardAnonymous, onFormSubmit, columnCards, permissions, customTeamAssessmentQuestions],
   );
 
   const handleDeleteColumnConfirm = useCallback(
@@ -329,6 +347,40 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                   <div className="italic text-sm font-thin text-left">Note: All responses for team assessment are stored anonymously.</div>
                 </div>
               </div>
+              {isNewBoardCreation && isIncludeTeamEffectivenessMeasurement && (
+                <div className="board-metadata-form-section-subheader">
+                  <div className="flex flex-col gap-2">
+                    <label>Custom Team Assessment Questions</label>
+                    {customTeamAssessmentQuestions.map((question, index) => (
+                      <div key={index} className="flex gap-2 items-center">
+                        <input
+                          aria-label={`Custom team assessment question ${index + 1}`}
+                          className="title-input-container"
+                          maxLength={200}
+                          placeholder="Enter a custom team assessment question"
+                          value={question}
+                          onChange={event => {
+                            const nextQuestions = [...customTeamAssessmentQuestions];
+                            nextQuestions[index] = event.target.value;
+                            setCustomTeamAssessmentQuestions(nextQuestions);
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="default button"
+                          aria-label={`Remove custom team assessment question ${index + 1}`}
+                          onClick={() => setCustomTeamAssessmentQuestions(customTeamAssessmentQuestions.filter((_, currentIndex) => currentIndex !== index))}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button type="button" className="default button self-start" onClick={() => setCustomTeamAssessmentQuestions([...customTeamAssessmentQuestions, ""])}>
+                      Add custom question
+                    </button>
+                  </div>
+                </div>
+              )}
               <div className="board-metadata-form-section-subheader">
                 <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">
                   <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />

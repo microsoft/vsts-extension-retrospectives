@@ -23,6 +23,7 @@ export interface IFeedbackBoardDocument {
   modifiedBy?: IdentityRef;
   activePhase: WorkflowPhase;
   isIncludeTeamEffectivenessMeasurement?: boolean;
+  teamAssessmentQuestions?: ITeamAssessmentQuestion[];
   isAnonymous?: boolean;
   shouldShowFeedbackAfterCollect?: boolean;
   maxVotesPerUser: number;
@@ -64,6 +65,16 @@ export class FeedbackBoardDocumentHelper {
 export interface IFeedbackBoardDocumentPermissions {
   Teams: string[];
   Members: string[];
+}
+
+export interface ITeamAssessmentQuestion {
+  id: number;
+  shortTitle: string;
+  title: string;
+  iconClassName: string;
+  tooltip: string;
+  discussActTemplate?: string;
+  isCustom?: boolean;
 }
 
 export interface ITeamEffectivenessMeasurementVoteCollection {

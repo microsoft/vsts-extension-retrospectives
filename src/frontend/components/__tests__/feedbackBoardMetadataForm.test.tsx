@@ -2195,3 +2195,30 @@ describe("FeedbackBoardMetadataForm - Null ref branch coverage", () => {
     }
   });
 });
+
+describe("FeedbackBoardMetadataForm custom team assessment questions", () => {
+  it("submits custom team assessment questions for new boards", async () => {
+    const user = userEvent.setup();
+    const onFormSubmit = jest.fn();
+
+    render(<FeedbackBoardMetadataForm {...mockedProps} onFormSubmit={onFormSubmit} />);
+
+    await user.type(screen.getByLabelText(/please enter new retrospective title/i), "Board with custom questions");
+    await user.click(screen.getByRole("button", { name: /add custom question/i }));
+    await user.type(screen.getByRole("textbox", { name: /custom team assessment question 1/i }), "How healthy are our handoffs?");
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(onFormSubmit).toHaveBeenCalledWith(
+        "Board with custom questions",
+        5,
+        expect.any(Array),
+        true,
+        false,
+        false,
+        expect.anything(),
+        expect.arrayContaining([expect.objectContaining({ title: "How healthy are our handoffs?", iconClassName: "assessment", isCustom: true })]),
+      );
+    });
+  });
+});

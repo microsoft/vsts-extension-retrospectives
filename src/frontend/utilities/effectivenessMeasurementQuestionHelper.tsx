@@ -1,4 +1,6 @@
-export const questions = [
+import { ITeamAssessmentQuestion } from "../interfaces/feedback";
+
+export const questions: ITeamAssessmentQuestion[] = [
   {
     id: 1,
     shortTitle: "Clarity",
