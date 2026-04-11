@@ -83,6 +83,7 @@ const getRandomArrayElement = <T extends {}>(array: T[]) => {
 const getInitialState = (props: IFeedbackBoardMetadataFormProps) => {
   const isCopyRetrospective = props.isNewBoardCreation && props.isDuplicatingBoard;
   const isEditRetrospective = !props.isNewBoardCreation;
+  const boardTeamAssessmentQuestions = props.currentBoard && props.currentBoard.teamAssessmentQuestions ? props.currentBoard.teamAssessmentQuestions : [];
 
   let defaultMaxVotes = 5;
   let defaultIncludeTeamEffectivenessMeasurement = true;
@@ -124,7 +125,7 @@ const getInitialState = (props: IFeedbackBoardMetadataFormProps) => {
     permissions: defaultPermissions,
     initialTitle: defaultTitle,
     title: defaultTitle,
-    customTeamAssessmentQuestions: isCopyRetrospective || isEditRetrospective ? (props.currentBoard?.teamAssessmentQuestions || []).filter(question => question.isCustom).map(question => question.title) : [],
+    customTeamAssessmentQuestions: isCopyRetrospective || isEditRetrospective ? boardTeamAssessmentQuestions.filter(question => question.isCustom).map(question => question.title) : [],
   };
 };
 
