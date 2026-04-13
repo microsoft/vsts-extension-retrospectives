@@ -1,5 +1,6 @@
 import React from "react";
 import { questions } from "../utilities/effectivenessMeasurementQuestionHelper";
+import { formatDate, t } from "../utilities/localization";
 
 export interface IQuestionAverage {
   questionId: number;
@@ -52,18 +53,18 @@ export const defaultChartColors: IChartColors = {
 export const defaultNumberFormatter = (value: number): string => value.toFixed(2);
 
 export const formatAxisDate = (date: Date): string =>
-  new Intl.DateTimeFormat("en-US", {
+  formatDate(date, {
     month: "short",
     day: "numeric",
     year: "2-digit",
-  }).format(date);
+  });
 
 export const formatTooltipDate = (date: Date): string =>
-  new Intl.DateTimeFormat("en-US", {
+  formatDate(date, {
     year: "numeric",
     month: "short",
     day: "numeric",
-  }).format(date);
+  });
 
 export const calculateYScale = (value: number, chartHeight: number, paddingTop: number, maxValue: number = 10): number => paddingTop + chartHeight - (value / maxValue) * chartHeight;
 
@@ -108,7 +109,7 @@ export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProp
   const yAxisValues = [0, 2, 4, 6, 8, 10];
 
   return (
-    <svg width={width} height={height} className="team-assessment-history-svg" role="img" aria-label="Team assessment history line chart showing scores over time">
+    <svg width={width} height={height} className="team-assessment-history-svg" role="img" aria-label={t("feedback_board_team_assessment_history_chart_aria")}>
       {/* Y-axis grid lines and labels */}
       {yAxisValues.map(value => (
         <g key={value}>
@@ -180,7 +181,7 @@ export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProp
 
       {/* Y-axis label */}
       <text x={padding.left - 50} y={height / 2} textAnchor="middle" fontSize="16" fill={chartColors.axisLabel} fontWeight="600" transform={`rotate(-90 ${padding.left - 50} ${height / 2})`}>
-        Average Score
+        {t("feedback_board_average_score")}
       </text>
 
       {/* Legend */}

@@ -3,6 +3,8 @@ import { getService } from "azure-devops-extension-sdk";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from "azure-devops-extension-api/WorkItemTracking";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
+
+import { formatDate, t } from "../utilities/localization";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getIconElement } from "./icons";
 
@@ -153,22 +155,22 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
   const initialColumns = useMemo(
     (): (IActionItemsColumn & { isSorted?: boolean; isSortedDescending?: boolean })[] => [
       {
-        ariaLabel: "Work item type icon",
+        ariaLabel: t("board_summary_work_item_type_icon"),
         key: "icon",
-        name: "Work Item Icon",
+        name: t("board_summary_work_item_icon"),
         fieldName: "icon",
         isIconOnly: true,
         isResizable: false,
         minWidth: 16,
         maxWidth: 16,
         onRender: ({ icon, type }: IActionItemsTableProps) => {
-          return <img src={icon.url} className="work-item-type-icon" alt={`${type} icon`} />;
+          return <img src={icon.url} className="work-item-type-icon" alt={t("board_summary_icon_alt", { type })} />;
         },
       },
       {
-        ariaLabel: "Work item title",
+        ariaLabel: t("board_summary_work_item_title"),
         key: "title",
-        name: "Title",
+        name: t("board_summary_title"),
         fieldName: "title",
         isResizable: true,
         isSorted: false,
@@ -190,9 +192,9 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         },
       },
       {
-        ariaLabel: "Work item state",
+        ariaLabel: t("board_summary_work_item_state"),
         key: "state",
-        name: "State",
+        name: t("board_summary_state"),
         fieldName: "state",
         isResizable: true,
         isSorted: false,
@@ -202,9 +204,9 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         maxWidth: 100,
       },
       {
-        ariaLabel: "Work item type",
+        ariaLabel: t("board_summary_work_item_type"),
         key: "type",
-        name: "Type",
+        name: t("board_summary_type"),
         fieldName: "type",
         isResizable: true,
         isSorted: false,
@@ -214,9 +216,9 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         maxWidth: 100,
       },
       {
-        ariaLabel: "Work item changed date",
+        ariaLabel: t("board_summary_work_item_changed_date"),
         key: "changedDate",
-        name: "Last Updated",
+        name: t("board_summary_last_updated"),
         fieldName: "changedDate",
         isResizable: true,
         isSorted: false,
@@ -226,13 +228,13 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         maxWidth: 150,
         onRender: ({ changedDate }: IActionItemsTableProps) => {
           const changedDateAsDate = new Date(changedDate);
-          return <div className="overflow-ellipsis">{new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(changedDateAsDate)}</div>;
+          return <div className="overflow-ellipsis">{formatDate(changedDateAsDate, { year: "numeric", month: "short", day: "numeric" })}</div>;
         },
       },
       {
-        ariaLabel: "Work item assigned to",
+        ariaLabel: t("board_summary_work_item_assigned_to"),
         key: "assignedTo",
-        name: "Assigned To",
+        name: t("board_summary_assigned_to"),
         fieldName: "assignedTo",
         isResizable: true,
         isSorted: false,
@@ -242,9 +244,9 @@ export const BoardSummary: React.FC<IBoardSummaryProps> = ({ actionItems, pendin
         maxWidth: 400,
       },
       {
-        ariaLabel: "Work item priority",
+        ariaLabel: t("board_summary_work_item_priority"),
         key: "priority",
-        name: "Priority",
+        name: t("board_summary_priority"),
         fieldName: "priority",
         isResizable: true,
         isSorted: false,

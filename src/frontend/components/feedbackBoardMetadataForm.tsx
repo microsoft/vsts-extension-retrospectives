@@ -7,6 +7,7 @@ import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
 import BoardDataService from "../dal/boardDataService";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, ITeamAssessmentQuestion } from "../interfaces/feedback";
+import { t } from "../utilities/localization";
 import EditableDocumentCardTitle from "./editableDocumentCardTitle";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
@@ -666,7 +667,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             )}
           </div>
         </PivotItem>
-        <PivotItem headerText={"Permissions"} aria-label="Board Permission Settings">
+        <PivotItem headerText={t("feedback_board_permissions")} aria-label={t("feedback_board_permission_settings")}>
           <FeedbackBoardMetadataFormPermissions board={currentBoard} permissions={permissions} permissionOptions={availablePermissionOptions} currentUserId={currentUserId} isNewBoardCreation={isNewBoardCreation} onPermissionChanged={(s: FeedbackBoardPermissionState) => setPermissions(s.permissions)} />
         </PivotItem>
       </Pivot>
@@ -682,10 +683,10 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
           }}
           className="metadata-form-save-button"
         >
-          Save
+          {t("common_save")}
         </button>
         <button className="default button" onClick={onFormCancel}>
-          Cancel
+          {t("common_cancel")}
         </button>
       </div>
     </div>

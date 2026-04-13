@@ -8,6 +8,7 @@ import BoardDataService from "../dal/boardDataService";
 import { itemDataService } from "../dal/itemDataService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { reflectBackendService } from "../dal/reflectBackendService";
+import { formatDate, t } from "../utilities/localization";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import BoardSummaryTableHeader from "./boardSummaryTableHeader";
@@ -117,18 +118,18 @@ export function TrashIcon({ board, currentUserId, currentUserIsTeamAdmin, onClic
 
   if (isArchivedWithoutValidDate(board)) {
     return (
-      <div className="centered-cell trash-icon-disabled" title="Toggle archive off and on to enable delete." aria-label="Toggle archive off and on to enable delete.">
+      <div className="centered-cell trash-icon-disabled" title={t("board_summary_table_toggle_archive_enable_delete")} aria-label={t("board_summary_table_toggle_archive_enable_delete")}>
         {getIconElement("delete")}
       </div>
     );
   }
 
   return isTrashEnabled(board) ? (
-    <div className="centered-cell trash-icon" title="Delete board" aria-label="Delete board" onClick={onClick}>
+    <div className="centered-cell trash-icon" title={t("board_summary_table_delete_board")} aria-label={t("board_summary_table_delete_board")} onClick={onClick}>
       {getIconElement("delete")}
     </div>
   ) : (
-    <div className="centered-cell trash-icon-disabled" title="To delete this board, you must wait for 2 minutes after archiving." aria-label="To delete this board, you must wait for 2 minutes after archiving.">
+    <div className="centered-cell trash-icon-disabled" title={t("board_summary_table_wait_to_delete")} aria-label={t("board_summary_table_wait_to_delete")}>
       {getIconElement("delete")}
     </div>
   );
@@ -218,7 +219,9 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     setTableData(boardSummaryState.boardsTableItems);
   }, [boardSummaryState.boardsTableItems]);
 
-  const dateFormatter = useMemo(() => new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }), []);
+  const dateFormatter = useMemo(() => {
+    return (value: Date) => formatDate(value, { year: "numeric", month: "short", day: "numeric" });
+  }, []);
   const deleteBoardDialogRef = useRef<HTMLDialogElement>(null);
 
   const toggleSort = (columnId: string) => {
@@ -254,7 +257,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       id: "expand",
       header: null,
       cell: (item: IBoardSummaryTableItem) => (
-        <button className="contextual-menu-button" aria-label="Expand Row" title="Expand Row" onClick={() => toggleExpanded(item.id)}>
+        <button className="contextual-menu-button" aria-label={t("board_summary_table_expand_row")} title={t("board_summary_table_expand_row")} onClick={() => toggleExpanded(item.id)}>
           {getIconElement(expandedRows.has(item.id) ? "chevron-down" : "chevron-right")}
         </button>
       ),
@@ -262,21 +265,21 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     },
     {
       id: "boardName",
-      header: "Retrospective Name",
+      header: t("board_summary_table_retrospective_name"),
       accessor: "boardName",
       cell: (item: IBoardSummaryTableItem) => item.boardName,
       sortable: true,
     },
     {
       id: "createdDate",
-      header: "Created Date",
+      header: t("board_summary_table_created_date"),
       accessor: "createdDate",
-      cell: (item: IBoardSummaryTableItem) => dateFormatter.format(item.createdDate),
+      cell: (item: IBoardSummaryTableItem) => dateFormatter(item.createdDate),
       sortable: true,
     },
     {
       id: "isArchived",
-      header: "Archived",
+      header: t("board_summary_table_archived"),
       accessor: "isArchived",
       cell: (item: IBoardSummaryTableItem) => (
         <div onClick={event => event.stopPropagation()} className="centered-cell">
@@ -293,21 +296,21 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     },
     {
       id: "archivedDate",
-      header: "Archived Date",
+      header: t("board_summary_table_archived_date"),
       accessor: "archivedDate",
-      cell: (item: IBoardSummaryTableItem) => (item.archivedDate ? dateFormatter.format(item.archivedDate) : ""),
+      cell: (item: IBoardSummaryTableItem) => (item.archivedDate ? dateFormatter(item.archivedDate) : ""),
       sortable: true,
     },
     {
       id: "feedbackItemsCount",
-      header: "Feedback Items",
+      header: t("board_summary_table_feedback_items"),
       accessor: "feedbackItemsCount",
       cell: (item: IBoardSummaryTableItem) => item.feedbackItemsCount,
       sortable: true,
     },
     {
       id: "totalWorkItemsCount",
-      header: "Total Work Items",
+      header: t("board_summary_table_total_work_items"),
       accessor: "totalWorkItemsCount",
       cell: (item: IBoardSummaryTableItem) => item.totalWorkItemsCount,
       sortable: true,
@@ -315,7 +318,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     {
       id: "trash",
       header: () => (
-        <div className="centered-cell trash-icon-header" title="Delete enabled for archived boards if user is board owner or team admin." aria-label="Archived boards can be deleted by board owner or team admin.">
+        <div className="centered-cell trash-icon-header" title={t("board_summary_table_delete_help")} aria-label={t("board_summary_table_delete_help")}>
           {getIconElement("delete")}
         </div>
       ),
