@@ -382,7 +382,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                       <button
                         className="feedback-column-card-delete-button"
                         title="Delete"
-                        aria-label="Delete"
+                        aria-label={`Remove custom team assessment question ${index + 1}`}
                         type="button"
                         onClick={() => setCustomTeamAssessmentQuestions(customTeamAssessmentQuestions.filter((_, currentIndex) => currentIndex !== index))}
                       >
