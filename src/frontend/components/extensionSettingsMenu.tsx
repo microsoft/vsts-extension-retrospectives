@@ -57,7 +57,7 @@ const processImportedData = async (importedData: IExportImportDataSchema[]) => {
   for (const dataToProcess of importedData) {
     const team = teams.find(e => e.name === dataToProcess.team.name) ?? defaultTeam;
     const oldBoard = dataToProcess.board;
-    const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.isAnonymous, oldBoard.startDate, oldBoard.endDate);
+    const newBoard = await boardDataService.createBoardForTeam(team.id, oldBoard.title, oldBoard.maxVotesPerUser, oldBoard.columns, oldBoard.isIncludeTeamEffectivenessMeasurement, oldBoard.shouldShowFeedbackAfterCollect, oldBoard.isAnonymous, oldBoard.startDate, oldBoard.endDate, oldBoard.permissions, oldBoard.teamAssessmentQuestions);
     for (let yLoop = 0; yLoop < dataToProcess.items.length; yLoop++) {
       const oldItem = dataToProcess.items[yLoop];
       oldItem.boardId = newBoard.id;

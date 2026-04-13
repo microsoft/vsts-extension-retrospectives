@@ -1,5 +1,5 @@
 import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, getValue, setValue } from "./dataService";
-import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from "../interfaces/feedback";
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument, ITeamAssessmentQuestion } from "../interfaces/feedback";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
 import { generateUUID } from "../utilities/random";
@@ -10,7 +10,7 @@ class BoardDataService {
   public readonly legacyPositiveColumnId: string = "whatwentwell";
   public readonly legacyNegativeColumnId: string = "whatdidntgowell";
 
-  public createBoardForTeam = async (teamId: string, title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement?: boolean, shouldShowFeedbackAfterCollect?: boolean, isAnonymous?: boolean, startDate?: Date, endDate?: Date, permissions?: IFeedbackBoardDocumentPermissions) => {
+  public createBoardForTeam = async (teamId: string, title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement?: boolean, shouldShowFeedbackAfterCollect?: boolean, isAnonymous?: boolean, startDate?: Date, endDate?: Date, permissions?: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => {
     const boardId: string = generateUUID();
     const userIdentity = getUserIdentity();
 
@@ -23,6 +23,7 @@ class BoardDataService {
       id: boardId,
       maxVotesPerUser,
       isIncludeTeamEffectivenessMeasurement: isIncludeTeamEffectivenessMeasurement ?? false,
+      teamAssessmentQuestions: teamAssessmentQuestions,
       shouldShowFeedbackAfterCollect: shouldShowFeedbackAfterCollect ?? false,
       isAnonymous: isAnonymous ?? false,
       modifiedDate: new Date(Date.now()),

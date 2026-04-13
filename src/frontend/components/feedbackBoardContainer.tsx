@@ -3,7 +3,7 @@ import React from "react";
 import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
 import BoardDataService from "../dal/boardDataService";
-import { FeedbackBoardDocumentHelper, IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument } from "../interfaces/feedback";
+import { FeedbackBoardDocumentHelper, IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument, ITeamAssessmentQuestion } from "../interfaces/feedback";
 import { reflectBackendService } from "../dal/reflectBackendService";
 import BoardSummaryTable from "./boardSummaryTable";
 import FeedbackBoardMetadataForm from "./feedbackBoardMetadataForm";
@@ -24,7 +24,7 @@ import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
-import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
+import { questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
@@ -77,8 +77,8 @@ export type FeedbackBoardContainerHandle = {
   parseUrlForBoardAndTeamInformation: () => Promise<{ teamId: string; boardId: string; phase?: WorkflowPhase }>;
   updateUrlWithBoardAndTeamInformation: (teamId: string, boardId: string) => Promise<void>;
 
-  createBoard: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, permissions: IFeedbackBoardDocumentPermissions) => Promise<IFeedbackBoardDocument>;
-  updateBoardMetadata: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => Promise<void>;
+  createBoard: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => Promise<IFeedbackBoardDocument>;
+  updateBoardMetadata: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => Promise<void>;
   archiveCurrentBoard: () => Promise<void>;
   generateEmailSummaryContent: () => Promise<void>;
 
@@ -156,8 +156,8 @@ export interface FeedbackBoardContainerState {
   allowCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: { id: string; name: string; imageUrl: string }[];
-  effectivenessMeasurementSummary: { questionId: number; question: string; average: number }[];
-  effectivenessMeasurementChartData: { questionId: number; red: number; yellow: number; green: number }[];
+  effectivenessMeasurementSummary: { questionId: number; question: string; average: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[];
+  effectivenessMeasurementChartData: { questionId: number; red: number; yellow: number; green: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[];
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   allMembers: TeamMember[];
@@ -1337,18 +1337,19 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     });
   };
 
-  const createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+  const createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => {
     const createdBoard = await BoardDataService.createBoardForTeam(
       stateRef.current.currentTeam.id,
       title,
       maxVotesPerUser,
       columns,
       isIncludeTeamEffectivenessMeasurement,
-      isBoardAnonymous,
       shouldShowFeedbackAfterCollect,
+      isBoardAnonymous,
       undefined, // Start Date
       undefined, // End Date
       permissions,
+      teamAssessmentQuestions,
     );
     await reloadBoardsForCurrentTeam();
     hideBoardCreationDialog();
@@ -1371,6 +1372,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
     const state = stateRef.current;
     const board = await BoardDataService.getBoardForTeamById(state.currentTeam.id, state.currentBoard.id);
+    const boardQuestions = board.teamAssessmentQuestions?.length ? board.teamAssessmentQuestions : questions;
     const voteCollection = board.teamEffectivenessMeasurementVoteCollection || [];
 
     voteCollection.forEach(vote => {
@@ -1379,22 +1381,28 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       });
     });
 
-    const average: { questionId: number; question: string; average: number }[] = [];
+    const average: { questionId: number; question: string; average: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[] = [];
 
     [...new Set(measurements.map(item => item.id))].forEach(e => {
-      average.push({ questionId: e, question: getQuestionName(e), average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
+      const teamAssessmentQuestion = boardQuestions.find(question => question.id === e);
+      if (teamAssessmentQuestion) {
+        average.push({ questionId: e, question: teamAssessmentQuestion.title, average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length, teamAssessmentQuestion });
+      }
     });
 
-    const chartData: { questionId: number; red: number; yellow: number; green: number }[] = [];
+    const chartData: { questionId: number; red: number; yellow: number; green: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[] = [];
 
-    [...Array(questions.length).keys()].forEach(e => {
-      chartData.push({ questionId: e + 1, red: 0, yellow: 0, green: 0 });
+    boardQuestions.forEach(question => {
+      chartData.push({ questionId: question.id, red: 0, yellow: 0, green: 0, teamAssessmentQuestion: question });
     });
 
     voteCollection?.forEach(vote => {
-      [...Array(questions.length).keys()].forEach(e => {
-        const selection = vote.responses.find(response => response.questionId === e + 1)?.selection;
-        const data = chartData.find(d => d.questionId === e + 1);
+      boardQuestions.forEach(question => {
+        const selection = vote.responses.find(response => response.questionId === question.id)?.selection;
+        const data = chartData.find(d => d.questionId === question.id);
+        if (selection === undefined || !data) {
+          return;
+        }
         if (selection <= 6) {
           data.red++;
         } else if (selection <= 8) {
@@ -1455,11 +1463,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       });
 
       const questionAverages: { questionId: number; average: number }[] = [];
-      [...new Set(measurements.map(item => item.id))].forEach(questionId => {
+      [...new Set(measurements.map(item => item.id))]
+        .filter(questionId => questions.some(question => question.id === questionId))
+        .forEach(questionId => {
         const responsesForQuestion = measurements.filter(m => m.id === questionId);
         const average = responsesForQuestion.reduce((sum, m) => sum + m.selected, 0) / responsesForQuestion.length;
         questionAverages.push({ questionId, average });
-      });
+        });
 
       return {
         boardTitle: board.title,
@@ -1482,7 +1492,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     teamAssessmentHistoryDialogRef?.current?.close();
   };
 
-  const updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => {
+  const updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, _teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => {
     const state = stateRef.current;
     const updatedBoard = await BoardDataService.updateBoardMetadata(state.currentTeam.id, state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
 
@@ -1562,7 +1572,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     downloadPdfBlob(pdfBlob, fileName);
   };
 
-  const renderBoardUpdateMetadataFormDialog = (dialogRef: React.RefObject<HTMLDialogElement>, isNewBoardCreation: boolean, isDuplicatingBoard: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions) => void, onCancel: () => void) => {
+  const renderBoardUpdateMetadataFormDialog = (dialogRef: React.RefObject<HTMLDialogElement>, isNewBoardCreation: boolean, isDuplicatingBoard: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void, onCancel: () => void) => {
     const permissionOptions: FeedbackBoardPermissionOption[] = [];
 
     const state = stateRef.current;
@@ -1832,12 +1842,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       return;
     }
 
+    const boardQuestions = currentBoard.teamAssessmentQuestions?.length ? currentBoard.teamAssessmentQuestions : questions;
     const teamEffectivenessMeasurementVoteCollection = currentBoard.teamEffectivenessMeasurementVoteCollection || [];
     const currentUserId = obfuscateUserId(state.currentUserId);
     const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
     const responseCount = currentUserVote?.responses?.length || 0;
 
-    if (responseCount < questions.length) {
+    if (responseCount < boardQuestions.length) {
       toast("Please answer all questions before saving");
       return;
     }
@@ -2108,8 +2119,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {questions.map(question => {
-                                      return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={getQuestionIconClassName(question.id)} title={getQuestionShortName(question.id)} subtitle={getQuestionName(question.id)} tooltip={getQuestionTooltip(question.id)} />;
+                                    {(state.currentBoard.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions).map(question => {
+                                      return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={question.iconClassName} title={question.shortTitle} subtitle={question.title} tooltip={question.tooltip} />;
                                     })}
                                   </tbody>
                                 </table>
@@ -2374,15 +2385,19 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                   <div className="retro-summary-effectiveness-scores">
                     <ul className="chart">
                       {state.effectivenessMeasurementChartData.map(data => {
+                        const teamAssessmentQuestion = data.teamAssessmentQuestion || state.effectivenessMeasurementSummary.find(summary => summary.questionId === data.questionId)?.teamAssessmentQuestion || questions.find(question => question.id === data.questionId);
                         const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
                         const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
                         const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
                         const redScore = (data.red * 100) / teamEffectivenessResponseCount;
+                        if (!teamAssessmentQuestion) {
+                          return null;
+                        }
                         return (
                           <li className="chart-question-block" key={data.questionId}>
                             <div className="chart-question">
-                              <i className={getQuestionIconClassName(data.questionId)} /> &nbsp;
-                              {getQuestionShortName(data.questionId)}
+                              {getIconElement(teamAssessmentQuestion.iconClassName)} &nbsp;
+                              {teamAssessmentQuestion.shortTitle}
                             </div>
                             {data.red > 0 && (
                               <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
@@ -2404,9 +2419,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                 {numberFormatter(averageScore)}
                               </div>
                             )}
-                            <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
-                              Discuss and Act
-                            </button>
+                            {!teamAssessmentQuestion.isCustom && (
+                              <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${teamAssessmentQuestion.shortTitle} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
+                                Discuss and Act
+                              </button>
+                            )}
                           </li>
                         );
                       })}

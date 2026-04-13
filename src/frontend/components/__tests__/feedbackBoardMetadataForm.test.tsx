@@ -2195,3 +2195,94 @@ describe("FeedbackBoardMetadataForm - Null ref branch coverage", () => {
     }
   });
 });
+
+describe("FeedbackBoardMetadataForm custom team assessment questions", () => {
+  it("submits custom team assessment questions for new boards", async () => {
+    const user = userEvent.setup();
+    const onFormSubmit = jest.fn();
+
+    render(<FeedbackBoardMetadataForm {...mockedProps} onFormSubmit={onFormSubmit} />);
+
+    await user.type(screen.getByLabelText(/please enter new retrospective title/i), "Board with custom questions");
+    await user.click(screen.getByRole("button", { name: /add custom question/i }));
+    await user.type(screen.getByRole("textbox", { name: /custom team assessment question 1/i }), "How healthy are our handoffs?");
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(onFormSubmit).toHaveBeenCalledWith(
+        "Board with custom questions",
+        5,
+        expect.any(Array),
+        true,
+        false,
+        false,
+        expect.anything(),
+        expect.arrayContaining([expect.objectContaining({ title: "How healthy are our handoffs?", iconClassName: "assessment", isCustom: true })]),
+      );
+    });
+  });
+
+  it("loads stored custom team assessment questions when duplicating a board", () => {
+    render(
+      <FeedbackBoardMetadataForm
+        {...mockedProps}
+        isNewBoardCreation={true}
+        isDuplicatingBoard={true}
+        currentBoard={{
+          ...testExistingBoard,
+          teamAssessmentQuestions: [
+            { id: 1, shortTitle: "Clarity", title: "Built in", iconClassName: "assessment", tooltip: "" },
+            { id: 7, shortTitle: "Custom", title: "How healthy are our handoffs?", iconClassName: "assessment", tooltip: "", isCustom: true },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByRole("textbox", { name: /custom team assessment question 1/i })).toHaveValue("How healthy are our handoffs?");
+  });
+
+  it("removes a custom team assessment question", async () => {
+    const user = userEvent.setup();
+
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    await user.click(screen.getByRole("button", { name: /add custom question/i }));
+    expect(screen.getByRole("textbox", { name: /custom team assessment question 1/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /remove custom team assessment question 1/i }));
+
+    expect(screen.queryByRole("textbox", { name: /custom team assessment question 1/i })).not.toBeInTheDocument();
+  });
+
+  it("submits no team assessment questions when team assessment is disabled", async () => {
+    const user = userEvent.setup();
+    const onFormSubmit = jest.fn();
+
+    render(<FeedbackBoardMetadataForm {...mockedProps} onFormSubmit={onFormSubmit} />);
+
+    await user.type(screen.getByLabelText(/please enter new retrospective title/i), "Board without assessment");
+    await user.click(screen.getByRole("checkbox", { name: /include team assessment/i }));
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(onFormSubmit).toHaveBeenCalledWith("Board without assessment", 5, expect.any(Array), false, false, false, expect.anything(), []);
+    });
+  });
+
+  it("truncates long custom question short titles when submitting", async () => {
+    const user = userEvent.setup();
+    const onFormSubmit = jest.fn();
+    const longQuestion = "This is a very long custom team assessment question for testing";
+
+    render(<FeedbackBoardMetadataForm {...mockedProps} onFormSubmit={onFormSubmit} />);
+
+    await user.type(screen.getByLabelText(/please enter new retrospective title/i), "Board with long custom question");
+    await user.click(screen.getByRole("button", { name: /add custom question/i }));
+    await user.type(screen.getByRole("textbox", { name: /custom team assessment question 1/i }), longQuestion);
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(onFormSubmit.mock.calls[0][7]).toEqual(expect.arrayContaining([expect.objectContaining({ title: longQuestion, shortTitle: "This is a very long custom ..." })]));
+    });
+  });
+});

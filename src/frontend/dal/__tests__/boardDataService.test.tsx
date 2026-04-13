@@ -111,6 +111,14 @@ describe("BoardDataService - createBoardForTeam", () => {
     expect(result.shouldShowFeedbackAfterCollect).toBe(true);
     expect(result.isAnonymous).toBe(true);
   });
+
+  it("should store custom team assessment questions when provided", async () => {
+    (createDocument as jest.Mock).mockImplementation(async (teamId, board) => board);
+
+    const result = await BoardDataService.createBoardForTeam("team-123", "Test Board", 5, [], true, false, false, undefined, undefined, mockPermissions, [{ id: 7, shortTitle: "Custom", title: "Custom question", iconClassName: "assessment", tooltip: "", isCustom: true }]);
+
+    expect(result.teamAssessmentQuestions).toEqual([{ id: 7, shortTitle: "Custom", title: "Custom question", iconClassName: "assessment", tooltip: "", isCustom: true }]);
+  });
 });
 
 describe("BoardDataService - checkIfBoardNameIsTaken", () => {
