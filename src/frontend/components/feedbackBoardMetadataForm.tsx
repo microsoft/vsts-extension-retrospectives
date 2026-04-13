@@ -133,7 +133,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   const { isNewBoardCreation, isDuplicatingBoard, currentBoard, teamId, placeholderText, availablePermissionOptions, currentUserId, onFormSubmit, onFormCancel } = props;
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardMetadataForm");
 
-  const initialState = getInitialState(props);
+  const [initialState] = useState(() => getInitialState(props));
 
   const [title, setTitle] = useState(initialState.title);
   const [initialTitle] = useState(initialState.initialTitle);
@@ -340,49 +340,6 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               <hr></hr>
               <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation</div>
               <div className="board-metadata-form-section-subheader">
-                <div className="flex flex-col">
-                  <label className="flex items-center gap-2" htmlFor="include-team-assessment-checkbox">
-                    <input id="include-team-assessment-checkbox" type="checkbox" aria-label="Include Team Assessment. This selection cannot be modified after board creation." checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />
-                    <span>Include Team Assessment</span>
-                  </label>
-                  <div className="italic text-sm font-thin text-left">Note: All responses for team assessment are stored anonymously.</div>
-                </div>
-              </div>
-              {isNewBoardCreation && isIncludeTeamEffectivenessMeasurement && (
-                <div className="board-metadata-form-section-subheader">
-                  <div className="flex flex-col gap-2">
-                    <label>Custom Team Assessment Questions</label>
-                    {customTeamAssessmentQuestions.map((question, index) => (
-                      <div key={index} className="flex gap-2 items-center">
-                        <input
-                          aria-label={`Custom team assessment question ${index + 1}`}
-                          className="title-input-container"
-                          maxLength={200}
-                          placeholder="Enter a custom team assessment question"
-                          value={question}
-                          onChange={event => {
-                            const nextQuestions = [...customTeamAssessmentQuestions];
-                            nextQuestions[index] = event.target.value;
-                            setCustomTeamAssessmentQuestions(nextQuestions);
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="default button"
-                          aria-label={`Remove custom team assessment question ${index + 1}`}
-                          onClick={() => setCustomTeamAssessmentQuestions(customTeamAssessmentQuestions.filter((_, currentIndex) => currentIndex !== index))}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                    <button type="button" className="default button self-start" onClick={() => setCustomTeamAssessmentQuestions([...customTeamAssessmentQuestions, ""])}>
-                      Add custom question
-                    </button>
-                  </div>
-                </div>
-              )}
-              <div className="board-metadata-form-section-subheader">
                 <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">
                   <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />
                   <span>Hide the feedback of others until after Collect phase</span>
@@ -394,7 +351,52 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                   <span>Do not display names in feedback</span>
                 </label>
               </div>
+              <div className="board-metadata-form-section-subheader">
+                <div className="flex flex-col">
+                  <label className="flex items-center gap-2" htmlFor="include-team-assessment-checkbox">
+                    <input id="include-team-assessment-checkbox" type="checkbox" aria-label="Include Team Assessment. This selection cannot be modified after board creation." checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />
+                    <span>Include Team Assessment</span>
+                  </label>
+                  <div className="italic text-sm font-thin text-left">Note: All responses for team assessment are stored anonymously.</div>
+                </div>
+              </div>
             </section>
+            {isNewBoardCreation && isIncludeTeamEffectivenessMeasurement && (
+              <section className="board-metadata-edit-column-settings">
+                <h2 className="board-metadata-form-section-header">Custom Team Assessment Questions</h2>
+                <div className="board-metadata-form-section-subheader flex-col">
+                  {customTeamAssessmentQuestions.map((question, index) => (
+                    <div key={index} className="flex gap-2 items-center mt-2 w-full border border-gray-300 p-2">
+                      <input
+                        aria-label={`Custom team assessment question ${index + 1}`}
+                        className="grow"
+                        maxLength={200}
+                        placeholder="Enter a custom team assessment question"
+                        value={question}
+                        onChange={event => {
+                          const nextQuestions = [...customTeamAssessmentQuestions];
+                          nextQuestions[index] = event.target.value;
+                          setCustomTeamAssessmentQuestions(nextQuestions);
+                        }}
+                      />
+                      <button
+                        className="feedback-column-card-delete-button"
+                        title="Delete"
+                        aria-label="Delete"
+                        type="button"
+                        onClick={() => setCustomTeamAssessmentQuestions(customTeamAssessmentQuestions.filter((_, currentIndex) => currentIndex !== index))}
+                      >
+                        {getIconElement("delete")}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button type="button" className="create-feedback-column-card-button" aria-label="Add custom question" onClick={() => setCustomTeamAssessmentQuestions([...customTeamAssessmentQuestions, ""])}>
+                  {getIconElement("add")}
+                  Add custom question
+                </button>
+              </section>
+            )}
             <section className="board-metadata-edit-column-settings">
               <h2 className="board-metadata-form-section-header">Column Settings</h2>
               <div className="board-metadata-form-section-information">

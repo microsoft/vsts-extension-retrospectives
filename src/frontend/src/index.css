@@ -1439,7 +1439,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .feedback-column-card {
-    @apply bg-(---nav-vertical-background-color) text-(--text-primary-color) h-15 mt-2.5 items-center;
+    @apply bg-(---nav-vertical-background-color) text-(--text-primary-color) h-15 mt-2.5 items-center max-w-full;
 
     & :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button) {
       @apply bg-transparent! m-2 border-none text-(--text-primary-color) cursor-pointer;
