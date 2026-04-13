@@ -31,6 +31,7 @@ import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetr
 import { copyToClipboard } from "../utilities/clipboardHelper";
 import { closeTopMostDialog } from "../utilities/dialogHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
+import { formatDate, formatNumber, t } from "../utilities/localization";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
@@ -747,15 +748,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   }, []);
 
   const numberFormatter = React.useCallback((value: number) => {
-    const formatter = new Intl.NumberFormat("en-US", { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 });
-
-    return formatter.format(value);
+    return formatNumber(value, { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }, []);
 
   const percentageFormatter = React.useCallback((value: number) => {
-    const formatter = new Intl.NumberFormat("en-US", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
-
-    return formatter.format(value / 100);
+    return formatNumber(value / 100, { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }, []);
 
   const handleBoardCreated = React.useCallback(
@@ -1521,13 +1518,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
   const showBoardUrlCopiedToast = () => {
     const board = stateRef.current.currentBoard;
-    toast(`The link to retrospective ${board.title} (${board.activePhase} phase) has been copied to your clipboard.`);
+    toast(t("feedback_board_link_copied", { title: board.title, phase: board.activePhase }));
   };
 
   const showEmailCopiedToast = () => {
     const board = stateRef.current.currentBoard;
     copyToClipboard(board.emailContent);
-    toast(`The email summary for "${board.title}" has been copied to your clipboard.`);
+    toast(t("feedback_board_email_copied", { title: board.title }));
   };
 
   const archiveCurrentBoard = async () => {
@@ -1811,13 +1808,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return (
       <div className="spinner" aria-live="assertive">
         <div></div>
-        <span>Loading...</span>
+        <span>{t("common_loading")}</span>
       </div>
     );
   }
 
   if (!state.currentTeam) {
-    return <div>We are unable to retrieve the list of teams for this project. Try reloading the page.</div>;
+    return <div>{t("feedback_board_team_list_error")}</div>;
   }
 
   const handleTeamSelectionChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -1849,7 +1846,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     const responseCount = currentUserVote?.responses?.length || 0;
 
     if (responseCount < boardQuestions.length) {
-      toast("Please answer all questions before saving");
+      toast(t("feedback_board_answer_all_questions"));
       return;
     }
 
@@ -2291,74 +2288,79 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         </div>
       </div>
       {state.currentBoard && (
-        <dialog className="archive-board-dialog" aria-label="Archive Retrospective" role="dialog" ref={archiveBoardDialogRef}>
+        <dialog className="archive-board-dialog" aria-label={t("feedback_board_archive_title")} role="dialog" ref={archiveBoardDialogRef}>
           <div className="header">
-            <h2 className="title">Archive Retrospective</h2>
-            <button onClick={() => archiveBoardDialogRef.current?.close()} aria-label="Close">
+            <h2 className="title">{t("feedback_board_archive_title")}</h2>
+            <button onClick={() => archiveBoardDialogRef.current?.close()} aria-label={t("common_close")}>
               {getIconElement("close")}
             </button>
           </div>
-          <div className="subText">
-            The retrospective board <strong>{state.currentBoard.title}</strong> with its feedback will be archived.
-          </div>
-          <div className="subText">
-            <em>Note:</em> Archived retrospectives remain available on the <strong>History</strong> tab, where they can be <em>restored</em> or <em>deleted</em>.
-          </div>
+          <div className="subText">{t("feedback_board_archive_message", { title: state.currentBoard.title })}</div>
+          <div className="subText">{t("feedback_board_archive_note")}</div>
           <div className="inner">
             <button className="button" onClick={() => archiveCurrentBoard()}>
-              Archive
+              {t("feedback_board_archive_button")}
             </button>
             <button className="default button" onClick={() => archiveBoardDialogRef.current?.close()}>
-              Cancel
+              {t("common_cancel")}
             </button>
           </div>
         </dialog>
       )}
-      {renderBoardUpdateMetadataFormDialog(boardCreationDialogRef, true, false, hideBoardCreationDialog, "Create new retrospective", `Example: Retrospective ${new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date())}`, createBoard, hideBoardCreationDialog)}
-      {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, "Create copy of retrospective", "", createBoard, hideBoardDuplicateDialog)}
-      {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, "Edit retrospective", "", updateBoardMetadata, hideBoardUpdateDialog)}
+      {renderBoardUpdateMetadataFormDialog(
+        boardCreationDialogRef,
+        true,
+        false,
+        hideBoardCreationDialog,
+        t("feedback_board_create_new"),
+        t("feedback_board_create_example", { date: formatDate(new Date(), { year: "numeric", month: "short", day: "numeric" }) }),
+        createBoard,
+        hideBoardCreationDialog,
+      )}
+      {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, t("feedback_board_create_copy"), "", createBoard, hideBoardDuplicateDialog)}
+      {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, t("feedback_board_edit"), "", updateBoardMetadata, hideBoardUpdateDialog)}
       {state.currentBoard && (
-        <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label="Email summary" role="dialog">
+        <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label={t("feedback_board_email_summary")} role="dialog">
           <div className="header">
-            <h2 className="title">Email summary</h2>
-            <button onClick={() => previewEmailDialogRef.current?.close()} aria-label="Close">
+            <h2 className="title">{t("feedback_board_email_summary")}</h2>
+            <button onClick={() => previewEmailDialogRef.current?.close()} aria-label={t("common_close")}>
               {getIconElement("close")}
             </button>
           </div>
           <div className="subText">
-            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={state.currentBoard.emailContent}></textarea>
+            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label={t("feedback_board_email_summary_aria")} value={state.currentBoard.emailContent}></textarea>
           </div>
           <div className="inner">
-            <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={showEmailCopiedToast}>
+            <button title={t("common_copy_to_clipboard")} aria-label={t("common_copy_to_clipboard")} onClick={showEmailCopiedToast}>
               {getIconElement("content-copy")}
-              Copy to clipboard
+              {t("common_copy_to_clipboard")}
             </button>
-            <button title="Download PDF" aria-label="Download email summary as PDF" onClick={downloadEmailSummaryPdf} className="default button">
+            <button title={t("common_download_pdf")} aria-label={t("common_download_pdf")} onClick={downloadEmailSummaryPdf} className="default button">
               {getIconElement("sim-card-download")}
-              Download PDF
+              {t("common_download_pdf")}
             </button>
           </div>
         </dialog>
       )}
       {state.currentBoard && (
-        <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label="Retrospective Board Summary" role="dialog">
+        <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label={t("feedback_board_retro_summary")} role="dialog">
           <div className="header">
-            <h2 className="title">Retrospective Board Summary</h2>
-            <button type="button" onClick={hideRetroSummaryDialog} aria-label="Close">
+            <h2 className="title">{t("feedback_board_retro_summary")}</h2>
+            <button type="button" onClick={hideRetroSummaryDialog} aria-label={t("common_close")}>
               {getIconElement("close")}
             </button>
           </div>
           <div className="subText">
             <section className="retro-summary-section">
-              <div className="retro-summary-section-header">Basic Settings</div>
-              <div id="retro-summary-created-date">Created date: {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(state.currentBoard.createdDate))}</div>
+              <div className="retro-summary-section-header">{t("feedback_board_basic_settings")}</div>
+              <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "short", day: "numeric" }) })}</div>
               <div id="retro-summary-created-by">
-                Created by <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
+                {t("feedback_board_created_by")} <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
               </div>
             </section>
             <section className="retro-summary-section">
-              <div className="retro-summary-section-header">Participant Summary</div>
-              <div className="retro-summary-section-item">Contributors: {state.contributors.length} participant(s)</div>
+              <div className="retro-summary-section-header">{t("feedback_board_participant_summary")}</div>
+              <div className="retro-summary-section-item">{t("feedback_board_contributors_count", { count: state.contributors.length })}</div>
 
               {!state.currentBoard.isAnonymous && state.contributors.length > 0 && (
                 <div className="retro-summary-contributors-section">
@@ -2371,10 +2373,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               )}
               <div className="retro-summary-item-horizontal-group">
                 <div className="retro-summary-section-item horizontal-group-item">
-                  {Object.keys(state.currentBoard?.boardVoteCollection || {}).length} participant(s) casted {state.castedVoteCount} vote(s)
+                  {t("feedback_board_votes_summary", {
+                    participants: Object.keys(state.currentBoard?.boardVoteCollection || {}).length,
+                    votes: state.castedVoteCount,
+                  })}
                 </div>
-                <div className="retro-summary-section-item horizontal-group-item">{state.feedbackItems.length} feedback item(s) created</div>
-                <div className="retro-summary-section-item horizontal-group-item">{state.actionItemIds.length} action item(s) created</div>
+                <div className="retro-summary-section-item horizontal-group-item">{t("feedback_board_feedback_items_created", { count: state.feedbackItems.length })}</div>
+                <div className="retro-summary-section-item horizontal-group-item">{t("feedback_board_action_items_created", { count: state.actionItemIds.length })}</div>
               </div>
             </section>
             {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
@@ -2451,22 +2456,25 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           </div>
         </dialog>
       )}
-      <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog" aria-label="Team Assessment History" role="dialog">
+      <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog" aria-label={t("feedback_board_team_assessment_history")} role="dialog">
         <div className="header">
-          <h2>Team Assessment History</h2>
-          <button type="button" onClick={hideTeamAssessmentHistoryDialog} aria-label="Close">
+          <h2>{t("feedback_board_team_assessment_history")}</h2>
+          <button type="button" onClick={hideTeamAssessmentHistoryDialog} aria-label={t("common_close")}>
             {getIconElement("close")}
           </button>
         </div>
         {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
           <div className="team-assessment-no-data">
-            <p>No team assessment history available.</p>
-            <p>Create retrospectives with team assessments to see historical trends.</p>
+            <p>{t("feedback_board_team_assessment_no_history")}</p>
+            <p>{t("feedback_board_team_assessment_trends")}</p>
           </div>
         ) : (
           <div className="subText">
             <p className="team-assessment-info-text">
-              Showing average scores over time across {state.teamAssessmentHistoryData.slice(-13).length} retrospective{state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
+              {t("feedback_board_team_assessment_showing_average_scores", {
+                count: state.teamAssessmentHistoryData.slice(-13).length,
+                suffix: state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : "",
+              })}
             </p>
             <TeamAssessmentHistoryChart historyData={state.teamAssessmentHistoryData.slice(-13)} numberFormatter={numberFormatter} />
           </div>
