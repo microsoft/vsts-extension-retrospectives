@@ -13,6 +13,7 @@ import FeedbackCarousel, { type FocusModeModel } from "./feedbackCarousel";
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
+import { TeamSettingsIteration } from "azure-devops-extension-api/Work";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
 import { userDataService } from "../dal/userDataService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
@@ -32,6 +33,7 @@ import { copyToClipboard } from "../utilities/clipboardHelper";
 import { closeTopMostDialog } from "../utilities/dialogHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { formatDate, formatNumber, t } from "../utilities/localization";
+import { createOrGetSprintRetrospectiveBoard, getCurrentIteration, sortIterationsForRetrospectives } from "../utilities/sprintRetrospectiveHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
@@ -40,6 +42,7 @@ import { playStartChime, playStopChime } from "../utilities/audioHelper";
 import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../utilities/pdfHelper";
 import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
+import { workService } from "../dal/azureDevOpsWorkService";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -64,7 +67,7 @@ export type FeedbackBoardContainerHandle = {
   persistColumnNotes: (columnId: string, notes: string) => Promise<void>;
   setSupportedWorkItemTypesForProject: () => Promise<void>;
   loadRecentlyVisitedOrDefaultTeamAndBoardState: (defaultTeam: WebApiTeam, userTeams: WebApiTeam[]) => Promise<{ currentTeam: WebApiTeam; currentBoard: IFeedbackBoardDocument; boards: IFeedbackBoardDocument[] }>;
-  reloadBoardsForCurrentTeam: () => Promise<void>;
+  reloadBoardsForCurrentTeam: (preferredBoardId?: string) => Promise<void>;
 
   startBoardTimer: () => void;
   pauseBoardTimer: () => void;
@@ -258,10 +261,16 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const prevActiveTabRef = React.useRef<FeedbackBoardContainerState["activeTab"]>(initialState.activeTab);
 
   const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
+  const sprintActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
 
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const sprintRetrospectiveDialogRef = React.useRef<HTMLDialogElement | null>(null);
+
+  const [sprintIterations, setSprintIterations] = React.useState<TeamSettingsIteration[]>([]);
+  const [selectedSprintIterationId, setSelectedSprintIterationId] = React.useState("");
+  const [isSprintActionRunning, setIsSprintActionRunning] = React.useState(false);
 
   React.useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -316,20 +325,18 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   }, [setState]);
 
   const handleBoardActionsDocumentPointerDown = React.useCallback((event: PointerEvent) => {
-    const root = boardActionsMenuRootRef.current;
-    if (!root) {
-      return;
-    }
-
     const target = event.target as Node | null;
     if (!target) {
       return;
     }
 
-    const openDetails = Array.from(root.querySelectorAll("details[open]"));
-    for (const detailsElement of openDetails) {
-      if (!detailsElement.contains(target)) {
-        detailsElement.removeAttribute("open");
+    const menuRoots = [boardActionsMenuRootRef.current, sprintActionsMenuRootRef.current].filter((root): root is HTMLDivElement => Boolean(root));
+    for (const root of menuRoots) {
+      const openDetails = Array.from(root.querySelectorAll("details[open]"));
+      for (const detailsElement of openDetails) {
+        if (!detailsElement.contains(target)) {
+          detailsElement.removeAttribute("open");
+        }
       }
     }
   }, []);
@@ -1237,7 +1244,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
    * @description Loads all feedback boards for the current team. Defaults the selected board to
    * the most recently created board.
    */
-  const reloadBoardsForCurrentTeam = async () => {
+  const reloadBoardsForCurrentTeam = async (preferredBoardId?: string) => {
     setState({ isTeamDataLoaded: false });
 
     try {
@@ -1263,10 +1270,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         )
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
+      const preferredBoard = preferredBoardId ? boardsForTeam.find(board => board.id === preferredBoardId) : undefined;
+
       setState({
         isTeamDataLoaded: true,
         boards: boardsForTeam,
-        currentBoard: boardsForTeam[0],
+        currentBoard: preferredBoard ?? boardsForTeam[0],
       });
     } catch (error) {
       appInsights.trackException(error, {
@@ -1284,22 +1293,24 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const setCurrentBoard = (selectedBoard: IFeedbackBoardDocument) => {
     const matchedBoard = stateRef.current.boards.find(board => board.id === selectedBoard.id);
 
+    if (!matchedBoard) {
+      return;
+    }
+
     if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
       matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
     }
 
-    if (matchedBoard) {
-      setState(prevState => {
-        // Ensure that we are actually changing boards to prevent needless rerenders.
-        if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {
-          return {
-            currentBoard: matchedBoard,
-          };
-        }
+    setState(prevState => {
+      // Ensure that we are actually changing boards to prevent needless rerenders.
+      if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {
+        return {
+          currentBoard: matchedBoard,
+        };
+      }
 
-        return null;
-      });
-    }
+      return null;
+    });
   };
 
   const changeSelectedTeam = async (team: WebApiTeam) => {
@@ -1362,6 +1373,93 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
   const hideBoardCreationDialog = (): void => {
     boardCreationDialogRef?.current?.close();
+  };
+
+  const hideSprintRetrospectiveDialog = (): void => {
+    sprintRetrospectiveDialogRef.current?.close();
+  };
+
+  const createOrOpenSprintRetrospective = async (iteration: TeamSettingsIteration): Promise<void> => {
+    const currentTeam = stateRef.current.currentTeam;
+    if (!currentTeam) {
+      return;
+    }
+
+    setIsSprintActionRunning(true);
+
+    try {
+      const result = await createOrGetSprintRetrospectiveBoard({
+        teamId: currentTeam.id,
+        iteration,
+        existingBoards: stateRef.current.boards,
+      });
+
+      if (result.wasCreated) {
+        await reloadBoardsForCurrentTeam(result.board.id);
+        reflectBackendService.broadcastNewBoard(currentTeam.id, result.board.id);
+      } else {
+        await changeSelectedBoard(result.board);
+      }
+
+      toast(t(result.wasCreated ? "sprint_retro_created" : "sprint_retro_exists", { title: result.board.title, iteration: iteration.name }), {
+        intent: result.wasCreated ? "success" : "info",
+      });
+      hideSprintRetrospectiveDialog();
+    } catch (error) {
+      appInsights.trackException(error, { action: "createSprintRetrospective", teamId: currentTeam.id, iterationId: iteration.id });
+      toast(t("sprint_retro_error", { iteration: iteration.name }), { intent: "error" });
+    } finally {
+      setIsSprintActionRunning(false);
+    }
+  };
+
+  const showSprintRetrospectiveDialog = async (): Promise<void> => {
+    const currentTeam = stateRef.current.currentTeam;
+    if (!currentTeam) {
+      return;
+    }
+
+    try {
+      const iterations = sortIterationsForRetrospectives(await workService.getIterations(currentTeam.id));
+      if (!iterations.length) {
+        toast(t("sprint_retro_no_iterations"), { intent: "error" });
+        return;
+      }
+
+      const currentIteration = getCurrentIteration(iterations) ?? iterations[0];
+      setSprintIterations(iterations);
+      setSelectedSprintIterationId(currentIteration.id);
+      sprintRetrospectiveDialogRef.current?.showModal();
+    } catch (error) {
+      appInsights.trackException(error, { action: "showSprintRetrospectiveDialog", teamId: currentTeam.id });
+      toast(t("sprint_retro_no_iterations"), { intent: "error" });
+    }
+  };
+
+  const createCurrentSprintRetrospective = async (): Promise<void> => {
+    const currentTeam = stateRef.current.currentTeam;
+    if (!currentTeam) {
+      return;
+    }
+
+    const currentIterations = await workService.getIterations(currentTeam.id, "current");
+    const currentIteration = getCurrentIteration(currentIterations) ?? currentIterations[0];
+
+    if (!currentIteration) {
+      toast(t("sprint_retro_current_not_found"), { intent: "error" });
+      return;
+    }
+
+    await createOrOpenSprintRetrospective(currentIteration);
+  };
+
+  const createSelectedSprintRetrospective = async (): Promise<void> => {
+    const selectedIteration = sprintIterations.find(iteration => iteration.id === selectedSprintIterationId);
+    if (!selectedIteration) {
+      return;
+    }
+
+    await createOrOpenSprintRetrospective(selectedIteration);
   };
 
   const showRetroSummaryDialog = async () => {
@@ -1968,6 +2066,24 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">
           {renderWorkflowTimerControls()}
+          <div className="sprint-actions-menu" ref={sprintActionsMenuRootRef}>
+            <details className="flex items-center relative">
+              <summary aria-label={t("sprint_retro_menu_label")} title={t("sprint_retro_menu_label")} className="sprint-actions-button">
+                {getIconElement("add")}
+                <span>{t("sprint_retro_menu_label")}</span>
+              </summary>
+              <div className="callout-menu right" role="menu" aria-label={t("sprint_retro_menu_label")}>
+                <button type="button" title={t("sprint_retro_create_current")} onClick={event => handleBoardActionMenuItemClick(createCurrentSprintRetrospective, event)}>
+                  {getIconElement("add")}
+                  {t("sprint_retro_create_current")}
+                </button>
+                <button type="button" title={t("sprint_retro_create_selected")} onClick={event => handleBoardActionMenuItemClick(showSprintRetrospectiveDialog, event)}>
+                  {getIconElement("more-horizontal")}
+                  {t("sprint_retro_create_selected")}
+                </button>
+              </div>
+            </details>
+          </div>
           <ExtensionSettingsMenu />
         </div>
       </div>
@@ -2319,6 +2435,35 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       )}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, t("feedback_board_create_copy"), "", createBoard, hideBoardDuplicateDialog)}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, t("feedback_board_edit"), "", updateBoardMetadata, hideBoardUpdateDialog)}
+      <dialog ref={sprintRetrospectiveDialogRef} className="sprint-retrospective-dialog" aria-label={t("sprint_retro_dialog_title")} role="dialog">
+        <div className="header">
+          <h2 className="title">{t("sprint_retro_dialog_title")}</h2>
+          <button type="button" onClick={hideSprintRetrospectiveDialog} aria-label={t("common_close")}>
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">
+          <div>{t("sprint_retro_dialog_description")}</div>
+          <div className="form-group mt-4">
+            <label htmlFor="sprint-retrospective-selector">{t("sprint_retro_dialog_selector_label")}</label>
+            <select id="sprint-retrospective-selector" className="selector-option" value={selectedSprintIterationId} onChange={event => setSelectedSprintIterationId(event.target.value)}>
+              {sprintIterations.map(iteration => (
+                <option key={iteration.id} value={iteration.id}>
+                  {iteration.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="inner">
+          <button type="button" onClick={createSelectedSprintRetrospective} disabled={!selectedSprintIterationId || isSprintActionRunning}>
+            {isSprintActionRunning ? t("common_loading") : t("sprint_retro_create_button")}
+          </button>
+          <button type="button" className="default button" onClick={hideSprintRetrospectiveDialog}>
+            {t("common_cancel")}
+          </button>
+        </div>
+      </dialog>
       {state.currentBoard && (
         <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label={t("feedback_board_email_summary")} role="dialog">
           <div className="header">

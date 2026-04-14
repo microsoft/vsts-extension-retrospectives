@@ -193,6 +193,50 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
+.sprint-actions-menu {
+  @apply relative flex flex-nowrap;
+
+  & .sprint-actions-button {
+    @apply flex items-center gap-1 cursor-pointer text-sm text-left bg-inherit border-0 min-w-0 mx-2 p-0 text-(--text-primary-color) list-none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    & svg {
+      @apply w-4 h-4;
+    }
+
+    &:hover {
+      @apply text-primary;
+    }
+
+    &:focus-visible {
+      @apply outline-2 outline-primary outline-offset-2 rounded;
+    }
+  }
+
+  & .callout-menu {
+    @apply absolute mt-3 bg-[rgb(var(--palette-neutral-2))] text-sm shadow-lg drop-shadow-lg min-w-56 z-10;
+
+    &.right {
+      @apply right-0;
+    }
+
+    & button {
+      @apply flex items-center gap-2 w-full px-4 py-2 bg-inherit border-0 text-(--text-primary-color) cursor-pointer;
+
+      &:hover {
+        @apply text-primary;
+      }
+
+      & svg {
+        @apply w-4 h-4;
+      }
+    }
+  }
+}
+
 .carousel-container {
   @apply relative w-full flex flex-col items-center gap-4;
 }
@@ -316,7 +360,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .link-existing-work-item-dialog,
 .unlink-work-item-confirmation-dialog,
 .preview-email-dialog,
-.carousel-dialog {
+.carousel-dialog,
+.sprint-retrospective-dialog {
   @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
 
   & table {

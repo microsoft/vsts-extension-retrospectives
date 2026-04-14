@@ -52,6 +52,17 @@
           "dark": "asset://images/logos/logo_navbar_dark_theme.png"
         }
       }
+    },
+    {
+      "id": "iteration-backlog-pane",
+      "type": "ms.vss-work-web.backlog-panel",
+      "targets": ["ms.vss-work-web.iteration-backlog-toolpane"],
+      "properties": {
+        "name": "Sprint retrospective",
+        "title": "Sprint retrospective",
+        "uri": "src/iteration-backlog-pane.html",
+        "registeredObjectId": "sprintRetrospectivePanelObject"
+      }
     }
   ],
   "files": [

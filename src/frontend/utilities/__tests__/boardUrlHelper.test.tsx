@@ -1,6 +1,7 @@
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { getBoardUrl } from "../boardUrlHelper";
 import { getHostBaseUrl, getProjectName } from "../servicesHelper";
+import { MockSDKControls } from "../../components/__mocks__/azure-devops-extension-sdk/sdk";
 
 jest.mock("../servicesHelper", () => ({
   getHostBaseUrl: jest.fn(),
@@ -13,6 +14,7 @@ const mockGetProjectName = getProjectName as jest.MockedFunction<typeof getProje
 describe("getBoardUrl", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    MockSDKControls.reset();
   });
 
   describe("successful URL generation", () => {
@@ -124,6 +126,21 @@ describe("getBoardUrl", () => {
       // Assert
       const expectedUrl = `${hostBase}${projectName}/_apps/hub/ms-devlabs.team-retrospectives.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`;
       expect(result).toBe(encodeURI(expectedUrl));
+    });
+
+    it("falls back to extension context id when publisher and extension ids are unavailable", async () => {
+      const teamId = "team123";
+      const boardId = "board456";
+      const hostBase = "https://dev.azure.com/myorg/";
+      const projectName = "MyProject";
+
+      MockSDKControls.setExtensionContext({ id: "custom.publisher-extension", publisherId: "" as never, extensionId: "" as never });
+      mockGetHostBaseUrl.mockResolvedValue(hostBase);
+      mockGetProjectName.mockResolvedValue(projectName);
+
+      const result = await getBoardUrl(teamId, boardId, WorkflowPhase.Collect);
+
+      expect(result).toBe(encodeURI(`${hostBase}${projectName}/_apps/hub/custom.publisher-extension.home#teamId=${teamId}&boardId=${boardId}&phase=Collect`));
     });
   });
 
