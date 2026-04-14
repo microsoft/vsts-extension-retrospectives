@@ -21,7 +21,7 @@ import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { formatBoardTimer } from "../../utilities/useBoardTimer";
 import { workService } from "../../dal/azureDevOpsWorkService";
-import { createOrGetSprintRetrospectiveBoard, getCurrentIteration, sortIterationsForRetrospectives } from "../../utilities/sprintRetrospectiveHelper";
+import { buildSprintRetrospectiveTitle, getCurrentIteration } from "../../utilities/sprintRetrospectiveHelper";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -111,9 +111,8 @@ jest.mock("../../dal/azureDevOpsWorkService", () => ({
   },
 }));
 jest.mock("../../utilities/sprintRetrospectiveHelper", () => ({
-  createOrGetSprintRetrospectiveBoard: jest.fn(),
+  buildSprintRetrospectiveTitle: jest.fn((iteration: { name: string }) => `${iteration.name} Retrospective`),
   getCurrentIteration: jest.fn(),
-  sortIterationsForRetrospectives: jest.fn(),
 }));
 jest.mock("../boardSummaryTable", () => () => <div data-testid="board-summary-table" />);
 jest.mock("../effectivenessMeasurementRow", () => ({ questionId }: { questionId: number }) => <div data-testid={`effectiveness-row-${questionId}`} />);
@@ -489,9 +488,8 @@ describe("FeedbackBoardContainer sprint actions", () => {
   const reflectMock = reflectBackendService as unknown as jest.Mocked<typeof reflectBackendService>;
   const getServiceMock = getService as jest.MockedFunction<typeof getService>;
   const workServiceMock = workService as jest.Mocked<typeof workService>;
-  const createOrGetSprintRetrospectiveBoardMock = createOrGetSprintRetrospectiveBoard as jest.MockedFunction<typeof createOrGetSprintRetrospectiveBoard>;
+  const buildSprintRetrospectiveTitleMock = buildSprintRetrospectiveTitle as jest.MockedFunction<typeof buildSprintRetrospectiveTitle>;
   const getCurrentIterationMock = getCurrentIteration as jest.MockedFunction<typeof getCurrentIteration>;
-  const sortIterationsForRetrospectivesMock = sortIterationsForRetrospectives as jest.MockedFunction<typeof sortIterationsForRetrospectives>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -503,10 +501,30 @@ describe("FeedbackBoardContainer sprint actions", () => {
       getHash: jest.fn().mockResolvedValue("#teamId=team-sprint&boardId=board-sprint&phase=Collect"),
       setHash: jest.fn(),
     } as any);
-    sortIterationsForRetrospectivesMock.mockImplementation(iterations => iterations);
+    buildSprintRetrospectiveTitleMock.mockImplementation(iteration => `${iteration.name} Retrospective`);
   });
 
-  it("creates or opens the current sprint retrospective from the header menu", async () => {
+  it("shows the current sprint action in Board Actions and hides the selected sprint action", async () => {
+    const { ref } = renderContainerWithHandle();
+    await act(async () => {
+      ref.current?.setState({
+        isAppInitialized: true,
+        isTeamDataLoaded: true,
+        currentTeam: team,
+        currentBoard: board,
+        boards: [board],
+        userTeams: [team],
+        projectTeams: [team],
+      });
+    });
+
+    fireEvent.click(screen.getByTitle("Board Actions"));
+
+    expect(screen.getByText("Create new for current sprint")).toBeInTheDocument();
+    expect(screen.queryByText("Create for selected sprint")).not.toBeInTheDocument();
+  });
+
+  it("opens the normal board creation dialog with the current sprint title from Board Actions", async () => {
     const iteration = {
       id: "iteration-current",
       name: "Sprint 12",
@@ -517,14 +535,8 @@ describe("FeedbackBoardContainer sprint actions", () => {
         timeFrame: 1,
       },
     } as any;
-    const sprintBoard = {
-      ...board,
-      id: "board-current",
-      title: "Sprint 12 Retrospective",
-    };
-
     workServiceMock.getIterations.mockResolvedValue([iteration]);
-    createOrGetSprintRetrospectiveBoardMock.mockResolvedValue({ board: sprintBoard, wasCreated: false });
+    getCurrentIterationMock.mockReturnValue(iteration);
 
     const { ref } = renderContainerWithHandle();
     await act(async () => {
@@ -539,83 +551,20 @@ describe("FeedbackBoardContainer sprint actions", () => {
       });
     });
 
-    fireEvent.click(screen.getByTitle("Sprint retrospective"));
+    const showModal = jest.fn();
+    if (ref.current) {
+      ref.current.boardCreationDialogRef.current = { showModal, close: jest.fn() } as any;
+    }
+
+    fireEvent.click(screen.getByTitle("Board Actions"));
     await act(async () => {
-      fireEvent.click(screen.getByText("Create for current sprint"));
+      fireEvent.click(screen.getByText("Create new for current sprint"));
     });
 
     expect(workServiceMock.getIterations).toHaveBeenCalledWith("team-sprint", "current");
-    expect(createOrGetSprintRetrospectiveBoardMock).toHaveBeenCalledWith({
-      teamId: "team-sprint",
-      iteration,
-      existingBoards: [board],
-    });
-    expect(await screen.findByText("Sprint Sprint 12 already has retrospective Sprint 12 Retrospective.")).toBeInTheDocument();
-  });
-
-  it("opens the selected sprint dialog and creates a sprint retrospective for the chosen iteration", async () => {
-    const currentIteration = {
-      id: "iteration-current",
-      name: "Sprint 12",
-      path: "Project\\Sprint 12",
-      attributes: {
-        startDate: new Date("2024-02-05T00:00:00.000Z"),
-        finishDate: new Date("2024-02-18T00:00:00.000Z"),
-        timeFrame: 1,
-      },
-    } as any;
-    const futureIteration = {
-      id: "iteration-future",
-      name: "Sprint 13",
-      path: "Project\\Sprint 13",
-      attributes: {
-        startDate: new Date("2024-02-19T00:00:00.000Z"),
-        finishDate: new Date("2024-03-03T00:00:00.000Z"),
-        timeFrame: 2,
-      },
-    } as any;
-    const createdBoard = {
-      ...board,
-      id: "board-future",
-      title: "Sprint 13 Retrospective",
-    };
-
-    workServiceMock.getIterations.mockResolvedValue([currentIteration, futureIteration]);
-    getCurrentIterationMock.mockReturnValue(currentIteration);
-    createOrGetSprintRetrospectiveBoardMock.mockResolvedValue({ board: createdBoard, wasCreated: true });
-    boardDataServiceMock.getBoardsForTeam?.mockResolvedValue([createdBoard, board]);
-
-    const { ref } = renderContainerWithHandle();
-    await act(async () => {
-      ref.current?.setState({
-        isAppInitialized: true,
-        isTeamDataLoaded: true,
-        currentTeam: team,
-        currentBoard: board,
-        boards: [board],
-        userTeams: [team],
-        projectTeams: [team],
-      });
-    });
-
-    fireEvent.click(screen.getByTitle("Sprint retrospective"));
-    await act(async () => {
-      fireEvent.click(screen.getByText("Create for selected sprint"));
-    });
-
-    expect(await screen.findByText("Create sprint retrospective")).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Sprint"), { target: { value: "iteration-future" } });
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Create retrospective board" }));
-    });
-
-    expect(createOrGetSprintRetrospectiveBoardMock).toHaveBeenCalledWith({
-      teamId: "team-sprint",
-      iteration: futureIteration,
-      existingBoards: [board],
-    });
-    expect(reflectMock.broadcastNewBoard).toHaveBeenCalledWith("team-sprint", "board-future");
-    expect(await screen.findByText("Opened retrospective Sprint 13 Retrospective for sprint Sprint 13.")).toBeInTheDocument();
+    expect(buildSprintRetrospectiveTitleMock).toHaveBeenCalledWith(iteration);
+    expect(showModal).toHaveBeenCalled();
+    expect(boardDataServiceMock.createBoardForTeam).not.toHaveBeenCalled();
   });
 });
 

@@ -13,7 +13,6 @@ import FeedbackCarousel, { type FocusModeModel } from "./feedbackCarousel";
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
-import { TeamSettingsIteration } from "azure-devops-extension-api/Work";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
 import { userDataService } from "../dal/userDataService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
@@ -33,7 +32,7 @@ import { copyToClipboard } from "../utilities/clipboardHelper";
 import { closeTopMostDialog } from "../utilities/dialogHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { formatDate, formatNumber, t } from "../utilities/localization";
-import { createOrGetSprintRetrospectiveBoard, getCurrentIteration, sortIterationsForRetrospectives } from "../utilities/sprintRetrospectiveHelper";
+import { buildSprintRetrospectiveTitle, getCurrentIteration } from "../utilities/sprintRetrospectiveHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
@@ -86,7 +85,7 @@ export type FeedbackBoardContainerHandle = {
   archiveCurrentBoard: () => Promise<void>;
   generateEmailSummaryContent: () => Promise<void>;
 
-  showBoardCreationDialog: () => void;
+  showBoardCreationDialog: (initialTitleOverride?: string) => void;
   hideBoardCreationDialog: () => void;
   showBoardDuplicateDialog: () => void;
   hideBoardDuplicateDialog: () => void;
@@ -261,16 +260,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const prevActiveTabRef = React.useRef<FeedbackBoardContainerState["activeTab"]>(initialState.activeTab);
 
   const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
-  const sprintActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
 
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const sprintRetrospectiveDialogRef = React.useRef<HTMLDialogElement | null>(null);
-
-  const [sprintIterations, setSprintIterations] = React.useState<TeamSettingsIteration[]>([]);
-  const [selectedSprintIterationId, setSelectedSprintIterationId] = React.useState("");
-  const [isSprintActionRunning, setIsSprintActionRunning] = React.useState(false);
+  const [boardCreationInitialTitleOverride, setBoardCreationInitialTitleOverride] = React.useState<string | undefined>(undefined);
+  const [boardCreationDialogInstanceKey, setBoardCreationDialogInstanceKey] = React.useState(0);
 
   React.useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -330,7 +325,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       return;
     }
 
-    const menuRoots = [boardActionsMenuRootRef.current, sprintActionsMenuRootRef.current].filter((root): root is HTMLDivElement => Boolean(root));
+    const menuRoots = [boardActionsMenuRootRef.current].filter((root): root is HTMLDivElement => Boolean(root));
     for (const root of menuRoots) {
       const openDetails = Array.from(root.querySelectorAll("details[open]"));
       for (const detailsElement of openDetails) {
@@ -1367,73 +1362,15 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return createdBoard;
   };
 
-  const showBoardCreationDialog = (): void => {
+  const showBoardCreationDialog = (initialTitleOverride?: string): void => {
+    setBoardCreationInitialTitleOverride(initialTitleOverride);
+    setBoardCreationDialogInstanceKey(previousKey => previousKey + 1);
     boardCreationDialogRef?.current?.showModal();
   };
 
   const hideBoardCreationDialog = (): void => {
+    setBoardCreationInitialTitleOverride(undefined);
     boardCreationDialogRef?.current?.close();
-  };
-
-  const hideSprintRetrospectiveDialog = (): void => {
-    sprintRetrospectiveDialogRef.current?.close();
-  };
-
-  const createOrOpenSprintRetrospective = async (iteration: TeamSettingsIteration): Promise<void> => {
-    const currentTeam = stateRef.current.currentTeam;
-    if (!currentTeam) {
-      return;
-    }
-
-    setIsSprintActionRunning(true);
-
-    try {
-      const result = await createOrGetSprintRetrospectiveBoard({
-        teamId: currentTeam.id,
-        iteration,
-        existingBoards: stateRef.current.boards,
-      });
-
-      if (result.wasCreated) {
-        await reloadBoardsForCurrentTeam(result.board.id);
-        reflectBackendService.broadcastNewBoard(currentTeam.id, result.board.id);
-      } else {
-        await changeSelectedBoard(result.board);
-      }
-
-      toast(t(result.wasCreated ? "sprint_retro_created" : "sprint_retro_exists", { title: result.board.title, iteration: iteration.name }), {
-        intent: result.wasCreated ? "success" : "info",
-      });
-      hideSprintRetrospectiveDialog();
-    } catch (error) {
-      appInsights.trackException(error, { action: "createSprintRetrospective", teamId: currentTeam.id, iterationId: iteration.id });
-      toast(t("sprint_retro_error", { iteration: iteration.name }), { intent: "error" });
-    } finally {
-      setIsSprintActionRunning(false);
-    }
-  };
-
-  const showSprintRetrospectiveDialog = async (): Promise<void> => {
-    const currentTeam = stateRef.current.currentTeam;
-    if (!currentTeam) {
-      return;
-    }
-
-    try {
-      const iterations = sortIterationsForRetrospectives(await workService.getIterations(currentTeam.id));
-      if (!iterations.length) {
-        toast(t("sprint_retro_no_iterations"), { intent: "error" });
-        return;
-      }
-
-      const currentIteration = getCurrentIteration(iterations) ?? iterations[0];
-      setSprintIterations(iterations);
-      setSelectedSprintIterationId(currentIteration.id);
-      sprintRetrospectiveDialogRef.current?.showModal();
-    } catch (error) {
-      appInsights.trackException(error, { action: "showSprintRetrospectiveDialog", teamId: currentTeam.id });
-      toast(t("sprint_retro_no_iterations"), { intent: "error" });
-    }
   };
 
   const createCurrentSprintRetrospective = async (): Promise<void> => {
@@ -1442,24 +1379,20 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       return;
     }
 
-    const currentIterations = await workService.getIterations(currentTeam.id, "current");
-    const currentIteration = getCurrentIteration(currentIterations) ?? currentIterations[0];
+    try {
+      const currentIterations = await workService.getIterations(currentTeam.id, "current");
+      const currentIteration = getCurrentIteration(currentIterations) ?? currentIterations[0];
 
-    if (!currentIteration) {
+      if (!currentIteration) {
+        toast(t("sprint_retro_current_not_found"), { intent: "error" });
+        return;
+      }
+
+      showBoardCreationDialog(buildSprintRetrospectiveTitle(currentIteration));
+    } catch (error) {
+      appInsights.trackException(error, { action: "prefillSprintRetrospectiveTitle", teamId: currentTeam.id });
       toast(t("sprint_retro_current_not_found"), { intent: "error" });
-      return;
     }
-
-    await createOrOpenSprintRetrospective(currentIteration);
-  };
-
-  const createSelectedSprintRetrospective = async (): Promise<void> => {
-    const selectedIteration = sprintIterations.find(iteration => iteration.id === selectedSprintIterationId);
-    if (!selectedIteration) {
-      return;
-    }
-
-    await createOrOpenSprintRetrospective(selectedIteration);
   };
 
   const showRetroSummaryDialog = async () => {
@@ -1667,7 +1600,18 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     downloadPdfBlob(pdfBlob, fileName);
   };
 
-  const renderBoardUpdateMetadataFormDialog = (dialogRef: React.RefObject<HTMLDialogElement>, isNewBoardCreation: boolean, isDuplicatingBoard: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void, onCancel: () => void) => {
+  const renderBoardUpdateMetadataFormDialog = (
+    dialogRef: React.RefObject<HTMLDialogElement>,
+    isNewBoardCreation: boolean,
+    isDuplicatingBoard: boolean,
+    onDismiss: () => void,
+    dialogTitle: string,
+    placeholderText: string,
+    onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void,
+    onCancel: () => void,
+    initialTitleOverride?: string,
+    formKey?: string,
+  ) => {
     const permissionOptions: FeedbackBoardPermissionOption[] = [];
 
     const state = stateRef.current;
@@ -1700,7 +1644,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             {getIconElement("close")}
           </button>
         </div>
-        <FeedbackBoardMetadataForm isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
+        <FeedbackBoardMetadataForm key={formKey} isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} initialTitleOverride={initialTitleOverride} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
       </dialog>
     );
   };
@@ -2066,24 +2010,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">
           {renderWorkflowTimerControls()}
-          <div className="sprint-actions-menu" ref={sprintActionsMenuRootRef}>
-            <details className="flex items-center relative">
-              <summary aria-label={t("sprint_retro_menu_label")} title={t("sprint_retro_menu_label")} className="sprint-actions-button">
-                {getIconElement("add")}
-                <span>{t("sprint_retro_menu_label")}</span>
-              </summary>
-              <div className="callout-menu right" role="menu" aria-label={t("sprint_retro_menu_label")}>
-                <button type="button" title={t("sprint_retro_create_current")} onClick={event => handleBoardActionMenuItemClick(createCurrentSprintRetrospective, event)}>
-                  {getIconElement("add")}
-                  {t("sprint_retro_create_current")}
-                </button>
-                <button type="button" title={t("sprint_retro_create_selected")} onClick={event => handleBoardActionMenuItemClick(showSprintRetrospectiveDialog, event)}>
-                  {getIconElement("more-horizontal")}
-                  {t("sprint_retro_create_selected")}
-                </button>
-              </div>
-            </details>
-          </div>
           <ExtensionSettingsMenu />
         </div>
       </div>
@@ -2123,6 +2049,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                           <button key="createBoard" type="button" title="Create new retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
                             {getIconElement("add")}
                             Create new retrospective
+                          </button>
+                          <button key="createBoardForCurrentSprint" type="button" title={t("sprint_retro_create_current")} onClick={event => handleBoardActionMenuItemClick(createCurrentSprintRetrospective, event)}>
+                            {getIconElement("add")}
+                            {t("sprint_retro_create_current")}
                           </button>
                           <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
                             {getIconElement("content-copy")}
@@ -2321,7 +2251,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             <div className="no-boards-container">
               <div className="no-boards-text">Get started with your first Retrospective</div>
               <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
-              <button title="Create Board" onClick={showBoardCreationDialog} className="create-new-board-button">
+              <button title="Create Board" onClick={() => showBoardCreationDialog()} className="create-new-board-button">
                 Create Board
               </button>
             </div>
@@ -2432,38 +2362,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         t("feedback_board_create_example", { date: formatDate(new Date(), { year: "numeric", month: "short", day: "numeric" }) }),
         createBoard,
         hideBoardCreationDialog,
+        boardCreationInitialTitleOverride,
+        `create-board-${boardCreationDialogInstanceKey}`,
       )}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, t("feedback_board_create_copy"), "", createBoard, hideBoardDuplicateDialog)}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, t("feedback_board_edit"), "", updateBoardMetadata, hideBoardUpdateDialog)}
-      <dialog ref={sprintRetrospectiveDialogRef} className="sprint-retrospective-dialog" aria-label={t("sprint_retro_dialog_title")} role="dialog">
-        <div className="header">
-          <h2 className="title">{t("sprint_retro_dialog_title")}</h2>
-          <button type="button" onClick={hideSprintRetrospectiveDialog} aria-label={t("common_close")}>
-            {getIconElement("close")}
-          </button>
-        </div>
-        <div className="subText">
-          <div>{t("sprint_retro_dialog_description")}</div>
-          <div className="form-group mt-4">
-            <label htmlFor="sprint-retrospective-selector">{t("sprint_retro_dialog_selector_label")}</label>
-            <select id="sprint-retrospective-selector" className="selector-option" value={selectedSprintIterationId} onChange={event => setSelectedSprintIterationId(event.target.value)}>
-              {sprintIterations.map(iteration => (
-                <option key={iteration.id} value={iteration.id}>
-                  {iteration.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="inner">
-          <button type="button" onClick={createSelectedSprintRetrospective} disabled={!selectedSprintIterationId || isSprintActionRunning}>
-            {isSprintActionRunning ? t("common_loading") : t("sprint_retro_create_button")}
-          </button>
-          <button type="button" className="default button" onClick={hideSprintRetrospectiveDialog}>
-            {t("common_cancel")}
-          </button>
-        </div>
-      </dialog>
       {state.currentBoard && (
         <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label={t("feedback_board_email_summary")} role="dialog">
           <div className="header">
