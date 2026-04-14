@@ -12,12 +12,10 @@ describe("frontend index entrypoint", () => {
     document.body.innerHTML = '<div id="root"></div>';
   });
 
-  const setupCommonMocks = (options?: { contributionId?: string; initError?: Error; hostedAzureDevOps?: boolean; projectId?: string }) => {
+  const setupCommonMocks = (options?: { initError?: Error; hostedAzureDevOps?: boolean; projectId?: string }) => {
     const renderMock = jest.fn();
     const createRootMock = jest.fn(() => ({ render: renderMock }));
     const feedbackBoardContainerMock = jest.fn((): null => null);
-    const sprintRetrospectivePanelMock = jest.fn((): null => null);
-    const contributionId = options?.contributionId ?? "ms-devlabs.team-retrospectives.home";
     const hostedAzureDevOps = options?.hostedAzureDevOps ?? true;
     const projectId = options?.projectId ?? "project-1";
 
@@ -31,10 +29,6 @@ describe("frontend index entrypoint", () => {
       __esModule: true,
       default: feedbackBoardContainerMock,
     }));
-    jest.doMock("../components/sprintRetrospectivePanel", () => ({
-      __esModule: true,
-      default: sprintRetrospectivePanelMock,
-    }));
     jest.doMock("../utilities/azureDevOpsContextHelper", () => ({
       isHostedAzureDevOps: jest.fn(() => Promise.resolve(hostedAzureDevOps)),
     }));
@@ -46,33 +40,17 @@ describe("frontend index entrypoint", () => {
     }));
     jest.doMock("azure-devops-extension-sdk", () => ({
       init: jest.fn(() => (options?.initError ? Promise.reject(options.initError) : Promise.resolve())),
-      getContributionId: jest.fn(() => contributionId),
     }));
 
     return {
       createRootMock,
       renderMock,
       feedbackBoardContainerMock,
-      sprintRetrospectivePanelMock,
     };
   };
 
-  it("renders the sprint retrospective panel for the backlog pane contribution", async () => {
-    const mocks = setupCommonMocks({ contributionId: "ms-devlabs.team-retrospectives.iteration-backlog-pane" });
-
-    jest.isolateModules(() => {
-      require("../index");
-    });
-    await flushPromises();
-
-    expect(mocks.createRootMock).toHaveBeenCalledWith(document.getElementById("root"));
-    const renderedTree = mocks.renderMock.mock.calls[0][0];
-    expect(renderedTree.props.children.type).toBe(mocks.sprintRetrospectivePanelMock);
-    expect(renderedTree.props.onError().props.children).toBe("We detected an error in the application");
-  });
-
   it("renders the main feedback board container for the hub contribution", async () => {
-    const mocks = setupCommonMocks({ contributionId: "ms-devlabs.team-retrospectives.home", hostedAzureDevOps: false, projectId: "project-42" });
+    const mocks = setupCommonMocks({ hostedAzureDevOps: false, projectId: "project-42" });
 
     jest.isolateModules(() => {
       require("../index");

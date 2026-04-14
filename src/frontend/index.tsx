@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { getContributionId, init as sdkInit } from "azure-devops-extension-sdk";
+import { init as sdkInit } from "azure-devops-extension-sdk";
 import { AppInsightsErrorBoundary } from "@microsoft/applicationinsights-react-js";
 
 import { isHostedAzureDevOps } from "./utilities/azureDevOpsContextHelper";
@@ -8,11 +8,8 @@ import { getProjectId } from "./utilities/servicesHelper";
 import { initializeLocale, t } from "./utilities/localization";
 import { reactPlugin } from "./utilities/telemetryClient";
 import FeedbackBoardContainer, { FeedbackBoardContainerProps } from "./components/feedbackBoardContainer";
-import SprintRetrospectivePanel from "./components/sprintRetrospectivePanel";
 
 initializeLocale();
-
-const SPRINT_RETROSPECTIVE_PANE_CONTRIBUTION_ID = "iteration-backlog-pane";
 
 sdkInit({ applyTheme: true })
   .then(async () => {
@@ -29,12 +26,6 @@ sdkInit({ applyTheme: true })
         </AppInsightsErrorBoundary>,
       );
     };
-
-    const contributionId = getContributionId();
-    if (contributionId.endsWith(SPRINT_RETROSPECTIVE_PANE_CONTRIBUTION_ID)) {
-      renderApp(<SprintRetrospectivePanel />);
-      return;
-    }
 
     const [hostedAzureDevOps, projectId] = await Promise.all([isHostedAzureDevOps(), getProjectId()]);
 
