@@ -35,8 +35,20 @@ describe("localization", () => {
     expect(t("common_cancel")).toBe("Cancelar");
   });
 
-  it("falls back to English strings for unsupported locales", () => {
+  it("switches to German when a supported locale is provided", () => {
+    initializeLocale("de-DE");
+
+    expect(t("common_cancel")).toBe("Abbrechen");
+  });
+
+  it("switches to French when a supported locale is provided", () => {
     initializeLocale("fr-FR");
+
+    expect(t("common_cancel")).toBe("Annuler");
+  });
+
+  it("falls back to English strings for unsupported locales", () => {
+    initializeLocale("it-IT");
 
     expect(t("common_cancel")).toBe("Cancel");
   });
