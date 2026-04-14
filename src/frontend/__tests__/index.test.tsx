@@ -63,6 +63,10 @@ describe("frontend index entrypoint", () => {
       isHostedAzureDevOps: false,
       projectId: "project-42",
     });
+
+    const errorFallback = renderedTree.props.onError();
+    expect(errorFallback.type).toBe("h1");
+    expect(errorFallback.props.children).toBe("We detected an error in the application");
   });
 
   it("renders the initialization fallback when SDK initialization fails", async () => {
