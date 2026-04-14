@@ -1,5 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 import SprintRetrospectivePanel from "../sprintRetrospectivePanel";
 import BoardDataService from "../../dal/boardDataService";
@@ -15,6 +16,11 @@ import {
 } from "../../utilities/sprintRetrospectiveHelper";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { MockSDK, MockSDKControls } from "../__mocks__/azure-devops-extension-sdk/sdk";
+
+const flushPromises = async (): Promise<void> => {
+  await Promise.resolve();
+  await Promise.resolve();
+};
 
 jest.mock("../../dal/boardDataService");
 jest.mock("../../dal/azureDevOpsWorkService", () => ({
@@ -89,13 +95,15 @@ describe("SprintRetrospectivePanel", () => {
 
     const { unmount } = render(<SprintRetrospectivePanel />);
 
-    expect(await screen.findByText("Sprint retrospective")).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "Open retrospective board" })).toHaveAttribute("href", "https://example.com/board");
     expect(screen.getByText("Existing retrospective: Sprint 12 Retrospective")).toBeInTheDocument();
     expect(screen.getByText("Team Alpha")).toBeInTheDocument();
     expect(screen.getByText("Sprint 12")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Open retrospective board" })).toHaveAttribute("href", "https://example.com/board");
     expect(screen.queryByRole("button", { name: "Create retrospective board" })).not.toBeInTheDocument();
     expect(registerSpy).toHaveBeenCalledWith("sprintRetrospectivePanelObject", expect.any(Object));
+    const registeredHandler = (registerSpy.mock.calls as unknown[][])[0]?.[1] as { workItemSelectionChanged: () => void } | undefined;
+    expect(registeredHandler).toBeDefined();
+    expect(() => registeredHandler?.workItemSelectionChanged()).not.toThrow();
     expect(resizeSpy).toHaveBeenCalled();
 
     unmount();
@@ -125,8 +133,29 @@ describe("SprintRetrospectivePanel", () => {
     expect(getBoardUrlMock).toHaveBeenLastCalledWith("team-1", "board-1", WorkflowPhase.Collect);
   });
 
+  it("shows the reuse message when the create flow resolves to an existing board", async () => {
+    createOrGetMock.mockResolvedValue({ board: existingBoard, wasCreated: false });
+
+    render(<SprintRetrospectivePanel />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Create retrospective board" }));
+
+    expect(await screen.findByText("Sprint Sprint 12 already has retrospective Sprint 12 Retrospective.")).toBeInTheDocument();
+  });
+
   it("shows an error when sprint context cannot be resolved", async () => {
     MockSDKControls.setConfiguration({});
+
+    render(<SprintRetrospectivePanel />);
+
+    expect(await screen.findByText("We could not load sprint context for this page.")).toBeInTheDocument();
+    expect(trackExceptionMock).toHaveBeenCalledWith(expect.any(Error), { action: "loadSprintRetrospectivePanel" });
+  });
+
+  it("shows an error when no iteration can be resolved for the team", async () => {
+    resolveIterationMock.mockReturnValue(undefined);
+    getCurrentIterationMock.mockReturnValue(undefined);
+    getIterationsMock.mockResolvedValue([]);
 
     render(<SprintRetrospectivePanel />);
 
@@ -160,5 +189,70 @@ describe("SprintRetrospectivePanel", () => {
     render(<SprintRetrospectivePanel />);
 
     expect(await screen.findByText("Sprint dates are not configured.")).toBeInTheDocument();
+  });
+
+  it("renders the missing-dates fallback text when iteration attributes are absent", async () => {
+    const noAttributeIteration = {
+      ...iteration,
+      attributes: undefined,
+    };
+    resolveIterationMock.mockReturnValue(noAttributeIteration);
+    getCurrentIterationMock.mockReturnValue(noAttributeIteration);
+
+    render(<SprintRetrospectivePanel />);
+
+    expect(await screen.findByText("Sprint dates are not configured.")).toBeInTheDocument();
+  });
+
+  it("does not update state after unmounting during a successful async load", async () => {
+    let resolveBoards: ((boards: unknown[]) => void) | undefined;
+    const boardsPromise = new Promise<unknown[]>(resolve => {
+      resolveBoards = resolve;
+    });
+
+    boardDataServiceMock.getBoardsForTeam?.mockReturnValue(boardsPromise as Promise<any[]>);
+    const { unmount } = render(<SprintRetrospectivePanel />);
+
+    await waitFor(() => {
+      expect(boardDataServiceMock.getBoardsForTeam).toHaveBeenCalledWith("team-1");
+    });
+    unmount();
+    resolveBoards?.([existingBoard]);
+    await flushPromises();
+
+    expect(trackExceptionMock).not.toHaveBeenCalled();
+  });
+
+  it("does not set error state after unmounting during an async failure", async () => {
+    let rejectBoards: ((error: Error) => void) | undefined;
+    const boardsPromise = new Promise<unknown[]>((_resolve, reject) => {
+      rejectBoards = reject;
+    });
+
+    boardDataServiceMock.getBoardsForTeam?.mockReturnValue(boardsPromise as Promise<any[]>);
+    const { unmount } = render(<SprintRetrospectivePanel />);
+
+    await waitFor(() => {
+      expect(boardDataServiceMock.getBoardsForTeam).toHaveBeenCalledWith("team-1");
+    });
+    unmount();
+    rejectBoards?.(new Error("late failure"));
+    await flushPromises();
+
+    expect(trackExceptionMock).toHaveBeenCalledWith(expect.any(Error), { action: "loadSprintRetrospectivePanel" });
+  });
+
+  it("returns early from the create handler when the team id is missing", async () => {
+    const useStateSpy = jest.spyOn(React, "useState");
+    const setState = jest.fn();
+
+    useStateSpy.mockImplementationOnce(() => [{ isLoading: false, isWorking: false, teamId: "", teamName: "", iteration }, setState]);
+
+    render(<SprintRetrospectivePanel />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Create retrospective board" }));
+
+    expect(createOrGetMock).not.toHaveBeenCalled();
+    useStateSpy.mockRestore();
   });
 });

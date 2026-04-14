@@ -69,6 +69,13 @@ describe("sprintRetrospectiveHelper", () => {
     expect(sortIterationsForRetrospectives(iterations).map(currentIteration => currentIteration.id)).toEqual(["iteration-1", "future-b", "future-a", "past", "unknown"]);
   });
 
+  it("falls back to alphabetical ordering when timeframe and timestamps are identical", () => {
+    const alphaIteration = createIteration({ id: "alpha", name: "Alpha", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
+    const betaIteration = createIteration({ id: "beta", name: "Beta", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
+
+    expect(sortIterationsForRetrospectives([betaIteration, alphaIteration]).map(currentIteration => currentIteration.id)).toEqual(["alpha", "beta"]);
+  });
+
   it("returns the current iteration when present", () => {
     const futureIteration = createIteration({ id: "future", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
 
@@ -219,6 +226,41 @@ describe("sprintRetrospectiveHelper", () => {
     );
   });
 
+  it("passes undefined sprint dates through when the iteration omits them entirely", async () => {
+    const createdBoard = { id: "board-4", title: "Sprint 100 Retrospective", teamId: "team-10" } as any;
+    const noDateIteration = createIteration({
+      id: "iteration-no-date",
+      name: "Sprint 100",
+      attributes: {
+        startDate: undefined,
+        finishDate: undefined,
+        timeFrame: TimeFrame.Future,
+      },
+    });
+
+    mockGetSetting.mockResolvedValue(undefined);
+    mockCreateBoardForTeam.mockResolvedValue(createdBoard);
+
+    await createOrGetSprintRetrospectiveBoard({
+      teamId: "team-10",
+      iteration: noDateIteration,
+      existingBoards: [],
+    });
+
+    expect(mockCreateBoardForTeam).toHaveBeenCalledWith(
+      "team-10",
+      "Sprint 100 Retrospective",
+      5,
+      expect.any(Array),
+      false,
+      false,
+      false,
+      undefined,
+      undefined,
+      undefined,
+    );
+  });
+
   it("resolves an iteration from backlog configuration payloads", () => {
     const iterations = [
       iteration,
@@ -246,6 +288,26 @@ describe("sprintRetrospectiveHelper", () => {
     expect(matchedIteration?.id).toBe("iteration-2");
   });
 
+  it("recursively resolves nested iteration payloads and skips unrelated keys", () => {
+    const futureIteration = createIteration({ id: "iteration-2", name: "Sprint 13", path: "Project\\Sprint 13", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
+
+    const matchedIteration = resolveIterationFromConfiguration(
+      {
+        iterationContext: {
+          metadata: {
+            ignored: true,
+          },
+          nestedIteration: {
+            iterationPath: "Project\\Sprint 13",
+          },
+        },
+      },
+      [iteration, futureIteration],
+    );
+
+    expect(matchedIteration?.id).toBe("iteration-2");
+  });
+
   it("resolves an iteration from string configuration values", () => {
     const futureIteration = createIteration({ id: "iteration-2", name: "Sprint 13", path: "Project\\Sprint 13", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
 
@@ -253,6 +315,7 @@ describe("sprintRetrospectiveHelper", () => {
   });
 
   it("returns undefined when configuration does not contain a matching iteration", () => {
+    expect(resolveIterationFromConfiguration({ selectedIteration: 5 as unknown as string }, [iteration])).toBeUndefined();
     expect(resolveIterationFromConfiguration({ selectedIteration: { iterationName: "No Match" } }, [iteration])).toBeUndefined();
     expect(resolveIterationFromConfiguration({}, [iteration])).toBeUndefined();
   });

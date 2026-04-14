@@ -65,14 +65,14 @@ const mockSdk = {
 
 export const MockSDK = mockSdk;
 export const MockSDKControls = {
-  setConfiguration: (configuration: typeof mockConfiguration) => {
-    mockConfiguration = configuration;
+  setConfiguration: (configuration: Record<string, unknown>) => {
+    mockConfiguration = configuration as typeof mockConfiguration;
   },
   setContributionId: (contributionId: string) => {
     mockContributionId = contributionId;
   },
-  setExtensionContext: (extensionContext: typeof mockExtensionContext) => {
-    mockExtensionContext = extensionContext;
+  setExtensionContext: (extensionContext: Partial<typeof mockExtensionContext> & { id: string }) => {
+    mockExtensionContext = { ...mockExtensionContext, ...extensionContext };
   },
   reset: () => {
     mockExtensionContext = { id: "ms-devlabs.team-retrospectives", publisherId: "ms-devlabs", extensionId: "team-retrospectives" };
