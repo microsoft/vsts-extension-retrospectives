@@ -539,7 +539,7 @@ describe("FeedbackBoardContainer sprint actions", () => {
       });
     });
 
-    fireEvent.click(screen.getByLabelText("Sprint retrospective"));
+    fireEvent.click(screen.getByTitle("Sprint retrospective"));
     await act(async () => {
       fireEvent.click(screen.getByText("Create for current sprint"));
     });
@@ -598,7 +598,7 @@ describe("FeedbackBoardContainer sprint actions", () => {
       });
     });
 
-    fireEvent.click(screen.getByLabelText("Sprint retrospective"));
+    fireEvent.click(screen.getByTitle("Sprint retrospective"));
     await act(async () => {
       fireEvent.click(screen.getByText("Create for selected sprint"));
     });

@@ -76,6 +76,16 @@ describe("sprintRetrospectiveHelper", () => {
     expect(sortIterationsForRetrospectives([betaIteration, alphaIteration]).map(currentIteration => currentIteration.id)).toEqual(["alpha", "beta"]);
   });
 
+  it("treats iterations without attributes as unknown and sorts them by name when timestamps are unavailable", () => {
+    const noAttributesAlpha = createIteration({ id: "alpha-no-attributes", name: "Alpha", attributes: undefined as never });
+    const noAttributesBeta = createIteration({ id: "beta-no-attributes", name: "Beta", attributes: undefined as never });
+
+    expect(sortIterationsForRetrospectives([noAttributesBeta, noAttributesAlpha]).map(currentIteration => currentIteration.id)).toEqual([
+      "alpha-no-attributes",
+      "beta-no-attributes",
+    ]);
+  });
+
   it("returns the current iteration when present", () => {
     const futureIteration = createIteration({ id: "future", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
 
@@ -86,6 +96,12 @@ describe("sprintRetrospectiveHelper", () => {
     const futureIteration = createIteration({ id: "future", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
 
     expect(getCurrentIteration([futureIteration])).toBeUndefined();
+  });
+
+  it("ignores iterations without attributes when searching for the current sprint", () => {
+    const unknownIteration = createIteration({ id: "unknown", attributes: undefined as never });
+
+    expect(getCurrentIteration([unknownIteration, iteration])?.id).toBe("iteration-1");
   });
 
   it("returns an existing board when sprint dates already match", async () => {
@@ -118,6 +134,18 @@ describe("sprintRetrospectiveHelper", () => {
     } as any;
 
     expect(findSprintRetrospectiveBoard([titleMatchedBoard], "team-1", iteration)?.id).toBe("board-title");
+  });
+
+  it("matches boards by title when the iteration omits attributes entirely", () => {
+    const titleMatchedBoard = {
+      id: "board-title-no-attributes",
+      title: "Sprint 12 Retrospective",
+      teamId: "team-1",
+      isArchived: false,
+    } as any;
+    const noAttributesIteration = createIteration({ attributes: undefined as never });
+
+    expect(findSprintRetrospectiveBoard([titleMatchedBoard], "team-1", noAttributesIteration)?.id).toBe("board-title-no-attributes");
   });
 
   it("ignores archived boards and boards for other teams", () => {
@@ -261,6 +289,37 @@ describe("sprintRetrospectiveHelper", () => {
     );
   });
 
+  it("passes undefined sprint dates through when the iteration has no attributes object", async () => {
+    const createdBoard = { id: "board-5", title: "Sprint 101 Retrospective", teamId: "team-10" } as any;
+    const noAttributesIteration = createIteration({
+      id: "iteration-no-attributes",
+      name: "Sprint 101",
+      attributes: undefined as never,
+    });
+
+    mockGetSetting.mockResolvedValue(undefined);
+    mockCreateBoardForTeam.mockResolvedValue(createdBoard);
+
+    await createOrGetSprintRetrospectiveBoard({
+      teamId: "team-10",
+      iteration: noAttributesIteration,
+      existingBoards: [],
+    });
+
+    expect(mockCreateBoardForTeam).toHaveBeenCalledWith(
+      "team-10",
+      "Sprint 101 Retrospective",
+      5,
+      expect.any(Array),
+      false,
+      false,
+      false,
+      undefined,
+      undefined,
+      undefined,
+    );
+  });
+
   it("resolves an iteration from backlog configuration payloads", () => {
     const iterations = [
       iteration,
@@ -312,6 +371,12 @@ describe("sprintRetrospectiveHelper", () => {
     const futureIteration = createIteration({ id: "iteration-2", name: "Sprint 13", path: "Project\\Sprint 13", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
 
     expect(resolveIterationFromConfiguration({ selectedIteration: "iteration-2" }, [iteration, futureIteration])?.id).toBe("iteration-2");
+  });
+
+  it("resolves an iteration from any configuration key containing iteration", () => {
+    const futureIteration = createIteration({ id: "iteration-2", name: "Sprint 13", path: "Project\\Sprint 13", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
+
+    expect(resolveIterationFromConfiguration({ customIterationReference: "Project\\Sprint 13" }, [iteration, futureIteration])?.id).toBe("iteration-2");
   });
 
   it("returns undefined when configuration does not contain a matching iteration", () => {
