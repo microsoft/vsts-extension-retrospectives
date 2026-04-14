@@ -1323,7 +1323,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response {
   & span {
-    @apply grid justify-end p-2 pl-16 pointer-events-none rounded-4xl bg-black/50 text-white;
+    @apply grid justify-end p-2 pl-12 pointer-events-none rounded-4xl bg-black/50 text-white;
   }
 
   &.red-chart-response {
