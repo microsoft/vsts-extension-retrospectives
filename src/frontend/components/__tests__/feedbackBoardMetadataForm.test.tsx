@@ -95,6 +95,14 @@ describe("Board Metadata Form", () => {
       expect(titleInput.value).toBe("");
     });
 
+    it("renders the title input with the initial title override for a new board", () => {
+      render(<FeedbackBoardMetadataForm {...mockedProps} initialTitleOverride="Sprint 12 Retrospective" />);
+
+      const titleInput = screen.getByLabelText(/please enter new retrospective title/i) as HTMLInputElement;
+
+      expect(titleInput).toHaveValue("Sprint 12 Retrospective");
+    });
+
     it("updates state when max vote counter input changes", async () => {
       const user = userEvent.setup();
       render(<FeedbackBoardMetadataForm {...mockedProps} />);

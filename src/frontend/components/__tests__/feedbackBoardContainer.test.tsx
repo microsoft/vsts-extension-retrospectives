@@ -20,6 +20,8 @@ import { getService } from "azure-devops-extension-sdk";
 import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { formatBoardTimer } from "../../utilities/useBoardTimer";
+import { workService } from "../../dal/azureDevOpsWorkService";
+import { buildSprintRetrospectiveTitle, getCurrentIteration } from "../../utilities/sprintRetrospectiveHelper";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -103,6 +105,15 @@ jest.mock("../../dal/azureDevOpsCoreService");
 jest.mock("../../dal/azureDevOpsWorkItemService");
 jest.mock("../../dal/userDataService");
 jest.mock("../../dal/itemDataService");
+jest.mock("../../dal/azureDevOpsWorkService", () => ({
+  workService: {
+    getIterations: jest.fn(),
+  },
+}));
+jest.mock("../../utilities/sprintRetrospectiveHelper", () => ({
+  buildSprintRetrospectiveTitle: jest.fn((iteration: { name: string }) => `${iteration.name} Retrospective`),
+  getCurrentIteration: jest.fn(),
+}));
 jest.mock("../boardSummaryTable", () => () => <div data-testid="board-summary-table" />);
 jest.mock("../effectivenessMeasurementRow", () => ({ questionId }: { questionId: number }) => <div data-testid={`effectiveness-row-${questionId}`} />);
 jest.mock("../../utilities/boardUrlHelper", () => ({
@@ -442,6 +453,118 @@ describe("FeedbackBoardContainer additional coverage", () => {
       ref.current?.setState({ activeTab: "History" });
     });
     expect(screen.getByTestId("board-summary-table")).toBeInTheDocument();
+  });
+});
+
+describe("FeedbackBoardContainer sprint actions", () => {
+  const team: WebApiTeam = {
+    id: "team-sprint",
+    name: "Sprint Team",
+    projectName: "Project 1",
+    description: "",
+    url: "",
+    identityUrl: "",
+    projectId: "project-1",
+    identity: {} as any,
+  };
+  const board: IFeedbackBoardDocument = {
+    id: "board-sprint",
+    title: "Board 1",
+    createdDate: new Date(),
+    createdBy: mockUserIdentity as IdentityRef,
+    boardVoteCollection: {},
+    isIncludeTeamEffectivenessMeasurement: false,
+    shouldShowFeedbackAfterCollect: false,
+    isAnonymous: false,
+    permissions: { Teams: [], Members: [] },
+    activePhase: WorkflowPhase.Collect,
+    teamId: "team-sprint",
+    maxVotesPerUser: 5,
+    teamEffectivenessMeasurementVoteCollection: [],
+    columns: [{ id: "c1", title: "Column 1", iconClass: "c1", accentColor: "" }],
+  };
+
+  const boardDataServiceMock = BoardDataService as unknown as jest.Mocked<typeof BoardDataService>;
+  const reflectMock = reflectBackendService as unknown as jest.Mocked<typeof reflectBackendService>;
+  const getServiceMock = getService as jest.MockedFunction<typeof getService>;
+  const workServiceMock = workService as jest.Mocked<typeof workService>;
+  const buildSprintRetrospectiveTitleMock = buildSprintRetrospectiveTitle as jest.MockedFunction<typeof buildSprintRetrospectiveTitle>;
+  const getCurrentIterationMock = getCurrentIteration as jest.MockedFunction<typeof getCurrentIteration>;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    boardDataServiceMock.getBoardsForTeam?.mockResolvedValue([board]);
+    boardDataServiceMock.getSetting?.mockResolvedValue(undefined as any);
+    reflectMock.broadcastNewBoard?.mockImplementation(() => undefined);
+    getServiceMock.mockResolvedValue({
+      getHash: jest.fn().mockResolvedValue("#teamId=team-sprint&boardId=board-sprint&phase=Collect"),
+      setHash: jest.fn(),
+    } as any);
+    buildSprintRetrospectiveTitleMock.mockImplementation(iteration => `${iteration.name} Retrospective`);
+  });
+
+  it("shows the current sprint action in Board Actions and hides the selected sprint action", async () => {
+    const { ref } = renderContainerWithHandle();
+    await act(async () => {
+      ref.current?.setState({
+        isAppInitialized: true,
+        isTeamDataLoaded: true,
+        currentTeam: team,
+        currentBoard: board,
+        boards: [board],
+        userTeams: [team],
+        projectTeams: [team],
+      });
+    });
+
+    fireEvent.click(screen.getByTitle("Board Actions"));
+
+    expect(screen.getByText("Create new for current sprint")).toBeInTheDocument();
+    expect(screen.queryByText("Create for selected sprint")).not.toBeInTheDocument();
+  });
+
+  it("opens the normal board creation dialog with the current sprint title from Board Actions", async () => {
+    const iteration = {
+      id: "iteration-current",
+      name: "Sprint 12",
+      path: "Project\\Sprint 12",
+      attributes: {
+        startDate: new Date("2024-02-05T00:00:00.000Z"),
+        finishDate: new Date("2024-02-18T00:00:00.000Z"),
+        timeFrame: 1,
+      },
+    } as any;
+    workServiceMock.getIterations.mockResolvedValue([iteration]);
+    getCurrentIterationMock.mockReturnValue(iteration);
+
+    const { ref } = renderContainerWithHandle();
+    await act(async () => {
+      ref.current?.setState({
+        isAppInitialized: true,
+        isTeamDataLoaded: true,
+        currentTeam: team,
+        currentBoard: board,
+        boards: [board],
+        userTeams: [team],
+        projectTeams: [team],
+      });
+    });
+
+    const showModal = jest.fn();
+    if (ref.current) {
+      ref.current.boardCreationDialogRef.current = { showModal, close: jest.fn() } as any;
+    }
+
+    fireEvent.click(screen.getByTitle("Board Actions"));
+    await act(async () => {
+      fireEvent.click(screen.getByText("Create new for current sprint"));
+    });
+
+    expect(workServiceMock.getIterations).toHaveBeenCalledWith("team-sprint", "current");
+    expect(buildSprintRetrospectiveTitleMock).toHaveBeenCalledWith(iteration);
+    expect(showModal).toHaveBeenCalled();
+    expect(boardDataServiceMock.createBoardForTeam).not.toHaveBeenCalled();
   });
 });
 

@@ -20,6 +20,7 @@ export interface IFeedbackBoardMetadataFormProps {
   isNewBoardCreation: boolean;
   isDuplicatingBoard: boolean;
   currentBoard: IFeedbackBoardDocument;
+  initialTitleOverride?: string;
   teamId: string;
   placeholderText: string;
   maxVotesPerUser: number;
@@ -115,7 +116,7 @@ const getInitialState = (props: IFeedbackBoardMetadataFormProps) => {
     defaultPermissions = props.currentBoard.permissions;
   }
 
-  const defaultTitle = isCopyRetrospective ? `${props.currentBoard.title} - copy` : isEditRetrospective ? props.currentBoard.title : "";
+  const defaultTitle = props.initialTitleOverride ?? (isCopyRetrospective ? `${props.currentBoard.title} - copy` : isEditRetrospective ? props.currentBoard.title : "");
 
   return {
     columnCards: defaultColumns,

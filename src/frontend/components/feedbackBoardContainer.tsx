@@ -32,6 +32,7 @@ import { copyToClipboard } from "../utilities/clipboardHelper";
 import { closeTopMostDialog } from "../utilities/dialogHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import { formatDate, formatNumber, t } from "../utilities/localization";
+import { buildSprintRetrospectiveTitle, getCurrentIteration } from "../utilities/sprintRetrospectiveHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
@@ -40,6 +41,7 @@ import { playStartChime, playStopChime } from "../utilities/audioHelper";
 import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../utilities/pdfHelper";
 import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
+import { workService } from "../dal/azureDevOpsWorkService";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -64,7 +66,7 @@ export type FeedbackBoardContainerHandle = {
   persistColumnNotes: (columnId: string, notes: string) => Promise<void>;
   setSupportedWorkItemTypesForProject: () => Promise<void>;
   loadRecentlyVisitedOrDefaultTeamAndBoardState: (defaultTeam: WebApiTeam, userTeams: WebApiTeam[]) => Promise<{ currentTeam: WebApiTeam; currentBoard: IFeedbackBoardDocument; boards: IFeedbackBoardDocument[] }>;
-  reloadBoardsForCurrentTeam: () => Promise<void>;
+  reloadBoardsForCurrentTeam: (preferredBoardId?: string) => Promise<void>;
 
   startBoardTimer: () => void;
   pauseBoardTimer: () => void;
@@ -83,7 +85,7 @@ export type FeedbackBoardContainerHandle = {
   archiveCurrentBoard: () => Promise<void>;
   generateEmailSummaryContent: () => Promise<void>;
 
-  showBoardCreationDialog: () => void;
+  showBoardCreationDialog: (initialTitleOverride?: string) => void;
   hideBoardCreationDialog: () => void;
   showBoardDuplicateDialog: () => void;
   hideBoardDuplicateDialog: () => void;
@@ -262,6 +264,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const [boardCreationInitialTitleOverride, setBoardCreationInitialTitleOverride] = React.useState<string | undefined>(undefined);
+  const [boardCreationDialogInstanceKey, setBoardCreationDialogInstanceKey] = React.useState(0);
 
   React.useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -316,20 +320,18 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   }, [setState]);
 
   const handleBoardActionsDocumentPointerDown = React.useCallback((event: PointerEvent) => {
-    const root = boardActionsMenuRootRef.current;
-    if (!root) {
-      return;
-    }
-
     const target = event.target as Node | null;
     if (!target) {
       return;
     }
 
-    const openDetails = Array.from(root.querySelectorAll("details[open]"));
-    for (const detailsElement of openDetails) {
-      if (!detailsElement.contains(target)) {
-        detailsElement.removeAttribute("open");
+    const menuRoots = [boardActionsMenuRootRef.current].filter((root): root is HTMLDivElement => Boolean(root));
+    for (const root of menuRoots) {
+      const openDetails = Array.from(root.querySelectorAll("details[open]"));
+      for (const detailsElement of openDetails) {
+        if (!detailsElement.contains(target)) {
+          detailsElement.removeAttribute("open");
+        }
       }
     }
   }, []);
@@ -1237,7 +1239,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
    * @description Loads all feedback boards for the current team. Defaults the selected board to
    * the most recently created board.
    */
-  const reloadBoardsForCurrentTeam = async () => {
+  const reloadBoardsForCurrentTeam = async (preferredBoardId?: string) => {
     setState({ isTeamDataLoaded: false });
 
     try {
@@ -1263,10 +1265,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         )
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
+      const preferredBoard = preferredBoardId ? boardsForTeam.find(board => board.id === preferredBoardId) : undefined;
+
       setState({
         isTeamDataLoaded: true,
         boards: boardsForTeam,
-        currentBoard: boardsForTeam[0],
+        currentBoard: preferredBoard ?? boardsForTeam[0],
       });
     } catch (error) {
       appInsights.trackException(error, {
@@ -1284,22 +1288,24 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const setCurrentBoard = (selectedBoard: IFeedbackBoardDocument) => {
     const matchedBoard = stateRef.current.boards.find(board => board.id === selectedBoard.id);
 
+    if (!matchedBoard) {
+      return;
+    }
+
     if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
       matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
     }
 
-    if (matchedBoard) {
-      setState(prevState => {
-        // Ensure that we are actually changing boards to prevent needless rerenders.
-        if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {
-          return {
-            currentBoard: matchedBoard,
-          };
-        }
+    setState(prevState => {
+      // Ensure that we are actually changing boards to prevent needless rerenders.
+      if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {
+        return {
+          currentBoard: matchedBoard,
+        };
+      }
 
-        return null;
-      });
-    }
+      return null;
+    });
   };
 
   const changeSelectedTeam = async (team: WebApiTeam) => {
@@ -1356,12 +1362,37 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return createdBoard;
   };
 
-  const showBoardCreationDialog = (): void => {
+  const showBoardCreationDialog = (initialTitleOverride?: string): void => {
+    setBoardCreationInitialTitleOverride(initialTitleOverride);
+    setBoardCreationDialogInstanceKey(previousKey => previousKey + 1);
     boardCreationDialogRef?.current?.showModal();
   };
 
   const hideBoardCreationDialog = (): void => {
+    setBoardCreationInitialTitleOverride(undefined);
     boardCreationDialogRef?.current?.close();
+  };
+
+  const createCurrentSprintRetrospective = async (): Promise<void> => {
+    const currentTeam = stateRef.current.currentTeam;
+    if (!currentTeam) {
+      return;
+    }
+
+    try {
+      const currentIterations = await workService.getIterations(currentTeam.id, "current");
+      const currentIteration = getCurrentIteration(currentIterations) ?? currentIterations[0];
+
+      if (!currentIteration) {
+        toast(t("sprint_retro_current_not_found"), { intent: "error" });
+        return;
+      }
+
+      showBoardCreationDialog(buildSprintRetrospectiveTitle(currentIteration));
+    } catch (error) {
+      appInsights.trackException(error, { action: "prefillSprintRetrospectiveTitle", teamId: currentTeam.id });
+      toast(t("sprint_retro_current_not_found"), { intent: "error" });
+    }
   };
 
   const showRetroSummaryDialog = async () => {
@@ -1569,7 +1600,18 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     downloadPdfBlob(pdfBlob, fileName);
   };
 
-  const renderBoardUpdateMetadataFormDialog = (dialogRef: React.RefObject<HTMLDialogElement>, isNewBoardCreation: boolean, isDuplicatingBoard: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void, onCancel: () => void) => {
+  const renderBoardUpdateMetadataFormDialog = (
+    dialogRef: React.RefObject<HTMLDialogElement>,
+    isNewBoardCreation: boolean,
+    isDuplicatingBoard: boolean,
+    onDismiss: () => void,
+    dialogTitle: string,
+    placeholderText: string,
+    onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void,
+    onCancel: () => void,
+    initialTitleOverride?: string,
+    formKey?: string,
+  ) => {
     const permissionOptions: FeedbackBoardPermissionOption[] = [];
 
     const state = stateRef.current;
@@ -1602,7 +1644,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             {getIconElement("close")}
           </button>
         </div>
-        <FeedbackBoardMetadataForm isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
+        <FeedbackBoardMetadataForm key={formKey} isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} initialTitleOverride={initialTitleOverride} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
       </dialog>
     );
   };
@@ -2008,6 +2050,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                             {getIconElement("add")}
                             Create new retrospective
                           </button>
+                          <button key="createBoardForCurrentSprint" type="button" title={t("sprint_retro_create_current")} onClick={event => handleBoardActionMenuItemClick(createCurrentSprintRetrospective, event)}>
+                            {getIconElement("add")}
+                            {t("sprint_retro_create_current")}
+                          </button>
                           <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
                             {getIconElement("content-copy")}
                             Create copy of retrospective
@@ -2205,7 +2251,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             <div className="no-boards-container">
               <div className="no-boards-text">Get started with your first Retrospective</div>
               <div className="no-boards-sub-text">Create a new board to start collecting feedback and create new work items.</div>
-              <button title="Create Board" onClick={showBoardCreationDialog} className="create-new-board-button">
+              <button title="Create Board" onClick={() => showBoardCreationDialog()} className="create-new-board-button">
                 Create Board
               </button>
             </div>
@@ -2316,6 +2362,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         t("feedback_board_create_example", { date: formatDate(new Date(), { year: "numeric", month: "short", day: "numeric" }) }),
         createBoard,
         hideBoardCreationDialog,
+        boardCreationInitialTitleOverride,
+        `create-board-${boardCreationDialogInstanceKey}`,
       )}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, t("feedback_board_create_copy"), "", createBoard, hideBoardDuplicateDialog)}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, t("feedback_board_edit"), "", updateBoardMetadata, hideBoardUpdateDialog)}

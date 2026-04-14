@@ -32,7 +32,10 @@ const mockProjectPageService = {
 };
 
 const mockUser = { id: "01234567-8910-1112-1314-151617181920" };
-const mockExtensionContext = { id: "contextId" };
+let mockExtensionContext = { id: "ms-devlabs.team-retrospectives", publisherId: "ms-devlabs", extensionId: "team-retrospectives" };
+let mockConfiguration = { team: { id: "team-id", name: "Team" } };
+let mockContributionId = "ms-devlabs.team-retrospectives.home";
+
 const getServiceMock = (id: string) => {
   if (id == CommonServiceIds.LocationService) return mockLocationService;
   else if (id == CommonServiceIds.ProjectPageService) return mockProjectPageService;
@@ -40,7 +43,11 @@ const getServiceMock = (id: string) => {
 };
 
 const mockSdk = {
+  init: () => Promise.resolve(),
+  ready: () => Promise.resolve(),
   getService: getServiceMock,
+  getConfiguration: () => mockConfiguration,
+  getContributionId: () => mockContributionId,
   getUser: () => {
     return mockUser;
   },
@@ -50,6 +57,26 @@ const mockSdk = {
   getAccessToken: () => {
     return "token";
   },
+  register: (): void => undefined,
+  unregister: (): void => undefined,
+  resize: (): void => undefined,
+  notifyLoadSucceeded: (): Promise<void> => Promise.resolve(),
 };
 
 export const MockSDK = mockSdk;
+export const MockSDKControls = {
+  setConfiguration: (configuration: Record<string, unknown>) => {
+    mockConfiguration = configuration as typeof mockConfiguration;
+  },
+  setContributionId: (contributionId: string) => {
+    mockContributionId = contributionId;
+  },
+  setExtensionContext: (extensionContext: Partial<typeof mockExtensionContext> & { id: string }) => {
+    mockExtensionContext = { ...mockExtensionContext, ...extensionContext };
+  },
+  reset: () => {
+    mockExtensionContext = { id: "ms-devlabs.team-retrospectives", publisherId: "ms-devlabs", extensionId: "team-retrospectives" };
+    mockConfiguration = { team: { id: "team-id", name: "Team" } };
+    mockContributionId = "ms-devlabs.team-retrospectives.home";
+  },
+};

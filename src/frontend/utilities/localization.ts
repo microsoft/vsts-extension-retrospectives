@@ -73,6 +73,9 @@ const translations = {
     board_summary_table_feedback_items: "Feedback Items",
     board_summary_table_total_work_items: "Total Work Items",
     board_summary_table_delete_help: "Archived boards can be deleted by board owner or team admin.",
+    sprint_retro_board_title: "{{iteration}} Retrospective",
+    sprint_retro_create_current: "Create new for current sprint",
+    sprint_retro_current_not_found: "No current sprint is configured for this team.",
   },
   es: {
     common_loading: "Cargando...",
@@ -146,6 +149,9 @@ const translations = {
     board_summary_table_feedback_items: "Elementos de feedback",
     board_summary_table_total_work_items: "Elementos de trabajo totales",
     board_summary_table_delete_help: "Los tableros archivados pueden ser eliminados por el propietario o por un administrador del equipo.",
+    sprint_retro_board_title: "{{iteration}} Retrospective",
+    sprint_retro_create_current: "Create new for current sprint",
+    sprint_retro_current_not_found: "No current sprint is configured for this team.",
   },
   de: {
     common_loading: "Wird geladen...",
@@ -219,6 +225,9 @@ const translations = {
     board_summary_table_feedback_items: "Feedback-Eintraege",
     board_summary_table_total_work_items: "Arbeitselemente gesamt",
     board_summary_table_delete_help: "Archivierte Boards koennen vom Board-Besitzer oder einem Team-Administrator geloescht werden.",
+    sprint_retro_board_title: "{{iteration}} Retrospective",
+    sprint_retro_create_current: "Create new for current sprint",
+    sprint_retro_current_not_found: "No current sprint is configured for this team.",
   },
   fr: {
     common_loading: "Chargement...",
@@ -292,6 +301,9 @@ const translations = {
     board_summary_table_feedback_items: "Elements de feedback",
     board_summary_table_total_work_items: "Total des elements de travail",
     board_summary_table_delete_help: "Les tableaux archives peuvent etre supprimes par le proprietaire du tableau ou un administrateur d'equipe.",
+    sprint_retro_board_title: "{{iteration}} Retrospective",
+    sprint_retro_create_current: "Create new for current sprint",
+    sprint_retro_current_not_found: "No current sprint is configured for this team.",
   },
 } as const;
 
