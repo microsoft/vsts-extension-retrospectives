@@ -379,6 +379,12 @@ describe("sprintRetrospectiveHelper", () => {
     expect(resolveIterationFromConfiguration({ customIterationReference: "Project\\Sprint 13" }, [iteration, futureIteration])?.id).toBe("iteration-2");
   });
 
+  it("ignores unrelated top-level configuration keys while scanning for iteration values", () => {
+    const futureIteration = createIteration({ id: "iteration-2", name: "Sprint 13", path: "Project\\Sprint 13", attributes: { startDate: new Date("2024-02-19T00:00:00.000Z"), finishDate: new Date("2024-03-03T00:00:00.000Z"), timeFrame: TimeFrame.Future } });
+
+    expect(resolveIterationFromConfiguration({ projectId: "project-1", selectedIteration: "iteration-2" }, [iteration, futureIteration])?.id).toBe("iteration-2");
+  });
+
   it("returns undefined when configuration does not contain a matching iteration", () => {
     expect(resolveIterationFromConfiguration({ selectedIteration: 5 as unknown as string }, [iteration])).toBeUndefined();
     expect(resolveIterationFromConfiguration({ selectedIteration: { iterationName: "No Match" } }, [iteration])).toBeUndefined();
