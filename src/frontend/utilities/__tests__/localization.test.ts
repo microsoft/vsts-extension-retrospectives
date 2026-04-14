@@ -1,3 +1,5 @@
+/** @jest-environment jsdom */
+
 import { formatDate, formatNumber, getCurrentLocale, initializeLocale, setLocale, t } from "../localization";
 
 describe("localization", () => {
@@ -95,6 +97,18 @@ describe("localization", () => {
     expect(setLocale("  en-GB  ")).toBe("en-GB");
     expect(getCurrentLocale()).toBe("en-GB");
     expect(document.documentElement.lang).toBe("en-GB");
+  });
+
+  it("falls back to the default locale when setLocale receives a blank value", () => {
+    expect(setLocale("   ")).toBe("en-US");
+    expect(getCurrentLocale()).toBe("en-US");
+    expect(document.documentElement.lang).toBe("en-US");
+  });
+
+  it("falls back to English templates when the locale token matches an inherited object property", () => {
+    initializeLocale("constructor-GB");
+
+    expect(t("common_cancel")).toBe("Cancel");
   });
 
   it("formats dates and numbers using the active locale", () => {
