@@ -507,4 +507,4 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
 FeedbackColumn.displayName = "FeedbackColumn";
 
-export default FeedbackColumn;
+export default React.memo(FeedbackColumn);
