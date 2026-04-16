@@ -42,6 +42,7 @@ import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../util
 import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
+import { shallowEqual } from "../utilities/shallowEqual";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -254,6 +255,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const boardTimerIntervalIdRef = React.useRef<number | undefined>(undefined);
   const connectionWatchdogIntervalIdRef = React.useRef<number | undefined>(undefined);
   const didMountRef = React.useRef(false);
+  const lastBoardFetchKeyRef = React.useRef<string>("");
 
   const prevCurrentTeamRef = React.useRef<WebApiTeam | undefined>(undefined);
   const prevCurrentBoardRef = React.useRef<IFeedbackBoardDocument | undefined>(undefined);
@@ -295,10 +297,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const setState: FeedbackBoardContainerHandle["setState"] = React.useCallback((updater, callback) => {
     const currentState = stateRef.current;
     const updatePartial = typeof updater === "function" ? updater(currentState) : updater;
-    if (updatePartial) {
+    if (updatePartial && !shallowEqual(currentState as unknown as Record<string, unknown>, updatePartial as unknown as Record<string, unknown>)) {
       Object.assign(currentState, updatePartial);
+      forceRender();
     }
-    forceRender();
     if (callback) {
       callback();
     }
@@ -471,6 +473,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       if (state.isAppInitialized && state.currentTeam) {
         userDataService.addVisit(state.currentTeam.id, state.currentBoard ? state.currentBoard.id : undefined);
       }
+      // Reset fetch key so the new board gets a fresh fetch
+      lastBoardFetchKeyRef.current = "";
       if (state.currentTeam && state.currentBoard) {
         void updateFeedbackItemsAndContributors(state.currentTeam, state.currentBoard);
       }
@@ -694,6 +698,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       if (!board) {
         return;
       }
+
+      // Skip redundant full refetch if the board hasn't changed since the last fetch
+      const fetchKey = `${board.id}:${board.modifiedDate ? new Date(board.modifiedDate).getTime() : ""}`;
+      if (fetchKey === lastBoardFetchKeyRef.current) {
+        return;
+      }
+      lastBoardFetchKeyRef.current = fetchKey;
 
       const feedbackItems = (await itemDataService.getFeedbackItemsForBoard(board?.id)) ?? [];
 
@@ -1844,6 +1855,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return handle;
   });
 
+  const handleFocusModeModelChange = React.useCallback(
+    (focusModeModel: FocusModeModel) => {
+      setState({ focusModeModel });
+    },
+    [setState],
+  );
+
   const state = stateRef.current;
 
   if (!state.isAppInitialized || !state.isTeamDataLoaded) {
@@ -2318,14 +2336,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                     workflowPhase={state.currentBoard.activePhase}
                     nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
                     allWorkItemTypes={state.allWorkItemTypes}
-                    onFocusModeModelChange={focusModeModel => {
-                      setState({ focusModeModel });
-                    }}
+                    onFocusModeModelChange={handleFocusModeModelChange}
                     isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
                     hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
                     userId={state.currentUserId}
                     onVoteCasted={updateCurrentVoteCount}
                     onColumnNotesChange={persistColumnNotes}
+                    isBackendServiceConnected={state.isBackendServiceConnected}
                   />
                 </>
               )}
@@ -2512,7 +2529,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           </button>
         </div>
         {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
-          <div className="team-assessment-no-data">
+          <div className="subText">
             <p>{t("feedback_board_team_assessment_no_history")}</p>
             <p>{t("feedback_board_team_assessment_trends")}</p>
           </div>

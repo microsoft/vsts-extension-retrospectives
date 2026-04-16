@@ -196,6 +196,44 @@ describe("WorkService", () => {
         "past",
       );
     });
+
+    it("should return cached iterations on second call with same args", async () => {
+      const mockIterations: TeamSettingsIteration[] = [{ id: "iteration-1", name: "Sprint 1" } as any];
+      mockGetTeamIterations.mockResolvedValue(mockIterations);
+
+      const first = await workService.getIterations("team-cache", "current");
+      const second = await workService.getIterations("team-cache", "current");
+
+      expect(first).toEqual(mockIterations);
+      expect(second).toEqual(mockIterations);
+      expect(mockGetTeamIterations).toHaveBeenCalledTimes(1);
+    });
+
+    it("should use separate cache keys for different timeframes", async () => {
+      const currentIterations: TeamSettingsIteration[] = [{ id: "current", name: "Current" } as any];
+      const pastIterations: TeamSettingsIteration[] = [{ id: "past", name: "Past" } as any];
+      mockGetTeamIterations.mockResolvedValueOnce(currentIterations).mockResolvedValueOnce(pastIterations);
+
+      const first = await workService.getIterations("team-1", "current");
+      const second = await workService.getIterations("team-1", "past");
+
+      expect(first).toEqual(currentIterations);
+      expect(second).toEqual(pastIterations);
+      expect(mockGetTeamIterations).toHaveBeenCalledTimes(2);
+    });
+
+    it("should not cache failed iteration responses", async () => {
+      mockGetTeamIterations.mockRejectedValueOnce(new Error("Network error"));
+      const mockIterations: TeamSettingsIteration[] = [{ id: "retry", name: "Retry" } as any];
+      mockGetTeamIterations.mockResolvedValueOnce(mockIterations);
+
+      const first = await workService.getIterations("team-retry");
+      expect(first).toEqual([]);
+
+      const second = await workService.getIterations("team-retry");
+      expect(second).toEqual(mockIterations);
+      expect(mockGetTeamIterations).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe("getTeamFieldValues", () => {
@@ -295,6 +333,61 @@ describe("WorkService", () => {
       await workService.getTeamFieldValues("team-permission-error");
 
       expect(mockTrackException).toHaveBeenCalledWith(error, { teamId: "team-permission-error" });
+    });
+
+    it("should return cached team field values on second call", async () => {
+      const mockFieldValues: TeamFieldValues = {
+        field: { referenceName: "System.AreaPath", name: "Area Path" },
+        values: [{ value: "Project\\Area1", includeChildren: true }],
+      } as any;
+      mockGetTeamFieldValues.mockResolvedValue(mockFieldValues);
+
+      const first = await workService.getTeamFieldValues("team-cache");
+      const second = await workService.getTeamFieldValues("team-cache");
+
+      expect(first).toEqual(mockFieldValues);
+      expect(second).toEqual(mockFieldValues);
+      expect(mockGetTeamFieldValues).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not cache undefined team field values", async () => {
+      mockGetTeamFieldValues.mockRejectedValueOnce(new Error("fail"));
+      const mockFieldValues: TeamFieldValues = {
+        field: { referenceName: "System.AreaPath", name: "Area Path" },
+        values: [],
+      } as any;
+      mockGetTeamFieldValues.mockResolvedValueOnce(mockFieldValues);
+
+      const first = await workService.getTeamFieldValues("team-retry-fields");
+      expect(first).toBeUndefined();
+
+      const second = await workService.getTeamFieldValues("team-retry-fields");
+      expect(second).toEqual(mockFieldValues);
+      expect(mockGetTeamFieldValues).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe("clearCache", () => {
+    it("should clear all cached data so next calls refetch", async () => {
+      const mockIterations: TeamSettingsIteration[] = [{ id: "c1", name: "Sprint" } as any];
+      const mockFieldValues: TeamFieldValues = {
+        field: { referenceName: "System.AreaPath", name: "Area Path" },
+        values: [{ value: "Area1", includeChildren: true }],
+      } as any;
+      mockGetTeamIterations.mockResolvedValue(mockIterations);
+      mockGetTeamFieldValues.mockResolvedValue(mockFieldValues);
+
+      await workService.getIterations("team-cc");
+      await workService.getTeamFieldValues("team-cc");
+      expect(mockGetTeamIterations).toHaveBeenCalledTimes(1);
+      expect(mockGetTeamFieldValues).toHaveBeenCalledTimes(1);
+
+      workService.clearCache();
+
+      await workService.getIterations("team-cc");
+      await workService.getTeamFieldValues("team-cc");
+      expect(mockGetTeamIterations).toHaveBeenCalledTimes(2);
+      expect(mockGetTeamFieldValues).toHaveBeenCalledTimes(2);
     });
   });
 });
