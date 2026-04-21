@@ -20,7 +20,7 @@ describe("effectivenessMeasurementQuestionHelper", () => {
 describe("getQuestionName", () => {
   it("should return the question title if the question exists", () => {
     const questionId = 1;
-    const expectedTitle = "I clearly understand what is expected of me on this team";
+    const expectedTitle = "I clearly understand what is expected of me on this team.";
 
     const result = getQuestionName(questionId);
 

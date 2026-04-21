@@ -422,8 +422,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                   <option disabled>─────────────</option>
                   <option value="clarity">Clarity</option>
                   <option value="energy">Energy</option>
-                  <option value="psy-safety">Psychological Safety</option>
-                  <option value="wlb">Work-life Balance</option>
+                  <option value="psy-safety">Psych Safety</option>
+                  <option value="wlb">Work-Life</option>
                   <option value="confidence">Confidence</option>
                   <option value="efficiency">Efficiency</option>
                 </select>

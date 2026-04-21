@@ -176,8 +176,8 @@ The assessment tracks 6 categories:
 
 - Clarity
 - Energy
-- Psychological Safety
-- Work-life Balance
+- Psych Safety
+- Work-Life
 - Confidence
 - Efficiency
 
@@ -421,7 +421,7 @@ week that drained your energy?”, "What are your priorities this week?", and "H
 help?". Drive continuous improvement in energy by using the “Energy” Retrospective Board template,
 following the standard retrospective process.
 - Best practices for improving **psychological safety** include conducting a baseline retrospective
-using the "Psychological Safety" template in Azure DevOps Retrospectives (anonymously). Identify top
+using the "Psych Safety" template in Azure DevOps Retrospectives (anonymously). Identify top
 actions that the team will implement to improve psychological safety. Repeat the psychological safety
 retrospective every 4-6 weeks until there are no scores below a 7. We've learned that every team is
 different and, in most cases, simple changes can make a profound impact, but it requires asking anonymously
@@ -433,14 +433,14 @@ limits and adhering to them, and only committing to deliver at the same velocity
 the team has predictably delivered in the past. Finally, simply asking the question in the Team Effectiveness
 survey and conducting deep dive discussions to identify drivers combined with follow-through on the
 associated actions should result in increased sustainability for the team. Drive continuous improvement
-in work-life balance by using the “Work-Life Balance” Retrospective Board template, following the
+in work-life balance by using the "Work-Life" Retrospective Board template, following the
 standard retrospective process.
 - Best practices for improving **confidence** include sharing Objectives and Key Results (OKRs) from
 different levels across your organization. Bringing transparency into the OKRs can help teams and
 individuals better understand how their work aligns to the organizations' priorities and can build
 confidence in doing the right work to deliver against those OKRs.
 - Best practices for improving **efficiency** can also include the implementation of agile practices
-including backlog refinement and prioritization. Limiting Work In Process by establishing WIP limits
+including backlog refinement and prioritization. Limiting work in process by establishing WIP limits
 and adhering to them enables teams to be more efficient so they can "stop starting and start finishing"!
 
 ## Contribute

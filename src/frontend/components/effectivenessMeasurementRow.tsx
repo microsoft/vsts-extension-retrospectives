@@ -34,15 +34,16 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
   const initialSelection = useMemo(() => {
     const currentUserId = obfuscateUserId(getUserIdentity().id);
     const vote = votes.find(e => e.userId === currentUserId)?.responses || [];
-    const currentVote = vote.filter(v => v.questionId === questionId);
-    return currentVote.length > 0 ? currentVote[0].selection : 0;
+    const currentVote = vote.find(v => v.questionId === questionId);
+    return currentVote ? currentVote.selection : 0;
   }, [votes, questionId]);
 
   const [selected, setSelected] = useState(initialSelection);
 
   useEffect(() => {
     setSelected(initialSelection);
-  }, [initialSelection]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [votes, questionId]);
 
   const handleSelect = useCallback(
     (value: number) => {
@@ -63,7 +64,7 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
       </th>
       <td className="effectiveness-measurement-tooltip-cell">
         <button type="button" className="contextual-menu-button tooltip" aria-label={`More information about ${title}`} aria-description={tooltip} title={tooltip}>
-          {getIconElement("exclamation")}
+          {getIconElement("info")}
         </button>
       </td>
       {VOTING_SCALE.map((value: number) => {

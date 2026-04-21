@@ -417,7 +417,7 @@ describe("boardColumnsHelper", () => {
       });
 
       describe("wlb template", () => {
-        it("should return correct columns for wlb template (work-life balance)", () => {
+        it("should return correct columns for wlb template (work-life)", () => {
           const result = getColumnsByTemplateId("wlb");
 
           expect(result).toHaveLength(3);
