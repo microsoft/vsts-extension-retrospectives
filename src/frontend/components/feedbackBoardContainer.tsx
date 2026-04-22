@@ -1875,7 +1875,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     const responseCount = currentUserVote?.responses?.length || 0;
 
     if (responseCount < boardQuestions.length) {
-      toast("Please answer all questions before saving");
       return;
     }
 
@@ -1945,6 +1944,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const teamEffectivenessResponseCount = state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
+  const teamAssessmentQuestions = state.currentBoard?.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions;
+  const currentUserTeamAssessmentResponses = state.currentBoard?.teamEffectivenessMeasurementVoteCollection
+    ?.find(vote => vote.userId === obfuscateUserId(state.currentUserId))
+    ?.responses?.length ?? 0;
+  const isTeamAssessmentComplete = currentUserTeamAssessmentResponses >= teamAssessmentQuestions.length;
 
   return (
     <div className="flex flex-col h-screen" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
@@ -2174,7 +2178,14 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                               </div>
                             </div>
                             <div className="inner">
-                              <button type="button" className="button" onClick={saveTeamEffectivenessMeasurement}>
+                              <button
+                                type="button"
+                                className="button"
+                                onClick={saveTeamEffectivenessMeasurement}
+                                disabled={!isTeamAssessmentComplete}
+                                title={!isTeamAssessmentComplete ? "Please answer all questions to enable saving" : "Save"}
+                                aria-disabled={!isTeamAssessmentComplete}
+                              >
                                 Save
                               </button>
                               <button type="button" className="button default" onClick={hideTeamEffectivenessDialog}>

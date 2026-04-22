@@ -675,6 +675,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
       <div className="inner">
         <button
           disabled={!isSaveButtonEnabled()}
+          title={!isSaveButtonEnabled() ? "Please enter retrospective name to enable saving" : undefined}
           onClick={event => {
             if (isNewBoardCreation || columnCards.every(columnCard => !columnCard.markedForDeletion)) {
               handleFormSubmit(event);

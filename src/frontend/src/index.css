@@ -371,7 +371,7 @@ div.ms-Tooltip-content .effectiveness-measurement-tooltip-content a {
 .preview-email-dialog,
 .carousel-dialog,
 .sprint-retrospective-dialog {
-  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
+  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
 
   & table {
     @apply w-full border-collapse text-left;
@@ -450,6 +450,10 @@ div.ms-Tooltip-content .effectiveness-measurement-tooltip-content a {
 
       & svg {
         @apply w-4 h-4;
+      }
+
+      &:disabled {
+        @apply cursor-not-allowed opacity-50 bg-(--border-subtle-color) text-(--text-primary-color) border-(--border-subtle-color);
       }
     }
   }
