@@ -24,7 +24,7 @@ import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
-import { getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
+import { getQuestionName, getQuestionShortName, getQuestionTooltip, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
@@ -2156,9 +2156,19 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {(state.currentBoard.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions).map(question => {
-                                      return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={question.iconClassName} title={question.shortTitle} subtitle={question.title} tooltip={question.tooltip} />;
-                                    })}
+                                    {(() => {
+                                      const teamAssessmentQuestions = state.currentBoard.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions;
+                                      const customQuestionIds = teamAssessmentQuestions
+                                        .filter(q => !questions.find(defaultQuestion => defaultQuestion.id === q.id))
+                                        .map(q => q.id);
+
+                                      return teamAssessmentQuestions.map(question => {
+                                        const customIndex = customQuestionIds.indexOf(question.id);
+                                        const displayTitle = customIndex >= 0 ? `Custom Q${customIndex + 1}` : question.shortTitle;
+
+                                        return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={question.iconClassName} title={displayTitle} subtitle={question.title} tooltip={question.tooltip} />;
+                                      });
+                                    })()}
                                   </tbody>
                                 </table>
                               </div>
@@ -2423,16 +2433,24 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                   Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
                   <div className="retro-summary-effectiveness-scores">
                     <ul className="chart">
-                      {state.effectivenessMeasurementChartData.map(data => {
+                      {(() => {
+                        const boardQuestions = state.currentBoard.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions;
+                        const customQuestionIds = boardQuestions
+                          .filter(q => !questions.find(defaultQuestion => defaultQuestion.id === q.id))
+                          .map(q => q.id);
+                        return state.effectivenessMeasurementChartData.map(data => {
                         const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
                         const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
                         const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
                         const redScore = (data.red * 100) / teamEffectivenessResponseCount;
+                        const questionIconClassName = boardQuestions.find(question => question.id === data.questionId)?.iconClassName;
+                        const customIndex = customQuestionIds.indexOf(data.questionId);
+                        const shortName = customIndex >= 0 ? `Custom Q${customIndex + 1}` : getQuestionShortName(data.questionId);
                         return (
                           <li className="chart-question-block" key={data.questionId}>
                             <div className="chart-question">
-                              <i className={getQuestionIconClassName(data.questionId)} />
-                              <span>{getQuestionShortName(data.questionId)}</span>
+                              {getIconElement(questionIconClassName)}
+                              <span>{shortName}</span>
                             </div>
                             <div className="chart-response-track">
                               {data.red > 0 && (
@@ -2456,12 +2474,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                 {numberFormatter(averageScore)}
                               </div>
                             )}
-                            <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${getQuestionShortName(data.questionId)} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
+                            <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${shortName} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
                               Discuss and Act
                             </button>
                           </li>
                         );
-                      })}
+                      });
+                      })()}
                     </ul>
                     <div className="chart-legend-section">
                       <div className="chart-legend-group">

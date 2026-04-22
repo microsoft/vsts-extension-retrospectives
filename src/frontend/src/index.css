@@ -117,6 +117,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-primary underline;
 }
 
+div.ms-Tooltip-content .effectiveness-measurement-tooltip-content {
+  @apply text-xs leading-5 text-left;
+  overflow-wrap: anywhere;
+}
+
+div.ms-Tooltip-content .effectiveness-measurement-tooltip-content a {
+  @apply text-primary underline;
+}
+
 .ms-Pivot .ms-Button {
   @apply text-(--text-primary-color);
 }
@@ -1311,6 +1320,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .chart-question {
   @apply mr-1 min-w-28 w-28 shrink-0 text-left gap-1;
+
+  & svg {
+    @apply shrink-0;
+  }
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .chart-response-track {
@@ -1347,7 +1360,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li .chart-question {
-  @apply flex items-center justify-start min-h-2 p-2 box-border whitespace-nowrap;
+  @apply flex items-center justify-start min-h-2 p-2 box-border whitespace-nowrap gap-1;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li .chart-response {
@@ -1955,30 +1968,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
     @apply w-10 border-r-2 border-solid border-primary text-center;
-  }
-}
-
-.effectiveness-measurement-info-container {
-  @apply relative inline-block;
-
-  .effectiveness-measurement-popup {
-    @apply absolute z-50 left-full top-0 ml-2 w-80 rounded shadow-lg p-3 text-sm text-left;
-    background-color: var(--background-color, #fff);
-    border: 1px solid var(--border-subtle-color, #ccc);
-    color: var(--text-primary-color, #000);
-
-    p {
-      @apply m-0 leading-relaxed;
-    }
-
-    a {
-      @apply underline;
-      color: var(--primary-color, #0078d4);
-    }
-  }
-
-  .effectiveness-measurement-popup-close {
-    @apply absolute top-1 right-1 p-0.5 bg-transparent border-none cursor-pointer text-inherit;
   }
 }
 

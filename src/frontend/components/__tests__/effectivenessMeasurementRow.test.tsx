@@ -83,7 +83,22 @@ describe("EffectivenessMeasurementRow", () => {
 
       const tooltipHost = getByRole("button", { name: getInfoAriaLabel(defaultProps.title) });
       expect(tooltipHost).toBeInTheDocument();
-      expect(tooltipHost).toHaveAttribute("title", defaultProps.tooltip);
+      expect(tooltipHost).toHaveAttribute("aria-description", defaultProps.tooltip);
+    });
+
+    it("renders clickable hyperlink in Fluent tooltip content", async () => {
+      const propsWithLink = {
+        ...defaultProps,
+        tooltip: "Read more at https://example.com/research (Example Study).",
+      };
+
+      render(<EffectivenessMeasurementRow {...propsWithLink} />);
+
+      const tooltipButton = screen.getByRole("button", { name: getInfoAriaLabel(defaultProps.title) });
+      fireEvent.mouseEnter(tooltipButton);
+
+      const link = await screen.findByRole("link", { name: "Example Study" });
+      expect(link).toHaveAttribute("href", "https://example.com/research");
     });
 
     it("renders all 10 voting buttons", () => {
