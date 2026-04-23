@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect, useCallback } from "react";
+﻿import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 
@@ -16,6 +16,7 @@ import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement } from "./icons";
+import { createVisibilityAwarePolling } from "../utilities/visibilityAwarePolling";
 
 export interface FeedbackBoardProps {
   displayBoard: boolean;
@@ -31,6 +32,7 @@ export interface FeedbackBoardProps {
   userId: string;
   onVoteCasted?: () => void;
   onColumnNotesChange?: (columnId: string, notes: string) => Promise<void>;
+  isBackendServiceConnected?: boolean;
 }
 
 export interface IColumn {
@@ -77,7 +79,7 @@ const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
   return resetFocusForStateColumns;
 };
 
-export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange }) => {
+export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange, isBackendServiceConnected }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoard");
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -435,20 +437,17 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   getAllBoardFeedbackItemsRef.current = getAllBoardFeedbackItems;
 
   useEffect(() => {
-    let fallbackPollingIntervalId: number | undefined;
-
-    if (workflowPhase === WorkflowPhase.Collect) {
-      fallbackPollingIntervalId = window.setInterval(() => {
-        void getAllBoardFeedbackItemsRef.current();
-      }, 10000);
-    }
+    const shouldPoll = workflowPhase === WorkflowPhase.Collect && !isBackendServiceConnected;
+    const handle = createVisibilityAwarePolling({
+      callback: () => void getAllBoardFeedbackItemsRef.current(),
+      intervalMs: 30000,
+      enabled: shouldPoll,
+    });
 
     return () => {
-      if (fallbackPollingIntervalId !== undefined) {
-        window.clearInterval(fallbackPollingIntervalId);
-      }
+      handle.cleanup();
     };
-  }, [workflowPhase]);
+  }, [workflowPhase, isBackendServiceConnected]);
 
   const setDefaultIterationAndAreaPath = useCallback(async (teamId: string): Promise<void> => {
     let currentIterations = await workService.getIterations(teamId, "current");
@@ -687,7 +686,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     onFocusModeModelChange?.(getFocusModeModel());
   }, [getFocusModeModel, onFocusModeModelChange]);
 
-  const getFeedbackColumnPropsList = useCallback((): FeedbackColumnProps[] => {
+  const feedbackColumnPropsList = useMemo((): FeedbackColumnProps[] => {
     const canCurrentUserEditBoard = board.createdBy?.id === userId;
 
     return columnIds.map((columnId, index) => {
@@ -736,8 +735,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   if (!displayBoard) {
     return <div> An unexpected exception occurred. </div>;
   }
-
-  const feedbackColumnPropsList = getFeedbackColumnPropsList();
 
   return (
     <div className="feedback-board" role="main" aria-label="Feedback board with columns" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
