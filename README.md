@@ -446,7 +446,7 @@ following the standard retrospective process.
 
 #### Psychological Safety
 
-**Why pyschological safety matters:** Psychological safety is the #1 predictor of team success according to a
+**Why psychological safety matters:** Psychological safety is the #1 predictor of team success according to a
 [study done by Google](https://rework.withgoogle.com/) as well as numerous studies including those
 outlined in the book [The Fearless Organization](https://www.amazon.com/Fearless-Organization-Psychological-Workplace-Innovation/dp/1119477247)
 by Amy Edmondson. Furthermore, data shows that psychological safety results in a 12% increase in

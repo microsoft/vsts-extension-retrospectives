@@ -9,7 +9,7 @@ You can find the changelog of the Retrospective Extension below.
 * Fix: Reset Team Assessment edits when Cancel or Close (X) is used so unsaved values are consistently discarded.
 * Fix: Prevented stale Team Assessment responses from a previously viewed retrospective from appearing in another board.
 * Refactor: Simplified Team Assessment detailed informational text and moved original rationale content to the README with direct links from the tooltip.
-* Fix: Restored Fluent UI tooltips for improved readability and repaired Team Assessment hyperlinks for each attribute.
+* Fix: Restored Fluent UI tooltip for improved readability and repaired Team Assessment hyperlinks for each attribute.
 * Refactor: Replaced percentage tooltip with response count (e.g., 2 of 7) in retrospective summary.
 * Style: Simplified styling and improved color variation for Team Assessment header.
 * Style: Abbreviated labels for Psychological Safety and Work-life Balance for improved spacing and alignment; standardized prompts for improved spacing.
@@ -24,7 +24,7 @@ From [GitHub PR #1660](https://github.com/microsoft/vsts-extension-retrospective
 ## v1.92.53
 
 * Fix: Resolved an issue where retrospective boards could become unresponsive during use. From [GitHub PR #1624](https://github.com/microsoft/vsts-extension-retrospectives/pull/1624)
-* Feature: Added support for customizable Team Assessment questions. From [GitHub PR #1646](https://github.com/microsoft/vsts-extension-retrospectives/pull/1646)
+* Feature: Added support for custom Team Assessment questions. From [GitHub PR #1646](https://github.com/microsoft/vsts-extension-retrospectives/pull/1646)
 * Feature: Added localization support for Spanish, German, and French. From [GitHub PR #1657](https://github.com/microsoft/vsts-extension-retrospectives/pull/1657) and  [GitHub PR #1658](https://github.com/microsoft/vsts-extension-retrospectives/pull/1658)
 * Feature: Added Sprint Retrospective functionality by using current sprint name in retrospective name. From [GitHub PR #1659](https://github.com/microsoft/vsts-extension-retrospectives/pull/1659)
 
@@ -61,7 +61,7 @@ From [GitHub PR #1660](https://github.com/microsoft/vsts-extension-retrospective
 * Refactored User Votes as My Votes and added total votes as Team Votes. From [GitHub PR #1405](https://github.com/microsoft/vsts-extension-retrospectives/pull/1405)
 * Implemented keyboard navigation, focus handling, and a dedicated keyboard shortcuts dialog for improved accessibility. From [GitHub PR #1386](https://github.com/microsoft/vsts-extension-retrospectives/pull/1386)
 * Introduced column notes to provide detailed context for each board column. From [GitHub PR #1372](https://github.com/microsoft/vsts-extension-retrospectives/pull/1372) and [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
-* Replaced icons sourced from FontAwesome and Fluent UI with SVG icons sourced from Material UI. From [GitHub PR #1453](https://github.com/microsoft/vsts-extension-retrospectives/pull/1453)
+* Replaced icons sourced from Font Awesome and Fluent UI with SVG icons sourced from Material UI. From [GitHub PR #1453](https://github.com/microsoft/vsts-extension-retrospectives/pull/1453)
 * Consolidated and simplified CSS styling rules; simplified styling for grouped feedback; removed mobile view styling and user setting. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
 * Restricts delete board functionality to the board owner or a team admin. From [GitHub PR #1308](https://github.com/microsoft/vsts-extension-retrospectives/pull/1308)
 * Updated hyperlinks in CONTRIBUTING markdown file. From [GitHub PR #1305](https://github.com/microsoft/vsts-extension-retrospectives/pull/1305)
