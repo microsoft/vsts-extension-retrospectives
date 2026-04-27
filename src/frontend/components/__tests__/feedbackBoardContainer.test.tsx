@@ -2856,6 +2856,14 @@ describe("FeedbackBoardContainer - Utility Methods", () => {
     expect((instance as any).percentageFormatter(100)).toBe("100.0%");
   });
 
+  it("should format assessment hover text as count out of total", () => {
+    const instance = createStandaloneTimerInstance();
+
+    expect((instance as any).formatAssessmentHoverText("Favorable", 2, 7)).toBe("Favorable: 2 of 7");
+    expect((instance as any).formatAssessmentHoverText("Neutral", 3, 7)).toBe("Neutral: 3 of 7");
+    expect((instance as any).formatAssessmentHoverText("Unfavorable", 2, 7)).toBe("Unfavorable: 2 of 7");
+  });
+
   it("should show and hide carousel dialog", () => {
     const instance = createStandaloneTimerInstance();
     const showModal = jest.fn();

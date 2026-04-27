@@ -108,6 +108,7 @@ export type FeedbackBoardContainerHandle = {
 
   numberFormatter: (value: number) => string;
   percentageFormatter: (value: number) => string;
+  formatAssessmentHoverText: (category: "Favorable" | "Neutral" | "Unfavorable", count: number, totalResponses: number) => string;
 
   archiveBoardDialogRef: React.RefObject<HTMLDialogElement>;
   previewEmailDialogRef: React.RefObject<HTMLDialogElement>;
@@ -762,6 +763,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     const formatter = new Intl.NumberFormat("en-US", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     return formatter.format(value / 100);
+  }, []);
+
+  const formatAssessmentHoverText = React.useCallback((category: "Favorable" | "Neutral" | "Unfavorable", count: number, totalResponses: number) => {
+    return `${category}: ${count} of ${totalResponses}`;
   }, []);
 
   const handleBoardCreated = React.useCallback(
@@ -1815,6 +1820,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       updateFeedbackItemsAndContributors,
       numberFormatter,
       percentageFormatter,
+      formatAssessmentHoverText,
       archiveBoardDialogRef,
       previewEmailDialogRef,
       boardCreationDialogRef,
@@ -2111,8 +2117,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                       <th scope="col" className="text-left">
                                         Question
                                       </th>
-                                      <th scope="col" className="text-left min-w-13">
-                                        Details
+                                      <th scope="col" className="text-left">
                                       </th>
                                       <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
                                         Unfavorable
@@ -2465,17 +2470,17 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                             </div>
                             <div className="chart-response-track">
                               {data.red > 0 && (
-                                <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
+                                <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={formatAssessmentHoverText("Unfavorable", data.red, teamEffectivenessResponseCount)} aria-label={formatAssessmentHoverText("Unfavorable", data.red, teamEffectivenessResponseCount)}>
                                   <span>{percentageFormatter(redScore)}</span>
                                 </div>
                               )}
                               {data.yellow > 0 && (
-                                <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
+                                <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={formatAssessmentHoverText("Neutral", data.yellow, teamEffectivenessResponseCount)} aria-label={formatAssessmentHoverText("Neutral", data.yellow, teamEffectivenessResponseCount)}>
                                   <span>{percentageFormatter(yellowScore)}</span>
                                 </div>
                               )}
                               {data.green > 0 && (
-                                <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
+                                <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={formatAssessmentHoverText("Favorable", data.green, teamEffectivenessResponseCount)} aria-label={formatAssessmentHoverText("Favorable", data.green, teamEffectivenessResponseCount)}>
                                   <span>{percentageFormatter(greenScore)}</span>
                                 </div>
                               )}

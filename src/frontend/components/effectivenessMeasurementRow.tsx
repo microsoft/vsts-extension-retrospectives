@@ -96,13 +96,13 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
       <td className="effectiveness-measurement-tooltip-cell">
         <TooltipHost
           hostClassName="effectiveness-measurement-tooltip-host"
+          className="effectiveness-measurement-tooltip"
           content={renderTooltipContent(tooltip)}
           calloutProps={{
             gapSpace: 4,
             doNotLayer: true,
             styles: {
               root: {
-                zIndex: 1000000,
                 marginTop: "0.5rem",
               },
               calloutMain: {

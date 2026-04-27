@@ -284,16 +284,13 @@ export const ExtensionSettingsMenu: React.FC = () => {
             {getIconElement("close")}
           </button>
         </div>
-        <div className="subText">This release focuses on accessibility, simplified stylings, and clearer visuals.</div>
-        <div className="subText li">Added full keyboard navigation across the board along with a dedicated keyboard shortcuts dialog and improved focus handling.</div>
-        <div className="subText li">Introduced a configurable countdown timer with a duration picker, start and stop chimes.</div>
-        <div className="subText li">Added a Team Assessment History dialog with trend charts so teams can review past assessment results.</div>
-        <div className="subText li">Added support for Retrospective Board columns to include notes to clarify what is expected from the user.</div>
-        <div className="subText li">Standardized icons to ensure a consistent look and feel. Icons are included in the package, enabling support for Azure DevOps Enterprise environments.</div>
-        <div className="subText li">Redesigned the voting phase to include the total votes used by the team.</div>
-        <div className="subText li">Refined feedback cards, grouped feedback visuals, and dialog layouts for better readability and consistency.</div>
-        <div className="subText li">Restricted board deletion permissions to the Board Owner and Team Admin.</div>
-        <div className="subText">Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.</div>
+        <div className="subText">This release focused on Team Assessment with improved readability, guidance, and handling of unsaved responses.</div>
+        <div className="subText li">Improved Team Assessment and Retrospective Summary readability with better spacing, alignment, and visual clarity.</div>
+        <div className="subText li">Discarded unsaved Team Assessment edits when Cancel or Close (X) is used to prevent unsaved responses from appearing when reopening Team Assessment.</div>
+        <div className="subText li">Standardized Team Assessment labels and prompts for consistency and clarity.</div>
+        <div className="subText li">Simplified Team Assessment informational text and linked to the README for additional details.</div>
+        <div className="subText li">Removed blurred popup backgrounds to better align with Azure DevOps visual standards.</div>
+        <div className="subText">Refer to the Changelog for a comprehensive listing of updates in this and prior releases.</div>
         <div className="inner">
           <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>
             Open change log
