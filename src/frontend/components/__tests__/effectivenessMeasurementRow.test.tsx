@@ -101,6 +101,36 @@ describe("EffectivenessMeasurementRow", () => {
       expect(link).toHaveAttribute("href", "https://example.com/research");
     });
 
+it("renders tooltip text around an unlabeled hyperlink", () => {
+  const tooltip = "Start text https://example.com/end end text";
+
+  const { container } = render(<EffectivenessMeasurementRow {...defaultProps} tooltip={tooltip} />);
+
+  const tooltipContent = container.querySelector(".effectiveness-measurement-tooltip-content");
+  expect(tooltipContent).toHaveTextContent("Start text https://example.com/end end text");
+
+  const link = tooltipContent?.querySelector("a");
+  expect(link).toHaveAttribute("href", "https://example.com/end");
+  expect(link).toHaveTextContent("https://example.com/end");
+  expect(link).toHaveAttribute("target", "_blank");
+  expect(link).toHaveAttribute("rel", "noreferrer noopener");
+});
+
+it("renders tooltip that contains only an unlabeled hyperlink", () => {
+  const tooltip = "https://example.com/only-link";
+
+  const { container } = render(<EffectivenessMeasurementRow {...defaultProps} tooltip={tooltip} />);
+
+  const tooltipContent = container.querySelector(".effectiveness-measurement-tooltip-content");
+  expect(tooltipContent).toHaveTextContent("https://example.com/only-link");
+
+  const link = tooltipContent?.querySelector("a");
+  expect(link).toHaveAttribute("href", "https://example.com/only-link");
+  expect(link).toHaveTextContent("https://example.com/only-link");
+
+  expect(tooltipContent?.querySelectorAll("span")).toHaveLength(0);
+});
+
     it("renders all 10 voting buttons", () => {
       const { container } = render(<EffectivenessMeasurementRow {...defaultProps} />);
 

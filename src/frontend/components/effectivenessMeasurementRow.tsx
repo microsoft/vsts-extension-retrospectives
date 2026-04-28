@@ -39,7 +39,7 @@ const renderTooltipContent = (tooltip: string): React.ReactElement => {
 
   for (const match of tooltip.matchAll(TOOLTIP_LINK_REGEX)) {
     const [fullMatch, url, label] = match;
-    const matchStart = match.index ?? 0;
+    const matchStart = match.index;
 
     if (matchStart > cursor) {
       segments.push(<span key={`tooltip-text-${key++}`}>{tooltip.slice(cursor, matchStart)}</span>);
