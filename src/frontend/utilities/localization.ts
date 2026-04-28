@@ -30,7 +30,7 @@ const translations = {
     feedback_board_create_example: "Example: Retrospective {{date}}",
     feedback_board_email_summary: "Email summary",
     feedback_board_email_summary_aria: "Email summary for retrospective",
-    feedback_board_retro_summary: "Retrospective board summary",
+    feedback_board_retro_summary: "Retrospective Board Summary",
     feedback_board_basic_settings: "Basic Settings",
     feedback_board_created_date: "Created date: {{date}}",
     feedback_board_created_by: "Created by",
