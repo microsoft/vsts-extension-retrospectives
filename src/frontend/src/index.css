@@ -438,11 +438,6 @@ div.ms-Tooltip-content .effectiveness-measurement-tooltip-content a {
     }
   }
 
-  /* Keep paragraph spacing intact while tightening only bullet-to-bullet gaps in What's New. */
-  &.whats-new-dialog .subText.li + .subText.li {
-    /* removed custom bullet gap tightening; revert to default spacing */
-  }
-
   & .inner {
     @apply flex items-center justify-end gap-3 px-5 py-3 shrink-0;
 
@@ -462,6 +457,10 @@ div.ms-Tooltip-content .effectiveness-measurement-tooltip-content a {
       }
     }
   }
+}
+
+.team-effectiveness-dialog table th:first-child {
+  padding-right: 0 !important;
 }
 
 .preview-email-content {
@@ -1340,8 +1339,8 @@ div.ms-Tooltip-content .effectiveness-measurement-tooltip-content a {
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .team-effectiveness-average-number {
-  @apply py-1 px-0 font-bold mr-0.75 my-auto text-right tabular-nums shrink-0;
-  width: 3.25ch;
+  @apply py-1 px-0 font-bold mx-px my-auto text-center tabular-nums shrink-0;
+  width: 3.5ch;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .assessment-chart-action {
