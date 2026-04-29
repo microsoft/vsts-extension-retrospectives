@@ -1278,7 +1278,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       setState({
         isTeamDataLoaded: true,
         boards: boardsForTeam,
-        currentBoard: preferredBoard || boardsForTeam[0],
+        currentBoard: preferredBoard ?? boardsForTeam[0],
       });
     } catch (error) {
       appInsights.trackException(error, {
@@ -2116,7 +2116,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                         Question
                                       </th>
                                       <th scope="col" className="text-left">
-                                        Details         
+                                        Details
                                       </th>
                                       <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
                                         Unfavorable
@@ -2411,7 +2411,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           <div className="subText">
             <section className="retro-summary-section">
               <div className="retro-summary-section-header">{t("feedback_board_basic_settings")}</div>
-              <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric" }).format(new Date(state.currentBoard.createdDate)) })}</div>
+              <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "short", day: "numeric" }) })}</div>              
               <div id="retro-summary-created-by">
                 {t("feedback_board_created_by", { name: state.currentBoard?.createdBy.displayName })} <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
               </div>
@@ -2431,7 +2431,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               )}
               <div className="retro-summary-item-horizontal-group">
                 <div className="retro-summary-section-item horizontal-group-item">
-                                    {t("feedback_board_votes_summary", {
+                    {t("feedback_board_votes_summary", {
                     participants: Object.keys(state.currentBoard?.boardVoteCollection || {}).length,
                     votes: state.castedVoteCount,
                   })}
@@ -2519,22 +2519,25 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           </div>
         </dialog>
       )}
-      <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog" aria-label="Team Assessment History" role="dialog">
+      <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog" aria-label={t("feedback_board_team_assessment_history")} role="dialog">
         <div className="header">
-          <h2>Team Assessment History</h2>
-          <button type="button" onClick={hideTeamAssessmentHistoryDialog} aria-label="Close">
+          <h2>{t("feedback_board_team_assessment_history")}</h2>
+          <button type="button" onClick={hideTeamAssessmentHistoryDialog} aria-label={t("common_close")}>
             {getIconElement("close")}
           </button>
         </div>
         {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
           <div className="team-assessment-no-data">
-            <p>No team assessment history available.</p>
-            <p>Create retrospectives with team assessments to see historical trends.</p>
+            <p>{t("feedback_board_team_assessment_no_history")}</p>
+            <p>{t("feedback_board_team_assessment_trends")}</p>
           </div>
         ) : (
           <div className="subText">
             <p className="team-assessment-info-text">
-              Showing average scores over time across {state.teamAssessmentHistoryData.slice(-13).length} retrospective{state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : ""}.
+              {t("feedback_board_team_assessment_showing_average_scores", {
+                count: state.teamAssessmentHistoryData.slice(-13).length,
+                suffix: state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : "",
+              })}
             </p>
             <TeamAssessmentHistoryChart historyData={state.teamAssessmentHistoryData.slice(-13)} numberFormatter={numberFormatter} />
           </div>
