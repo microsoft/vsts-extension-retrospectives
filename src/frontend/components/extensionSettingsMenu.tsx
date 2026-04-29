@@ -10,6 +10,7 @@ import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 
 import { getIconElement } from "./icons";
+import { t } from "../utilities/localization";
 
 interface IExportImportDataSchema {
   team: WebApiTeam;
@@ -272,7 +273,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
             Open Retrospective Wiki
           </button>
           <button className="default button" onClick={() => primeDirectiveDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>
@@ -296,7 +297,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
             Open change log
           </button>
           <button className="default button" onClick={() => whatsNewDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>
@@ -315,7 +316,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
             Open user guide
           </button>
           <button className="default button" onClick={() => userGuideDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>
@@ -335,7 +336,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
             Open contributing guidelines
           </button>
           <button className="default button" onClick={() => volunteerDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>
@@ -390,7 +391,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
         <div className="inner">
           <button className="default button" onClick={() => keyboardShortcutsDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>

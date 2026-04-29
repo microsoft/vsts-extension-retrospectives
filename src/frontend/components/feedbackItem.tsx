@@ -20,6 +20,7 @@ import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelpe
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement, MoreVerticalIcon } from "./icons";
+import { t } from "../utilities/localization";
 
 export interface IFeedbackItemColumnContext {
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
@@ -1165,7 +1166,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
             Delete
           </button>
           <button className="default button" onClick={hideDeleteItemConfirmationDialog}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>
@@ -1195,7 +1196,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
               </button>
             ))}
           <button className="default button" onClick={hideMoveFeedbackItemDialog}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>
@@ -1285,7 +1286,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
             Remove Feedback from Group
           </button>
           <button className="default button" onClick={hideRemoveFeedbackItemFromGroupConfirmationDialog}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>

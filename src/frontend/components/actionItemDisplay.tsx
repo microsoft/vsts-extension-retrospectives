@@ -13,6 +13,7 @@ import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetr
 import ActionItem from "./actionItem";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { getIconElement } from "./icons";
+import { t } from "../utilities/localization";
 
 export interface ActionItemDisplayProps {
   feedbackItemId: string;
@@ -236,7 +237,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
             Link work item
           </button>
           <button className="default button" onClick={() => linkExistingWorkItemDialogRef.current!.close()}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>

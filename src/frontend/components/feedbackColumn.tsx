@@ -13,6 +13,7 @@ import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkIt
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement } from "./icons";
+import { t } from "../utilities/localization";
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -494,10 +495,10 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
         </div>
         <div className="inner">
           <button type="button" className="button" onClick={saveColumnNotes}>
-            Save
+            {t("common_save")}
           </button>
           <button type="button" className="button default" onClick={() => editColumnNotesDialogRef.current!.close()}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>

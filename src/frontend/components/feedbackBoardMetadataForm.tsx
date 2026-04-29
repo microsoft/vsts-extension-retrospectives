@@ -612,7 +612,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 </div>
                 <div className="inner">
                   <button className="default button" onClick={() => chooseColumnIconDialogRef.current!.close()}>
-                    Close
+                    {t("common_close")}
                   </button>
                 </div>
               </dialog>

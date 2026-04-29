@@ -24,7 +24,7 @@ import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
-import { getQuestionName, getQuestionShortName, getQuestionTooltip, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
+import { getQuestionShortName, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
@@ -41,6 +41,7 @@ import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { buildSprintRetrospectiveTitle, getCurrentIteration } from "../utilities/sprintRetrospectiveHelper";
 import { workService } from "../dal/azureDevOpsWorkService";
+import { t } from "../utilities/localization";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -1843,7 +1844,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return (
       <div className="spinner" aria-live="assertive">
         <div></div>
-        <span>Loading...</span>
+        <span>{t("common_loading")}</span>
       </div>
     );
   }
@@ -1992,7 +1993,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               Proceed
             </button>
             <button type="button" className="button default" onClick={() => discussAndActDialogRef.current!.close()}>
-              Cancel
+              {t("common_cancel")}
             </button>
           </div>
         </dialog>
@@ -2192,10 +2193,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                 title={!isTeamAssessmentComplete ? "Please answer all questions to enable saving" : "Save"}
                                 aria-disabled={!isTeamAssessmentComplete}
                               >
-                                Save
+                                {t("common_save")}
                               </button>
                               <button type="button" className="button default" onClick={hideTeamEffectivenessDialog}>
-                                Cancel
+                                {t("common_cancel")}
                               </button>
                             </div>
                           </dialog>
@@ -2375,7 +2376,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               Archive
             </button>
             <button className="default button" onClick={() => archiveBoardDialogRef.current?.close()}>
-              Cancel
+              {t("common_cancel")}
             </button>
           </div>
         </dialog>
@@ -2395,13 +2396,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             <textarea rows={20} className="preview-email-content" readOnly={true} aria-label="Email summary for retrospective" value={state.currentBoard.emailContent}></textarea>
           </div>
           <div className="inner">
-            <button title="Copy to clipboard" aria-label="Copy to clipboard" onClick={showEmailCopiedToast}>
+            <button title={t("common_copy_to_clipboard")} aria-label={t("common_copy_to_clipboard")} onClick={showEmailCopiedToast}>
               {getIconElement("content-copy")}
-              Copy to clipboard
+              {t("common_copy_to_clipboard")}
             </button>
-            <button title="Download PDF" aria-label="Download email summary as PDF" onClick={downloadEmailSummaryPdf} className="default button">
+            <button title={t("common_download_pdf")} aria-label={t("common_download_pdf")} onClick={downloadEmailSummaryPdf} className="default button">
               {getIconElement("sim-card-download")}
-              Download PDF
+              {t("common_download_pdf")}
             </button>
           </div>
         </dialog>
