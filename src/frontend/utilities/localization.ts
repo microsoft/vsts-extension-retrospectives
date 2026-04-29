@@ -19,7 +19,7 @@ const translations = {
     feedback_board_team_list_error: "We are unable to retrieve the list of teams for this project. Try reloading the page.",
     feedback_board_link_copied: "The link to retrospective {{title}} ({{phase}} phase) has been copied to your clipboard.",
     feedback_board_email_copied: "The email summary for \"{{title}}\" has been copied to your clipboard.",
-    feedback_board_answer_all_questions: "Please answer all questions before saving.",
+    feedback_board_answer_all_questions: "Please answer all questions before saving",
     feedback_board_archive_title: "Archive Retrospective",
     feedback_board_archive_message: "The retrospective board {{title}} with its feedback will be archived.",
     feedback_board_archive_note: "Archived retrospectives remain available on the History tab, where they can be restored or deleted.",
