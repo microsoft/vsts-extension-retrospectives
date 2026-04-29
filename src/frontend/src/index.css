@@ -1369,7 +1369,7 @@ div.ms-Tooltip-content .effectiveness-measurement-tooltip-content a {
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li .chart-question {
-  @apply flex items-center justify-start p-1.5 box-border whitespace-nowrap gap-1;
+  @apply flex items-center justify-start p-1.5 pl-0 box-border whitespace-nowrap gap-1;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li .chart-response {

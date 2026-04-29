@@ -2118,7 +2118,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                         Question
                                       </th>
                                       <th scope="col" className="text-left">
-                                        Details&nbsp;
+                                        Details         
                                       </th>
                                       <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
                                         Unfavorable
