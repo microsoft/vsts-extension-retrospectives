@@ -37,7 +37,7 @@ jobs:
               - 'src/backend.tests/**'
 
       - if: steps.changes.outputs.src == 'true'
-        run: dotnet restore --locked-mode
+        run: dotnet restore --force-evaluate
         name: Restore
         working-directory: '.'
 
