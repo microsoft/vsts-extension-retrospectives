@@ -377,14 +377,20 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
-      await initializeProjectTeams(initialCurrentTeam);
-
       setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true });
     } catch (error) {
       appInsights.trackException(error, {
         action: "initializeTeamAndBoardState",
       });
       setState({ isTeamDataLoaded: true });
+    }
+
+    try {
+      await initializeProjectTeams(initialCurrentTeam);
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "initializeProjectTeams",
+      });
     }
 
     try {
@@ -2431,7 +2437,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               )}
               <div className="retro-summary-item-horizontal-group">
                 <div className="retro-summary-section-item horizontal-group-item">
-                    {t("feedback_board_votes_summary", {
+                  {t("feedback_board_votes_summary", {
                     participants: Object.keys(state.currentBoard?.boardVoteCollection || {}).length,
                     votes: state.castedVoteCount,
                   })}

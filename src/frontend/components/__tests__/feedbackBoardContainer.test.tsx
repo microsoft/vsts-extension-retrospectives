@@ -406,6 +406,20 @@ describe("FeedbackBoardContainer additional coverage", () => {
     expect(instance.state.isBackendServiceConnected).toBe(false);
   });
 
+  it("keeps initialized team and board state when initializeProjectTeams fails", async () => {
+    azureCoreMock.getAllTeams
+      ?.mockResolvedValueOnce([team])
+      .mockRejectedValueOnce(new Error("initializeProjectTeams failed"));
+
+    const instance = createSynchronousContainer();
+    await instance.componentDidMount();
+
+    expect(instance.state.currentTeam?.id).toBe(team.id);
+    expect(instance.state.currentBoard?.id).toBe(baseBoard.id);
+    expect(instance.state.isTeamDataLoaded).toBe(true);
+    expect(appInsights.trackException).toHaveBeenCalledWith(expect.any(Error), expect.objectContaining({ action: "initializeProjectTeams" }));
+  });
+
   it("renders initialized board and history views", async () => {
     const { ref } = renderContainerWithHandle();
 
