@@ -37,18 +37,17 @@ jobs:
               - 'src/backend.tests/**'
 
       - if: steps.changes.outputs.src == 'true'
-        run: |
-          dotnet restore --locked-mode
-          dotnet build
-        name: Build
-        working-directory: 'src/backend'
+        run: dotnet restore --locked-mode
+        name: Restore
+        working-directory: '.'
 
       - if: steps.changes.outputs.src == 'true'
-        run: |
-          dotnet restore --locked-mode
-          dotnet test --logger "trx;LogFileName=test-results.trx"
+        run: dotnet build src/backend/CollaborationStateService.csproj
+        name: Build
+
+      - if: steps.changes.outputs.src == 'true'
+        run: dotnet test src/backend.tests/RetrospectiveExtension.Backend.Tests.csproj --logger "trx;LogFileName=test-results.trx"
         name: Test
-        working-directory: 'src/backend.tests'
 
       - if: success() || failure()
         name: Upload backend test report
