@@ -505,7 +505,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     return (
       <div className="spinner" aria-live="assertive">
         <div></div>
-        <span>Loading...</span>
+        <span>{t("common_loading")}</span>
       </div>
     );
   }
@@ -554,7 +554,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
               setOpenDialogBoardId(null);
             }}
           >
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>

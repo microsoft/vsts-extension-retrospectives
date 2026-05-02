@@ -176,8 +176,8 @@ The assessment tracks 6 categories:
 
 - Clarity
 - Energy
-- Psychological Safety
-- Work-life Balance
+- Psych Safety
+- Work-Life
 - Confidence
 - Efficiency
 
@@ -404,43 +404,98 @@ biggest opportunity with actions identified should be a part of that process.
 
 ![Screenshot of the Team Assessment Questions](https://user-images.githubusercontent.com/114175122/203427827-f8e1e562-daf9-448b-9636-ec5f9beae120.png)
 
-- Best practices for improving **clarity** include creation of and alignment to OKRs. Regular review
+#### Clarity
+
+**Why clarity matters:** Only about 50% of employees strongly indicate they know what is expected of them
+at work according to [Gallup](https://www.gallup.com/workplace/236567/obsolete-annual-reviews-gallup-advice.aspx).
+Furthermore, clarity of expectations is statistically linked to many important organizational outcomes.
+Getting expectations right relates to better customer perceptions of service quality, productivity,
+retention of employees and safety. Substantial gains in clarity of expectations connect to productivity
+gains of 5% to 10%, and link to 10% to 20% fewer safety incidents.
+
+**Best practices for improving clarity** include creation of and alignment to OKRs. Regular review
 of OKRs with stakeholders combined with the implementation of agile development methodologies to continually
 prioritize the work that will have the biggest impact on achieving the OKRs. A well maintained backlog
 that is visible to the entire team and reviewed regularly will ensure clarity. The backlog should be
 stack ranked in order of priority with minimum work in process will ensure team clarity on the work
 that matters the most. Drive continuous improvement in clarity by using the “Clarity” Retrospective
 Board template, following the standard retrospective process.
-- Best practices for improving **energy** include ensuring that all team members are spending at least
+
+#### Energy
+
+**Why energy matters:** Only 2 out of 10 employees strongly indicate that they use their strengths every
+day at work according to [Marcus Buckingham](https://www.tmbc.com/business-case-for-strengths/), yet
+those who do have 38% higher productivity, 44% higher customer satisfaction scores, and 50% higher
+retention. Using your strengths at work results in being excited to work and is one of the strongest
+predictors of whether you are on a high performing team. Furthermore,
+[Marcus Buckingham argues](https://www.youtube.com/watch?v=knxVp4u8fGA) that if we spend less than
+20% of our time at work doing what we love we are much more likely to burn out. An inspired employee
+is 2.25 times more productive than a merely satisfied employee according to research by the
+[Bain Company](https://www.bain.com/insights/summary-of-time-talent-and-energy/) summarized in the
+book _Time, Talent, Energy_.
+
+**Best practices for improving energy** include ensuring that all team members are spending at least
 20% of their time on the team doing work that they love. Each team member should embark on a journey
 of self-discovery to identify what they love by keeping a record of the work that they loved doing
 on a daily and weekly basis until their strengths are clearly identified. Managers should endeavor
 to understand the work that their employees love by conducting a simple weekly check-in and asking 4
-simple questions: "What did you do last week that energized you (you loved)?”, “What did you do last
-week that drained your energy?”, "What are your priorities this week?", and "How can I (your manager)
-help?". Drive continuous improvement in energy by using the “Energy” Retrospective Board template,
+simple questions: “What did you do last week that energized you (you loved)?”, “What did you do last
+week that drained your energy?”, “What are your priorities this week?”, and “How can I (your manager)
+help?”. Drive continuous improvement in energy by using the “Energy” Retrospective Board template,
 following the standard retrospective process.
-- Best practices for improving **psychological safety** include conducting a baseline retrospective
-using the "Psychological Safety" template in Azure DevOps Retrospectives (anonymously). Identify top
+
+#### Psychological Safety
+
+**Why psychological safety matters:** Psychological safety is the #1 predictor of team success according to a
+[study done by Google](https://rework.withgoogle.com/) as well as numerous studies including those
+outlined in the book [The Fearless Organization](https://www.amazon.com/Fearless-Organization-Psychological-Workplace-Innovation/dp/1119477247)
+by Amy Edmondson. Furthermore, data shows that psychological safety results in a 12% increase in
+productivity, a 27% reduction in turnover, and a 40% reduction in mistakes according to
+[Gallup](https://www.gallup.com/workplace/236198/create-culture-psychological-safety.aspx).
+
+**Best practices for improving psychological safety** include conducting a baseline retrospective
+using the “Psych Safety” template in Azure DevOps Retrospectives (anonymously). Identify top
 actions that the team will implement to improve psychological safety. Repeat the psychological safety
-retrospective every 4-6 weeks until there are no scores below a 7. We've learned that every team is
+retrospective every 4-6 weeks until there are no scores below a 7. We’ve learned that every team is
 different and, in most cases, simple changes can make a profound impact, but it requires asking anonymously
-and taking action to improve.  Drive continuous improvement in psychological safety by using the
+and taking action to improve. Drive continuous improvement in psychological safety by using the
 “Psychological Safety” Retrospective Board template, following the standard retrospective process.
-- Best practices for improving **work-life balance** include the implementation of fundamental agile
+
+#### Work-Life Balance
+
+**Why work-life balance matters:** Self-assessed productivity in 2021 was the same or higher than in previous years
+for many employees (82%), but at a human cost. One in five global survey respondents say their employer
+doesn’t care about their work-life balance. 54% of workers feel overworked and 39% feel exhausted
+according to the [2021 Work Trend Index from Microsoft](https://www.microsoft.com/en-us/worklab/work-trend-index/hybrid-work).
+
+**Best practices for improving work-life balance** include the implementation of fundamental agile
 practices including backlog refinement and prioritization, limiting Work In Process by establishing WIP
 limits and adhering to them, and only committing to deliver at the same velocity as the data indicates
 the team has predictably delivered in the past. Finally, simply asking the question in the Team Effectiveness
 survey and conducting deep dive discussions to identify drivers combined with follow-through on the
 associated actions should result in increased sustainability for the team. Drive continuous improvement
-in work-life balance by using the “Work-Life Balance” Retrospective Board template, following the
+in work-life balance by using the “Work-Life” Retrospective Board template, following the
 standard retrospective process.
-- Best practices for improving **confidence** include sharing Objectives and Key Results (OKRs) from
+
+#### Confidence
+
+**Why team confidence matters:** [Research](https://content.apa.org/record/2009-06703-020) by the American
+Psychological Association shows the strongest predictor of team efficacy is the collective confidence
+of the team to be successful.
+
+**Best practices for improving team confidence** include sharing Objectives and Key Results (OKRs) from
 different levels across your organization. Bringing transparency into the OKRs can help teams and
-individuals better understand how their work aligns to the organizations' priorities and can build
+individuals better understand how their work aligns to the organizations’ priorities and can build
 confidence in doing the right work to deliver against those OKRs.
-- Best practices for improving **efficiency** can also include the implementation of agile practices
-including backlog refinement and prioritization. Limiting Work In Process by establishing WIP limits
+
+#### Efficiency
+
+**Why efficiency matters:** Case studies, such as those in [Accelerate](https://www.amazon.com/Accelerate-Software-Performing-Technology-Organizations/dp/1942788339/)
+by Forsgren, Humble, and Kim, show that organizations that optimize their processes and tools see
+improvements in customer responsiveness, lead time, and developer satisfaction.
+
+**Best practices for improving efficiency** can also include the implementation of agile practices
+including backlog refinement and prioritization. Limiting work in process by establishing WIP limits
 and adhering to them enables teams to be more efficient so they can "stop starting and start finishing"!
 
 ## Contribute

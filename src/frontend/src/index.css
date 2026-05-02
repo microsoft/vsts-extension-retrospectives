@@ -117,6 +117,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-primary underline;
 }
 
+div.ms-Tooltip-content .effectiveness-measurement-tooltip-content {
+  @apply text-xs leading-5 text-left;
+  overflow-wrap: anywhere;
+}
+
+div.ms-Tooltip-content .effectiveness-measurement-tooltip-content a {
+  @apply text-primary underline;
+}
+
 .ms-Pivot .ms-Button {
   @apply text-(--text-primary-color);
 }
@@ -362,7 +371,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .preview-email-dialog,
 .carousel-dialog,
 .sprint-retrospective-dialog {
-  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
+  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
 
   & table {
     @apply w-full border-collapse text-left;
@@ -442,8 +451,16 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       & svg {
         @apply w-4 h-4;
       }
+
+      &:disabled {
+        @apply cursor-not-allowed opacity-50 bg-(--border-subtle-color) text-(--text-primary-color) border-(--border-subtle-color);
+      }
     }
   }
+}
+
+.team-effectiveness-dialog table th:first-child {
+  padding-right: 0 !important;
 }
 
 .preview-email-content {
@@ -1306,48 +1323,57 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block {
-  @apply flex flex-row my-0.5 mx-0 gap-1;
+  @apply flex flex-row items-stretch my-0.5 mx-0 gap-1 w-full;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .chart-question {
-  @apply w-72;
+  @apply mr-1 min-w-28 w-28 shrink-0 text-left gap-1;
+
+  & svg {
+    @apply shrink-0;
+  }
+}
+
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .chart-response-track {
+  @apply flex flex-row flex-1 min-w-0 items-stretch;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .team-effectiveness-average-number {
-  @apply p-1 font-bold my-auto mx-0.5 w-7 text-center;
+  @apply py-1 px-0 font-bold mx-px my-auto text-center tabular-nums shrink-0;
+  width: 3.5ch;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-question-block .assessment-chart-action {
-  @apply whitespace-nowrap py-0 px-1.5 bg-primary;
+  @apply whitespace-nowrap py-0 px-1.5 bg-primary shrink-0 self-stretch flex items-center;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores ul.chart .chart-response {
   & span {
-    @apply grid justify-end p-2 pl-24 pointer-events-none rounded-4xl bg-black/50;
+    @apply grid justify-end p-2 pl-3 mr-1 pointer-events-none rounded-4xl bg-black/50 text-white;
   }
 
   &.red-chart-response {
     @apply bg-error;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 11px, #bd1c1a 11px, #bd1c1a 12px);
   }
 
   &.yellow-chart-response {
     @apply bg-task-yellow;
-    background-image: repeating-linear-gradient(90deg, transparent, transparent 15px, #ceab02 15px, #ceab02 16px);
+    background-image: repeating-linear-gradient(90deg, transparent, transparent 12px, #d9b923 12px, #d9b923 13px);
   }
 
   &.green-chart-response {
     @apply bg-success;
-    background-image: radial-gradient(#006238 20%, transparent 20%), radial-gradient(#006238 20%, transparent 20%);
-    background-size: 12px 12px;
-    background-position:
-      top left,
-      6px 6px;
+    background-image: repeating-linear-gradient(135deg, transparent, transparent 11px, #008739 11px, #008739 12px);
   }
 }
 
-.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li div {
-  @apply flex items-center justify-end min-h-2 p-2 box-border;
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li .chart-question {
+  @apply flex items-center justify-start p-1.5 pl-0 box-border whitespace-nowrap gap-1;
+}
+
+.retro-summary-dialog .retro-summary-effectiveness-scores ul.chart li .chart-response {
+  @apply flex items-center justify-end py-1.5 px-0 box-border;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section {
@@ -1857,7 +1883,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-effectiveness-measurement-table {
-  @apply w-full border-separate [border-spacing:0_0.5em];
+  @apply border-separate [border-spacing:0_0.5em];
+  width: fit-content !important;
 
   & thead {
     @apply text-center;
@@ -1872,54 +1899,46 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       &.voting-measurement-index-unfavorable,
       &.voting-measurement-index-neutral,
       &.voting-measurement-index-favorable {
-        @apply [text-shadow:-2px_0_black,0_2px_black,2px_0_black,0_-2px_black];
+        @apply [text-shadow:-1px_0_black,0_1px_black,1px_0_black,0_-1px_black];
 
         &.voting-index-1 {
           @apply bg-[#db4d4f];
-          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #bd1c1a 9px, #bd1c1a 10px);
         }
 
         &.voting-index-2 {
           @apply bg-[#e1664f];
-          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc4127 9px, #cc4127 10px);
         }
 
         &.voting-index-3 {
           @apply bg-[#ee794f];
-          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e15927 9px, #e15927 10px);
         }
 
         &.voting-index-4 {
           @apply bg-[rgb(240,155,79)];
-          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #cc7424 9px, #cc7424 10px);
         }
 
         &.voting-index-5 {
           @apply bg-[rgb(251,177,79)];
-          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #e89c37 9px, #e89c37 10px);
         }
 
         &.voting-index-6 {
           @apply bg-[rgb(253,193,79)];
-          background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, #df9e24 9px, #df9e24 10px);
         }
 
         &.voting-index-7 {
           @apply bg-[rgb(255,211,92)];
-          background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #ecc503 7px, #ecc503 8px);
         }
 
         &.voting-index-8 {
           @apply bg-[rgb(242,227,92)];
-          background-image: repeating-linear-gradient(90deg, transparent, transparent 7px, #f7d113 7px, #f7d113 8px);
         }
 
         &.voting-index-9 {
-          @apply bg-success bg-[radial-gradient(var(--color-success-lighter)_10%,transparent_10%),radial-gradient(var(--color-success-lighter)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
+          @apply bg-[rgb(138,196,84)];
         }
 
         &.voting-index-10 {
-          @apply bg-success bg-[radial-gradient(var(--color-success)_10%,transparent_10%),radial-gradient(var(--color-success)_10%,transparent_10%)] bg-size-[12px_12px] bg-position-[top_left,6px_6px];
+          @apply bg-success;
         }
       }
     }
@@ -1930,15 +1949,19 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & tbody .effectiveness-measurement-row th {
-    @apply font-normal p-2;
+    @apply font-normal py-2 pl-2 pr-0 w-auto;
 
     & p {
       @apply flex items-center gap-1;
     }
   }
 
+  & tbody .effectiveness-measurement-row td:not(.effectiveness-measurement-tooltip-cell) {
+    @apply w-8 p-0 text-center align-middle;
+  }
+
   & tbody .effectiveness-measurement-row .team-assessment-score-button {
-    @apply text-(--text-primary-color) inline-flex items-center justify-center bg-transparent border-none cursor-pointer p-1;
+    @apply text-(--text-primary-color) inline-flex items-center justify-center bg-transparent border-none cursor-pointer p-1 mx-auto;
 
     &:focus-visible {
       @apply outline-2 outline-(--nav-header-active-item-background) outline-offset-2;
@@ -1950,7 +1973,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell {
-    @apply w-10 border-r-2 border-solid border-primary text-center;
+    @apply w-8 px-0 border-r-2 border-solid border-(--border-subtle-color) text-center align-middle;
+  }
+
+  & tbody .effectiveness-measurement-row .effectiveness-measurement-tooltip-cell .contextual-menu-button {
+    @apply inline-flex items-center justify-center p-1 mx-auto align-middle;
   }
 }
 

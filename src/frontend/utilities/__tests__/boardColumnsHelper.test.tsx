@@ -403,7 +403,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#cc293d",
             iconClass: "sad-face",
             id: "uuid-2",
-            title: "What undermines pyschological safety?",
+            title: "What undermines psychological safety?",
             notes: "",
           });
           expect(result[2]).toEqual({
@@ -417,7 +417,7 @@ describe("boardColumnsHelper", () => {
       });
 
       describe("wlb template", () => {
-        it("should return correct columns for wlb template (work-life balance)", () => {
+        it("should return correct columns for wlb template (work-life)", () => {
           const result = getColumnsByTemplateId("wlb");
 
           expect(result).toHaveLength(3);

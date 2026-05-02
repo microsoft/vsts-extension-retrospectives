@@ -422,8 +422,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                   <option disabled>─────────────</option>
                   <option value="clarity">Clarity</option>
                   <option value="energy">Energy</option>
-                  <option value="psy-safety">Psychological Safety</option>
-                  <option value="wlb">Work-life Balance</option>
+                  <option value="psy-safety">Psych Safety</option>
+                  <option value="wlb">Work-Life</option>
                   <option value="confidence">Confidence</option>
                   <option value="efficiency">Efficiency</option>
                 </select>
@@ -612,7 +612,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 </div>
                 <div className="inner">
                   <button className="default button" onClick={() => chooseColumnIconDialogRef.current!.close()}>
-                    Close
+                    {t("common_close")}
                   </button>
                 </div>
               </dialog>
@@ -675,6 +675,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
       <div className="inner">
         <button
           disabled={!isSaveButtonEnabled()}
+          title={!isSaveButtonEnabled() ? "Please enter retrospective name to enable saving" : undefined}
           onClick={event => {
             if (isNewBoardCreation || columnCards.every(columnCard => !columnCard.markedForDeletion)) {
               handleFormSubmit(event);

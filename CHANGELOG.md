@@ -2,22 +2,48 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.54
+
+* Fix: Improved readability of retrospective summary for Team Assessment by displaying percentage with white text in dark pill, reducing pill size, and adjusting background styling.
+* Fix: Addressed alignment issues for Team Assessment and Retrospective summary for icons, labels, charts, and values.
+* Fix: Reset Team Assessment edits when Cancel or Close (X) is used so unsaved values are consistently discarded.
+* Fix: Prevented stale Team Assessment responses from a previously viewed retrospective from appearing in another board.
+* Refactor: Simplified Team Assessment detailed informational text and moved original rationale content to the README with direct links from the tooltip.
+* Fix: Restored Fluent UI tooltip for improved readability and repaired Team Assessment hyperlinks for each attribute.
+* Refactor: Replaced percentage tooltip with response count (e.g., 2 of 7) in retrospective summary.
+* Style: Simplified styling and improved color variation for Team Assessment header.
+* Style: Abbreviated labels for Psychological Safety and Work-life Balance for improved spacing and alignment; standardized prompts for improved spacing.
+* Fix: Added standard custom question labels for Team Assessment and fixed alignment in the retrospective summary.
+* Refactor: Replaced legacy icons used in Retrospective Summary with SVG icons; replaced Efficiency icon with a visually simpler gear icon.
+* Refactor: Disabled Save when Team Assessment responses incomplete instead of using Toast messaging.
+* Fix: Added tooltip messaging in Create Retrospective when Save is disabled because a retrospective name is required.
+* Style: Removed blurred popup backgrounds to match Azure DevOps visual standards.
+
+From [GitHub PR #1660](https://github.com/microsoft/vsts-extension-retrospectives/pull/1660)
+
+## v1.92.53
+
+* Fix: Resolved an issue where retrospective boards could become unresponsive during use. From [GitHub PR #1624](https://github.com/microsoft/vsts-extension-retrospectives/pull/1624)
+* Feature: Added support for custom Team Assessment questions. From [GitHub PR #1646](https://github.com/microsoft/vsts-extension-retrospectives/pull/1646)
+* Feature: Added localization support for Spanish, German, and French. From [GitHub PR #1657](https://github.com/microsoft/vsts-extension-retrospectives/pull/1657) and  [GitHub PR #1658](https://github.com/microsoft/vsts-extension-retrospectives/pull/1658)
+* Feature: Added Sprint Retrospective functionality by using current sprint name in retrospective name. From [GitHub PR #1659](https://github.com/microsoft/vsts-extension-retrospectives/pull/1659)
+
 ## v1.92.52
 
-* Fix: improve archived board delete messaging in History and harden loading-state recovery to avoid indefinite spinner states after data-load failures. From [GitHub PR #1578](https://github.com/microsoft/vsts-extension-retrospectives/pull/1578)
-* Fix: improve live-sync reliability with automatic reconnect, manual retry, and connection telemetry for better diagnostics. From [GitHub PR #1580](https://github.com/microsoft/vsts-extension-retrospectives/pull/1580)
-* Fix: order feedback items by votes in retrospective email summary and CSV export, with newest-first tie-breaking for consistent results. From [GitHub PR #1581](https://github.com/microsoft/vsts-extension-retrospectives/pull/1581)
-* Refactor: inline favorability-band helper logic in team assessment score aria-label generation. From [GitHub PR #1582](https://github.com/microsoft/vsts-extension-retrospectives/pull/1582)
-* Refactor: remove remaining Fluent UI dependencies by replacing selector-combo, dialogs, buttons, editable inputs, and board summary list/table implementations with native HTML elements, with associated style and test updates. From [GitHub PR #1583](https://github.com/microsoft/vsts-extension-retrospectives/pull/1583)
-* Fix: improve Team Assessment info button accessibility by providing explicit accessible names and descriptions for screen readers. From [GitHub PR #1584](https://github.com/microsoft/vsts-extension-retrospectives/pull/1584)
-* Feat: improve runtime performance by memoizing heavy frontend computations, optimizing team assessment history chart rendering, and updating TypeScript target settings. From [GitHub PR #1585](https://github.com/microsoft/vsts-extension-retrospectives/pull/1585)
-* Fix: tune SignalR keep-alive configuration to improve websocket connection stability and reduce noisy keep-alive traffic. From [GitHub PR #1586](https://github.com/microsoft/vsts-extension-retrospectives/pull/1586)
+* Fix: Improved archived board delete messaging in History and hardened loading-state recovery to avoid indefinite spinner states after data-load failures. From [GitHub PR #1578](https://github.com/microsoft/vsts-extension-retrospectives/pull/1578)
+* Fix: Improved live-sync reliability with automatic reconnect, manual retry, and connection telemetry for better diagnostics. From [GitHub PR #1580](https://github.com/microsoft/vsts-extension-retrospectives/pull/1580)
+* Fix: Ordered feedback items by votes in retrospective email summary and CSV export, with newest-first tie-breaking for consistent results. From [GitHub PR #1581](https://github.com/microsoft/vsts-extension-retrospectives/pull/1581)
+* Refactor: Added inline favorability-band helper logic in team assessment score aria-label generation. From [GitHub PR #1582](https://github.com/microsoft/vsts-extension-retrospectives/pull/1582)
+* Refactor: Removed remaining Fluent UI dependencies by replacing selector-combo, dialogs, buttons, editable inputs, and board summary list/table implementations with native HTML elements, with associated style and test updates. From [GitHub PR #1583](https://github.com/microsoft/vsts-extension-retrospectives/pull/1583)
+* Fix: Improved Team Assessment info button accessibility by providing explicit accessible names and descriptions for screen readers. From [GitHub PR #1584](https://github.com/microsoft/vsts-extension-retrospectives/pull/1584)
+* Feature: Improved runtime performance by memoizing heavy frontend computations, optimizing team assessment history chart rendering, and updating TypeScript target settings. From [GitHub PR #1585](https://github.com/microsoft/vsts-extension-retrospectives/pull/1585)
+* Fix: Tuned SignalR keep-alive configuration to improve websocket connection stability and reduce noisy keep-alive traffic. From [GitHub PR #1586](https://github.com/microsoft/vsts-extension-retrospectives/pull/1586)
 
 ## v1.92.51
 
-* Fix: improve readability of retrospective summary percentages by adjusting background styling. From [GitHub PR #1552](https://github.com/microsoft/vsts-extension-retrospectives/pull/1552)
-* Feat: update AdjustIcon SVG for improved design and functionality. From [GitHub PR #1554](https://github.com/microsoft/vsts-extension-retrospectives/pull/1554)
-* Fix: update Retrospective Wiki URL to the correct domain. From [GitHub PR #1556](https://github.com/microsoft/vsts-extension-retrospectives/pull/1556)
+* Fix: Improved readability of retrospective summary percentages by adjusting background styling. From [GitHub PR #1552](https://github.com/microsoft/vsts-extension-retrospectives/pull/1552)
+* Feature: Updated AdjustIcon SVG for improved design and functionality. From [GitHub PR #1554](https://github.com/microsoft/vsts-extension-retrospectives/pull/1554)
+* Fix: Updated Retrospective Wiki URL to the correct domain. From [GitHub PR #1556](https://github.com/microsoft/vsts-extension-retrospectives/pull/1556)
 
 ## v1.92.50
 
@@ -26,17 +52,21 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.49
 
-* Fixing regression issues. From [GitHub PR #1545](https://github.com/microsoft/vsts-extension-retrospectives/pull/1545)
+* Achieved 100% test code coverage and fixed regression issues. From [GitHub PR #1545](https://github.com/microsoft/vsts-extension-retrospectives/pull/1545)
 
 ## v1.92.48
 
 * Added Team Assessment History dialog with trend charts to review past assessment results. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
 * Enhanced timer with a configurable countdown, duration picker, start/stop chimes, and visibility that adapts by board phase. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392) and [GitHub PR #1405](https://github.com/microsoft/vsts-extension-retrospectives/pull/1405)
+* Refactored User Votes as My Votes and added total votes as Team Votes. From [GitHub PR #1405](https://github.com/microsoft/vsts-extension-retrospectives/pull/1405)
 * Implemented keyboard navigation, focus handling, and a dedicated keyboard shortcuts dialog for improved accessibility. From [GitHub PR #1386](https://github.com/microsoft/vsts-extension-retrospectives/pull/1386)
+* Introduced column notes to provide detailed context for each board column. From [GitHub PR #1372](https://github.com/microsoft/vsts-extension-retrospectives/pull/1372) and [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
+* Replaced icons sourced from Font Awesome and Fluent UI with SVG icons sourced from Material UI. From [GitHub PR #1453](https://github.com/microsoft/vsts-extension-retrospectives/pull/1453)
+* Consolidated and simplified CSS styling rules; simplified styling for grouped feedback; removed mobile view styling and user setting. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
 * Restricts delete board functionality to the board owner or a team admin. From [GitHub PR #1308](https://github.com/microsoft/vsts-extension-retrospectives/pull/1308)
 * Updated hyperlinks in CONTRIBUTING markdown file. From [GitHub PR #1305](https://github.com/microsoft/vsts-extension-retrospectives/pull/1305)
 * Added "Ways to Contribute" to the CONTRIBUTING markdown file. From [GitHub PR #1304](https://github.com/microsoft/vsts-extension-retrospectives/pull/1304)
-* Removes groups from Permission table, since setting permission by groups not supported. From [GitHub PR #1294](https://github.com/microsoft/vsts-extension-retrospectives/pull/1294)
+* Removed groups from Permission table, since setting permission by groups not supported. From [GitHub PR #1294](https://github.com/microsoft/vsts-extension-retrospectives/pull/1294)
 * Improved test code coverage. From [GitHub PR #1289](https://github.com/microsoft/vsts-extension-retrospectives/pull/1289)
 
 ## v1.92.46
@@ -82,18 +112,18 @@ From [GitHub PR #1184](https://github.com/microsoft/vsts-extension-retrospective
 
 * Improved test code coverage by more than 15% as part of above pull requests, plus the following pull requests:
 
-From [GitHub PR #1212](https://github.com/microsoft/vsts-extension-retrospectives/pull/1212)
-From [GitHub PR #1213](https://github.com/microsoft/vsts-extension-retrospectives/pull/1213)
-From [GitHub PR #1214](https://github.com/microsoft/vsts-extension-retrospectives/pull/1214)
-From [GitHub PR #1222](https://github.com/microsoft/vsts-extension-retrospectives/pull/1222)
-From [GitHub PR #1227](https://github.com/microsoft/vsts-extension-retrospectives/pull/1227)
-From [GitHub PR #1231](https://github.com/microsoft/vsts-extension-retrospectives/pull/1231)
-From [GitHub PR #1237](https://github.com/microsoft/vsts-extension-retrospectives/pull/1237)
-From [GitHub PR #1238](https://github.com/microsoft/vsts-extension-retrospectives/pull/1238)
-From [GitHub PR #1241](https://github.com/microsoft/vsts-extension-retrospectives/pull/1241)
-From [GitHub PR #1242](https://github.com/microsoft/vsts-extension-retrospectives/pull/1242)
-From [GitHub PR #1243](https://github.com/microsoft/vsts-extension-retrospectives/pull/1243)
-From [GitHub PR #1255](https://github.com/microsoft/vsts-extension-retrospectives/pull/1255)
+From [GitHub PR #1212](https://github.com/microsoft/vsts-extension-retrospectives/pull/1212),
+ [GitHub PR #1213](https://github.com/microsoft/vsts-extension-retrospectives/pull/1213),
+ [GitHub PR #1214](https://github.com/microsoft/vsts-extension-retrospectives/pull/1214),
+ [GitHub PR #1222](https://github.com/microsoft/vsts-extension-retrospectives/pull/1222),
+ [GitHub PR #1227](https://github.com/microsoft/vsts-extension-retrospectives/pull/1227),
+ [GitHub PR #1231](https://github.com/microsoft/vsts-extension-retrospectives/pull/1231),
+ [GitHub PR #1237](https://github.com/microsoft/vsts-extension-retrospectives/pull/1237),
+ [GitHub PR #1238](https://github.com/microsoft/vsts-extension-retrospectives/pull/1238),
+ [GitHub PR #1241](https://github.com/microsoft/vsts-extension-retrospectives/pull/1241),
+ [GitHub PR #1242](https://github.com/microsoft/vsts-extension-retrospectives/pull/1242),
+ [GitHub PR #1243](https://github.com/microsoft/vsts-extension-retrospectives/pull/1243),
+ [GitHub PR #1255](https://github.com/microsoft/vsts-extension-retrospectives/pull/1255)
 
 * Additional 12 pull requests covering pipelines, performance, formatting, accessibility, and other maintenance.
 

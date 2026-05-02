@@ -332,7 +332,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           accentColor: "#cc293d",
           iconClass: "sad-face",
           id: generateUUID(),
-          title: "What undermines pyschological safety?",
+          title: "What undermines psychological safety?",
           notes: "",
         },
         {

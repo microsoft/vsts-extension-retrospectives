@@ -3,7 +3,7 @@ import React from "react";
 import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
 import BoardDataService from "../dal/boardDataService";
-import { FeedbackBoardDocumentHelper, IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument, ITeamAssessmentQuestion } from "../interfaces/feedback";
+import { FeedbackBoardDocumentHelper, IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument, ITeamAssessmentQuestion, ITeamEffectivenessMeasurementVoteCollection } from "../interfaces/feedback";
 import { reflectBackendService } from "../dal/reflectBackendService";
 import BoardSummaryTable from "./boardSummaryTable";
 import FeedbackBoardMetadataForm from "./feedbackBoardMetadataForm";
@@ -24,15 +24,13 @@ import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
-import { questions } from "../utilities/effectivenessMeasurementQuestionHelper";
+import { getQuestionShortName, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { copyToClipboard } from "../utilities/clipboardHelper";
 import { closeTopMostDialog } from "../utilities/dialogHelper";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
-import { formatDate, formatNumber, t } from "../utilities/localization";
-import { buildSprintRetrospectiveTitle, getCurrentIteration } from "../utilities/sprintRetrospectiveHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
 import { getService } from "azure-devops-extension-sdk";
@@ -41,7 +39,9 @@ import { playStartChime, playStopChime } from "../utilities/audioHelper";
 import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../utilities/pdfHelper";
 import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
+import { buildSprintRetrospectiveTitle, getCurrentIteration } from "../utilities/sprintRetrospectiveHelper";
 import { workService } from "../dal/azureDevOpsWorkService";
+import { formatDate, formatNumber, t } from "../utilities/localization";
 
 export interface FeedbackBoardContainerProps {
   isHostedAzureDevOps: boolean;
@@ -80,7 +80,7 @@ export type FeedbackBoardContainerHandle = {
   parseUrlForBoardAndTeamInformation: () => Promise<{ teamId: string; boardId: string; phase?: WorkflowPhase }>;
   updateUrlWithBoardAndTeamInformation: (teamId: string, boardId: string) => Promise<void>;
 
-  createBoard: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => Promise<IFeedbackBoardDocument>;
+  createBoard: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => Promise<IFeedbackBoardDocument>;
   updateBoardMetadata: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => Promise<void>;
   archiveCurrentBoard: () => Promise<void>;
   generateEmailSummaryContent: () => Promise<void>;
@@ -109,6 +109,7 @@ export type FeedbackBoardContainerHandle = {
 
   numberFormatter: (value: number) => string;
   percentageFormatter: (value: number) => string;
+  formatAssessmentHoverText: (category: "Favorable" | "Neutral" | "Unfavorable", count: number, totalResponses: number) => string;
 
   archiveBoardDialogRef: React.RefObject<HTMLDialogElement>;
   previewEmailDialogRef: React.RefObject<HTMLDialogElement>;
@@ -159,8 +160,8 @@ export interface FeedbackBoardContainerState {
   allowCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
   contributors: { id: string; name: string; imageUrl: string }[];
-  effectivenessMeasurementSummary: { questionId: number; question: string; average: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[];
-  effectivenessMeasurementChartData: { questionId: number; red: number; yellow: number; green: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[];
+  effectivenessMeasurementSummary: { questionId: number; question: string; average: number }[];
+  effectivenessMeasurementChartData: { questionId: number; red: number; yellow: number; green: number }[];
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   allMembers: TeamMember[];
@@ -180,6 +181,7 @@ export interface FeedbackBoardContainerState {
     createdDate: Date;
     questionAverages: { questionId: number; average: number }[];
   }[];
+  teamEffectivenessMeasurementVoteSnapshot: ITeamEffectivenessMeasurementVoteCollection[] | undefined;
 }
 
 export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
@@ -242,6 +244,7 @@ const initialState: FeedbackBoardContainerState = {
   countdownDurationMinutes: 5,
   hasPlayedStopChime: false,
   teamAssessmentHistoryData: [],
+  teamEffectivenessMeasurementVoteSnapshot: undefined,
 };
 
 export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHandle, FeedbackBoardContainerProps>(function FeedbackBoardContainer(props, ref) {
@@ -320,18 +323,20 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   }, [setState]);
 
   const handleBoardActionsDocumentPointerDown = React.useCallback((event: PointerEvent) => {
+    const root = boardActionsMenuRootRef.current;
+    if (!root) {
+      return;
+    }
+
     const target = event.target as Node | null;
     if (!target) {
       return;
     }
 
-    const menuRoots = [boardActionsMenuRootRef.current].filter((root): root is HTMLDivElement => Boolean(root));
-    for (const root of menuRoots) {
-      const openDetails = Array.from(root.querySelectorAll("details[open]"));
-      for (const detailsElement of openDetails) {
-        if (!detailsElement.contains(target)) {
-          detailsElement.removeAttribute("open");
-        }
+    const openDetails = Array.from(root.querySelectorAll("details[open]"));
+    for (const detailsElement of openDetails) {
+      if (!detailsElement.contains(target)) {
+        detailsElement.removeAttribute("open");
       }
     }
   }, []);
@@ -372,14 +377,20 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
-      await initializeProjectTeams(initialCurrentTeam);
-
       setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true });
     } catch (error) {
       appInsights.trackException(error, {
         action: "initializeTeamAndBoardState",
       });
       setState({ isTeamDataLoaded: true });
+    }
+
+    try {
+      await initializeProjectTeams(initialCurrentTeam);
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "initializeProjectTeams",
+      });
     }
 
     try {
@@ -755,6 +766,10 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
   const percentageFormatter = React.useCallback((value: number) => {
     return formatNumber(value / 100, { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }, []);
+
+  const formatAssessmentHoverText = React.useCallback((category: "Favorable" | "Neutral" | "Unfavorable", count: number, totalResponses: number) => {
+    return `${category}: ${count} of ${totalResponses}`;
   }, []);
 
   const handleBoardCreated = React.useCallback(
@@ -1264,7 +1279,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           ),
         )
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-
       const preferredBoard = preferredBoardId ? boardsForTeam.find(board => board.id === preferredBoardId) : undefined;
 
       setState({
@@ -1288,24 +1302,22 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const setCurrentBoard = (selectedBoard: IFeedbackBoardDocument) => {
     const matchedBoard = stateRef.current.boards.find(board => board.id === selectedBoard.id);
 
-    if (!matchedBoard) {
-      return;
-    }
-
     if (matchedBoard.teamEffectivenessMeasurementVoteCollection === undefined) {
       matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
     }
 
-    setState(prevState => {
-      // Ensure that we are actually changing boards to prevent needless rerenders.
-      if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {
-        return {
-          currentBoard: matchedBoard,
-        };
-      }
+    if (matchedBoard) {
+      setState(prevState => {
+        // Ensure that we are actually changing boards to prevent needless rerenders.
+        if (!prevState.currentBoard || prevState.currentBoard.id !== matchedBoard.id) {
+          return {
+            currentBoard: matchedBoard,
+          };
+        }
 
-      return null;
-    });
+        return null;
+      });
+    }
   };
 
   const changeSelectedTeam = async (team: WebApiTeam) => {
@@ -1340,15 +1352,15 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     });
   };
 
-  const createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => {
+  const createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, isBoardAnonymous: boolean, shouldShowFeedbackAfterCollect: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => {
     const createdBoard = await BoardDataService.createBoardForTeam(
       stateRef.current.currentTeam.id,
       title,
       maxVotesPerUser,
       columns,
       isIncludeTeamEffectivenessMeasurement,
-      shouldShowFeedbackAfterCollect,
       isBoardAnonymous,
+      shouldShowFeedbackAfterCollect,
       undefined, // Start Date
       undefined, // End Date
       permissions,
@@ -1409,19 +1421,19 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       });
     });
 
-    const average: { questionId: number; question: string; average: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[] = [];
+    const average: { questionId: number; question: string; average: number }[] = [];
 
     [...new Set(measurements.map(item => item.id))].forEach(e => {
       const teamAssessmentQuestion = boardQuestions.find(question => question.id === e);
       if (teamAssessmentQuestion) {
-        average.push({ questionId: e, question: teamAssessmentQuestion.title, average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length, teamAssessmentQuestion });
+        average.push({ questionId: e, question: teamAssessmentQuestion.title, average: measurements.filter(m => m.id === e).reduce((a, b) => a + b.selected, 0) / measurements.filter(m => m.id === e).length });
       }
     });
 
-    const chartData: { questionId: number; red: number; yellow: number; green: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[] = [];
+    const chartData: { questionId: number; red: number; yellow: number; green: number }[] = [];
 
     boardQuestions.forEach(question => {
-      chartData.push({ questionId: question.id, red: 0, yellow: 0, green: 0, teamAssessmentQuestion: question });
+      chartData.push({ questionId: question.id, red: 0, yellow: 0, green: 0 });
     });
 
     voteCollection?.forEach(vote => {
@@ -1491,13 +1503,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       });
 
       const questionAverages: { questionId: number; average: number }[] = [];
-      [...new Set(measurements.map(item => item.id))]
-        .filter(questionId => questions.some(question => question.id === questionId))
-        .forEach(questionId => {
+      [...new Set(measurements.map(item => item.id))].forEach(questionId => {
         const responsesForQuestion = measurements.filter(m => m.id === questionId);
         const average = responsesForQuestion.reduce((sum, m) => sum + m.selected, 0) / responsesForQuestion.length;
         questionAverages.push({ questionId, average });
-        });
+      });
 
       return {
         boardTitle: board.title,
@@ -1600,18 +1610,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     downloadPdfBlob(pdfBlob, fileName);
   };
 
-  const renderBoardUpdateMetadataFormDialog = (
-    dialogRef: React.RefObject<HTMLDialogElement>,
-    isNewBoardCreation: boolean,
-    isDuplicatingBoard: boolean,
-    onDismiss: () => void,
-    dialogTitle: string,
-    placeholderText: string,
-    onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void,
-    onCancel: () => void,
-    initialTitleOverride?: string,
-    formKey?: string,
-  ) => {
+  const renderBoardUpdateMetadataFormDialog = (dialogRef: React.RefObject<HTMLDialogElement>, isNewBoardCreation: boolean, isDuplicatingBoard: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void, onCancel: () => void, initialTitleOverride?: string, instanceKey?: number) => {
     const permissionOptions: FeedbackBoardPermissionOption[] = [];
 
     const state = stateRef.current;
@@ -1644,7 +1643,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             {getIconElement("close")}
           </button>
         </div>
-        <FeedbackBoardMetadataForm key={formKey} isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} initialTitleOverride={initialTitleOverride} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
+        <FeedbackBoardMetadataForm key={instanceKey} isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} initialTitleOverride={initialTitleOverride} />
       </dialog>
     );
   };
@@ -1743,9 +1742,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     [setState, updateFeedbackItemsAndContributors],
   );
 
-  const attemptBackendReconnectRef = React.useRef(attemptBackendReconnect);
-  attemptBackendReconnectRef.current = attemptBackendReconnect;
-
   const retryBackendConnection = async () => {
     await attemptBackendReconnect(true);
   };
@@ -1758,7 +1754,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           return;
         }
 
-        void attemptBackendReconnectRef.current(false);
+        void attemptBackendReconnect(false);
       }, 5000);
     }
 
@@ -1768,7 +1764,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         connectionWatchdogIntervalIdRef.current = undefined;
       }
     };
-  }, [props.isHostedAzureDevOps]);
+  }, [attemptBackendReconnect, props.isHostedAzureDevOps]);
 
   React.useImperativeHandle(ref, () => {
     const handle: FeedbackBoardContainerHandle = {
@@ -1828,6 +1824,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       updateFeedbackItemsAndContributors,
       numberFormatter,
       percentageFormatter,
+      formatAssessmentHoverText,
       archiveBoardDialogRef,
       previewEmailDialogRef,
       boardCreationDialogRef,
@@ -1888,7 +1885,6 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     const responseCount = currentUserVote?.responses?.length || 0;
 
     if (responseCount < boardQuestions.length) {
-      toast(t("feedback_board_answer_all_questions"));
       return;
     }
 
@@ -1898,10 +1894,18 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const showTeamEffectivenessDialog = () => {
+    const snapshot = JSON.parse(JSON.stringify(state.currentBoard?.teamEffectivenessMeasurementVoteCollection ?? []));
+    setState({ teamEffectivenessMeasurementVoteSnapshot: snapshot });
     teamEffectivenessDialogRef?.current?.showModal();
   };
 
   const hideTeamEffectivenessDialog = () => {
+    const snapshot = stateRef.current.teamEffectivenessMeasurementVoteSnapshot;
+    if (snapshot !== undefined && stateRef.current.currentBoard) {
+      const currentBoard = stateRef.current.currentBoard;
+      currentBoard.teamEffectivenessMeasurementVoteCollection = snapshot;
+      setState({ currentBoard, teamEffectivenessMeasurementVoteSnapshot: undefined });
+    }
     teamEffectivenessDialogRef?.current?.close();
   };
 
@@ -1950,6 +1954,11 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const teamEffectivenessResponseCount = state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
+  const teamAssessmentQuestions = state.currentBoard?.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions;
+  const currentUserTeamAssessmentResponses = state.currentBoard?.teamEffectivenessMeasurementVoteCollection
+    ?.find(vote => vote.userId === obfuscateUserId(state.currentUserId))
+    ?.responses?.length ?? 0;
+  const isTeamAssessmentComplete = currentUserTeamAssessmentResponses >= teamAssessmentQuestions.length;
 
   return (
     <div className="flex flex-col h-screen" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
@@ -1987,15 +1996,15 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               Proceed
             </button>
             <button type="button" className="button default" onClick={() => discussAndActDialogRef.current!.close()}>
-              Cancel
+              {t("common_cancel")}
             </button>
           </div>
         </dialog>
 
-        <h1 className="header-title" aria-label="Retrospectives">
+        <h1 className="text-2xl font-medium tracking-tight" aria-label="Retrospectives">
           Retrospectives
         </h1>
-        <div className="flex items-center" role="group" aria-label="Team selector">
+        <div className="flex items-center mx-6" role="group" aria-label="Team selector">
           <label htmlFor="team-selector" className="sr-only">
             Team
           </label>
@@ -2017,16 +2026,15 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         <div className="w-full">
           {state.currentBoard && (
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className="header-tabs">
-                <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
-                  Board
-                </div>
-                <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
-                  History
-                </div>
+              <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
+                Board
+              </div>
+              <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
+                History
               </div>
               {state.activeTab === "Board" && (
                 <>
+                  <div className="mx-4 vertical-tab-separator" />
                   <div className="flex items-center justify-start">
                     <div className="board-selector">
                       <label htmlFor="board-selector" className="sr-only">
@@ -2054,7 +2062,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                             {getIconElement("add")}
                             {t("sprint_retro_create_current")}
                           </button>
-                          <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
+                          <button key="duplicateBoard" type="button" title={t("feedback_board_create_copy")} onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
                             {getIconElement("content-copy")}
                             Create copy of retrospective
                           </button>
@@ -2104,7 +2112,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                             <div className="subText">
                               <div className="ms-Dialog-inner">
                                 <div className="team-effectiveness-section-information">
-                                  {getIconElement("info")}
+                                  {getIconElement("exclamation")}
                                   All answers will be saved anonymously
                                 </div>
                                 <table className="team-effectiveness-measurement-table">
@@ -2113,7 +2121,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                       <th scope="col" className="text-left">
                                         Question
                                       </th>
-                                      <th scope="col" className="text-left min-w-13">
+                                      <th scope="col" className="text-left">
                                         Details
                                       </th>
                                       <th scope="colgroup" colSpan={6} className="team-effectiveness-favorability-label">
@@ -2162,19 +2170,36 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {(state.currentBoard.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions).map(question => {
-                                      return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={question.iconClassName} title={question.shortTitle} subtitle={question.title} tooltip={question.tooltip} />;
-                                    })}
+                                    {(() => {
+                                      const teamAssessmentQuestions = state.currentBoard.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions;
+                                      const customQuestionIds = teamAssessmentQuestions
+                                        .filter(q => !questions.find(defaultQuestion => defaultQuestion.id === q.id))
+                                        .map(q => q.id);
+
+                                      return teamAssessmentQuestions.map(question => {
+                                        const customIndex = customQuestionIds.indexOf(question.id);
+                                        const displayTitle = customIndex >= 0 ? `Custom Q${customIndex + 1}` : question.shortTitle;
+
+                                        return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={question.iconClassName} title={displayTitle} subtitle={question.title} tooltip={question.tooltip} />;
+                                      });
+                                    })()}
                                   </tbody>
                                 </table>
                               </div>
                             </div>
                             <div className="inner">
-                              <button type="button" className="button" onClick={saveTeamEffectivenessMeasurement}>
-                                Save
+                              <button
+                                type="button"
+                                className="button"
+                                onClick={saveTeamEffectivenessMeasurement}
+                                disabled={!isTeamAssessmentComplete}
+                                title={!isTeamAssessmentComplete ? "Please answer all questions to enable saving" : "Save"}
+                                aria-disabled={!isTeamAssessmentComplete}
+                              >
+                                {t("common_save")}
                               </button>
-                              <button type="button" className="button default" onClick={() => teamEffectivenessDialogRef.current!.close()}>
-                                Cancel
+                              <button type="button" className="button default" onClick={hideTeamEffectivenessDialog}>
+                                {t("common_cancel")}
                               </button>
                             </div>
                           </dialog>
@@ -2261,16 +2286,18 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
               {state.currentTeam && state.currentBoard && (
                 <>
                   {!props.isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
-                    <div className="retro-message-bar">
-                      <span>
-                        <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
-                      </span>
+                    <>
+                      <div className="retro-message-bar">
+                        <span>
+                          <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
+                        </span>
+                      </div>
                       <div className="actions">
                         <button type="button" className="dismiss" onClick={hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
                           <span aria-hidden="true">×</span>
                         </button>
                       </div>
-                    </div>
+                    </>
                   )}
                   {!props.isHostedAzureDevOps && state.isDropIssueInEdgeMessageBarVisible && !state.isBackendServiceConnected && (
                     <div className="retro-message-bar" role="alert" aria-live="assertive">
@@ -2353,18 +2380,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           </div>
         </dialog>
       )}
-      {renderBoardUpdateMetadataFormDialog(
-        boardCreationDialogRef,
-        true,
-        false,
-        hideBoardCreationDialog,
-        t("feedback_board_create_new"),
-        t("feedback_board_create_example", { date: formatDate(new Date(), { year: "numeric", month: "short", day: "numeric" }) }),
-        createBoard,
-        hideBoardCreationDialog,
-        boardCreationInitialTitleOverride,
-        `create-board-${boardCreationDialogInstanceKey}`,
-      )}
+      {renderBoardUpdateMetadataFormDialog(boardCreationDialogRef, true, false, hideBoardCreationDialog, t("feedback_board_create_new"), t("feedback_board_create_example", { date: formatDate(new Date(), { year: "numeric", month: "short", day: "numeric" }) }), createBoard, hideBoardCreationDialog, boardCreationInitialTitleOverride, boardCreationDialogInstanceKey)}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, t("feedback_board_create_copy"), "", createBoard, hideBoardDuplicateDialog)}
       {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, t("feedback_board_edit"), "", updateBoardMetadata, hideBoardUpdateDialog)}
       {state.currentBoard && (
@@ -2376,7 +2392,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
             </button>
           </div>
           <div className="subText">
-            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label={t("feedback_board_email_summary_aria")} value={state.currentBoard.emailContent}></textarea>
+            <textarea rows={20} className="preview-email-content" readOnly={true} aria-label={t("feedback_board_email_summary")} value={state.currentBoard.emailContent}></textarea>
           </div>
           <div className="inner">
             <button title={t("common_copy_to_clipboard")} aria-label={t("common_copy_to_clipboard")} onClick={showEmailCopiedToast}>
@@ -2401,9 +2417,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
           <div className="subText">
             <section className="retro-summary-section">
               <div className="retro-summary-section-header">{t("feedback_board_basic_settings")}</div>
-              <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "short", day: "numeric" }) })}</div>
+              <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "short", day: "numeric" }) })}</div>              
               <div id="retro-summary-created-by">
-                {t("feedback_board_created_by")} <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
+                {t("feedback_board_created_by", { name: state.currentBoard?.createdBy.displayName })} <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
               </div>
             </section>
             <section className="retro-summary-section">
@@ -2437,49 +2453,54 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                   Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
                   <div className="retro-summary-effectiveness-scores">
                     <ul className="chart">
-                      {state.effectivenessMeasurementChartData.map(data => {
-                        const teamAssessmentQuestion = data.teamAssessmentQuestion || state.effectivenessMeasurementSummary.find(summary => summary.questionId === data.questionId)?.teamAssessmentQuestion || questions.find(question => question.id === data.questionId);
+                      {(() => {
+                        const boardQuestions = state.currentBoard.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions;
+                        const customQuestionIds = boardQuestions
+                          .filter(q => !questions.find(defaultQuestion => defaultQuestion.id === q.id))
+                          .map(q => q.id);
+                        return state.effectivenessMeasurementChartData.map(data => {
                         const averageScore = state.effectivenessMeasurementSummary.filter(e => e.questionId == data.questionId)[0]?.average ?? 0;
                         const greenScore = (data.green * 100) / teamEffectivenessResponseCount;
                         const yellowScore = (data.yellow * 100) / teamEffectivenessResponseCount;
                         const redScore = (data.red * 100) / teamEffectivenessResponseCount;
-                        if (!teamAssessmentQuestion) {
-                          return null;
-                        }
+                        const questionIconClassName = boardQuestions.find(question => question.id === data.questionId)?.iconClassName;
+                        const customIndex = customQuestionIds.indexOf(data.questionId);
+                        const shortName = customIndex >= 0 ? `Custom Q${customIndex + 1}` : getQuestionShortName(data.questionId);
                         return (
                           <li className="chart-question-block" key={data.questionId}>
                             <div className="chart-question">
-                              {getIconElement(teamAssessmentQuestion.iconClassName)} &nbsp;
-                              {teamAssessmentQuestion.shortTitle}
+                              {getIconElement(questionIconClassName)}
+                              <span>{shortName}</span>
                             </div>
-                            {data.red > 0 && (
-                              <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={`Unfavorable percentage is ${redScore}%`} aria-label={`Unfavorable percentage is ${redScore}%`}>
-                                <span>{percentageFormatter(redScore)}</span>
-                              </div>
-                            )}
-                            {data.yellow > 0 && (
-                              <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={`Neutral percentage is ${yellowScore}%`} aria-label={`Neutral percentage is ${yellowScore}%`}>
-                                <span>{percentageFormatter(yellowScore)}</span>
-                              </div>
-                            )}
-                            {data.green > 0 && (
-                              <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={`Favorable percentage is ${greenScore}%`} aria-label={`Favorable percentage is ${greenScore}%`}>
-                                <span>{percentageFormatter(greenScore)}</span>
-                              </div>
-                            )}
+                            <div className="chart-response-track">
+                              {data.red > 0 && (
+                                <div className="red-chart-response chart-response" style={{ width: `${redScore}%` }} title={formatAssessmentHoverText("Unfavorable", data.red, teamEffectivenessResponseCount)} aria-label={formatAssessmentHoverText("Unfavorable", data.red, teamEffectivenessResponseCount)}>
+                                  <span>{percentageFormatter(redScore)}</span>
+                                </div>
+                              )}
+                              {data.yellow > 0 && (
+                                <div className="yellow-chart-response chart-response" style={{ width: `${yellowScore}%` }} title={formatAssessmentHoverText("Neutral", data.yellow, teamEffectivenessResponseCount)} aria-label={formatAssessmentHoverText("Neutral", data.yellow, teamEffectivenessResponseCount)}>
+                                  <span>{percentageFormatter(yellowScore)}</span>
+                                </div>
+                              )}
+                              {data.green > 0 && (
+                                <div className="green-chart-response chart-response" style={{ width: `${greenScore}%` }} title={formatAssessmentHoverText("Favorable", data.green, teamEffectivenessResponseCount)} aria-label={formatAssessmentHoverText("Favorable", data.green, teamEffectivenessResponseCount)}>
+                                  <span>{percentageFormatter(greenScore)}</span>
+                                </div>
+                              )}
+                            </div>
                             {averageScore > 0 && (
                               <div className="team-effectiveness-average-number" aria-label={`The average score for this question is ${numberFormatter(averageScore)}`}>
                                 {numberFormatter(averageScore)}
                               </div>
                             )}
-                            {!teamAssessmentQuestion.isCustom && (
-                              <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${teamAssessmentQuestion.shortTitle} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
-                                Discuss and Act
-                              </button>
-                            )}
+                            <button className="assessment-chart-action" title={`${state.feedbackItems.length > 0 ? "There are feedback items created for this board, you cannot change the board template" : `Clicking this will modify the board template to the "${shortName} template" allowing your team to discuss and take actions using the retrospective board`}`} disabled={state.feedbackItems.length > 0} onClick={() => showDiscussAndActDialog(data.questionId)}>
+                              Discuss and Act
+                            </button>
                           </li>
                         );
-                      })}
+                      });
+                      })()}
                     </ul>
                     <div className="chart-legend-section">
                       <div className="chart-legend-group">

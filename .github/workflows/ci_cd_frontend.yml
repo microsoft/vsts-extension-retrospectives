@@ -86,6 +86,9 @@ jobs:
           wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/ddb8f07599b5b15147168d3bcd8bbede0df8d2c7/dictionaries/base.txt
           echo "" >> base.txt
           echo "azure-devops-extension-" >> base.txt
+          echo "Bain" >> base.txt
+          echo "Edmondson" >> base.txt
+          echo "Forsgren" >> base.txt
           echo "parens" >> base.txt
           echo "emailable" >> base.txt
           echo "anonymize" >> base.txt
@@ -93,6 +96,7 @@ jobs:
           echo "favorability" >> base.txt
           echo "Dev" >> base.txt
           echo "tooltip" >> base.txt
+          echo "tooltips" >> base.txt
           echo "outloud" >> base.txt
           echo "timebox" >> base.txt
           echo "uncast" >> base.txt

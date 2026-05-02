@@ -14,7 +14,7 @@ initializeLocale();
 sdkInit({ applyTheme: true })
   .then(async () => {
     const root = createRoot(document.getElementById("root"));
-    const renderApp = (application: React.ReactNode) => {
+    const renderApp = (application: React.ReactElement) => {
       root.render(
         <AppInsightsErrorBoundary
           onError={() => {

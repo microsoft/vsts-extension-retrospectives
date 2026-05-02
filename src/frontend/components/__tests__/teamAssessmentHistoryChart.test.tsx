@@ -6,12 +6,12 @@ import { TeamAssessmentHistoryChart, IBoardAverageScore, defaultNumberFormatter,
 // Mock the questions from effectivenessMeasurementQuestionHelper
 jest.mock("../../utilities/effectivenessMeasurementQuestionHelper", () => ({
   questions: [
-    { id: 1, shortTitle: "Clarity", title: "I clearly understand what is expected of me on this team" },
-    { id: 2, shortTitle: "Energy", title: "I am energized by the work I do" },
-    { id: 3, shortTitle: "Psychological Safety", title: "I feel safe and do not fear making mistakes" },
-    { id: 4, shortTitle: "Work-life Balance", title: "My typical workload allows me to achieve balance" },
-    { id: 5, shortTitle: "Confidence", title: "I'm confident our team will be successful" },
-    { id: 6, shortTitle: "Efficiency", title: "Tools, resources, processes allow me to effectively meet needs" },
+    { id: 1, shortTitle: "Clarity", title: "I clearly understand what is expected of me in my role on this team." },
+    { id: 2, shortTitle: "Energy", title: "My day-to-day work keeps me engaged, motivated, and energized." },
+    { id: 3, shortTitle: "Psych Safety", title: "I feel safe speaking up, raising issues, taking risks, and asking for help." },
+    { id: 4, shortTitle: "Work-Life", title: "My workload is sustainable and supports a healthy work-life balance." },
+    { id: 5, shortTitle: "Confidence", title: "I am confident our team will be successful and achieve our goals." },
+    { id: 6, shortTitle: "Efficiency", title: "Our processes and tools help me work efficiently and effectively." },
   ],
 }));
 
@@ -293,8 +293,8 @@ describe("TeamAssessmentHistoryChart", () => {
 
       expect(labelTexts).toContain("Clarity");
       expect(labelTexts).toContain("Energy");
-      expect(labelTexts).toContain("Psychological Safety");
-      expect(labelTexts).toContain("Work-life Balance");
+      expect(labelTexts).toContain("Psych Safety");
+      expect(labelTexts).toContain("Work-Life");
       expect(labelTexts).toContain("Confidence");
       expect(labelTexts).toContain("Efficiency");
     });

@@ -382,7 +382,7 @@ class ItemDataService {
       boardItem.teamEffectivenessMeasurementVoteCollection = [];
     }
 
-    if (boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined || boardItem.boardVoteCollection[currentUserId] === null) {
+    if (boardItem.teamEffectivenessMeasurementVoteCollection.find(e => e.userId === currentUserId) === undefined) {
       boardItem.teamEffectivenessMeasurementVoteCollection.push({ userId: currentUserId, responses: [] });
     }
 
