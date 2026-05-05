@@ -1538,7 +1538,7 @@ describe("FeedbackBoardMetadataForm - Form Submission Advanced", () => {
 
   it("should allow submission when board name matches initial title", async () => {
     const user = userEvent.setup();
-    mockCheckIfBoardNameIsTaken.mockResolvedValue(true);
+    mockCheckIfBoardNameIsTaken.mockResolvedValue(false);
     mockedProps.isNewBoardCreation = false;
     mockedProps.currentBoard = testExistingBoard;
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
@@ -1549,6 +1549,25 @@ describe("FeedbackBoardMetadataForm - Form Submission Advanced", () => {
     await waitFor(() => {
       expect(mockOnFormSubmit).toHaveBeenCalledTimes(1);
     });
+
+    expect(mockCheckIfBoardNameIsTaken).toHaveBeenCalledWith(testTeamId, testExistingBoard.title, testExistingBoard.id);
+  });
+
+  it("should not pass excluded board id when creating a board", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const titleInput = screen.getByLabelText(/please enter new retrospective title/i);
+    await user.type(titleInput, "Brand New Board");
+
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockOnFormSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    expect(mockCheckIfBoardNameIsTaken).toHaveBeenCalledWith(testTeamId, "Brand New Board", undefined);
   });
 
   it("should not submit when title is only whitespace", async () => {

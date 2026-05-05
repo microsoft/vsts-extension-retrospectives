@@ -39,10 +39,14 @@ class BoardDataService {
     return await createDocument<IFeedbackBoardDocument>(teamId, board);
   };
 
-  public checkIfBoardNameIsTaken = async (teamId: string, boardName: string) => {
+  public checkIfBoardNameIsTaken = async (teamId: string, boardName: string, excludeBoardId?: string) => {
     const teamBoards: IFeedbackBoardDocument[] = await this.getBoardsForTeam(teamId);
 
     const boardNameExists = teamBoards.find(teamBoard => {
+      if (excludeBoardId && teamBoard.id === excludeBoardId) {
+        return false;
+      }
+
       return teamBoard.title.replace(/\s+/g, " ").trim().localeCompare(boardName.replace(/\s+/g, " ").trim(), [], { sensitivity: "accent" }) === 0;
     });
 

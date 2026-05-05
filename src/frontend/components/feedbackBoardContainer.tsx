@@ -266,6 +266,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const [boardCreationInitialTitleOverride, setBoardCreationInitialTitleOverride] = React.useState<string | undefined>(undefined);
   const [boardCreationDialogInstanceKey, setBoardCreationDialogInstanceKey] = React.useState(0);
+  const [boardDuplicateDialogInstanceKey, setBoardDuplicateDialogInstanceKey] = React.useState(0);
+  const [boardUpdateDialogInstanceKey, setBoardUpdateDialogInstanceKey] = React.useState(0);
 
   React.useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -1322,6 +1324,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const changeSelectedBoard = async (board: IFeedbackBoardDocument) => {
     if (board) {
       setCurrentBoard(board);
+      setBoardDuplicateDialogInstanceKey(previousKey => previousKey + 1);
+      setBoardUpdateDialogInstanceKey(previousKey => previousKey + 1);
       await updateUrlWithBoardAndTeamInformation(stateRef.current.currentTeam.id, board.id);
       appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardSelectionChanged, properties: { boardId: board.id } });
     }
@@ -1528,6 +1532,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const showBoardUpdateDialog = (): void => {
+    setBoardUpdateDialogInstanceKey(previousKey => previousKey + 1);
     boardUpdateDialogRef?.current?.showModal();
   };
 
@@ -1536,6 +1541,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   const showBoardDuplicateDialog = (): void => {
+    setBoardDuplicateDialogInstanceKey(previousKey => previousKey + 1);
     boardDuplicateDialogRef?.current?.showModal();
   };
 
@@ -2365,8 +2371,32 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         boardCreationInitialTitleOverride,
         `create-board-${boardCreationDialogInstanceKey}`,
       )}
-      {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, t("feedback_board_create_copy"), "", createBoard, hideBoardDuplicateDialog)}
-      {state.currentBoard && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, t("feedback_board_edit"), "", updateBoardMetadata, hideBoardUpdateDialog)}
+      {state.currentBoard &&
+        renderBoardUpdateMetadataFormDialog(
+          boardDuplicateDialogRef,
+          true,
+          true,
+          hideBoardDuplicateDialog,
+          t("feedback_board_create_copy"),
+          "",
+          createBoard,
+          hideBoardDuplicateDialog,
+          undefined,
+          `duplicate-board-${state.currentBoard.id}-${boardDuplicateDialogInstanceKey}`,
+        )}
+      {state.currentBoard &&
+        renderBoardUpdateMetadataFormDialog(
+          boardUpdateDialogRef,
+          false,
+          false,
+          hideBoardUpdateDialog,
+          t("feedback_board_edit"),
+          "",
+          updateBoardMetadata,
+          hideBoardUpdateDialog,
+          state.currentBoard.title,
+          `edit-board-${state.currentBoard.id}-${boardUpdateDialogInstanceKey}`,
+        )}
       {state.currentBoard && (
         <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label={t("feedback_board_email_summary")} role="dialog">
           <div className="header">

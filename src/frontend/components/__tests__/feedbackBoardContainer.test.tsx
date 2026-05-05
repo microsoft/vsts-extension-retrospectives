@@ -218,7 +218,12 @@ const getTeamFieldValuesMock = () => {
   ];
 };
 
-jest.mock("../feedbackBoardMetadataForm", () => () => <div data-testid="metadata-form" />);
+const mockFeedbackBoardMetadataForm = jest.fn((_: unknown) => <div data-testid="metadata-form" />);
+
+jest.mock("../feedbackBoardMetadataForm", () => ({
+  __esModule: true,
+  default: (props: unknown) => mockFeedbackBoardMetadataForm(props),
+}));
 jest.mock("azure-devops-extension-api/Work/WorkClient", () => {
   return {
     getTeamIterations: getTeamIterationsMock,
@@ -2332,6 +2337,120 @@ describe("FeedbackBoardContainer - Board operations", () => {
 
     (instance as any).hideBoardDuplicateDialog();
     expect(close).toHaveBeenCalled();
+  });
+
+  it("should pass undefined duplicate initial title override to metadata form", () => {
+    const instance = createStandaloneTimerInstance();
+    const showModal = jest.fn();
+    const close = jest.fn();
+    (instance as any).boardDuplicateDialogRef.current = { showModal, close } as any;
+
+    const currentTeam = {
+      id: "team-1",
+      name: "Team 1",
+      projectName: "Project 1",
+    } as WebApiTeam;
+
+    const currentBoard = {
+      id: "board-1",
+      title: "Sprint 12 Retro",
+      teamId: "team-1",
+      createdDate: new Date(),
+      createdBy: mockUserIdentity as unknown as IdentityRef,
+      boardVoteCollection: {},
+      isIncludeTeamEffectivenessMeasurement: false,
+      shouldShowFeedbackAfterCollect: false,
+      isAnonymous: false,
+      permissions: { Teams: [], Members: [] },
+      activePhase: WorkflowPhase.Collect,
+      maxVotesPerUser: 5,
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [{ id: "c1", title: "Keep", iconClass: "heart", accentColor: "#008000" }],
+    } as IFeedbackBoardDocument;
+
+    act(() => {
+      instance.setState({
+        isAppInitialized: true,
+        isTeamDataLoaded: true,
+        currentTeam,
+        currentBoard,
+        boards: [currentBoard],
+        userTeams: [currentTeam],
+        projectTeams: [currentTeam],
+        allMembers: [],
+        currentUserId: "user-1",
+      });
+    });
+
+    mockFeedbackBoardMetadataForm.mockClear();
+
+    act(() => {
+      (instance as any).showBoardDuplicateDialog();
+    });
+
+    const duplicateFormProps = (mockFeedbackBoardMetadataForm.mock.calls as unknown as Array<[unknown]>)
+      .map(call => call[0] as { isDuplicatingBoard?: boolean; initialTitleOverride?: string })
+      .find(props => props.isDuplicatingBoard === true);
+
+    expect(duplicateFormProps).toBeDefined();
+    expect(duplicateFormProps?.initialTitleOverride).toBeUndefined();
+  });
+
+  it("should pass current board title as edit initial title override", () => {
+    const instance = createStandaloneTimerInstance();
+    const showModal = jest.fn();
+    const close = jest.fn();
+    (instance as any).boardUpdateDialogRef.current = { showModal, close } as any;
+
+    const currentTeam = {
+      id: "team-1",
+      name: "Team 1",
+      projectName: "Project 1",
+    } as WebApiTeam;
+
+    const currentBoard = {
+      id: "board-1",
+      title: "Current Retro",
+      teamId: "team-1",
+      createdDate: new Date(),
+      createdBy: mockUserIdentity as unknown as IdentityRef,
+      boardVoteCollection: {},
+      isIncludeTeamEffectivenessMeasurement: false,
+      shouldShowFeedbackAfterCollect: false,
+      isAnonymous: false,
+      permissions: { Teams: [], Members: [] },
+      activePhase: WorkflowPhase.Collect,
+      maxVotesPerUser: 5,
+      teamEffectivenessMeasurementVoteCollection: [],
+      columns: [{ id: "c1", title: "Keep", iconClass: "heart", accentColor: "#008000" }],
+    } as IFeedbackBoardDocument;
+
+    act(() => {
+      instance.setState({
+        isAppInitialized: true,
+        isTeamDataLoaded: true,
+        currentTeam,
+        currentBoard,
+        boards: [currentBoard],
+        userTeams: [currentTeam],
+        projectTeams: [currentTeam],
+        allMembers: [],
+        currentUserId: "user-1",
+      });
+    });
+
+    mockFeedbackBoardMetadataForm.mockClear();
+
+    act(() => {
+      (instance as any).showBoardUpdateDialog();
+    });
+
+    const editFormProps = (mockFeedbackBoardMetadataForm.mock.calls as unknown as Array<[unknown]>)
+      .map(call => call[0] as { isNewBoardCreation?: boolean; isDuplicatingBoard?: boolean; initialTitleOverride?: string })
+      .find(props => props.isNewBoardCreation === false && props.isDuplicatingBoard === false);
+
+    expect(editFormProps).toBeDefined();
+    expect(editFormProps?.initialTitleOverride).toBe("Current Retro");
   });
 
   it("should show and hide archive confirmation dialog", () => {

@@ -135,6 +135,22 @@ describe("BoardDataService - checkIfBoardNameIsTaken", () => {
     const result = await BoardDataService.checkIfBoardNameIsTaken("team-123", "Retrospective");
     expect(result).toBe(false);
   });
+
+  it("should return false when matching board is excluded", async () => {
+    const result = await BoardDataService.checkIfBoardNameIsTaken("team-123", "Sprint Planning", "board-1");
+    expect(result).toBe(false);
+  });
+
+  it("should return true when another board with same name exists and current board is excluded", async () => {
+    const duplicateBoards: IFeedbackBoardDocument[] = [
+      { ...mockBoard, id: "board-1", title: "Sprint Planning" },
+      { ...mockBoard, id: "board-2", title: "Sprint Planning" },
+    ];
+    (readDocuments as jest.Mock).mockResolvedValue(duplicateBoards);
+
+    const result = await BoardDataService.checkIfBoardNameIsTaken("team-123", "Sprint Planning", "board-1");
+    expect(result).toBe(true);
+  });
 });
 
 describe("BoardDataService - getBoardsForTeam", () => {

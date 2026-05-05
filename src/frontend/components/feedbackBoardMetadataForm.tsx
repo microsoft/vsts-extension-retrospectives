@@ -133,12 +133,12 @@ const getInitialState = (props: IFeedbackBoardMetadataFormProps) => {
 
 export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps> = props => {
   const { isNewBoardCreation, isDuplicatingBoard, currentBoard, teamId, placeholderText, availablePermissionOptions, currentUserId, onFormSubmit, onFormCancel } = props;
+  const isEditRetrospective = !isNewBoardCreation;
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardMetadataForm");
 
   const [initialState] = useState(() => getInitialState(props));
 
   const [title, setTitle] = useState(initialState.title);
-  const [initialTitle] = useState(initialState.initialTitle);
   const [isBoardNameTaken, setIsBoardNameTaken] = useState(false);
   const [columnCards, setColumnCards] = useState<IFeedbackColumnCard[]>(initialState.columnCards);
   const [maxVotesPerUser, setMaxVotesPerUser] = useState(initialState.maxVotesPerUser);
@@ -201,12 +201,10 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
       event.preventDefault();
       event.stopPropagation();
 
-      const isTaken = await BoardDataService.checkIfBoardNameIsTaken(teamId, title);
+      const isTaken = await BoardDataService.checkIfBoardNameIsTaken(teamId, title, isEditRetrospective ? currentBoard?.id : undefined);
       if (isTaken) {
-        if (initialTitle !== title) {
-          setIsBoardNameTaken(true);
-          return;
-        }
+        setIsBoardNameTaken(true);
+        return;
       }
 
       if (isNewBoardCreation && !isDuplicatingBoard) {
@@ -241,7 +239,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
           : [],
       );
     },
-    [title, teamId, initialTitle, isNewBoardCreation, isDuplicatingBoard, maxVotesPerUser, isIncludeTeamEffectivenessMeasurement, shouldShowFeedbackAfterCollect, isBoardAnonymous, onFormSubmit, columnCards, permissions, customTeamAssessmentQuestions],
+    [title, teamId, isEditRetrospective, currentBoard, isNewBoardCreation, isDuplicatingBoard, maxVotesPerUser, isIncludeTeamEffectivenessMeasurement, shouldShowFeedbackAfterCollect, isBoardAnonymous, onFormSubmit, columnCards, permissions, customTeamAssessmentQuestions],
   );
 
   const handleDeleteColumnConfirm = useCallback(
