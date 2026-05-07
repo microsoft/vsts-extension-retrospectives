@@ -1640,6 +1640,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-2/5;
 }
 
+@media (max-aspect-ratio: 3/2) {
+  .board-metadata-dialog {
+    width: 60vw;
+    max-width: 60vw;
+  }
+}
+
 @media (orientation: portrait) {
   .board-metadata-dialog {
     width: 80vw;
