@@ -2365,7 +2365,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
         false,
         hideBoardCreationDialog,
         t("feedback_board_create_new"),
-        t("feedback_board_create_example", { date: formatDate(new Date(), { year: "numeric", month: "short", day: "numeric" }) }),
+        t("feedback_board_create_example", { date: formatDate(new Date(), { year: "numeric", month: "long" }) }),
         createBoard,
         hideBoardCreationDialog,
         boardCreationInitialTitleOverride,

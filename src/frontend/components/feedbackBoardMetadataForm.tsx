@@ -35,6 +35,8 @@ export interface IFeedbackColumnCard {
   markedForDeletion: boolean;
 }
 
+type NameValidationState = "none" | "required" | "duplicate";
+
 const maxColumnCount = 5;
 
 const allIconClassNames = availableIcons.filter(icon => icon.tags && icon.tags.length > 0);
@@ -139,7 +141,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   const [initialState] = useState(() => getInitialState(props));
 
   const [title, setTitle] = useState(initialState.title);
-  const [isBoardNameTaken, setIsBoardNameTaken] = useState(false);
+  const [nameValidation, setNameValidation] = useState<NameValidationState>("none");
   const [columnCards, setColumnCards] = useState<IFeedbackColumnCard[]>(initialState.columnCards);
   const [maxVotesPerUser, setMaxVotesPerUser] = useState(initialState.maxVotesPerUser);
   const [isIncludeTeamEffectivenessMeasurement, setIsIncludeTeamEffectivenessMeasurement] = useState(initialState.isIncludeTeamEffectivenessMeasurement);
@@ -193,7 +195,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
 
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
-    setIsBoardNameTaken(false);
+    setNameValidation("none");
   }, []);
 
   const handleFormSubmit = useCallback(
@@ -201,9 +203,17 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
       event.preventDefault();
       event.stopPropagation();
 
-      const isTaken = await BoardDataService.checkIfBoardNameIsTaken(teamId, title, isEditRetrospective ? currentBoard?.id : undefined);
+      const trimmedTitle = title.trim();
+      if (!trimmedTitle) {
+        setNameValidation("required");
+        return;
+      }
+
+      setNameValidation("none");
+
+      const isTaken = await BoardDataService.checkIfBoardNameIsTaken(teamId, trimmedTitle, isEditRetrospective ? currentBoard.id : undefined);
       if (isTaken) {
-        setIsBoardNameTaken(true);
+        setNameValidation("duplicate");
         return;
       }
 
@@ -215,7 +225,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
       }
 
       onFormSubmit(
-        title.trim(),
+        trimmedTitle,
         maxVotesPerUser,
         columnCards.filter(columnCard => !columnCard.markedForDeletion).map(columnCard => columnCard.column),
         isIncludeTeamEffectivenessMeasurement,
@@ -289,17 +299,18 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   }, []);
 
   const isSaveButtonEnabled = useCallback(() => {
-    if (!title.trim()) {
-      return false;
-    }
-
     const nonDeletedColumns = columnCards.filter(columnCard => !columnCard.markedForDeletion);
     if (nonDeletedColumns.find(columnCard => !columnCard.column.title.trim())) {
       return false;
     }
 
     return true;
-  }, [title, columnCards]);
+  }, [columnCards]);
+
+  const topNameValidationMessage =
+    nameValidation === "required" ? "Required field" : nameValidation === "duplicate" ? "Name not unique" : null;
+  const bottomNameValidationMessage =
+    nameValidation === "required" ? "Please enter a retrospective name to continue." : nameValidation === "duplicate" ? "Please enter a unique board name to continue." : null;
 
   const handleColumnsTemplateChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
     const columns = getColumnsByTemplateId(event.target.value);
@@ -323,17 +334,35 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
           <div className="board-metadata-form">
             <section className="board-metadata-edit-column-settings">
               <h2 className="board-metadata-form-section-header">Board Settings</h2>
-              <div className="board-metadata-form-section-subheader">
+              <div className="board-metadata-form-section-subheader board-metadata-title-row">
                 <label htmlFor="title-input-container">
-                  Retrospective Name<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:
+                  Retrospective&nbsp;Name:
                 </label>
-                <input aria-label="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} className="title-input-container" id="retrospective-title-input" value={title} maxLength={100} onChange={handleInputChange} />
-                {isBoardNameTaken && <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>}
+                <input
+                  aria-label="Please enter new retrospective title"
+                  aria-required={true}
+                  placeholder={placeholderText}
+                  className="title-input-container"
+                  id="retrospective-title-input"
+                  style={{ margin: "0 4px 0 8px" }}
+                  value={title}
+                  maxLength={100}
+                  onChange={handleInputChange}
+                />
+                {topNameValidationMessage && (
+                  <>
+                    {/* Keep the trailing non-breaking space for visual alignment with the section divider. */}
+                    <span className="input-validation-message">
+                      {topNameValidationMessage}
+                      <>&nbsp;</>
+                    </span>
+                  </>
+                )}
               </div>
               <hr></hr>
               <div className="board-metadata-form-section-subheader">
                 <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                  Max Votes per User (Current: {isNewBoardCreation ? maxVotesPerUser : currentBoard.maxVotesPerUser}):
+                  Max Votes per User:
                 </label>
                 <input className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />
               </div>
@@ -342,7 +371,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               <div className="board-metadata-form-section-subheader">
                 <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">
                   <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />
-                  <span>Hide the feedback of others until after Collect phase</span>
+                  <span>Hide feedback during Collect phase</span>
                 </label>
               </div>
               <div className="board-metadata-form-section-subheader">
@@ -402,7 +431,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               <div className="board-metadata-form-section-information">
                 {getIconElement("exclamation")} You can create a maximum of {maxColumnCount} columns in a retrospective
               </div>
-              {!isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Warning: Existing feedback items may not be available after changing the board template!</div>}
+              {!isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Changing template after feedback entered may result in loss of feedback</div>}
               <div className="board-metadata-form-section-subheader">
                 <label htmlFor="column-template-dropdown">Apply template:</label>
                 <select onChange={handleColumnsTemplateChange} id="column-template-dropdown" className="title-input-container column-template-dropdown">
@@ -671,6 +700,11 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         </PivotItem>
       </Pivot>
       <div className="inner">
+        {bottomNameValidationMessage && (
+          <span className="input-validation-message" aria-live="assertive">
+            {bottomNameValidationMessage}
+          </span>
+        )}
         <button
           disabled={!isSaveButtonEnabled()}
           onClick={event => {

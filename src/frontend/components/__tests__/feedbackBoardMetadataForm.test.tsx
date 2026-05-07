@@ -457,7 +457,13 @@ describe("FeedbackBoardMetadataForm - Form Submission", () => {
     await user.type(titleInput, "   ");
 
     const submitButton = screen.getByRole("button", { name: /save/i });
-    expect(submitButton).toBeDisabled();
+    expect(submitButton).toBeEnabled();
+
+    await user.click(submitButton);
+
+    expect(screen.getByText(/required field/i)).toBeInTheDocument();
+    expect(screen.getByText(/please enter a retrospective name to continue\./i)).toBeInTheDocument();
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
   });
 
   it("should enable submit button when title is valid", async () => {
@@ -909,10 +915,16 @@ describe("FeedbackBoardMetadataForm - Form Submission Extended", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const saveButton = screen.getByRole("button", { name: /save/i });
-    expect(saveButton).toBeDisabled();
+    expect(saveButton).toBeEnabled();
+
+    await user.click(saveButton);
+
+    expect(screen.getByText(/required field/i)).toBeInTheDocument();
+    expect(screen.getByText(/please enter a retrospective name to continue\./i)).toBeInTheDocument();
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
   });
 
-  it("should disable save button when no columns exist", async () => {
+  it("should keep save enabled when columns are valid even if title is empty", async () => {
     const user = userEvent.setup();
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
@@ -924,8 +936,7 @@ describe("FeedbackBoardMetadataForm - Form Submission Extended", () => {
     }
 
     const saveButton = screen.getByRole("button", { name: /save/i });
-    // Save should still be disabled if no title
-    expect(saveButton).toBeDisabled();
+    expect(saveButton).toBeEnabled();
   });
 });
 
@@ -1306,7 +1317,13 @@ describe("FeedbackBoardMetadataForm - Board Name Taken Validation", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const saveButton = screen.getByRole("button", { name: /save/i });
-    expect(saveButton).toBeDisabled();
+    expect(saveButton).toBeEnabled();
+
+    await user.click(saveButton);
+
+    expect(screen.getByText(/required field/i)).toBeInTheDocument();
+    expect(screen.getByText(/please enter a retrospective name to continue\./i)).toBeInTheDocument();
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
   });
 
   it("should handle whitespace-only board names", async () => {
@@ -1317,7 +1334,13 @@ describe("FeedbackBoardMetadataForm - Board Name Taken Validation", () => {
     await user.type(titleInput, "   ");
 
     const saveButton = screen.getByRole("button", { name: /save/i });
-    expect(saveButton).toBeDisabled();
+    expect(saveButton).toBeEnabled();
+
+    await user.click(saveButton);
+
+    expect(screen.getByText(/required field/i)).toBeInTheDocument();
+    expect(screen.getByText(/please enter a retrospective name to continue\./i)).toBeInTheDocument();
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
   });
 });
 
@@ -1530,7 +1553,8 @@ describe("FeedbackBoardMetadataForm - Form Submission Advanced", () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/a board with this name already exists/i)).toBeInTheDocument();
+      expect(screen.getByText(/name not unique/i)).toBeInTheDocument();
+      expect(screen.getByText(/please enter a unique board name to continue\./i)).toBeInTheDocument();
     });
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
@@ -1805,14 +1829,16 @@ describe("FeedbackBoardMetadataForm - Input Change Handler", () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/a board with this name already exists/i)).toBeInTheDocument();
+      expect(screen.getByText(/name not unique/i)).toBeInTheDocument();
+      expect(screen.getByText(/please enter a unique board name to continue\./i)).toBeInTheDocument();
     });
 
     // Change the title to clear the error
     await user.type(titleInput, " Modified");
 
     await waitFor(() => {
-      expect(screen.queryByText(/a board with this name already exists/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/name not unique/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/please enter a unique board name to continue\./i)).not.toBeInTheDocument();
     });
   });
 });
