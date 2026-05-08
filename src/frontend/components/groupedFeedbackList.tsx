@@ -23,11 +23,12 @@ const GroupedFeedbackList: React.FC<IGroupedFeedbackListProps> = ({ childrenIds,
           const childCard: IColumnItem | undefined = columnItems?.find(c => c.feedbackItem.id === id);
           const originalColumn = childCard ? columns[childCard.feedbackItem.originalColumnId] : null;
           const childItemHidden = !!childCard && hideFeedbackItems && childCard.feedbackItem.userIdRef !== currentUserId;
-          const childDisplayTitle = childItemHidden ? "[Hidden Feedback]" : childCard?.feedbackItem.title;
+          const childDisplayTitle = childCard?.feedbackItem.title ?? "";
+          const childScreenReaderTitle = childItemHidden ? "Hidden feedback" : childDisplayTitle;
 
           return (
             childCard && (
-              <li key={id} role="listitem">
+              <li key={id} role="listitem" aria-label={`Related feedback: ${childScreenReaderTitle}`}>
                 <div
                   className="icon"
                   style={{
@@ -36,7 +37,7 @@ const GroupedFeedbackList: React.FC<IGroupedFeedbackListProps> = ({ childrenIds,
                 >
                   {getIconElement("sms")}
                 </div>
-                <div className="related-feedback-title" aria-label={`Related feedback: ${childDisplayTitle}`} aria-hidden={childItemHidden || undefined} title={childDisplayTitle}>
+                <div className={`related-feedback-title${childItemHidden ? " hidden-related-feedback-title" : ""}`} aria-hidden={childItemHidden || undefined} title={childScreenReaderTitle}>
                   {childDisplayTitle}
                 </div>
                 {isFocusModalHidden && currentColumnId !== originalColumn?.columnProperties?.id && originalColumn && <div className="original-column-info">Original Column: {originalColumn.columnProperties.title}</div>}

@@ -406,7 +406,7 @@ describe("Feedback Item", () => {
 
       // Should remain in non-editing state (no input/textarea editor visible).
       expect(container.querySelector(".editable-text-input-container")).toBeNull();
-      expect(container.textContent).toContain("[Hidden Feedback]");
+      expect(card.getAttribute("aria-label")).toContain("Title: Hidden feedback.");
     });
   });
 
@@ -628,13 +628,16 @@ describe("Feedback Item", () => {
         timerId: "",
         isGroupedCarouselItem: false,
       };
-      const { container, queryByText } = render(<FeedbackItem {...props} />);
+      const { container, getByText } = render(<FeedbackItem {...props} />);
 
-      // Should show placeholder text
-      expect(container.textContent).toContain("[Hidden Feedback]");
+      // Should render actual text visually so CSS blur can obfuscate it.
+      expect(getByText("Secret Feedback Content")).toBeInTheDocument();
 
-      // Should NOT show the actual title
-      expect(queryByText("Secret Feedback Content")).not.toBeInTheDocument();
+      // Screen readers should still get hidden feedback semantics.
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      const cardContent = container.querySelector(".card-content") as HTMLElement;
+      expect(card.getAttribute("aria-label")).toContain("Title: Hidden feedback.");
+      expect(cardContent.getAttribute("aria-hidden")).toBe("true");
     });
 
     test("shows actual title when user is the owner", () => {
@@ -2858,7 +2861,7 @@ describe("Feedback Item", () => {
   });
 
   describe("Accessibility - Obscured feedback (Issue #1318)", () => {
-    test("adds aria-hidden='true' to obscured feedback items", () => {
+    test("adds aria-hidden='true' to obscured feedback content", () => {
       const props: any = {
         id: "test-obscured-aria",
         title: "Hidden Feedback",
@@ -2889,8 +2892,11 @@ describe("Feedback Item", () => {
 
       const { container } = render(<FeedbackItem {...props} />);
       const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-obscured-aria"]');
+      const contentElement = feedbackItemElement?.querySelector(".card-content");
 
-      expect(feedbackItemElement).toHaveAttribute("aria-hidden", "true");
+      expect(feedbackItemElement).not.toHaveAttribute("aria-hidden");
+      expect(feedbackItemElement).toHaveAttribute("aria-label", expect.stringContaining("Title: Hidden feedback."));
+      expect(contentElement).toHaveAttribute("aria-hidden", "true");
     });
 
     test("does not add aria-hidden when feedback is not obscured", () => {
@@ -8920,8 +8926,8 @@ describe("FeedbackItem additional coverage (merged)", () => {
     if (groupStack) {
       expect(container.textContent).toContain("Grouped Feedback");
 
-      // Check for hidden feedback placeholder for child1 (different user)
-      expect(container.textContent).toContain("[Hidden Feedback]");
+      // Check for hidden feedback semantics for child1 (different user)
+      expect(screen.getByRole("listitem", { name: "Related feedback: Hidden feedback" })).toBeInTheDocument();
 
       // Check for original column info for child1
       expect(container.textContent).toContain("Original Column:");

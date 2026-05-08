@@ -42,39 +42,43 @@ const allIconClassNames = availableIcons.filter(icon => icon.tags && icon.tags.l
 const allAccentColors: { friendlyName: string; colorCode: string }[] = [
   {
     friendlyName: "green",
-    colorCode: "#008000",
+    colorCode: "#107c10",
   },
   {
     friendlyName: "red",
-    colorCode: "#cc293d",
-  },
-  {
-    friendlyName: "navy",
-    colorCode: "#174170",
-  },
-  {
-    friendlyName: "orange",
-    colorCode: "#F78A53",
-  },
-  {
-    friendlyName: "pink",
-    colorCode: "#ff00cc",
+    colorCode: "#d13438",
   },
   {
     friendlyName: "yellow",
-    colorCode: "#f6af08",
+    colorCode: "#ffaa44",
   },
   {
     friendlyName: "blue",
     colorCode: "#0078d4",
   },
   {
+    friendlyName: "orange",
+    colorCode: "#ca5010",
+  },
+  {
     friendlyName: "purple",
-    colorCode: "#8063bf",
+    colorCode: "#8764b8",
+  },
+  {
+    friendlyName: "navy",
+    colorCode: "#003966",
+  },
+  {
+    friendlyName: "teal",
+    colorCode: "#00b7c3",
+  },
+  {
+    friendlyName: "pink",
+    colorCode: "#e3008c",
   },
   {
     friendlyName: "grey",
-    colorCode: "#555555",
+    colorCode: "#8a8886",
   },
 ];
 
@@ -645,6 +649,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                       <button
                         key={accentColor.friendlyName}
                         aria-label={"Choose the color " + accentColor.friendlyName}
+                        title={accentColor.friendlyName}
                         className="choose-feedback-column-accent-color-button"
                         onClick={() => {
                           columnCardBeingEdited.column.accentColor = accentColor.colorCode;

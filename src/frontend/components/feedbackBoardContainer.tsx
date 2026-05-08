@@ -252,7 +252,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const [, forceRender] = React.useReducer((x: number) => x + 1, 0);
 
   const boardTimerIntervalIdRef = React.useRef<number | undefined>(undefined);
-  const connectionWatchdogIntervalIdRef = React.useRef<number | undefined>(undefined);
+  const connectionWatchdogTimeoutIdRef = React.useRef<number | undefined>(undefined);
+  const reconnectBackoffMsRef = React.useRef(5000);
   const didMountRef = React.useRef(false);
 
   const prevCurrentTeamRef = React.useRef<WebApiTeam | undefined>(undefined);
@@ -437,9 +438,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       boardTimerIntervalIdRef.current = undefined;
     }
 
-    if (connectionWatchdogIntervalIdRef.current !== undefined) {
-      window.clearInterval(connectionWatchdogIntervalIdRef.current);
-      connectionWatchdogIntervalIdRef.current = undefined;
+    if (connectionWatchdogTimeoutIdRef.current !== undefined) {
+      window.clearTimeout(connectionWatchdogTimeoutIdRef.current);
+      connectionWatchdogTimeoutIdRef.current = undefined;
     }
 
     document.removeEventListener("pointerdown", handleBoardActionsDocumentPointerDown);
@@ -1547,15 +1548,14 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     archiveBoardDialogRef?.current?.showModal();
   };
 
-  const showBoardUrlCopiedToast = () => {
+  const showEmailCopiedToast = async () => {
     const board = stateRef.current.currentBoard;
-    toast(t("feedback_board_link_copied", { title: board.title, phase: board.activePhase }));
-  };
-
-  const showEmailCopiedToast = () => {
-    const board = stateRef.current.currentBoard;
-    copyToClipboard(board.emailContent);
-    toast(t("feedback_board_email_copied", { title: board.title }));
+    const success = await copyToClipboard(board.emailContent);
+    if (success) {
+      toast(t("feedback_board_email_copied", { title: board.title }));
+    } else {
+      toast(t("feedback_board_email_copy_failed"));
+    }
   };
 
   const archiveCurrentBoard = async () => {
@@ -1570,8 +1570,12 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   const copyBoardUrl = async () => {
     const state = stateRef.current;
     const boardDeepLinkUrl = await getBoardUrl(state.currentTeam.id, state.currentBoard.id, state.currentBoard.activePhase);
-    copyToClipboard(boardDeepLinkUrl);
-    showBoardUrlCopiedToast();
+    const success = await copyToClipboard(boardDeepLinkUrl);
+    if (success) {
+      toast(t("feedback_board_link_copied", { title: state.currentBoard.title, phase: state.currentBoard.activePhase }));
+    } else {
+      toast(t("feedback_board_link_copy_failed"));
+    }
   };
 
   const generateCSVContent = async () => {
@@ -1639,7 +1643,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     return (
       <dialog className="board-metadata-dialog" ref={dialogRef} role="dialog" aria-label={dialogTitle}>
         <div className="header">
-          <h2 className="ms-Dialog-title">{dialogTitle}</h2>
+          <h2 className="title">{dialogTitle}</h2>
           <button type="button" onClick={onDismiss} aria-label="Close">
             {getIconElement("close")}
           </button>
@@ -1735,6 +1739,9 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       }
 
       setState({ isBackendServiceConnected, isBackendServiceReconnecting: false });
+      if (isBackendServiceConnected) {
+        reconnectBackoffMsRef.current = 5000;
+      }
 
       if (isBackendServiceConnected && state.currentTeam && state.currentBoard) {
         await updateFeedbackItemsAndContributors(state.currentTeam, state.currentBoard);
@@ -1751,21 +1758,39 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   };
 
   React.useEffect(() => {
-    if (props.isHostedAzureDevOps) {
-      connectionWatchdogIntervalIdRef.current = window.setInterval(() => {
+    const scheduleNextReconnectAttempt = (delayMs: number) => {
+      if (connectionWatchdogTimeoutIdRef.current !== undefined) {
+        window.clearTimeout(connectionWatchdogTimeoutIdRef.current);
+      }
+
+      connectionWatchdogTimeoutIdRef.current = window.setTimeout(async () => {
         const state = stateRef.current;
         if (state.isBackendServiceConnected || state.isBackendServiceReconnecting) {
+          reconnectBackoffMsRef.current = 5000;
+          scheduleNextReconnectAttempt(5000);
           return;
         }
 
-        void attemptBackendReconnectRef.current(false);
-      }, 5000);
+        await attemptBackendReconnectRef.current(false);
+
+        if (stateRef.current.isBackendServiceConnected) {
+          reconnectBackoffMsRef.current = 5000;
+        } else {
+          reconnectBackoffMsRef.current = Math.min(reconnectBackoffMsRef.current * 2, 60000);
+        }
+
+        scheduleNextReconnectAttempt(reconnectBackoffMsRef.current);
+      }, delayMs);
+    };
+
+    if (props.isHostedAzureDevOps) {
+      scheduleNextReconnectAttempt(5000);
     }
 
     return () => {
-      if (connectionWatchdogIntervalIdRef.current !== undefined) {
-        window.clearInterval(connectionWatchdogIntervalIdRef.current);
-        connectionWatchdogIntervalIdRef.current = undefined;
+      if (connectionWatchdogTimeoutIdRef.current !== undefined) {
+        window.clearTimeout(connectionWatchdogTimeoutIdRef.current);
+        connectionWatchdogTimeoutIdRef.current = undefined;
       }
     };
   }, [props.isHostedAzureDevOps]);
@@ -2212,7 +2237,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                       {state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
                           <button className="focus-mode-button" onClick={showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
-                            {getIconElement("adjust")}
+                            {getIconElement("focus")}
                             <span>Focus Mode</span>
                           </button>
                           <dialog ref={carouselDialogRef} className="carousel-dialog" role="dialog" aria-label="Focus Mode">

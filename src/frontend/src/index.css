@@ -77,8 +77,37 @@ body {
   @apply text-2xl font-medium tracking-tight w-44;
 }
 
+
 .header-tabs {
   @apply flex items-center w-44;
+}
+
+.pivot-tab {
+  display: inline-block;
+  position: relative;
+  padding: 0 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary-color);
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 12px;
+  padding-bottom: 2px;
+  transition: color 0.2s;
+}
+
+.pivot-tab.active {
+  color: var(--color-primary);
+}
+.pivot-tab.active::after {
+  content: "";
+  display: block;
+  margin: 2px auto 0 auto;
+  height: 3px;
+  width: 100%;
+  background: var(--color-primary);
+  border-radius: 2px;
 }
 
 .work-item-task-color {
@@ -345,6 +374,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .board-metadata-dialog,
 .delete-feedback-item-dialog,
 .team-effectiveness-dialog,
+.copy-link-fallback-dialog,
 .choose-column-accent-color-dialog,
 .retro-summary-dialog,
 .team-assessment-history-dialog,
@@ -362,7 +392,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .preview-email-dialog,
 .carousel-dialog,
 .sprint-retrospective-dialog {
-  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
+  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
 
   & table {
     @apply w-full border-collapse text-left;
@@ -403,6 +433,17 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .subText {
     @apply block px-5 py-2 text-sm text-(--text-primary-color);
+
+    & .board-name {
+      @apply font-semibold;
+    }
+
+    & .warning-icon {
+      @apply inline-block;
+      font-size: 1.5em;
+      line-height: 1;
+      vertical-align: -0.1em;
+    }
 
     &.li {
       @apply list-item list-inside list-disc ml-4;
@@ -1604,8 +1645,27 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.retrospectives-choose-column-accent-color-dialog .choose-feedback-column-accent-color-button {
-  @apply text-3xl h-12 m-1;
+.board-metadata-dialog .header,
+.sprint-retrospective-dialog .header {
+  @apply px-5 py-3;
+}
+
+.board-metadata-dialog .header .title,
+.sprint-retrospective-dialog .header .title {
+  @apply m-0 text-xl font-semibold;
+}
+
+.board-metadata-dialog .header button,
+.sprint-retrospective-dialog .header button {
+  @apply p-2;
+}
+
+.copy-link-fallback-dialog .copy-link-fallback-input {
+  @apply w-full p-2 border border-(--border-subtle-color) bg-(--background-color) text-(--text-primary-color) text-sm;
+}
+
+.choose-column-accent-color-dialog .choose-feedback-column-accent-color-button {
+  @apply m-1 p-0 border-0 bg-transparent cursor-pointer leading-none text-4xl;
 }
 
 .choose-column-icon-dialog .choose-feedback-column-icon-button {
@@ -2179,6 +2239,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       & .related-feedback-title {
         @apply ml-2.5 text-(--text-primary-color) text-xs content-center [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
         display: -webkit-box;
+      }
+
+      & .related-feedback-title.hidden-related-feedback-title {
+        @apply blur-xs pointer-events-none;
       }
     }
   }

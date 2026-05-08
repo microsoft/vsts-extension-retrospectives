@@ -127,7 +127,7 @@ describe("GroupedFeedbackList", () => {
   });
 
   describe("Hidden feedback items", () => {
-    it("should show [Hidden Feedback] when hideFeedbackItems is true and item belongs to different user", () => {
+    it("should keep visual text and expose hidden semantics to screen readers when hideFeedbackItems is true", () => {
       const childItem = createFeedbackItem({
         id: "child-1",
         title: "Secret Feedback",
@@ -137,8 +137,8 @@ describe("GroupedFeedbackList", () => {
 
       render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} hideFeedbackItems={true} />);
 
-      expect(screen.getByText("[Hidden Feedback]")).toBeInTheDocument();
-      expect(screen.queryByText("Secret Feedback")).not.toBeInTheDocument();
+      expect(screen.getByText("Secret Feedback")).toBeInTheDocument();
+      expect(screen.getByRole("listitem", { name: "Related feedback: Hidden feedback" })).toBeInTheDocument();
     });
 
     it("should show actual title when hideFeedbackItems is true but item belongs to current user", () => {
@@ -164,8 +164,9 @@ describe("GroupedFeedbackList", () => {
 
       render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} hideFeedbackItems={true} />);
 
-      const titleElement = screen.getByTitle("[Hidden Feedback]");
+      const titleElement = screen.getByTitle("Hidden feedback");
       expect(titleElement).toHaveAttribute("aria-hidden", "true");
+      expect(titleElement).toHaveClass("hidden-related-feedback-title");
     });
   });
 
@@ -239,8 +240,8 @@ describe("GroupedFeedbackList", () => {
 
       render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} />);
 
-      const titleElement = screen.getByTitle("Accessible Feedback");
-      expect(titleElement).toHaveAttribute("aria-label", "Related feedback: Accessible Feedback");
+      const listItem = screen.getByRole("listitem", { name: "Related feedback: Accessible Feedback" });
+      expect(listItem).toBeInTheDocument();
     });
 
     it("should render list items with listitem role", () => {

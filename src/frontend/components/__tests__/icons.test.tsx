@@ -15,5 +15,17 @@ describe("icons", () => {
       const { container } = render(icon);
       expect(container.querySelector(".icon-table-chart")).toBeTruthy();
     });
+
+    it("returns ForwardCircleIcon for adjust id", () => {
+      const icon = getIconElement("adjust");
+      const { container } = render(icon);
+      expect(container.querySelector(".icon-forward-circle")).toBeTruthy();
+    });
+
+    it("returns AdjustIcon for focus id", () => {
+      const icon = getIconElement("focus");
+      const { container } = render(icon);
+      expect(container.querySelector(".icon-adjust")).toBeTruthy();
+    });
   });
 });

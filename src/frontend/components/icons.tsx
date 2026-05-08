@@ -436,6 +436,14 @@ export const AdjustIcon = () => {
   );
 };
 
+export const ForwardCircleIcon = () => {
+  return (
+    <svg className="icon-forward-circle" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+      <path d="M480-280q83 0 141.5-58.5T680-480h-60q0 58-41 99t-99 41q-58 0-99-41t-41-99q0-58 41-99t99-41h3l-49 50 42 43 120-120-120-120-43 43 44 44q-82 2-139.5 60T280-480q0 83 58.5 141.5T480-280Zm0 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+    </svg>
+  );
+};
+
 export const InsightsIcon = () => {
   return (
     <svg className="icon-insights" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -860,7 +868,8 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "rocket-launch", tags: ["fas fa-rocket", "fas fa-fan"], name: "Rocket", icon: <RocketLaunchIcon /> },
   { id: "play-circle", tags: ["far fa-circle-play"], name: "Play", icon: <PlayCircleIcon /> },
   { id: "stop-circle", tags: ["far fa-circle-stop"], name: "Stop", icon: <StopCircleIcon /> },
-  { id: "adjust", tags: ["far fa-circle-dot", "fa-bullseye"], name: "Target", icon: <AdjustIcon /> },
+  { id: "adjust", tags: ["far fa-circle-dot", "fa-bullseye", "forward-circle", "fa-circle-arrow-right"], name: "Repeat", icon: <ForwardCircleIcon /> },
+  { id: "focus", tags: [], name: "Focus", icon: <AdjustIcon /> },
   { id: "thumb-up", tags: ["far fa-thumbs-up"], name: "Thumb Up", icon: <ThumbUpIcon /> },
   { id: "thumb-down", tags: ["fas fa-skull-crossbones", "far fa-thumbs-down"], name: "Thumb Down", icon: <ThumbDownIcon /> },
   { id: "thumb-up-down", tags: ["far fa-thumbs-up-down"], name: "Thumb Up/Down", icon: <ThumbUpDownIcon /> },

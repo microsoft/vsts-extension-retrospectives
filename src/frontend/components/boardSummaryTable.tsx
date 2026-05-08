@@ -538,10 +538,10 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           </button>
         </div>
         <div className="subText">
-          The retrospective board {selectedBoardForDelete?.boardName} with {selectedBoardForDelete?.feedbackItemsCount} feedback items will be deleted.
+          The retrospective board "<span className="board-name">{selectedBoardForDelete?.boardName}</span>" with {selectedBoardForDelete?.feedbackItemsCount} feedback items will be deleted.
         </div>
         <div className="subText">
-          <em>⚠️ Warning: This action is permanent and cannot be undone.</em>
+          <span className="warning-icon" aria-hidden="true">⚠️</span> <em>Warning: This action is permanent and cannot be undone.</em>
         </div>
         <div className="inner">
           <button className="button" onClick={handleConfirmDelete}>
