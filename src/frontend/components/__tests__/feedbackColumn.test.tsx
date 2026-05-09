@@ -89,10 +89,27 @@ describe("Feedback Column ", () => {
   describe("info button", () => {
     it("shows the info icon with notes in tooltip when notes exist", () => {
       const props = { ...testColumnProps, columnNotes: "Saved notes", showColumnEditButton: false };
-      const { getByRole, getByText } = render(<FeedbackColumn {...props} />);
+      const { getByRole } = render(<FeedbackColumn {...props} />);
 
       const infoButton = getByRole("button", { name: `Column notes: ${props.columnNotes}` });
       expect(infoButton).toBeInTheDocument();
+    });
+
+    it("shows and hides column notes tooltip on hover", () => {
+      const props = { ...testColumnProps, columnNotes: "Saved notes", showColumnEditButton: false };
+      const { getByRole, queryByText } = render(<FeedbackColumn {...props} />);
+
+      const infoButton = getByRole("button", { name: `Column notes: ${props.columnNotes}` });
+      const wrapper = infoButton.closest(".feedback-column-notes-wrapper") as HTMLElement;
+
+      expect(wrapper).toBeInTheDocument();
+      expect(queryByText("Saved notes")).not.toBeInTheDocument();
+
+      fireEvent.mouseEnter(wrapper);
+      expect(queryByText("Saved notes")).toBeInTheDocument();
+
+      fireEvent.mouseLeave(wrapper);
+      expect(queryByText("Saved notes")).not.toBeInTheDocument();
     });
 
     it("does not show info button when no notes exist", () => {

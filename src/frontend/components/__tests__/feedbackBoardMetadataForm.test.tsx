@@ -969,6 +969,22 @@ describe("FeedbackBoardMetadataForm - Permissions Tab", () => {
 
     expect(permissionsTab).toHaveAttribute("aria-selected", "true");
   });
+
+  it("should switch back to general tab when General is clicked", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const settingsTabs = screen.getByRole("tablist", { name: /board settings tabs/i });
+    const permissionsTab = within(settingsTabs).getByRole("tab", { name: /permissions/i });
+    const generalTab = within(settingsTabs).getByRole("tab", { name: /general/i });
+
+    await user.click(permissionsTab);
+    expect(permissionsTab).toHaveAttribute("aria-selected", "true");
+
+    await user.click(generalTab);
+    expect(generalTab).toHaveAttribute("aria-selected", "true");
+    expect(permissionsTab).toHaveAttribute("aria-selected", "false");
+  });
 });
 
 describe("FeedbackBoardMetadataForm - Delete Column Undo", () => {
