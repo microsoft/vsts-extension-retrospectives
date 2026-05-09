@@ -16,6 +16,18 @@ describe("icons", () => {
       expect(container.querySelector(".icon-table-chart")).toBeTruthy();
     });
 
+    it("returns PropellerIcon for propeller-icon ID", () => {
+      const icon = getIconElement("propeller-icon");
+      const { container } = render(icon);
+      expect(container.querySelector(".icon-propeller")).toBeTruthy();
+    });
+
+    it("returns DangerousIcon for dangerous-icon ID", () => {
+      const icon = getIconElement("dangerous-icon");
+      const { container } = render(icon);
+      expect(container.querySelector(".icon-dangerous")).toBeTruthy();
+    });
+
     it("returns ForwardCircleIcon for adjust id", () => {
       const icon = getIconElement("adjust");
       const { container } = render(icon);

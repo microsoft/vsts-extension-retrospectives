@@ -101,7 +101,7 @@ Once you have created the retrospective board and you want to select a retrospec
 
 ### 6. Share the Link to the Retrospective
 
-Once you create a new retrospective, you can share a link to it to all participants. Users can then access that link even from their mobile browsers to participate in the retrospective. The extension offers real time synchronization, so all users will see the most up-to-date information without having to refresh the page.
+Once you create a new retrospective, you can share a link to it to all participants. Users can then access that link to participate in the retrospective. The extension offers real time synchronization, so all users will see the most up-to-date information without having to refresh the page.
 
 ![A screenshot of the dropdown from the Board Actions Menu. The option for 'Copy retrospective link' is highlighted as the fourth menu option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/menu-dropdown-copy-retrospective-link.png)
 

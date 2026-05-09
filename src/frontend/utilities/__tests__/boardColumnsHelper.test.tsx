@@ -293,15 +293,15 @@ describe("boardColumnsHelper", () => {
     });
 
     describe("speedboat template", () => {
-      it("should return correct columns for speedboat template (Propellors, Lifesavers, Anchors, Rocks)", () => {
+      it("should return correct columns for speedboat template (Propellers, Lifesavers, Anchors, Rocks)", () => {
         const result = getColumnsByTemplateId("speedboat");
 
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "rocket-launch",
+          iconClass: "propeller-icon",
           id: "uuid-1",
-          title: "Propellors",
+          title: "Propellers",
           notes: "",
         });
         expect(result[1]).toEqual({
@@ -320,7 +320,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "thumb-down",
+          iconClass: "dangerous-icon",
           id: "uuid-4",
           title: "Rocks",
           notes: "",

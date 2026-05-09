@@ -239,13 +239,13 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           notes: "",
         },
       ];
-    case "speedboat": // Speedboat retrospective - Propellors, Life Preserver, Anchors, Rocks
+    case "speedboat": // Speedboat retrospective - Propellers, Life Preserver, Anchors, Rocks
       return [
         {
           accentColor: "#008000", //green
-          iconClass: "rocket-launch",
+          iconClass: "propeller-icon",
           id: generateUUID(),
-          title: "Propellors",
+          title: "Propellers",
           notes: "",
         },
         {
@@ -264,7 +264,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#f6af08", //yellow
-          iconClass: "thumb-down",
+          iconClass: "dangerous-icon",
           id: generateUUID(),
           title: "Rocks",
           notes: "",

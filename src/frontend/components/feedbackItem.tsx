@@ -932,7 +932,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const isNotGroupedItem = !props.groupedItemProps;
   const isMainItem = isNotGroupedItem || props.groupedItemProps?.isMainItem;
-  const isMainCollapsedItem = !isNotGroupedItem && !props.groupedItemProps?.isGroupExpanded;
+  const isMainCollapsedItem = !isNotGroupedItem && isMainItem && !props.groupedItemProps?.isGroupExpanded;
   const isGroupedCarouselItem = props.isGroupedCarouselItem;
   const childrenIds = props.groupIds;
 
@@ -957,6 +957,8 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const isDraggable = workflowState.isGroupPhase && !state.isMarkedForDeletion;
   const showVoteButton = workflowState.isVotePhase;
   const showVotes = showVoteButton || workflowState.isActPhase;
+  const isShowingGroupedTotal = isMainCollapsedItem || mainGroupedItemInFocusMode;
+  const showSummedVotesIndicator = isShowingGroupedTotal && groupedVotes > 0;
 
   const groupItemsCount = (props.groupedItemProps?.groupedCount ?? 0) + 1;
   const currentColumnItems = props.columns[props.columnId]?.columnItems;
@@ -1041,7 +1043,16 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
               {mainGroupedItemInFocusMode && renderGroupButton(groupItemsCount, true)}
               {mainGroupedItemNotInFocusMode && renderGroupButton(groupItemsCount, false)}
               {showVotes && (
-                <>
+                <div className="feedback-vote-controls">
+                  {showSummedVotesIndicator && (
+                    <span
+                      className="feedback-summed-indicator-before-upvote"
+                      title="Vote total includes grouped cards"
+                      aria-label="Vote total includes grouped cards"
+                    >
+                      ∑
+                    </span>
+                  )}
                   <button
                     title="Vote"
                     aria-live="polite"
@@ -1062,7 +1073,9 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                   >
                     {getIconElement("arrow-circle-up")}
                   </button>
-                  <span className="feedback-vote-count">{totalVotes.toString()}</span>
+                  <span className="feedback-vote-count-wrapper">
+                    <span className="feedback-vote-count">{totalVotes.toString()}</span>
+                  </span>
                   <button
                     title="Unvote"
                     aria-live="polite"
@@ -1083,7 +1096,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                   >
                     {getIconElement("arrow-circle-down")}
                   </button>
-                </>
+                </div>
               )}
               {!props.newlyCreated && (
                 <div className="item-actions-menu relative">

@@ -1,17 +1,15 @@
-import { copyToClipboard } from "../clipboardHelper";
+import { clipboardEnvironment, copyToClipboard } from "../clipboardHelper";
 
 describe("clipboardHelper", () => {
   describe("copyToClipboard", () => {
-        it("should return false if document is undefined (non-browser environment)", async () => {
-          // @ts-ignore
-          const originalDocument = global.document;
-          // @ts-ignore
-          delete global.document;
-          const { copyToClipboard } = await import("../clipboardHelper");
-          const result = await copyToClipboard("test");
-          expect(result).toBe(false);
-          global.document = originalDocument;
-        });
+    it("should return false if document is undefined (non-browser environment)", async () => {
+      const getDocumentSpy = jest.spyOn(clipboardEnvironment, "getDocument").mockReturnValue(undefined);
+
+      const result = await copyToClipboard("test");
+
+      expect(result).toBe(false);
+      getDocumentSpy.mockRestore();
+    });
     let originalExecCommand: typeof document.execCommand;
     let originalAddEventListener: typeof document.addEventListener;
     let originalRemoveEventListener: typeof document.removeEventListener;
@@ -60,6 +58,30 @@ describe("clipboardHelper", () => {
       expect(result).toBe(true);
       expect(document.execCommand).toHaveBeenCalledWith("copy");
       expect(setData).toHaveBeenCalledWith("text/plain", testText);
+      expect(preventDefault).toHaveBeenCalled();
+    });
+
+    it("should still prevent default when clipboardData is missing", async () => {
+      let copyHandler: ((e: ClipboardEvent) => void) | null = null;
+      const preventDefault = jest.fn();
+
+      document.addEventListener = jest.fn((type: string, listener: EventListenerOrEventListenerObject) => {
+        if (type === "copy") {
+          copyHandler = listener as (e: ClipboardEvent) => void;
+        }
+      }) as typeof document.addEventListener;
+
+      document.execCommand = jest.fn().mockImplementation(() => {
+        copyHandler?.({
+          clipboardData: undefined,
+          preventDefault,
+        } as unknown as ClipboardEvent);
+        return true;
+      });
+
+      const result = await copyToClipboard("Test text to copy");
+
+      expect(result).toBe(true);
       expect(preventDefault).toHaveBeenCalled();
     });
 

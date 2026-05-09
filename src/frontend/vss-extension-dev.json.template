@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "retrospective-vsts-extension-dev",
+  "publisher": "<publisher id>",
+  "version": "0.0.1",
+  "name": "Retrospectives (Dev)",
+  "description": "An Azure DevOps extension for efficient retrospectives.",
+  "public": false,
+  "baseUri": "https://localhost:3000",
+  "icons": {
+    "small": "images/logos/logo_small.png",
+    "branding": "images/logos/logo_branding.png",
+    "default": "images/logos/logo_default.png"
+  },
+  "branding": {
+    "color": "#0065a3",
+    "theme": "dark"
+  },
+  "content": {
+    "details": {
+      "path": "./assets/PACKAGE-DESCRIPTION.md"
+    },
+    "license": {
+      "path": "./assets/LICENSE.md"
+    }
+  },
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "demands": [
+    "api-version/4.1"
+  ],
+  "tags": [
+    "agile",
+    "feedback",
+    "retrospective"
+  ],
+  "categories": [
+    "Azure Boards"
+  ],
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/microsoft/vsts-extension-retrospectives"
+  },
+  "CustomerQnASupport": {
+    "enableqna": "true"
+  },
+  "scopes": [
+    "vso.work",
+    "vso.work_write"
+  ],
+  "contributions": [
+    {
+      "id": "home",
+      "type": "ms.vss-web.hub",
+      "targets": [
+        "ms.vss-work-web.work-hub-group"
+      ],
+      "properties": {
+        "name": "Retrospectives (Dev)",
+        "uri": "src/index.html",
+        "icon": {
+          "light": "asset://images/logos/logo_navbar_light_theme.png",
+          "dark": "asset://images/logos/logo_navbar_dark_theme.png"
+        }
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "src",
+      "addressable": true
+    },
+    {
+      "path": "dist/reflect-bundle.js",
+      "addressable": true
+    },
+    {
+      "path": "images/logos",
+      "addressable": true
+    },
+    {
+      "path": "images/screenshots",
+      "addressable": true
+    }
+  ]
+}

@@ -886,7 +886,7 @@ describe("FeedbackBoardContainer - Component lifecycle", () => {
   it("should handle screen resolution changes", () => {
     render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
-    // Simulate resize to mobile width
+    // Simulate resize to narrow width
     global.innerWidth = 500;
     global.dispatchEvent(new Event("resize"));
 
@@ -967,12 +967,6 @@ describe("FeedbackBoardContainer - State management", () => {
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
-  it("should manage mobile vs desktop view state", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
-
-    // Component should detect viewport size
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
-  });
 });
 
 describe("FeedbackBoardContainer - Team effectiveness measurement", () => {
@@ -1024,29 +1018,6 @@ describe("FeedbackBoardContainer - Board operations", () => {
     render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
 
     // Component should manage board deleted dialog
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
-  });
-});
-
-describe("FeedbackBoardContainer - Mobile support", () => {
-  it("should handle mobile board actions dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
-
-    // Component should manage mobile actions dialog
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
-  });
-
-  it("should handle mobile team selector dialog", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
-
-    // Component should manage mobile team selector
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
-  });
-
-  it("should manage auto-resize functionality", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" deferInitialization={true} />);
-
-    // Component should handle auto-resize state
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });

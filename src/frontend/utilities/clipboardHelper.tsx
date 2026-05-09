@@ -5,8 +5,13 @@
  * @param text The text to copy to the clipboard
  * @returns Promise<boolean> True if the copy operation succeeded, false otherwise
  */
+export const clipboardEnvironment = {
+  getDocument: (): Document | undefined => globalThis.document as Document | undefined,
+};
+
 export const copyToClipboard = async (text: string): Promise<boolean> => {
-  if (typeof document === "undefined") {
+  const currentDocument = clipboardEnvironment.getDocument();
+  if (typeof currentDocument === "undefined") {
     return false;
   }
 
@@ -15,10 +20,10 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
       e.clipboardData?.setData("text/plain", text);
       e.preventDefault();
     };
-    document.addEventListener("copy", onCopy, { once: true });
-    const succeeded = document.execCommand("copy");
+    currentDocument.addEventListener("copy", onCopy, { once: true });
+    const succeeded = currentDocument.execCommand("copy");
     if (!succeeded) {
-      document.removeEventListener("copy", onCopy);
+      currentDocument.removeEventListener("copy", onCopy);
       console.warn("execCommand('copy') returned false - clipboard not updated.");
     }
     return succeeded;

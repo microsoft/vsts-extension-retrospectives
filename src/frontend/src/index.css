@@ -2134,6 +2134,28 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-(--text-secondary-color);
 }
 
+.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-vote-controls,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-vote-controls,
+.feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-vote-controls,
+.feedback-item-group .groupedItemCard .card-integral-part .card-header .feedback-vote-controls {
+  @apply inline-flex items-center gap-1.5;
+}
+
+.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-vote-count-wrapper,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-vote-count-wrapper,
+.feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-vote-count-wrapper,
+.feedback-item-group .groupedItemCard .card-integral-part .card-header .feedback-vote-count-wrapper {
+  @apply inline-flex items-start;
+}
+
+.feedbackItem .mainItemCard .card-integral-part .card-header .feedback-summed-indicator-before-upvote,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header .feedback-summed-indicator-before-upvote,
+.feedback-item-group .mainItemCard .card-integral-part .card-header .feedback-summed-indicator-before-upvote,
+.feedback-item-group .groupedItemCard .card-integral-part .card-header .feedback-summed-indicator-before-upvote {
+  @apply text-[10px] leading-none text-(--text-secondary-color);
+}
+
+
 .item-actions-menu {
   @apply mt-2 mr-2;
 

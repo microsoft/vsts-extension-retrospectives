@@ -666,6 +666,34 @@ export const RocketLaunchIcon = () => {
   );
 };
 
+export const PropellerIcon = () => {
+  return (
+    <svg className="icon-propeller" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <g>
+        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" />
+        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" transform="rotate(72 12 12)" />
+        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" transform="rotate(144 12 12)" />
+        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" transform="rotate(216 12 12)" />
+        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" transform="rotate(288 12 12)" />
+      </g>
+    </svg>
+  );
+};
+
+export const DangerousIcon = () => {
+  return (
+    <svg className="icon-dangerous" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <g>
+        <rect fill="none" height="24" width="24" />
+      </g>
+      <g>
+        <path d="M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27zM17 15.74 15.74 17 12 13.26 8.26 17 7 15.74 10.74 12 7 8.26 8.26 7 12 10.74 15.74 7 17 8.26 13.26 12z" />
+      </g>
+    </svg>
+  );
+};
+
 export const SupportIcon = () => {
   return (
     <svg className="icon-support" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -943,6 +971,14 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
 ];
 
 export function getIconElement(iconId: string | undefined | null): React.ReactElement {
+  if (iconId === "propeller-icon") {
+    return <PropellerIcon />;
+  }
+
+  if (iconId === "dangerous-icon") {
+    return <DangerousIcon />;
+  }
+
   const foundIcon = availableIcons.find(icon => icon.id === iconId || icon.tags.includes(iconId));
 
   if (!foundIcon) {

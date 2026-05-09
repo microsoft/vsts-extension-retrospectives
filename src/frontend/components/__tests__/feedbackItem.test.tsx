@@ -9232,16 +9232,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
   });
 
-  test("Mobile feedback item actions dialog", async () => {
-    const props = makeProps({ workflowPhase: "Collect" });
-    const { container } = render(<FeedbackItem {...props} />);
-
-    await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
-
-    // Component renders successfully with mobile support
-    expect(container.querySelector(`[data-feedback-item-id="${props.id}"]`)).toBeTruthy();
-  });
-
   test("Save feedback with createdBy as anonymous", async () => {
     const props = makeProps({
       newlyCreated: true,
