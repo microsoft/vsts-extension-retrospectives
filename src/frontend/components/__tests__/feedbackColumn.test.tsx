@@ -89,11 +89,10 @@ describe("Feedback Column ", () => {
   describe("info button", () => {
     it("shows the info icon with notes in tooltip when notes exist", () => {
       const props = { ...testColumnProps, columnNotes: "Saved notes", showColumnEditButton: false };
-      const { getByRole } = render(<FeedbackColumn {...props} />);
+      const { getByRole, getByText } = render(<FeedbackColumn {...props} />);
 
       const infoButton = getByRole("button", { name: `Column notes: ${props.columnNotes}` });
       expect(infoButton).toBeInTheDocument();
-      expect(infoButton).toHaveAttribute("title", "Saved notes");
     });
 
     it("does not show info button when no notes exist", () => {

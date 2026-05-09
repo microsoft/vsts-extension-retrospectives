@@ -82,34 +82,6 @@ body {
   @apply flex items-center w-44;
 }
 
-.pivot-tab {
-  display: inline-block;
-  position: relative;
-  padding: 0 12px;
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text-primary-color);
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-right: 12px;
-  padding-bottom: 2px;
-  transition: color 0.2s;
-}
-
-.pivot-tab.active {
-  color: var(--color-primary);
-}
-.pivot-tab.active::after {
-  content: "";
-  display: block;
-  margin: 2px auto 0 auto;
-  height: 3px;
-  width: 100%;
-  background: var(--color-primary);
-  border-radius: 2px;
-}
-
 .work-item-task-color {
   @apply text-task-yellow;
 }
@@ -551,7 +523,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .separator {
-    @apply flex items-center text-base text-(--text-secondary-color);
+    @apply flex items-center text-base text-(--text-secondary-color) mr-1;
   }
 }
 
@@ -1225,7 +1197,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column-header {
-  @apply px-4 py-2 border-b-3 border-(--nav-header-active-item-background) flex items-center justify-between gap-2 h-14;
+  @apply relative px-4 py-2 border-b-3 border-(--nav-header-active-item-background) flex items-center justify-between gap-2 h-14;
 
   & .feedback-column-title {
     @apply flex items-center;
@@ -1241,6 +1213,29 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .feedback-column-actions {
     @apply inline-flex items-center gap-1;
+
+    & .feedback-column-notes-wrapper {
+      @apply inline-flex;
+
+      & .column-notes-tooltip {
+        position: absolute;
+        left: 15%;
+        right: 15%;
+        top: 0;
+        background-color: white;
+        border-radius: 0.25rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        padding: 0.75rem;
+        font-size: 0.875rem;
+        color: black;
+        max-width: 80vw;
+        z-index: 50;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+    }
 
     & .feedback-column-edit-button,
     & .feedback-column-info-button {
@@ -1753,7 +1748,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .pivot-tab {
-  @apply px-3 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent leading-none;
+  @apply px-2 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-semibold cursor-pointer leading-none border-0 [appearance:none];
 
   &:hover {
     @apply text-primary;
@@ -1764,8 +1759,40 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   &.active {
-    @apply text-primary border-b-primary;
+    @apply text-primary font-semibold;
   }
+}
+
+.workflow-stage-tab {
+  @apply px-2 py-2 text-sm text-(--text-primary-color) bg-(--background-color) font-semibold cursor-pointer transition-colors duration-150 leading-none border-0 [appearance:none];
+
+  &:hover {
+    @apply text-primary;
+  }
+
+  &:focus-visible {
+    @apply outline-2 outline-primary outline-offset-2;
+  }
+}
+
+.workflow-stage-tab--active {
+  @apply text-primary font-semibold;
+}
+
+.tab-label {
+  @apply inline-block relative;
+}
+
+.pivot-tab.active .tab-label::after,
+.workflow-stage-tab--active .tab-label::after {
+  content: "";
+  @apply absolute left-0 right-0 bg-primary;
+  height: 2px;
+  bottom: -7px;
+}
+
+.dialog-tab-list {
+  @apply flex items-center gap-1 ml-1;
 }
 
 .vertical-tab-separator {
@@ -1826,22 +1853,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .workflow-stage-header {
   @apply flex items-center gap-3 flex-nowrap;
-}
-
-.workflow-stage-tab {
-  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent transition-colors duration-150 leading-none;
-
-  &:hover {
-    @apply text-primary;
-  }
-
-  &:focus-visible {
-    @apply outline-2 outline-primary outline-offset-2;
-  }
-}
-
-.workflow-stage-tab--active {
-  @apply text-primary border-b-primary;
 }
 
 .workflow-stage-timer {

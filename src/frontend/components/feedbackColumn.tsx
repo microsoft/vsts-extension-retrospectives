@@ -138,6 +138,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   const [isCollapsed] = useState(false);
   const [columnNotesDraft, setColumnNotesDraft] = useState("");
   const [, setFocusedItemIndex] = useState(-1);
+  const [showColumnNotesTooltip, setShowColumnNotesTooltip] = useState(false);
 
   const columnRef = useRef<HTMLDivElement>(null);
   const editColumnNotesDialogRef = useRef<HTMLDialogElement>(null);
@@ -458,9 +459,16 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
             </button>
           )}
           {columnNotes && (
-            <button className="feedback-column-info-button" title={columnNotes} aria-label={`Column notes: ${columnNotes}`}>
-              {getIconElement("info")}
-            </button>
+            <div className="feedback-column-notes-wrapper" onMouseEnter={() => setShowColumnNotesTooltip(true)} onMouseLeave={() => setShowColumnNotesTooltip(false)}>
+              <button className="feedback-column-info-button" aria-label={`Column notes: ${columnNotes}`}>
+                {getIconElement("info")}
+              </button>
+              {showColumnNotesTooltip && (
+                <div className="column-notes-tooltip">
+                  {columnNotes}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

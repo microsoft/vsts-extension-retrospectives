@@ -952,10 +952,10 @@ describe("FeedbackBoardMetadataForm - Permissions Tab", () => {
   });
 
   it("should render permissions tab", async () => {
-    const user = userEvent.setup();
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-    const permissionsTab = screen.getByRole("tab", { name: /permissions/i });
+    const settingsTabs = screen.getByRole("tablist", { name: /board settings tabs/i });
+    const permissionsTab = within(settingsTabs).getByRole("tab", { name: /permissions/i });
     expect(permissionsTab).toBeInTheDocument();
   });
 
@@ -963,7 +963,8 @@ describe("FeedbackBoardMetadataForm - Permissions Tab", () => {
     const user = userEvent.setup();
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-    const permissionsTab = screen.getByRole("tab", { name: /permissions/i });
+    const settingsTabs = screen.getByRole("tablist", { name: /board settings tabs/i });
+    const permissionsTab = within(settingsTabs).getByRole("tab", { name: /permissions/i });
     await user.click(permissionsTab);
 
     expect(permissionsTab).toHaveAttribute("aria-selected", "true");

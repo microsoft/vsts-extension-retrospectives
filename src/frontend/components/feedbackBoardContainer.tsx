@@ -2041,13 +2041,13 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       <div className="flex items-center justify-start shrink-0">
         <div className="w-full">
           {state.currentBoard && (
-            <div className="flex items-center justify-start mt-2 ml-4 h-10">
+            <div className="flex items-center justify-start mt-2 ml-2 h-10">
               <div className="header-tabs">
                 <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
-                  Board
+                  <span className="tab-label">Board</span>
                 </div>
                 <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
-                  History
+                  <span className="tab-label">History</span>
                 </div>
               </div>
               {state.activeTab === "Board" && (
@@ -2209,7 +2209,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                           </button>
                         </>
                       )}
-                      <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
+                      <div className="flex flex-row gap-1" role="tablist" aria-label="Workflow stage">
                         <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} />
                         <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} />
                         <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} />
@@ -2349,6 +2349,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                     isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
                     hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
                     userId={state.currentUserId}
+                    isTeamAdmin={isCurrentUserTeamAdmin()}
                     onVoteCasted={updateCurrentVoteCount}
                     onColumnNotesChange={persistColumnNotes}
                   />

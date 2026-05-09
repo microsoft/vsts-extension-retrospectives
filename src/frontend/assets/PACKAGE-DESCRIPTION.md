@@ -4,7 +4,7 @@ Don’t just ship your products — LEARN from them. Looking back is an essentia
 
 Team Retrospectives, a Microsoft Garage project, is an extension for Azure DevOps that provides a first-class experience for retrospectives and general feedback board scenarios.
 Collect feedback on your project milestones, organize and prioritize, and create and track actionable tasks to help your team improve over time.
-Optimized for both desktop and mobile.
+
 Celebrate the good, improve the bad, and increase productivity with Team Retrospectives.
 
 ![Desktop board](https://raw.githubusercontent.com/microsoft/vsts-extension-retrospectives/refs/heads/main/src/frontend/images/screenshots/board_desktop.jpg)

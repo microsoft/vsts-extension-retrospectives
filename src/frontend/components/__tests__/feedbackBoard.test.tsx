@@ -1793,6 +1793,28 @@ describe("FeedbackBoard Component", () => {
       const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
       expect(columnProps?.showColumnEditButton).toBe(false);
     });
+
+    it("shows column edit button when user is team admin even if not board creator", async () => {
+      const creatorBoard = {
+        ...mockedBoard,
+        createdBy: { ...mockedIdentity, id: "different-user-id" },
+      };
+      const propsWithTeamAdmin = {
+        ...mockedProps,
+        board: creatorBoard,
+        userId: "team-admin-user-id",
+        isTeamAdmin: true,
+      };
+
+      render(<FeedbackBoard {...propsWithTeamAdmin} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
+      expect(columnProps?.showColumnEditButton).toBe(true);
+    });
   });
 
   describe("Column Item Finding", () => {

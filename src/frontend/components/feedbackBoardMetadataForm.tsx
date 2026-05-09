@@ -1,7 +1,6 @@
 import React, { ChangeEvent, useState, useEffect, useRef, useCallback } from "react";
 import { List } from "@fluentui/react/lib/List";
 import { DocumentCardType, DocumentCard } from "@fluentui/react/lib/DocumentCard";
-import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { cn } from "../utilities/classNameHelper";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
@@ -155,6 +154,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   const [columnCardBeingEdited, setColumnCardBeingEdited] = useState<IFeedbackColumnCard | null>(null);
   const [isChooseColumnIconDialogOpen, setIsChooseColumnIconDialogOpen] = useState(false);
   const [permissions, setPermissions] = useState<IFeedbackBoardDocumentPermissions>(initialState.permissions);
+  const [activeMetadataTab, setActiveMetadataTab] = useState<"general" | "permissions">("general");
 
   const chooseColumnIconDialogRef = useRef<HTMLDialogElement>(null);
   const deleteColumnConfirmDialogRef = useRef<HTMLDialogElement>(null);
@@ -324,8 +324,16 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
 
   return (
     <div className="flex flex-col flex-nowrap" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
-      <Pivot>
-        <PivotItem headerText={"General"} aria-label="Board General Settings">
+      <div className="dialog-tab-list" role="tablist" aria-label="Board settings tabs">
+        <button type="button" role="tab" aria-selected={activeMetadataTab === "general"} className={cn("pivot-tab", activeMetadataTab === "general" && "active")} onClick={() => setActiveMetadataTab("general")}>
+          <span className="tab-label">General</span>
+        </button>
+        <button type="button" role="tab" aria-selected={activeMetadataTab === "permissions"} className={cn("pivot-tab", activeMetadataTab === "permissions" && "active")} onClick={() => setActiveMetadataTab("permissions")}>
+          <span className="tab-label">{t("feedback_board_permissions")}</span>
+        </button>
+      </div>
+      <div className="board-metadata-pivot-content">
+        {activeMetadataTab === "general" && (
           <div className="board-metadata-form">
             <section className="board-metadata-edit-column-settings">
               <h2 className="board-metadata-form-section-header">Board Settings</h2>
@@ -672,11 +680,11 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               </dialog>
             )}
           </div>
-        </PivotItem>
-        <PivotItem headerText={t("feedback_board_permissions")} aria-label={t("feedback_board_permission_settings")}>
+        )}
+        {activeMetadataTab === "permissions" && (
           <FeedbackBoardMetadataFormPermissions board={currentBoard} permissions={permissions} permissionOptions={availablePermissionOptions} currentUserId={currentUserId} isNewBoardCreation={isNewBoardCreation} onPermissionChanged={(s: FeedbackBoardPermissionState) => setPermissions(s.permissions)} />
-        </PivotItem>
-      </Pivot>
+        )}
+      </div>
       <div className="inner">
         <button
           disabled={!isSaveButtonEnabled()}

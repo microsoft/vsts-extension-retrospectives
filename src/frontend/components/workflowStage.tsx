@@ -43,7 +43,7 @@ const WorkflowStage: React.FC<IWorkflowStageProps> = ({ display, value, isActive
 
   return (
     <div className={classes} aria-setsize={4} aria-posinset={ariaPosInSet} aria-label={display} aria-selected={isActive} role="tab" onClick={handleClick} onKeyDown={combinedKeyDown} onMouseMove={trackActivity} onTouchStart={trackActivity} tabIndex={0}>
-      <p className="stage-text">{display}</p>
+      <span className="tab-label">{display}</span>
     </div>
   );
 };

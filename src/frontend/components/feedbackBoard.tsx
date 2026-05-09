@@ -29,6 +29,7 @@ export interface FeedbackBoardProps {
   hideFeedbackItems: boolean;
   onFocusModeModelChange?: (model: FocusModeModel) => void;
   userId: string;
+  isTeamAdmin?: boolean;
   onVoteCasted?: () => void;
   onColumnNotesChange?: (columnId: string, notes: string) => Promise<void>;
 }
@@ -77,7 +78,7 @@ const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
   return resetFocusForStateColumns;
 };
 
-export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange }) => {
+export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, isTeamAdmin, onVoteCasted, onColumnNotesChange }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoard");
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -688,7 +689,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   }, [getFocusModeModel, onFocusModeModelChange]);
 
   const getFeedbackColumnPropsList = useCallback((): FeedbackColumnProps[] => {
-    const canCurrentUserEditBoard = board.createdBy?.id === userId;
+    const canCurrentUserEditBoard = board.createdBy?.id === userId || !!isTeamAdmin;
 
     return columnIds.map((columnId, index) => {
       return {
