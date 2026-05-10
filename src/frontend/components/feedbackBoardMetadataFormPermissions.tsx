@@ -211,7 +211,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                 const isBoardOwner: boolean = props.isNewBoardCreation ? option.id === props.currentUserId : option.id === props.board?.createdBy?.id;
                 return (
                   <tr key={option.id} className="option-row">
-                    <td>
+                    <td className="cell-checkbox">
                       <input
                         className="my-2"
                         id={`permission-option-${option.id}`}

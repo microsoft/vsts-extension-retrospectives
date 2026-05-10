@@ -534,11 +534,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
   & .board-metadata-form-section-information {
-    @apply m-2.5;
+    @apply mt-2.5 mx-2.5 mb-0;
   }
 
   & .search-bar {
-    @apply pt-0 px-2.5 pb-2.5;
+    @apply pt-2.5 px-2.5 pb-2.5;
 
     & .permission-search-input {
       @apply w-full p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
@@ -546,7 +546,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-table-container {
-    @apply max-h-85 overflow-auto;
+    @apply overflow-auto;
+    max-height: calc(80vh - 255px);
+  }
+
+  &:not(:has(> .board-metadata-form-section-information)) .board-metadata-table-container {
+    max-height: calc(80vh - 210px);
   }
 
   & .board-metadata-table {
@@ -556,16 +561,28 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply text-(--text-primary-color) p-2.5;
     }
 
+    & :is(td, th):first-child {
+      @apply w-[10%];
+    }
+
+    & :is(td, th).cell-checkbox {
+      @apply pr-5 pl-5;
+    }
+
+    & th:not(.cell-checkbox) {
+      @apply pl-1;
+    }
+
     & th {
       @apply sticky bg-(--background-color) border-b border-(--border-subtle-color) top-0 z-1;
 
       &.cell-checkbox {
-        @apply w-7.5;
+        @apply w-5;
       }
     }
 
     & .option-row td.cell-content {
-      @apply bg-(--background-color);
+      @apply bg-(--background-color) pl-1;
 
       & .content-image {
         @apply flex pr-2.5;
@@ -1638,6 +1655,22 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .title-input-container .ms-TextField-errorMessage {
     @apply -ml-20;
   }
+}
+
+.board-metadata-dialog[open]:has(.board-metadata-form-permissions) {
+  overflow: hidden;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.board-metadata-dialog[open]:has(.board-metadata-form-permissions) > *:not(.header) {
+  flex: 1;
+  min-height: 0;
+}
+
+.board-metadata-dialog[open]:has(.board-metadata-form-permissions) .inner {
+  margin-top: auto;
 }
 
 .board-metadata-dialog .header,
